@@ -22,6 +22,8 @@ export class HistoryController implements ReactiveController {
     (this.host = host).addController(this);
   }
   hostConnected() {
+    this.url = new URL(window.location.href);
+    this.state = window.history.state as HistoryState;
     this.popstateListener = (event: PopStateEvent) => {
       this.url = new URL(window.location.href);
       this.state = event.state as HistoryState;

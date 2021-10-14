@@ -5,8 +5,17 @@ import { customElement, property } from "lit/decorators.js";
 import { bootstrapCss } from ".";
 import { HistoryController } from "./history-controller";
 
-@customElement("pw-a")
-export class PwA extends LitElement {
+// this works really bad because bootstrap css styles usually need context information which is not there with this.
+export const aClick = (event: MouseEvent) => {
+  event.preventDefault();
+  HistoryController.goto(
+    new URL((event.target as HTMLAnchorElement).href, window.location.href),
+    {}
+  );
+};
+
+@customElement("pw-a-dontuse")
+export class PwADontUse extends LitElement {
   @property({ type: String })
   href: string;
 
@@ -15,6 +24,16 @@ export class PwA extends LitElement {
 
   @property({ type: String })
   role: "button";
+
+  @property({ type: String })
+  ariaCurrent:
+    | "page"
+    | "step"
+    | "location"
+    | "date"
+    | "time"
+    | "true"
+    | "false";
 
   clickHandler = (event: MouseEvent) => {
     event.preventDefault();
@@ -26,6 +45,7 @@ export class PwA extends LitElement {
         href=${this.href}
         class=${this.class}
         role=${this.role}
+        aria-current=${this.ariaCurrent}
         @click=${this.clickHandler}
         ><slot></slot
       ></a>`;
