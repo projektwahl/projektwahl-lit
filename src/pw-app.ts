@@ -1,18 +1,37 @@
-// SPDX-License-Identifier: AGPL-3.0-or-later
+import "./routes/login"; // SPDX-License-Identifier: AGPL-3.0-or-later
 // SPDX-FileCopyrightText: 2021 Moritz Hedtke <Moritz.Hedtke@t-online.de>
-import { html, LitElement } from "lit";
-import { customElement } from "lit/decorators.js";
+import { html, LitElement, TemplateResult } from "lit";
+import { customElement, state } from "lit/decorators.js";
 import { bootstrapCss } from ".";
 import { HistoryController } from "./history-controller";
 import { aClick } from "./pw-a";
 import { classMap } from "lit/directives/class-map.js";
+import { until } from "lit/directives/until.js";
+import { pwLogin } from "./routes/login";
 
 @customElement("pw-app")
 export class PwApp extends LitElement {
   private history = new HistoryController(this);
 
+  @state()
+  private last: Promise<TemplateResult>;
+
+  @state()
+  private current: Promise<TemplateResult>;
+
+  constructor() {
+    super();
+    this.current = Promise.resolve(html`Loading...`);
+  }
+
   render() {
-    return html` ${bootstrapCss}
+    this.last = this.current;
+    this.current =
+      this.history.url.pathname === "/login"
+        ? pwLogin()
+        : Promise.resolve(html`Not Found`);
+    return html`
+      ${bootstrapCss}
       <nav
         class="navbar navbar-expand-lg navbar-light bg-light shadow p-3 mb-5"
       >
@@ -92,6 +111,9 @@ export class PwApp extends LitElement {
             </ul>
           </div>
         </div>
-      </nav>`;
+      </nav>
+
+      ${until(this.current, this.last)}
+    `;
   }
 }

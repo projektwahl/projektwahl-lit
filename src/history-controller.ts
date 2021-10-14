@@ -18,6 +18,8 @@ export class HistoryController implements ReactiveController {
     }>
   ) => void;
 
+  testAsyncIterable: AsyncIterable<URL>;
+
   constructor(host: ReactiveControllerHost) {
     (this.host = host).addController(this);
   }
@@ -41,6 +43,20 @@ export class HistoryController implements ReactiveController {
       this.host.requestUpdate();
     }),
       window.addEventListener("navigate", this.navigateListener);
+
+    /*
+      // this doesn't work which I already expected
+      this.testAsyncIterable = {
+        async* [Symbol.asyncIterator]() {
+            yield new URL(window.location.href);
+            window.addEventListener("navigate", (event: CustomEvent<{
+              url: URL;
+              state: HistoryState;
+            }>) => {
+              yield event.detail.url
+            })
+        }
+    };*/
   }
   hostDisconnected() {
     window.removeEventListener("popstate", this.popstateListener);
