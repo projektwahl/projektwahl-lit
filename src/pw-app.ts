@@ -21,7 +21,6 @@ export class PwApp extends LitElement {
 
   constructor() {
     super();
-    this.current = Promise.resolve(html`Loading...`);
   }
 
   render() {
@@ -112,6 +111,17 @@ export class PwApp extends LitElement {
           </div>
         </div>
       </nav>
+
+      <div
+        style="position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);"
+      >
+        ${until(
+          this.current.then(() => undefined),
+          html`<div class="spinner-grow text-primary" role="status">
+            <span class="visually-hidden">Loading...</span>
+          </div>`
+        )}
+      </div>
 
       ${until(this.current, this.last)}
     `;
