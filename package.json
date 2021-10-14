@@ -16,7 +16,7 @@
   "description": "Software to manage choosing projects and automatically assigning people to projects.",
   "type": "module",
   "scripts": {
-    "start": "web-dev-server --node-resolve --open --config web-dev-server-config.mjs",
+    "start": "web-dev-server --node-resolve --app-index index.html --open --config web-dev-server-config.mjs",
     "format": "prettier --write .",
     "check:format": "prettier --check .",
     "prepare": "husky install",
