@@ -29,6 +29,11 @@ export class PwInput extends LitElement {
     this.randomId = "id" + Math.random().toString().replace(".", "");
   }
 
+  // because forms in shadow root are garbage
+  protected createRenderRoot() {
+    return this;
+  }
+
   render() {
     return html`
       ${bootstrapCss}

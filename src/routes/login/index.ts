@@ -17,7 +17,7 @@ export class PwLogin extends LitElement {
   data: string;
 
   login = (event: SubmitEvent) => {
-    event.preventDefault();
+    //event.preventDefault();
   };
 
   // https://www.chromestatus.com/feature/4708990554472448
