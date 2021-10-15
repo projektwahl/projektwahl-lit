@@ -5,6 +5,7 @@
     "name": "Moritz Hedtke",
     "email": "Moritz.Hedtke@t-online.de"
   },
+  "main": "index.ts",
   "bugs": {
     "url": "https://github.com/mohe2015/projektwahl-lit/issues"
   },
@@ -20,7 +21,8 @@
     "format": "prettier --write .",
     "check:format": "prettier --check .",
     "prepare": "husky install",
-    "lint": "eslint ."
+    "lint": "eslint .",
+    "server": "esbuild index.ts | node --input-type=module --trace-sync-io"
   },
   "license": "AGPL-3.0-or-later",
   "devDependencies": {
@@ -36,6 +38,8 @@
     "typescript": "^4.4.4"
   },
   "dependencies": {
+    "esbuild": "^0.13.6",
+    "express": "^4.17.1",
     "lit": "^2.0.2"
   }
 }
