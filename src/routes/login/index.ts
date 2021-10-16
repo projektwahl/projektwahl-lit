@@ -16,7 +16,7 @@ export const pwLogin = async (): Promise<TemplateResult> => {
 export class PwLogin extends LitElement {
   private history = new HistoryController(this);
 
-  data: string;
+  data!: string;
 
   form: Ref<HTMLFormElement> = createRef();
 

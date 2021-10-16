@@ -15,10 +15,10 @@ export class PwApp extends LitElement {
   private history = new HistoryController(this);
 
   @state()
-  private last: Promise<TemplateResult>;
+  private last?: Promise<TemplateResult>;
 
   @state()
-  private current: Promise<TemplateResult>;
+  private current!: Promise<TemplateResult>;
 
   constructor() {
     super();

@@ -4,8 +4,8 @@ import { html, LitElement } from "lit";
 import { customElement, property } from "lit/decorators.js";
 import { bootstrapCss } from ".";
 import { HistoryController } from "./history-controller";
+import { ifDefined } from "lit/directives/if-defined.js";
 
-// this works really bad because bootstrap css styles usually need context information which is not there with this.
 export const aClick = (event: MouseEvent) => {
   event.preventDefault();
   HistoryController.goto(
@@ -14,19 +14,25 @@ export const aClick = (event: MouseEvent) => {
   );
 };
 
+// this works really bad because bootstrap css styles usually need context information which is not there with this.
 @customElement("pw-a-dontuse")
 export class PwADontUse extends LitElement {
-  @property({ type: String })
-  href: string;
+  // with this this may actually be usable again
+  protected createRenderRoot() {
+    return this;
+  }
 
   @property({ type: String })
-  class: string;
+  href!: string;
 
   @property({ type: String })
-  role: "button";
+  class?: string;
 
   @property({ type: String })
-  ariaCurrent:
+  role?: "button";
+
+  @property({ type: String })
+  ariaCurrent!:
     | "page"
     | "step"
     | "location"
@@ -42,10 +48,10 @@ export class PwADontUse extends LitElement {
 
   render() {
     return html`${bootstrapCss}<a
-        href=${this.href}
-        class=${this.class}
-        role=${this.role}
-        aria-current=${this.ariaCurrent}
+        href=${ifDefined(this.href)}
+        class=${ifDefined(this.class)}
+        role=${ifDefined(this.role)}
+        aria-current=${ifDefined(this.ariaCurrent)}
         @click=${this.clickHandler}
         ><slot></slot
       ></a>`;

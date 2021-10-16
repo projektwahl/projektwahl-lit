@@ -10,16 +10,16 @@ export class PwInput extends LitElement {
   private history = new HistoryController(this);
 
   @property({ type: String })
-  label: string;
+  label!: string;
 
   @property({ type: String })
-  type: "text" | "password";
+  type!: "text" | "password";
 
   @property({ type: String })
-  name: string;
+  name!: string;
 
   @property({ type: String })
-  autocomplete: "username" | "current-password";
+  autocomplete!: "username" | "current-password";
 
   @state()
   randomId: string;

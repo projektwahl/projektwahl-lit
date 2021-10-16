@@ -5,7 +5,15 @@ import morgan from "morgan";
 import { v4 as uuidv4 } from "uuid";
 import multer from "multer";
 import bodyParser from "body-parser";
+import { z } from "zod";
 
+// https://learning-notes.mistermicheels.com/javascript/typescript/runtime-type-checking/
+// https://www.azavea.com/blog/2020/10/29/run-time-type-checking-in-typescript-with-io-ts/
+// io-ts
+// https://github.com/colinhacks/zod
+// https://trpc.io/
+// https://www.npmjs.com/package/zod#comparison
+// https://www.npmjs.com/package/yup
 
 const aMulter = multer({
   limits: {
@@ -46,8 +54,15 @@ app.get("/", function (req, res) {
   res.send("hello world");
 });
 
+const loginInputSchema = z.object({
+  username: z.string().min(3).max(100),
+  password: z.string(),
+});
+
+type LoginInputType = z.infer<typeof loginInputSchema>;
+
 app.post("/api/v1/login", function (req, res) {
-  console.log(req.body);
+  const user = loginInputSchema.parse(req.body);
 
   res.send("hello world");
 });
