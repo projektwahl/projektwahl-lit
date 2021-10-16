@@ -18,7 +18,7 @@ export const aClick = (event: MouseEvent) => {
 @customElement("pw-a-dontuse")
 export class PwADontUse extends LitElement {
   // with this this may actually be usable again
-  protected createRenderRoot() {
+  protected override createRenderRoot() {
     return this;
   }
 
@@ -32,7 +32,7 @@ export class PwADontUse extends LitElement {
   role?: "button";
 
   @property({ type: String })
-  ariaCurrent!:
+  override ariaCurrent!:
     | "page"
     | "step"
     | "location"
@@ -46,7 +46,7 @@ export class PwADontUse extends LitElement {
     HistoryController.goto(new URL(this.href, window.location.href), {});
   };
 
-  render() {
+  override render() {
     return html`${bootstrapCss}<a
         href=${ifDefined(this.href)}
         class=${ifDefined(this.class)}

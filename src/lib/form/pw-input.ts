@@ -30,11 +30,11 @@ export class PwInput extends LitElement {
   }
 
   // because forms in shadow root are garbage
-  protected createRenderRoot() {
+  protected override createRenderRoot() {
     return this;
   }
 
-  render() {
+  override render() {
     return html`
       ${bootstrapCss}
       <div class="mb-3">

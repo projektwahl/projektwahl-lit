@@ -47,7 +47,7 @@ if ('FormDataEvent' in window) {
 }
   */
 
-  render() {
+  override render() {
     return html`
       ${bootstrapCss}
       <main class="container">

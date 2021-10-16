@@ -24,7 +24,7 @@ export class PwApp extends LitElement {
     super();
   }
 
-  render() {
+  override render() {
     this.last = this.current;
     this.current =
       this.history.url.pathname === "/login"
