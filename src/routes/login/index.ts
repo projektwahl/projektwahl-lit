@@ -65,7 +65,7 @@ if ('FormDataEvent' in window) {
                 type="text"
                 autocomplete="username"
                 label="Name"
-                name="name"
+                name="username"
               ></pw-input>
               <pw-input
                 label="Passwort"

@@ -56,7 +56,7 @@ app.get("/", function (req, res) {
 
 const loginInputSchema = z.object({
   username: z.string().min(3).max(100),
-  password: z.string(),
+  password: z.string().min(6).max(1024),
 });
 
 type LoginInputType = z.infer<typeof loginInputSchema>;
