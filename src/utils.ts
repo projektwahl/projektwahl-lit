@@ -13,5 +13,5 @@ export async function myFetch<P extends keyof Routes>(
       `Network response was not OK: ${response.status} ${response.statusText}`
     );
   }
-  return await response.json() as Routes[P];
+  return (await response.json()) as Routes[P];
 }

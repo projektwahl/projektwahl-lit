@@ -23,7 +23,8 @@ export class PwLogin extends LitElement {
   login = async (event: SubmitEvent) => {
     event.preventDefault();
 
-    const formData = new FormData(this.form.value);
+    // @ts-expect-error doesn't contain files so this is fine
+    const formData = new URLSearchParams(new FormData(this.form.value));
 
     const result = await myFetch("/api/v1/login", {
       method: "POST",
