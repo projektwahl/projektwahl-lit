@@ -8,7 +8,12 @@ const app = express();
 app.get("/", function (req, res) {
   res.send("hello world");
 });
-const server = app.listen(3000);
+
+app.post("/api/v1/login", function (req, res) {
+  res.send("hello world");
+});
+
+const server = app.listen(9001);
 
 process.on("SIGINT", () => {
   console.log("SIGINT signal received: closing HTTP server");

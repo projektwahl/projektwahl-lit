@@ -2,8 +2,10 @@ import "../../lib/form/pw-input"; // SPDX-License-Identifier: AGPL-3.0-or-later
 // SPDX-FileCopyrightText: 2021 Moritz Hedtke <Moritz.Hedtke@t-online.de>
 import { html, LitElement, TemplateResult } from "lit";
 import { customElement } from "lit/decorators.js";
+import { createRef, Ref, ref } from "lit/directives/ref.js";
 import { bootstrapCss } from "../..";
 import { HistoryController } from "../../history-controller";
+import { myFetch } from "../../utils";
 
 export const pwLogin = async (): Promise<TemplateResult> => {
   const content = await fetch("./index.html").then((r) => r.text());
@@ -16,8 +18,17 @@ export class PwLogin extends LitElement {
 
   data: string;
 
-  login = (event: SubmitEvent) => {
-    //event.preventDefault();
+  form: Ref<HTMLFormElement> = createRef();
+
+  login = async (event: SubmitEvent) => {
+    event.preventDefault();
+
+    const formData = new FormData(this.form.value);
+
+    const result = await myFetch("/api/v1/login", {
+      method: "POST",
+      body: formData,
+    });
   };
 
   // https://www.chromestatus.com/feature/4708990554472448
@@ -43,7 +54,12 @@ if ('FormDataEvent' in window) {
 
         <div class="row justify-content-center">
           <div class="col-md-7 col-lg-8">
-            <form method="POST" action="/no-javascript" @submit=${this.login}>
+            <form
+              ${ref(this.form)}
+              method="POST"
+              action="/no-javascript"
+              @submit=${this.login}
+            >
               <pw-input
                 type="text"
                 autocomplete="username"
