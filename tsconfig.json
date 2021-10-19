@@ -17,6 +17,7 @@
     "noImplicitReturns": true,
     "forceConsistentCasingInFileNames": true,
     "noImplicitOverride": true,
+    "noPropertyAccessFromIndexSignature": true,
     "exactOptionalPropertyTypes": true
   },
   "include": ["**/*.ts"],

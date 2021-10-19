@@ -1,14 +1,14 @@
 import "../../lib/form/pw-input"; // SPDX-License-Identifier: AGPL-3.0-or-later
 // SPDX-FileCopyrightText: 2021 Moritz Hedtke <Moritz.Hedtke@t-online.de>
 import { html, LitElement, TemplateResult } from "lit";
-import { customElement } from "lit/decorators.js";
+import { customElement, state } from "lit/decorators.js";
 import { createRef, Ref, ref } from "lit/directives/ref.js";
 import { bootstrapCss } from "../..";
 import { HistoryController } from "../../history-controller";
 import { myFetch } from "../../utils";
 
 export const pwLogin = async (): Promise<TemplateResult> => {
-  const content = await fetch("./index.html").then((r) => r.text());
+  const content = await fetch("/api/v1/sleep").then((r) => r.text());
   return html`<pw-login .data=${content}></pw-login>`;
 };
 
@@ -20,13 +20,16 @@ export class PwLogin extends LitElement {
 
   form: Ref<HTMLFormElement> = createRef();
 
-  login = async (event: SubmitEvent) => {
+  @state()
+  result: Promise<unknown> = Promise.resolve();
+
+  login = (event: SubmitEvent) => {
     event.preventDefault();
 
     // @ts-expect-error doesn't contain files so this is fine
     const formData = new URLSearchParams(new FormData(this.form.value));
 
-    const result = await myFetch("/api/v1/login", {
+    this.result = myFetch("/api/v1/login", {
       method: "POST",
       body: formData,
     });
@@ -48,6 +51,7 @@ if ('FormDataEvent' in window) {
   */
 
   override render() {
+    console.log("rerender");
     return html`
       ${bootstrapCss}
       <main class="container">
@@ -66,12 +70,14 @@ if ('FormDataEvent' in window) {
                 autocomplete="username"
                 label="Name"
                 name="username"
+                .result=${this.result}
               ></pw-input>
               <pw-input
                 label="Passwort"
                 name="password"
                 type="password"
                 autocomplete="current-password"
+                .result=${this.result}
               ></pw-input>
 
               <button type="submit" class="btn btn-primary">Login</button>

@@ -62,9 +62,19 @@ const loginInputSchema = z.object({
 type LoginInputType = z.infer<typeof loginInputSchema>;
 
 app.post("/api/v1/login", function (req, res) {
-  const user = loginInputSchema.parse(req.body);
+  const user = loginInputSchema.safeParse(req.body);
 
-  res.send("hello world");
+  if (user.success) {
+    res.json(user);
+  } else {
+    res.json(user);
+  }
+});
+
+app.get("/api/v1/sleep", function (req, res) {
+  setTimeout(() => {
+    res.send("hello world");
+  }, 1000);
 });
 
 const server = app.listen(9001);
