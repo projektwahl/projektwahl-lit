@@ -11,5 +11,5 @@ type TestResponse = number;
 export type Routes = {
   "/api/v1/login": LoginResponse;
   "/api/v1/test": TestResponse;
-  "/api/v1/sleep": string
+  "/api/v1/sleep": string;
 };

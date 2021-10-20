@@ -2,8 +2,8 @@
 // SPDX-FileCopyrightText: 2021 Moritz Hedtke <Moritz.Hedtke@t-online.de>
 import { AsyncDirective, directive } from "lit/async-directive.js";
 
-class PromiseDirective<T, Q> extends AsyncDirective {
-  render(
+class PromiseDirective extends AsyncDirective {
+  render<T, Q>(
     promise: Promise<T>,
     defaultValue: Q,
     resolveMapper: (v: T) => Q,
@@ -22,4 +22,6 @@ class PromiseDirective<T, Q> extends AsyncDirective {
     return defaultValue;
   }
 }
+
+// https://github.com/lit/lit/blob/main/packages/lit-html/src/directives/repeat.ts#L481
 export const promise = directive(PromiseDirective);

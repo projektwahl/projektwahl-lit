@@ -6,8 +6,8 @@ import { v4 as uuidv4 } from "uuid";
 import multer from "multer";
 import bodyParser from "body-parser";
 import { z } from "zod";
-import { get, post } from "./src/lib/express";
-import { zod2result } from "./src/lib/result";
+import { get, post } from "./src/lib/express.js";
+import { zod2result } from "./src/lib/result.js";
 
 // https://learning-notes.mistermicheels.com/javascript/typescript/runtime-type-checking/
 // https://www.azavea.com/blog/2020/10/29/run-time-type-checking-in-typescript-with-io-ts/
@@ -58,13 +58,14 @@ app.get("/", function (req, res) {
 
 const loginInputSchema = z.object({
   username: z.string().min(3).max(100),
-  password: z.string().min(6).max(1024),
+  password: z.string().min(6).max(1024).regex(/ffa/),
 });
 
 type LoginInputType = z.infer<typeof loginInputSchema>;
 
 post(app, "/api/v1/login", function (req, res) {
-  const user = zod2result(loginInputSchema.safeParse(req.body));
+  let zodResult = loginInputSchema.safeParse(req.body);
+  const user = zod2result(zodResult);
 
   res.json(user);
 });
