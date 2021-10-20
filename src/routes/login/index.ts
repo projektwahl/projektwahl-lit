@@ -6,6 +6,7 @@ import { createRef, Ref, ref } from "lit/directives/ref.js";
 import { bootstrapCss } from "../..";
 import { HistoryController } from "../../history-controller";
 import { myFetch } from "../../utils";
+import { LoginResponse } from "../../routes";
 
 export const pwLogin = async (): Promise<TemplateResult> => {
   const content = await fetch("/api/v1/sleep").then((r) => r.text());
@@ -21,7 +22,7 @@ export class PwLogin extends LitElement {
   form: Ref<HTMLFormElement> = createRef();
 
   @state()
-  result: Promise<unknown> = Promise.resolve();
+  result: Promise<LoginResponse> = Promise.resolve({result: "none"});
 
   login = (event: SubmitEvent) => {
     event.preventDefault();

@@ -4,7 +4,7 @@ import { html, LitElement, noChange } from "lit";
 import { customElement, property, state } from "lit/decorators.js";
 import { bootstrapCss } from "../..";
 import { HistoryController } from "../../history-controller";
-import { Result } from "../result";
+import { OptionalResult, Result } from "../result";
 import { promise } from "./promise-directive";
 
 @customElement("pw-input")
@@ -27,7 +27,7 @@ export class PwInput<T> extends LitElement {
   randomId: string;
 
   @property({ attribute: false })
-  result?: Promise<Result<T>>;
+  result?: Promise<OptionalResult<T>>;
 
   constructor() {
     super();
