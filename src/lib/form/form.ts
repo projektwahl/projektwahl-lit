@@ -1,36 +1,38 @@
-import "../../lib/form/pw-input"; // SPDX-License-Identifier: AGPL-3.0-or-later
+import "./pw-input"; // SPDX-License-Identifier: AGPL-3.0-or-later
 // SPDX-FileCopyrightText: 2021 Moritz Hedtke <Moritz.Hedtke@t-online.de>
-import { html, LitElement, TemplateResult } from "lit";
+import { html, LitElement, noChange, TemplateResult } from "lit";
 import { customElement, state } from "lit/decorators.js";
 import { createRef, Ref, ref } from "lit/directives/ref.js";
 import { bootstrapCss } from "../..";
 import { HistoryController } from "../../history-controller";
 import { myFetch } from "../../utils";
-import { LoginResponse } from "../../routes";
+import { LoginResponse, Routes } from "../../routes";
+import { isErr, OptionalResult, Result } from "../result";
+import { promise } from "./promise-directive";
 
-export const pwLogin = async (): Promise<TemplateResult> => {
-  const content = await fetch("/api/v1/sleep").then((r) => r.text());
-  return html`<pw-login .data=${content}></pw-login>`;
-};
-
-@customElement("pw-login")
-export class PwLogin extends LitElement {
+@customElement("pw-form")
+export class PwForm<P extends keyof Routes> extends LitElement {
   private history = new HistoryController(this);
+
+  url!: P;
+
+  actionText!: string;
 
   data!: string;
 
   form: Ref<HTMLFormElement> = createRef();
 
   @state()
-  result: Promise<LoginResponse> = Promise.resolve({ result: "none" });
+  result: Promise<OptionalResult<Routes[P], { network?: string; } & { [key in keyof Routes[P]]?: string }>> = Promise.resolve({ result: "none" });
 
-  login = (event: SubmitEvent) => {
+  submit = (event: SubmitEvent) => {
     event.preventDefault();
 
     // @ts-expect-error doesn't contain files so this is fine
     const formData = new URLSearchParams(new FormData(this.form.value));
 
-    this.result = myFetch("/api/v1/login", {
+    // "/api/v1/login"
+    this.result = myFetch(this.url, {
       method: "POST",
       body: formData,
     });
@@ -56,7 +58,29 @@ if ('FormDataEvent' in window) {
     return html`
       ${bootstrapCss}
       <main class="container">
-        <h1 class="text-center">Login</h1>
+        <h1 class="text-center">${this.actionText}</h1>
+
+        ${promise<OptionalResult<Routes[P], {
+    network?: string;
+} & { [key in keyof Routes[P]]?: string; }>, symbol | TemplateResult | undefined>(
+          this.result,
+          noChange,
+          (v) =>
+            isErr(v)
+              ? html` <div
+                  id="network-feedback"
+                  class="invalid-feedback"
+                >
+                  ${v.failure.network}
+                </div>`
+              : undefined,
+          (v) => html` <div
+            id="network-feedback"
+            class="invalid-feedback"
+          >
+            ${v.failure.network}
+          </div>`
+        )}
 
         <div class="row justify-content-center">
           <div class="col-md-7 col-lg-8">
@@ -64,24 +88,12 @@ if ('FormDataEvent' in window) {
               ${ref(this.form)}
               method="POST"
               action="/no-javascript"
-              @submit=${this.login}
+              @submit=${this.submit}
             >
-              <pw-input
-                type="text"
-                autocomplete="username"
-                label="Name"
-                name="username"
-                .result=${this.result}
-              ></pw-input>
-              <pw-input
-                label="Passwort"
-                name="password"
-                type="password"
-                autocomplete="current-password"
-                .result=${this.result}
-              ></pw-input>
+              <slot></slot>
+             
 
-              <button type="submit" class="btn btn-primary">Login</button>
+              <button type="submit" class="btn btn-primary">${this.actionText}</button>
             </form>
           </div>
         </div>

@@ -4,12 +4,10 @@
 import { OptionalResult, Result } from "./lib/result";
 import { Existing, RawUserType } from "./lib/types";
 
-export type LoginResponse = OptionalResult<Existing<RawUserType>>;
+export type LoginResponse = Existing<RawUserType>;
 
-export type TestResponse = number;
 
 export type Routes = {
   "/api/v1/login": LoginResponse;
-  "/api/v1/test": TestResponse;
-  "/api/v1/sleep": string;
+  "/api/v1/sleep": {};
 };
