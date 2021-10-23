@@ -1,6 +1,5 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // SPDX-FileCopyrightText: 2021 Moritz Hedtke <Moritz.Hedtke@t-online.de>
-import { fdatasyncSync } from "fs";
 import { html, LitElement, noChange, TemplateResult } from "lit";
 import { customElement, property, state } from "lit/decorators.js";
 import { bootstrapCss } from "../..";
@@ -28,7 +27,9 @@ export class PwInput<T> extends LitElement {
   randomId: string;
 
   @property({ attribute: false })
-  result!: Promise<OptionalResult<T>>;
+  result!: Promise<
+    OptionalResult<T, { network?: string } & { [key in keyof T]?: string }>
+  >;
 
   constructor() {
     super();
@@ -58,13 +59,22 @@ export class PwInput<T> extends LitElement {
         <input
           type=${this.type}
           class="form-control ${promise<
-            OptionalResult<T, { [key in keyof T]: string }>,
+            OptionalResult<
+              T,
+              { network?: string } & { [key in keyof T]?: string }
+            >,
             string | symbol | undefined
           >(
             this.result,
             noChange,
-            (v) => (isErr(v) ? "is-invalid" : undefined),
-            (e) => "is-invalid"
+            (v) =>
+              isErr(v) && v.failure[this.name] !== undefined
+                ? "is-invalid"
+                : (isErr(v) && v.failure.network !== undefined) ||
+                  v.result === "none"
+                ? undefined
+                : "is-valid",
+            (e) => undefined
           )}"
           name=${this.name.toString()}
           id=${this.randomId}
@@ -72,13 +82,16 @@ export class PwInput<T> extends LitElement {
           autocomplete=${this.autocomplete}
         />
         ${promise<
-          OptionalResult<T, { [key in keyof T]: string }>,
+          OptionalResult<
+            T,
+            { network?: string } & { [key in keyof T]?: string }
+          >,
           TemplateResult | symbol | undefined
         >(
           this.result,
           noChange,
           (v) =>
-            isErr(v)
+            isErr(v) && v.failure[this.name] !== undefined
               ? html` <div
                   id="${this.randomId}-feedback"
                   class="invalid-feedback"
@@ -86,12 +99,7 @@ export class PwInput<T> extends LitElement {
                   ${v.failure[this.name]}
                 </div>`
               : undefined,
-          (v) => html` <div
-            id="${this.randomId}-feedback"
-            class="invalid-feedback"
-          >
-            ${v.failure[this.name]}
-          </div>`
+          (e) => undefined
         )}
       </div>
     `;

@@ -6,6 +6,7 @@ import { bootstrapCss } from ".";
 import { HistoryController } from "./history-controller";
 import { ifDefined } from "lit/directives/if-defined.js";
 
+// TODO FIXME https://lit.dev/docs/components/events/#shadowdom-retargeting just use the approach shown there
 export const aClick = (event: MouseEvent) => {
   event.preventDefault();
   HistoryController.goto(

@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // SPDX-FileCopyrightText: 2021 Moritz Hedtke <Moritz.Hedtke@t-online.de>
-import "./lib/form/form";
+import "./lib/form/pw-form";
 import { html, LitElement, TemplateResult } from "lit";
 import { customElement, state } from "lit/decorators.js";
 import { bootstrapCss } from ".";
@@ -8,7 +8,7 @@ import { HistoryController } from "./history-controller";
 import { aClick } from "./pw-a";
 import { classMap } from "lit/directives/class-map.js";
 import { until } from "lit/directives/until.js";
-import { pwLogin } from "./lib/form/form";
+import { pwLogin } from "./routes/login/pw-login";
 
 @customElement("pw-app")
 export class PwApp extends LitElement {

@@ -1,7 +1,7 @@
 import "./pw-input"; // SPDX-License-Identifier: AGPL-3.0-or-later
 // SPDX-FileCopyrightText: 2021 Moritz Hedtke <Moritz.Hedtke@t-online.de>
 import { html, LitElement, noChange, TemplateResult } from "lit";
-import { customElement, state } from "lit/decorators.js";
+import { customElement, property, state } from "lit/decorators.js";
 import { createRef, Ref, ref } from "lit/directives/ref.js";
 import { bootstrapCss } from "../..";
 import { HistoryController } from "../../history-controller";
@@ -14,16 +14,24 @@ import { promise } from "./promise-directive";
 export class PwForm<P extends keyof Routes> extends LitElement {
   private history = new HistoryController(this);
 
+  @property({ attribute: false })
   url!: P;
 
+  @property({ type: String })
   actionText!: string;
 
-  data!: string;
+  @property({ attribute: false })
+  fakeSlot!: TemplateResult;
 
   form: Ref<HTMLFormElement> = createRef();
 
   @state()
-  result: Promise<OptionalResult<Routes[P], { network?: string; } & { [key in keyof Routes[P]]?: string }>> = Promise.resolve({ result: "none" });
+  result: Promise<
+    OptionalResult<
+      Routes[P],
+      { network?: string } & { [key in keyof Routes[P]]?: string }
+    >
+  > = Promise.resolve({ result: "none" });
 
   submit = (event: SubmitEvent) => {
     event.preventDefault();
@@ -31,11 +39,17 @@ export class PwForm<P extends keyof Routes> extends LitElement {
     // @ts-expect-error doesn't contain files so this is fine
     const formData = new URLSearchParams(new FormData(this.form.value));
 
-    // "/api/v1/login"
     this.result = myFetch(this.url, {
       method: "POST",
       body: formData,
     });
+    // https://lit.dev/docs/components/events/#dispatching-events
+    const resultEvent = new CustomEvent("form-result", {
+      detail: this.result,
+      bubbles: true,
+      composed: true,
+    });
+    this.dispatchEvent(resultEvent);
   };
 
   // https://www.chromestatus.com/feature/4708990554472448
@@ -52,48 +66,58 @@ if ('FormDataEvent' in window) {
   // formdata event is supported
 }
   */
-
+  /*
+  // because forms in shadow root are garbage
+  protected override createRenderRoot() {
+    return this;
+  }
+*/
   override render() {
+    if (this.url === undefined || this.actionText === undefined) {
+      throw new Error("component not fully initialized");
+    }
+
     console.log("rerender");
     return html`
       ${bootstrapCss}
       <main class="container">
         <h1 class="text-center">${this.actionText}</h1>
 
-        ${promise<OptionalResult<Routes[P], {
-    network?: string;
-} & { [key in keyof Routes[P]]?: string; }>, symbol | TemplateResult | undefined>(
-          this.result,
-          noChange,
-          (v) =>
-            isErr(v)
-              ? html` <div
-                  id="network-feedback"
-                  class="invalid-feedback"
-                >
-                  ${v.failure.network}
-                </div>`
-              : undefined,
-          (v) => html` <div
-            id="network-feedback"
-            class="invalid-feedback"
-          >
-            ${v.failure.network}
-          </div>`
-        )}
-
         <div class="row justify-content-center">
           <div class="col-md-7 col-lg-8">
+            ${promise<
+              OptionalResult<
+                Routes[P],
+                {
+                  network?: string;
+                } & { [key in keyof Routes[P]]?: string }
+              >,
+              symbol | TemplateResult | undefined
+            >(
+              this.result,
+              noChange,
+              (v) =>
+                isErr(v) && v.failure.network !== undefined
+                  ? html` <div class="alert alert-danger" role="alert">
+                      ${v.failure.network}
+                    </div>`
+                  : undefined,
+              (v) => html` <div class="alert alert-danger" role="alert">
+                Unbekannter Fehler!
+              </div>`
+            )}
+
             <form
               ${ref(this.form)}
               method="POST"
               action="/no-javascript"
               @submit=${this.submit}
             >
-              <slot></slot>
-             
+              ${this.fakeSlot}
 
-              <button type="submit" class="btn btn-primary">${this.actionText}</button>
+              <button type="submit" class="btn btn-primary">
+                ${this.actionText}
+              </button>
             </form>
           </div>
         </div>
