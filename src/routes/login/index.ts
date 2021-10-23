@@ -22,7 +22,7 @@ export class PwLogin extends LitElement {
   form: Ref<HTMLFormElement> = createRef();
 
   @state()
-  result: Promise<LoginResponse> = Promise.resolve({result: "none"});
+  result: Promise<LoginResponse> = Promise.resolve({ result: "none" });
 
   login = (event: SubmitEvent) => {
     event.preventDefault();

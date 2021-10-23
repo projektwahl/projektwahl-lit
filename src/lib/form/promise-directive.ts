@@ -23,5 +23,17 @@ class PromiseDirective extends AsyncDirective {
   }
 }
 
+export type KeyFn<T> = (item: T, index: number) => unknown;
+export type ItemTemplate<T> = (item: T, index: number) => unknown;
+
+export interface PromiseDirectiveFn {
+  <T, Q>(
+    promise: Promise<T>,
+    defaultValue: Q,
+    resolveMapper: (v: T) => Q,
+    rejectMapper: (v: any) => Q
+  ): unknown;
+}
+
 // https://github.com/lit/lit/blob/main/packages/lit-html/src/directives/repeat.ts#L481
-export const promise = directive(PromiseDirective);
+export const promise = directive(PromiseDirective) as PromiseDirectiveFn;

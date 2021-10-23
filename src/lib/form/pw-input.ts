@@ -1,10 +1,11 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // SPDX-FileCopyrightText: 2021 Moritz Hedtke <Moritz.Hedtke@t-online.de>
-import { html, LitElement, noChange } from "lit";
+import { fdatasyncSync } from "fs";
+import { html, LitElement, noChange, TemplateResult } from "lit";
 import { customElement, property, state } from "lit/decorators.js";
 import { bootstrapCss } from "../..";
 import { HistoryController } from "../../history-controller";
-import { OptionalResult, Result } from "../result";
+import { isErr, OptionalResult, Result } from "../result";
 import { promise } from "./promise-directive";
 
 @customElement("pw-input")
@@ -12,22 +13,22 @@ export class PwInput<T> extends LitElement {
   private history = new HistoryController(this);
 
   @property({ type: String })
-  label?: string;
+  label!: string;
 
   @property({ type: String })
-  type?: "text" | "password";
+  type!: "text" | "password";
 
   @property({ type: String })
-  name?: string;
+  name!: keyof T;
 
   @property({ type: String })
-  autocomplete?: "username" | "current-password";
+  autocomplete!: "username" | "current-password";
 
   @state()
   randomId: string;
 
   @property({ attribute: false })
-  result?: Promise<OptionalResult<T>>;
+  result!: Promise<OptionalResult<T>>;
 
   constructor() {
     super();
@@ -56,26 +57,40 @@ export class PwInput<T> extends LitElement {
         <label for=${this.randomId} class="form-label">${this.label}:</label>
         <input
           type=${this.type}
-          class="form-control ${promise(
+          class="form-control ${promise<
+            OptionalResult<T, { [key in keyof T]: string }>,
+            string | symbol | undefined
+          >(
             this.result,
             noChange,
-            (v) => v,
+            (v) => (isErr(v) ? "is-invalid" : undefined),
             (e) => "is-invalid"
           )}"
-          name=${this.name}
+          name=${this.name.toString()}
           id=${this.randomId}
           aria-describedby="${this.randomId}-feedback"
           autocomplete=${this.autocomplete}
         />
-        ${promise(
+        ${promise<
+          OptionalResult<T, { [key in keyof T]: string }>,
+          TemplateResult | symbol | undefined
+        >(
           this.result,
           noChange,
-          (v) => undefined,
+          (v) =>
+            isErr(v)
+              ? html` <div
+                  id="${this.randomId}-feedback"
+                  class="invalid-feedback"
+                >
+                  ${v.failure[this.name]}
+                </div>`
+              : undefined,
           (v) => html` <div
             id="${this.randomId}-feedback"
             class="invalid-feedback"
           >
-            test
+            ${v.failure[this.name]}
           </div>`
         )}
       </div>
