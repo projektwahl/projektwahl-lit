@@ -163,6 +163,8 @@ for (const [pkgpath, pkg] of Object.entries(package_lock.packages)) {
         await gitClonePackage([pkgpath, pkg], package_json, `@web/dev-server-hmr@${pkg.version}`);
     } else if (pkgpath.endsWith("/@web/dev-server-rollup")) {
         await gitClonePackage([pkgpath, pkg], package_json, `@web/dev-server-rollup@${pkg.version}`);
+    } else if (pkgpath.endsWith("/@napi-rs/triples")) {
+        await gitClonePackage([pkgpath, pkg], package_json, `@napi-rs/triples@${pkg.version}`);
     } else if (pkgpath.endsWith("/@web/parse5-utils")) {
         await gitClonePackage([pkgpath, pkg], package_json, `@web/parse5-utils@${pkg.version}`);
     } else if (package_json.name === "uri-js" && package_json.version === "4.4.1") {
@@ -185,6 +187,12 @@ for (const [pkgpath, pkg] of Object.entries(package_lock.packages)) {
         await gitClonePackageCommit([pkgpath, pkg], package_json, "e7c9899a68797f8e891220b4c1a70456991a32a5")
     } else if (package_json.name === "fill-range" && package_json.version === "7.0.1") {
         await gitClonePackageCommit([pkgpath, pkg], package_json, "39f421b499d5c97b62e955c179fa34c062aab2a5")
+    } else if (package_json.name === "@open-wc/dev-server-hmr" && package_json.version === "0.1.2") {
+        await gitClonePackageCommit([pkgpath, pkg], package_json, "@open-wc/dev-server-hmr@0.1.2-next.0")
+    } else if (package_json.name === "file-entry-cache" && package_json.version === "6.0.1") {
+        await gitClonePackageCommit([pkgpath, pkg], package_json, "c227beb3f0dacc1a8dd95504deabb74a7618c003")
+    } else if (package_json.name === "acorn-jsx" && package_json.version === "5.3.2") {
+        await gitClonePackageCommit([pkgpath, pkg], package_json, "f5c107b85872230d5016dbb97d71788575cda9c3")
     } else {
         await gitClonePackage([pkgpath, pkg], package_json, pkg.version);
         await gitClonePackage([pkgpath, pkg], package_json, `v${pkg.version}`);
