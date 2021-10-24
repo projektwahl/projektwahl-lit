@@ -12,8 +12,7 @@ const asyncExecFile = promisify(execFile);
 npm install git+https://github.com/Microsoft/TypeScript.git
 
 // try out express.js first as it has dependencies and is still comparably simple
-npm install git+https://github.com/expressjs/express.git
-
+npm install git+https://github.com/expressjs/express.git#semver:4.17.1
 
 
 npm install
