@@ -14,10 +14,15 @@ npm install git+https://github.com/Microsoft/TypeScript.git
 // try out express.js first as it has dependencies and is still comparably simple
 npm install git+https://github.com/expressjs/express.git
 
+
+
+npm install
 rm -Rf /tmp/node_modules/ && node ~/Documents/projektwahl-lit/audit.js
 mv new-package-lock.json package-lock.json
-rm -Rf node_modules/
+mv node_modules/ old_node_modules
 npm ci
+find . -exec touch -m -d 0 {} +
+diffoscope old_node_modules/ node_modules/
 
 */
 
@@ -237,14 +242,16 @@ for (const [pkgpath, pkg] of Object.entries(package_lock.packages)) {
         }
     }
 
-    pkg.integrity = correct_url;
-    delete pkg.resolved;
+    correct_url = correct_url.replace("git+git", "git+https")
+
+    pkg.resolved = correct_url;
+    //delete pkg.integrity;
 
     //console.log(pkg)
     //console.log(pkg.resolved)
 }
 
-delete package_lock.dependencies;
+//delete package_lock.dependencies;
 
 console.log(JSON.stringify(package_lock))
-await writeFile("new-package-lock.json", JSON.stringify(package_lock, null, 4))
+await writeFile("new-package-lock.json", JSON.stringify(package_lock, null, 2))
