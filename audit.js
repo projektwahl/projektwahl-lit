@@ -36,7 +36,9 @@ async function gitClonePackage([pkgpath, pkg], package_json, version) {
         repository = "https://github.com/"+repository+".git"
     }
     repository = repository.replace(/^git\+/, "");
-    //console.log(repository)
+    repository = repository.replace(/tree.+/, "");
+
+    console.log(repository)
     // TODO FIXME parse the URL so we at least have a little bit more safety of malicious inputs
 
     if (!existsSync(join("/tmp", pkgpath))) {
@@ -167,6 +169,12 @@ for (const [pkgpath, pkg] of Object.entries(package_lock.packages)) {
         await gitClonePackage([pkgpath, pkg], package_json, `@napi-rs/triples@${pkg.version}`);
     } else if (pkgpath.endsWith("/@web/parse5-utils")) {
         await gitClonePackage([pkgpath, pkg], package_json, `@web/parse5-utils@${pkg.version}`);
+    } else if (pkgpath.endsWith("/@nodelib/fs.scandir")) {
+        await gitClonePackage([pkgpath, pkg], package_json, `@nodelib/fs.scandir@${pkg.version}`);
+    } else if (pkgpath.endsWith("/@nodelib/fs.stat")) {
+        await gitClonePackage([pkgpath, pkg], package_json, `@nodelib/fs.stat@${pkg.version}`);
+    } else if (pkgpath.endsWith("/@nodelib/fs.walk")) {
+        await gitClonePackage([pkgpath, pkg], package_json, `@nodelib/fs.walk@${pkg.version}`);
     } else if (package_json.name === "uri-js" && package_json.version === "4.4.1") {
         await gitClonePackageCommit([pkgpath, pkg], package_json, "9a328873a21262651c3790505b24c9e318a0e12d")
     } else if (package_json.name === "string_decoder" && package_json.version === "0.10.31") {
