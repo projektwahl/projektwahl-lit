@@ -20,7 +20,6 @@
     "client": "web-dev-server --node-resolve --app-index index.html --open --config web-dev-server-config.mjs",
     "format": "prettier --write .",
     "check:format": "prettier --check .",
-    "prepare": "husky install",
     "lint": "eslint .",
     "check": "tsc --noEmit",
     "server": "DEBUG=express:* nodemon --exec node -- --trace-sync-io --loader ts-node/esm index.ts"
@@ -39,7 +38,6 @@
     "@web/dev-server-esbuild": "^0.2.14",
     "eslint": "^8.1.0",
     "eslint-config-prettier": "^8.3.0",
-    "husky": "^7.0.4",
     "koa-proxies": "^0.12.1",
     "nodemon": "^2.0.14",
     "prettier": "2.4.1",
