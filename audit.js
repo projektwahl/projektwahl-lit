@@ -5,6 +5,11 @@ import { execFile } from 'child_process'
 import { promisify } from 'util';
 const asyncExecFile = promisify(execFile);
 
+// first approach: try to create a package-lock.json that uses git-repos
+// if that doesn't work try to implement building manually
+
+
+
 // string_decoder has an archived upstream with replacement
 // npm why string_decoder
 
