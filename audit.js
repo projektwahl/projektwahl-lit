@@ -65,7 +65,7 @@ async function gitClonePackageCommit([pkgpath, pkg], package_json, commit) {
 
     if (!existsSync(join("/tmp", pkgpath))) {
         try {
-            let result = await asyncExecFile("git", ["clone", "--filter=tree:0", "--branch", "master", "--no-checkout", repository, pkgpath], {
+            let result = await asyncExecFile("git", ["clone", "--filter=tree:0", "--no-checkout", repository, pkgpath], {
                 cwd: "/tmp",
             })
             console.log(result)
@@ -173,6 +173,18 @@ for (const [pkgpath, pkg] of Object.entries(package_lock.packages)) {
         await gitClonePackageCommit([pkgpath, pkg], package_json, "f82ab879fc8929a5be76828545a0674af14f8d43")
     } else if (package_json.name === "progress" && package_json.version === "2.0.3") {
         await gitClonePackageCommit([pkgpath, pkg], package_json, "0790207ef077cbfb7ebde24a1dd9895ebf4643e1")
+    } else if (package_json.name === "path-to-regexp" && package_json.version === "0.1.7") {
+        await gitClonePackageCommit([pkgpath, pkg], package_json, "4c5412af6fae141f48c32e535bc931573ade99c4")
+    } else if (package_json.name === "normalize-url" && package_json.version === "4.5.1") {
+        await gitClonePackageCommit([pkgpath, pkg], package_json, "454970b662086e8856d1af074c7a57df96545b8b")
+    } else if (package_json.name === "mkdirp" && package_json.version === "0.5.5") {
+        await gitClonePackageCommit([pkgpath, pkg], package_json, "f2003bbcffa80f8c9744579fabab1212fc84545a")
+    } else if (package_json.name === "json-buffer" && package_json.version === "3.0.0") {
+        await gitClonePackageCommit([pkgpath, pkg], package_json, "da6fe4c61fd9a5e7b450aecb079219794733b245")
+    } else if (package_json.name === "functional-red-black-tree" && package_json.version === "1.0.1") {
+        await gitClonePackageCommit([pkgpath, pkg], package_json, "e7c9899a68797f8e891220b4c1a70456991a32a5")
+    } else if (package_json.name === "fill-range" && package_json.version === "7.0.1") {
+        await gitClonePackageCommit([pkgpath, pkg], package_json, "39f421b499d5c97b62e955c179fa34c062aab2a5")
     } else {
         await gitClonePackage([pkgpath, pkg], package_json, pkg.version);
         await gitClonePackage([pkgpath, pkg], package_json, `v${pkg.version}`);
