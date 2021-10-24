@@ -21,6 +21,11 @@ const asyncExecFile = promisify(execFile);
 // https://github.com/jonschlinkert/fill-range/issues/13
 // https://github.com/royriojas/file-entry-cache/issues/27
 
+// DefinitelyTyped
+// e.g. https://www.npmjs.com/package/@types/node
+
+// Each Definitely Typed package is versioned when published to npm. The DefinitelyTyped-tools (the tool that publishes @types packages to npm) will set the declaration package's version by using the major.minor version number listed in the first line of its index.d.ts file. For example, here are the first few lines of Node's type declarations for version 10.12.x at the time of writing:
+
 // https://docs.npmjs.com/cli/v7/configuring-npm/package-lock-json
 let package_lock = JSON.parse(await readFile("./package-lock.json"));
 
