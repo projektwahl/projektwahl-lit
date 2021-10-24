@@ -36,7 +36,7 @@ async function gitClonePackage([pkgpath, pkg], package_json, version) {
         repository = "https://github.com/"+repository+".git"
     }
     repository = repository.replace(/^git\+/, "");
-    console.log(repository)
+    //console.log(repository)
     // TODO FIXME parse the URL so we at least have a little bit more safety of malicious inputs
 
     if (!existsSync(join("/tmp", pkgpath))) {
@@ -53,6 +53,33 @@ async function gitClonePackage([pkgpath, pkg], package_json, version) {
     }
 }
 
+async function gitClonePackageCommit([pkgpath, pkg], package_json, commit) {
+    let repository = package_json.repository
+    if (typeof repository === "object") repository = repository.url;
+    if (/^[a-zA-Z0-9-]+\/[a-zA-Z0-9-\.]+$/.test(repository)) {
+        repository = "https://github.com/"+repository+".git"
+    }
+    repository = repository.replace(/^git\+/, "");
+    //console.log(repository)
+    // TODO FIXME parse the URL so we at least have a little bit more safety of malicious inputs
+
+    if (!existsSync(join("/tmp", pkgpath))) {
+        try {
+            let result = await asyncExecFile("git", ["clone", "--filter=tree:0", "--branch", "master", "--no-checkout", repository, pkgpath], {
+                cwd: "/tmp",
+            })
+            console.log(result)
+
+            result = await asyncExecFile("git", ["checkout", commit], {
+                cwd: join("/tmp", pkgpath),
+            })
+            console.log(result)
+        } catch (error) {
+            console.error(error)
+        }
+    }
+}
+
 async function typesPackage([pkgpath, pkg], package_json) {
     // please tell me how to extract version better out of @types packages
     // there is a hash in the package.json we could calculate but I don't if that works.
@@ -63,7 +90,7 @@ async function typesPackage([pkgpath, pkg], package_json) {
         repository = "https://github.com/"+repository+".git"
     }
     repository = repository.replace(/^git\+/, "");
-    console.log(repository)
+    //console.log(repository)
     // TODO FIXME parse the URL so we at least have a little bit more safety of malicious inputs
 
     if (!existsSync(join("/tmp", pkgpath))) {
@@ -80,7 +107,7 @@ async function typesPackage([pkgpath, pkg], package_json) {
             let re = /Last updated: (.+)/
             let readme_time = readme_md.match(re)[1]
             console.log(readme_time)
-            
+
             let commit = await asyncExecFile("git", ["rev-list", "-1", `--before="${readme_time}"`, "master"], {
                 cwd: join("/tmp", pkgpath),
             })
@@ -111,6 +138,9 @@ for (const [pkgpath, pkg] of Object.entries(package_lock.packages)) {
     // https://docs.npmjs.com/cli/v7/configuring-npm/package-json
     let package_json = JSON.parse(await readFile(join(pkgpath, "package.json")))
 
+    console.log(package_json.name)
+    console.log(package_json.version)
+
     if (pkgpath.includes("/@types/")) {
         await typesPackage([pkgpath, pkg], package_json)
     } else if (pkgpath.endsWith("/lodash.merge")) {
@@ -121,6 +151,28 @@ for (const [pkgpath, pkg] of Object.entries(package_lock.packages)) {
         await gitClonePackage([pkgpath, pkg], package_json, `lit-element@${pkg.version}`);
     } else if (pkgpath.endsWith("/lit")) {
         await gitClonePackage([pkgpath, pkg], package_json, `lit@${pkg.version}`);
+    } else if (pkgpath.endsWith("/@lit/reactive-element")) {
+        await gitClonePackage([pkgpath, pkg], package_json, `@lit/reactive-element@${pkg.version}`);
+    } else if (pkgpath.endsWith("/@web/dev-server")) {
+        await gitClonePackage([pkgpath, pkg], package_json, `@web/dev-server@${pkg.version}`);
+    } else if (pkgpath.endsWith("/@web/dev-server-core")) {
+        await gitClonePackage([pkgpath, pkg], package_json, `@web/dev-server-core@${pkg.version}`);
+    } else if (pkgpath.endsWith("/@web/dev-server-esbuild")) {
+        await gitClonePackage([pkgpath, pkg], package_json, `@web/dev-server-esbuild@${pkg.version}`);
+    } else if (pkgpath.endsWith("/@web/dev-server-hmr")) {
+        await gitClonePackage([pkgpath, pkg], package_json, `@web/dev-server-hmr@${pkg.version}`);
+    } else if (pkgpath.endsWith("/@web/dev-server-rollup")) {
+        await gitClonePackage([pkgpath, pkg], package_json, `@web/dev-server-rollup@${pkg.version}`);
+    } else if (pkgpath.endsWith("/@web/parse5-utils")) {
+        await gitClonePackage([pkgpath, pkg], package_json, `@web/parse5-utils@${pkg.version}`);
+    } else if (package_json.name === "uri-js" && package_json.version === "4.4.1") {
+        await gitClonePackageCommit([pkgpath, pkg], package_json, "9a328873a21262651c3790505b24c9e318a0e12d")
+    } else if (package_json.name === "string_decoder" && package_json.version === "0.10.31") {
+        await gitClonePackageCommit([pkgpath, pkg], package_json, "06bb4afbf163c9e1acd14125618784f9513f39d9")
+    } else if (package_json.name === "pstree.remy" && package_json.version === "1.1.8") {
+        await gitClonePackageCommit([pkgpath, pkg], package_json, "f82ab879fc8929a5be76828545a0674af14f8d43")
+    } else if (package_json.name === "progress" && package_json.version === "2.0.3") {
+        await gitClonePackageCommit([pkgpath, pkg], package_json, "0790207ef077cbfb7ebde24a1dd9895ebf4643e1")
     } else {
         await gitClonePackage([pkgpath, pkg], package_json, pkg.version);
         await gitClonePackage([pkgpath, pkg], package_json, `v${pkg.version}`);
