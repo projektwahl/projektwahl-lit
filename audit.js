@@ -60,7 +60,7 @@ async function gitClonePackage([pkgpath, pkg], package_json, version) {
         repository = "https://github.com/"+repository+".git"
     }
     repository = repository.replace(/^git\+/, "");
-    repository = repository.replace(/tree.+/, "");
+    repository = repository.replace(/\/tree\/.+/, "");
 
     console.log(repository)
     // TODO FIXME parse the URL so we at least have a little bit more safety of malicious inputs
@@ -169,6 +169,8 @@ async function typesPackage([pkgpath, pkg], package_json) {
 
 for (const [pkgpath, pkg] of Object.entries(package_lock.packages)) {
     if (pkgpath === "") continue;
+    if (pkg.cpu !== undefined && !pkg.cpu.includes("x86_64")) continue;
+    if (pkg.cpu !== undefined && !pkg.os.includes("linux")) continue;
     // https://docs.npmjs.com/cli/v7/configuring-npm/package-json
     let package_json = JSON.parse(await readFile(join(pkgpath, "package.json")))
 
@@ -208,7 +210,26 @@ for (const [pkgpath, pkg] of Object.entries(package_lock.packages)) {
         correct_url = await gitClonePackage([pkgpath, pkg], package_json, `@nodelib/fs.stat@${pkg.version}`);
     } else if (pkgpath.endsWith("/@nodelib/fs.walk")) {
         correct_url = await gitClonePackage([pkgpath, pkg], package_json, `@nodelib/fs.walk@${pkg.version}`);
-    } else if (package_json.name === "uri-js" && package_json.version === "4.4.1") {
+    } else if (pkgpath.endsWith("/@node-rs/helper")) {
+        correct_url = await gitClonePackage([pkgpath, pkg], package_json, `@node-rs/helper@${pkg.version}`);
+    } else if (pkgpath.endsWith("/@rollup/plugin-node-resolve")) {
+        correct_url = await gitClonePackage([pkgpath, pkg], package_json, `node-resolve-v${pkg.version}`);
+    } else if (pkgpath.endsWith("/@rollup/pluginutils")) {
+        correct_url = await gitClonePackage([pkgpath, pkg], package_json, `pluginutils-v${pkg.version}`);
+    } else if (pkgpath.endsWith("/@tsconfig/node16")) {
+        correct_url = await gitClonePackage([pkgpath, pkg], package_json, `main`);
+    }  else if (pkgpath.endsWith("/@tsconfig/node14")) {
+        correct_url = await gitClonePackage([pkgpath, pkg], package_json, `main`);
+    }  else if (pkgpath.endsWith("/@tsconfig/node12")) {
+        correct_url = await gitClonePackage([pkgpath, pkg], package_json, `main`);
+    }  else if (pkgpath.endsWith("/@tsconfig/node10")) {
+        correct_url = await gitClonePackage([pkgpath, pkg], package_json, `main`);
+    } 
+    
+    
+    
+    
+    else if (package_json.name === "uri-js" && package_json.version === "4.4.1") {
         correct_url = await gitClonePackageCommit([pkgpath, pkg], package_json, "9a328873a21262651c3790505b24c9e318a0e12d")
     } else if (package_json.name === "string_decoder" && package_json.version === "0.10.31") {
         correct_url = await gitClonePackageCommit([pkgpath, pkg], package_json, "06bb4afbf163c9e1acd14125618784f9513f39d9")
@@ -234,6 +255,8 @@ for (const [pkgpath, pkg] of Object.entries(package_lock.packages)) {
         correct_url = await gitClonePackageCommit([pkgpath, pkg], package_json, "c227beb3f0dacc1a8dd95504deabb74a7618c003")
     } else if (package_json.name === "acorn-jsx" && package_json.version === "5.3.2") {
         correct_url = await gitClonePackageCommit([pkgpath, pkg], package_json, "f5c107b85872230d5016dbb97d71788575cda9c3")
+    }  else if (package_json.name === "@swc/helpers" && package_json.version === "0.2.13") {
+        correct_url = await gitClonePackageCommit([pkgpath, pkg], package_json, "a1a348372ff2c2d1941bbd5eb944de9f6da26628")
     } else {
         correct_url = await gitClonePackage([pkgpath, pkg], package_json, pkg.version);
         if (correct_url === undefined) {
@@ -241,7 +264,8 @@ for (const [pkgpath, pkg] of Object.entries(package_lock.packages)) {
         }
     }
 
-    correct_url = correct_url.replace("git+git", "git+https")
+    // the easiest way to fix this would be to just get the commit and remote out of the cloned directory
+    correct_url = correct_url?.replace("git+git", "git+https")
 
     pkg.resolved = correct_url;
     //delete pkg.integrity;
