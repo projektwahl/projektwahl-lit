@@ -15,12 +15,13 @@ npm install git+https://github.com/Microsoft/TypeScript.git
 npm install git+https://github.com/expressjs/express.git#semver:4.17.1
 
 
-npm install
-rm -Rf /tmp/node_modules/ && node ~/Documents/projektwahl-lit/audit.js
-mv new-package-lock.json package-lock.json
-mv node_modules/ old_node_modules
-npm ci
-find . -exec touch -m -d 0 {} +
+faketime '1970-01-01 00:00:00' npm install
+faketime '1970-01-01 00:00:00' rm -Rf /tmp/node_modules/ && node ~/Documents/projektwahl-lit/audit.js
+faketime '1970-01-01 00:00:00' mv new-package-lock.json package-lock.json
+faketime '1970-01-01 00:00:00' mv node_modules/ old_node_modules
+faketime '1970-01-01 00:00:00' npm ci
+find node_modules -exec touch -m -d 0 {} +
+find old_node_modules -exec touch -m -d 0 {} +
 diffoscope old_node_modules/ node_modules/
 
 */
