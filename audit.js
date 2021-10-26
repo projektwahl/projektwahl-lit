@@ -2,6 +2,7 @@ import { readFile, writeFile, mkdtemp } from 'fs/promises';
 import { join } from 'path';
 import { execFile } from 'child_process'
 import { promisify } from 'util';
+import { tmpdir } from 'os';
 const asyncExecFile = promisify(execFile);
 
 // first approach: try to create a package-lock.json that uses git-repos
@@ -59,19 +60,23 @@ let package_lock = JSON.parse(await readFile("./package-lock.json"));
 
 async function gitClonePackage([pkgpath, pkg], package_json, commit) {
     // TODO FIXME parse the URL so we at least have a little bit more safety of malicious inputs
-    let directory = await mkdtemp(path.join(os.tmpdir(), 'foo-'));
+    let directory = await mkdtemp(join(tmpdir(), 'foo-'));
     try {
         let result = await asyncExecFile("git", ["clone", "--filter=tree:0", "--no-checkout", package_json.repository, directory], {
             cwd: "/tmp",
         })
         console.log(result)
 
-        result = await asyncExecFile("git", ["checkout", "--depth", "1", commit], {
-            cwd: join("/tmp", directory),
+        result = await asyncExecFile("git", ["fetch", "--depth", "1", "origin", commit], {
+            cwd: directory,
+        })
+
+        result = await asyncExecFile("git", ["checkout", commit], {
+            cwd: directory,
         })
 
         result = await asyncExecFile("git", ["rev-parse", "HEAD"], {
-            cwd: join("/tmp", directory),
+            cwd: directory,
         })
 
         return result.stdout.trim();
@@ -82,6 +87,8 @@ async function gitClonePackage([pkgpath, pkg], package_json, commit) {
 }
 
 async function typesPackage([pkgpath, pkg], package_json) {
+    let directory = await mkdtemp(join(tmpdir(), 'foo-'));
+
     let result = await asyncExecFile("git", ["clone", "--filter=tree:0", "--branch", "master", "--no-checkout", package_json.repository, directory], {
         cwd: "/tmp",
     })
@@ -96,22 +103,22 @@ async function typesPackage([pkgpath, pkg], package_json) {
     console.log(readme_time)
 
     let commit = await asyncExecFile("git", ["rev-list", "-1", `--before="${readme_time}"`, "master"], {
-        cwd: join("/tmp", directory),
+        cwd: directory,
     })
     console.log(commit)
 
     result = await asyncExecFile("git", ["sparse-checkout", "init", "--cone"], {
-        cwd: join("/tmp", directory),
+        cwd: directory,
     })
     console.log(result)
 
     result = await asyncExecFile("git", ["sparse-checkout", "set", package_json.repository.directory], {
-        cwd: join("/tmp", directory),
+        cwd: directory,
     })
     console.log(result)
 
     result = await asyncExecFile("git", ["checkout", commit.stdout.trim()], {
-        cwd: join("/tmp", directory),
+        cwd: directory,
     })
     console.log(result)
     return `git+${repository}#${commit.stdout.trim()}`
@@ -222,6 +229,9 @@ for (const [pkgpath, pkg] of Object.entries(package_lock.packages)) {
         correct_url = await gitClonePackage([pkgpath, pkg], package_json, pkg.version);
         if (correct_url === undefined) {
             correct_url = await gitClonePackage([pkgpath, pkg], package_json, `v${pkg.version}`);
+        }
+        if (correct_url === undefined) {
+            throw new Error("failed")
         }
     }
 
