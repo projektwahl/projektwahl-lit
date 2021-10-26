@@ -15,13 +15,17 @@ npm install git+https://github.com/Microsoft/TypeScript.git
 npm install git+https://github.com/expressjs/express.git#semver:4.17.1
 
 
-faketime '1970-01-01 00:00:00' npm install
-faketime '1970-01-01 00:00:00' rm -Rf /tmp/node_modules/ && node ~/Documents/projektwahl-lit/audit.js
-faketime '1970-01-01 00:00:00' mv new-package-lock.json package-lock.json
-faketime '1970-01-01 00:00:00' mv node_modules/ old_node_modules
-faketime '1970-01-01 00:00:00' npm ci
+npm install
+rm -Rf /tmp/node_modules/ && node ~/Documents/projektwahl-lit/audit.js
+mv package-lock.json old-package-lock.json
+mv new-package-lock.json package-lock.json
+mv node_modules/ old_node_modules
+npm ci
 find node_modules -exec touch -m -d 0 {} +
 find old_node_modules -exec touch -m -d 0 {} +
+
+# faketime '1970-01-01 00:00:00' 
+
 diffoscope old_node_modules/ node_modules/
 
 */
@@ -172,6 +176,7 @@ for (const [pkgpath, pkg] of Object.entries(package_lock.packages)) {
     if (pkgpath === "") continue;
     if (pkg.cpu !== undefined && !pkg.cpu.includes("x86_64")) continue;
     if (pkg.cpu !== undefined && !pkg.os.includes("linux")) continue;
+    if (pkg.optional) continue;
     // https://docs.npmjs.com/cli/v7/configuring-npm/package-json
     let package_json = JSON.parse(await readFile(join(pkgpath, "package.json")))
 
@@ -269,7 +274,7 @@ for (const [pkgpath, pkg] of Object.entries(package_lock.packages)) {
     correct_url = correct_url?.replace("git+git", "git+https")
 
     pkg.resolved = correct_url;
-    //delete pkg.integrity;
+    delete pkg.integrity;
 
     //console.log(pkg)
     //console.log(pkg.resolved)
