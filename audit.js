@@ -94,7 +94,7 @@ async function typesPackage([pkgpath, pkg], package_json) {
     })
     console.log(result)
 
-    let readme_md = await readFile(join(directory, "README.md"), {
+    let readme_md = await readFile(join(pkgpath, "README.md"), {
         encoding: "utf-8"
     })
 
@@ -121,7 +121,7 @@ async function typesPackage([pkgpath, pkg], package_json) {
         cwd: directory,
     })
     console.log(result)
-    return `git+${repository}#${commit.stdout.trim()}`
+    return `git+${package_json.repository}#${commit.stdout.trim()}`
 }
 
 for (const [pkgpath, pkg] of Object.entries(package_lock.packages)) {
