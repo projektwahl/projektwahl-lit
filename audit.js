@@ -264,14 +264,15 @@ for (const [pkgpath, pkg] of Object.entries(package_lock.packages)) {
     // the easiest way to fix this would be to just get the commit and remote out of the cloned directory
     correct_url = correct_url?.replace("git+git", "git+https")
 
-    pkg.resolved = correct_url;
-    delete pkg.integrity;
+    pkg.version = `git+${package_json.repository}#${correct_url}`;
+    pkg.resolved = `git+${package_json.repository}#${correct_url}`;
+    pkg.integrity = correct_url;
 
     //console.log(pkg)
     //console.log(pkg.resolved)
 }
 
-//delete package_lock.dependencies;
+delete package_lock.dependencies;
 
-console.log(JSON.stringify(package_lock))
+//console.log(JSON.stringify(package_lock))
 await writeFile("new-package-lock.json", JSON.stringify(package_lock, null, 2))
