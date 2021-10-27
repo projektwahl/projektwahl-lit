@@ -17,7 +17,7 @@ npm install git+https://github.com/expressjs/express.git#semver:4.17.1
 
 
 npm install
-rm -Rf /tmp/node_modules/ && node ~/Documents/projektwahl-lit/audit.js
+node ~/Documents/projektwahl-lit/audit.js
 mv package-lock.json old-package-lock.json
 mv new-package-lock.json package-lock.json
 mv node_modules/ old_node_modules
