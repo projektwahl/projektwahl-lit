@@ -22,12 +22,8 @@ mv package-lock.json old-package-lock.json
 mv new-package-lock.json package-lock.json
 mv node_modules/ old_node_modules
 npm ci
-find node_modules -exec touch -m -d 0 {} +
-find old_node_modules -exec touch -m -d 0 {} +
 
-# faketime '1970-01-01 00:00:00' 
-
-diffoscope old_node_modules/ node_modules/
+diffoscope --exclude-directory-metadata yes old_node_modules/ node_modules/
 
 */
 
@@ -264,9 +260,9 @@ for (const [pkgpath, pkg] of Object.entries(package_lock.packages)) {
     // the easiest way to fix this would be to just get the commit and remote out of the cloned directory
     correct_url = correct_url?.replace("git+git", "git+https")
 
-    pkg.version = `git+${package_json.repository}#${correct_url}`;
     pkg.resolved = `git+${package_json.repository}#${correct_url}`;
-    pkg.integrity = correct_url;
+    //pkg.integrity = correct_url;
+    delete pkg.integrity;
 
     //console.log(pkg)
     //console.log(pkg.resolved)

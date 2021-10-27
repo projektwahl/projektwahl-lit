@@ -22,6 +22,7 @@
               pkgs.cbc
               pkgs.glpk
               pkgs.lp_solve
+              pkgs.diffoscope
             ];
           };
         }
