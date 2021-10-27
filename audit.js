@@ -59,35 +59,53 @@ diffoscope old_node_modules/ node_modules/
 // https://docs.npmjs.com/cli/v7/configuring-npm/package-lock-json
 let package_lock = JSON.parse(await readFile("./package-lock.json"));
 
-async function gitClonePackage([pkgpath, pkg], package_json, commit) {
+
+// TODO FIXME we probably don't need to checkout as long as we only paste these into package-lock. If we need to calculate integrity hashes or so then we would.
+
+async function gitClonePackage([pkgpath, pkg], package_json, refs) {
     // TODO FIXME parse the URL so we at least have a little bit more safety of malicious inputs
     let directory = join(tmpdir(), Buffer.from(package_json.repository).toString('base64'));
-    try {
-        let result;
-        if (!existsSync(directory)) {
-            result = await asyncExecFile("git", ["clone", "--filter=tree:0", "--no-checkout", package_json.repository, directory], {
-                cwd: "/tmp",
-            })
-            console.log(result)
-        }
-
-        result = await asyncExecFile("git", ["fetch", "--depth", "1", "origin", commit], {
-            cwd: directory,
+    let result;
+    if (!existsSync(directory)) {
+        result = await asyncExecFile("git", ["clone", "--filter=tree:0", "--no-checkout", package_json.repository, directory], {
+            cwd: "/tmp",
         })
-
-        result = await asyncExecFile("git", ["checkout", commit], {
-            cwd: directory,
-        })
-
-        result = await asyncExecFile("git", ["rev-parse", "HEAD"], {
-            cwd: directory,
-        })
-
-        return result.stdout.trim();
-    } catch (error) {
-        console.error(error.stderr.trim())
-        return undefined
+        console.log(result)
     }
+
+    for (const ref of refs) {
+        try {
+            result = await asyncExecFile("git", ["checkout", ref], {
+                cwd: directory,
+            })
+
+            result = await asyncExecFile("git", ["rev-parse", "HEAD"], {
+                cwd: directory,
+            })
+    
+            return result.stdout.trim();
+        } catch (error) {}
+    }
+
+    for (const ref of refs) {
+        try {
+            result = await asyncExecFile("git", ["fetch", "--depth", "1", "origin", ref], {
+                cwd: directory,
+            })
+
+            result = await asyncExecFile("git", ["checkout", ref], {
+                cwd: directory,
+            })
+
+            result = await asyncExecFile("git", ["rev-parse", "HEAD"], {
+                cwd: directory,
+            })
+    
+            return result.stdout.trim();
+        } catch (error) {}
+    }
+
+    throw new Error(`no ref found from ${refs} for ${package_json.name} ${package_json.version} on ${package_json.repository}`)
 }
 
 async function typesPackage([pkgpath, pkg], package_json) {
@@ -149,6 +167,9 @@ for (const [pkgpath, pkg] of Object.entries(package_lock.packages)) {
     }
     package_json.repository = package_json.repository.replace(/^git\+/, "");
     package_json.repository = package_json.repository.replace(/\/tree\/.+/, "");
+    package_json.repository = package_json.repository.replace("git@github.com:", "https://github.com/");
+    package_json.repository = package_json.repository.replace("ssh://git@", "https://");
+
 
     console.log(package_json.repository)
 
@@ -156,94 +177,88 @@ for (const [pkgpath, pkg] of Object.entries(package_lock.packages)) {
     if (pkgpath.includes("/@types/")) {
         correct_url = await typesPackage([pkgpath, pkg], package_json)
     } else if (pkgpath.endsWith("/lodash.merge")) {
-        correct_url = await gitClonePackage([pkgpath, pkg], package_json, `${pkg.version}-npm-packages`);
+        correct_url = await gitClonePackage([pkgpath, pkg], package_json, [`${pkg.version}-npm-packages`]);
     } else if (pkgpath.endsWith("/lit-html")) {
-        correct_url = await gitClonePackage([pkgpath, pkg], package_json, `lit-html@${pkg.version}`);
+        correct_url = await gitClonePackage([pkgpath, pkg], package_json, [`lit-html@${pkg.version}`]);
     } else if (pkgpath.endsWith("/lit-element")) {
-        correct_url = await gitClonePackage([pkgpath, pkg], package_json, `lit-element@${pkg.version}`);
+        correct_url = await gitClonePackage([pkgpath, pkg], package_json, [`lit-element@${pkg.version}`]);
     } else if (pkgpath.endsWith("/lit")) {
-        correct_url = await gitClonePackage([pkgpath, pkg], package_json, `lit@${pkg.version}`);
+        correct_url = await gitClonePackage([pkgpath, pkg], package_json, [`lit@${pkg.version}`]);
     } else if (pkgpath.endsWith("/@lit/reactive-element")) {
-        correct_url = await gitClonePackage([pkgpath, pkg], package_json, `@lit/reactive-element@${pkg.version}`);
+        correct_url = await gitClonePackage([pkgpath, pkg], package_json, [`@lit/reactive-element@${pkg.version}`]);
     } else if (pkgpath.endsWith("/@web/dev-server")) {
-        correct_url = await gitClonePackage([pkgpath, pkg], package_json, `@web/dev-server@${pkg.version}`);
+        correct_url = await gitClonePackage([pkgpath, pkg], package_json, [`@web/dev-server@${pkg.version}`]);
     } else if (pkgpath.endsWith("/@web/dev-server-core")) {
-        correct_url = await gitClonePackage([pkgpath, pkg], package_json, `@web/dev-server-core@${pkg.version}`);
+        correct_url = await gitClonePackage([pkgpath, pkg], package_json, [`@web/dev-server-core@${pkg.version}`]);
     } else if (pkgpath.endsWith("/@web/dev-server-esbuild")) {
-        correct_url = await gitClonePackage([pkgpath, pkg], package_json, `@web/dev-server-esbuild@${pkg.version}`);
+        correct_url = await gitClonePackage([pkgpath, pkg], package_json, [`@web/dev-server-esbuild@${pkg.version}`]);
     } else if (pkgpath.endsWith("/@web/dev-server-hmr")) {
-        correct_url = await gitClonePackage([pkgpath, pkg], package_json, `@web/dev-server-hmr@${pkg.version}`);
+        correct_url = await gitClonePackage([pkgpath, pkg], package_json, [`@web/dev-server-hmr@${pkg.version}`]);
     } else if (pkgpath.endsWith("/@web/dev-server-rollup")) {
-        correct_url = await gitClonePackage([pkgpath, pkg], package_json, `@web/dev-server-rollup@${pkg.version}`);
+        correct_url = await gitClonePackage([pkgpath, pkg], package_json, [`@web/dev-server-rollup@${pkg.version}`]);
     } else if (pkgpath.endsWith("/@web/config-loader")) {
-        correct_url = await gitClonePackage([pkgpath, pkg], package_json, `@web/config-loader@${pkg.version}`);
+        correct_url = await gitClonePackage([pkgpath, pkg], package_json, [`@web/config-loader@${pkg.version}`]);
     } else if (pkgpath.endsWith("/@napi-rs/triples")) {
-        correct_url = await gitClonePackage([pkgpath, pkg], package_json, `@napi-rs/triples@${pkg.version}`);
+        correct_url = await gitClonePackage([pkgpath, pkg], package_json, [`@napi-rs/triples@${pkg.version}`]);
     } else if (pkgpath.endsWith("/@web/parse5-utils")) {
-        correct_url = await gitClonePackage([pkgpath, pkg], package_json, `@web/parse5-utils@${pkg.version}`);
+        correct_url = await gitClonePackage([pkgpath, pkg], package_json, [`@web/parse5-utils@${pkg.version}`]);
     } else if (pkgpath.endsWith("/@nodelib/fs.scandir")) {
-        correct_url = await gitClonePackage([pkgpath, pkg], package_json, `@nodelib/fs.scandir@${pkg.version}`);
+        correct_url = await gitClonePackage([pkgpath, pkg], package_json, [`@nodelib/fs.scandir@${pkg.version}`]);
     } else if (pkgpath.endsWith("/@nodelib/fs.stat")) {
-        correct_url = await gitClonePackage([pkgpath, pkg], package_json, `@nodelib/fs.stat@${pkg.version}`);
+        correct_url = await gitClonePackage([pkgpath, pkg], package_json, [`@nodelib/fs.stat@${pkg.version}`]);
     } else if (pkgpath.endsWith("/@nodelib/fs.walk")) {
-        correct_url = await gitClonePackage([pkgpath, pkg], package_json, `@nodelib/fs.walk@${pkg.version}`);
+        correct_url = await gitClonePackage([pkgpath, pkg], package_json, [`@nodelib/fs.walk@${pkg.version}`]);
     } else if (pkgpath.endsWith("/@node-rs/helper")) {
-        correct_url = await gitClonePackage([pkgpath, pkg], package_json, `@node-rs/helper@${pkg.version}`);
+        correct_url = await gitClonePackage([pkgpath, pkg], package_json, [`@node-rs/helper@${pkg.version}`]);
     } else if (pkgpath.endsWith("/@rollup/plugin-node-resolve")) {
-        correct_url = await gitClonePackage([pkgpath, pkg], package_json, `node-resolve-v${pkg.version}`);
+        correct_url = await gitClonePackage([pkgpath, pkg], package_json, [`node-resolve-v${pkg.version}`]);
     } else if (pkgpath.endsWith("/@rollup/pluginutils")) {
-        correct_url = await gitClonePackage([pkgpath, pkg], package_json, `pluginutils-v${pkg.version}`);
+        correct_url = await gitClonePackage([pkgpath, pkg], package_json, [`pluginutils-v${pkg.version}`]);
     } else if (pkgpath.endsWith("/@tsconfig/node16")) {
-        correct_url = await gitClonePackage([pkgpath, pkg], package_json, `main`);
+        correct_url = await gitClonePackage([pkgpath, pkg], package_json, [`main`]);
     }  else if (pkgpath.endsWith("/@tsconfig/node14")) {
-        correct_url = await gitClonePackage([pkgpath, pkg], package_json, `main`);
+        correct_url = await gitClonePackage([pkgpath, pkg], package_json, [`main`]);
     }  else if (pkgpath.endsWith("/@tsconfig/node12")) {
-        correct_url = await gitClonePackage([pkgpath, pkg], package_json, `main`);
+        correct_url = await gitClonePackage([pkgpath, pkg], package_json, [`main`]);
     }  else if (pkgpath.endsWith("/@tsconfig/node10")) {
-        correct_url = await gitClonePackage([pkgpath, pkg], package_json, `main`);
+        correct_url = await gitClonePackage([pkgpath, pkg], package_json, [`main`]);
     } 
     
     
     
     
     else if (package_json.name === "uri-js" && package_json.version === "4.4.1") {
-        correct_url = await gitClonePackage([pkgpath, pkg], package_json, "9a328873a21262651c3790505b24c9e318a0e12d")
+        correct_url = await gitClonePackage([pkgpath, pkg], package_json, ["9a328873a21262651c3790505b24c9e318a0e12d"])
     } else if (package_json.name === "rc" && package_json.version === "1.2.8") {
-        correct_url = await gitClonePackage([pkgpath, pkg], package_json, "a97f6adcc37ee1cad06ab7dc9b0bd842bbc5c664")
+        correct_url = await gitClonePackage([pkgpath, pkg], package_json, ["a97f6adcc37ee1cad06ab7dc9b0bd842bbc5c664"])
     } else if (package_json.name === "string_decoder" && package_json.version === "0.10.31") {
-        correct_url = await gitClonePackage([pkgpath, pkg], package_json, "06bb4afbf163c9e1acd14125618784f9513f39d9")
+        correct_url = await gitClonePackage([pkgpath, pkg], package_json, ["06bb4afbf163c9e1acd14125618784f9513f39d9"])
     } else if (package_json.name === "pstree.remy" && package_json.version === "1.1.8") {
-        correct_url = await gitClonePackage([pkgpath, pkg], package_json, "f82ab879fc8929a5be76828545a0674af14f8d43")
+        correct_url = await gitClonePackage([pkgpath, pkg], package_json, ["f82ab879fc8929a5be76828545a0674af14f8d43"])
     } else if (package_json.name === "progress" && package_json.version === "2.0.3") {
-        correct_url = await gitClonePackage([pkgpath, pkg], package_json, "0790207ef077cbfb7ebde24a1dd9895ebf4643e1")
+        correct_url = await gitClonePackage([pkgpath, pkg], package_json, ["0790207ef077cbfb7ebde24a1dd9895ebf4643e1"])
     } else if (package_json.name === "path-to-regexp" && package_json.version === "0.1.7") {
-        correct_url = await gitClonePackage([pkgpath, pkg], package_json, "4c5412af6fae141f48c32e535bc931573ade99c4")
+        correct_url = await gitClonePackage([pkgpath, pkg], package_json, ["4c5412af6fae141f48c32e535bc931573ade99c4"])
     } else if (package_json.name === "normalize-url" && package_json.version === "4.5.1") {
-        correct_url = await gitClonePackage([pkgpath, pkg], package_json, "454970b662086e8856d1af074c7a57df96545b8b")
+        correct_url = await gitClonePackage([pkgpath, pkg], package_json, ["454970b662086e8856d1af074c7a57df96545b8b"])
     } else if (package_json.name === "mkdirp" && package_json.version === "0.5.5") {
-        correct_url = await gitClonePackage([pkgpath, pkg], package_json, "f2003bbcffa80f8c9744579fabab1212fc84545a")
+        correct_url = await gitClonePackage([pkgpath, pkg], package_json, ["f2003bbcffa80f8c9744579fabab1212fc84545a"])
     } else if (package_json.name === "json-buffer" && package_json.version === "3.0.0") {
-        correct_url = await gitClonePackage([pkgpath, pkg], package_json, "da6fe4c61fd9a5e7b450aecb079219794733b245")
+        correct_url = await gitClonePackage([pkgpath, pkg], package_json, ["da6fe4c61fd9a5e7b450aecb079219794733b245"])
     } else if (package_json.name === "functional-red-black-tree" && package_json.version === "1.0.1") {
-        correct_url = await gitClonePackage([pkgpath, pkg], package_json, "e7c9899a68797f8e891220b4c1a70456991a32a5")
+        correct_url = await gitClonePackage([pkgpath, pkg], package_json, ["e7c9899a68797f8e891220b4c1a70456991a32a5"])
     } else if (package_json.name === "fill-range" && package_json.version === "7.0.1") {
-        correct_url = await gitClonePackage([pkgpath, pkg], package_json, "39f421b499d5c97b62e955c179fa34c062aab2a5")
+        correct_url = await gitClonePackage([pkgpath, pkg], package_json, ["39f421b499d5c97b62e955c179fa34c062aab2a5"])
     } else if (package_json.name === "@open-wc/dev-server-hmr" && package_json.version === "0.1.2") {
-        correct_url = await gitClonePackage([pkgpath, pkg], package_json, "@open-wc/dev-server-hmr@0.1.2-next.0")
+        correct_url = await gitClonePackage([pkgpath, pkg], package_json, ["@open-wc/dev-server-hmr@0.1.2-next.0"])
     } else if (package_json.name === "file-entry-cache" && package_json.version === "6.0.1") {
-        correct_url = await gitClonePackage([pkgpath, pkg], package_json, "c227beb3f0dacc1a8dd95504deabb74a7618c003")
+        correct_url = await gitClonePackage([pkgpath, pkg], package_json, ["c227beb3f0dacc1a8dd95504deabb74a7618c003"])
     } else if (package_json.name === "acorn-jsx" && package_json.version === "5.3.2") {
-        correct_url = await gitClonePackage([pkgpath, pkg], package_json, "f5c107b85872230d5016dbb97d71788575cda9c3")
+        correct_url = await gitClonePackage([pkgpath, pkg], package_json, ["f5c107b85872230d5016dbb97d71788575cda9c3"])
     }  else if (package_json.name === "@swc/helpers" && package_json.version === "0.2.13") {
-        correct_url = await gitClonePackage([pkgpath, pkg], package_json, "a1a348372ff2c2d1941bbd5eb944de9f6da26628")
+        correct_url = await gitClonePackage([pkgpath, pkg], package_json, ["a1a348372ff2c2d1941bbd5eb944de9f6da26628"])
     } else {
-        correct_url = await gitClonePackage([pkgpath, pkg], package_json, pkg.version);
-        if (correct_url === undefined) {
-            correct_url = await gitClonePackage([pkgpath, pkg], package_json, `v${pkg.version}`);
-        }
-        if (correct_url === undefined) {
-            throw new Error("failed")
-        }
+        correct_url = await gitClonePackage([pkgpath, pkg], package_json, [pkg.version, `v${pkg.version}`]);
     }
 
     // the easiest way to fix this would be to just get the commit and remote out of the cloned directory
