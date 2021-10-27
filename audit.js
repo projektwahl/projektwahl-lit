@@ -3,6 +3,7 @@ import { join } from 'path';
 import { execFile } from 'child_process'
 import { promisify } from 'util';
 import { tmpdir } from 'os';
+import { existsSync } from 'fs';
 const asyncExecFile = promisify(execFile);
 
 // first approach: try to create a package-lock.json that uses git-repos
@@ -60,12 +61,15 @@ let package_lock = JSON.parse(await readFile("./package-lock.json"));
 
 async function gitClonePackage([pkgpath, pkg], package_json, commit) {
     // TODO FIXME parse the URL so we at least have a little bit more safety of malicious inputs
-    let directory = await mkdtemp(join(tmpdir(), 'foo-'));
+    let directory = join(tmpdir(), Buffer.from(package_json.repository).toString('base64'));
     try {
-        let result = await asyncExecFile("git", ["clone", "--filter=tree:0", "--no-checkout", package_json.repository, directory], {
-            cwd: "/tmp",
-        })
-        console.log(result)
+        let result;
+        if (!existsSync(directory)) {
+            result = await asyncExecFile("git", ["clone", "--filter=tree:0", "--no-checkout", package_json.repository, directory], {
+                cwd: "/tmp",
+            })
+            console.log(result)
+        }
 
         result = await asyncExecFile("git", ["fetch", "--depth", "1", "origin", commit], {
             cwd: directory,
@@ -81,18 +85,21 @@ async function gitClonePackage([pkgpath, pkg], package_json, commit) {
 
         return result.stdout.trim();
     } catch (error) {
-        console.error(error)
+        console.error(error.stderr.trim())
         return undefined
     }
 }
 
 async function typesPackage([pkgpath, pkg], package_json) {
-    let directory = await mkdtemp(join(tmpdir(), 'foo-'));
+    let directory = join(tmpdir(), Buffer.from(package_json.repository).toString('base64'));
 
-    let result = await asyncExecFile("git", ["clone", "--filter=tree:0", "--branch", "master", "--no-checkout", package_json.repository, directory], {
-        cwd: "/tmp",
-    })
-    console.log(result)
+    let result;
+    if (!existsSync(directory)) {
+        result = await asyncExecFile("git", ["clone", "--filter=tree:0", "--branch", "master", "--no-checkout", package_json.repository, directory], {
+            cwd: "/tmp",
+        })
+        console.log(result)
+    }
 
     let readme_md = await readFile(join(pkgpath, "README.md"), {
         encoding: "utf-8"
@@ -168,6 +175,8 @@ for (const [pkgpath, pkg] of Object.entries(package_lock.packages)) {
         correct_url = await gitClonePackage([pkgpath, pkg], package_json, `@web/dev-server-hmr@${pkg.version}`);
     } else if (pkgpath.endsWith("/@web/dev-server-rollup")) {
         correct_url = await gitClonePackage([pkgpath, pkg], package_json, `@web/dev-server-rollup@${pkg.version}`);
+    } else if (pkgpath.endsWith("/@web/config-loader")) {
+        correct_url = await gitClonePackage([pkgpath, pkg], package_json, `@web/config-loader@${pkg.version}`);
     } else if (pkgpath.endsWith("/@napi-rs/triples")) {
         correct_url = await gitClonePackage([pkgpath, pkg], package_json, `@napi-rs/triples@${pkg.version}`);
     } else if (pkgpath.endsWith("/@web/parse5-utils")) {
@@ -199,6 +208,8 @@ for (const [pkgpath, pkg] of Object.entries(package_lock.packages)) {
     
     else if (package_json.name === "uri-js" && package_json.version === "4.4.1") {
         correct_url = await gitClonePackage([pkgpath, pkg], package_json, "9a328873a21262651c3790505b24c9e318a0e12d")
+    } else if (package_json.name === "rc" && package_json.version === "1.2.8") {
+        correct_url = await gitClonePackage([pkgpath, pkg], package_json, "a97f6adcc37ee1cad06ab7dc9b0bd842bbc5c664")
     } else if (package_json.name === "string_decoder" && package_json.version === "0.10.31") {
         correct_url = await gitClonePackage([pkgpath, pkg], package_json, "06bb4afbf163c9e1acd14125618784f9513f39d9")
     } else if (package_json.name === "pstree.remy" && package_json.version === "1.1.8") {
