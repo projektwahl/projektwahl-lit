@@ -60,12 +60,10 @@ let package_lock = JSON.parse(await readFile("./package-lock.json"));
 
 async function gitClonePackage([pkgpath, pkg], package_json, refs) {
     // TODO FIXME parse the URL so we at least have a little bit more safety of malicious inputs
-    let directory = join(tmpdir(), Buffer.from(package_json.repository).toString('base64'));
+    let directory = join("/tmp/npm-audit", Buffer.from(package_json.repository).toString('base64'));
     let result;
     if (!existsSync(directory)) {
-        result = await asyncExecFile("git", ["clone", "--filter=tree:0", "--no-checkout", package_json.repository, directory], {
-            cwd: "/tmp",
-        })
+        result = await asyncExecFile("git", ["clone", "--filter=tree:0", "--no-checkout", package_json.repository, directory])
         console.log(result)
     }
 
@@ -105,13 +103,11 @@ async function gitClonePackage([pkgpath, pkg], package_json, refs) {
 }
 
 async function typesPackage([pkgpath, pkg], package_json) {
-    let directory = join(tmpdir(), Buffer.from(package_json.repository).toString('base64'));
+    let directory = join("/tmp/npm-audit", Buffer.from(package_json.repository).toString('base64'));
 
     let result;
     if (!existsSync(directory)) {
-        result = await asyncExecFile("git", ["clone", "--filter=tree:0", "--branch", "master", "--no-checkout", package_json.repository, directory], {
-            cwd: "/tmp",
-        })
+        result = await asyncExecFile("git", ["clone", "--filter=tree:0", "--branch", "master", "--no-checkout", package_json.repository, directory])
         console.log(result)
     }
 
