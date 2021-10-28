@@ -36,12 +36,12 @@ export class MyCustomResolver implements Resolver {
     //console.log("nextdescriptor:", nextDescriptor)
 
     let candidates = await opts.resolver.getCandidates(nextDescriptor, dependencies, opts);
-    console.log(candidates)
+    //console.log(candidates)
 
     // https://yarnpkg.com/features/protocols
     return candidates.map(locator => {
       if (locator.scope === "open-wc" && locator.name == "dev-server-hmr" && locator.reference === "npm:0.1.2") {
-        return structUtils.parseLocator("git@github.com:yarnpkg/berry.git#workspace=@yarnpkg/shell&tag=@yarnpkg/shell/2.1.0", true)
+        //return structUtils.parseLocator("git@github.com:yarnpkg/berry.git#workspace=@yarnpkg/shell&tag=@yarnpkg/shell/2.1.0", true)
       }
       return locator
     })
