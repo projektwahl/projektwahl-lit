@@ -322,10 +322,10 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           ],
           "linkType": "SOFT",
         }],
-        ["virtual:88c0516341bf13d9ef981717f9bd571cda65285eb1ffe7850493fa37302736b97063aff80b46d9db0c6d1f3963c7d13a437a4c889090a05d1ffc1b1946aa8166#npm:7.12.13", {
-          "packageLocation": "./.yarn/__virtual__/@babel-plugin-syntax-class-properties-virtual-26a1a00201/0/cache/@babel-plugin-syntax-class-properties-npm-7.12.13-002ee9d930-24f34b196d.zip/node_modules/@babel/plugin-syntax-class-properties/",
+        ["virtual:dd96323b2856489bbbd563656733e18c04fa410a7dfc1490857b94929d89480f2c86554fe86e0a1d0f16ee2f4bab49b0d1710e04a43e4da35fc6716eae13a774#npm:7.12.13", {
+          "packageLocation": "./.yarn/__virtual__/@babel-plugin-syntax-class-properties-virtual-07f96733c4/0/cache/@babel-plugin-syntax-class-properties-npm-7.12.13-002ee9d930-24f34b196d.zip/node_modules/@babel/plugin-syntax-class-properties/",
           "packageDependencies": [
-            ["@babel/plugin-syntax-class-properties", "virtual:88c0516341bf13d9ef981717f9bd571cda65285eb1ffe7850493fa37302736b97063aff80b46d9db0c6d1f3963c7d13a437a4c889090a05d1ffc1b1946aa8166#npm:7.12.13"],
+            ["@babel/plugin-syntax-class-properties", "virtual:dd96323b2856489bbbd563656733e18c04fa410a7dfc1490857b94929d89480f2c86554fe86e0a1d0f16ee2f4bab49b0d1710e04a43e4da35fc6716eae13a774#npm:7.12.13"],
             ["@babel/core", "npm:7.15.8"],
             ["@babel/helper-plugin-utils", "npm:7.14.5"],
             ["@types/babel__core", null]
@@ -345,10 +345,10 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           ],
           "linkType": "SOFT",
         }],
-        ["virtual:88c0516341bf13d9ef981717f9bd571cda65285eb1ffe7850493fa37302736b97063aff80b46d9db0c6d1f3963c7d13a437a4c889090a05d1ffc1b1946aa8166#npm:7.14.5", {
-          "packageLocation": "./.yarn/__virtual__/@babel-plugin-syntax-import-assertions-virtual-b5fc965509/0/cache/@babel-plugin-syntax-import-assertions-npm-7.14.5-5446846301-9d3851743e.zip/node_modules/@babel/plugin-syntax-import-assertions/",
+        ["virtual:dd96323b2856489bbbd563656733e18c04fa410a7dfc1490857b94929d89480f2c86554fe86e0a1d0f16ee2f4bab49b0d1710e04a43e4da35fc6716eae13a774#npm:7.14.5", {
+          "packageLocation": "./.yarn/__virtual__/@babel-plugin-syntax-import-assertions-virtual-b1aba26706/0/cache/@babel-plugin-syntax-import-assertions-npm-7.14.5-5446846301-9d3851743e.zip/node_modules/@babel/plugin-syntax-import-assertions/",
           "packageDependencies": [
-            ["@babel/plugin-syntax-import-assertions", "virtual:88c0516341bf13d9ef981717f9bd571cda65285eb1ffe7850493fa37302736b97063aff80b46d9db0c6d1f3963c7d13a437a4c889090a05d1ffc1b1946aa8166#npm:7.14.5"],
+            ["@babel/plugin-syntax-import-assertions", "virtual:dd96323b2856489bbbd563656733e18c04fa410a7dfc1490857b94929d89480f2c86554fe86e0a1d0f16ee2f4bab49b0d1710e04a43e4da35fc6716eae13a774#npm:7.14.5"],
             ["@babel/core", "npm:7.15.8"],
             ["@babel/helper-plugin-utils", "npm:7.14.5"],
             ["@types/babel__core", null]
@@ -368,10 +368,10 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           ],
           "linkType": "SOFT",
         }],
-        ["virtual:88c0516341bf13d9ef981717f9bd571cda65285eb1ffe7850493fa37302736b97063aff80b46d9db0c6d1f3963c7d13a437a4c889090a05d1ffc1b1946aa8166#npm:7.14.5", {
-          "packageLocation": "./.yarn/__virtual__/@babel-plugin-syntax-top-level-await-virtual-af5044021c/0/cache/@babel-plugin-syntax-top-level-await-npm-7.14.5-60a0a2e83b-bbd1a56b09.zip/node_modules/@babel/plugin-syntax-top-level-await/",
+        ["virtual:dd96323b2856489bbbd563656733e18c04fa410a7dfc1490857b94929d89480f2c86554fe86e0a1d0f16ee2f4bab49b0d1710e04a43e4da35fc6716eae13a774#npm:7.14.5", {
+          "packageLocation": "./.yarn/__virtual__/@babel-plugin-syntax-top-level-await-virtual-bfcf25857c/0/cache/@babel-plugin-syntax-top-level-await-npm-7.14.5-60a0a2e83b-bbd1a56b09.zip/node_modules/@babel/plugin-syntax-top-level-await/",
           "packageDependencies": [
-            ["@babel/plugin-syntax-top-level-await", "virtual:88c0516341bf13d9ef981717f9bd571cda65285eb1ffe7850493fa37302736b97063aff80b46d9db0c6d1f3963c7d13a437a4c889090a05d1ffc1b1946aa8166#npm:7.14.5"],
+            ["@babel/plugin-syntax-top-level-await", "virtual:dd96323b2856489bbbd563656733e18c04fa410a7dfc1490857b94929d89480f2c86554fe86e0a1d0f16ee2f4bab49b0d1710e04a43e4da35fc6716eae13a774#npm:7.14.5"],
             ["@babel/core", "npm:7.15.8"],
             ["@babel/helper-plugin-utils", "npm:7.14.5"],
             ["@types/babel__core", null]
@@ -610,14 +610,14 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
         }]
       ]],
       ["@open-wc/dev-server-hmr", [
-        ["npm:0.1.2", {
-          "packageLocation": "./.yarn/cache/@open-wc-dev-server-hmr-npm-0.1.2-88c0516341-09c221d642.zip/node_modules/@open-wc/dev-server-hmr/",
+        ["git@github.com:open-wc/open-wc.git#workspace=%40open-wc%2Fdev-server-hmr&commit=e99947128fdda2411387a171de74519331c0e8e8", {
+          "packageLocation": "./.yarn/cache/@open-wc-dev-server-hmr-git@github.com-dd96323b28-c45af7f338.zip/node_modules/@open-wc/dev-server-hmr/",
           "packageDependencies": [
-            ["@open-wc/dev-server-hmr", "npm:0.1.2"],
+            ["@open-wc/dev-server-hmr", "git@github.com:open-wc/open-wc.git#workspace=%40open-wc%2Fdev-server-hmr&commit=e99947128fdda2411387a171de74519331c0e8e8"],
             ["@babel/core", "npm:7.15.8"],
-            ["@babel/plugin-syntax-class-properties", "virtual:88c0516341bf13d9ef981717f9bd571cda65285eb1ffe7850493fa37302736b97063aff80b46d9db0c6d1f3963c7d13a437a4c889090a05d1ffc1b1946aa8166#npm:7.12.13"],
-            ["@babel/plugin-syntax-import-assertions", "virtual:88c0516341bf13d9ef981717f9bd571cda65285eb1ffe7850493fa37302736b97063aff80b46d9db0c6d1f3963c7d13a437a4c889090a05d1ffc1b1946aa8166#npm:7.14.5"],
-            ["@babel/plugin-syntax-top-level-await", "virtual:88c0516341bf13d9ef981717f9bd571cda65285eb1ffe7850493fa37302736b97063aff80b46d9db0c6d1f3963c7d13a437a4c889090a05d1ffc1b1946aa8166#npm:7.14.5"],
+            ["@babel/plugin-syntax-class-properties", "virtual:dd96323b2856489bbbd563656733e18c04fa410a7dfc1490857b94929d89480f2c86554fe86e0a1d0f16ee2f4bab49b0d1710e04a43e4da35fc6716eae13a774#npm:7.12.13"],
+            ["@babel/plugin-syntax-import-assertions", "virtual:dd96323b2856489bbbd563656733e18c04fa410a7dfc1490857b94929d89480f2c86554fe86e0a1d0f16ee2f4bab49b0d1710e04a43e4da35fc6716eae13a774#npm:7.14.5"],
+            ["@babel/plugin-syntax-top-level-await", "virtual:dd96323b2856489bbbd563656733e18c04fa410a7dfc1490857b94929d89480f2c86554fe86e0a1d0f16ee2f4bab49b0d1710e04a43e4da35fc6716eae13a774#npm:7.14.5"],
             ["@web/dev-server-core", "npm:0.3.16"],
             ["@web/dev-server-hmr", "npm:0.1.9"],
             ["picomatch", "npm:2.3.0"]
@@ -3061,7 +3061,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "packageDependencies": [
             ["browserslist", "npm:4.17.5"],
             ["caniuse-lite", "npm:1.0.30001272"],
-            ["electron-to-chromium", "npm:1.3.883"],
+            ["electron-to-chromium", "npm:1.3.884"],
             ["escalade", "npm:3.1.1"],
             ["node-releases", "npm:2.0.1"],
             ["picocolors", "npm:1.0.0"]
@@ -3942,10 +3942,10 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
         }]
       ]],
       ["electron-to-chromium", [
-        ["npm:1.3.883", {
-          "packageLocation": "./.yarn/cache/electron-to-chromium-npm-1.3.883-687e68ae62-da869b4021.zip/node_modules/electron-to-chromium/",
+        ["npm:1.3.884", {
+          "packageLocation": "./.yarn/cache/electron-to-chromium-npm-1.3.884-526041a18b-c067df7f2a.zip/node_modules/electron-to-chromium/",
           "packageDependencies": [
-            ["electron-to-chromium", "npm:1.3.883"]
+            ["electron-to-chromium", "npm:1.3.884"]
           ],
           "linkType": "HARD",
         }]
@@ -7028,7 +7028,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "packageLocation": "./packages/projektwahl-lit/",
           "packageDependencies": [
             ["projektwahl-lit", "workspace:packages/projektwahl-lit"],
-            ["@open-wc/dev-server-hmr", "npm:0.1.2"],
+            ["@open-wc/dev-server-hmr", "git@github.com:open-wc/open-wc.git#workspace=%40open-wc%2Fdev-server-hmr&commit=e99947128fdda2411387a171de74519331c0e8e8"],
             ["@swc/core", "npm:1.2.105"],
             ["@swc/helpers", "npm:0.2.13"],
             ["@types/express", "npm:4.17.13"],

@@ -39,9 +39,15 @@ export class MyCustomResolver implements Resolver {
     //console.log(candidates)
 
     // https://yarnpkg.com/features/protocols
+    // yarn workspaces info - yarn classis seems to name workspaces differently
     return candidates.map(locator => {
       if (locator.scope === "open-wc" && locator.name == "dev-server-hmr" && locator.reference === "npm:0.1.2") {
-        return structUtils.parseLocator("git@github.com:open-wc/open-wc.git#workspace=packages/dev-server-hmr&tag=@open-wc/dev-server-hmr@0.1.2-next.0", true)
+        //return structUtils.parseLocator("git@github.com:open-wc/open-wc.git#workspace=@open-wc/dev-server-hmr&tag=@open-wc/dev-server-hmr@0.1.2-next.0", true)
+
+        // https://github.com/yarnpkg/berry/blob/554257087edb4a103633e808253323fb9a21250d/packages/plugin-git/sources/GitResolver.ts#L30
+        // it wants a locked version
+
+        return structUtils.makeLocator(structUtils.convertToIdent(locator), "git@github.com:open-wc/open-wc.git#workspace=%40open-wc%2Fdev-server-hmr&commit=e99947128fdda2411387a171de74519331c0e8e8")
       }
       return locator
     })
