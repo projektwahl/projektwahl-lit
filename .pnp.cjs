@@ -2272,6 +2272,28 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           ],
           "linkType": "SOFT",
         }],
+        ["virtual:0b46eb3db083fd79154e1b927ad7610bceca028489d0fd9da1955603a435a09ada330afea05cc3f5ea0efdff20ab17e551fa085fb4961e0fad7ab2a29d8d8b65#npm:2.6.0", {
+          "packageLocation": "./.yarn/__virtual__/@yarnpkg-plugin-npm-virtual-9f4231178d/0/cache/@yarnpkg-plugin-npm-npm-2.6.0-538f6d491f-bc75ea0603.zip/node_modules/@yarnpkg/plugin-npm/",
+          "packageDependencies": [
+            ["@yarnpkg/plugin-npm", "virtual:0b46eb3db083fd79154e1b927ad7610bceca028489d0fd9da1955603a435a09ada330afea05cc3f5ea0efdff20ab17e551fa085fb4961e0fad7ab2a29d8d8b65#npm:2.6.0"],
+            ["@types/yarnpkg__core", null],
+            ["@types/yarnpkg__plugin-pack", null],
+            ["@yarnpkg/core", "npm:3.1.0"],
+            ["@yarnpkg/fslib", "npm:2.6.0"],
+            ["@yarnpkg/plugin-pack", null],
+            ["enquirer", "npm:2.3.6"],
+            ["semver", "npm:7.3.5"],
+            ["ssri", "npm:6.0.2"],
+            ["tslib", "npm:1.14.1"]
+          ],
+          "packagePeers": [
+            "@types/yarnpkg__core",
+            "@types/yarnpkg__plugin-pack",
+            "@yarnpkg/core",
+            "@yarnpkg/plugin-pack"
+          ],
+          "linkType": "HARD",
+        }],
         ["virtual:a2b848ad206b6246796e13479b1c806aa29e0832d4d394fa544337d679f776efa0f7575a00837c8ccd13e6432170738186341e0745206f98899c11ee756b9cdd#npm:2.6.0", {
           "packageLocation": "./.yarn/__virtual__/@yarnpkg-plugin-npm-virtual-fc6e7bfd9d/0/cache/@yarnpkg-plugin-npm-npm-2.6.0-538f6d491f-bc75ea0603.zip/node_modules/@yarnpkg/plugin-npm/",
           "packageDependencies": [
@@ -8907,6 +8929,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["@yarnpkg/builder", "virtual:0b46eb3db083fd79154e1b927ad7610bceca028489d0fd9da1955603a435a09ada330afea05cc3f5ea0efdff20ab17e551fa085fb4961e0fad7ab2a29d8d8b65#npm:3.1.0"],
             ["@yarnpkg/cli", "virtual:0b46eb3db083fd79154e1b927ad7610bceca028489d0fd9da1955603a435a09ada330afea05cc3f5ea0efdff20ab17e551fa085fb4961e0fad7ab2a29d8d8b65#npm:3.1.0"],
             ["@yarnpkg/core", "npm:3.1.0"],
+            ["@yarnpkg/plugin-npm", "virtual:0b46eb3db083fd79154e1b927ad7610bceca028489d0fd9da1955603a435a09ada330afea05cc3f5ea0efdff20ab17e551fa085fb4961e0fad7ab2a29d8d8b65#npm:2.6.0"],
             ["clipanion", "virtual:11e49090eef2ab4a7d256d57407eff59125c10a45a2c4a95d4b4eed662e01c6bb0b545ee238f4cce0100c8d2885c1a88c24bcf184f4baba2c58b80f525a4f6ab#npm:3.1.0"],
             ["typescript", "patch:typescript@npm%3A4.4.4#~builtin<compat/typescript>::version=4.4.4&hash=ddd1e8"]
           ],

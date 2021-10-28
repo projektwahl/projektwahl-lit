@@ -1,84 +1,58 @@
-import {Resolver, ResolveOptions, MinimalResolveOptions} from '@yarnpkg/core';
-import {Descriptor, Locator, Manifest}                   from '@yarnpkg/core';
-import {LinkType}                                        from '@yarnpkg/core';
-import {miscUtils, structUtils}                          from '@yarnpkg/core';
-
+import {Descriptor, Locator, Resolver, ResolveOptions, MinimalResolveOptions, Package, DescriptorHash, structUtils, } from '@yarnpkg/core';
+import { NpmSemverResolver } from '@yarnpkg/plugin-npm/lib/NpmSemverResolver'
 
 export class MyCustomResolver implements Resolver {
+
+  static PROTOCOL = "custom:";
+
   supportsDescriptor(descriptor: Descriptor, opts: MinimalResolveOptions) {
-    console.log("descriptor: " + descriptor + " opts: " + opts)
-    /*if (!TARBALL_REGEXP.test(descriptor.range))
-      return false;
+    console.log("descriptor")
+    console.log(descriptor)
 
-    if (PROTOCOL_REGEXP.test(descriptor.range))
-      return true;
-
-    return false;*/
-    return false;
+    return descriptor.range.startsWith(MyCustomResolver.PROTOCOL)
   }
 
+  // in the optimal case we resolve to locators of other resolvers
   supportsLocator(locator: Locator, opts: MinimalResolveOptions) {
-    console.log("locator: " + locator + " opts: " + opts)
-
-
-    return false;
-      /*
-    if (!TARBALL_REGEXP.test(locator.reference))
-      return false;
-
-    if (PROTOCOL_REGEXP.test(locator.reference))
-      return true;
-
-    return false;*/
+    return false
   }
 
-  shouldPersistResolution(locator: Locator, opts: MinimalResolveOptions) {
-    return true;
+ shouldPersistResolution(locator: Locator, opts: MinimalResolveOptions) {
+    return false; // for testing
   }
-
+ 
+  // should be good
   bindDescriptor(descriptor: Descriptor, fromLocator: Locator, opts: MinimalResolveOptions) {
     return descriptor;
   }
 
+  // should be good
   getResolutionDependencies(descriptor: Descriptor, opts: MinimalResolveOptions) {
     return [];
   }
 
-  async getCandidates(descriptor: Descriptor, dependencies: unknown, opts: ResolveOptions) {
-    return [structUtils.convertDescriptorToLocator(descriptor)];
+  async getCandidates(descriptor: Descriptor, dependencies: Map<DescriptorHash, Package>, opts: ResolveOptions) {
+    const nextDescriptor = structUtils.parseDescriptor(`${descriptor.scope?`@${descriptor.scope}/`:""}${descriptor.name}@npm:${descriptor.range.slice(MyCustomResolver.PROTOCOL.length)}`, true);
+    console.log("nextdescriptor:", nextDescriptor)
+
+    let candidates = await opts.resolver.getCandidates(nextDescriptor, dependencies, opts);
+    console.log(candidates)
+
+    return candidates.map(locator => {
+      if () {
+
+      }
+      return locator
+    })
   }
 
+  // should be good
   async getSatisfying(descriptor: Descriptor, references: Array<string>, opts: ResolveOptions) {
     return null;
   }
 
-  async resolve(locator: Locator, opts: ResolveOptions) {
-    if (!opts.fetchOptions)
-      throw new Error(`Assertion failed: This resolver cannot be used unless a fetcher is configured`);
-
-    const packageFetch = await opts.fetchOptions.fetcher.fetch(locator, opts.fetchOptions);
-
-    const manifest = await miscUtils.releaseAfterUseAsync(async () => {
-      return await Manifest.find(packageFetch.prefixPath, {baseFs: packageFetch.packageFs});
-    }, packageFetch.releaseFs);
-
-    return {
-      ...locator,
-
-      version: manifest.version || `0.0.0`,
-
-      languageName: manifest.languageName || opts.project.configuration.get(`defaultLanguageName`),
-      linkType: LinkType.HARD,
-
-      conditions: manifest.getConditions(),
-
-      dependencies: manifest.dependencies,
-      peerDependencies: manifest.peerDependencies,
-
-      dependenciesMeta: manifest.dependenciesMeta,
-      peerDependenciesMeta: manifest.peerDependenciesMeta,
-
-      bin: manifest.bin,
-    };
+  // should be good
+  async resolve(locator: Locator, opts: ResolveOptions): Promise<Package> {
+    throw new Error("not supported");
   }
 }
