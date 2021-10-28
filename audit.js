@@ -31,6 +31,7 @@ mv new-package-lock.json package-lock.json
 mv node_modules/ old_node_modules
 #npm --maxsockets 1 ci --verbose
 
+# TODO FIXME yarn uses the old .dependencies information so we need to also set that...
 yarn import
 
 
