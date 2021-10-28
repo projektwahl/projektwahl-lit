@@ -41,7 +41,7 @@ export class MyCustomResolver implements Resolver {
     // https://yarnpkg.com/features/protocols
     return candidates.map(locator => {
       if (locator.scope === "open-wc" && locator.name == "dev-server-hmr" && locator.reference === "npm:0.1.2") {
-        //return structUtils.parseLocator("git@github.com:yarnpkg/berry.git#workspace=@yarnpkg/shell&tag=@yarnpkg/shell/2.1.0", true)
+        return structUtils.parseLocator("git@github.com:open-wc/open-wc.git#workspace=packages/dev-server-hmr&tag=@open-wc/dev-server-hmr@0.1.2-next.0", true)
       }
       return locator
     })
