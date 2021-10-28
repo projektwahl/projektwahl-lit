@@ -14,6 +14,8 @@ npm install git+https://github.com/Microsoft/TypeScript.git
 // try out express.js first as it has dependencies and is still comparably simple
 npm install git+https://github.com/expressjs/express.git#semver:4.17.1
 
+// codeload doesnt handle user renames of github so npm breaks with that
+
 #rm -Rf ~/.npm/
 #npm cache clean --force
 #npm cache verify
@@ -27,7 +29,9 @@ node ~/Documents/projektwahl-lit/audit.js
 mv package-lock.json old-package-lock.json
 mv new-package-lock.json package-lock.json
 mv node_modules/ old_node_modules
-npm ci --verbose --maxsockets 1
+#npm --maxsockets 1 ci --verbose
+
+yarn import
 
 
 diffoscope --exclude-directory-metadata yes old_node_modules/ node_modules/
@@ -178,6 +182,9 @@ for (const [pkgpath, pkg] of Object.entries(package_lock.packages)) {
     package_json.repository = package_json.repository.replace("git@github.com:", "https://github.com/");
     package_json.repository = package_json.repository.replace("ssh://git@", "https://");
 
+    if (package_json.repository === "https://github.com/dfcreative/color-name.git") {
+        package_json.repository = "https://github.com/colorjs/color-name.git";
+    }
 
     console.log(package_json.repository)
 
@@ -273,8 +280,10 @@ for (const [pkgpath, pkg] of Object.entries(package_lock.packages)) {
     correct_url = correct_url?.replace("git+git", "git+https")
 
     if (package_json.name.startsWith("@tsconfig")) continue; // no package.json maybe that breaks it
-    if (package.json.name.startsWith("lodash.")) continue; // wrong package name?
-    if (package.json.name === "esbuild") continue; // no package.json
+    if (package_json.name.startsWith("lodash.")) continue; // wrong package name?
+    if (package_json.name === "esbuild") continue; // no package.json
+
+
 
 
     pkg.resolved = `git+${package_json.repository}#${correct_url}`;
@@ -285,7 +294,7 @@ for (const [pkgpath, pkg] of Object.entries(package_lock.packages)) {
     //console.log(pkg.resolved)
 }
 
-delete package_lock.dependencies;
+//delete package_lock.dependencies;
 
 //console.log(JSON.stringify(package_lock))
 await writeFile("new-package-lock.json", JSON.stringify(package_lock, null, 2))
