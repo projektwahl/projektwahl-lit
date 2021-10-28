@@ -11,6 +11,7 @@ const asyncExecFile = promisify(execFile);
 
 //  yarn dlx @yarnpkg/sdks vscode
 // yarn tsc -p tsconfig.json
+// yarn dlx @yarnpkg/doctor 
 
 // first approach: try to create a package-lock.json that uses git-repos
 // If the package being installed contains a prepare script, its dependencies and devDependencies will be installed, and the prepare script will be run, before the package is packaged and installed.
