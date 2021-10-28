@@ -2,7 +2,6 @@ import { readFile, writeFile, mkdtemp } from 'fs/promises';
 import { join } from 'path';
 import { execFile } from 'child_process'
 import { promisify } from 'util';
-import { tmpdir } from 'os';
 import { existsSync } from 'fs';
 const asyncExecFile = promisify(execFile);
 
@@ -15,13 +14,21 @@ npm install git+https://github.com/Microsoft/TypeScript.git
 // try out express.js first as it has dependencies and is still comparably simple
 npm install git+https://github.com/expressjs/express.git#semver:4.17.1
 
+#rm -Rf ~/.npm/
+#npm cache clean --force
+#npm cache verify
 
+// I think it says corrupted if there is no package.json
+// maybe also if the package name / version doesn't match
+
+git clean -xdf
 npm install
 node ~/Documents/projektwahl-lit/audit.js
 mv package-lock.json old-package-lock.json
 mv new-package-lock.json package-lock.json
 mv node_modules/ old_node_modules
-npm ci
+npm ci --verbose --maxsockets 1
+
 
 diffoscope --exclude-directory-metadata yes old_node_modules/ node_modules/
 
@@ -67,15 +74,19 @@ async function gitClonePackage([pkgpath, pkg], package_json, refs) {
         console.log(result)
     }
 
+    console.log(directory)
+
     for (const ref of refs) {
         try {
-            result = await asyncExecFile("git", ["checkout", ref], {
+            //result = await asyncExecFile("git", ["checkout", ref], {
+            //    cwd: directory,
+            //})
+
+            result = await asyncExecFile("git", ["rev-parse", `${ref}^{}`], {
                 cwd: directory,
             })
 
-            result = await asyncExecFile("git", ["rev-parse", "HEAD"], {
-                cwd: directory,
-            })
+            console.log(result)
     
             return result.stdout.trim();
         } catch (error) {}
@@ -86,17 +97,21 @@ async function gitClonePackage([pkgpath, pkg], package_json, refs) {
             result = await asyncExecFile("git", ["fetch", "--depth", "1", "origin", ref], {
                 cwd: directory,
             })
+            console.log(result)
 
-            result = await asyncExecFile("git", ["checkout", ref], {
+            //result = await asyncExecFile("git", ["checkout", ref], {
+            //    cwd: directory,
+            //})
+
+            result = await asyncExecFile("git", ["rev-parse", `${ref}^{}`], {
                 cwd: directory,
             })
-
-            result = await asyncExecFile("git", ["rev-parse", "HEAD"], {
-                cwd: directory,
-            })
+            console.log(result)
     
             return result.stdout.trim();
-        } catch (error) {}
+        } catch (error) {
+            console.log(error)
+        }
     }
 
     throw new Error(`no ref found from ${refs} for ${package_json.name} ${package_json.version} on ${package_json.repository}`)
@@ -123,7 +138,7 @@ async function typesPackage([pkgpath, pkg], package_json) {
         cwd: directory,
     })
     console.log(commit)
-
+/*
     result = await asyncExecFile("git", ["sparse-checkout", "init", "--cone"], {
         cwd: directory,
     })
@@ -138,7 +153,8 @@ async function typesPackage([pkgpath, pkg], package_json) {
         cwd: directory,
     })
     console.log(result)
-    return `git+${package_json.repository}#${commit.stdout.trim()}`
+    */
+    return commit.stdout.trim()
 }
 
 for (const [pkgpath, pkg] of Object.entries(package_lock.packages)) {
@@ -255,6 +271,11 @@ for (const [pkgpath, pkg] of Object.entries(package_lock.packages)) {
 
     // the easiest way to fix this would be to just get the commit and remote out of the cloned directory
     correct_url = correct_url?.replace("git+git", "git+https")
+
+    if (package_json.name.startsWith("@tsconfig")) continue; // no package.json maybe that breaks it
+    if (package.json.name.startsWith("lodash.")) continue; // wrong package name?
+    if (package.json.name === "esbuild") continue; // no package.json
+
 
     pkg.resolved = `git+${package_json.repository}#${correct_url}`;
     //pkg.integrity = correct_url;
