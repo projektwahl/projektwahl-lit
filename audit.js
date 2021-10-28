@@ -25,10 +25,14 @@ npm install git+https://github.com/expressjs/express.git#semver:4.17.1
 
 git clean -xdf
 npm install
+mv package-lock.json original-package-lock.json
+mv node_modules/ original_node_modules
+
+
+npm diff --diff=https://github.com/Microsoft/TypeScript.git --diff=typescript@4
+
+
 node ~/Documents/projektwahl-lit/audit.js
-mv package-lock.json old-package-lock.json
-mv new-package-lock.json package-lock.json
-mv node_modules/ old_node_modules
 #npm --maxsockets 1 ci --verbose
 
 # TODO FIXME yarn uses the old .dependencies information so we need to also set that...
@@ -65,7 +69,7 @@ diffoscope --exclude-directory-metadata yes old_node_modules/ node_modules/
 // Each Definitely Typed package is versioned when published to npm. The DefinitelyTyped-tools (the tool that publishes @types packages to npm) will set the declaration package's version by using the major.minor version number listed in the first line of its index.d.ts file. For example, here are the first few lines of Node's type declarations for version 10.12.x at the time of writing:
 
 // https://docs.npmjs.com/cli/v7/configuring-npm/package-lock-json
-let package_lock = JSON.parse(await readFile("./package-lock.json"));
+let package_lock = JSON.parse(await readFile("./original-package-lock.json"));
 
 
 // TODO FIXME we probably don't need to checkout as long as we only paste these into package-lock. If we need to calculate integrity hashes or so then we would.
@@ -131,7 +135,7 @@ async function typesPackage([pkgpath, pkg], package_json) {
         console.log(result)
     }
 
-    let readme_md = await readFile(join(pkgpath, "README.md"), {
+    let readme_md = await readFile(join("original_"+pkgpath, "README.md"), {
         encoding: "utf-8"
     })
 
@@ -168,7 +172,7 @@ for (const [pkgpath, pkg] of Object.entries(package_lock.packages)) {
     if (pkg.cpu !== undefined && !pkg.os.includes("linux")) continue;
     if (pkg.optional) continue;
     // https://docs.npmjs.com/cli/v7/configuring-npm/package-json
-    let package_json = JSON.parse(await readFile(join(pkgpath, "package.json")))
+    let package_json = JSON.parse(await readFile(join("original_" + pkgpath, "package.json")))
 
     console.log(package_json.name)
     console.log(package_json.version)
@@ -298,4 +302,4 @@ for (const [pkgpath, pkg] of Object.entries(package_lock.packages)) {
 //delete package_lock.dependencies;
 
 //console.log(JSON.stringify(package_lock))
-await writeFile("new-package-lock.json", JSON.stringify(package_lock, null, 2))
+await writeFile("package-lock.json", JSON.stringify(package_lock, null, 2))
