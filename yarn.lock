@@ -7347,9 +7347,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"yarn-plugin-helloworld@workspace:packages/yarn-git-fetcher-plugin":
+"yarn-plugin-dependencies-from-source@workspace:packages/yarn-plugin-dependencies-from-source":
   version: 0.0.0-use.local
-  resolution: "yarn-plugin-helloworld@workspace:packages/yarn-git-fetcher-plugin"
+  resolution: "yarn-plugin-dependencies-from-source@workspace:packages/yarn-plugin-dependencies-from-source"
   dependencies:
     "@types/node": ^16.0.0
     "@yarnpkg/builder": ^3.1.0
