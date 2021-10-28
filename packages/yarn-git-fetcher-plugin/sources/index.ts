@@ -1,20 +1,30 @@
 import {Plugin} from '@yarnpkg/core';
+import {BaseCommand} from '@yarnpkg/cli';
+import {Option} from 'clipanion';
 
-const plugin: Plugin {
-    name: `plugin-hello-world`,
-    factory: require => ({
-      hooks: {
-        setupScriptEnvironment(project, scriptEnv) {
-          scriptEnv.HELLO_WORLD = `my first plugin!`;
-        },
-      },
-    })
-  };
+class HelloWorldCommand extends BaseCommand {
+  static paths = [
+    [`hello`, `world`],
+  ];
 
-  // https://github.com/yarnpkg/berry/tree/master/packages/plugin-exec
+  name = Option.String(`--name`, `John Doe`, {
+    description: `Your name`,
+  });
 
-  // https://github.com/yarnpkg/berry/blob/master/packages/plugin-essentials/sources/commands/install.ts
-  // https://github.com/yarnpkg/berry/blob/e95a1df42f6b94fc7a308af1b038e43c7278ac5a/packages/yarnpkg-core/sources/Project.ts#L1725
-  // https://github.com/yarnpkg/berry/blob/e95a1df42f6b94fc7a308af1b038e43c7278ac5a/packages/yarnpkg-core/sources/Project.ts#L1440
-  // https://github.com/yarnpkg/berry/blob/e95a1df42f6b94fc7a308af1b038e43c7278ac5a/packages/yarnpkg-core/sources/Project.ts#L644
-  
+  async execute() {
+    console.log(`Hello ${this.name}!`);
+  }
+}
+
+const plugin: Plugin = {
+  hooks: {
+    afterAllInstalled: () => {
+      console.log(`What a great install, am I right?`);
+    },
+  },
+  commands: [
+    HelloWorldCommand,
+  ],
+};
+
+export default plugin;
