@@ -55,6 +55,5 @@
     "uuid": "^8.3.2",
     "zod": "^3.11.4"
   },
-  "workspaces": ["yarn-git-fetcher-plugin"],
   "packageManager": "yarn@3.1.0"
 }
