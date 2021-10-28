@@ -3,25 +3,35 @@
 import { hmrPlugin, presets } from "@open-wc/dev-server-hmr";
 import { esbuildPlugin } from "@web/dev-server-esbuild";
 import proxy from "koa-proxies";
+import { startDevServer } from '@web/dev-server';
 
 // https://github.com/open-wc/open-wc/issues/2327
 // https://open-wc.org/docs/development/hot-module-replacement/
 // https://modern-web.dev/docs/dev-server/cli-and-configuration/
-export default {
-  plugins: [
-    esbuildPlugin({ ts: true, target: "auto" }),
-    hmrPlugin({
-      include: ["src/**/*"],
-      presets: [presets.lit],
-    }),
-  ],
-  mimeTypes: {
-    "**/*.ts": "ts",
-  },
-  port: 9000,
-  middleware: [
-    proxy("/api", {
-      target: "http://localhost:9001",
-    }),
-  ],
-};
+
+async function main() {
+  const server = await startDevServer({
+    config: {
+      nodeResolve: true,
+      appIndex: "index.html",
+      plugins: [
+        esbuildPlugin({ ts: true, target: "auto" }),
+        hmrPlugin({
+          include: ["src/**/*"],
+          presets: [presets.lit],
+        }),
+      ],
+      mimeTypes: {
+        "**/*.ts": "ts",
+      },
+      port: 9000,
+      middleware: [
+        proxy("/api", {
+          target: "http://localhost:9001",
+        }),
+      ],
+    }    
+  });
+}
+
+main();

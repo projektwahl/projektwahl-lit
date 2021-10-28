@@ -9,6 +9,7 @@ const asyncExecFile = promisify(execFile);
 // https://yarnpkg.com/features/plugins
 // https://yarnpkg.com/advanced/plugin-tutorial
 
+//  yarn dlx @yarnpkg/sdks vscode
 // yarn tsc -p tsconfig.json
 
 // first approach: try to create a package-lock.json that uses git-repos

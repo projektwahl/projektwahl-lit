@@ -17,7 +17,7 @@
   "description": "Software to manage choosing projects and automatically assigning people to projects.",
   "type": "module",
   "scripts": {
-    "client": "web-dev-server --node-resolve --app-index index.html --open --config web-dev-server-config.mjs",
+    "client": "yarn node web-dev-server-config.mjs",
     "format": "prettier --write .",
     "check:format": "prettier --check .",
     "lint": "eslint .",
