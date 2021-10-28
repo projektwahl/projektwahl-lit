@@ -18,7 +18,8 @@
     "forceConsistentCasingInFileNames": true,
     "noImplicitOverride": true,
     "noPropertyAccessFromIndexSignature": true,
-    "exactOptionalPropertyTypes": true
+    "exactOptionalPropertyTypes": true,
+    "esModuleInterop": true
   },
   "include": ["**/*.ts"],
   "ts-node": {

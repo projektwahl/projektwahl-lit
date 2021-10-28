@@ -15,7 +15,7 @@
             nativeBuildInputs = [
               pkgs.bashInteractive
               pkgs.nodejs-16_x
-              pkgs.yarn
+              (pkgs.yarn.override { nodejs = pkgs.nodejs-16_x; })
               pkgs.postgresql_14
               pkgs.reuse
               pkgs.nixpkgs-fmt

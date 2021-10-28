@@ -22,7 +22,7 @@
     "check:format": "prettier --check .",
     "lint": "eslint .",
     "check": "tsc --noEmit",
-    "server": "DEBUG=express:* nodemon --exec node -- --trace-sync-io --loader ts-node/esm index.ts"
+    "server": "nodemon --exec yarn node -- --trace-sync-io index.js"
   },
   "license": "AGPL-3.0-or-later",
   "devDependencies": {
