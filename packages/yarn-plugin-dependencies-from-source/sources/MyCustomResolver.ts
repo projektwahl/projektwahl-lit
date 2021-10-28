@@ -6,8 +6,8 @@ export class MyCustomResolver implements Resolver {
   static PROTOCOL = "custom:";
 
   supportsDescriptor(descriptor: Descriptor, opts: MinimalResolveOptions) {
-    console.log("descriptor")
-    console.log(descriptor)
+    //console.log("descriptor")
+    //console.log(descriptor)
 
     return descriptor.range.startsWith(MyCustomResolver.PROTOCOL)
   }
@@ -33,14 +33,15 @@ export class MyCustomResolver implements Resolver {
 
   async getCandidates(descriptor: Descriptor, dependencies: Map<DescriptorHash, Package>, opts: ResolveOptions) {
     const nextDescriptor = structUtils.parseDescriptor(`${descriptor.scope?`@${descriptor.scope}/`:""}${descriptor.name}@npm:${descriptor.range.slice(MyCustomResolver.PROTOCOL.length)}`, true);
-    console.log("nextdescriptor:", nextDescriptor)
+    //console.log("nextdescriptor:", nextDescriptor)
 
     let candidates = await opts.resolver.getCandidates(nextDescriptor, dependencies, opts);
     console.log(candidates)
 
+    // https://yarnpkg.com/features/protocols
     return candidates.map(locator => {
-      if () {
-
+      if (locator.scope === "open-wc" && locator.name == "dev-server-hmr" && locator.reference === "npm:0.1.2") {
+        return structUtils.parseLocator("git@github.com:yarnpkg/berry.git#workspace=@yarnpkg/shell&tag=@yarnpkg/shell/2.1.0", true)
       }
       return locator
     })
