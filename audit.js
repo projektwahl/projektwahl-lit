@@ -5,6 +5,10 @@ import { promisify } from 'util';
 import { existsSync } from 'fs';
 const asyncExecFile = promisify(execFile);
 
+// https://yarnpkg.com/
+// https://yarnpkg.com/features/plugins
+// https://yarnpkg.com/advanced/plugin-tutorial
+
 // first approach: try to create a package-lock.json that uses git-repos
 // If the package being installed contains a prepare script, its dependencies and devDependencies will be installed, and the prepare script will be run, before the package is packaged and installed.
 // <protocol> is one of git, git+ssh, git+http, git+https, or git+file.
