@@ -3,45 +3,8 @@
 
 import { ZodError } from "zod";
 
-export type OptionalResult<
-  T,
-  E extends { [key: string]: string } = { [key in keyof T]: string }
-> = Result<T, E> | NoneResult<T, E>;
-
-export type Result<
-  T,
-  E extends { [key: string]: string } = { [key in keyof T]: string }
-> = SuccessResult<T, E> | FailureResult<T, E>;
-
-export type NoneResult<
-  T,
-  E extends { [key: string]: string } = { [key in keyof T]: string }
-> = {
-  result: "none";
-};
-
-export type SuccessResult<
-  T,
-  E extends { [key: string]: string } = { [key in keyof T]: string }
-> = {
-  result: "success";
-  success: T;
-};
-
-export type FailureResult<
-  T,
-  E extends { [key: string]: string } = { [key in keyof T]: string }
-> = {
-  result: "failure";
-  failure: E;
-};
-
-export const isErr = <
-  T,
-  E extends { [key: string]: string } = { [key in keyof T]: string }
->(
-  result: OptionalResult<T, E>
-): result is FailureResult<T, E> => {
+/** @type {<T,E extends { [key: string]: string } = { [key in keyof T]: string }>(result: import("./types").OptionalResult<T, E>) => result is import("./types").FailureResult<T, E>} */
+export const isErr = (result) => {
   return result.result === "failure";
 };
 
