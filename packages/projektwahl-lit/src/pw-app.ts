@@ -1,13 +1,7 @@
-var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
-    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
-    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
-    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
-    return c > 3 && r && Object.defineProperty(target, key, r), r;
-};
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // SPDX-FileCopyrightText: 2021 Moritz Hedtke <Moritz.Hedtke@t-online.de>
 import "./lib/form/pw-form";
-import { html, LitElement } from "lit";
+import { html, LitElement, TemplateResult } from "lit";
 import { customElement, state } from "lit/decorators.js";
 import { bootstrapCss } from ".";
 import { HistoryController } from "./history-controller";
@@ -15,18 +9,28 @@ import { aClick } from "./pw-a";
 import { classMap } from "lit/directives/class-map.js";
 import { until } from "lit/directives/until.js";
 import { pwLogin } from "./routes/login/pw-login";
-let PwApp = class PwApp extends LitElement {
-    constructor() {
-        super();
-        this.history = new HistoryController(this);
-    }
-    render() {
-        this.last = this.current;
-        this.current =
-            this.history.url.pathname === "/login"
-                ? pwLogin()
-                : Promise.resolve(html `Not Found`);
-        return html `
+
+@customElement("pw-app")
+export class PwApp extends LitElement {
+  private history = new HistoryController(this);
+
+  @state()
+  private last?: Promise<TemplateResult>;
+
+  @state()
+  private current!: Promise<TemplateResult>;
+
+  constructor() {
+    super();
+  }
+
+  override render() {
+    this.last = this.current;
+    this.current =
+      this.history.url.pathname === "/login"
+        ? pwLogin()
+        : Promise.resolve(html`Not Found`);
+    return html`
       ${bootstrapCss}
       <nav
         class="navbar navbar-expand-lg navbar-light bg-light shadow p-3 mb-5"
@@ -50,8 +54,8 @@ let PwApp = class PwApp extends LitElement {
                 <a
                   @click=${aClick}
                   class="nav-link ${classMap({
-            active: this.history.url.pathname === "/",
-        })}"
+                    active: this.history.url.pathname === "/",
+                  })}"
                   aria-current="page"
                   href="/"
                   >Start</a
@@ -61,8 +65,8 @@ let PwApp = class PwApp extends LitElement {
                 <a
                   @click=${aClick}
                   class="nav-link ${classMap({
-            active: this.history.url.pathname === "/users",
-        })}"
+                    active: this.history.url.pathname === "/users",
+                  })}"
                   href="/users"
                   >Nutzer</a
                 >
@@ -71,8 +75,8 @@ let PwApp = class PwApp extends LitElement {
                 <a
                   @click=${aClick}
                   class="nav-link ${classMap({
-            active: this.history.url.pathname === "/projects",
-        })}"
+                    active: this.history.url.pathname === "/projects",
+                  })}"
                   href="/projects"
                   >Projekte</a
                 >
@@ -81,8 +85,8 @@ let PwApp = class PwApp extends LitElement {
                 <a
                   @click=${aClick}
                   class="nav-link ${classMap({
-            active: this.history.url.pathname === "/election",
-        })}"
+                    active: this.history.url.pathname === "/election",
+                  })}"
                   href="/election"
                   >Wahl</a
                 >
@@ -98,8 +102,8 @@ let PwApp = class PwApp extends LitElement {
                 <a
                   @click=${aClick}
                   class="nav-link ${classMap({
-            active: this.history.url.pathname === "/login",
-        })}"
+                    active: this.history.url.pathname === "/login",
+                  })}"
                   href="/login"
                   >Anmelden</a
                 >
@@ -112,22 +116,15 @@ let PwApp = class PwApp extends LitElement {
       <div
         style="position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);"
       >
-        ${until(this.current.then(() => undefined), html `<div class="spinner-grow text-primary" role="status">
+        ${until(
+          this.current.then(() => undefined),
+          html`<div class="spinner-grow text-primary" role="status">
             <span class="visually-hidden">Loading...</span>
-          </div>`)}
+          </div>`
+        )}
       </div>
 
       ${until(this.current, this.last)}
     `;
-    }
-};
-__decorate([
-    state()
-], PwApp.prototype, "last", void 0);
-__decorate([
-    state()
-], PwApp.prototype, "current", void 0);
-PwApp = __decorate([
-    customElement("pw-app")
-], PwApp);
-export { PwApp };
+  }
+}
