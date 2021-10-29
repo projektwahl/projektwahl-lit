@@ -35,7 +35,7 @@ app.use((req, res, next) => {
   next();
 });
 
-morgan.token<express.Request>("id", function getId(req) {
+morgan.token("id", function getId(/** @type {express.Request} */ req) {
   return req.id;
 });
 
@@ -60,8 +60,6 @@ const loginInputSchema = z.object({
   username: z.string().min(3).max(100),
   password: z.string().min(6).max(1024).regex(/ffa/),
 });
-
-type LoginInputType = z.infer<typeof loginInputSchema>;
 
 post(app, "/api/v1/login", function (req, res) {
   let zodResult = loginInputSchema.safeParse(req.body);
