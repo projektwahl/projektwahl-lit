@@ -19,9 +19,7 @@
     "noImplicitOverride": true,
     "noPropertyAccessFromIndexSignature": true,
     "exactOptionalPropertyTypes": true,
-    "esModuleInterop": true,
-    "checkJs": true,
-    "allowJs": true
+    "esModuleInterop": true
   },
   "include": ["**/*.ts"],
   "ts-node": {
