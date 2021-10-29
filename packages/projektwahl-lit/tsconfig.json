@@ -7,8 +7,8 @@
     "moduleResolution": "Node",
     "lib": ["ESNext", "DOM"],
     "declaration": true,
-    "declarationMap": true,
-    "sourceMap": true,
+    "declarationMap": false,
+    "sourceMap": false,
     "strict": true,
     "experimentalDecorators": true,
     "useDefineForClassFields": false,
@@ -19,11 +19,9 @@
     "noImplicitOverride": true,
     "noPropertyAccessFromIndexSignature": true,
     "exactOptionalPropertyTypes": true,
-    "esModuleInterop": true
+    "esModuleInterop": true,
+    "allowJs": true,
+    "checkJs": true
   },
-  "include": ["**/*.ts"],
-  "ts-node": {
-    "transpileOnly": true,
-    "transpiler": "ts-node/transpilers/swc-experimental"
-  }
+  "include": ["**/*.js"],
 }
