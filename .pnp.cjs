@@ -4087,7 +4087,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
       ]],
       ["esbuild", [
         ["npm:0.12.29", {
-          "packageLocation": "./.yarn/unplugged/esbuild-npm-0.12.29-607de1d3c9/node_modules/esbuild/",
+          "packageLocation": "./.yarn/cache/esbuild-npm-0.12.29-607de1d3c9-06a6e84eff.zip/node_modules/esbuild/",
           "packageDependencies": [
             ["esbuild", "npm:0.12.29"]
           ],
