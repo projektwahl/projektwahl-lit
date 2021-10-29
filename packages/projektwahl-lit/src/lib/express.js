@@ -3,6 +3,12 @@
 import express from "express";
 import { Routes } from "../routes";
 
+/**
+ * 
+ * @param {*} app 
+ * @param {*} path 
+ * @param {*} handler 
+ */
 export function post<P extends keyof Routes>(
   app: express.Express,
   path: P,

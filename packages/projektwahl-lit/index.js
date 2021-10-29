@@ -9,6 +9,7 @@ import { z } from "zod";
 import { get, post } from "./src/lib/express.js";
 import { zod2result } from "./src/lib/result.js";
 
+
 // https://learning-notes.mistermicheels.com/javascript/typescript/runtime-type-checking/
 // https://www.azavea.com/blog/2020/10/29/run-time-type-checking-in-typescript-with-io-ts/
 // io-ts
@@ -61,9 +62,12 @@ const loginInputSchema = z.object({
   password: z.string().min(6).max(1024).regex(/ffa/),
 });
 
-type LoginInputType = z.infer<typeof loginInputSchema>;
+/**
+* @typedef {z.infer<typeof loginInputSchema>} LoginInputType;
+*/
 
 post(app, "/api/v1/login", function (req, res) {
+  /** @type {LoginInputType} */
   let zodResult = loginInputSchema.safeParse(req.body);
   const user = zod2result(zodResult);
 
