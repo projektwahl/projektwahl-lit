@@ -3,7 +3,7 @@
 import { hmrPlugin, presets } from "@open-wc/dev-server-hmr";
 import { esbuildPlugin } from "@web/dev-server-esbuild";
 import proxy from "koa-proxies";
-import { startDevServer } from '@web/dev-server';
+import { startDevServer } from "@web/dev-server";
 
 // https://github.com/open-wc/open-wc/issues/2327
 // https://open-wc.org/docs/development/hot-module-replacement/
@@ -26,7 +26,7 @@ async function main() {
           target: "http://localhost:9001",
         }),
       ],
-    }    
+    },
   });
 }
 

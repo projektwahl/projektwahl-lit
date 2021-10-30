@@ -5,7 +5,7 @@
     "name": "Moritz Hedtke",
     "email": "Moritz.Hedtke@t-online.de"
   },
-  "main": "index.ts",
+  "main": "index.js",
   "bugs": {
     "url": "https://github.com/mohe2015/projektwahl-lit/issues"
   },

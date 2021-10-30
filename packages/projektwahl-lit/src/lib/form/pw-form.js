@@ -17,12 +17,12 @@ export class PwForm extends LitElement {
       url: { attribute: false },
       actionText: { type: String },
       fakeSlot: { attribute: false },
-      result: { state: true }
-    }
+      result: { state: true },
+    };
   }
-  
+
   constructor() {
-    super()
+    super();
 
     /** @private */ this.history = new HistoryController(this);
 
@@ -95,8 +95,12 @@ if ('FormDataEvent' in window) {
         <div class="row justify-content-center">
           <div class="col-md-7 col-lg-8">
             ${promise(
-              /** @type {Promise<import("../types").OptionalResult<import("../../routes").Routes[P],{network?: string;} & { [key in keyof import("../../routes").Routes[P]]?: string }>>} */ (this.result),
-              /** @type {symbol | import("lit").TemplateResult | undefined} */ (noChange),
+              /** @type {Promise<import("../types").OptionalResult<import("../../routes").Routes[P],{network?: string;} & { [key in keyof import("../../routes").Routes[P]]?: string }>>} */ (
+                this.result
+              ),
+              /** @type {symbol | import("lit").TemplateResult | undefined} */ (
+                noChange
+              ),
               (v) =>
                 isErr(v) && v.failure.network !== undefined
                   ? html` <div class="alert alert-danger" role="alert">
@@ -126,4 +130,4 @@ if ('FormDataEvent' in window) {
     `;
   }
 }
-customElements.define("pw-form", PwForm)
+customElements.define("pw-form", PwForm);

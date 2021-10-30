@@ -16,32 +16,32 @@ export class PwInput extends LitElement {
       autocomplete: { type: String },
       randomId: { state: true },
       result: { attribute: false },
-    }
+    };
   }
 
   constructor() {
     super();
     this.randomId = "id" + Math.random().toString().replace(".", "");
 
-      /** @private */ this.history = new HistoryController(this);
+    /** @private */ this.history = new HistoryController(this);
 
-      /** @type {string} */
-      this.label;
+    /** @type {string} */
+    this.label;
 
-      /** @type {"text" | "password"} */
-      this.type;
+    /** @type {"text" | "password"} */
+    this.type;
 
-      /** @type {keyof T} */
-      this.name;
+    /** @type {keyof T} */
+    this.name;
 
-      /** @type {"username" | "current-password"} */
-      this.autocomplete;
+    /** @type {"username" | "current-password"} */
+    this.autocomplete;
 
-      /** @type {string} */
-      this.randomId;
+    /** @type {string} */
+    this.randomId;
 
-      /** @type {Promise<import("../types").OptionalResult<T, { network?: string } & { [key in keyof T]?: string }>>} */
-      this.result;
+    /** @type {Promise<import("../types").OptionalResult<T, { network?: string } & { [key in keyof T]?: string }>>} */
+    this.result;
   }
 
   // because forms in shadow root are garbage
@@ -67,7 +67,9 @@ export class PwInput extends LitElement {
         <input
           type=${this.type}
           class="form-control ${promise(
-            /** @type {Promise<import("../types").OptionalResult<T,{ network?: string } & { [key in keyof T]?: string }>>} */ (this.result),
+            /** @type {Promise<import("../types").OptionalResult<T,{ network?: string } & { [key in keyof T]?: string }>>} */ (
+              this.result
+            ),
             /** @type {string | symbol | undefined} */ (noChange),
             (v) =>
               isErr(v) && v.failure[this.name] !== undefined
@@ -84,8 +86,12 @@ export class PwInput extends LitElement {
           autocomplete=${this.autocomplete}
         />
         ${promise(
-          /** @type {Promise<import("../types").OptionalResult<T,{ network?: string } & { [key in keyof T]?: string }>>} */ (this.result),
-          /** @type {import("lit").TemplateResult | symbol | undefined} */ (noChange),
+          /** @type {Promise<import("../types").OptionalResult<T,{ network?: string } & { [key in keyof T]?: string }>>} */ (
+            this.result
+          ),
+          /** @type {import("lit").TemplateResult | symbol | undefined} */ (
+            noChange
+          ),
           (v) =>
             isErr(v) && v.failure[this.name] !== undefined
               ? html` <div
@@ -101,4 +107,4 @@ export class PwInput extends LitElement {
     `;
   }
 }
-customElements.define("pw-input", PwInput)
+customElements.define("pw-input", PwInput);

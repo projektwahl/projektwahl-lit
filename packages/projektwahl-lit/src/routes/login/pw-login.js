@@ -21,12 +21,12 @@ export const pwLogin = async () => {
 export class PwLogin extends LitElement {
   /** @override */ static get properties() {
     return {
-      result: { state: true }
-    }
+      result: { state: true },
+    };
   }
 
   constructor() {
-    super()
+    super();
     /** @type {Promise<import("../../lib/types").OptionalResult<import("../../routes").Routes[P],{ network?: string } & { [key in keyof import("../../routes").Routes[P]]?: string }>>} */
     this.result = Promise.resolve({ result: "none" });
   }
@@ -57,4 +57,4 @@ export class PwLogin extends LitElement {
     </pw-form>`;
   }
 }
-customElements.define("pw-login", PwLogin)
+customElements.define("pw-login", PwLogin);

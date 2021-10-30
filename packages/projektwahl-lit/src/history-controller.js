@@ -5,29 +5,27 @@
 
 /** @implements {import("lit").ReactiveController} */
 export class HistoryController {
-
   constructor(/** @type {import("lit").ReactiveControllerHost} */ host) {
-  /** @type {import("lit").ReactiveControllerHost} */
-  this.host = host;
-  host.addController(this)
+    /** @type {import("lit").ReactiveControllerHost} */
+    this.host = host;
+    host.addController(this);
 
-  /** @type {URL} */
-  this.url;
+    /** @type {URL} */
+    this.url;
 
-  /** @type {HistoryState} */
-  this.state;
+    /** @type {HistoryState} */
+    this.state;
 
-  /** @private @type {(this: Window, ev: PopStateEvent) => void} */
-  this.popstateListener;
+    /** @private @type {(this: Window, ev: PopStateEvent) => void} */
+    this.popstateListener;
 
-  /** @private @type {(this: Window,event: CustomEvent<{url: URL;state: HistoryState;}>) => void} */
-  this.navigateListener;
-
+    /** @private @type {(this: Window,event: CustomEvent<{url: URL;state: HistoryState;}>) => void} */
+    this.navigateListener;
   }
   hostConnected() {
     this.url = new URL(window.location.href);
     this.state = /** @type HistoryState */ (window.history.state);
-    this.popstateListener = (/** @type {PopStateEvent} */event) => {
+    this.popstateListener = (/** @type {PopStateEvent} */ event) => {
       this.url = new URL(window.location.href);
       this.state = /** @type {HistoryState} */ (event.state);
       this.host.requestUpdate();
@@ -39,9 +37,9 @@ export class HistoryController {
       this.url = event.detail.url;
       this.state = event.detail.state;
       this.host.requestUpdate();
-    }
+    };
 
-      window.addEventListener("navigate", this.navigateListener);
+    window.addEventListener("navigate", this.navigateListener);
   }
   hostDisconnected() {
     window.removeEventListener("popstate", this.popstateListener);

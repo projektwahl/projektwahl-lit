@@ -10,10 +10,7 @@ import { ifDefined } from "lit/directives/if-defined.js";
 export const aClick = (/** @type {MouseEvent} */ event) => {
   event.preventDefault();
   let target = /** @type {HTMLAnchorElement} */ (event.target);
-  HistoryController.goto(
-    new URL(target.href, window.location.href),
-    {}
-  );
+  HistoryController.goto(new URL(target.href, window.location.href), {});
 };
 
 // this works really bad because bootstrap css styles usually need context information which is not there with this.
@@ -23,8 +20,8 @@ export class PwADontUse extends LitElement {
       href: { type: String },
       class: { type: String },
       role: { type: String },
-      ariaCurrent: { type: String }
-    }
+      ariaCurrent: { type: String },
+    };
   }
 
   // with this this may actually be usable again
@@ -45,8 +42,8 @@ export class PwADontUse extends LitElement {
     this.role;
 
     /** @type {"page" | "step" | "location" | "date" | "time" | "true" | "false"} */
-    this.ariaCurrent
-}
+    this.ariaCurrent;
+  }
 
   clickHandler = (/** @type {MouseEvent} */ event) => {
     event.preventDefault();
@@ -64,4 +61,4 @@ export class PwADontUse extends LitElement {
       ></a>`;
   }
 }
-customElements.define("pw-a-dontuse", PwADontUse)
+customElements.define("pw-a-dontuse", PwADontUse);

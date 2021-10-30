@@ -3,22 +3,16 @@
 import { AsyncDirective, directive } from "lit/async-directive.js";
 
 class PromiseDirective extends AsyncDirective {
-
   /**
    * @template T
    * @template Q
-   * @param {Promise<T>} promise 
-   * @param {Q} defaultValue 
-   * @param {(v: T) => Q} resolveMapper 
-   * @param {(v: any) => Q} rejectMapper 
-   * @returns 
+   * @param {Promise<T>} promise
+   * @param {Q} defaultValue
+   * @param {(v: T) => Q} resolveMapper
+   * @param {(v: any) => Q} rejectMapper
+   * @returns
    */
-  render(
-    promise,
-    defaultValue,
-    resolveMapper,
-    rejectMapper
-  ) {
+  render(promise, defaultValue, resolveMapper, rejectMapper) {
     promise
       .then((resolvedValue) => {
         console.log("success");
@@ -34,4 +28,7 @@ class PromiseDirective extends AsyncDirective {
 }
 
 // https://github.com/lit/lit/blob/main/packages/lit-html/src/directives/repeat.ts#L481
-export const promise = /** @type {import("./promise-directive-types").PromiseDirectiveFn} */ (directive(PromiseDirective));
+export const promise =
+  /** @type {import("./promise-directive-types").PromiseDirectiveFn} */ (
+    directive(PromiseDirective)
+  );

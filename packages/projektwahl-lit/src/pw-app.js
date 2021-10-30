@@ -10,21 +10,20 @@ import { until } from "lit/directives/until.js";
 import { pwLogin } from "./routes/login/pw-login.js";
 
 // TODO FIXME show more details if possible (maybe error page)
-window.addEventListener('error', function(event) {
-  alert("unknown error: " + event.message)
-})
+window.addEventListener("error", function (event) {
+  alert("unknown error: " + event.message);
+});
 
-window.addEventListener('unhandledrejection', function(event) {
-   alert("unknown error: " + event.reason)
-})
-
+window.addEventListener("unhandledrejection", function (event) {
+  alert("unknown error: " + event.reason);
+});
 
 export class PwApp extends LitElement {
   /** @override */ static get properties() {
     return {
       last: { state: true },
-      current: { state: true }
-    }
+      current: { state: true },
+    };
   }
 
   constructor() {
@@ -33,18 +32,18 @@ export class PwApp extends LitElement {
     /**
      * @private
      * @type {Promise<import("lit").TemplateResult> | undefined}
-    */ 
+     */
     this.last;
 
     /**
      * @private
-    */
+     */
     this.history = new HistoryController(this);
 
     /**
      * @private
      * @type {Promise<import("lit").TemplateResult>}
-    */
+     */
     this.current;
   }
 
@@ -152,4 +151,4 @@ export class PwApp extends LitElement {
     `;
   }
 }
-customElements.define('pw-app', PwApp)
+customElements.define("pw-app", PwApp);
