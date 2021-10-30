@@ -16,6 +16,13 @@ yarn dlx @yarnpkg/sdks vscode
 ```
 https://docs.joshuatz.com/cheatsheets/js/jsdoc/
 
+TODO use https://www.npmjs.com/package/@lit-labs/task
+https://github.com/lit/lit/tree/main/packages/labs/task
+
+https://github.com/lit/lit/tree/main/packages/labs/motion
+
+https://github.com/lit/lit/blob/94dff0a4b74877a3de192eb32534c6237bb098a7/packages/labs/motion/demo/hero.html
+
 ## Firefox
 
 `about:config`: `layout.css.constructable-stylesheets.enabled = true`

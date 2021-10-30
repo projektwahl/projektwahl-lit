@@ -502,6 +502,16 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "linkType": "HARD",
         }]
       ]],
+      ["@lit-labs/motion", [
+        ["npm:1.0.1", {
+          "packageLocation": "./.yarn/cache/@lit-labs-motion-npm-1.0.1-22231fa78e-0dd6443e40.zip/node_modules/@lit-labs/motion/",
+          "packageDependencies": [
+            ["@lit-labs/motion", "npm:1.0.1"],
+            ["lit", "npm:2.0.2"]
+          ],
+          "linkType": "HARD",
+        }]
+      ]],
       ["@lit/reactive-element", [
         ["npm:1.0.1", {
           "packageLocation": "./.yarn/cache/@lit-reactive-element-npm-1.0.1-1ac8aded20-82f8eb195a.zip/node_modules/@lit/reactive-element/",
@@ -6759,6 +6769,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "packageLocation": "./packages/projektwahl-lit/",
           "packageDependencies": [
             ["projektwahl-lit", "workspace:packages/projektwahl-lit"],
+            ["@lit-labs/motion", "npm:1.0.1"],
             ["@open-wc/dev-server-hmr", "npm:0.1.2"],
             ["@types/express", "npm:4.17.13"],
             ["@types/morgan", "npm:1.9.3"],

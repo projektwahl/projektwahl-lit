@@ -1,7 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // SPDX-FileCopyrightText: 2021 Moritz Hedtke <Moritz.Hedtke@t-online.de>
 import { hmrPlugin, presets } from "@open-wc/dev-server-hmr";
-import { esbuildPlugin } from "@web/dev-server-esbuild";
 import proxy from "koa-proxies";
 import { startDevServer } from "@web/dev-server";
 

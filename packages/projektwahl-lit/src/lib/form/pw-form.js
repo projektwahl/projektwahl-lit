@@ -7,6 +7,7 @@ import { HistoryController } from "../../history-controller";
 import { myFetch } from "../../utils";
 import { promise } from "./promise-directive";
 import { isErr } from "../result";
+import { animate, flyLeft, flyRight } from "@lit-labs/motion";
 
 /**
  * @template {keyof import("../../routes").Routes} P
@@ -86,6 +87,11 @@ if ('FormDataEvent' in window) {
       throw new Error("component not fully initialized");
     }
 
+    const keyframeOptions = {
+      duration: 500,
+      fill: 'both',
+    };
+
     console.log("rerender");
     return html`
       ${bootstrapCss}
@@ -120,9 +126,10 @@ if ('FormDataEvent' in window) {
             >
               ${this.fakeSlot}
 
-              <button type="submit" class="btn btn-primary">
-                ${this.actionText}
+              <button type="submit" ?disabled=${promise(this.result, true, () => false, () => false)} class="btn btn-primary">
+              ${this.actionText}
               </button>
+
             </form>
           </div>
         </div>

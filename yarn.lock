@@ -368,6 +368,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@lit-labs/motion@npm:^1.0.1":
+  version: 1.0.1
+  resolution: "@lit-labs/motion@npm:1.0.1"
+  dependencies:
+    lit: ^2.0.0
+  checksum: 0dd6443e40c32d181be6c4c398c15bcef2309055d95aeddf9aa2915654ca9a63f6fbd72806f7ba1177de5f6fc49aee1fca2ba665f11c56c0287ebdaab959bb5d
+  languageName: node
+  linkType: hard
+
 "@lit/reactive-element@npm:^1.0.0":
   version: 1.0.1
   resolution: "@lit/reactive-element@npm:1.0.1"
@@ -4516,7 +4525,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"lit@npm:^2.0.2":
+"lit@npm:^2.0.0, lit@npm:^2.0.2":
   version: 2.0.2
   resolution: "lit@npm:2.0.2"
   dependencies:
@@ -5472,6 +5481,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "projektwahl-lit@workspace:packages/projektwahl-lit"
   dependencies:
+    "@lit-labs/motion": ^1.0.1
     "@open-wc/dev-server-hmr": ^0.1.2
     "@types/express": ^4.17.13
     "@types/morgan": ^1.9.3

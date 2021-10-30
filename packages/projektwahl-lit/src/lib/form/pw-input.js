@@ -84,6 +84,7 @@ export class PwInput extends LitElement {
           id=${this.randomId}
           aria-describedby="${this.randomId}-feedback"
           autocomplete=${this.autocomplete}
+          ?disabled=${promise(this.result, true, () => false, () => false)}
         />
         ${promise(
           /** @type {Promise<import("../types").OptionalResult<T,{ network?: string } & { [key in keyof T]?: string }>>} */ (

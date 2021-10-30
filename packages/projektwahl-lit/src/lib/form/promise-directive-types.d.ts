@@ -7,5 +7,5 @@ export interface PromiseDirectiveFn {
     defaultValue: Q,
     resolveMapper: (v: T) => Q,
     rejectMapper: (v: any) => Q
-  ): unknown;
+  ): Q;
 }
