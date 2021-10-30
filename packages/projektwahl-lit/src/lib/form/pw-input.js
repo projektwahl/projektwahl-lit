@@ -8,13 +8,15 @@ import { promise } from "./promise-directive";
 
 /** @template T */
 export class PwInput extends LitElement {
-  /** @override */ static properties = {
-    label: { type: String },
-    type: { type: String },
-    name: { type: String },
-    autocomplete: { type: String },
-    randomId: { state: true },
-    result: { attribute: false },
+  /** @override */ static get properties() {
+    return {
+      label: { type: String },
+      type: { type: String },
+      name: { type: String },
+      autocomplete: { type: String },
+      randomId: { state: true },
+      result: { attribute: false },
+    }
   }
 
   constructor() {

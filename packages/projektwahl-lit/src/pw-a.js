@@ -18,12 +18,14 @@ export const aClick = (/** @type {MouseEvent} */ event) => {
 
 // this works really bad because bootstrap css styles usually need context information which is not there with this.
 export class PwADontUse extends LitElement {
-  /** @override */ static properties = {
-    href: { type: String },
-    class: { type: String },
-    role: { type: String },
-    ariaCurrent: { type: String }
-  };
+  /** @override */ static get properties() {
+    return {
+      href: { type: String },
+      class: { type: String },
+      role: { type: String },
+      ariaCurrent: { type: String }
+    }
+  }
 
   // with this this may actually be usable again
   /** @protected @override */ createRenderRoot() {

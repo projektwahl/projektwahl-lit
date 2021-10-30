@@ -12,11 +12,13 @@ import { isErr } from "../result";
  * @template {keyof import("../../routes").Routes} P
  */
 export class PwForm extends LitElement {
-  /** @override */ static properties = {
-    url: { attribute: false },
-    actionText: { type: String },
-    fakeSlot: { attribute: false },
-    result: { state: true }
+  /** @override */ static get properties() {
+    return {
+      url: { attribute: false },
+      actionText: { type: String },
+      fakeSlot: { attribute: false },
+      result: { state: true }
+    }
   }
   
   constructor() {

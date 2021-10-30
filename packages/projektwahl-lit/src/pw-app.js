@@ -20,10 +20,12 @@ window.addEventListener('unhandledrejection', function(event) {
 
 
 export class PwApp extends LitElement {
-  /** @override */ static properties = {
-    last: { state: true },
-    current: { state: true }
-  };
+  /** @override */ static get properties() {
+    return {
+      last: { state: true },
+      current: { state: true }
+    }
+  }
 
   constructor() {
     super();

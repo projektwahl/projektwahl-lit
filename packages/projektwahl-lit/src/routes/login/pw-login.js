@@ -19,8 +19,10 @@ export const pwLogin = async () => {
  * @template {keyof import("../../routes").Routes} P
  */
 export class PwLogin extends LitElement {
-  /** @override */ static properties = {
-    result: { state: true }
+  /** @override */ static get properties() {
+    return {
+      result: { state: true }
+    }
   }
 
   constructor() {
