@@ -21,6 +21,7 @@
     "format": "prettier --write .",
     "check:format": "prettier --check .",
     "lint": "eslint .",
+    "fix:lint": "eslint --fix .",
     "check": "tsc --noEmit",
     "server": "nodemon --exec yarn node -- --trace-sync-io index.js"
   },
