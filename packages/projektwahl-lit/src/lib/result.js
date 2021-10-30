@@ -1,8 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // SPDX-FileCopyrightText: 2021 Moritz Hedtke <Moritz.Hedtke@t-online.de>
 
-import { z, ZodError } from "zod";
-
 /** @type {<T,E extends { [key: string]: string } = { [key in keyof T]: string }>(result: import("./types").OptionalResult<T, E>) => result is import("./types").FailureResult<T, E>} */
 export const isErr = (result) => {
   return result.result === "failure";
@@ -79,8 +77,9 @@ export function errOrDefault(result, defaultError) {
   return defaultError;
 }
 
-const zoderr2err = (/** @type {z.ZodIssue[]} */ arr) => {
+const zoderr2err = (/** @type {import("zod").z.ZodIssue[]} */ arr) => {
   const initialValue = {};
+  // @ts-expect-error
   return arr.reduce((/** @type {Record<string, string>} */ acc, cval) => {
     const myAttribute = cval.path[0];
     acc[myAttribute] = (acc[myAttribute] || "") + cval.message + ". ";
@@ -95,7 +94,7 @@ const zoderr2err = (/** @type {z.ZodIssue[]} */ arr) => {
       }
     | {
         success: false;
-        error: ZodError<Input>;
+        error: import("zod").ZodError<Input>;
       }
 ) => import("./types").Result<Output>} */
 export function zod2result(input) {

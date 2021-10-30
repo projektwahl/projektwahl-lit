@@ -1,11 +1,9 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // SPDX-FileCopyrightText: 2021 Moritz Hedtke <Moritz.Hedtke@t-online.de>
-import { html, LitElement, noChange, TemplateResult } from "lit";
-import { customElement, property, state } from "lit/decorators.js";
+import { html, LitElement, noChange } from "lit";
 import { bootstrapCss } from "../..";
 import { HistoryController } from "../../history-controller";
 import { isErr } from "../result";
-import {OptionalResult, Result } from "../types"
 import { promise } from "./promise-directive";
 
 /** @template T */
@@ -40,7 +38,7 @@ export class PwInput extends LitElement {
       /** @type {string} */
       this.randomId;
 
-      /** @type {Promise<OptionalResult<T, { network?: string } & { [key in keyof T]?: string }>>} */
+      /** @type {Promise<import("../types").OptionalResult<T, { network?: string } & { [key in keyof T]?: string }>>} */
       this.result;
   }
 
@@ -67,7 +65,7 @@ export class PwInput extends LitElement {
         <input
           type=${this.type}
           class="form-control ${promise(
-            /** @type {Promise<OptionalResult<T,{ network?: string } & { [key in keyof T]?: string }>>} */ (this.result),
+            /** @type {Promise<import("../types").OptionalResult<T,{ network?: string } & { [key in keyof T]?: string }>>} */ (this.result),
             /** @type {string | symbol | undefined} */ (noChange),
             (v) =>
               isErr(v) && v.failure[this.name] !== undefined
@@ -84,8 +82,8 @@ export class PwInput extends LitElement {
           autocomplete=${this.autocomplete}
         />
         ${promise(
-          /** @type {Promise<OptionalResult<T,{ network?: string } & { [key in keyof T]?: string }>>} */ (this.result),
-          /** @type {TemplateResult | symbol | undefined} */ (noChange),
+          /** @type {Promise<import("../types").OptionalResult<T,{ network?: string } & { [key in keyof T]?: string }>>} */ (this.result),
+          /** @type {import("lit").TemplateResult | symbol | undefined} */ (noChange),
           (v) =>
             isErr(v) && v.failure[this.name] !== undefined
               ? html` <div

@@ -1,17 +1,15 @@
 import "./pw-input"; // SPDX-License-Identifier: AGPL-3.0-or-later
 // SPDX-FileCopyrightText: 2021 Moritz Hedtke <Moritz.Hedtke@t-online.de>
-import { html, LitElement, noChange, TemplateResult } from "lit";
-import { createRef, Ref, ref } from "lit/directives/ref.js";
+import { html, LitElement, noChange } from "lit";
+import { createRef, ref } from "lit/directives/ref.js";
 import { bootstrapCss } from "../..";
 import { HistoryController } from "../../history-controller";
 import { myFetch } from "../../utils";
-import { Routes } from "../../routes";
-import { OptionalResult } from "../types";
 import { promise } from "./promise-directive";
 import { isErr } from "../result";
 
 /**
- * @template {keyof Routes} P
+ * @template {keyof import("../../routes").Routes} P
  */
 export class PwForm extends LitElement {
   /** @override */ static properties = {
@@ -32,13 +30,13 @@ export class PwForm extends LitElement {
     /** @type {string} */
     this.actionText;
 
-    /** @type {TemplateResult} */
+    /** @type {import("lit").TemplateResult} */
     this.fakeSlot;
 
-    /** @type {Ref<HTMLFormElement>} */
+    /** @type {import("lit/directives/ref").Ref<HTMLFormElement>} */
     this.form = createRef();
 
-    /** @type {Promise<OptionalResult<Routes[P],{ network?: string } & { [key in keyof Routes[P]]?: string }>>} */
+    /** @type {Promise<import("../types").OptionalResult<import("../../routes").Routes[P],{ network?: string } & { [key in keyof import("../../routes").Routes[P]]?: string }>>} */
     this.result = Promise.resolve({ result: "none" });
   }
 
@@ -95,8 +93,8 @@ if ('FormDataEvent' in window) {
         <div class="row justify-content-center">
           <div class="col-md-7 col-lg-8">
             ${promise(
-              /** @type {Promise<OptionalResult<Routes[P],{network?: string;} & { [key in keyof Routes[P]]?: string }>>} */ (this.result),
-              /** @type {symbol | TemplateResult | undefined} */ (noChange),
+              /** @type {Promise<import("../types").OptionalResult<import("../../routes").Routes[P],{network?: string;} & { [key in keyof import("../../routes").Routes[P]]?: string }>>} */ (this.result),
+              /** @type {symbol | import("lit").TemplateResult | undefined} */ (noChange),
               (v) =>
                 isErr(v) && v.failure.network !== undefined
                   ? html` <div class="alert alert-danger" role="alert">

@@ -21,7 +21,8 @@
     "exactOptionalPropertyTypes": true,
     "esModuleInterop": true,
     "allowJs": true,
-    "checkJs": true
+    "checkJs": true,
+    "importsNotUsedAsValues": "error",
   },
   "include": ["**/*.ts", "**/*.js"],
   "ts-node": {

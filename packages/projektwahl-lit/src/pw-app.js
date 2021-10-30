@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // SPDX-FileCopyrightText: 2021 Moritz Hedtke <Moritz.Hedtke@t-online.de>
 import "./lib/form/pw-form";
-import { html, LitElement, TemplateResult } from "lit";
+import { html, LitElement } from "lit";
 import { bootstrapCss } from "./index.js";
 import { HistoryController } from "./history-controller";
 import { aClick } from "./pw-a.js";
@@ -30,7 +30,7 @@ export class PwApp extends LitElement {
 
     /**
      * @private
-     * @type {Promise<TemplateResult> | undefined}
+     * @type {Promise<import("lit").TemplateResult> | undefined}
     */ 
     this.last;
 
@@ -41,7 +41,7 @@ export class PwApp extends LitElement {
 
     /**
      * @private
-     * @type {Promise<TemplateResult>}
+     * @type {Promise<import("lit").TemplateResult>}
     */
     this.current;
   }

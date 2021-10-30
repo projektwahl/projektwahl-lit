@@ -1,14 +1,13 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // SPDX-FileCopyrightText: 2021 Moritz Hedtke <Moritz.Hedtke@t-online.de>
-import { ReactiveController, ReactiveControllerHost } from "lit";
 
 /** @typedef {Record<string, unknown>} HistoryState */
 
-/** @implements {ReactiveController} */
+/** @implements {import("lit").ReactiveController} */
 export class HistoryController {
 
-  constructor(/** @type {ReactiveControllerHost} */ host) {
-  /** @type {ReactiveControllerHost} */
+  constructor(/** @type {import("lit").ReactiveControllerHost} */ host) {
+  /** @type {import("lit").ReactiveControllerHost} */
   this.host = host;
   host.addController(this)
 
