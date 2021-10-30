@@ -9,6 +9,16 @@ import { classMap } from "lit/directives/class-map.js";
 import { until } from "lit/directives/until.js";
 import { pwLogin } from "./routes/login/pw-login.js";
 
+// TODO FIXME show more details if possible (maybe error page)
+window.addEventListener('error', function(event) {
+  alert("unknown error: " + event.message)
+})
+
+window.addEventListener('unhandledrejection', function(event) {
+   alert("unknown error: " + event.reason)
+})
+
+
 export class PwApp extends LitElement {
   /** @override */ static properties = {
     last: { state: true },

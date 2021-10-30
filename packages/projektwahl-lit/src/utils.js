@@ -1,18 +1,19 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // SPDX-FileCopyrightText: 2021 Moritz Hedtke <Moritz.Hedtke@t-online.de>
 
-import { Result } from "./lib/result";
+import { Result } from "./lib/types";
 import { Routes } from "./routes";
 
-export const myFetch = async <P extends keyof Routes>(
+/** @type {<P extends keyof Routes>(
   url: P,
   options: RequestInit | undefined
-): Promise<
+) => Promise<
   Result<
     Routes[P],
     { network?: string } & { [key in keyof Routes[P]]?: string }
   >
-> => {
+>} */
+export const myFetch = async (url, options) => {
   try {
     const response = await fetch(url, options);
     if (!response.ok) {
@@ -24,7 +25,7 @@ export const myFetch = async <P extends keyof Routes>(
             network: `Failed to request ${url}: ${response.status} ${response.statusText}\nAdditional information: ${additionalInfo}`,
           },
         };
-      } catch (error: unknown) {
+      } catch (/** @type {unknown} */ error) {
         return {
           result: "failure",
           failure: {

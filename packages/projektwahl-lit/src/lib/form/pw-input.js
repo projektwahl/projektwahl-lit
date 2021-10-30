@@ -4,44 +4,52 @@ import { html, LitElement, noChange, TemplateResult } from "lit";
 import { customElement, property, state } from "lit/decorators.js";
 import { bootstrapCss } from "../..";
 import { HistoryController } from "../../history-controller";
-import { isErr, OptionalResult, Result } from "../result";
+import { isErr } from "../result";
+import {OptionalResult, Result } from "../types"
 import { promise } from "./promise-directive";
 
-@customElement("pw-input")
-export class PwInput<T> extends LitElement {
-  private history = new HistoryController(this);
-
-  @property({ type: String })
-  label!: string;
-
-  @property({ type: String })
-  type!: "text" | "password";
-
-  @property({ type: String })
-  name!: keyof T;
-
-  @property({ type: String })
-  autocomplete!: "username" | "current-password";
-
-  @state()
-  randomId: string;
-
-  @property({ attribute: false })
-  result!: Promise<
-    OptionalResult<T, { network?: string } & { [key in keyof T]?: string }>
-  >;
+/** @template T */
+export class PwInput extends LitElement {
+  /** @override */ static properties = {
+    label: { type: String },
+    type: { type: String },
+    name: { type: String },
+    autocomplete: { type: String },
+    randomId: { state: true },
+    result: { attribute: false },
+  }
 
   constructor() {
     super();
     this.randomId = "id" + Math.random().toString().replace(".", "");
+
+      /** @private */ this.history = new HistoryController(this);
+
+      /** @type {string} */
+      this.label;
+
+      /** @type {"text" | "password"} */
+      this.type;
+
+      /** @type {keyof T} */
+      this.name;
+
+      /** @type {"username" | "current-password"} */
+      this.autocomplete;
+
+      /** @type {string} */
+      this.randomId;
+
+      /** @type {Promise<OptionalResult<T, { network?: string } & { [key in keyof T]?: string }>>} */
+      this.result;
   }
 
   // because forms in shadow root are garbage
-  protected override createRenderRoot() {
+  /** @protected @override */ createRenderRoot() {
     return this;
   }
 
-  override render() {
+  /** @override */ render() {
     if (
       this.label === undefined ||
       this.type === undefined ||
@@ -58,15 +66,9 @@ export class PwInput<T> extends LitElement {
         <label for=${this.randomId} class="form-label">${this.label}:</label>
         <input
           type=${this.type}
-          class="form-control ${promise<
-            OptionalResult<
-              T,
-              { network?: string } & { [key in keyof T]?: string }
-            >,
-            string | symbol | undefined
-          >(
-            this.result,
-            noChange,
+          class="form-control ${promise(
+            /** @type {Promise<OptionalResult<T,{ network?: string } & { [key in keyof T]?: string }>>} */ (this.result),
+            /** @type {string | symbol | undefined} */ (noChange),
             (v) =>
               isErr(v) && v.failure[this.name] !== undefined
                 ? "is-invalid"
@@ -81,15 +83,9 @@ export class PwInput<T> extends LitElement {
           aria-describedby="${this.randomId}-feedback"
           autocomplete=${this.autocomplete}
         />
-        ${promise<
-          OptionalResult<
-            T,
-            { network?: string } & { [key in keyof T]?: string }
-          >,
-          TemplateResult | symbol | undefined
-        >(
-          this.result,
-          noChange,
+        ${promise(
+          /** @type {Promise<OptionalResult<T,{ network?: string } & { [key in keyof T]?: string }>>} */ (this.result),
+          /** @type {TemplateResult | symbol | undefined} */ (noChange),
           (v) =>
             isErr(v) && v.failure[this.name] !== undefined
               ? html` <div
@@ -105,3 +101,4 @@ export class PwInput<T> extends LitElement {
     `;
   }
 }
+customElements.define("pw-input", PwInput)

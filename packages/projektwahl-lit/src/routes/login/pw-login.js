@@ -5,7 +5,7 @@ import { html, LitElement, TemplateResult } from "lit";
 import { customElement, state } from "lit/decorators.js";
 import { Routes } from "../../routes";
 import { OptionalResult } from "../../lib/types";
-import "../../lib/form/pw-input";
+import "../../lib/form/pw-input.js";
 
 // https://lit.dev/docs/components/lifecycle/
 // updateComplete

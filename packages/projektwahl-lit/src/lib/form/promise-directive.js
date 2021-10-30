@@ -3,11 +3,21 @@
 import { AsyncDirective, directive } from "lit/async-directive.js";
 
 class PromiseDirective extends AsyncDirective {
-  render<T, Q>(
-    promise: Promise<T>,
-    defaultValue: Q,
-    resolveMapper: (v: T) => Q,
-    rejectMapper: (v: any) => Q
+
+  /**
+   * @template T
+   * @template Q
+   * @param {Promise<T>} promise 
+   * @param {Q} defaultValue 
+   * @param {(v: T) => Q} resolveMapper 
+   * @param {(v: any) => Q} rejectMapper 
+   * @returns 
+   */
+  render(
+    promise,
+    defaultValue,
+    resolveMapper,
+    rejectMapper
   ) {
     promise
       .then((resolvedValue) => {
@@ -23,17 +33,5 @@ class PromiseDirective extends AsyncDirective {
   }
 }
 
-export type KeyFn<T> = (item: T, index: number) => unknown;
-export type ItemTemplate<T> = (item: T, index: number) => unknown;
-
-export interface PromiseDirectiveFn {
-  <T, Q>(
-    promise: Promise<T>,
-    defaultValue: Q,
-    resolveMapper: (v: T) => Q,
-    rejectMapper: (v: any) => Q
-  ): unknown;
-}
-
 // https://github.com/lit/lit/blob/main/packages/lit-html/src/directives/repeat.ts#L481
-export const promise = directive(PromiseDirective) as PromiseDirectiveFn;
+export const promise = /** @type {import("./promise-directive-types").PromiseDirectiveFn} */ (directive(PromiseDirective));

@@ -24,7 +24,8 @@ SPDX-FileCopyrightText: 2021 Moritz Hedtke <Moritz.Hedtke@t-online.de>
     <title>Hello, world!</title>
   </head>
   <body>
-    <script type="module" src="src/pw-app.js"></script>
+    <script onerror="javascript:alert('Failed to load')" type="module" src="src/pw-app.js"></script>
+    <noscript>Bitte aktiviere JavaScript!</noscript>
 
     <pw-app></pw-app>
   </body>
