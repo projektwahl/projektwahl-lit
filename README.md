@@ -14,6 +14,7 @@ nix develop
 yarn
 yarn dlx @yarnpkg/sdks vscode
 ```
+https://docs.joshuatz.com/cheatsheets/js/jsdoc/
 
 ## Firefox
 

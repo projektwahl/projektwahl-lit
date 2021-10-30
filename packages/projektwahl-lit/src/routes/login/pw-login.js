@@ -1,39 +1,42 @@
 import "../../lib/form/pw-form";
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // SPDX-FileCopyrightText: 2021 Moritz Hedtke <Moritz.Hedtke@t-online.de>
-import { html, LitElement, noChange, TemplateResult } from "lit";
+import { html, LitElement, TemplateResult } from "lit";
 import { customElement, state } from "lit/decorators.js";
-import { createRef, Ref, ref } from "lit/directives/ref.js";
-import { bootstrapCss } from "../..";
-import { HistoryController } from "../../history-controller";
-import { myFetch } from "../../utils";
-import { LoginResponse, Routes } from "../../routes";
-import { OptionalResult } from "../../lib/result";
+import { Routes } from "../../routes";
+import { OptionalResult } from "../../lib/types";
 import "../../lib/form/pw-input";
 
 // https://lit.dev/docs/components/lifecycle/
 // updateComplete
 
-export const pwLogin = async (): Promise<TemplateResult> => {
+/**
+ * @returns {Promise<TemplateResult>}
+ */
+export const pwLogin = async () => {
   const content = await fetch("/api/v1/sleep").then((r) => r.text());
   return html`<pw-login .data=${content}></pw-login>`;
 };
 
-@customElement("pw-login")
-export class PwLogin<P extends keyof Routes> extends LitElement {
-  @state()
-  result: Promise<
-    OptionalResult<
-      Routes[P],
-      { network?: string } & { [key in keyof Routes[P]]?: string }
-    >
-  > = Promise.resolve({ result: "none" });
+/**
+ * @template {keyof Routes} P
+ */
+export class PwLogin extends LitElement {
+  /** @override */ static properties = {
+    result: { state: true }
+  }
 
-  override render() {
+  constructor() {
+    super()
+    /** @type {Promise<OptionalResult<Routes[P],{ network?: string } & { [key in keyof Routes[P]]?: string }>>} */
+    this.result = Promise.resolve({ result: "none" });
+  }
+
+  /** @override */ render() {
     console.log("rerender");
     return html`<pw-form
       .url=${"/api/v1/login"}
-      @form-result=${(event: CustomEvent) => {
+      @form-result=${(/** @type {CustomEvent} */ event) => {
         this.result = event.detail;
       }}
       actionText="Login"
@@ -55,3 +58,4 @@ export class PwLogin<P extends keyof Routes> extends LitElement {
     </pw-form>`;
   }
 }
+customElements.define("pw-login", PwLogin)

@@ -7,47 +7,51 @@ import { HistoryController } from "./history-controller";
 import { ifDefined } from "lit/directives/if-defined.js";
 
 // TODO FIXME https://lit.dev/docs/components/events/#shadowdom-retargeting just use the approach shown there
-export const aClick = (event: MouseEvent) => {
+export const aClick = (/** @type {MouseEvent} */ event) => {
   event.preventDefault();
+  let target = /** @type {HTMLAnchorElement} */ (event.target);
   HistoryController.goto(
-    new URL((event.target as HTMLAnchorElement).href, window.location.href),
+    new URL(target.href, window.location.href),
     {}
   );
 };
 
 // this works really bad because bootstrap css styles usually need context information which is not there with this.
-@customElement("pw-a-dontuse")
 export class PwADontUse extends LitElement {
+  /** @override */ static properties = {
+    href: { type: String },
+    class: { type: String },
+    role: { type: String },
+    ariaCurrent: { type: String }
+  };
+
   // with this this may actually be usable again
-  protected override createRenderRoot() {
+  /** @protected @override */ createRenderRoot() {
     return this;
   }
 
-  @property({ type: String })
-  href!: string;
+  constructor() {
+    super();
 
-  @property({ type: String })
-  class?: string;
+    /** @type {string} */
+    this.href;
 
-  @property({ type: String })
-  role?: "button";
+    /** @type {string | undefined} */
+    this.class;
 
-  @property({ type: String })
-  override ariaCurrent!:
-    | "page"
-    | "step"
-    | "location"
-    | "date"
-    | "time"
-    | "true"
-    | "false";
+    /** @type {"button" | undefined} */
+    this.role;
 
-  clickHandler = (event: MouseEvent) => {
+    /** @type {"page" | "step" | "location" | "date" | "time" | "true" | "false"} */
+    this.ariaCurrent
+}
+
+  clickHandler = (/** @type {MouseEvent} */ event) => {
     event.preventDefault();
     HistoryController.goto(new URL(this.href, window.location.href), {});
   };
 
-  override render() {
+  /** @override */ render() {
     return html`${bootstrapCss}<a
         href=${ifDefined(this.href)}
         class=${ifDefined(this.class)}
@@ -58,3 +62,4 @@ export class PwADontUse extends LitElement {
       ></a>`;
   }
 }
+customElements.define("pw-a-dontuse", PwADontUse)

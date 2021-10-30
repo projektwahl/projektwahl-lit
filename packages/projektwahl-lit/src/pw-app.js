@@ -2,13 +2,12 @@
 // SPDX-FileCopyrightText: 2021 Moritz Hedtke <Moritz.Hedtke@t-online.de>
 import "./lib/form/pw-form";
 import { html, LitElement, TemplateResult } from "lit";
-import { customElement, state } from "lit/decorators.js";
-import { bootstrapCss } from ".";
+import { bootstrapCss } from "./index.js";
 import { HistoryController } from "./history-controller";
-import { aClick } from "./pw-a";
+import { aClick } from "./pw-a.js";
 import { classMap } from "lit/directives/class-map.js";
 import { until } from "lit/directives/until.js";
-import { pwLogin } from "./routes/login/pw-login";
+import { pwLogin } from "./routes/login/pw-login.js";
 
 export class PwApp extends LitElement {
   /** @override */ static properties = {

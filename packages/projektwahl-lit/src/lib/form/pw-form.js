@@ -1,39 +1,48 @@
 import "./pw-input"; // SPDX-License-Identifier: AGPL-3.0-or-later
 // SPDX-FileCopyrightText: 2021 Moritz Hedtke <Moritz.Hedtke@t-online.de>
 import { html, LitElement, noChange, TemplateResult } from "lit";
-import { customElement, property, state } from "lit/decorators.js";
 import { createRef, Ref, ref } from "lit/directives/ref.js";
 import { bootstrapCss } from "../..";
 import { HistoryController } from "../../history-controller";
 import { myFetch } from "../../utils";
-import { LoginResponse, Routes } from "../../routes";
-import { isErr, OptionalResult, Result } from "../result";
+import { Routes } from "../../routes";
+import { OptionalResult } from "../types";
 import { promise } from "./promise-directive";
+import { isErr } from "../result";
 
-@customElement("pw-form")
-export class PwForm<P extends keyof Routes> extends LitElement {
-  private history = new HistoryController(this);
+/**
+ * @template {keyof Routes} P
+ */
+export class PwForm extends LitElement {
+  /** @override */ static properties = {
+    url: { attribute: false },
+    actionText: { type: String },
+    fakeSlot: { attribute: false },
+    result: { state: true }
+  }
+  
+  constructor() {
+    super()
 
-  @property({ attribute: false })
-  url!: P;
+    /** @private */ this.history = new HistoryController(this);
 
-  @property({ type: String })
-  actionText!: string;
+    /** @type {P} */
+    this.url;
 
-  @property({ attribute: false })
-  fakeSlot!: TemplateResult;
+    /** @type {string} */
+    this.actionText;
 
-  form: Ref<HTMLFormElement> = createRef();
+    /** @type {TemplateResult} */
+    this.fakeSlot;
 
-  @state()
-  result: Promise<
-    OptionalResult<
-      Routes[P],
-      { network?: string } & { [key in keyof Routes[P]]?: string }
-    >
-  > = Promise.resolve({ result: "none" });
+    /** @type {Ref<HTMLFormElement>} */
+    this.form = createRef();
 
-  submit = (event: SubmitEvent) => {
+    /** @type {Promise<OptionalResult<Routes[P],{ network?: string } & { [key in keyof Routes[P]]?: string }>>} */
+    this.result = Promise.resolve({ result: "none" });
+  }
+
+  submit = (/** @type {SubmitEvent} */ event) => {
     event.preventDefault();
 
     // @ts-expect-error doesn't contain files so this is fine
@@ -72,7 +81,7 @@ if ('FormDataEvent' in window) {
     return this;
   }
 */
-  override render() {
+  /** @override */ render() {
     if (this.url === undefined || this.actionText === undefined) {
       throw new Error("component not fully initialized");
     }
@@ -85,17 +94,9 @@ if ('FormDataEvent' in window) {
 
         <div class="row justify-content-center">
           <div class="col-md-7 col-lg-8">
-            ${promise<
-              OptionalResult<
-                Routes[P],
-                {
-                  network?: string;
-                } & { [key in keyof Routes[P]]?: string }
-              >,
-              symbol | TemplateResult | undefined
-            >(
-              this.result,
-              noChange,
+            ${promise(
+              /** @type {Promise<OptionalResult<Routes[P],{network?: string;} & { [key in keyof Routes[P]]?: string }>>} */ (this.result),
+              /** @type {symbol | TemplateResult | undefined} */ (noChange),
               (v) =>
                 isErr(v) && v.failure.network !== undefined
                   ? html` <div class="alert alert-danger" role="alert">
@@ -125,3 +126,4 @@ if ('FormDataEvent' in window) {
     `;
   }
 }
+customElements.define("pw-form", PwForm)
