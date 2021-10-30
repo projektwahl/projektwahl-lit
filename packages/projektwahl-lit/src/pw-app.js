@@ -10,21 +10,34 @@ import { classMap } from "lit/directives/class-map.js";
 import { until } from "lit/directives/until.js";
 import { pwLogin } from "./routes/login/pw-login";
 
-@customElement("pw-app")
 export class PwApp extends LitElement {
-  private history = new HistoryController(this);
-
-  @state()
-  private last?: Promise<TemplateResult>;
-
-  @state()
-  private current!: Promise<TemplateResult>;
+  /** @override */ static properties = {
+    last: { state: true },
+    current: { state: true }
+  };
 
   constructor() {
     super();
+
+    /**
+     * @private
+     * @type {Promise<TemplateResult> | undefined}
+    */ 
+    this.last;
+
+    /**
+     * @private
+    */
+    this.history = new HistoryController(this);
+
+    /**
+     * @private
+     * @type {Promise<TemplateResult>}
+    */
+    this.current;
   }
 
-  override render() {
+  /** @override */ render() {
     this.last = this.current;
     this.current =
       this.history.url.pathname === "/login"
@@ -128,3 +141,4 @@ export class PwApp extends LitElement {
     `;
   }
 }
+customElements.define('pw-app', PwApp)

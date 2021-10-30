@@ -15,15 +15,11 @@ async function main() {
       nodeResolve: true,
       appIndex: "index.html",
       plugins: [
-        esbuildPlugin({ ts: true, target: "auto" }),
         hmrPlugin({
           include: ["src/**/*"],
           presets: [presets.lit],
         }),
       ],
-      mimeTypes: {
-        "**/*.ts": "ts",
-      },
       port: 9000,
       middleware: [
         proxy("/api", {
