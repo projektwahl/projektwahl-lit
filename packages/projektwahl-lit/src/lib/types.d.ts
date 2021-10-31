@@ -3,24 +3,24 @@
 
 export type OptionalResult<
   T,
-  E extends { [key: string]: string } = { [key in keyof T]: string }
+  E extends Partial<{ [key: string]: string }> = Partial<{ [key in keyof T]: string }>
 > = Result<T, E> | NoneResult<T, E>;
 
 export type Result<
   T,
-  E extends { [key: string]: string } = { [key in keyof T]: string }
+  E extends Partial<{ [key: string]: string }> = Partial<{ [key in keyof T]: string }>
 > = SuccessResult<T, E> | FailureResult<T, E>;
 
 export type NoneResult<
   T,
-  E extends { [key: string]: string } = { [key in keyof T]: string }
+  E extends Partial<{ [key: string]: string }> = Partial<{ [key in keyof T]: string }>
 > = {
   result: "none";
 };
 
 export type SuccessResult<
   T,
-  E extends { [key: string]: string } = { [key in keyof T]: string }
+  E extends Partial<{ [key: string]: string }> = Partial<{ [key in keyof T]: string }>
 > = {
   result: "success";
   success: T;
@@ -28,7 +28,7 @@ export type SuccessResult<
 
 export type FailureResult<
   T,
-  E extends { [key: string]: string } = { [key in keyof T]: string }
+  E extends Partial<{ [key: string]: string }> = Partial<{ [key in keyof T]: string }>
 > = {
   result: "failure";
   failure: E;
@@ -39,10 +39,10 @@ export type Existing<T> = T & { id: number };
 
 export type RawUserType = {
   username: string;
-  password: string;
+  password_hash: string | null;
   type: "helper" | "admin" | "voter";
-  group: string; // TODO FIXME null
-  age: number; // TODO FIXME null
+  group: string | null;
+  age: number | null;
   away: boolean;
   project_leader_id: number | null;
   force_in_project_id: number | null;

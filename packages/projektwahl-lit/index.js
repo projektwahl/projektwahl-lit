@@ -9,6 +9,7 @@ import { z } from "zod";
 import { get, post } from "./src/lib/express.js";
 import { zod2result } from "./src/lib/result.js";
 import postgres from "postgres";
+import { checkPassword } from "./src/password.js";
 
 const sql = postgres({
   database: "projektwahl",
@@ -64,20 +65,60 @@ app.get("/", function (req, res) {
   res.send("hello world");
 });
 
-const loginInputSchema = z.object({
+export const loginInputSchema = z.object({
   username: z.string().min(3).max(100),
   password: z.string().min(6).max(1024).regex(/ffa/),
 });
 
 post(app, "/api/v1/login", async function (req, res) {
-  let zodResult = loginInputSchema.safeParse(req.body);
-  const user = zod2result(zodResult);
+  const loginRequest = zod2result(loginInputSchema.safeParse(req.body));
 
-  for (const value of (await sql`SELECT 1 as a,2 as b,3 as c`)) {
-    console.log(value)
+  if (loginRequest.result == "failure") {
+    return res.json(loginRequest);
   }
 
-  res.json(user);
+  /** @type {[import("./src/lib/types.js").Existing<Pick<import("./src/lib/types.js").RawUserType, "id"|"username"|"password_hash">>?]} */
+  const [dbUser] = await sql`SELECT id, username, password_hash AS password, type FROM users WHERE name = ${loginRequest.success.username} LIMIT 1`;
+
+  if (dbUser === undefined) {
+    return res.json({
+      result: "failure",
+      failure: {
+        username: "Nutzer existiert nicht!"
+      }
+    })
+  }
+
+  if (dbUser.password_hash == null || !(await checkPassword(dbUser.password_hash, loginRequest.success.password))) {
+		return res.json({
+      result: 'failure',
+      failure: {
+        password: 'Falsches Passwort!'
+      }
+		});
+	}
+
+  /** @type {[Pick<import("./src/lib/types.js").RawSessionType, "session_id">]} */
+  const [session] = await sql.begin('READ WRITE', async (sql) => {
+		return await sql`INSERT INTO sessions (user_id) VALUES (${dbUser.id}) RETURNING session_id`;
+	});
+
+  res.cookie("strict_id", session.session_id, {
+    maxAge: 48 * 60 * 60 * 1000,
+    secure: true,
+    httpOnly: true,
+    sameSite: "strict",
+  })
+  res.cookie("lax_id", session.session_id, {
+    maxAge: 48 * 60 * 60 * 1000,
+    secure: true,
+    httpOnly: true,
+    sameSite: "lax",
+  })
+  return res.json({
+    result: "success",
+    success: undefined,
+  });
 });
 
 get(app, "/api/v1/sleep", function (req, res) {
