@@ -64,7 +64,7 @@ sql`SELECT "id", "title", "info", "place" FROM projects WHERE 1 ${list.map((v) =
 
 /**
  * 
- * @param {string|Sql|Sql[]|string[]|boolean|number} object 
+ * @param {string|Sql|Sql[]|string[]|boolean|number|null} object 
  * @returns {string}
  */
 export function sqlToString(object) {
@@ -76,6 +76,9 @@ export function sqlToString(object) {
     }
     if (Array.isArray(object)) {
         return object.map(sqlToString).join("")
+    }
+    if (object === null) {
+        return "NULL"
     }
     return object.toString();
 }
