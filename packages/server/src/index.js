@@ -6,9 +6,9 @@ import { v4 as uuidv4 } from "uuid";
 import multer from "multer";
 import bodyParser from "body-parser";
 import { z } from "zod";
-import { get, post } from "./src/lib/express.js";
-import { zod2result } from "./src/lib/result.js";
-import { checkPassword } from "./src/password.js";
+import { get, post } from "./express.js";
+import { zod2result } from " /result.js";
+import { checkPassword } from "./password.js";
 
 // https://learning-notes.mistermicheels.com/javascript/typescript/runtime-type-checking/
 // https://www.azavea.com/blog/2020/10/29/run-time-type-checking-in-typescript-with-io-ts/

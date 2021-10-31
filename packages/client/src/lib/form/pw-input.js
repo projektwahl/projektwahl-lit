@@ -3,7 +3,7 @@
 import { html, LitElement, noChange } from "lit";
 import { bootstrapCss } from "../..";
 import { HistoryController } from "../../history-controller";
-import { isErr } from "../result";
+import { isErr } from "projektwahl-lit-lib/src/result";
 import { promise } from "./promise-directive";
 
 /** @template T */

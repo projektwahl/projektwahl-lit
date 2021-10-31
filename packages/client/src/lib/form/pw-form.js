@@ -6,7 +6,7 @@ import { bootstrapCss } from "../..";
 import { HistoryController } from "../../history-controller";
 import { myFetch } from "../../utils";
 import { promise } from "./promise-directive";
-import { isErr } from "../result";
+import { isErr } from "root-workspace-0b6124/packages/lib/src/result";
 import { animate, flyLeft, flyRight } from "@lit-labs/motion";
 
 /**

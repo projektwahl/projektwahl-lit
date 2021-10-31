@@ -5627,6 +5627,25 @@ __metadata:
   languageName: node
   linkType: hard
 
+"projektwahl-lit-client@workspace:packages/client":
+  version: 0.0.0-use.local
+  resolution: "projektwahl-lit-client@workspace:packages/client"
+  dependencies:
+    "@lit-labs/motion": ^1.0.1
+    "@open-wc/dev-server-hmr": ^0.1.2
+    "@typescript-eslint/eslint-plugin": ^5.2.0
+    "@typescript-eslint/parser": ^5.2.0
+    "@web/dev-server": ^0.1.25
+    eslint: ^8.1.0
+    eslint-config-prettier: ^8.3.0
+    koa-proxies: ^0.12.1
+    lit: ^2.0.2
+    prettier: 2.4.1
+    typescript: ^4.4.4
+    zod: ^3.11.4
+  languageName: unknown
+  linkType: soft
+
 "projektwahl-lit-server@workspace:packages/server":
   version: 0.0.0-use.local
   resolution: "projektwahl-lit-server@workspace:packages/server"
@@ -5654,22 +5673,16 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"projektwahl-lit@workspace:packages/client":
+"projektwahl-lit@workspace:.":
   version: 0.0.0-use.local
-  resolution: "projektwahl-lit@workspace:packages/client"
+  resolution: "projektwahl-lit@workspace:."
   dependencies:
-    "@lit-labs/motion": ^1.0.1
-    "@open-wc/dev-server-hmr": ^0.1.2
-    "@typescript-eslint/eslint-plugin": ^5.2.0
-    "@typescript-eslint/parser": ^5.2.0
-    "@web/dev-server": ^0.1.25
     eslint: ^8.1.0
-    eslint-config-prettier: ^8.3.0
-    koa-proxies: ^0.12.1
-    lit: ^2.0.2
-    prettier: 2.4.1
+    prettier: ^2.4.1
     typescript: ^4.4.4
-    zod: ^3.11.4
+  dependenciesMeta:
+    argon2:
+      built: true
   languageName: unknown
   linkType: soft
 
@@ -6073,19 +6086,6 @@ __metadata:
   checksum: 20305ac3aea2a62be1728cfd3477419431bad2931532cc136da1904841fa03c318b231027b3a3da077baa0a874c20d72985bf74ed42dad103e88de610eb447a9
   languageName: node
   linkType: hard
-
-"root-workspace-0b6124@workspace:.":
-  version: 0.0.0-use.local
-  resolution: "root-workspace-0b6124@workspace:."
-  dependencies:
-    eslint: ^8.1.0
-    prettier: ^2.4.1
-    typescript: ^4.4.4
-  dependenciesMeta:
-    argon2:
-      built: true
-  languageName: unknown
-  linkType: soft
 
 "run-parallel@npm:^1.1.9":
   version: 1.2.0

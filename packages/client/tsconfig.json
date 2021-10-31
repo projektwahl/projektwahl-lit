@@ -24,9 +24,5 @@
     "checkJs": true,
     "importsNotUsedAsValues": "error"
   },
-  "include": ["**/*.ts", "**/*.js"],
-  "ts-node": {
-    "transpileOnly": true,
-    "transpiler": "ts-node/transpilers/swc-experimental"
-  }
+  "include": ["**/*.ts", "**/*.js", "../lib/src/result.js"]
 }

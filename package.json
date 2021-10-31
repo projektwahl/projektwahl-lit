@@ -1,4 +1,5 @@
 {
+    "name": "projektwahl-lit",
     "private": true,
     "workspaces": [
         "packages/*"
