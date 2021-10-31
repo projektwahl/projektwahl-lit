@@ -8,7 +8,6 @@
 
 // the postgres binary format doesnt seem to be specified but I think would still be worth to implement for performance
 
-
 // https://github.com/porsager/postgres-benchmarks
 
 /** @typedef {number} Sql */

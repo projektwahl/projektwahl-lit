@@ -6710,6 +6710,15 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "linkType": "HARD",
         }]
       ]],
+      ["postgres", [
+        ["npm:2.0.0-beta.10", {
+          "packageLocation": "./.yarn/cache/postgres-npm-2.0.0-beta.10-d7883c4caf-ba243424ce.zip/node_modules/postgres/",
+          "packageDependencies": [
+            ["postgres", "npm:2.0.0-beta.10"]
+          ],
+          "linkType": "HARD",
+        }]
+      ]],
       ["prelude-ls", [
         ["npm:1.2.1", {
           "packageLocation": "./.yarn/cache/prelude-ls-npm-1.2.1-3e4d272a55-cd192ec0d0.zip/node_modules/prelude-ls/",
@@ -6788,6 +6797,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["morgan", "npm:1.10.0"],
             ["multer", "npm:1.4.3"],
             ["nodemon", "npm:2.0.14"],
+            ["postgres", "npm:2.0.0-beta.10"],
             ["prettier", "npm:2.4.1"],
             ["typescript", "patch:typescript@npm%3A4.4.4#~builtin<compat/typescript>::version=4.4.4&hash=ddd1e8"],
             ["uuid", "npm:8.3.2"],
