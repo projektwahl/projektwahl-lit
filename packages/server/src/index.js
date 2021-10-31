@@ -9,6 +9,7 @@ import { z } from "zod";
 import { get, post } from "./express.js";
 import { zod2result } from "projektwahl-lit-lib/src/result.js";
 import { checkPassword } from "./password.js";
+import { sql } from './database.js'
 
 // https://learning-notes.mistermicheels.com/javascript/typescript/runtime-type-checking/
 // https://www.azavea.com/blog/2020/10/29/run-time-type-checking-in-typescript-with-io-ts/
@@ -59,7 +60,7 @@ app.get("/", function (req, res) {
 
 export const loginInputSchema = z.object({
   username: z.string().min(3).max(100),
-  password: z.string().min(6).max(1024).regex(/ffa/),
+  password: z.string().min(6).max(1024),
 });
 
 post(app, "/api/v1/login", async function (req, res) {
@@ -69,8 +70,8 @@ post(app, "/api/v1/login", async function (req, res) {
     return res.json(loginRequest);
   }
 
-  /** @type {[import("./src/lib/types.js").Existing<Pick<import("./src/lib/types.js").RawUserType, "id"|"username"|"password_hash">>?]} */
-  const [dbUser] = await sql`SELECT id, username, password_hash AS password, type FROM users WHERE name = ${loginRequest.success.username} LIMIT 1`;
+  /** @type {[import("projektwahl-lit-lib/src/types").Existing<Pick<import("projektwahl-lit-lib/src/types").RawUserType, "id"|"username"|"password_hash">>?]} */
+  const [dbUser] = await sql`SELECT id, username, password_hash, type FROM users WHERE username = ${loginRequest.success.username} LIMIT 1`;
 
   if (dbUser === undefined) {
     return res.json({

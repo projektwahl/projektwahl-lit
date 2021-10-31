@@ -24,7 +24,7 @@ CREATE TYPE user_type AS ENUM ('admin', 'helper', 'voter');
 
 CREATE TABLE IF NOT EXISTS users (
   id SERIAL PRIMARY KEY NOT NULL,
-  name VARCHAR(64) UNIQUE NOT NULL,
+  username VARCHAR(64) UNIQUE NOT NULL,
   password_hash VARCHAR(512),
   type user_type NOT NULL,
   project_leader_id INTEGER, -- TODO FIXME maybe m:n as somebody could theoretically be in multiple projects?

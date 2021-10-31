@@ -30,6 +30,7 @@
           # sudo nixos-container create projektwahl --flake .#x86_64-linux
           # sudo nixos-container start projektwahl
           # sudo nixos-container update --flake .#x86_64-linux projektwahl
+          # psql --host projektwahl --user projektwahl
           nixosConfigurations = nixpkgs.lib.nixosSystem {
             inherit system;
             modules = [

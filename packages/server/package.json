@@ -22,7 +22,8 @@
     "lint": "eslint .",
     "fix:lint": "eslint --fix .",
     "check": "tsc --noEmit",
-    "server": "nodemon --exec yarn node -- src/index.js"
+    "server": "nodemon --exec yarn node -- src/index.js",
+    "setup": "yarn node src/setup.js"
   },
   "license": "AGPL-3.0-or-later",
   "devDependencies": {
