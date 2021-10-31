@@ -11,7 +11,10 @@ import { zod2result } from "./src/lib/result.js";
 import postgres from "postgres";
 
 const sql = postgres({
-  
+  database: "projektwahl",
+  user: "projektwahl",
+  password: "projektwahl",
+  host: "projektwahl"
 })
 
 // https://learning-notes.mistermicheels.com/javascript/typescript/runtime-type-checking/
@@ -66,9 +69,13 @@ const loginInputSchema = z.object({
   password: z.string().min(6).max(1024).regex(/ffa/),
 });
 
-post(app, "/api/v1/login", function (req, res) {
+post(app, "/api/v1/login", async function (req, res) {
   let zodResult = loginInputSchema.safeParse(req.body);
   const user = zod2result(zodResult);
+
+  for (const value of (await sql`SELECT 1 as a,2 as b,3 as c`)) {
+    console.log(value)
+  }
 
   res.json(user);
 });
