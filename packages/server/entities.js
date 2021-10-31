@@ -15,7 +15,13 @@ export async function fetchData(table, fieldsToSelect, orderByInfo, query, sanit
         query.sorting = query.sorting.map(v => [v[0], v[1]==="ASC"?"DESC":"ASC"])
     }
 
-    const paginationQuery = sql``
+    let queries = query.sorting.map((value, index, array) => {
+        const part = array.slice(0, index + 1)
 
-    sql`SELECT ${sql(fieldsToSelect.join(", "))} FROM ${sql(table)} WHERE ${query.paginationCursor === null} OR (${customFilterQuery(sanitizedData)}) AND (${paginationQuery}) LIMIT ${query.paginationLimit+1}`
+        return sql`(SELECT ${sql(fieldsToSelect.join(", "))} FROM ${sql(table)} WHERE ${query.paginationCursor === null} OR (${customFilterQuery(sanitizedData)}) AND (${part.map((value, index) => {
+            sql`${index === part.length - 1 ? (value[1] === "ASC" ? sql`<` : sql`>`) : sql`IS NOT DISTINCT FROM`} ${value[0]} AND `
+        })} TRUE) LIMIT ${query.paginationLimit+1})`
+    });
+
+    sql`${queries.flatMap(v => [sql` UNION ALL `, v]).slice(1)} LIMIT ${query.paginationLimit+1}.`
 }
