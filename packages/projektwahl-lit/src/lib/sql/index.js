@@ -6,6 +6,9 @@
 // https://www.postgresql.org/docs/current/protocol-message-types.html
 // https://www.postgresql.org/docs/current/protocol-message-formats.html
 
+// the postgres binary format doesnt seem to be specified but I think would still be worth to implement for performance
+
+
 // https://github.com/porsager/postgres-benchmarks
 
 /** @typedef {number} Sql */
@@ -29,4 +32,5 @@ sql`SELECT "id", "title", "info", "place" FROM projects WHERE 1 ${list.map((v) =
 // an Sql gets inserted
 // other values get prepared-statements
 
+// probably make the execute a wrapper to porsager for now because I wont have the time to fully implement a postgres client lib
 await sql`SELECT 1`.execute()
