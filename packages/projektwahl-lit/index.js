@@ -8,15 +8,7 @@ import bodyParser from "body-parser";
 import { z } from "zod";
 import { get, post } from "./src/lib/express.js";
 import { zod2result } from "./src/lib/result.js";
-import postgres from "postgres";
 import { checkPassword } from "./src/password.js";
-
-const sql = postgres({
-  database: "projektwahl",
-  user: "projektwahl",
-  password: "projektwahl",
-  host: "projektwahl"
-})
 
 // https://learning-notes.mistermicheels.com/javascript/typescript/runtime-type-checking/
 // https://www.azavea.com/blog/2020/10/29/run-time-type-checking-in-typescript-with-io-ts/
