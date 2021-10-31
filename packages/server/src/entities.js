@@ -1,4 +1,4 @@
-import { sql } from './src/sql/index.js'
+import { sql } from './sql/index.js'
 
 /**
  * @template T
@@ -7,7 +7,7 @@ import { sql } from './src/sql/index.js'
  * @param {{ [field: string]: 'nulls-first'|'nulls-last' }} orderByInfo
  * @param {import("projektwahl-lit-lib/src/types").BaseQuery<T>} query
  * @param {T} sanitizedData 
- * @param {(query: T) => import('./src/sql').Sql} customFilterQuery 
+ * @param {(query: T) => import('./sql').Sql} customFilterQuery 
  */
 export async function fetchData(table, fieldsToSelect, orderByInfo, query, sanitizedData, customFilterQuery) {
     // orderBy needs to be reversed for backwards pagination
@@ -25,3 +25,17 @@ export async function fetchData(table, fieldsToSelect, orderByInfo, query, sanit
 
     sql`${queries.flatMap(v => [sql` UNION ALL `, v]).slice(1)} LIMIT ${query.paginationLimit+1}.`
 }
+
+const value = fetchData("users", ["id", "type", "username", "password_hash"], { "id": "nulls-first", "type": "nulls-first", "username": "nulls-first", "password_hash": "nulls-first" }, {
+    filters: {},
+    paginationCursor: null,
+    paginationDirection: "forwards",
+    paginationLimit: 100,
+    sorting: [["name", "ASC"]]
+}, {
+    name: "test"
+}, (query) => {
+    return sql` name IS NOT DISTINCT FROM ${query.name}`
+})
+
+console.log(value)
