@@ -14,7 +14,7 @@ export class Sql {
 /**
  * 
  * @param {TemplateStringsArray} strings 
- * @param  {...any} keys 
+ * @param  {(string|Sql|Sql[]|string[]|boolean|number)[]} keys 
  */
     constructor(strings, keys) {
         this.strings = strings;
@@ -34,7 +34,7 @@ export function literal(string) {
 /**
  * 
  * @param {TemplateStringsArray} strings 
- * @param  {...any} keys 
+ * @param  {...(string|Sql|Sql[]|string[]|boolean|number)} keys 
  * @returns {any}
  */
 export function sql(strings, ...keys) {
@@ -64,11 +64,10 @@ sql`SELECT "id", "title", "info", "place" FROM projects WHERE 1 ${list.map((v) =
 
 /**
  * 
- * @param  {unknown} object 
+ * @param {string|Sql|Sql[]|string[]|boolean|number} object 
  * @returns {string}
  */
 export function sqlToString(object) {
-    console.log(object)
     if (object instanceof Sql) {
         return object.strings.map((string, i) => {
             if (object.strings.length - 1 == i) return string;
@@ -78,7 +77,7 @@ export function sqlToString(object) {
     if (Array.isArray(object)) {
         return object.map(sqlToString).join("")
     }
-    return object;
+    return object.toString();
 }
 
-console.log(sqlToString(sql`SELECT ${"hi"} 1 ${1}`))
+//console.log(sqlToString(sql`SELECT ${"hi"} 1 ${1}`))
