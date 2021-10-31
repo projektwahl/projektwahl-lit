@@ -10,15 +10,36 @@
 
 // https://github.com/porsager/postgres-benchmarks
 
-/** @typedef {{ execute: <T>() => Promise<T> }} Sql */
+export class Sql {
+/**
+ * 
+ * @param {TemplateStringsArray} strings 
+ * @param  {...any} keys 
+ */
+    constructor(strings, ...keys) {
+        this.strings = strings;
+        this.keys = keys;
+    }
+}
 
 /**
  * 
- * @param {*} strings 
+ * @param {string} string 
+ * @returns 
+ */
+export function literal(string) {
+    return string
+}
+
+/**
+ * 
+ * @param {TemplateStringsArray} strings 
  * @param  {...any} keys 
- * @returns {Sql}
+ * @returns {any}
  */
 export function sql(strings, ...keys) {
+	return new Sql(strings, keys);
+
     return {
          /**
          * @template T
@@ -32,11 +53,29 @@ export function sql(strings, ...keys) {
 /** @type {any[]} */
 let list = [];
 
-sql`SELECT "id", "title", "info", "place" FROM projects WHERE 1 ${list.map((v) => sql`AND ( ${sql(v)} < 5 )`)} OR NOT ... params() ORDER BY ${list.map(v => sql`${sql(v)} ASC`)} LIMIT 1337`
+sql`SELECT "id", "title", "info", "place" FROM projects WHERE 1 ${list.map((v) => sql`AND ( ${literal(v)} < 5 )`)} OR NOT ... params() ORDER BY ${list.map(v => sql`${literal(v)} ASC`)} LIMIT 1337`
 
 // an array of Sql gets concatenated
 // an Sql gets inserted
 // other values get prepared-statements
 
 // probably make the execute a wrapper to porsager for now because I wont have the time to fully implement a postgres client lib
-await sql`SELECT 1`.execute()
+//await sql`SELECT 1`.execute()
+
+/**
+ * 
+ * @param  {unknown} object 
+ * @returns {string}
+ */
+export function sqlToString(object) {
+    if (object instanceof Sql) {
+        return object.strings.map((string, i) => {
+            if (object.strings.length - 1 == i) return string;
+            return string + sqlToString(object.keys[i]);
+        }).join("")
+    }
+    if (Array.isArray(object)) {
+        return object.map(sqlToString).join("")
+    }
+    return object;
+}
