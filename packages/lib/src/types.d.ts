@@ -86,3 +86,13 @@ export type EntityResponseBody<T> = {
   previousCursor: T | null;
   nextCursor: T | null;
 };
+
+export type BaseQuery<C> = {
+	paginationDirection: 'forwards' | 'backwards';
+	paginationCursor: C | null; // if this is null the start is at start/end depending on paginationDirection
+	sorting: [string, "ASC"|"DESC"][];
+	paginationLimit: number;
+	filters: {
+		[key in keyof C]?: C[key]; // boolean | string | number | string[] | null | undefined // TODO FIXME C[key]
+	};
+};

@@ -91,7 +91,7 @@ post(app, "/api/v1/login", async function (req, res) {
 		});
 	}
 
-  /** @type {[Pick<import("./src/lib/types.js").RawSessionType, "session_id">]} */
+  /** @type {[Pick<import("projektwahl-lit-lib/src/types").RawSessionType, "session_id">]} */
   const [session] = await sql.begin('READ WRITE', async (sql) => {
 		return await sql`INSERT INTO sessions (user_id) VALUES (${dbUser.id}) RETURNING session_id`;
 	});

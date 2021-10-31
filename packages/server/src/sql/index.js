@@ -10,7 +10,7 @@
 
 // https://github.com/porsager/postgres-benchmarks
 
-/** @typedef {number} Sql */
+/** @typedef {{ execute: <T>() => Promise<T> }} Sql */
 
 /**
  * 
@@ -18,8 +18,15 @@
  * @param  {...any} keys 
  * @returns {Sql}
  */
-function sql(strings, ...keys) {
-    return 1
+export function sql(strings, ...keys) {
+    return {
+         /**
+         * @template T
+         */
+        execute: async () => {
+            return /** @type {T} */ (/** @type {unknown} */ (undefined))
+        }
+    }
 }
 
 /** @type {any[]} */
