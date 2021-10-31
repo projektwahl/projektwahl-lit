@@ -7,7 +7,7 @@ import multer from "multer";
 import bodyParser from "body-parser";
 import { z } from "zod";
 import { get, post } from "./express.js";
-import { zod2result } from " /result.js";
+import { zod2result } from "projektwahl-lit-lib/src/result.js";
 import { checkPassword } from "./password.js";
 
 // https://learning-notes.mistermicheels.com/javascript/typescript/runtime-type-checking/
