@@ -1,5 +1,5 @@
 {
-  "name": "projektwahl-lit",
+  "name": "projektwahl-lit-server",
   "version": "0.0.1",
   "author": {
     "name": "Moritz Hedtke",
@@ -17,7 +17,6 @@
   "description": "Software to manage choosing projects and automatically assigning people to projects.",
   "type": "module",
   "scripts": {
-    "client": "yarn node web-dev-server-config.mjs",
     "format": "prettier --write .",
     "check:format": "prettier --check .",
     "lint": "eslint .",
@@ -27,19 +26,27 @@
   },
   "license": "AGPL-3.0-or-later",
   "devDependencies": {
-    "@open-wc/dev-server-hmr": "^0.1.2",
+    "@types/express": "^4.17.13",
+    "@types/morgan": "^1.9.3",
+    "@types/multer": "^1.4.7",
+    "@types/node": "^16.11.5",
+    "@types/uuid": "^8.3.1",
     "@typescript-eslint/eslint-plugin": "^5.2.0",
     "@typescript-eslint/parser": "^5.2.0",
-    "@web/dev-server": "^0.1.25",
     "eslint": "^8.1.0",
     "eslint-config-prettier": "^8.3.0",
-    "koa-proxies": "^0.12.1",
+    "nodemon": "^2.0.14",
     "prettier": "2.4.1",
     "typescript": "^4.4.4"
   },
   "dependencies": {
-    "@lit-labs/motion": "^1.0.1",
-    "lit": "^2.0.2",
+    "argon2": "^0.28.2",
+    "body-parser": "^1.19.0",
+    "express": "^4.17.1",
+    "morgan": "^1.10.0",
+    "multer": "^1.4.3",
+    "postgres": "beta",
+    "uuid": "^8.3.2",
     "zod": "^3.11.4"
   },
   "packageManager": "yarn@3.1.0"
