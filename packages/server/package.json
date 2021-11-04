@@ -30,9 +30,9 @@
     "@types/express": "^4.17.13",
     "@types/morgan": "^1.9.3",
     "@types/multer": "^1.4.7",
-    "@types/node": "^16.11.5",
-    "@typescript-eslint/eslint-plugin": "^5.2.0",
-    "@typescript-eslint/parser": "^5.2.0",
+    "@types/node": "^16.11.6",
+    "@typescript-eslint/eslint-plugin": "^5.3.0",
+    "@typescript-eslint/parser": "^5.3.0",
     "eslint": "^8.1.0",
     "eslint-config-prettier": "^8.3.0",
     "prettier": "2.4.1",
@@ -46,7 +46,7 @@
     "multer": "^1.4.3",
     "postgres": "beta",
     "projektwahl-lit-lib": "workspace:^",
-    "zod": "^3.11.4"
+    "zod": "^3.11.6"
   },
   "packageManager": "yarn@3.1.0"
 }
