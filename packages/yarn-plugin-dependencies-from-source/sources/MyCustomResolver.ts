@@ -1,5 +1,4 @@
 import {Descriptor, Locator, Resolver, ResolveOptions, MinimalResolveOptions, Package, DescriptorHash, structUtils, } from '@yarnpkg/core';
-import { NpmSemverResolver } from '@yarnpkg/plugin-npm/lib/NpmSemverResolver'
 
 export class MyCustomResolver implements Resolver {
 
