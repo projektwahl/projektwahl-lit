@@ -8,6 +8,8 @@ import { sql } from './database.js'
 import { createSecureServer } from 'node:http2'
 import { readFileSync } from 'node:fs'
 
+console.log(await import.meta.resolve("projektwahl-lit-client/index.html"))
+
 /*
 openssl req -x509 -newkey rsa:2048 -nodes -sha256 -subj '/CN=localhost' -keyout localhost-privkey.pem -out localhost-cert.pem
 */

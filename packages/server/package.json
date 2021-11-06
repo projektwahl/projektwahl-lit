@@ -22,8 +22,8 @@
     "lint": "eslint .",
     "fix:lint": "eslint --fix .",
     "check": "tsc --noEmit",
-    "server": "node src/index.js",
-    "setup": "yarn node src/setup.js"
+    "server": "node --experimental-import-meta-resolve src/index.js",
+    "setup": "node src/setup.js"
   },
   "license": "AGPL-3.0-or-later",
   "devDependencies": {

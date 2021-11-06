@@ -1,13 +1,13 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // SPDX-FileCopyrightText: 2021 Moritz Hedtke <Moritz.Hedtke@t-online.de>
 
-import { zod2result } from "projektwahl-lit-lib/src/result";
-import { loginInputSchema } from "projektwahl-lit-lib/src/routes";
+import { zod2result } from "projektwahl-lit-lib/src/result.js";
+import {  } from "projektwahl-lit-lib/src/routes.js";
 import {
   json,
 } from 'node:stream/consumers';
 
-/** @type {<P extends keyof import("projektwahl-lit-lib/src/route-types").Routes>(stream: import("http2").ServerHttp2Stream, headers: import("http2").IncomingHttpHeaders, path: P) => void} */
+/** @type {<P extends keyof import("projektwahl-lit-lib/src/routes").routes>(stream: import("http2").ServerHttp2Stream, headers: import("http2").IncomingHttpHeaders, path: P) => void} */
 export async function post(stream, headers, path) {
   if (headers[":method"] === "GET" && new RegExp(path).test(/** @type {string} */ (headers[":path"]))) {
     const body = await json(stream.toWeb())

@@ -1,5 +1,5 @@
 import { z, ZodType } from "zod";
-import { result } from "./result";
+import { result } from "./result.js";
 
 export const loginInputSchema = z.object({
     username: z.string().min(3).max(100),
