@@ -1,17 +1,36 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // SPDX-FileCopyrightText: 2021 Moritz Hedtke <Moritz.Hedtke@t-online.de>
 
-/** @type {<T,E extends { [key: string]: string } = { [key in keyof T]: string }>(result: import("projektwahl-lit/src/lib/types").OptionalResult<T, E>) => result is import("projektwahl-lit/src/lib/types").FailureResult<T, E>} */
+import { z, ZodObject, ZodRecord, ZodType } from "zod";
+
+export const noneResult = z.object({
+  result: z.literal("none")
+}).strict()
+
+export const successResult = (/** @type {ZodType<any>} */ zodObject) => z.object({
+  result: z.literal("success"),
+  success: zodObject,
+}).strict()
+
+export const failureResult = (/** @type {ZodRecord<any>} */ zodObject) => z.object({
+  result: z.literal("failure"),
+  success: zodObject,
+}).strict()
+
+export const result = (/** @type {ZodType<any>} */ successZodObject, /** @type {ZodRecord<any>} */ failureZodObject) => 
+successResult(successZodObject).or(failureResult(failureZodObject));
+
+/** @type {<T,E extends { [key: string]: string } = { [key in keyof T]: string }>(result: import("projektwahl-lit-lib/src/types").OptionalResult<T, E>) => result is import("projektwahl-lit/src/lib/types").FailureResult<T, E>} */
 export const isErr = (result) => {
   return result.result === "failure";
 };
 
-/** @type {<T,E extends { [key: string]: string } = { [key in keyof T]: string }>(result: import("projektwahl-lit/src/lib/types").OptionalResult<T, E>) => result is import("projektwahl-lit/src/lib/types").SuccessResult<T, E>} */
+/** @type {<T,E extends { [key: string]: string } = { [key in keyof T]: string }>(result: import("projektwahl-lit-lib/src/types").OptionalResult<T, E>) => result is import("projektwahl-lit/src/lib/types").SuccessResult<T, E>} */
 export const isOk = (result) => {
   return result.result === "success";
 };
 
-/** @type {<T,E extends { [key: string]: string } = { [key in keyof T]: string }>(value: T) => import("projektwahl-lit/src/lib/types").SuccessResult<T, E>} */
+/** @type {<T,E extends { [key: string]: string } = { [key in keyof T]: string }>(value: T) => import("projektwahl-lit-lib/src/types").SuccessResult<T, E>} */
 export const ok = (value) => {
   return {
     result: "success",
