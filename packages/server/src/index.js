@@ -5,6 +5,30 @@ import { get, post } from "./express.js";
 import { zod2result } from "projektwahl-lit-lib/src/result.js";
 import { checkPassword } from "./password.js";
 import { sql } from './database.js'
+import { createSecureServer } from 'node:http2'
+import { readFileSync } from 'node:fs'
+
+/*
+openssl req -x509 -newkey rsa:2048 -nodes -sha256 -subj '/CN=localhost' -keyout localhost-privkey.pem -out localhost-cert.pem
+*/
+const server = createSecureServer({
+  key: readFileSync('localhost-privkey.pem'),
+  cert: readFileSync('localhost-cert.pem')
+});
+server.on('error', (err) => console.error(err));
+
+server.on('stream', (stream, headers) => {
+  if (/^\/$/.test(/** @type {string} */ (headers[":path"]))) {
+    stream.respond({
+      'content-type': 'text/html; charset=utf-8',
+      ':status': 200
+    });
+    stream.end('<h1>Hello World</h1>');
+  }
+  
+});
+
+server.listen(8443);
 
 // https://learning-notes.mistermicheels.com/javascript/typescript/runtime-type-checking/
 // https://www.azavea.com/blog/2020/10/29/run-time-type-checking-in-typescript-with-io-ts/
@@ -15,10 +39,6 @@ import { sql } from './database.js'
 // https://www.npmjs.com/package/yup
 
 /*
-// respond with "hello world" when a GET request is made to the homepage
-app.get("/", function (req, res) {
-  res.send("hello world");
-});
 
 export const loginInputSchema = z.object({
   username: z.string().min(3).max(100),
