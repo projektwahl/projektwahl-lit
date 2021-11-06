@@ -7,24 +7,55 @@ import { checkPassword } from "./password.js";
 import { sql } from './database.js'
 import { createSecureServer } from 'node:http2'
 import { readFileSync } from 'node:fs'
+import cluster from 'cluster';
+import { cpus } from 'os';
+import process from 'process';
+import { workerData } from "node:worker_threads";
 
 console.log(await import.meta.resolve("projektwahl-lit-client/index.html"))
 
-/*
-openssl req -x509 -newkey rsa:2048 -nodes -sha256 -subj '/CN=localhost' -keyout localhost-privkey.pem -out localhost-cert.pem
-*/
-const server = createSecureServer({
-  key: readFileSync('localhost-privkey.pem'),
-  cert: readFileSync('localhost-cert.pem')
-});
-server.on('error', (err) => console.error(err));
+const numCPUs = 3;// cpus().length;
 
-server.on('stream', (stream, headers) => {
-  
-  
-});
+if (cluster.isPrimary) {
+  console.log(`Primary is running`);
 
-server.listen(8443);
+  // Fork workers.
+  for (let i = 0; i < numCPUs; i++) {
+    cluster.fork();
+  }
+
+  cluster.on('exit', (worker, code, signal) => {
+    console.log(`worker ${worker.id} died`);
+    cluster.fork();
+  });
+} else {
+  
+  /*
+  openssl req -x509 -newkey rsa:2048 -nodes -sha256 -subj '/CN=localhost' -keyout localhost-privkey.pem -out localhost-cert.pem
+  */
+  const server = createSecureServer({
+    key: readFileSync('localhost-privkey.pem'),
+    cert: readFileSync('localhost-cert.pem')
+  });
+  server.on('error', (err) => console.error(err));
+
+  server.on('stream', (stream, headers) => {
+    stream.respond({
+      'content-type': 'text/html; charset=utf-8',
+      ':status': 200
+    });
+    stream.end(`afb ${cluster.worker?.id}`);
+  });
+
+  server.listen(8443, () => {
+    console.log(`Worker ${cluster.worker?.id} started`);
+
+    setTimeout(() => {
+      process.kill(process.pid, "SIGTERM")
+    }, Math.random()*2000);
+  });
+}
+
 
 // https://learning-notes.mistermicheels.com/javascript/typescript/runtime-type-checking/
 // https://www.azavea.com/blog/2020/10/29/run-time-type-checking-in-typescript-with-io-ts/
