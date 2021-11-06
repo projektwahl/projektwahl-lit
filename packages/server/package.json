@@ -22,14 +22,16 @@
     "lint": "eslint .",
     "fix:lint": "eslint --fix .",
     "check": "tsc --noEmit",
-    "server": "nodemon --exec yarn node -- src/index.js",
+    "server": "node src/index.js",
     "setup": "yarn node src/setup.js"
   },
   "license": "AGPL-3.0-or-later",
+  "devDependencies": {
+    "@types/node": "^16.11.6"
+  },
   "dependencies": {
     "postgres": "beta",
-    "projektwahl-lit-lib": "workspace:^",
+    "projektwahl-lit-lib": "0.0.1",
     "zod": "^3.11.6"
-  },
-  "packageManager": "yarn@3.1.0"
+  }
 }
