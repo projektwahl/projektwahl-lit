@@ -18,13 +18,7 @@ const server = createSecureServer({
 server.on('error', (err) => console.error(err));
 
 server.on('stream', (stream, headers) => {
-  if (/^\/$/.test(/** @type {string} */ (headers[":path"]))) {
-    stream.respond({
-      'content-type': 'text/html; charset=utf-8',
-      ':status': 200
-    });
-    stream.end('<h1>Hello World</h1>');
-  }
+  
   
 });
 
@@ -39,12 +33,6 @@ server.listen(8443);
 // https://www.npmjs.com/package/yup
 
 /*
-
-export const loginInputSchema = z.object({
-  username: z.string().min(3).max(100),
-  password: z.string().min(6).max(1024),
-});
-
 post(app, "/api/v1/login", async function (req, res) {
   const loginRequest = zod2result(loginInputSchema.safeParse(req.body));
 
