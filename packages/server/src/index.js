@@ -111,7 +111,7 @@ global.server = createSecureServer({
         url = url.substring("file:///home/moritz/Documents/projektwahl-lit/".length)
         return `import "/${url}"`
       });
-      contents = await replaceAsync(contents, /([* ])from ?"([^"]+)"/g, async (match, args) => {
+      contents = await replaceAsync(contents, /([*} ])from ?"([^"]+)"/g, async (match, args) => {
         console.log(match)
         console.log(args)
         let url = await import.meta.resolve(args[1], pathToFileURL(filename))
