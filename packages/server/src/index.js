@@ -68,54 +68,43 @@ global.server = createSecureServer({
 
   server.on('stream', async (stream, headers) => {
     console.log("start"+ headers[":path"]+"end")
-
-    // TODO FIXME we really likely need to replace all imports
-    // as module imports dont end with this trailing slash
-    // which breaks everything
     
+    // TODO FIXME respond can throw
 
-    // TODO FIXME this is not really worth it
-    // there is also the funny problem that @lit-labs/motion
-    // imports animate.js
-    // but the trailing slash is missing so this searches in the wrong dir
-    
     if (headers[":path"] === "/") {
-      let url = await import.meta.resolve("projektwahl-lit-client/index.html")
-      let contents = await readFile(fileURLToPath(url), {
-        encoding: "utf-8"
-      })
-      stream.respond({
+      stream.respondWithFile("../client/index.html", {
         'content-type': 'text/html; charset=utf-8',
         ':status': 200
-      });
-      stream.end(contents);
+      }, {});
     } else if (headers[":path"] === "/favicon.ico") {
       stream.respond({
         ':status': 404
       }, {
         endStream: true
       })
+    } else if (headers[":path"]?.startsWith("/api")) {
+      
     } else {
       // TODO FIXME injection
       // TODO FIXME caching (server+clientside)
       try {
         let filename = "../.."+headers[":path"]
-        console.log("mod", filename)
+        //console.log("mod", filename)
         let contents = await readFile(filename, {
           encoding: "utf-8"
         })
         //console.log(contents)
 
         contents = await replaceAsync(contents, /import( )?"([^"]+)"/g, async (match, args) => {
-          console.log(match)
-          console.log(args)
+          //console.log(match)
+          //console.log(args)
           let url = await import.meta.resolve(args[1], pathToFileURL(filename))
           url = url.substring("file:///home/moritz/Documents/projektwahl-lit/".length)
           return `import "/${url}"`
         });
         contents = await replaceAsync(contents, /([*} ])from ?"([^"]+)"/g, async (match, args) => {
-          console.log(match)
-          console.log(args)
+          //console.log(match)
+          //console.log(args)
           let url = await import.meta.resolve(args[1], pathToFileURL(filename))
           url = url.substring("file:///home/moritz/Documents/projektwahl-lit/".length)
           return `${args[0]} from "/${url}"`
@@ -128,9 +117,10 @@ global.server = createSecureServer({
         });
         stream.end(contents);
       } catch (error) {
-        stream.respond({
-          ':status': 404,
-        }, {endStream: true})
+        stream.respondWithFile("../client/index.html", {
+          'content-type': 'text/html; charset=utf-8',
+          ':status': 200
+        }, {});
       }
     }
   });
