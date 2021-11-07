@@ -29,6 +29,7 @@
     "@lit-labs/motion": "^1.0.1",
     "lit": "^2.0.2",
     "postgres": "beta",
+    "typescript": "^4.5.1-rc",
     "zod": "^3.11.6"
   },
   "devDependencies": {

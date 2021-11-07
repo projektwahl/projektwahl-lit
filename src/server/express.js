@@ -8,7 +8,7 @@ import {
 import { routes } from "../lib/routes.js";
 import { Duplex } from "stream";
 
-/** @type {<P extends keyof routes>(method: string, path: P, handler: (r: import("zod").infer<typeof routes[P]["request"]>) => import("zod").infer<typeof routes[P]["response"]>) => void} */
+/** @type {<P extends keyof routes>(method: string, path: P, handler: (r: import("zod").infer<typeof routes[P]["request"]>) => Promise<import("zod").infer<typeof routes[P]["response"]>>) => ((stream: import("http2").ServerHttp2Stream, headers: import("http2").IncomingHttpHeaders) => Promise<void>)} */
 export function request(method, path, handler) {
   let fn = 
   /**
