@@ -46,6 +46,11 @@ global.server = createSecureServer({
   server.on('stream', async (stream, headers) => {
     console.log("start"+ headers[":path"]+"end")
 
+    // TODO FIXME this is not really worth it
+    // there is also the funny problem that @lit-labs/motion
+    // imports animate.js
+    // but the trailing slash is missing so this searches in the wrong dir
+    
     if (headers[":path"] === "/") {
       let url = await import.meta.resolve("projektwahl-lit-client/index.html")
       let contents = await readFile(fileURLToPath(url), {
@@ -64,21 +69,38 @@ global.server = createSecureServer({
       })
     } else if (headers[":path"]?.startsWith("/node_modules/")) {
       // TODO FIXME injection
-      let mod = headers[":path"].substring("/node_modules/".length)
-      console.log("mod", mod)
-      let url = await import.meta.resolve(mod)
-      let contents = await readFile(fileURLToPath(url), {
-        encoding: "utf-8"
-      })
-      // Package subpath './lit-html.js' is not defined by "exports" in 
-      // bruh - probably just read from node_modules
+      try {
+        let mod = "../.."+headers[":path"]
+        console.log("mod", mod)
+        let contents = await readFile(mod, {
+          encoding: "utf-8"
+        })
+        // Package subpath './lit-html.js' is not defined by "exports" in 
+        // bruh - probably just read from node_modules
 
-      contents = contents.replaceAll(/([* ])from ?"([^\.])/g, `$1 from "/node_modules/$2`)
-      stream.respond({
-        'content-type': 'application/javascript; charset=utf-8',
-        ':status': 200
-      });
-      stream.end(contents);
+        contents = contents.replaceAll(/([* ])from ?"([^\.])/g, `$1 from "/node_modules/$2`)
+        stream.respond({
+          'content-type': 'application/javascript; charset=utf-8',
+          ':status': 200
+        });
+        stream.end(contents);
+      } catch (error) {
+        let mod = headers[":path"].substring("/node_modules/".length)
+        console.log("mod", mod)
+        let url = await import.meta.resolve(mod)
+        let contents = await readFile(fileURLToPath(url), {
+          encoding: "utf-8"
+        })
+        // Package subpath './lit-html.js' is not defined by "exports" in 
+        // bruh - probably just read from node_modules
+
+        contents = contents.replaceAll(/([* ])from ?"([^\.])/g, `$1 from "/node_modules/$2`)
+        stream.respond({
+          'content-type': 'application/javascript; charset=utf-8',
+          ':status': 200
+        });
+        stream.end(contents);
+      }
     } else {
       // TODO FIXME injection
       let url = await import.meta.resolve("projektwahl-lit-client"+headers[":path"])

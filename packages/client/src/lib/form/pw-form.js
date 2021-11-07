@@ -8,7 +8,6 @@ import { HistoryController } from "../../history-controller.js";
 import { myFetch } from "../../utils.js";
 import { promise } from "./promise-directive.js";
 import { isErr } from "projektwahl-lit-lib/src/result.js";
-import { animate, flyLeft, flyRight } from "@lit-labs/motion";
 
 /**
  * @template {keyof import("../../routes").Routes} P
