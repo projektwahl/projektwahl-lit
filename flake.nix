@@ -3,7 +3,7 @@
 {
   description = "projektwahl-lit's development flake";
 
-  inputs.nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
+  inputs.nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable-small";
   inputs.flake-utils.url = "github:numtide/flake-utils";
 
   outputs = { self, nixpkgs, flake-utils }:
@@ -14,8 +14,8 @@
           devShell = pkgs.mkShell {
             nativeBuildInputs = [
               pkgs.bashInteractive
-              pkgs.nodejs-16_x
-              (pkgs.yarn.override { nodejs = pkgs.nodejs-16_x; })
+              pkgs.nodejs-17_x
+              (pkgs.yarn.override { nodejs = pkgs.nodejs-17_x; })
               pkgs.postgresql_14
               pkgs.reuse
               pkgs.nixpkgs-fmt

@@ -1,3 +1,4 @@
+/// <reference path="index.d.ts" />
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // SPDX-FileCopyrightText: 2021 Moritz Hedtke <Moritz.Hedtke@t-online.de>
 import { z } from "zod";
@@ -11,13 +12,14 @@ import cluster from 'cluster';
 import { cpus } from 'os';
 import process from 'process';
 import { workerData } from "node:worker_threads";
-
-console.log(await import.meta.resolve("projektwahl-lit-client/index.html"))
+import repl from 'repl';
+import { readFile } from "node:fs/promises";
+import { fileURLToPath } from 'url';
 
 const numCPUs = 3;// cpus().length;
-
+/*
 if (cluster.isPrimary) {
-  console.log(`Primary is running`);
+  //console.log(`Primary is running`);
 
   // Fork workers.
   for (let i = 0; i < numCPUs; i++) {
@@ -25,37 +27,46 @@ if (cluster.isPrimary) {
   }
 
   cluster.on('exit', (worker, code, signal) => {
-    console.log(`worker ${worker.id} died`);
+    //console.log(`worker ${worker.id} died`);
     cluster.fork();
   });
-} else {
+*/
+//} else {
   
   /*
   openssl req -x509 -newkey rsa:2048 -nodes -sha256 -subj '/CN=localhost' -keyout localhost-privkey.pem -out localhost-cert.pem
   */
-  const server = createSecureServer({
+ 
+global.server = createSecureServer({
     key: readFileSync('localhost-privkey.pem'),
     cert: readFileSync('localhost-cert.pem')
   });
   server.on('error', (err) => console.error(err));
 
-  server.on('stream', (stream, headers) => {
+  server.on('stream', async (stream, headers) => {
+    let url = await import.meta.resolve("projektwahl-lit-client/index.html")
+
+    let contents = await readFile(fileURLToPath(url), {
+      encoding: "utf-8"
+    })
+
     stream.respond({
       'content-type': 'text/html; charset=utf-8',
       ':status': 200
     });
-    stream.end(`afb ${cluster.worker?.id}`);
+    stream.end(contents);
   });
 
   server.listen(8443, () => {
-    console.log(`Worker ${cluster.worker?.id} started`);
+    //console.log(`Worker ${cluster.worker?.id} started`);
 
-    setTimeout(() => {
+    /*setTimeout(() => {
       process.kill(process.pid, "SIGTERM")
-    }, Math.random()*2000);
+    }, Math.random()*2000);*/
   });
-}
+//}
 
+//repl.start({})
 
 // https://learning-notes.mistermicheels.com/javascript/typescript/runtime-type-checking/
 // https://www.azavea.com/blog/2020/10/29/run-time-type-checking-in-typescript-with-io-ts/
