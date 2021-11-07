@@ -1,9 +1,9 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // SPDX-FileCopyrightText: 2021 Moritz Hedtke <Moritz.Hedtke@t-online.de>
 import { html, LitElement, noChange } from "lit";
-import { bootstrapCss } from "../../index.js";
-import { HistoryController } from "../../history-controller.js";
-import { isErr } from "../../lib/src/result.js";
+import { bootstrapCss } from "../index.js";
+import { HistoryController } from "../history-controller.js";
+import { isErr } from "../../lib/result.js";
 import { promise } from "./promise-directive.js";
 
 /** @template T */

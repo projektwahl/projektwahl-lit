@@ -3,7 +3,7 @@
 // SPDX-FileCopyrightText: 2021 Moritz Hedtke <Moritz.Hedtke@t-online.de>
 import { z } from "zod";
 import { request } from "./express.js";
-import { zod2result } from "../../lib/src/result.js";
+import { zod2result } from "../lib/result.js";
 import { checkPassword } from "./password.js";
 import { sql } from './database.js'
 import { createSecureServer } from 'node:http2'
@@ -72,7 +72,7 @@ global.server = createSecureServer({
     // TODO FIXME respond can throw
 
     if (headers[":path"] === "/") {
-      stream.respondWithFile("../client/index.html", {
+      stream.respondWithFile("./src/client/index.html", {
         'content-type': 'text/html; charset=utf-8',
         ':status': 200
       }, {});
@@ -92,28 +92,30 @@ global.server = createSecureServer({
       // TODO FIXME injection
       // TODO FIXME caching (server+clientside)
       try {
-        let filename = "../.."+headers[":path"]
-        //console.log("mod", filename)
+        let filename = "." + headers[":path"]
+        console.log("mod", filename)
         let contents = await readFile(filename, {
           encoding: "utf-8"
         })
-        //console.log(contents)
+        console.log(contents)
 
         contents = await replaceAsync(contents, /import( )?"([^"]+)"/g, async (match, args) => {
-          //console.log(match)
-          //console.log(args)
+          console.log(match)
+          console.log(args)
           let url = await import.meta.resolve(args[1], pathToFileURL(filename))
+          console.log(url)
           url = url.substring("file:///home/moritz/Documents/projektwahl-lit/".length)
           return `import "/${url}"`
         });
         contents = await replaceAsync(contents, /([*} ])from ?"([^"]+)"/g, async (match, args) => {
-          //console.log(match)
-          //console.log(args)
+          console.log(match)
+          console.log(args)
           let url = await import.meta.resolve(args[1], pathToFileURL(filename))
+          console.log(url)
           url = url.substring("file:///home/moritz/Documents/projektwahl-lit/".length)
           return `${args[0]} from "/${url}"`
         });
-        //console.log(contents)
+        console.log(contents)
 
         stream.respond({
           'content-type': 'application/javascript; charset=utf-8',
@@ -121,7 +123,7 @@ global.server = createSecureServer({
         });
         stream.end(contents);
       } catch (error) {
-        stream.respondWithFile("../client/index.html", {
+        stream.respondWithFile("./src/client/index.html", {
           'content-type': 'text/html; charset=utf-8',
           ':status': 200
         }, {});

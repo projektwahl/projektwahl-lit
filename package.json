@@ -22,7 +22,7 @@
     "lint": "eslint .",
     "fix:lint": "eslint --fix .",
     "check": "tsc --noEmit",
-    "server": "nodemon --exec yarn node -- index.js"
+    "server": "node --experimental-import-meta-resolve src/server/index.js"
   },
   "license": "AGPL-3.0-or-later",
   "dependencies": {

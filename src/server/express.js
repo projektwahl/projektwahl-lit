@@ -1,11 +1,11 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // SPDX-FileCopyrightText: 2021 Moritz Hedtke <Moritz.Hedtke@t-online.de>
 
-import { zod2result } from "../../lib/src/result.js";
+import { zod2result } from "../lib/result.js";
 import {
   json, text,
 } from 'node:stream/consumers';
-import { routes } from "../../lib/src/routes.js";
+import { routes } from "../lib/routes.js";
 import { Duplex } from "stream";
 
 /** @type {<P extends keyof routes>(method: string, path: P, handler: (r: import("zod").infer<typeof routes[P].request>) => import("zod").infer<typeof routes[P].response>) => void} */

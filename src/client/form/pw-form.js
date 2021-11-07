@@ -3,14 +3,14 @@
 import "./pw-input.js";
 import { html, LitElement, noChange } from "lit";
 import { createRef, ref } from "lit/directives/ref.js";
-import { bootstrapCss } from "../../index.js";
-import { HistoryController } from "../../history-controller.js";
-import { myFetch } from "../../utils.js";
+import { bootstrapCss } from "../index.js";
+import { HistoryController } from "../history-controller.js";
+import { myFetch } from "../utils.js";
 import { promise } from "./promise-directive.js";
-import { isErr } from "../../lib/src/result.js";
+import { isErr } from "../../lib/result.js";
 
 /**
- * @template {keyof import("../../routes").Routes} P
+ * @template {keyof import("../../lib/routes").routes} P
  */
 export class PwForm extends LitElement {
   /** @override */ static get properties() {
@@ -39,7 +39,7 @@ export class PwForm extends LitElement {
     /** @type {import("lit/directives/ref").Ref<HTMLFormElement>} */
     this.form = createRef();
 
-    /** @type {Promise<import("../types").OptionalResult<import("../../routes").Routes[P],{ network?: string } & { [key in keyof import("../../routes").Routes[P]]?: string }>>} */
+    /** @type {Promise<import("../../lib/types").OptionalResult<import("../../lib/routes").routes[P],{ network?: string } & { [key in keyof import("../../lib/routes").routes[P]]?: string }>>} */
     this.result = Promise.resolve({ result: "none" });
   }
 
@@ -101,7 +101,7 @@ if ('FormDataEvent' in window) {
         <div class="row justify-content-center">
           <div class="col-md-7 col-lg-8">
             ${promise(
-              /** @type {Promise<import("../types").OptionalResult<import("../../routes").Routes[P],{network?: string;} & { [key in keyof import("../../routes").Routes[P]]?: string }>>} */ (
+              /** @type {Promise<import("../../lib/types").OptionalResult<import("../../lib/routes").routes[P],{network?: string;} & { [key in keyof import("../../lib/routes").routes[P]]?: string }>>} */ (
                 this.result
               ),
               /** @type {symbol | import("lit").TemplateResult | undefined} */ (

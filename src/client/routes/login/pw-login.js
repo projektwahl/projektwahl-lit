@@ -1,8 +1,8 @@
-import "../../lib/form/pw-form.js";
+import "../../form/pw-form.js";
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // SPDX-FileCopyrightText: 2021 Moritz Hedtke <Moritz.Hedtke@t-online.de>
 import { html, LitElement } from "lit";
-import "../../lib/form/pw-input.js";
+import "../../form/pw-input.js";
 
 // https://lit.dev/docs/components/lifecycle/
 // updateComplete

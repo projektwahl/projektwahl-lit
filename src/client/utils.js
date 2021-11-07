@@ -1,13 +1,13 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // SPDX-FileCopyrightText: 2021 Moritz Hedtke <Moritz.Hedtke@t-online.de>
 
-/** @type {<P extends keyof import("./routes").Routes>(
+/** @type {<P extends keyof import("../lib/routes").routes>(
   url: P,
   options: RequestInit | undefined
 ) => Promise<
-  import("./lib/types").Result<
-    import("./routes").Routes[P],
-    { network?: string } & { [key in keyof import("./routes").Routes[P]]?: string }
+  import("../lib/types").Result<
+    import("../lib/routes").routes[P],
+    { network?: string } & { [key in keyof import("../lib/routes").routes[P]]?: string }
   >
 >} */
 export const myFetch = async (url, options) => {
