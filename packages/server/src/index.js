@@ -36,7 +36,27 @@ if (cluster.isPrimary) {
   /*
   openssl req -x509 -newkey rsa:2048 -nodes -sha256 -subj '/CN=localhost' -keyout localhost-privkey.pem -out localhost-cert.pem
   */
- 
+
+/**
+ * 
+ * @param {string} str 
+ * @param {RegExp} regex 
+ * @param {(match: string, ...args: any[]) => Promise<string>} asyncFn 
+ * @returns {Promise<string>}
+ */
+async function replaceAsync(str, regex, asyncFn) {
+  /** @type {Promise<string>[]} */
+  const promises = [];
+  str.replace(regex, (match, ...args) => {
+    const promise = asyncFn(match, ...args);
+    promises.push(promise);
+    return ""
+  });
+  const data = await Promise.all(promises);
+  return str.replace(regex, () => /** @type {string} */ (data.shift()));
+}
+
+
 global.server = createSecureServer({
     key: readFileSync('localhost-privkey.pem'),
     cert: readFileSync('localhost-cert.pem')
@@ -74,47 +94,15 @@ global.server = createSecureServer({
       })
     } else if (headers[":path"]?.startsWith("/node_modules/")) {
       // TODO FIXME injection
-      try {
-        let mod = "../.."+headers[":path"]
-        console.log("mod", mod)
-        let contents = await readFile(mod, {
-          encoding: "utf-8"
-        })
-        // Package subpath './lit-html.js' is not defined by "exports" in 
-        // bruh - probably just read from node_modules
-        contents = contents.replaceAll(/import ?"([^\.])/g, `import "/node_modules/$1`)
-
-        contents = contents.replaceAll(/([* ])from ?"([^\.])/g, `$1 from "/node_modules/$2`)
-        stream.respond({
-          'content-type': 'application/javascript; charset=utf-8',
-          ':status': 200
-        });
-        stream.end(contents);
-      } catch (error) {
-        let mod = headers[":path"].substring("/node_modules/".length)
-        console.log("mod", mod)
-        let url = await import.meta.resolve(mod)
-        let contents = await readFile(fileURLToPath(url), {
-          encoding: "utf-8"
-        })
-        // Package subpath './lit-html.js' is not defined by "exports" in 
-        // bruh - probably just read from node_modules
-        contents = contents.replaceAll(/import ?"([^\.])/g, `import "/node_modules/$1`)
-
-        contents = contents.replaceAll(/([* ])from ?"([^\.])/g, `$1 from "/node_modules/$2`)
-        stream.respond({
-          'content-type': 'application/javascript; charset=utf-8',
-          ':status': 200
-        });
-        stream.end(contents);
-      }
-    } else {
-      // TODO FIXME injection
-      let url = await import.meta.resolve("projektwahl-lit-client"+headers[":path"])
-      let contents = await readFile(fileURLToPath(url), {
+      let mod = "../.."+headers[":path"]
+      console.log("mod", mod)
+      let contents = await readFile(mod, {
         encoding: "utf-8"
       })
+      // Package subpath './lit-html.js' is not defined by "exports" in 
+      // bruh - probably just read from node_modules
       contents = contents.replaceAll(/import ?"([^\.])/g, `import "/node_modules/$1`)
+
       contents = contents.replaceAll(/([* ])from ?"([^\.])/g, `$1 from "/node_modules/$2`)
       stream.respond({
         'content-type': 'application/javascript; charset=utf-8',
