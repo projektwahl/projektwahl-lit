@@ -5,7 +5,7 @@ import { literal, Sql, sql, sqlToString } from './sql/index.js'
  * @param {string} table 
  * @param {string[]} fieldsToSelect 
  * @param {{ [field: string]: 'nulls-first'|'nulls-last' }} orderByInfo
- * @param {import("projektwahl-lit-lib/src/types").BaseQuery<T>} _query
+ * @param {import("../../lib/src/types").BaseQuery<T>} _query
  * @param {T} sanitizedData 
  * @param {(query: T) => import('./sql').Sql} customFilterQuery 
  * @returns {Sql}

@@ -77,7 +77,7 @@ await sql.begin('READ WRITE', async (sql) => {
 		console.log(keycloakUser);
 		*/
 
-		/** @type {[import("projektwahl-lit-lib/src/types").Existing<import("projektwahl-lit-lib/src/types").RawUserType>]} */
+		/** @type {[import("../../lib/src/types").Existing<import("../../lib/src/types").RawUserType>]} */
 		const [user] = await sql`INSERT INTO users (name, type, "group", age) VALUES (${`user${Math.random()}`}, 'voter', 'a', 10) ON CONFLICT DO NOTHING RETURNING *;`;
 		shuffleArray(projects);
 		for (let j = 0; j < 5; j++) {

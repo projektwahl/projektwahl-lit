@@ -7,7 +7,7 @@ import { bootstrapCss } from "../../index.js";
 import { HistoryController } from "../../history-controller.js";
 import { myFetch } from "../../utils.js";
 import { promise } from "./promise-directive.js";
-import { isErr } from "projektwahl-lit-lib/src/result.js";
+import { isErr } from "../../lib/src/result.js";
 
 /**
  * @template {keyof import("../../routes").Routes} P

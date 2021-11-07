@@ -3,7 +3,7 @@
 // SPDX-FileCopyrightText: 2021 Moritz Hedtke <Moritz.Hedtke@t-online.de>
 import { z } from "zod";
 import { request } from "./express.js";
-import { zod2result } from "projektwahl-lit-lib/src/result.js";
+import { zod2result } from "../../lib/src/result.js";
 import { checkPassword } from "./password.js";
 import { sql } from './database.js'
 import { createSecureServer } from 'node:http2'

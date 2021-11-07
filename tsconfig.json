@@ -10,6 +10,7 @@
     "declarationMap": true,
     "sourceMap": true,
     "strict": true,
+    "noEmit": true,
     "experimentalDecorators": true,
     "useDefineForClassFields": false,
     "allowSyntheticDefaultImports": true,
@@ -24,5 +25,5 @@
     "checkJs": true,
     "importsNotUsedAsValues": "error"
   },
-  "include": ["**/*.ts", "**/*.js", "../lib/src/result.js"]
+  "include": ["**/*.ts", "**/*.js"]
 }

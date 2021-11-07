@@ -1,18 +1,34 @@
 {
-    "name": "projektwahl-lit",
-    "private": true,
-    "workspaces": [
-        "packages/lib",
-        "packages/server",
-        "packages/client"
-    ],
-    "packageManager": "yarn@3.1.0",
-    "dependenciesMeta": {
-        "argon2": {
-            "built": true
-        }
-    },
-    "dependencies": {
-        
-    }
+  "name": "projektwahl-lit",
+  "version": "0.0.1",
+  "author": {
+    "name": "Moritz Hedtke",
+    "email": "Moritz.Hedtke@t-online.de"
+  },
+  "bugs": {
+    "url": "https://github.com/mohe2015/projektwahl-lit/issues"
+  },
+  "homepage": "https://github.com/mohe2015/projektwahl-lit",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/mohe2015/projektwahl-lit.git"
+  },
+  "description": "Software to manage choosing projects and automatically assigning people to projects.",
+  "type": "module",
+  "scripts": {
+    "client": "yarn node web-dev-server-config.mjs",
+    "format": "prettier --write .",
+    "check:format": "prettier --check .",
+    "lint": "eslint .",
+    "fix:lint": "eslint --fix .",
+    "check": "tsc --noEmit",
+    "server": "nodemon --exec yarn node -- index.js"
+  },
+  "license": "AGPL-3.0-or-later",
+  "dependencies": {
+    "@lit-labs/motion": "^1.0.1",
+    "lit": "^2.0.2",
+    "postgres": "beta",
+    "zod": "^3.11.6"
+  }
 }
