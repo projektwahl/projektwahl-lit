@@ -97,34 +97,41 @@ global.server = createSecureServer({
       })
     } else {
       // TODO FIXME injection
-      let filename = "../.."+headers[":path"]
-      console.log("mod", filename)
-      let contents = await readFile(filename, {
-        encoding: "utf-8"
-      })
-      console.log(contents)
+      // TODO FIXME caching (server+clientside)
+      try {
+        let filename = "../.."+headers[":path"]
+        console.log("mod", filename)
+        let contents = await readFile(filename, {
+          encoding: "utf-8"
+        })
+        //console.log(contents)
 
-      contents = await replaceAsync(contents, /import( )?"([^"]+)"/g, async (match, args) => {
-        console.log(match)
-        console.log(args)
-        let url = await import.meta.resolve(args[1], pathToFileURL(filename))
-        url = url.substring("file:///home/moritz/Documents/projektwahl-lit/".length)
-        return `import "/${url}"`
-      });
-      contents = await replaceAsync(contents, /([*} ])from ?"([^"]+)"/g, async (match, args) => {
-        console.log(match)
-        console.log(args)
-        let url = await import.meta.resolve(args[1], pathToFileURL(filename))
-        url = url.substring("file:///home/moritz/Documents/projektwahl-lit/".length)
-        return `${args[0]} from "/${url}"`
-      });
-      console.log(contents)
+        contents = await replaceAsync(contents, /import( )?"([^"]+)"/g, async (match, args) => {
+          console.log(match)
+          console.log(args)
+          let url = await import.meta.resolve(args[1], pathToFileURL(filename))
+          url = url.substring("file:///home/moritz/Documents/projektwahl-lit/".length)
+          return `import "/${url}"`
+        });
+        contents = await replaceAsync(contents, /([*} ])from ?"([^"]+)"/g, async (match, args) => {
+          console.log(match)
+          console.log(args)
+          let url = await import.meta.resolve(args[1], pathToFileURL(filename))
+          url = url.substring("file:///home/moritz/Documents/projektwahl-lit/".length)
+          return `${args[0]} from "/${url}"`
+        });
+        //console.log(contents)
 
-      stream.respond({
-        'content-type': 'application/javascript; charset=utf-8',
-        ':status': 200
-      });
-      stream.end(contents);
+        stream.respond({
+          'content-type': 'application/javascript; charset=utf-8',
+          ':status': 200
+        });
+        stream.end(contents);
+      } catch (error) {
+        stream.respond({
+          ':status': 404,
+        }, {endStream: true})
+      }
     }
   });
 
