@@ -17,19 +17,14 @@ export function request(method, path, handler) {
    * @param {import("http2").IncomingHttpHeaders} headers 
    */
   async (stream, headers) => {
-    console.log("notgonnahappen")
     if (headers[":method"] === method && new RegExp(path).test(/** @type {string} */ (headers[":path"]))) {
-      console.log("yess")
       const webStream = Duplex.toWeb(stream);
       console.log(webStream)
       const body = headers[":method"] === "POST" ? await text(webStream.readable) : undefined;
-      console.log("boddy")
       const requestBody = zod2result(routes[path].request.safeParse(body));
 
       const responseBody = await handler(requestBody);
-      console.log("hi")
       routes[path].response.parse(responseBody);
-      console.log("jo")
 
       stream.respond({
         'content-type': 'text/json; charset=utf-8',
