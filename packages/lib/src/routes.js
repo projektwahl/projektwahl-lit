@@ -8,7 +8,8 @@ export const loginInputSchema = z.object({
 
 export const loginOutputSchema = result(z.void(), z.record(z.string()))
 
-export let routes = /** @type { { [regex: string]: { request: ZodType<any, any, any>, response: ZodType<any, any, any> } } } */ ({
+export const routes = /**
+    @type { { [regex in "/api/v1/login"]: { request: ZodType<any, any, any>, response: ZodType<any, any, any> } } } */ ({
     "/api/v1/login": {
         request: loginInputSchema,
         response: loginOutputSchema,
