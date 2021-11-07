@@ -1,10 +1,10 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // SPDX-FileCopyrightText: 2021 Moritz Hedtke <Moritz.Hedtke@t-online.de>
 import { html, LitElement, noChange } from "lit";
-import { bootstrapCss } from "../..";
-import { HistoryController } from "../../history-controller";
-import { isErr } from "projektwahl-lit-lib/src/result";
-import { promise } from "./promise-directive";
+import { bootstrapCss } from "../../index.js";
+import { HistoryController } from "../../history-controller.js";
+import { isErr } from "projektwahl-lit-lib/src/result.js";
+import { promise } from "./promise-directive.js";
 
 /** @template T */
 export class PwInput extends LitElement {

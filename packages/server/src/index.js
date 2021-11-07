@@ -62,12 +62,27 @@ global.server = createSecureServer({
       }, {
         endStream: true
       })
+    } else if (headers[":path"]?.startsWith("/node_modules/")) {
+      // TODO FIXME injection
+      let mod = headers[":path"].substring("/node_modules/".length)
+      console.log("mod", mod)
+      let url = await import.meta.resolve(mod)
+      let contents = await readFile(fileURLToPath(url), {
+        encoding: "utf-8"
+      })
+      contents = contents.replaceAll(/ from "([^\.])/g, ` from "/node_modules/$1`)
+      stream.respond({
+        'content-type': 'application/javascript; charset=utf-8',
+        ':status': 200
+      });
+      stream.end(contents);
     } else {
       // TODO FIXME injection
       let url = await import.meta.resolve("projektwahl-lit-client"+headers[":path"])
       let contents = await readFile(fileURLToPath(url), {
         encoding: "utf-8"
       })
+      contents = contents.replaceAll(/ from "([^\.])/g, ` from "/node_modules/$1`)
       stream.respond({
         'content-type': 'application/javascript; charset=utf-8',
         ':status': 200

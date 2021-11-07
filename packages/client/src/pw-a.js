@@ -2,8 +2,8 @@
 // SPDX-FileCopyrightText: 2021 Moritz Hedtke <Moritz.Hedtke@t-online.de>
 import { html, LitElement } from "lit";
 import { customElement, property } from "lit/decorators.js";
-import { bootstrapCss } from ".";
-import { HistoryController } from "./history-controller";
+import { bootstrapCss } from "./index.js";
+import { HistoryController } from "./history-controller.js";
 import { ifDefined } from "lit/directives/if-defined.js";
 
 // TODO FIXME https://lit.dev/docs/components/events/#shadowdom-retargeting just use the approach shown there

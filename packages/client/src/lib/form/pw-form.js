@@ -1,12 +1,13 @@
-import "./pw-input"; // SPDX-License-Identifier: AGPL-3.0-or-later
+// SPDX-License-Identifier: AGPL-3.0-or-later
 // SPDX-FileCopyrightText: 2021 Moritz Hedtke <Moritz.Hedtke@t-online.de>
+import "./pw-input.js";
 import { html, LitElement, noChange } from "lit";
 import { createRef, ref } from "lit/directives/ref.js";
-import { bootstrapCss } from "../..";
-import { HistoryController } from "../../history-controller";
-import { myFetch } from "../../utils";
-import { promise } from "./promise-directive";
-import { isErr } from "projektwahl-lit-lib/src/result";
+import { bootstrapCss } from "../../index.js";
+import { HistoryController } from "../../history-controller.js";
+import { myFetch } from "../../utils.js";
+import { promise } from "./promise-directive.js";
+import { isErr } from "projektwahl-lit-lib/src/result.js";
 import { animate, flyLeft, flyRight } from "@lit-labs/motion";
 
 /**
