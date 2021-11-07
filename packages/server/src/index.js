@@ -15,6 +15,9 @@ import { workerData } from "node:worker_threads";
 import repl from 'repl';
 import { readFile } from "node:fs/promises";
 import { fileURLToPath } from 'url';
+import { pathToFileURL } from "node:url";
+
+// npm run server -w projektwahl-lit-server
 
 const numCPUs = 3;// cpus().length;
 /*
@@ -41,19 +44,19 @@ if (cluster.isPrimary) {
  * 
  * @param {string} str 
  * @param {RegExp} regex 
- * @param {(match: string, ...args: any[]) => Promise<string>} asyncFn 
+ * @param {(match: string, args: any) => Promise<string>} asyncFn 
  * @returns {Promise<string>}
  */
 async function replaceAsync(str, regex, asyncFn) {
   /** @type {Promise<string>[]} */
   const promises = [];
-  str.replace(regex, (match, ...args) => {
-    const promise = asyncFn(match, ...args);
+  str.replaceAll(regex, (match, ...args) => {
+    const promise = asyncFn(match, args);
     promises.push(promise);
     return ""
   });
   const data = await Promise.all(promises);
-  return str.replace(regex, () => /** @type {string} */ (data.shift()));
+  return str.replaceAll(regex, () => /** @type {string} */ (data.shift()));
 }
 
 
@@ -86,24 +89,37 @@ global.server = createSecureServer({
         ':status': 200
       });
       stream.end(contents);
-    } else if (headers[":path"] === "favicon.ico") {
+    } else if (headers[":path"] === "/favicon.ico") {
       stream.respond({
         ':status': 404
       }, {
         endStream: true
       })
-    } else if (headers[":path"]?.startsWith("/node_modules/")) {
+    } else {
       // TODO FIXME injection
-      let mod = "../.."+headers[":path"]
-      console.log("mod", mod)
-      let contents = await readFile(mod, {
+      let filename = "../.."+headers[":path"]
+      console.log("mod", filename)
+      let contents = await readFile(filename, {
         encoding: "utf-8"
       })
-      // Package subpath './lit-html.js' is not defined by "exports" in 
-      // bruh - probably just read from node_modules
-      contents = contents.replaceAll(/import ?"([^\.])/g, `import "/node_modules/$1`)
+      console.log(contents)
 
-      contents = contents.replaceAll(/([* ])from ?"([^\.])/g, `$1 from "/node_modules/$2`)
+      contents = await replaceAsync(contents, /import( )?"([^"]+)"/g, async (match, args) => {
+        console.log(match)
+        console.log(args)
+        let url = await import.meta.resolve(args[1], pathToFileURL(filename))
+        url = url.substring("file:///home/moritz/Documents/projektwahl-lit/".length)
+        return `import "/${url}"`
+      });
+      contents = await replaceAsync(contents, /([* ])from ?"([^"]+)"/g, async (match, args) => {
+        console.log(match)
+        console.log(args)
+        let url = await import.meta.resolve(args[1], pathToFileURL(filename))
+        url = url.substring("file:///home/moritz/Documents/projektwahl-lit/".length)
+        return `${args[0]} from "/${url}"`
+      });
+      console.log(contents)
+
       stream.respond({
         'content-type': 'application/javascript; charset=utf-8',
         ':status': 200
