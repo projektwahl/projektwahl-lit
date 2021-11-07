@@ -83,9 +83,60 @@ global.server = createSecureServer({
         endStream: true
       })
     } else if (headers[":path"]?.startsWith("/api")) {
-      await request("GET", "/api/v1/sleep", async function (req) {
-        return "hello world";
+      await request("GET", "/api/v1/sleep", function (req) {
+        return new Promise((resolve, reject) => {
+          setTimeout(() => {
+            resolve(undefined)
+          }, 1000);
+        })
       })(stream, headers);
+
+
+await request("POST", "/api/v1/login", async function (body) {
+  /** @type {[import("../lib/types").Existing<Pick<import("../lib/types").RawUserType, "id"|"username"|"password_hash">>?]} */
+  const [dbUser] = await sql`SELECT id, username, password_hash, type FROM users WHERE username = ${body.username} LIMIT 1`;
+
+  if (dbUser === undefined) {
+    return res.json({
+      result: "failure",
+      failure: {
+        username: "Nutzer existiert nicht!"
+      }
+    })
+  }
+
+  if (dbUser.password_hash == null || !(await checkPassword(dbUser.password_hash, loginRequest.success.password))) {
+		return res.json({
+      result: 'failure',
+      failure: {
+        password: 'Falsches Passwort!'
+      }
+		});
+	}
+
+  /** @type {[Pick<import("projektwahl-lit-lib/src/types").RawSessionType, "session_id">]} */
+  const [session] = await sql.begin('READ WRITE', async (sql) => {
+		return await sql`INSERT INTO sessions (user_id) VALUES (${dbUser.id}) RETURNING session_id`;
+	});
+
+  res.cookie("strict_id", session.session_id, {
+    maxAge: 48 * 60 * 60 * 1000,
+    secure: true,
+    httpOnly: true,
+    sameSite: "strict",
+  })
+  res.cookie("lax_id", session.session_id, {
+    maxAge: 48 * 60 * 60 * 1000,
+    secure: true,
+    httpOnly: true,
+    sameSite: "lax",
+  })
+  return res.json({
+    result: "success",
+    success: undefined,
+  });
+})(stream, headers);
+
 
 
     } else {
@@ -93,29 +144,29 @@ global.server = createSecureServer({
       // TODO FIXME caching (server+clientside)
       try {
         let filename = "." + headers[":path"]
-        console.log("mod", filename)
+        //console.log("mod", filename)
         let contents = await readFile(filename, {
           encoding: "utf-8"
         })
-        console.log(contents)
+        //console.log(contents)
 
         contents = await replaceAsync(contents, /import( )?"([^"]+)"/g, async (match, args) => {
-          console.log(match)
-          console.log(args)
+          //console.log(match)
+          //console.log(args)
           let url = await import.meta.resolve(args[1], pathToFileURL(filename))
-          console.log(url)
+          //console.log(url)
           url = url.substring("file:///home/moritz/Documents/projektwahl-lit/".length)
           return `import "/${url}"`
         });
         contents = await replaceAsync(contents, /([*} ])from ?"([^"]+)"/g, async (match, args) => {
-          console.log(match)
-          console.log(args)
+          //console.log(match)
+          //console.log(args)
           let url = await import.meta.resolve(args[1], pathToFileURL(filename))
-          console.log(url)
+          //console.log(url)
           url = url.substring("file:///home/moritz/Documents/projektwahl-lit/".length)
           return `${args[0]} from "/${url}"`
         });
-        console.log(contents)
+        //console.log(contents)
 
         stream.respond({
           'content-type': 'application/javascript; charset=utf-8',
@@ -151,58 +202,6 @@ global.server = createSecureServer({
 // https://www.npmjs.com/package/yup
 
 /*
-post(app, "/api/v1/login", async function (req, res) {
-  const loginRequest = zod2result(loginInputSchema.safeParse(req.body));
-
-  if (loginRequest.result == "failure") {
-    return res.json(loginRequest);
-  }
-
-  /** @type {[import("projektwahl-lit-lib/src/types").Existing<Pick<import("projektwahl-lit-lib/src/types").RawUserType, "id"|"username"|"password_hash">>?]} /
-  const [dbUser] = await sql`SELECT id, username, password_hash, type FROM users WHERE username = ${loginRequest.success.username} LIMIT 1`;
-
-  if (dbUser === undefined) {
-    return res.json({
-      result: "failure",
-      failure: {
-        username: "Nutzer existiert nicht!"
-      }
-    })
-  }
-
-  if (dbUser.password_hash == null || !(await checkPassword(dbUser.password_hash, loginRequest.success.password))) {
-		return res.json({
-      result: 'failure',
-      failure: {
-        password: 'Falsches Passwort!'
-      }
-		});
-	}
-
-  /** @type {[Pick<import("projektwahl-lit-lib/src/types").RawSessionType, "session_id">]} /
-  const [session] = await sql.begin('READ WRITE', async (sql) => {
-		return await sql`INSERT INTO sessions (user_id) VALUES (${dbUser.id}) RETURNING session_id`;
-	});
-
-  res.cookie("strict_id", session.session_id, {
-    maxAge: 48 * 60 * 60 * 1000,
-    secure: true,
-    httpOnly: true,
-    sameSite: "strict",
-  })
-  res.cookie("lax_id", session.session_id, {
-    maxAge: 48 * 60 * 60 * 1000,
-    secure: true,
-    httpOnly: true,
-    sameSite: "lax",
-  })
-  return res.json({
-    result: "success",
-    success: undefined,
-  });
-});
-
-
 process.on("SIGINT", () => {
   console.log("SIGINT signal received: closing HTTP server");
   server.close(() => {

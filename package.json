@@ -30,5 +30,8 @@
     "lit": "^2.0.2",
     "postgres": "beta",
     "zod": "^3.11.6"
+  },
+  "devDependencies": {
+    "@types/node": "^16.11.6"
   }
 }

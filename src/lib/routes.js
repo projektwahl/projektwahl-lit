@@ -8,9 +8,14 @@ export const loginInputSchema = z.object({
 
 export const loginOutputSchema = result(z.void(), z.record(z.string()))
 
+/** @type {{ [r in "/api/v1/login"|"/api/v1/sleep"]: { request: ZodType<any>, response: ZodType<any> } }} */
 export const routes = ({
     "/api/v1/login": {
         request: loginInputSchema,
         response: loginOutputSchema,
+    },
+    "/api/v1/sleep": {
+        request: z.undefined(),
+        response: z.undefined(),
     }
 })

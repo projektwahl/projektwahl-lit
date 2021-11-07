@@ -10,6 +10,8 @@ import { Duplex } from "stream";
 
 /** @type {<P extends keyof routes>(method: string, path: P, handler: (r: import("zod").infer<typeof routes[P].request>) => import("zod").infer<typeof routes[P].response>) => void} */
 export function request(method, path, handler) {
+  routes[path].request
+
   let fn = 
   /**
    * 
