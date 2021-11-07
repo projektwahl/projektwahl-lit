@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // SPDX-FileCopyrightText: 2021 Moritz Hedtke <Moritz.Hedtke@t-online.de>
 import { z } from "zod";
-import { get, post } from "./express.js";
+import { request } from "./express.js";
 import { zod2result } from "projektwahl-lit-lib/src/result.js";
 import { checkPassword } from "./password.js";
 import { sql } from './database.js'
@@ -67,7 +67,7 @@ global.server = createSecureServer({
   server.on('error', (err) => console.error(err));
 
   server.on('stream', async (stream, headers) => {
-    console.log("start"+ headers[":path"]+"end")
+    //console.log("start"+ headers[":path"]+"end")
     
     // TODO FIXME respond can throw
 
@@ -83,7 +83,11 @@ global.server = createSecureServer({
         endStream: true
       })
     } else if (headers[":path"]?.startsWith("/api")) {
-      
+      await request("GET", "/api/v1/sleep", async function (req) {
+        return "hello world";
+      })(stream, headers);
+
+
     } else {
       // TODO FIXME injection
       // TODO FIXME caching (server+clientside)
@@ -196,11 +200,6 @@ post(app, "/api/v1/login", async function (req, res) {
   });
 });
 
-get(app, "/api/v1/sleep", function (req, res) {
-  setTimeout(() => {
-    res.send("hello world");
-  }, 1000);
-});
 
 process.on("SIGINT", () => {
   console.log("SIGINT signal received: closing HTTP server");
