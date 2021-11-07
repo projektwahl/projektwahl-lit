@@ -5,10 +5,10 @@ import { zod2result } from "projektwahl-lit-lib/src/result.js";
 import {
   json, text,
 } from 'node:stream/consumers';
-import { routes } from "projektwahl-lit-lib/src/routes.js";
+import { routes } from "../../lib/src/routes.js";
 import { Duplex } from "stream";
 
-/** @type {<P extends keyof import("../../lib/src/routes.js").routes>(method: string, path: P, handler: (r: import("zod").infer<typeof routes[P].request>) => import("zod").infer<typeof routes[P].response>) => void} */
+/** @type {<P extends keyof routes>(method: string, path: P, handler: (r: import("zod").infer<typeof routes[P].request>) => import("zod").infer<typeof routes[P].response>) => void} */
 export function request(method, path, handler) {
   let fn = 
   /**
