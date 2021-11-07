@@ -44,17 +44,36 @@ global.server = createSecureServer({
   server.on('error', (err) => console.error(err));
 
   server.on('stream', async (stream, headers) => {
-    let url = await import.meta.resolve("projektwahl-lit-client/index.html")
+    console.log("start"+ headers[":path"]+"end")
 
-    let contents = await readFile(fileURLToPath(url), {
-      encoding: "utf-8"
-    })
-
-    stream.respond({
-      'content-type': 'text/html; charset=utf-8',
-      ':status': 200
-    });
-    stream.end(contents);
+    if (headers[":path"] === "/") {
+      let url = await import.meta.resolve("projektwahl-lit-client/index.html")
+      let contents = await readFile(fileURLToPath(url), {
+        encoding: "utf-8"
+      })
+      stream.respond({
+        'content-type': 'text/html; charset=utf-8',
+        ':status': 200
+      });
+      stream.end(contents);
+    } else if (headers[":path"] === "favicon.ico") {
+      stream.respond({
+        ':status': 404
+      }, {
+        endStream: true
+      })
+    } else {
+      // TODO FIXME injection
+      let url = await import.meta.resolve("projektwahl-lit-client"+headers[":path"])
+      let contents = await readFile(fileURLToPath(url), {
+        encoding: "utf-8"
+      })
+      stream.respond({
+        'content-type': 'application/javascript; charset=utf-8',
+        ':status': 200
+      });
+      stream.end(contents);
+    }
   });
 
   server.listen(8443, () => {
