@@ -46,6 +46,11 @@ global.server = createSecureServer({
   server.on('stream', async (stream, headers) => {
     console.log("start"+ headers[":path"]+"end")
 
+    // TODO FIXME we really likely need to replace all imports
+    // as module imports dont end with this trailing slash
+    // which breaks everything
+    
+
     // TODO FIXME this is not really worth it
     // there is also the funny problem that @lit-labs/motion
     // imports animate.js
