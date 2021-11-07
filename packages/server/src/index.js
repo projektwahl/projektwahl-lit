@@ -77,6 +77,7 @@ global.server = createSecureServer({
         })
         // Package subpath './lit-html.js' is not defined by "exports" in 
         // bruh - probably just read from node_modules
+        contents = contents.replaceAll(/import ?"([^\.])/g, `import "/node_modules/$1`)
 
         contents = contents.replaceAll(/([* ])from ?"([^\.])/g, `$1 from "/node_modules/$2`)
         stream.respond({
@@ -93,6 +94,7 @@ global.server = createSecureServer({
         })
         // Package subpath './lit-html.js' is not defined by "exports" in 
         // bruh - probably just read from node_modules
+        contents = contents.replaceAll(/import ?"([^\.])/g, `import "/node_modules/$1`)
 
         contents = contents.replaceAll(/([* ])from ?"([^\.])/g, `$1 from "/node_modules/$2`)
         stream.respond({
@@ -107,6 +109,7 @@ global.server = createSecureServer({
       let contents = await readFile(fileURLToPath(url), {
         encoding: "utf-8"
       })
+      contents = contents.replaceAll(/import ?"([^\.])/g, `import "/node_modules/$1`)
       contents = contents.replaceAll(/([* ])from ?"([^\.])/g, `$1 from "/node_modules/$2`)
       stream.respond({
         'content-type': 'application/javascript; charset=utf-8',
