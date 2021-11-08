@@ -61,7 +61,7 @@ if (cluster.isPrimary) {
         }
         for (const id in oldWorkers) {
           console.log(`worker ${id} died`);
-          oldWorkers[id]?.destroy("SIGTERM")
+          oldWorkers[id]?.process.kill("SIGTERM")
         }
       }
     })()
@@ -119,7 +119,7 @@ global.server = createSecureServer({
         return new Promise((resolve, reject) => {
           setTimeout(() => {
             resolve(undefined)
-          }, 1000);
+          }, 2000);
         })
       })(stream, headers);
 
