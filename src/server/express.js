@@ -15,23 +15,33 @@ export function request(method, path, handler) {
      * @param {import("http2").IncomingHttpHeaders} headers
      */
     async (stream, headers) => {
-      if (
-        headers[":method"] === method &&
-        new RegExp(path).test(/** @type {string} */ (headers[":path"]))
-      ) {
-        const webStream = Duplex.toWeb(stream);
-        console.log(webStream);
-        const body =
-          headers[":method"] === "POST"
-            ? await text(webStream.readable)
-            : undefined;
-        const requestBody = zod2result(routes[path].request.safeParse(body));
+      try {
+        console.log(headers[":method"]+" "+method+" "+path+" "+headers[":path"])
+        if (
+          headers[":method"] === method &&
+          new RegExp(path).test(/** @type {string} */ (headers[":path"]))
+        ) {
+          console.log("Its a match")
+          const webStream = Duplex.toWeb(stream);
+          const body =
+            headers[":method"] === "POST"
+              ? await json(webStream.readable)
+              : undefined;
+          console.log("its the stream that is buggy bruh")
 
-        const [new_headers, responseBody] = await handler(requestBody, stream);
-        routes[path].response.parse(responseBody);
+          const requestBody = zod2result(routes[path].request.safeParse(body));
 
-        stream.respond(new_headers);
-        stream.end(JSON.stringify(responseBody));
+            const [new_headers, responseBody] = await handler(requestBody, stream);
+            routes[path].response.parse(responseBody);
+            stream.respond(new_headers);
+            stream.end(JSON.stringify(responseBody));
+        
+          
+          return true;
+        }
+      } catch (error) {
+        console.error(error)
+        stream.respond({":status": "500"}, {endStream: true});
         return true;
       }
       return false;
