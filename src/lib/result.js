@@ -3,22 +3,32 @@
 
 import { z, ZodObject, ZodRecord, ZodType } from "zod";
 
-export const noneResult = z.object({
-  result: z.literal("none")
-}).strict()
+export const noneResult = z
+  .object({
+    result: z.literal("none"),
+  })
+  .strict();
 
-export const successResult = (/** @type {ZodType<any>} */ zodObject) => z.object({
-  result: z.literal("success"),
-  success: zodObject,
-}).strict()
+export const successResult = (/** @type {ZodType<any>} */ zodObject) =>
+  z
+    .object({
+      result: z.literal("success"),
+      success: zodObject,
+    })
+    .strict();
 
-export const failureResult = (/** @type {ZodRecord<any>} */ zodObject) => z.object({
-  result: z.literal("failure"),
-  failure: zodObject,
-}).strict()
+export const failureResult = (/** @type {ZodRecord<any>} */ zodObject) =>
+  z
+    .object({
+      result: z.literal("failure"),
+      failure: zodObject,
+    })
+    .strict();
 
-export const result = (/** @type {ZodType<any>} */ successZodObject, /** @type {ZodRecord<any>} */ failureZodObject) => 
-successResult(successZodObject).or(failureResult(failureZodObject));
+export const result = (
+  /** @type {ZodType<any>} */ successZodObject,
+  /** @type {ZodRecord<any>} */ failureZodObject
+) => successResult(successZodObject).or(failureResult(failureZodObject));
 
 /** @type {<T,E extends { [key: string]: string } = { [key in keyof T]: string }>(result: import("projektwahl-lit-lib/src/types").OptionalResult<T, E>) => result is import("projektwahl-lit/src/lib/types").FailureResult<T, E>} */
 export const isErr = (result) => {

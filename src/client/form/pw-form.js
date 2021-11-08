@@ -89,7 +89,7 @@ if ('FormDataEvent' in window) {
 
     const keyframeOptions = {
       duration: 500,
-      fill: 'both',
+      fill: "both",
     };
 
     console.log("rerender");
@@ -126,10 +126,18 @@ if ('FormDataEvent' in window) {
             >
               ${this.fakeSlot}
 
-              <button type="submit" ?disabled=${promise(this.result, true, () => false, () => false)} class="btn btn-primary">
-              ${this.actionText}
+              <button
+                type="submit"
+                ?disabled=${promise(
+                  this.result,
+                  true,
+                  () => false,
+                  () => false
+                )}
+                class="btn btn-primary"
+              >
+                ${this.actionText}
               </button>
-
             </form>
           </div>
         </div>

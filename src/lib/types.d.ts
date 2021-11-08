@@ -3,24 +3,32 @@
 
 export type OptionalResult<
   T,
-  E extends Partial<{ [key: string]: string }> = Partial<{ [key in keyof T]: string }>
+  E extends Partial<{ [key: string]: string }> = Partial<{
+    [key in keyof T]: string;
+  }>
 > = Result<T, E> | NoneResult<T, E>;
 
 export type Result<
   T,
-  E extends Partial<{ [key: string]: string }> = Partial<{ [key in keyof T]: string }>
+  E extends Partial<{ [key: string]: string }> = Partial<{
+    [key in keyof T]: string;
+  }>
 > = SuccessResult<T, E> | FailureResult<T, E>;
 
 export type NoneResult<
   T,
-  E extends Partial<{ [key: string]: string }> = Partial<{ [key in keyof T]: string }>
+  E extends Partial<{ [key: string]: string }> = Partial<{
+    [key in keyof T]: string;
+  }>
 > = {
   result: "none";
 };
 
 export type SuccessResult<
   T,
-  E extends Partial<{ [key: string]: string }> = Partial<{ [key in keyof T]: string }>
+  E extends Partial<{ [key: string]: string }> = Partial<{
+    [key in keyof T]: string;
+  }>
 > = {
   result: "success";
   success: T;
@@ -28,7 +36,9 @@ export type SuccessResult<
 
 export type FailureResult<
   T,
-  E extends Partial<{ [key: string]: string }> = Partial<{ [key in keyof T]: string }>
+  E extends Partial<{ [key: string]: string }> = Partial<{
+    [key in keyof T]: string;
+  }>
 > = {
   result: "failure";
   failure: E;
@@ -88,11 +98,11 @@ export type EntityResponseBody<T> = {
 };
 
 export type BaseQuery<C> = {
-	paginationDirection: 'forwards' | 'backwards';
-	paginationCursor: C | null; // if this is null the start is at start/end depending on paginationDirection
-	sorting: [keyof C, "ASC"|"DESC"][];
-	paginationLimit: number;
-	filters: {
-		[key in keyof C]?: C[key]; // boolean | string | number | string[] | null | undefined // TODO FIXME C[key]
-	};
+  paginationDirection: "forwards" | "backwards";
+  paginationCursor: C | null; // if this is null the start is at start/end depending on paginationDirection
+  sorting: [keyof C, "ASC" | "DESC"][];
+  paginationLimit: number;
+  filters: {
+    [key in keyof C]?: C[key]; // boolean | string | number | string[] | null | undefined // TODO FIXME C[key]
+  };
 };

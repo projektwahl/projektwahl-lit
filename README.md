@@ -13,6 +13,7 @@ Software to manage choosing projects and automatically assigning people to proje
 nix develop
 npm ci
 ```
+
 https://docs.joshuatz.com/cheatsheets/js/jsdoc/
 
 TODO use https://www.npmjs.com/package/@lit-labs/task

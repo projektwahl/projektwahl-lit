@@ -10,62 +10,64 @@ const argon2Options = {
 	hashLength: 256 / 8, // 32
 	parallelism: 4
 };*/
-import crypto, { webcrypto } from 'node:crypto';
+import crypto, { webcrypto } from "node:crypto";
 
 /**
- * 
- * @param {string} password 
+ *
+ * @param {string} password
  * @returns {Promise<CryptoKey>}
  */
 async function getKeyMaterial(password) {
-	let enc = new TextEncoder();
-	return webcrypto.subtle.importKey(
-	  "raw",
-	  enc.encode(password),
-	  "PBKDF2",
-	  false,
-	  ["deriveBits"]
-	);
+  let enc = new TextEncoder();
+  return webcrypto.subtle.importKey(
+    "raw",
+    enc.encode(password),
+    "PBKDF2",
+    false,
+    ["deriveBits"]
+  );
 }
 
 /**
- * 
- * @param {string} password 
- * @param {BufferSource} salt 
+ *
+ * @param {string} password
+ * @param {BufferSource} salt
  * @returns {Promise<ArrayBuffer>}
  */
 async function hashPasswordWithSalt(password, salt) {
-	let keyMaterial = await getKeyMaterial(password);
-	return await webcrypto.subtle.deriveBits(
-	  {
-		"name": "PBKDF2",
-		salt: salt,
-		"iterations": 100000,
-		"hash": "SHA-256"
-	  },
-	  keyMaterial,
-	  256
-	);
+  let keyMaterial = await getKeyMaterial(password);
+  return await webcrypto.subtle.deriveBits(
+    {
+      name: "PBKDF2",
+      salt: salt,
+      iterations: 100000,
+      hash: "SHA-256",
+    },
+    keyMaterial,
+    256
+  );
 }
 
-
 /**
- * 
- * @param {string} password 
+ *
+ * @param {string} password
  * @returns Promise<[ArrayBuffer, ArrayBuffer]>
  */
 export async function hashPassword(password) {
-	const salt = webcrypto.getRandomValues(new Uint8Array(64));
-	return [await hashPasswordWithSalt(password, salt), salt];
+  const salt = webcrypto.getRandomValues(new Uint8Array(64));
+  return [await hashPasswordWithSalt(password, salt), salt];
 }
 
 /**
- * 
- * @param {ArrayBuffer} hash 
+ *
+ * @param {ArrayBuffer} hash
  * @param {ArrayBuffer} salt
- * @param {string} password 
+ * @param {string} password
  * @returns {Promise<boolean>}
  */
 export async function checkPassword(hash, salt, password) {
-	return crypto.timingSafeEqual(new Uint8Array(await hashPasswordWithSalt(password, salt)), new Uint8Array(salt));
+  return crypto.timingSafeEqual(
+    new Uint8Array(await hashPasswordWithSalt(password, salt)),
+    new Uint8Array(salt)
+  );
 }
