@@ -15,15 +15,15 @@
             nativeBuildInputs = [
               pkgs.bashInteractive
               pkgs.nodejs-17_x
-              (pkgs.yarn.override { nodejs = pkgs.nodejs-17_x; })
+              #(pkgs.yarn.override { nodejs = pkgs.nodejs-17_x; })
               pkgs.postgresql_14
-              pkgs.reuse
-              pkgs.nixpkgs-fmt
+              #pkgs.reuse
+              #pkgs.nixpkgs-fmt
               pkgs.nodePackages.npm-check-updates
-              pkgs.cbc
+              #pkgs.cbc
               pkgs.glpk
-              pkgs.lp_solve
-              pkgs.diffoscope
+              #pkgs.lp_solve
+              #pkgs.diffoscope
             ];
           };
 

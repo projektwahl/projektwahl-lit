@@ -7,20 +7,38 @@ import { zod2result } from "../lib/result.js";
 import { checkPassword } from "./password.js";
 import { sql } from './database.js'
 import { createSecureServer } from 'node:http2'
-import { readFileSync } from 'node:fs'
+import { readFileSync, watchFile } from 'node:fs'
 import cluster from 'cluster';
 import { cpus } from 'os';
 import process from 'process';
 import { workerData } from "node:worker_threads";
 import repl from 'repl';
-import { readFile } from "node:fs/promises";
+import { readdir, readFile, watch } from "node:fs/promises";
 import { fileURLToPath } from 'url';
 import { pathToFileURL } from "node:url";
+import { resolve } from "node:path";
 
-// npm run server -w projektwahl-lit-server
+const numCPUs = 1;// cpus().length;
 
-const numCPUs = 3;// cpus().length;
-/*
+/**
+ * 
+ * @param {string} dir 
+ * @returns {AsyncIterable<string>}
+ */
+async function* getDirs(dir) {
+  yield dir;
+  const dirents = await readdir(dir, { withFileTypes: true });
+  for (const dirent of dirents) {
+    const res = resolve(dir, dirent.name);
+    if (dirent.isDirectory()) {
+      yield* getDirs(res);
+    }
+  }
+}
+
+// npm run server
+
+
 if (cluster.isPrimary) {
   //console.log(`Primary is running`);
 
@@ -30,11 +48,25 @@ if (cluster.isPrimary) {
   }
 
   cluster.on('exit', (worker, code, signal) => {
-    //console.log(`worker ${worker.id} died`);
-    cluster.fork();
   });
-*/
-//} else {
+
+  for await (const f of getDirs('.')) {
+    (async () => {
+      for await (const event of watch(f)) {
+        //console.log(event)
+        let oldWorkers = {...cluster.workers};
+        for (let i = 0; i < numCPUs; i++) {
+          console.log("new")
+          cluster.fork();
+        }
+        for (const id in oldWorkers) {
+          console.log(`worker ${id} died`);
+          oldWorkers[id]?.destroy("SIGTERM")
+        }
+      }
+    })()
+  }
+} else {
   
   /*
   openssl req -x509 -newkey rsa:2048 -nodes -sha256 -subj '/CN=localhost' -keyout localhost-privkey.pem -out localhost-cert.pem
@@ -183,13 +215,8 @@ await request("POST", "/api/v1/login", async function (body) {
   });
 
   server.listen(8443, () => {
-    //console.log(`Worker ${cluster.worker?.id} started`);
-
-    /*setTimeout(() => {
-      process.kill(process.pid, "SIGTERM")
-    }, Math.random()*2000);*/
   });
-//}
+}
 
 //repl.start({})
 
