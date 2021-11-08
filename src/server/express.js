@@ -22,10 +22,20 @@ export function request(method, path, handler) {
           new RegExp(path).test(/** @type {string} */ (headers[":path"]))
         ) {
           console.log("Its a match")
-          const webStream = Duplex.toWeb(stream);
-          const body =
+          
+          let data = "";
+          stream.on('readable', function() {
+              let new_data;
+              while (new_data = stream.read()) {
+                data += new_data;
+              }
+          });
+          stream.on('end', async () => {
+            console.log(data)
+
+            const body =
             headers[":method"] === "POST"
-              ? await json(webStream.readable)
+              ? JSON.parse(data)
               : undefined;
           console.log("its the stream that is buggy bruh")
 
@@ -37,6 +47,9 @@ export function request(method, path, handler) {
             stream.end(JSON.stringify(responseBody));
         
           
+          return true;
+          });
+
           return true;
         }
       } catch (error) {
