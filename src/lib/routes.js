@@ -17,5 +17,9 @@ export const routes = /** @type {const} */ ({
     "/api/v1/sleep": {
         request: z.undefined(),
         response: z.undefined(),
+    },
+    "/api/v1/update": {
+        request: z.undefined(),
+        response: z.number(),
     }
 })

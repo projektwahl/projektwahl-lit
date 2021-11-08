@@ -152,3 +152,18 @@ export class PwApp extends LitElement {
   }
 }
 customElements.define("pw-app", PwApp);
+
+const initialTime = await (await fetch("/api/v1/update")).json()
+
+async function foo() {
+  let response = await fetch("/api/v1/update")
+  let json = await response.json();
+
+  if (json > initialTime) {
+    location.reload()
+  }
+
+  setTimeout(foo, 1000);
+}
+
+foo();

@@ -91,6 +91,7 @@ async function replaceAsync(str, regex, asyncFn) {
   return str.replaceAll(regex, () => /** @type {string} */ (data.shift()));
 }
 
+const startTime = Date.now();
 
 global.server = createSecureServer({
     key: readFileSync('localhost-privkey.pem'),
@@ -115,6 +116,7 @@ global.server = createSecureServer({
         endStream: true
       })
     } else if (headers[":path"]?.startsWith("/api")) {
+
       await request("GET", "/api/v1/sleep", function (req) {
         return new Promise((resolve, reject) => {
           setTimeout(() => {
@@ -123,6 +125,9 @@ global.server = createSecureServer({
         })
       })(stream, headers);
 
+      await request("GET", "/api/v1/update", async function (req) {
+        return startTime
+      })(stream, headers);
 
 await request("POST", "/api/v1/login", async function (body) {
   /** @type {[import("../lib/types").Existing<Pick<import("../lib/types").RawUserType, "id"|"username"|"password_hash">>?]} */
@@ -215,6 +220,7 @@ await request("POST", "/api/v1/login", async function (body) {
   });
 
   server.listen(8443, () => {
+    
   });
 }
 
