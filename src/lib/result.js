@@ -14,7 +14,7 @@ export const successResult = (/** @type {ZodType<any>} */ zodObject) => z.object
 
 export const failureResult = (/** @type {ZodRecord<any>} */ zodObject) => z.object({
   result: z.literal("failure"),
-  success: zodObject,
+  failure: zodObject,
 }).strict()
 
 export const result = (/** @type {ZodType<any>} */ successZodObject, /** @type {ZodRecord<any>} */ failureZodObject) => 

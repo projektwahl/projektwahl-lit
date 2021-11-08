@@ -8,7 +8,7 @@ import {
 import { routes } from "../lib/routes.js";
 import { Duplex } from "stream";
 
-/** @type {<P extends keyof routes>(method: string, path: P, handler: (r: import("zod").infer<typeof routes[P]["request"]>) => Promise<import("zod").infer<typeof routes[P]["response"]>>) => ((stream: import("http2").ServerHttp2Stream, headers: import("http2").IncomingHttpHeaders) => Promise<void>)} */
+/** @type {<P extends keyof routes>(method: string, path: P, handler: (r: import("zod").infer<typeof routes[P]["request"]>) => Promise<[import("http2").OutgoingHttpHeaders, import("zod").infer<typeof routes[P]["response"]>]>) => ((stream: import("http2").ServerHttp2Stream, headers: import("http2").IncomingHttpHeaders) => Promise<boolean>)} */
 export function request(method, path, handler) {
   let fn = 
   /**
@@ -23,15 +23,14 @@ export function request(method, path, handler) {
       const body = headers[":method"] === "POST" ? await text(webStream.readable) : undefined;
       const requestBody = zod2result(routes[path].request.safeParse(body));
 
-      const responseBody = await handler(requestBody);
+      const [new_headers, responseBody] = await handler(requestBody, stream);
       routes[path].response.parse(responseBody);
 
-      stream.respond({
-        'content-type': 'text/json; charset=utf-8',
-        ':status': 200
-      });
+      stream.respond(new_headers);
       stream.end(JSON.stringify(responseBody));
+      return true;
     }
+    return false;
   };
   return fn;
 }

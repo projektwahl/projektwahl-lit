@@ -6,7 +6,7 @@ import { request } from "./express.js";
 import { zod2result } from "../lib/result.js";
 import { checkPassword } from "./password.js";
 import { sql } from './database.js'
-import { createSecureServer } from 'node:http2'
+import { createSecureServer, sensitiveHeaders } from 'node:http2'
 import { readFileSync, watchFile } from 'node:fs'
 import cluster from 'cluster';
 import { cpus } from 'os';
@@ -117,38 +117,44 @@ global.server = createSecureServer({
       })
     } else if (headers[":path"]?.startsWith("/api")) {
 
-      await request("GET", "/api/v1/sleep", function (req) {
+      let executed = await request("GET", "/api/v1/sleep", function (req) {
         return new Promise((resolve, reject) => {
           setTimeout(() => {
-            resolve(undefined)
-          }, 2000);
+            resolve([{
+              'content-type': 'text/json; charset=utf-8',
+              ':status': 200
+            }, undefined])
+          }, 1000);
         })
       })(stream, headers);
 
-      await request("GET", "/api/v1/update", async function (req) {
-        return startTime
+      executed = executed || await request("GET", "/api/v1/update", async function (req) {
+        return [{
+          'content-type': 'text/json; charset=utf-8',
+          ':status': 200
+        }, startTime]
       })(stream, headers);
 
-await request("POST", "/api/v1/login", async function (body) {
+    executed = executed || await request("POST", "/api/v1/login", async function (body) {
   /** @type {[import("../lib/types").Existing<Pick<import("../lib/types").RawUserType, "id"|"username"|"password_hash">>?]} */
   const [dbUser] = await sql`SELECT id, username, password_hash, type FROM users WHERE username = ${body.username} LIMIT 1`;
 
   if (dbUser === undefined) {
-    return res.json({
+    return {
       result: "failure",
       failure: {
         username: "Nutzer existiert nicht!"
       }
-    })
+    }
   }
 
   if (dbUser.password_hash == null || !(await checkPassword(dbUser.password_hash, loginRequest.success.password))) {
-		return res.json({
+		return {
       result: 'failure',
       failure: {
         password: 'Falsches Passwort!'
       }
-		});
+		};
 	}
 
   /** @type {[Pick<import("../lib/types").RawSessionType, "session_id">]} */
@@ -156,23 +162,25 @@ await request("POST", "/api/v1/login", async function (body) {
 		return await sql`INSERT INTO sessions (user_id) VALUES (${dbUser.id}) RETURNING session_id`;
 	});
 
-  res.cookie("strict_id", session.session_id, {
-    maxAge: 48 * 60 * 60 * 1000,
-    secure: true,
-    httpOnly: true,
-    sameSite: "strict",
-  })
-  res.cookie("lax_id", session.session_id, {
-    maxAge: 48 * 60 * 60 * 1000,
-    secure: true,
-    httpOnly: true,
-    sameSite: "lax",
-  })
-  return res.json({
+  const headers = {
+    'content-type': 'text/json; charset=utf-8',
+    ':status': 200,
+    [sensitiveHeaders]: [
+      `Set-Cookie: strict_id=${session.session_id}; Secure; SameSite=Strict; HttpOnly; Max-Age=${48 * 60 * 60};`,
+      `Set-Cookie: lax_id=${session.session_id}; Secure; SameSite=Lax; HttpOnly; Max-Age=${48 * 60 * 60};`
+    ]
+  }  
+  return [headers, {
     result: "success",
     success: undefined,
-  });
+  }];
 })(stream, headers);
+
+if (!executed) {
+  stream.respond({
+    ':status': 404
+  }, {endStream: true})
+}
 
 
 
@@ -220,7 +228,7 @@ await request("POST", "/api/v1/login", async function (body) {
   });
 
   server.listen(8443, () => {
-    
+
   });
 }
 
