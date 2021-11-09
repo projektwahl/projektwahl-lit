@@ -8,6 +8,7 @@ import { aClick } from "./pw-a.js";
 import { classMap } from "lit/directives/class-map.js";
 import { until } from "lit/directives/until.js";
 import { pwLogin } from "./routes/login/pw-login.js";
+import { setupHmr } from "./hmr.js";
 
 // TODO FIXME show more details if possible (maybe error page)
 window.addEventListener("error", function (event) {
@@ -152,67 +153,7 @@ export let PwApp = class PwApp extends LitElement {
   }
 }
 
-// https://github.com/open-wc/open-wc/blob/master/packages/dev-server-hmr/src/wcHmrRuntime.js
-PwApp.connectedElements = new Set();
-
-const oldConnectedCallback = PwApp.prototype.connectedCallback;
-PwApp.prototype.connectedCallback = function() {
-  oldConnectedCallback.call(this);
-  PwApp.connectedElements.add(this);
-}
-const oldDisconnectedCallback = PwApp.prototype.disconnectedCallback;
-PwApp.prototype.disconnectedCallback = function() {
-  oldDisconnectedCallback.call(this);
-  PwApp.connectedElements.delete(this);
-}
-
-// static callback
-LitElement.hotReplacedCallback = function hotReplacedCallback() {
-  console.log("static callback")
-  this.finalize();
-};
-
-// instance callback
-LitElement.prototype.hotReplacedCallback = function hotReplacedCallback() {
-  console.log("instance callback")
-  this.constructor.finalizeStyles();
-  if (window.ShadowRoot && this.renderRoot instanceof window.ShadowRoot) {
-    adoptStyles(
-      this.renderRoot,
-      this.constructor.elementStyles
-    );
-  }
-  this.requestUpdate();
-};
-
-var eventSource = new EventSource('/api/v1/hmr');
-eventSource.addEventListener("error", function(error) {
-  console.error(error)
-})
-eventSource.addEventListener("open", function(event) {
-  console.log(event)
-})
-eventSource.addEventListener("message", async function(event) {
-  let updatedUrl = new URL(event.data, document.location.origin)
-  let currentUrl = new URL(import.meta.url)
-
-  if (updatedUrl.toString() == currentUrl.toString()) {
-    console.log("hmr updating self")
-
-    let response = await import(`${updatedUrl.toString()}?${Date.now()}`);
-
-    console.log(response)
-
-    PwApp.prototype.render = response.PwApp.prototype.render;
-
-    PwApp.hotReplacedCallback();
-    PwApp.connectedElements.forEach(e => {
-      e.hotReplacedCallback()
-    })
-  }
-});
-
-
+setupHmr(PwApp, import.meta.url)
 
 if (!customElements.get("pw-app")) {
   customElements.define("pw-app", PwApp);
