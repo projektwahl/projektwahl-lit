@@ -59,7 +59,7 @@ export let PwApp = class PwApp extends LitElement {
         class="navbar navbar-expand-lg navbar-light bg-light shadow p-3 mb-5"
       >
         <div class="container-fluid">
-          <a @click=${aClick} class="navbar-brand" href="/">Projektwahl1</a>
+          <a @click=${aClick} class="navbar-brand" href="/">Projektwahl</a>
           <button
             class="navbar-toggler"
             type="button"
@@ -151,9 +151,39 @@ export let PwApp = class PwApp extends LitElement {
     `;
   }
 }
-if (!customElements.get("pw-app")) {
-  customElements.define("pw-app", PwApp);
+
+// https://github.com/open-wc/open-wc/blob/master/packages/dev-server-hmr/src/wcHmrRuntime.js
+PwApp.connectedElements = new Set();
+
+const oldConnectedCallback = PwApp.prototype.connectedCallback;
+PwApp.prototype.connectedCallback = function() {
+  oldConnectedCallback.call(this);
+  PwApp.connectedElements.add(this);
 }
+const oldDisconnectedCallback = PwApp.prototype.disconnectedCallback;
+PwApp.prototype.disconnectedCallback = function() {
+  oldDisconnectedCallback.call(this);
+  PwApp.connectedElements.delete(this);
+}
+
+// static callback
+LitElement.hotReplacedCallback = function hotReplacedCallback() {
+  console.log("static callback")
+  this.finalize();
+};
+
+// instance callback
+LitElement.prototype.hotReplacedCallback = function hotReplacedCallback() {
+  console.log("instance callback")
+  this.constructor.finalizeStyles();
+  if (window.ShadowRoot && this.renderRoot instanceof window.ShadowRoot) {
+    adoptStyles(
+      this.renderRoot,
+      this.constructor.elementStyles
+    );
+  }
+  this.requestUpdate();
+};
 
 var eventSource = new EventSource('/api/v1/hmr');
 eventSource.addEventListener("error", function(error) {
@@ -162,66 +192,28 @@ eventSource.addEventListener("error", function(error) {
 eventSource.addEventListener("open", function(event) {
   console.log(event)
 })
-eventSource.addEventListener("message", function(event) {
-  console.log(event.data)
+eventSource.addEventListener("message", async function(event) {
+  let updatedUrl = new URL(event.data, document.location.origin)
+  let currentUrl = new URL(import.meta.url)
+
+  if (updatedUrl.toString() == currentUrl.toString()) {
+    console.log("hmr updating self")
+
+    let response = await import(`${updatedUrl.toString()}?${Date.now()}`);
+
+    console.log(response)
+
+    PwApp.prototype.render = response.PwApp.prototype.render;
+
+    PwApp.hotReplacedCallback();
+    PwApp.connectedElements.forEach(e => {
+      e.hotReplacedCallback()
+    })
+  }
 });
 
-/*
 
-let initialTime = await (await fetch("/api/v1/update")).json();
 
-async function foo() {
-  setTimeout(foo, 1000);
-
-  let response = await fetch("/api/v1/update");
-  let json = await response.json();
-
-  if (json > initialTime) {
-    initialTime = json;
-    //location.reload();
-  }
-
+if (!customElements.get("pw-app")) {
+  customElements.define("pw-app", PwApp);
 }
-
-foo();
-
-async function selfUpdate() {
-  setTimeout(selfUpdate, 1000);
-
-  let response = await import(`/src/client/pw-app.js?${initialTime}`);
-
-  console.log("hmr")
-
-  console.log(response)
-
-  PwApp.prototype.render = response.PwApp.prototype.render;
-  
-
-  // static callback
-  LitElement.hotReplacedCallback = function hotReplacedCallback() {
-    console.log("staticCallback")
-    this.finalize();
-  };
-
-  // instance callback
-  LitElement.prototype.hotReplacedCallback = function hotReplacedCallback() {
-    console.log("instanceCallback")
-    this.constructor.finalizeStyles();
-    if (window.ShadowRoot && this.renderRoot instanceof window.ShadowRoot) {
-      adoptStyles(
-        this.renderRoot,
-        this.constructor.elementStyles
-      );
-    }
-    this.requestUpdate();
-  };
-
-  PwApp.hotReplacedCallback();
-  [...document.getElementsByTagName("pw-app")].forEach(e => {
-    console.log(e.render)
-    e.hotReplacedCallback()
-  })
-}
-
-selfUpdate();
-*/

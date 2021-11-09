@@ -83,8 +83,9 @@ export async function serverHandler(stream, headers) {
       for await (const f of getDirs("./src/client")) {
         (async () => {
           for await (const event of watch(f)) {
+            
             console.log("sse", event)
-            stream.write("data: "+event.filename+"\n\n")
+            stream.write(`data: ${f}/${event.filename}\n\n`)
             
           }
         })();
