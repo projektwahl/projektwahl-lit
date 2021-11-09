@@ -123,7 +123,7 @@ export async function serverHandler(stream, headers) {
         executed ||
         (await request("POST", "/api/v1/login", async function (body) {
           console.log(body)
-          /** @type {[import("../lib/types").Existing<Pick<import("../lib/types").RawUserType, "id"|"username"|"password_hash">>?]} */
+          /** @type {[import("../lib/types").Existing<Pick<import("../lib/types").RawUserType, "id"|"username"|"password_hash"|"password_salt">>?]} */
           const [dbUser] =
             await sql`SELECT id, username, password_hash, password_salt, type FROM users WHERE username = ${body.username} LIMIT 1`;
 
@@ -139,6 +139,7 @@ export async function serverHandler(stream, headers) {
             }];
           }
 
+          console.log(dbUser)
           if (
             dbUser.password_hash == null ||
             !(await checkPassword(

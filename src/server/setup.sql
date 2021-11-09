@@ -20,7 +20,11 @@ CREATE TABLE IF NOT EXISTS projects (
   random_assignments BOOLEAN NOT NULL DEFAULT FALSE
 );
 
-CREATE TYPE user_type AS ENUM ('admin', 'helper', 'voter');
+DO $$ BEGIN
+  CREATE TYPE user_type AS ENUM ('admin', 'helper', 'voter');
+EXCEPTION
+    WHEN duplicate_object THEN null;
+END $$;
 
 CREATE TABLE IF NOT EXISTS users (
   id SERIAL PRIMARY KEY NOT NULL,
@@ -85,7 +89,7 @@ CREATE TABLE IF NOT EXISTS settings (
 );
 
 
-CREATE VIEW present_voters AS SELECT * FROM users WHERE type = 'voter' AND NOT away;
+CREATE OR REPLACE VIEW present_voters AS SELECT * FROM users WHERE type = 'voter' AND NOT away;
 
 
 -- https://www.cybertec-postgresql.com/en/triggers-to-enforce-constraints/

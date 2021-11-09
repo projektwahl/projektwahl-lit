@@ -49,8 +49,8 @@ export type Existing<T> = T & { id: number };
 
 export type RawUserType = {
   username: string;
-  password_hash: ArrayBuffer;
-  password_salt: ArrayBuffer;
+  password_hash: Uint8Array;
+  password_salt: Uint8Array;
   type: "helper" | "admin" | "voter";
   group: string | null;
   age: number | null;
