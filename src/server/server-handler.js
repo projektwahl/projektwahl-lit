@@ -164,17 +164,17 @@ export async function serverHandler(stream, headers) {
             return await sql`INSERT INTO sessions (user_id) VALUES (${dbUser.id}) RETURNING session_id`;
           });
 
+          /** @type {import("node:http2").OutgoingHttpHeaders} */
           const headers = {
             "content-type": "text/json; charset=utf-8",
             ":status": 200,
-            [sensitiveHeaders]: [
-              `Set-Cookie: strict_id=${
-                session.session_id
-              }; Secure; SameSite=Strict; HttpOnly; Max-Age=${48 * 60 * 60};`,
-              `Set-Cookie: lax_id=${
-                session.session_id
-              }; Secure; SameSite=Lax; HttpOnly; Max-Age=${48 * 60 * 60};`,
-            ],
+            "set-cookie": [`strict_id=${
+              session.session_id
+            }; Secure; SameSite=Strict; HttpOnly; Max-Age=${48 * 60 * 60};`,
+            `lax_id=${
+              session.session_id
+            }; Secure; SameSite=Lax; HttpOnly; Max-Age=${48 * 60 * 60};`],
+            [sensitiveHeaders]: ["set-cookie"],
           };
           return [
             headers,
