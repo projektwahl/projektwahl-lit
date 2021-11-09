@@ -22,33 +22,21 @@ export function request(method, path, handler) {
           new RegExp(path).test(/** @type {string} */ (headers[":path"]))
         ) {
           console.log("Its a match")
-          
-          let data = "";
-          stream.on('readable', function() {
-              let new_data;
-              while (new_data = stream.read()) {
-                data += new_data;
-              }
-          });
-          stream.on('end', async () => {
-            console.log(data)
 
-            const body =
-            headers[":method"] === "POST"
-              ? JSON.parse(data)
-              : undefined;
+          const body =
+          headers[":method"] === "POST"
+            ? json(stream)
+            : undefined;
           console.log("its the stream that is buggy bruh")
 
           const requestBody = zod2result(routes[path].request.safeParse(body));
 
-            const [new_headers, responseBody] = await handler(requestBody, stream);
-            routes[path].response.parse(responseBody);
-            stream.respond(new_headers);
-            stream.end(JSON.stringify(responseBody));
-        
-          
-          return true;
-          });
+          const [new_headers, responseBody] = await handler(requestBody, stream);
+          routes[path].response.parse(responseBody);
+          stream.respond(new_headers);
+          stream.end(JSON.stringify(responseBody));
+      
+         
 
           return true;
         }
