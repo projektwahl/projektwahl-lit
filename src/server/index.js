@@ -47,7 +47,7 @@ if (cluster.isPrimary) {
   server.on("error", (err) => console.error(err));
 
   server.on("stream", async (stream, headers) => {
-    await (await import(`./server-handler.js?${Date.now()}`)).serverHandler(stream, headers);
+    await (await import(`./server-handler.js`)).serverHandler(stream, headers);
   });
 
   server.listen(8443, () => {});

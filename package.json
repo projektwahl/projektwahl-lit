@@ -22,11 +22,12 @@
     "lint": "eslint .",
     "fix:lint": "eslint --fix .",
     "check": "tsc --noEmit",
-    "server": "node --experimental-import-meta-resolve src/server/index.js"
+    "server": "node --experimental-loader hot-esm --experimental-import-meta-resolve src/server/index.js"
   },
   "license": "AGPL-3.0-or-later",
   "dependencies": {
     "@lit-labs/motion": "^1.0.1",
+    "hot-esm": "github:vinsonchuong/hot-esm#456dc02e6bfcc5e403f93c3a77ce10e3125fc305",
     "lit": "^2.0.2",
     "postgres": "beta",
     "typescript": "^4.5.1-rc",

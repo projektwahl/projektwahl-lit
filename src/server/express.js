@@ -28,6 +28,7 @@ export function request(method, path, handler) {
             ? await json(stream)
             : undefined;
 
+
           const requestBody = zod2result(routes[path].request.safeParse(body));
 
           const [new_headers, responseBody] = await handler(requestBody, stream);
