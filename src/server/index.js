@@ -100,8 +100,9 @@ if (cluster.isPrimary) {
     //console.log("start"+ headers[":path"]+"end")
 
     // TODO FIXME respond can throw
+    let url = new URL(headers[":path"], "https://localhost:8443");
 
-    if (headers[":path"] === "/") {
+    if (url.pathname === "/") {
       stream.respondWithFile(
         "./src/client/index.html",
         {
@@ -110,7 +111,7 @@ if (cluster.isPrimary) {
         },
         {}
       );
-    } else if (headers[":path"] === "/favicon.ico") {
+    } else if (url.pathname === "/favicon.ico") {
       stream.respond(
         {
           ":status": 404,
@@ -119,8 +120,8 @@ if (cluster.isPrimary) {
           endStream: true,
         }
       );
-    } else if (headers[":path"]?.startsWith("/api")) {
-      console.log("what", headers[":path"])
+    } else if (url.pathname.startsWith("/api")) {
+      console.log("what", url.pathname)
 
       let executed = await request("GET", "/api/v1/sleep", function (req) {
         return new Promise((resolve, reject) => {
@@ -227,7 +228,7 @@ if (cluster.isPrimary) {
       // TODO FIXME injection
       // TODO FIXME caching (server+clientside)
       try {
-        let filename = "." + headers[":path"];
+        let filename = "." + url.pathname;
         //console.log("mod", filename)
         let contents = await readFile(filename, {
           encoding: "utf-8",

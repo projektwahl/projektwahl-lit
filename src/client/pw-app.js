@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // SPDX-FileCopyrightText: 2021 Moritz Hedtke <Moritz.Hedtke@t-online.de>
 import "./form/pw-form.js";
-import { html, LitElement } from "lit";
+import { adoptStyles, html, LitElement } from "lit";
 import { bootstrapCss } from "./index.js";
 import { HistoryController } from "./history-controller.js";
 import { aClick } from "./pw-a.js";
@@ -18,7 +18,7 @@ window.addEventListener("unhandledrejection", function (event) {
   alert("unknown error: " + event.reason);
 });
 
-export class PwApp extends LitElement {
+export let PwApp = class PwApp extends LitElement {
   /** @override */ static get properties() {
     return {
       last: { state: true },
@@ -153,17 +153,49 @@ export class PwApp extends LitElement {
 }
 customElements.define("pw-app", PwApp);
 
-const initialTime = await (await fetch("/api/v1/update")).json();
+let initialTime = await (await fetch("/api/v1/update")).json();
 
 async function foo() {
   let response = await fetch("/api/v1/update");
   let json = await response.json();
 
   if (json > initialTime) {
-    location.reload();
+    initialTime = json;
+    //location.reload();
   }
 
   setTimeout(foo, 1000);
 }
 
 foo();
+
+async function selfUpdate() {
+  let response = await import(`/src/client/pw-app.js?${initialTime}`);
+
+  console.log("hmr")
+
+  PwApp.prototype.render = response.PwApp.render;
+
+  // static callback
+  LitElement.hotReplacedCallback = function hotReplacedCallback() {
+    console.log("staticCallback")
+    this.finalize();
+  };
+
+  // instance callback
+  LitElement.prototype.hotReplacedCallback = function hotReplacedCallback() {
+    console.log("instanceCallback")
+    this.constructor.finalizeStyles();
+    if (window.ShadowRoot && this.renderRoot instanceof window.ShadowRoot) {
+      adoptStyles(
+        this.renderRoot,
+        this.constructor.elementStyles
+      );
+    }
+    this.requestUpdate();
+  };
+
+  setTimeout(selfUpdate, 1000);
+}
+
+selfUpdate();
