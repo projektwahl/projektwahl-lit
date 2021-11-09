@@ -31,12 +31,12 @@ async function getKeyMaterial(password) {
 /**
  *
  * @param {string} password
- * @param {BufferSource} salt
- * @returns {Promise<Uint8Array>}
+ * @param {Buffer} salt
+ * @returns {Promise<Buffer>}
  */
 async function hashPasswordWithSalt(password, salt) {
   let keyMaterial = await getKeyMaterial(password);
-  return new Uint8Array(await webcrypto.subtle.deriveBits(
+  return Buffer.from(await webcrypto.subtle.deriveBits(
     {
       name: "PBKDF2",
       salt: salt,
@@ -51,23 +51,23 @@ async function hashPasswordWithSalt(password, salt) {
 /**
  *
  * @param {string} password
- * @returns Promise<[Uint8Array, Uint8Array]>
+ * @returns Promise<[Buffer, Buffer]>
  */
 export async function hashPassword(password) {
   const salt = webcrypto.getRandomValues(new Uint8Array(64));
-  return [await hashPasswordWithSalt(password, salt), salt];
+  return [await hashPasswordWithSalt(password, salt), Buffer.from(salt)];
 }
 
 /**
  *
- * @param {Uint8Array} hash
- * @param {Uint8Array} salt
+ * @param {Buffer} hash
+ * @param {Buffer} salt
  * @param {string} password
  * @returns {Promise<boolean>}
  */
 export async function checkPassword(hash, salt, password) {
   return crypto.timingSafeEqual(
-    new Uint8Array(await hashPasswordWithSalt(password, salt)),
-    new Uint8Array(hash)
+    await hashPasswordWithSalt(password, salt),
+    hash
   );
 }
