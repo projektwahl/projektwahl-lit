@@ -25,10 +25,12 @@ export class Sql {
 /**
  *
  * @param {string} string
- * @returns
+ * @returns {Sql}
  */
-export function literal(string) {
-  return string;
+export function unsafe(string) {
+  let r = new String(string);
+  r.raw = string;
+  return new Sql([r], []);
 }
 
 /**
@@ -54,9 +56,9 @@ export function sql(strings, ...keys) {
 let list = [];
 
 sql`SELECT "id", "title", "info", "place" FROM projects WHERE 1 ${list.map(
-  (v) => sql`AND ( ${literal(v)} < 5 )`
+  (v) => sql`AND ( ${unsafe(v)} < 5 )`
 )} OR NOT ... params() ORDER BY ${list.map(
-  (v) => sql`${literal(v)} ASC`
+  (v) => sql`${unsafe(v)} ASC`
 )} LIMIT 1337`;
 
 // an array of Sql gets concatenated
@@ -65,6 +67,25 @@ sql`SELECT "id", "title", "info", "place" FROM projects WHERE 1 ${list.map(
 
 // probably make the execute a wrapper to porsager for now because I wont have the time to fully implement a postgres client lib
 //await sql`SELECT 1`.execute()
+
+/**
+ *
+ * @param {string|Sql|Sql[]|string[]|boolean|number|null} object
+ * @returns {[TemplateStringsArray, ...any[]]}
+ */
+ export function sqlFlatten(object) {
+  if (object instanceof Sql) {
+    return [object.strings, ...object.keys]
+  }
+  if (Array.isArray(object)) {
+    return object.reduce((previous, current) => {
+
+    }, [[]]);
+  }
+  let r = new String("");
+  r.raw = "";
+  return [[r, r], object];
+}
 
 /**
  *
