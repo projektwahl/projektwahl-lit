@@ -151,11 +151,15 @@ export let PwApp = class PwApp extends LitElement {
     `;
   }
 }
-customElements.define("pw-app", PwApp);
+if (!customElements.get("pw-app")) {
+  customElements.define("pw-app", PwApp);
+}
 
 let initialTime = await (await fetch("/api/v1/update")).json();
 
 async function foo() {
+  setTimeout(foo, 1000);
+
   let response = await fetch("/api/v1/update");
   let json = await response.json();
 
@@ -164,17 +168,21 @@ async function foo() {
     //location.reload();
   }
 
-  setTimeout(foo, 1000);
 }
 
 foo();
 
 async function selfUpdate() {
+  setTimeout(selfUpdate, 1000);
+
   let response = await import(`/src/client/pw-app.js?${initialTime}`);
 
   console.log("hmr")
 
-  PwApp.prototype.render = response.PwApp.render;
+  console.log(response)
+
+  PwApp.prototype.render = response.PwApp.prototype.render;
+  
 
   // static callback
   LitElement.hotReplacedCallback = function hotReplacedCallback() {
@@ -195,7 +203,11 @@ async function selfUpdate() {
     this.requestUpdate();
   };
 
-  setTimeout(selfUpdate, 1000);
+  PwApp.hotReplacedCallback();
+  [...document.getElementsByTagName("pw-app")].forEach(e => {
+    console.log(e.render)
+    e.hotReplacedCallback()
+  })
 }
 
 selfUpdate();
