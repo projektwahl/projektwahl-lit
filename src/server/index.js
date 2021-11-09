@@ -48,7 +48,7 @@ if (cluster.isPrimary) {
 
   cluster.on("exit", (worker, code, signal) => {});
 
-  for await (const f of getDirs(".")) {
+  for await (const f of getDirs("./src/server")) {
     (async () => {
       for await (const event of watch(f)) {
         //console.log(event)
@@ -120,6 +120,22 @@ if (cluster.isPrimary) {
           endStream: true,
         }
       );
+    } else if (url.pathname === "/api/v1/hmr") {
+      console.log("sse start")
+      stream.respond({
+        ':status': 200,
+        'content-type': 'text/event-stream',
+      });
+
+      for await (const f of getDirs("./src/client")) {
+        (async () => {
+          for await (const event of watch(f)) {
+            console.log("sse", event)
+            stream.write("data: "+event.filename+"\n\n")
+            
+          }
+        })();
+      }
     } else if (url.pathname.startsWith("/api")) {
       console.log("what", url.pathname)
 

@@ -59,7 +59,7 @@ export let PwApp = class PwApp extends LitElement {
         class="navbar navbar-expand-lg navbar-light bg-light shadow p-3 mb-5"
       >
         <div class="container-fluid">
-          <a @click=${aClick} class="navbar-brand" href="/">Projektwahl</a>
+          <a @click=${aClick} class="navbar-brand" href="/">Projektwahl1</a>
           <button
             class="navbar-toggler"
             type="button"
@@ -155,6 +155,19 @@ if (!customElements.get("pw-app")) {
   customElements.define("pw-app", PwApp);
 }
 
+var eventSource = new EventSource('/api/v1/hmr');
+eventSource.addEventListener("error", function(error) {
+  console.error(error)
+})
+eventSource.addEventListener("open", function(event) {
+  console.log(event)
+})
+eventSource.addEventListener("message", function(event) {
+  console.log(event.data)
+});
+
+/*
+
 let initialTime = await (await fetch("/api/v1/update")).json();
 
 async function foo() {
@@ -211,3 +224,4 @@ async function selfUpdate() {
 }
 
 selfUpdate();
+*/
