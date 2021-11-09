@@ -28,9 +28,11 @@ export class Sql {
  * @returns {Sql}
  */
 export function unsafe(string) {
-  let r = new String(string);
-  r.raw = string;
-  return new Sql([r], []);
+  /** @type {import("../../lib/types").WritableTemplateStringsArray} */
+  let r = [string];
+  r.raw = [string];
+  const r2 = /** @type {TemplateStringsArray} */ (r);
+  return new Sql(r2, []);
 }
 
 /**
@@ -74,17 +76,31 @@ sql`SELECT "id", "title", "info", "place" FROM projects WHERE 1 ${list.map(
  * @returns {[TemplateStringsArray, ...any[]]}
  */
  export function sqlFlatten(object) {
+  /** @type {import("../../lib/types").WritableTemplateStringsArray} */
+  let r = [""];
+  r.raw = [""];
+  const r2 = /** @type {TemplateStringsArray} */ (r);
+
   if (object instanceof Sql) {
     return [object.strings, ...object.keys]
   }
   if (Array.isArray(object)) {
-    return object.reduce((previous, current) => {
-
-    }, [[]]);
+    return object.map(sqlFlatten).reduce((previous, current) => {
+      /** @type {import("../../lib/types").WritableTemplateStringsArray} */
+      const templateStrings = [
+        ...previous[0].slice(0, -1),
+        previous[0].slice(-1)[0] + current[0][0],
+        ...current[0].slice(1)
+      ];
+      templateStrings.raw = [
+        ...previous[0].raw.slice(0, -1),
+        previous[0].raw.slice(-1)[0] + current[0].raw[0],
+        ...current[0].raw.slice(1)
+      ];
+      return /** @type {[TemplateStringsArray, ...any[]]} */ ([/** @type {TemplateStringsArray} */ (templateStrings), ...previous[1], ...current[1]]);
+    }, [r]);
   }
-  let r = new String("");
-  r.raw = "";
-  return [[r, r], object];
+  return [r2, object];
 }
 
 /**

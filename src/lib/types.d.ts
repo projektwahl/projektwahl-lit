@@ -107,3 +107,7 @@ export type BaseQuery<C> = {
     [key in keyof C]?: C[key]; // boolean | string | number | string[] | null | undefined // TODO FIXME C[key]
   };
 };
+
+export interface WritableTemplateStringsArray extends Array<string> {
+  raw?: string[];
+}
