@@ -98,8 +98,9 @@ sql`SELECT "id", "title", "info", "place" FROM projects WHERE 1 ${list.map(
         ...current[0].raw.slice(1)
       ];
       return /** @type {[TemplateStringsArray, ...any[]]} */ ([/** @type {TemplateStringsArray} */ (templateStrings), ...previous[1], ...current[1]]);
-    }, [r]);
+    }, /** @type {[TemplateStringsArray, ...any[]]} */ ([r]));
   }
+  // TODO FIXME probably needs left and right
   return [r2, object];
 }
 
