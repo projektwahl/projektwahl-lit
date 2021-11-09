@@ -25,7 +25,7 @@ export function request(method, path, handler) {
 
           const body =
           headers[":method"] === "POST"
-            ? json(stream)
+            ? await json(stream)
             : undefined;
           console.log("its the stream that is buggy bruh")
 
