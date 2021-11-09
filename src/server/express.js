@@ -2,9 +2,8 @@
 // SPDX-FileCopyrightText: 2021 Moritz Hedtke <Moritz.Hedtke@t-online.de>
 
 import { zod2result } from "../lib/result.js";
-import { json, text } from "node:stream/consumers";
+import { json } from "node:stream/consumers";
 import { routes } from "../lib/routes.js";
-import { Duplex } from "stream";
 import {URL} from 'url'
 
 /** @type {<P extends keyof routes>(method: string, path: P, handler: (r: import("zod").infer<typeof routes[P]["request"]>) => Promise<[import("http2").OutgoingHttpHeaders, import("zod").infer<typeof routes[P]["response"]>]>) => ((stream: import("http2").ServerHttp2Stream, headers: import("http2").IncomingHttpHeaders) => Promise<boolean>)} */
@@ -23,13 +22,11 @@ export function request(method, path, handler) {
           headers[":method"] === method &&
           new RegExp(path).test(/** @type {string} */ (url.pathname))
         ) {
-          console.log("Its a match")
 
           const body =
           headers[":method"] === "POST"
             ? await json(stream)
             : undefined;
-          console.log("its the stream that is buggy bruh")
 
           const requestBody = zod2result(routes[path].request.safeParse(body));
 
