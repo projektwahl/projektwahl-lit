@@ -125,7 +125,7 @@ export async function serverHandler(stream, headers) {
           console.log(body)
           /** @type {[import("../lib/types").Existing<Pick<import("../lib/types").RawUserType, "id"|"username"|"password_hash">>?]} */
           const [dbUser] =
-            await sql`SELECT id, username, password_hash, type FROM users WHERE username = ${body.username} LIMIT 1`;
+            await sql`SELECT id, username, password_hash, password_salt, type FROM users WHERE username = ${body.username} LIMIT 1`;
 
           if (dbUser === undefined) {
             return [{
@@ -143,7 +143,7 @@ export async function serverHandler(stream, headers) {
             dbUser.password_hash == null ||
             !(await checkPassword(
               dbUser.password_hash,
-              "FIXMESALT",
+              dbUser.password_salt,
               body.password
             ))
           ) {

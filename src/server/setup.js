@@ -17,13 +17,14 @@ const shuffleArray = (array) => {
 };
 
 await sql.begin("READ WRITE", async (sql) => {
-  await sql.file("./src/setup.sql", /** @type {any} */ (undefined), {
+  await sql.file("./src/server/setup.sql", /** @type {any} */ (undefined), {
     cache: false, // TODO FIXME doesnt seem to work properly
   });
 
-  await sql`INSERT INTO users (name, password_hash, type) VALUES ('admin', ${await hashPassword(
+  let [hash, salt] = await hashPassword(
     "changeme"
-  )}, 'admin') ON CONFLICT DO NOTHING;`;
+  );
+  await sql`INSERT INTO users (username, password_hash, password_salt, type) VALUES ('admin', ${hash}, ${salt}, 'admin') ON CONFLICT DO NOTHING;`;
 
   const projects =
     await sql`INSERT INTO projects (title, info, place, costs, min_age, max_age, min_participants, max_participants, presentation_type, requirements, random_assignments) (SELECT generate_series, '', '', 0, 5, 13, 5, 20, '', '', FALSE FROM generate_series(1, 10)) RETURNING *;`;
@@ -77,9 +78,9 @@ await sql.begin("READ WRITE", async (sql) => {
 		console.log(keycloakUser);
 		*/
 
-    /** @type {[import("../../lib/src/types").Existing<import("../../lib/src/types").RawUserType>]} */
+    /** @type {[import("../lib/types").Existing<import("../lib/types").RawUserType>]} */
     const [user] =
-      await sql`INSERT INTO users (name, type, "group", age) VALUES (${`user${Math.random()}`}, 'voter', 'a', 10) ON CONFLICT DO NOTHING RETURNING *;`;
+      await sql`INSERT INTO users (username, type, "group", age) VALUES (${`user${Math.random()}`}, 'voter', 'a', 10) ON CONFLICT DO NOTHING RETURNING *;`;
     shuffleArray(projects);
     for (let j = 0; j < 5; j++) {
       // TODO FIXME generate users who voted incorrectly (maybe increase/decrease iterations)
@@ -88,7 +89,6 @@ await sql.begin("READ WRITE", async (sql) => {
         user.id
       }, ${projects[j]["id"]}, ${j + 1});`;
     }
-    console.log("jo");
   }
 });
 

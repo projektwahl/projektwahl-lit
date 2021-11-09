@@ -16,12 +16,10 @@
   "description": "Software to manage choosing projects and automatically assigning people to projects.",
   "type": "module",
   "scripts": {
-    "client": "yarn node web-dev-server-config.mjs",
     "format": "prettier --write .",
-    "check:format": "prettier --check .",
     "lint": "eslint .",
     "fix:lint": "eslint --fix .",
-    "check": "tsc --noEmit",
+    "setup": "node ./src/server/setup.js",
     "server": "node --experimental-loader hot-esm --experimental-import-meta-resolve src/server/index.js"
   },
   "license": "AGPL-3.0-or-later",
