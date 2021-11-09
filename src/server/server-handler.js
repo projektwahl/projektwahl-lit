@@ -119,12 +119,10 @@ export async function serverHandler(stream, headers) {
           ];
         })(stream, headers));
 
-        console.log("iiii", executed)
-
       executed =
         executed ||
         (await request("POST", "/api/v1/login", async function (body) {
-          console.log("jojojo")
+          console.log(body)
           /** @type {[import("../lib/types").Existing<Pick<import("../lib/types").RawUserType, "id"|"username"|"password_hash">>?]} */
           const [dbUser] =
             await sql`SELECT id, username, password_hash, type FROM users WHERE username = ${body.username} LIMIT 1`;

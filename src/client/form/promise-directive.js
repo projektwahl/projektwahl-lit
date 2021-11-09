@@ -22,7 +22,6 @@ class PromiseDirective extends AsyncDirective {
         console.log("failure");
         this.setValue(rejectMapper(reason));
       });
-    console.log("start");
     return defaultValue;
   }
 }

@@ -1,5 +1,12 @@
 import { adoptStyles, LitElement } from "lit";
 
+const originalDefine = window.customElements.define;
+window.customElements.define = (name, ...rest) => {
+  if (!window.customElements.get(name)) {
+    originalDefine.call(window.customElements, name, ...rest);
+  }
+};
+
 export function setupHmr(clazz, url) {
     // https://github.com/open-wc/open-wc/blob/master/packages/dev-server-hmr/src/wcHmrRuntime.js
     clazz.connectedElements = new Set();

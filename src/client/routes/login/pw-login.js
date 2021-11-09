@@ -32,7 +32,6 @@ export class PwLogin extends LitElement {
   }
 
   /** @override */ render() {
-    console.log("rerender");
     return html`<pw-form
       .url=${"/api/v1/login"}
       @form-result=${(/** @type {CustomEvent} */ event) => {

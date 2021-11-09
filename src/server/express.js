@@ -17,7 +17,6 @@ export function request(method, path, handler) {
     async (stream, headers) => {
       try {
         let url = new URL(headers[":path"], "https://localhost:8443");
-        console.log(headers[":method"]+" "+method+" "+path+" "+url.pathname)
         if (
           headers[":method"] === method &&
           new RegExp(path).test(/** @type {string} */ (url.pathname))
@@ -28,16 +27,20 @@ export function request(method, path, handler) {
             ? await json(stream)
             : undefined;
 
-
           const requestBody = zod2result(routes[path].request.safeParse(body));
-
-          const [new_headers, responseBody] = await handler(requestBody, stream);
-          routes[path].response.parse(responseBody);
-          stream.respond(new_headers);
-          stream.end(JSON.stringify(responseBody));
+          if (requestBody.result == "success") {
+            const [new_headers, responseBody] = await handler(requestBody.success);
+            routes[path].response.parse(responseBody);
+            stream.respond(new_headers);
+            stream.end(JSON.stringify(responseBody));
+          } else {
+            stream.respond({
+              "content-type": "text/json; charset=utf-8",
+              ":status": 200,
+            });
+            stream.end(JSON.stringify(requestBody));
+          }
       
-         
-
           return true;
         }
       } catch (error) {

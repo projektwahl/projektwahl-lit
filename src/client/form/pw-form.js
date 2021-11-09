@@ -46,12 +46,17 @@ export class PwForm extends LitElement {
   submit = (/** @type {SubmitEvent} */ event) => {
     event.preventDefault();
 
-    // @ts-expect-error doesn't contain files so this is fine
-    const formData = new URLSearchParams(new FormData(this.form.value));
+    // ts-expect-error doesn't contain files so this is fine
+    const formData = /*new URLSearchParams(*/new FormData(this.form.value);
+
+    let jsonData = Object.fromEntries(formData.entries());
 
     this.result = myFetch(this.url, {
       method: "POST",
-      body: formData,
+      headers: {
+        "content-type": "text/json",
+      },
+      body: JSON.stringify(jsonData),
     });
     // https://lit.dev/docs/components/events/#dispatching-events
     const resultEvent = new CustomEvent("form-result", {
@@ -92,7 +97,6 @@ if ('FormDataEvent' in window) {
       fill: "both",
     };
 
-    console.log("rerender");
     return html`
       ${bootstrapCss}
       <main class="container">

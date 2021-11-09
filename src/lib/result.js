@@ -125,7 +125,7 @@ const zoderr2err = (/** @type {import("zod").z.ZodIssue[]} */ arr) => {
         success: false;
         error: import("zod").ZodError<Input>;
       }
-) => import("projektwahl-lit-lib/src/types").Result<Output>} */
+) => import("../lib/types").Result<Output>} */
 export function zod2result(input) {
   if (input.success) {
     return ok(input.data);
