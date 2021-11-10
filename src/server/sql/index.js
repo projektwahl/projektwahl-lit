@@ -81,8 +81,18 @@ sql`SELECT "id", "title", "info", "place" FROM projects WHERE 1 ${list.map(
   r.raw = [""];
   const r2 = /** @type {TemplateStringsArray} */ (r);
 
+  /** @type {import("../../lib/types").WritableTemplateStringsArray} */
+  let rd = ["", ""];
+  rd.raw = ["", ""];
+  const rd2 = /** @type {TemplateStringsArray} */ (rd);
+
   if (object instanceof Sql) {
-    return [object.strings, ...object.keys]
+    return sqlFlatten(object.strings.map((k, i) => {
+      let rm = [k, ""];
+      rm.raw = [k, ""];
+      const rm2 = /** @type {TemplateStringsArray} */ (rm);
+      return [rm2, sqlFlatten(object.keys[i])]
+    }))
   }
   if (Array.isArray(object)) {
     return object.map(sqlFlatten).reduce((previous, current) => {
@@ -101,7 +111,7 @@ sql`SELECT "id", "title", "info", "place" FROM projects WHERE 1 ${list.map(
     }, /** @type {[TemplateStringsArray, ...any[]]} */ ([r]));
   }
   // TODO FIXME probably needs left and right
-  return [r2, object];
+  return [rd2, object];
 }
 
 /**
@@ -127,4 +137,5 @@ export function sqlToString(object) {
   return object.toString();
 }
 
-//console.log(sqlToString(sql`SELECT ${"hi"} 1 ${1}`))
+console.log(sqlFlatten(sql`SELECT ${"hi"} 1 ${1}`))
+console.log(sqlFlatten(sql`SELECT ${sql`* FROM test`} WHERE ${1}`))
