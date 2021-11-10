@@ -10,39 +10,27 @@
 
 // https://github.com/porsager/postgres-benchmarks
 
-export class Sql {
-  /**
-   *
-   * @param {TemplateStringsArray} strings
-   * @param  {(string|Sql|Sql[]|string[]|boolean|number)[]} keys
-   */
-  constructor(strings, keys) {
-    this.strings = strings;
-    this.keys = keys;
-  }
-}
-
 /**
  *
  * @param {string} string
- * @returns {Sql}
+ * @returns {[TemplateStringsArray, ...any[]]}
  */
 export function unsafe(string) {
   /** @type {import("../../lib/types").WritableTemplateStringsArray} */
   let r = [string];
   r.raw = [string];
   const r2 = /** @type {TemplateStringsArray} */ (r);
-  return new Sql(r2, []);
+  return [r2];
 }
 
 /**
  *
  * @param {TemplateStringsArray} strings
- * @param  {...(string|Sql|Sql[]|string[]|boolean|number)} keys
+ * @param  {...(string|[TemplateStringsArray, ...any[]]|[TemplateStringsArray, ...any[]][]|string[]|boolean|number)} keys
  * @returns {any}
  */
 export function sql(strings, ...keys) {
-  return new Sql(strings, keys);
+  return [strings, ...keys];
 
   return {
     /**
@@ -99,7 +87,7 @@ export function internalMerge(array) {
 
 /**
  *
- * @param {string|Sql|Sql[]|string[]|boolean|number|null} object
+ * @param {string|[TemplateStringsArray, ...any[]]|[TemplateStringsArray, ...any[]][]|string[]|boolean|number|null} object
  * @returns {[TemplateStringsArray, ...any[]]}
  */
  export function sqlFlatten(object) {
