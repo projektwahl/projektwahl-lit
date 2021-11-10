@@ -1,5 +1,7 @@
 // https://github.com/porsager/postgres/
 
+import { inspect } from "node:util";
+
 // https://www.postgresql.org/docs/current/protocol.html
 
 // postgres can "Extended Query" execute BEGIN; and COMMIT;? seems like yes
@@ -87,8 +89,8 @@ export function internalMerge(array) {
 
 /**
  *
- * @param {string|[TemplateStringsArray, ...any[]]|[TemplateStringsArray, ...any[]][]|string[]|boolean|number|null} _object
- * @returns {[TemplateStringsArray, ...any[]]}
+ * @param {string|[TemplateStringsArray, ...any[]]|[TemplateStringsArray, ...any[]][]|boolean|number|null} _object
+ * @returns {[TemplateStringsArray, ...any[]]} this must be one with flattened keys (so only primitives)
  */
  export function sqlFlatten(_object) {
   const object = _object;
@@ -102,6 +104,14 @@ export function internalMerge(array) {
   rd.raw = ["", ""];
   const rd2 = /** @type {TemplateStringsArray} */ (rd);
 
+  if (object == null || typeof object === "string" || typeof object === "number" || typeof object === "boolean") return [rd2, object];
+
+  // [TemplateStringsArray, ...any[]][]
+  if (Array.isArray(object) && (typeof object[0] !== "object" || !('raw' in object[0]))) {
+    return internalMerge(object.map(sqlFlatten))
+  }
+
+  // [TemplateStringsArray, ...any[]]
   if (Array.isArray(object) && typeof object[0] === "object" && 'raw' in object[0]) {
     return internalMerge(object[0].map((_, i) => {
       if (i == object[0].length - 1) {
@@ -120,10 +130,6 @@ export function internalMerge(array) {
       }
     }))
   }
-  if (Array.isArray(object)) {
-    return internalMerge(object.map(sqlFlatten))
-  }
-  return [rd2, object];
 }
 
 /**
@@ -149,6 +155,6 @@ export function sqlToString(object) {
   return object.toString();
 }
 
-console.log(sqlFlatten(sql`SELECT * FROM test`))
-console.log(sqlFlatten(sql`SELECT ${"hi"}`))
+//console.log(sqlFlatten(sql`SELECT * FROM test`))
+console.log(sqlFlatten(sql`SE ${"hi"}`))
 //console.log(sqlFlatten(sql`SELECT ${sql`* FROM test`} WHERE ${1}`))
