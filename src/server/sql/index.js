@@ -115,13 +115,19 @@ export function internalMerge(array) {
   const rd2 = /** @type {TemplateStringsArray} */ (rd);
 
   if (object instanceof Sql) {
-    return internalMerge(object.strings.map((k, i) => {
+    console.log(object)
       /** @type {import("../../lib/types").WritableTemplateStringsArray} */
-      let rm = [k, ""];
-      rm.raw = [k, ""];
+    let rf = [object.strings[0]];
+    rf.raw = [object.strings.raw[0]]
+    const rf2 = /** @type {TemplateStringsArray} */ (rf);
+
+    return internalMerge([[rf2], ...object.keys.map((k, i) => {
+      /** @type {import("../../lib/types").WritableTemplateStringsArray} */
+      let rm = [object.strings[i], ""];
+      rm.raw = [object.strings[i], ""];
       const rm2 = /** @type {TemplateStringsArray} */ (rm);
-      return i == object.keys.length ? [rm2] : [rm2, sqlFlatten(object.keys[i])]
-    }))
+      return [rm2, sqlFlatten(object.keys[i])]
+    })])
   }
   if (Array.isArray(object)) {
     return internalMerge(object.map(sqlFlatten))
@@ -154,5 +160,5 @@ export function sqlToString(object) {
 }
 
 console.log(sqlFlatten(sql`SELECT * FROM test`))
-console.log(sqlFlatten(sql`SELECT ${"hi"}`))
-console.log(sqlFlatten(sql`SELECT ${sql`* FROM test`} WHERE ${1}`))
+//console.log(sqlFlatten(sql`SELECT ${"hi"}`))
+//console.log(sqlFlatten(sql`SELECT ${sql`* FROM test`} WHERE ${1}`))
