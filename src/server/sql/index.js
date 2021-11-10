@@ -114,7 +114,6 @@ export function internalMerge(array) {
   const rd2 = /** @type {TemplateStringsArray} */ (rd);
 
   if (object instanceof Sql) {
-    
     return internalMerge(object.strings.map((_, i) => {
       if (i == object.strings.length - 1) {
         /** @type {import("../../lib/types").WritableTemplateStringsArray} */
@@ -135,7 +134,6 @@ export function internalMerge(array) {
   if (Array.isArray(object)) {
     return internalMerge(object.map(sqlFlatten))
   }
-  // TODO FIXME probably needs left and right
   return [rd2, object];
 }
 
