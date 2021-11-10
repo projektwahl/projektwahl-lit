@@ -76,6 +76,7 @@ sql`SELECT "id", "title", "info", "place" FROM projects WHERE 1 ${list.map(
  * @returns {[TemplateStringsArray, ...any[]]}
  */
 export function internalMerge(array) {
+  console.log(array)
   /** @type {import("../../lib/types").WritableTemplateStringsArray} */
   let r = [""];
   r.raw = [""];
@@ -93,8 +94,8 @@ export function internalMerge(array) {
       previous[0].raw.slice(-1)[0] + current[0].raw[0],
       ...current[0].raw.slice(1)
     ];
-    return /** @type {[TemplateStringsArray, ...any[]]} */ ([/** @type {TemplateStringsArray} */ (templateStrings), ...previous[1], ...current[1]]);
-  }, /** @type {[TemplateStringsArray, ...any[]]} */ (r));
+    return /** @type {[TemplateStringsArray, ...any[]]} */ ([/** @type {TemplateStringsArray} */ (templateStrings), ...(previous[1] || []), ...(current[1] || [])]);
+  }, /** @type {[TemplateStringsArray, ...any[]]} */ ([r]));
 }
 
 /**
@@ -152,5 +153,6 @@ export function sqlToString(object) {
   return object.toString();
 }
 
-console.log(sqlFlatten(sql`SELECT ${"hi"} 1 ${1}`))
+console.log(sqlFlatten(sql`SELECT * FROM test`))
+console.log(sqlFlatten(sql`SELECT ${"hi"}`))
 console.log(sqlFlatten(sql`SELECT ${sql`* FROM test`} WHERE ${1}`))
