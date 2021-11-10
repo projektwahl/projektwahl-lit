@@ -87,10 +87,11 @@ export function internalMerge(array) {
 
 /**
  *
- * @param {string|[TemplateStringsArray, ...any[]]|[TemplateStringsArray, ...any[]][]|string[]|boolean|number|null} object
+ * @param {string|[TemplateStringsArray, ...any[]]|[TemplateStringsArray, ...any[]][]|string[]|boolean|number|null} _object
  * @returns {[TemplateStringsArray, ...any[]]}
  */
- export function sqlFlatten(object) {
+ export function sqlFlatten(_object) {
+  const object = _object;
   /** @type {import("../../lib/types").WritableTemplateStringsArray} */
   let r = [""];
   r.raw = [""];
@@ -101,21 +102,21 @@ export function internalMerge(array) {
   rd.raw = ["", ""];
   const rd2 = /** @type {TemplateStringsArray} */ (rd);
 
-  if (object instanceof Sql) {
-    return internalMerge(object.strings.map((_, i) => {
-      if (i == object.strings.length - 1) {
+  if (Array.isArray(object) && typeof object[0] === "object" && 'raw' in object[0]) {
+    return internalMerge(object[0].map((_, i) => {
+      if (i == object[0].length - 1) {
         /** @type {import("../../lib/types").WritableTemplateStringsArray} */
-        let rf = [object.strings[i]];
-        rf.raw = [object.strings.raw[i]]
+        let rf = [object[0][i]];
+        rf.raw = [object[0].raw[i]]
         const rf2 = /** @type {TemplateStringsArray} */ (rf);
 
         return [rf2];
       } else {
         /** @type {import("../../lib/types").WritableTemplateStringsArray} */
-        let rm = [object.strings[i], ""];
-        rm.raw = [object.strings[i], ""];
+        let rm = [object[0][i], ""];
+        rm.raw = [object[0][i], ""];
         const rm2 = /** @type {TemplateStringsArray} */ (rm);
-        return /** @type {[TemplateStringsArray, ...any[]]} */ ([rm2, sqlFlatten(object.keys[i])])
+        return /** @type {[TemplateStringsArray, ...any[]]} */ ([rm2, sqlFlatten(object[i+1])])
       }
     }))
   }
