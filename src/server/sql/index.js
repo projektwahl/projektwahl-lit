@@ -76,7 +76,6 @@ sql`SELECT "id", "title", "info", "place" FROM projects WHERE 1 ${list.map(
  * @returns {[TemplateStringsArray, ...any[]]}
  */
 export function internalMerge(array) {
-  console.log(array)
   /** @type {import("../../lib/types").WritableTemplateStringsArray} */
   let r = [""];
   r.raw = [""];
@@ -115,19 +114,23 @@ export function internalMerge(array) {
   const rd2 = /** @type {TemplateStringsArray} */ (rd);
 
   if (object instanceof Sql) {
-    console.log(object)
-      /** @type {import("../../lib/types").WritableTemplateStringsArray} */
-    let rf = [object.strings[0]];
-    rf.raw = [object.strings.raw[0]]
-    const rf2 = /** @type {TemplateStringsArray} */ (rf);
+    
+    return internalMerge(object.strings.map((_, i) => {
+      if (i == object.strings.length - 1) {
+        /** @type {import("../../lib/types").WritableTemplateStringsArray} */
+        let rf = [object.strings[i]];
+        rf.raw = [object.strings.raw[i]]
+        const rf2 = /** @type {TemplateStringsArray} */ (rf);
 
-    return internalMerge([[rf2], ...object.keys.map((k, i) => {
-      /** @type {import("../../lib/types").WritableTemplateStringsArray} */
-      let rm = [object.strings[i], ""];
-      rm.raw = [object.strings[i], ""];
-      const rm2 = /** @type {TemplateStringsArray} */ (rm);
-      return [rm2, sqlFlatten(object.keys[i])]
-    })])
+        return [rf2];
+      } else {
+        /** @type {import("../../lib/types").WritableTemplateStringsArray} */
+        let rm = [object.strings[i], ""];
+        rm.raw = [object.strings[i], ""];
+        const rm2 = /** @type {TemplateStringsArray} */ (rm);
+        return /** @type {[TemplateStringsArray, ...any[]]} */ ([rm2, sqlFlatten(object.keys[i])])
+      }
+    }))
   }
   if (Array.isArray(object)) {
     return internalMerge(object.map(sqlFlatten))
@@ -160,5 +163,5 @@ export function sqlToString(object) {
 }
 
 console.log(sqlFlatten(sql`SELECT * FROM test`))
-//console.log(sqlFlatten(sql`SELECT ${"hi"}`))
+console.log(sqlFlatten(sql`SELECT ${"hi"}`))
 //console.log(sqlFlatten(sql`SELECT ${sql`* FROM test`} WHERE ${1}`))
