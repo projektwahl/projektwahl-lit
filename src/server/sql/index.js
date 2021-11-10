@@ -71,6 +71,33 @@ sql`SELECT "id", "title", "info", "place" FROM projects WHERE 1 ${list.map(
 //await sql`SELECT 1`.execute()
 
 /**
+ * 
+ * @param {[TemplateStringsArray, ...any[]][]} array 
+ * @returns {[TemplateStringsArray, ...any[]]}
+ */
+export function internalMerge(array) {
+  /** @type {import("../../lib/types").WritableTemplateStringsArray} */
+  let r = [""];
+  r.raw = [""];
+  const r2 = /** @type {TemplateStringsArray} */ (r);
+
+  return array.reduce((previous, current) => {
+    /** @type {import("../../lib/types").WritableTemplateStringsArray} */
+    const templateStrings = [
+      ...previous[0].slice(0, -1),
+      previous[0].slice(-1)[0] + current[0][0],
+      ...current[0].slice(1)
+    ];
+    templateStrings.raw = [
+      ...previous[0].raw.slice(0, -1),
+      previous[0].raw.slice(-1)[0] + current[0].raw[0],
+      ...current[0].raw.slice(1)
+    ];
+    return /** @type {[TemplateStringsArray, ...any[]]} */ ([/** @type {TemplateStringsArray} */ (templateStrings), ...previous[1], ...current[1]]);
+  }, /** @type {[TemplateStringsArray, ...any[]]} */ (r));
+}
+
+/**
  *
  * @param {string|Sql|Sql[]|string[]|boolean|number|null} object
  * @returns {[TemplateStringsArray, ...any[]]}
@@ -87,28 +114,16 @@ sql`SELECT "id", "title", "info", "place" FROM projects WHERE 1 ${list.map(
   const rd2 = /** @type {TemplateStringsArray} */ (rd);
 
   if (object instanceof Sql) {
-    return sqlFlatten(object.strings.map((k, i) => {
+    return internalMerge(object.strings.map((k, i) => {
+      /** @type {import("../../lib/types").WritableTemplateStringsArray} */
       let rm = [k, ""];
       rm.raw = [k, ""];
       const rm2 = /** @type {TemplateStringsArray} */ (rm);
-      return [rm2, sqlFlatten(object.keys[i])]
+      return i == object.keys.length ? [rm2] : [rm2, sqlFlatten(object.keys[i])]
     }))
   }
   if (Array.isArray(object)) {
-    return object.map(sqlFlatten).reduce((previous, current) => {
-      /** @type {import("../../lib/types").WritableTemplateStringsArray} */
-      const templateStrings = [
-        ...previous[0].slice(0, -1),
-        previous[0].slice(-1)[0] + current[0][0],
-        ...current[0].slice(1)
-      ];
-      templateStrings.raw = [
-        ...previous[0].raw.slice(0, -1),
-        previous[0].raw.slice(-1)[0] + current[0].raw[0],
-        ...current[0].raw.slice(1)
-      ];
-      return /** @type {[TemplateStringsArray, ...any[]]} */ ([/** @type {TemplateStringsArray} */ (templateStrings), ...previous[1], ...current[1]]);
-    }, /** @type {[TemplateStringsArray, ...any[]]} */ ([r]));
+    return internalMerge(object.map(sqlFlatten))
   }
   // TODO FIXME probably needs left and right
   return [rd2, object];
