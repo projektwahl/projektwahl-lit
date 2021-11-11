@@ -8,6 +8,7 @@ import { HistoryController } from "./history-controller.js";
 import { aClick } from "./pw-a.js";
 import { classMap } from "lit/directives/class-map.js";
 import { until } from "lit/directives/until.js";
+import { repeat } from "lit/directives/repeat.js";
 import { pwLogin } from "./routes/login/pw-login.js";
 import { setupHmr } from "./hmr.js";
 
@@ -55,27 +56,37 @@ export let PwApp = class PwApp extends LitElement {
       this.current = pwLogin()
     } else if (this.history.url.pathname === "/users") {
       this.current = Promise.resolve(html`<pw-entitylist title="Nutzende">
-<table class="table">
-
-<tr slot="response">
+<table slot="response" class="table">
+${repeat([1, 2, 3], i => i, (item, index) => {
+  return html`<tr>
 						<th scope="row"> 
               <p class="placeholder-wave">
-                <span class="placeholder w-100">test</span>
+                <span class="placeholder">id</span>
               </p>
             </th>
-						<td>{entity.name}</td>
-						<td>{entity.type}</td>
+						<td>
+              <p class="placeholder-wave">
+                <span class="placeholder">username</span>
+              </p>
+            </td>
+						<td>
+              <p class="placeholder-wave">
+                <span class="placeholder">type</span>
+              </p>
+            </td>
 						<td>
 					
-							<a class="btn btn-secondary" href="/users/edit/{entity.id}" role="button">
-								<i class="bi bi-pen"></i>
-							</a>
+              <a class="btn btn-secondary" href="/users/edit/{entity.id}" role="button">
+                <i class="bi bi-pen"></i>
+              </a>
 						
 							<button class="btn btn-secondary" type="button">
 								<i class="bi bi-box-arrow-in-right"></i>
 							</button>
 						</td>
-					</tr>
+					</tr>`
+})}
+
 </table>
 
       </pw-entitylist>`)
