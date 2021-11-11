@@ -87,6 +87,10 @@ export function internalMerge(array) {
   }, /** @type {[TemplateStringsArray, ...any[]]} */ ([r]));
 }
 
+// array of templates
+// templates
+// other primitives
+
 /**
  *
  * @param {string|[TemplateStringsArray, ...any[]]|[TemplateStringsArray, ...any[]][]|boolean|number|null} _object
@@ -130,29 +134,6 @@ export function internalMerge(array) {
       }
     }))
   }
-}
-
-/**
- *
- * @param {string|Sql|Sql[]|string[]|boolean|number|null} object
- * @returns {string}
- */
-export function sqlToString(object) {
-  if (object instanceof Sql) {
-    return object.strings
-      .map((string, i) => {
-        if (object.strings.length - 1 == i) return string;
-        return string + sqlToString(object.keys[i]);
-      })
-      .join("");
-  }
-  if (Array.isArray(object)) {
-    return object.map(sqlToString).join("");
-  }
-  if (object === null) {
-    return "NULL";
-  }
-  return object.toString();
 }
 
 //console.log(sqlFlatten(sql`SELECT * FROM test`))
