@@ -33,6 +33,7 @@ export function unsafe(string) {
 export function sql(_strings, ..._keys) {
   const strings = _strings;
   const keys = _keys;
+  console.log("sql", strings, keys)
   // TODO FIXME maybe flatten here this should be way easier...
   // so the parameter is either an array of flat templates, a flat template or a primitive value
   /** @type {import("../../lib/types").WritableTemplateStringsArray} */
@@ -48,8 +49,8 @@ export function sql(_strings, ..._keys) {
 
   const stringsAsTemplates = strings.map(unsafe)
 
-  // array of templates or primitive values?
-  /** @type {(string|[TemplateStringsArray, ...(string|string[]|boolean|number)[]]|string[]|boolean|number)[]} */
+  // array of templates?
+  /** @type {[TemplateStringsArray, ...(string|string[]|boolean|number)[]][]} */
   const flattened = stringsAsTemplates.flatMap((m, i) => {
     if (i == keys.length) {
       return [m];
@@ -58,14 +59,16 @@ export function sql(_strings, ..._keys) {
     if (Array.isArray(keys[i]) && keys[i].every(p => Array.isArray(p) && typeof p[0] === "object" && 'raw' in p[0])) {
       return [m, ...keys[i]]
     }
-    // flat template string or primitive
-
-    // TODO FIXME primitives also converted to template string?
-
-    return [m, keys[i]];
+    // flat template string
+    if (Array.isArray(keys[i]) && typeof keys[i][0] === "object" && 'raw' in keys[i][0]) {
+      return [m, keys[i]];
+    }
+    // primitive
+    return [m, [rd, keys[i]]];
   })
+  console.log("flattened", flattened)
 
-  return flattened.reduce((previous, current) => {
+  const result = flattened.reduce((previous, current) => {
     /** @type {import("../../lib/types").WritableTemplateStringsArray} */
     const templateStrings = [
       ...previous[0].slice(0, -1),
@@ -80,6 +83,9 @@ export function sql(_strings, ..._keys) {
     return /** @type {[TemplateStringsArray, ...any[]]} */ ([/** @type {TemplateStringsArray} */ (templateStrings), ...previous.slice(1), ...current.slice(1)]);
   }, /** @type {[TemplateStringsArray, ...any[]]} */ ([r]));
 
+  console.log("result", result)
+
+  return result
 
   return {
     /**
