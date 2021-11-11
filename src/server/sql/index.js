@@ -14,7 +14,7 @@
  * @param {string} string
  * @returns {[TemplateStringsArray, ...any[]]}
  */
-export function unsafe(string) {
+export function unsafe2(string) {
   /** @type {import("../../lib/types").WritableTemplateStringsArray} */
   let r = [string];
   r.raw = [string];
@@ -25,12 +25,12 @@ export function unsafe(string) {
  *
  * @param {TemplateStringsArray} _strings
  * @param  {...(string|[TemplateStringsArray, ...(string|string[]|boolean|number)[]]|[TemplateStringsArray, ...(string|string[]|boolean|number)[]][]|string[]|boolean|number)} _keys
- * @returns {any}
+ * @returns {[TemplateStringsArray, ...(string|string[]|boolean|number)[]]}
  */
-export function sql(_strings, ..._keys) {
+export function sql2(_strings, ..._keys) {
   const strings = _strings;
   const keys = _keys;
-  console.log("sql", strings, keys)
+  //console.log("sql", strings, keys)
 
   /** @type {import("../../lib/types").WritableTemplateStringsArray} */
   const r = [""];
@@ -40,7 +40,7 @@ export function sql(_strings, ..._keys) {
   const rd = ["", ""];
   rd.raw = ["", ""];
 
-  const stringsAsTemplates = strings.map(unsafe)
+  const stringsAsTemplates = strings.map(unsafe2)
 
   // array of templates
   /** @type {[TemplateStringsArray, ...(string|string[]|boolean|number)[]][]} */
@@ -59,7 +59,7 @@ export function sql(_strings, ..._keys) {
     // primitive
     return [m, [rd, keys[i]]];
   })
-  console.log("flattened", flattened)
+  //console.log("flattened", flattened)
 
   const result = flattened.reduce((previous, current) => {
     /** @type {import("../../lib/types").WritableTemplateStringsArray} */
@@ -76,28 +76,21 @@ export function sql(_strings, ..._keys) {
     return /** @type {[TemplateStringsArray, ...any[]]} */ ([/** @type {TemplateStringsArray} */ (templateStrings), ...previous.slice(1), ...current.slice(1)]);
   }, /** @type {[TemplateStringsArray, ...any[]]} */ ([r]));
 
-  console.log("result", result)
+  //console.log("result", result)
 
   return result
-
-  return {
-    /**
-     * @template T
-     */
-    then: async () => {
-      return /** @type {T} */ (/** @type {unknown} */ (undefined));
-    },
-  };
 }
-
-console.log(sql`SELECT * FROM test`)
-console.log(sql`SELECT ${"hill"}`)
-console.log(sql`SELECT ${sql`* FROM test`} WHERE ${1}`)
+/*
+console.log(sql2`SELECT * FROM test`)
+console.log(sql2`SELECT ${"hill"}`)
+console.log(sql2`SELECT ${sql2`* FROM test`} WHERE ${1}`)
 /** @type {any[]} */
+/*
 let list = ["id", "title", "info"];
 
-console.log(sql`SELECT "id", "title", "info", "place" FROM projects WHERE 1${list.map(
-  (v) => sql` AND (${unsafe(v)} < ${1})`
+console.log(sql2`SELECT "id", "title", "info", "place" FROM projects WHERE 1${list.map(
+  (v) => sql2` AND (${unsafe2(v)} < ${1})`
 )} OR NOT ... params() ORDER BY ${list.map(
-  (v) => sql`${unsafe(v)} ASC, `
+  (v) => sql2`${unsafe2(v)} ASC, `
 )} LIMIT 1337`);
+*/

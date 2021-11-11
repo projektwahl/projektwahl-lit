@@ -1,4 +1,4 @@
-import { literal, Sql, sql, sqlToString } from "./sql/index.js";
+import { sql2, unsafe2 } from "./sql/index.js";
 
 /**
  * @template T
@@ -7,8 +7,8 @@ import { literal, Sql, sql, sqlToString } from "./sql/index.js";
  * @param {{ [field: string]: 'nulls-first'|'nulls-last' }} orderByInfo
  * @param {import("../lib/types").BaseQuery<T>} _query
  * @param {T} sanitizedData
- * @param {(query: T) => import('./sql').Sql} customFilterQuery
- * @returns {Sql}
+ * @param {(query: T) => [TemplateStringsArray, ...(string|string[]|boolean|number)[]]} customFilterQuery
+ * @returns {[TemplateStringsArray, ...(string|string[]|boolean|number)[]]}
  */
 export function fetchData(
   table,
@@ -33,11 +33,11 @@ export function fetchData(
   }
 
   const orderByQuery = query.sorting
-    .flatMap((v) => [sql`,`, sql`${v[0]} ${v[1]}`])
+    .flatMap((v) => [sql2`,`, sql2`${unsafe2(v[0])} ${unsafe2(v[1])}`])
     .slice(1);
 
   if (query.paginationCursor === null) {
-    return sql`(SELECT ${literal(fieldsToSelect.join(", "))} FROM ${literal(
+    return sql2`(SELECT ${unsafe2(fieldsToSelect.join(", "))} FROM ${unsafe2(
       table
     )} WHERE ORDER BY ${orderByQuery} LIMIT ${query.paginationLimit + 1})`;
   } else {
@@ -47,19 +47,19 @@ export function fetchData(
       let parts = part
         .flatMap((value, index) => {
           return [
-            sql` AND `,
-            sql`${query.paginationCursor[value[0]] ?? null} ${
+            sql2` AND `,
+            sql2`${query.paginationCursor[value[0]] ?? null} ${
               index === part.length - 1
                 ? value[1] === "ASC"
-                  ? sql`<`
-                  : sql`>`
-                : sql`IS NOT DISTINCT FROM`
-            } ${value[0] ?? null}`,
+                  ? sql2`<`
+                  : sql2`>`
+                : sql2`IS NOT DISTINCT FROM`
+            } ${unsafe2(value[0] ?? null)}`,
           ];
         })
         .slice(1);
 
-      return sql`(SELECT ${literal(fieldsToSelect.join(", "))} FROM ${literal(
+      return sql2`(SELECT ${unsafe2(fieldsToSelect.join(", "))} FROM ${unsafe2(
         table
       )} WHERE${customFilterQuery(
         sanitizedData
@@ -68,8 +68,8 @@ export function fetchData(
       })`;
     });
 
-    return sql`${queries
-      .flatMap((v) => [sql`\nUNION ALL\n`, v])
+    return sql2`${queries
+      .flatMap((v) => [sql2`\nUNION ALL\n`, v])
       .slice(1)} LIMIT ${query.paginationLimit + 1}`;
   }
 }
@@ -98,8 +98,8 @@ const value = fetchData(
     name: "test",
   },
   (query) => {
-    return sql``;
+    return sql2``;
   }
 );
 
-console.log(sqlToString(value));
+console.log(value);
