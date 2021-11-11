@@ -55,8 +55,29 @@ export let PwApp = class PwApp extends LitElement {
       this.current = pwLogin()
     } else if (this.history.url.pathname === "/users") {
       this.current = Promise.resolve(html`<pw-entitylist title="Nutzende">
-      
-      
+<table class="table">
+
+<tr slot="response">
+						<th scope="row"> 
+              <p class="placeholder-wave">
+                <span class="placeholder w-100">test</span>
+              </p>
+            </th>
+						<td>{entity.name}</td>
+						<td>{entity.type}</td>
+						<td>
+					
+							<a class="btn btn-secondary" href="/users/edit/{entity.id}" role="button">
+								<i class="bi bi-pen"></i>
+							</a>
+						
+							<button class="btn btn-secondary" type="button">
+								<i class="bi bi-box-arrow-in-right"></i>
+							</button>
+						</td>
+					</tr>
+</table>
+
       </pw-entitylist>`)
     } else {
       this.current = Promise.resolve(html`Not Found`);

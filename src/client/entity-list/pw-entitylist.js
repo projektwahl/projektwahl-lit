@@ -49,21 +49,19 @@ ${html`
 <div class="col-3">
     <!-- svelte-ignore a11y-no-onchange -->
     <select
-        bind:value={$query.paginationLimit}
+        .value=${"10"}
         class="form-select"
         aria-label="Default select example"
     >
-        <option value={10}>10 pro Seite</option>
-        <option value={25}>25 pro Seite</option>
-        <option value={50}>50 pro Seite</option>
-        <option value={100}>100 pro Seite</option>
+        <option value=${10}>10 pro Seite</option>
+        <option value=${25}>25 pro Seite</option>
+        <option value=${50}>50 pro Seite</option>
+        <option value=${100}>100 pro Seite</option>
     </select>
 </div>
 </div>
-<table class="table">
-<slot name="filter" {headerClick} {currentSortValue}></slot>
-<slot name="response" response={$response}></slot>
-</table>
+<slot name="filter"></slot>
+<slot name="response"></slot>
 <nav aria-label="Navigation der Nutzerliste">
 <ul class="pagination justify-content-center">
     <!-- { # await only works in blocks -->
