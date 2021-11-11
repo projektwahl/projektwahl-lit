@@ -1,5 +1,5 @@
 import { sql } from "./database.js";
-import { sql2, unsafe2 } from "./sql/index.js";
+import { sql2, sql2ToString, unsafe2 } from "./sql/index.js";
 
 /**
  * @template T
@@ -86,9 +86,9 @@ const value = fetchData(
   },
   {
     filters: {},
-    paginationCursor: { name: "hi" },
+    paginationCursor: { username: "aaaa", type: "voter" },
     paginationDirection: "forwards",
-    paginationLimit: 100,
+    paginationLimit: 10,
     sorting: [
       ["type", "DESC"],
       ["username", "ASC"],
@@ -104,6 +104,8 @@ const value = fetchData(
 );
 
 console.log(value)
+
+console.log(sql2ToString(value))
 
 console.log(await sql(...value));
 

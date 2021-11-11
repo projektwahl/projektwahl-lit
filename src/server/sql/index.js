@@ -80,6 +80,21 @@ export function sql2(_strings, ..._keys) {
 
   return result
 }
+
+/**
+ * 
+ * @param {[TemplateStringsArray, ...(string|string[]|boolean|number)[]]} sql 
+ */
+export function sql2ToString(sql) {
+  return sql[0].map((s, i) => {
+    if (i+1 == sql.length) {
+      return s;
+    }
+    return s + JSON.stringify(sql[i+1]);
+  }).join("")
+}
+
+
 /*
 console.log(sql2`SELECT * FROM test`)
 console.log(sql2`SELECT ${"hill"}`)
