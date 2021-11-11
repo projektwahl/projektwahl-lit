@@ -21,8 +21,7 @@ export function unsafe(string) {
   /** @type {import("../../lib/types").WritableTemplateStringsArray} */
   let r = [string];
   r.raw = [string];
-  const r2 = /** @type {TemplateStringsArray} */ (r);
-  return [r2];
+  return [/** @type {TemplateStringsArray} */ (r)];
 }
 
 /**
@@ -44,22 +43,6 @@ export function sql(strings, ...keys) {
   };
 }
 
-/** @type {any[]} */
-let list = [];
-
-sql`SELECT "id", "title", "info", "place" FROM projects WHERE 1 ${list.map(
-  (v) => sql`AND ( ${unsafe(v)} < 5 )`
-)} OR NOT ... params() ORDER BY ${list.map(
-  (v) => sql`${unsafe(v)} ASC`
-)} LIMIT 1337`;
-
-// an array of Sql gets concatenated
-// an Sql gets inserted
-// other values get prepared-statements
-
-// probably make the execute a wrapper to porsager for now because I wont have the time to fully implement a postgres client lib
-//await sql`SELECT 1`.execute()
-
 // array of templates
 // templates
 // other primitives
@@ -70,7 +53,7 @@ sql`SELECT "id", "title", "info", "place" FROM projects WHERE 1 ${list.map(
  * @returns {[TemplateStringsArray, ...any[]]} this must be one with flattened keys (so only primitives)
  */
  export function sqlFlatten(_object) {
-   console.log(_object)
+  console.log(_object)
   const object = _object;
   /** @type {import("../../lib/types").WritableTemplateStringsArray} */
   const r = [""];
@@ -84,15 +67,13 @@ sql`SELECT "id", "title", "info", "place" FROM projects WHERE 1 ${list.map(
 
   if (Array.isArray(object) && object.every(p => Array.isArray(p) && typeof p[0] === "object" && 'raw' in p[0])) {
     const object2 = /** @type {[TemplateStringsArray, ...any[]][]} */ (object);
-    const flattenedArgs = object2 // TODO maybe can be removed?
+    const flattenedArgs = object2.map(sqlFlatten)
 
     /** @type {import("../../lib/types").WritableTemplateStringsArray} */
     let r = [""];
     r.raw = [""];
 
     return flattenedArgs.reduce((previous, current) => {
-      // TODO FIXME this part is probably wrong
-
       /** @type {import("../../lib/types").WritableTemplateStringsArray} */
       const templateStrings = [
         ...previous[0].slice(0, -1),
@@ -109,11 +90,13 @@ sql`SELECT "id", "title", "info", "place" FROM projects WHERE 1 ${list.map(
   }
 
   if (Array.isArray(object) && typeof object[0] === "object" && 'raw' in object[0]) {
-    const object2 = /** @type {[TemplateStringsArray, ...any[]]} */ object;
+    const object2 = /** @type {[TemplateStringsArray, ...any[]]} */ (object);
+
+    if (object2.length == 1) return object2;
     
     const mapped2 = object2[0].map(unsafe) // this should be one longer
 
-    const mapped = object.slice(1).map(sqlFlatten)
+    const mapped = object.slice(1)
 
     return sqlFlatten(mapped2.flatMap((m, i) => i == mapped.length ? [m] : [m, mapped[i]]))
   }
@@ -121,6 +104,14 @@ sql`SELECT "id", "title", "info", "place" FROM projects WHERE 1 ${list.map(
   return [rd2, object];
 }
 
-//console.log(sqlFlatten(sql`SELECT * FROM test`))
+console.log(sqlFlatten(sql`SELECT * FROM test`))
 console.log(sqlFlatten(sql`SE ${"hill"}`))
-//console.log(sqlFlatten(sql`SELECT ${sql`* FROM test`} WHERE ${1}`))
+console.log(sqlFlatten(sql`SELECT ${sql`* FROM test`} WHERE ${1}`))
+/** @type {any[]} */
+let list = ["id", "title", "info"];
+
+console.log(sqlFlatten(sql`SELECT "id", "title", "info", "place" FROM projects WHERE 1 ${list.map(
+  (v) => sql`AND ( ${unsafe(v)} < 5 )`
+)} OR NOT ... params() ORDER BY ${list.map(
+  (v) => sql`${unsafe(v)} ASC`
+)} LIMIT 1337`));
