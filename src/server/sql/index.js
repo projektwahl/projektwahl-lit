@@ -26,11 +26,13 @@ export function unsafe(string) {
 
 /**
  *
- * @param {TemplateStringsArray} strings
- * @param  {...(string|[TemplateStringsArray, ...any[]]|[TemplateStringsArray, ...any[]][]|string[]|boolean|number)} keys
+ * @param {TemplateStringsArray} _strings
+ * @param  {...(string|[TemplateStringsArray, ...(string|string[]|boolean|number)[]]|[TemplateStringsArray, ...(string|string[]|boolean|number)[]][]|string[]|boolean|number)} _keys
  * @returns {any}
  */
-export function sql(strings, ...keys) {
+export function sql(_strings, ..._keys) {
+  const strings = _strings;
+  const keys = _keys;
   // TODO FIXME maybe flatten here this should be way easier...
   // so the parameter is either an array of flat templates, a flat template or a primitive value
   /** @type {import("../../lib/types").WritableTemplateStringsArray} */
@@ -44,63 +46,40 @@ export function sql(strings, ...keys) {
   // maybe map strings and all keys together into an array of flat templates or primitives
   // then extract the flat templates again?
 
+  const stringsAsTemplates = strings.map(unsafe)
 
+  // array of templates or primitive values?
+  /** @type {(string|[TemplateStringsArray, ...(string|string[]|boolean|number)[]]|string[]|boolean|number)[]} */
+  const flattened = stringsAsTemplates.flatMap((m, i) => {
+    if (i == keys.length) {
+      return [m];
+    }
+    // array of flat template strings
+    if (Array.isArray(keys[i]) && keys[i].every(p => Array.isArray(p) && typeof p[0] === "object" && 'raw' in p[0])) {
+      return [m, ...keys[i]]
+    }
+    // flat template string or primitive
 
+    // TODO FIXME primitives also converted to template string?
 
+    return [m, keys[i]];
+  })
 
-  
-
-
-  // reduce each key in keys from array to single flat template
-  // maybe just combine this with reducing the other keys at the same time?
-  if (object.every(p => Array.isArray(p) && typeof p[0] === "object" && 'raw' in p[0])) {
-    const object2 = /** @type {[TemplateStringsArray, ...any[]][]} */ (object);
-
-    console.log("array", object2)
-
-    const flattenedArgs = object2
-
+  return flattened.reduce((previous, current) => {
     /** @type {import("../../lib/types").WritableTemplateStringsArray} */
-    let r = [""];
-    r.raw = [""];
+    const templateStrings = [
+      ...previous[0].slice(0, -1),
+      previous[0].slice(-1)[0] + current[0][0],
+      ...current[0].slice(1)
+    ];
+    templateStrings.raw = [
+      ...previous[0].raw.slice(0, -1),
+      previous[0].raw.slice(-1)[0] + current[0].raw[0],
+      ...current[0].raw.slice(1)
+    ];
+    return /** @type {[TemplateStringsArray, ...any[]]} */ ([/** @type {TemplateStringsArray} */ (templateStrings), ...previous.slice(1), ...current.slice(1)]);
+  }, /** @type {[TemplateStringsArray, ...any[]]} */ ([r]));
 
-    return flattenedArgs.reduce((previous, current) => {
-      /** @type {import("../../lib/types").WritableTemplateStringsArray} */
-      const templateStrings = [
-        ...previous[0].slice(0, -1),
-        previous[0].slice(-1)[0] + current[0][0],
-        ...current[0].slice(1)
-      ];
-      templateStrings.raw = [
-        ...previous[0].raw.slice(0, -1),
-        previous[0].raw.slice(-1)[0] + current[0].raw[0],
-        ...current[0].raw.slice(1)
-      ];
-      return /** @type {[TemplateStringsArray, ...any[]]} */ ([/** @type {TemplateStringsArray} */ (templateStrings), ...previous.slice(1), ...current.slice(1)]);
-    }, /** @type {[TemplateStringsArray, ...any[]]} */ ([r]));
-  }
-
-  if (Array.isArray(object) && typeof object[0] === "object" && 'raw' in object[0]) {
-    const object2 = /** @type {[TemplateStringsArray, ...any[]]} */ (object);
-
-    console.log("template", object2)
-
-    if (object2.length == 1) return object2;
-    
-    const mapped2 = object2[0].map(unsafe) // this should be one longer
-
-    const mapped = object.slice(1)
-
-    const flattened = mapped2.flatMap((m, i) => i == mapped.length ? [m] : [m, mapped[i]])
-
-    console.log("flattened", flattened)
-
-    return sqlFlatten(flattened)
-  }
-
-  console.log("other", object)
-
-  return [/** @type {TemplateStringsArray} */ (rd), object];
 
   return {
     /**
