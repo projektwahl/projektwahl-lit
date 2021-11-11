@@ -60,33 +60,6 @@ sql`SELECT "id", "title", "info", "place" FROM projects WHERE 1 ${list.map(
 // probably make the execute a wrapper to porsager for now because I wont have the time to fully implement a postgres client lib
 //await sql`SELECT 1`.execute()
 
-/**
- * 
- * @param {[TemplateStringsArray, ...any[]]} array 
- * @returns {[TemplateStringsArray, ...any[]]}
- */
-export function internalMerge(array) {
-  /** @type {import("../../lib/types").WritableTemplateStringsArray} */
-  let r = [""];
-  r.raw = [""];
-  const r2 = /** @type {TemplateStringsArray} */ (r);
-
-  return array.reduce((previous, current) => {
-    /** @type {import("../../lib/types").WritableTemplateStringsArray} */
-    const templateStrings = [
-      ...previous[0].slice(0, -1),
-      previous[0].slice(-1)[0] + current[0][0],
-      ...current[0].slice(1)
-    ];
-    templateStrings.raw = [
-      ...previous[0].raw.slice(0, -1),
-      previous[0].raw.slice(-1)[0] + current[0].raw[0],
-      ...current[0].raw.slice(1)
-    ];
-    return /** @type {[TemplateStringsArray, ...any[]]} */ ([/** @type {TemplateStringsArray} */ (templateStrings), ...(previous[1] || []), ...(current[1] || [])]);
-  }, /** @type {[TemplateStringsArray, ...any[]]} */ ([r]));
-}
-
 // array of templates
 // templates
 // other primitives
@@ -123,6 +96,25 @@ export function internalMerge(array) {
     const object2 = /** @type {[TemplateStringsArray, ...any[]]} */ object;
     const flattenedArgs = object2.slice(1).map(sqlFlatten)
 
+    /** @type {import("../../lib/types").WritableTemplateStringsArray} */
+    let r = [""];
+    r.raw = [""];
+
+    // TODO FIXME add the strings in the outer template string
+    return flattenedArgs.reduce((previous, current) => {
+      /** @type {import("../../lib/types").WritableTemplateStringsArray} */
+      const templateStrings = [
+        ...previous[0].slice(0, -1),
+        previous[0].slice(-1)[0] + current[0][0],
+        ...current[0].slice(1)
+      ];
+      templateStrings.raw = [
+        ...previous[0].raw.slice(0, -1),
+        previous[0].raw.slice(-1)[0] + current[0].raw[0],
+        ...current[0].raw.slice(1)
+      ];
+      return /** @type {[TemplateStringsArray, ...any[]]} */ ([/** @type {TemplateStringsArray} */ (templateStrings), ...(previous[1] || []), ...(current[1] || [])]);
+    }, /** @type {[TemplateStringsArray, ...any[]]} */ ([r]));
   }
 }
 
