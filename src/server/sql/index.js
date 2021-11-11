@@ -85,13 +85,12 @@ sql`SELECT "id", "title", "info", "place" FROM projects WHERE 1 ${list.map(
 
   if (Array.isArray(object) && (typeof object[0] !== "object" || !('raw' in object[0]))) {
     const object2 = /** @type {[TemplateStringsArray, ...any[]][]} */ object;
-    const flattenedArgs = object2.map(sqlFlatten)
+    const flattenedArgs = object2.map(sqlFlatten) // TODO maybe can be removed?
 
     /** @type {import("../../lib/types").WritableTemplateStringsArray} */
     let r = [""];
     r.raw = [""];
 
-    // TODO FIXME add the strings in the outer template string
     return flattenedArgs.reduce((previous, current) => {
       /** @type {import("../../lib/types").WritableTemplateStringsArray} */
       const templateStrings = [
@@ -106,17 +105,13 @@ sql`SELECT "id", "title", "info", "place" FROM projects WHERE 1 ${list.map(
       ];
       return /** @type {[TemplateStringsArray, ...any[]]} */ ([/** @type {TemplateStringsArray} */ (templateStrings), ...(previous[1] || []), ...(current[1] || [])]);
     }, /** @type {[TemplateStringsArray, ...any[]]} */ ([r]));
-
-    /*
-    /** @type {import("../../lib/types").WritableTemplateStringsArray} /
-    const r = Array(object2.length+1).fill("")
-    r.raw = Array(object2.length+1).fill("")
-    return sqlFlatten([/** @type {TemplateStringsArray} / (r), ...object2])*/
   }
 
   if (Array.isArray(object) && typeof object[0] === "object" && 'raw' in object[0]) {
     const object2 = /** @type {[TemplateStringsArray, ...any[]]} */ object;
     
+    const mapped = object.slice(1).map(sqlFlatten)
+    const mapped2 = object2[0].map(unsafe)
   }
 }
 
