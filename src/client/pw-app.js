@@ -54,7 +54,10 @@ export let PwApp = class PwApp extends LitElement {
     if (this.history.url.pathname === "/login") {
       this.current = pwLogin()
     } else if (this.history.url.pathname === "/users") {
-      this.current = Promise.resolve(html`<pw-entitylist></pw-entitylist>`)
+      this.current = Promise.resolve(html`<pw-entitylist title="Nutzende">
+      
+      
+      </pw-entitylist>`)
     } else {
       this.current = Promise.resolve(html`Not Found`);
     }

@@ -9,11 +9,15 @@ import { setupHmr } from "../hmr.js";
 export let PwEntityList = class extends LitElement {
   /** @override */ static get properties() {
     return {
+        title: { type: String },
     };
   }
 
   constructor() {
     super();
+
+    /** @type {string} */
+    this.title;
 
     /**
      * @private
@@ -22,22 +26,25 @@ export let PwEntityList = class extends LitElement {
   }
 
   /** @override */ render() {
+    if (
+        this.title === undefined
+      ) {
+        throw new Error("component not fully initialized");
+      }
+
     return html`
       ${bootstrapCss}
-      
 <div style="position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);">
-{#if $response.result === "loading" }
-    <div class="spinner-grow text-primary" role="status">
+${html`
+<div class="spinner-grow text-primary" role="status">
         <span class="visually-hidden">Loading...</span>
-    </div>
-{/if}
+    </div>`
+}
 </div>
-<h1 class="text-center">{title}</h1>
+<h1 class="text-center">${this.title}</h1>
 <div class="row justify-content-between">
 <div class="col-auto">
-    {#if createUrl}<a class="btn btn-primary" href={createUrl} role="button">{title} erstellen</a
-        >{/if}
-    <slot name="buttons" />
+    <slot name="buttons"></slot>
 </div>
 <div class="col-3">
     <!-- svelte-ignore a11y-no-onchange -->
@@ -54,38 +61,40 @@ export let PwEntityList = class extends LitElement {
 </div>
 </div>
 <table class="table">
-<slot name="filter" {headerClick} {currentSortValue} />
-<slot name="response" response={$response} />
+<slot name="filter" {headerClick} {currentSortValue}></slot>
+<slot name="response" response={$response}></slot>
 </table>
 <nav aria-label="Navigation der Nutzerliste">
 <ul class="pagination justify-content-center">
     <!-- { # await only works in blocks -->
     <li class="page-item {mapOr($response, v => v.previousCursor, null) ? '' : 'disabled'}">
         <a
-            on:click|preventDefault={() => {
-                ($query.paginationCursor = mapOr($response, v => v.previousCursor, null)),
-                    ($query.paginationDirection = 'backwards');
+            @click=${(e) => {
+                e.preventDefault();
+                //($query.paginationCursor = mapOr($response, v => v.previousCursor, null)),
+                //    ($query.paginationDirection = 'backwards');
             }}
             class="page-link"
             href="/"
             aria-label="Vorherige Seite"
-            tabindex={mapOr($response, v => v.previousCursor, null) ? undefined : -1}
-            aria-disabled={!mapOr($response, v => v.previousCursor, null)}
+            tabindex=${-1/*mapOr($response, v => v.previousCursor, null) ? undefined : -1*/}
+            aria-disabled=${true/*!mapOr($response, v => v.previousCursor, null)*/}
         >
             <span aria-hidden="true">&laquo;</span>
         </a>
     </li>
     <li class="page-item {mapOr($response, v => v.nextCursor, null) ? '' : 'disabled'}}">
         <a
-            on:click|preventDefault={() => {
-                ($query.paginationCursor = mapOr($response, v => v.nextCursor, null)),
-                    ($query.paginationDirection = 'forwards');
+            @click=${(e) => {
+                e.preventDefault();
+                //($query.paginationCursor = mapOr($response, v => v.nextCursor, null)),
+                //    ($query.paginationDirection = 'forwards');
             }}
             class="page-link"
             href="/"
             aria-label="Nächste Seite"
-            tabindex={mapOr($response, v => v.nextCursor, null) ? undefined : -1}
-            aria-disabled={!mapOr($response, v => v.nextCursor, null)}
+            tabindex=${/*mapOr($response, v => v.nextCursor, null) ? undefined : -1*/-1}
+            aria-disabled=${/*!mapOr($response, v => v.nextCursor, null)*/false}
         >
             <span aria-hidden="true">&raquo;</span>
         </a>
