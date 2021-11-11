@@ -70,6 +70,7 @@ sql`SELECT "id", "title", "info", "place" FROM projects WHERE 1 ${list.map(
  * @returns {[TemplateStringsArray, ...any[]]} this must be one with flattened keys (so only primitives)
  */
  export function sqlFlatten(_object) {
+   console.log(_object)
   const object = _object;
   /** @type {import("../../lib/types").WritableTemplateStringsArray} */
   const r = [""];
@@ -81,8 +82,6 @@ sql`SELECT "id", "title", "info", "place" FROM projects WHERE 1 ${list.map(
   rd.raw = ["", ""];
   const rd2 = /** @type {TemplateStringsArray} */ (rd);
 
-  if (object == null || typeof object === "string" || typeof object === "number" || typeof object === "boolean") return [rd2, object];
-
   if (Array.isArray(object) && object.every(p => Array.isArray(p) && typeof p[0] === "object" && 'raw' in p[0])) {
     const object2 = /** @type {[TemplateStringsArray, ...any[]][]} */ (object);
     const flattenedArgs = object2 // TODO maybe can be removed?
@@ -92,6 +91,8 @@ sql`SELECT "id", "title", "info", "place" FROM projects WHERE 1 ${list.map(
     r.raw = [""];
 
     return flattenedArgs.reduce((previous, current) => {
+      // TODO FIXME this part is probably wrong
+
       /** @type {import("../../lib/types").WritableTemplateStringsArray} */
       const templateStrings = [
         ...previous[0].slice(0, -1),
@@ -103,7 +104,7 @@ sql`SELECT "id", "title", "info", "place" FROM projects WHERE 1 ${list.map(
         previous[0].raw.slice(-1)[0] + current[0].raw[0],
         ...current[0].raw.slice(1)
       ];
-      return /** @type {[TemplateStringsArray, ...any[]]} */ ([/** @type {TemplateStringsArray} */ (templateStrings), ...(previous[1] || []), ...(current[1] || [])]);
+      return /** @type {[TemplateStringsArray, ...any[]]} */ ([/** @type {TemplateStringsArray} */ (templateStrings), ...previous.slice(1), ...current.slice(1)]);
     }, /** @type {[TemplateStringsArray, ...any[]]} */ ([r]));
   }
 
@@ -116,8 +117,10 @@ sql`SELECT "id", "title", "info", "place" FROM projects WHERE 1 ${list.map(
 
     return sqlFlatten(mapped2.flatMap((m, i) => i == mapped.length ? [m] : [m, mapped[i]]))
   }
+
+  return [rd2, object];
 }
 
 //console.log(sqlFlatten(sql`SELECT * FROM test`))
-console.log(sqlFlatten(sql`SE ${"hi"}`))
+console.log(sqlFlatten(sql`SE ${"hill"}`))
 //console.log(sqlFlatten(sql`SELECT ${sql`* FROM test`} WHERE ${1}`))
