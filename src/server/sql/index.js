@@ -85,16 +85,7 @@ sql`SELECT "id", "title", "info", "place" FROM projects WHERE 1 ${list.map(
 
   if (Array.isArray(object) && (typeof object[0] !== "object" || !('raw' in object[0]))) {
     const object2 = /** @type {[TemplateStringsArray, ...any[]][]} */ object;
-
-    /** @type {import("../../lib/types").WritableTemplateStringsArray} */
-    const r = Array(object2.length+1).fill("")
-    r.raw = Array(object2.length+1).fill("")
-    return sqlFlatten([/** @type {TemplateStringsArray} */ (r), ...object2])
-  }
-
-  if (Array.isArray(object) && typeof object[0] === "object" && 'raw' in object[0]) {
-    const object2 = /** @type {[TemplateStringsArray, ...any[]]} */ object;
-    const flattenedArgs = object2.slice(1).map(sqlFlatten)
+    const flattenedArgs = object2.map(sqlFlatten)
 
     /** @type {import("../../lib/types").WritableTemplateStringsArray} */
     let r = [""];
@@ -115,6 +106,17 @@ sql`SELECT "id", "title", "info", "place" FROM projects WHERE 1 ${list.map(
       ];
       return /** @type {[TemplateStringsArray, ...any[]]} */ ([/** @type {TemplateStringsArray} */ (templateStrings), ...(previous[1] || []), ...(current[1] || [])]);
     }, /** @type {[TemplateStringsArray, ...any[]]} */ ([r]));
+
+    /*
+    /** @type {import("../../lib/types").WritableTemplateStringsArray} /
+    const r = Array(object2.length+1).fill("")
+    r.raw = Array(object2.length+1).fill("")
+    return sqlFlatten([/** @type {TemplateStringsArray} / (r), ...object2])*/
+  }
+
+  if (Array.isArray(object) && typeof object[0] === "object" && 'raw' in object[0]) {
+    const object2 = /** @type {[TemplateStringsArray, ...any[]]} */ object;
+    
   }
 }
 
