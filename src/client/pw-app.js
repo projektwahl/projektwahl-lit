@@ -56,35 +56,38 @@ export let PwApp = class PwApp extends LitElement {
       this.current = pwLogin()
     } else if (this.history.url.pathname === "/users") {
       this.current = Promise.resolve(html`<pw-entitylist title="Nutzende">
-<table slot="response" class="table">
+<div slot="response" class="container">
+<table class="table">
 
 <thead>
-			<tr>
+  
+  <tr>
       <th class="table-cell-hover" scope="col"
-	>{title}<i
+	>{id}<i
 		class="bi-arrow-{curr == 'ASC' ? 'up' : curr == 'DESC' ? 'down' : 'down-up'}"
 		role="img"
 		aria-label="Nach {title} sortieren"
 	></i></th>
 
   <th class="table-cell-hover" scope="col"
-	>{title}<i
+	>{username}<i
 		class="bi-arrow-{curr == 'ASC' ? 'up' : curr == 'DESC' ? 'down' : 'down-up'}"
 		role="img"
 		aria-label="Nach {title} sortieren"
 	></i></th>
 
   <th class="table-cell-hover" scope="col"
-	>{title}<i
+	>{type}<i
 		class="bi-arrow-{curr == 'ASC' ? 'up' : curr == 'DESC' ? 'down' : 'down-up'}"
 		role="img"
 		aria-label="Nach {title} sortieren"
 	></i></th>
 
       
-				<th>Aktionen</th>
+				<th class="">Aktionen</th>
 			</tr>
-			<tr class="align-middle">
+      <!--
+			<tr class="row align-middle">
 	
 
       <th scope="col">
@@ -116,25 +119,26 @@ export let PwApp = class PwApp extends LitElement {
 	/>
 </th>
 
-			</tr>
+			</tr>-->
 		</thead>
 
   <tbody>
 ${repeat([1, 2, 3], i => i, (item, index) => {
   return html`<tr>
 						<th scope="row"> 
-              <p class="placeholder-wave">
-                <span class="placeholder">id</span>
+              <p class="placeholder-glow">
+                <span class="placeholder">1337</span>
               </p>
             </th>
 						<td>
-              <p class="placeholder-wave">
-                <span class="placeholder">username</span>
+              <p class="placeholder-glow">
+                <span class="placeholder">Long Full Name</span>
+                <span class="placeholder">Long Full Name</span>
               </p>
             </td>
 						<td>
-              <p class="placeholder-wave">
-                <span class="placeholder">type</span>
+              <p class="placeholder-glow">
+                <span class="placeholder">helper</span>
               </p>
             </td>
 						<td>
@@ -151,7 +155,7 @@ ${repeat([1, 2, 3], i => i, (item, index) => {
 })}
 </tbody>
 </table>
-
+</div>
       </pw-entitylist>`)
     } else {
       this.current = Promise.resolve(html`Not Found`);
