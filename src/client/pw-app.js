@@ -57,6 +57,69 @@ export let PwApp = class PwApp extends LitElement {
     } else if (this.history.url.pathname === "/users") {
       this.current = Promise.resolve(html`<pw-entitylist title="Nutzende">
 <table slot="response" class="table">
+
+<thead>
+			<tr>
+      <th class="table-cell-hover" scope="col"
+	>{title}<i
+		class="bi-arrow-{curr == 'ASC' ? 'up' : curr == 'DESC' ? 'down' : 'down-up'}"
+		role="img"
+		aria-label="Nach {title} sortieren"
+	></i></th>
+
+  <th class="table-cell-hover" scope="col"
+	>{title}<i
+		class="bi-arrow-{curr == 'ASC' ? 'up' : curr == 'DESC' ? 'down' : 'down-up'}"
+		role="img"
+		aria-label="Nach {title} sortieren"
+	></i></th>
+
+  <th class="table-cell-hover" scope="col"
+	>{title}<i
+		class="bi-arrow-{curr == 'ASC' ? 'up' : curr == 'DESC' ? 'down' : 'down-up'}"
+		role="img"
+		aria-label="Nach {title} sortieren"
+	></i></th>
+
+      
+				<th>Aktionen</th>
+			</tr>
+			<tr class="align-middle">
+	
+
+      <th scope="col">
+	<input
+		bind:value={$query.filters[name]}
+		type="text"
+		class="form-control"
+		id="projects-filter-{name}"
+	/>
+</th>
+
+
+<th scope="col">
+	<input
+		bind:value={$query.filters[name]}
+		type="text"
+		class="form-control"
+		id="projects-filter-{name}"
+	/>
+</th>
+
+
+<th scope="col">
+	<input
+		bind:value={$query.filters[name]}
+		type="text"
+		class="form-control"
+		id="projects-filter-{name}"
+	/>
+</th>
+
+			</tr>
+		</thead>
+
+  <tbody>
 ${repeat([1, 2, 3], i => i, (item, index) => {
   return html`<tr>
 						<th scope="row"> 
@@ -86,7 +149,7 @@ ${repeat([1, 2, 3], i => i, (item, index) => {
 						</td>
 					</tr>`
 })}
-
+</tbody>
 </table>
 
       </pw-entitylist>`)

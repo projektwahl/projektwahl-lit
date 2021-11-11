@@ -60,7 +60,6 @@ ${html`
     </select>
 </div>
 </div>
-<slot name="filter"></slot>
 <slot name="response"></slot>
 <nav aria-label="Navigation der Nutzerliste">
 <ul class="pagination justify-content-center">
