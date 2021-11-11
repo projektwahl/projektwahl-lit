@@ -62,7 +62,7 @@ sql`SELECT "id", "title", "info", "place" FROM projects WHERE 1 ${list.map(
 
 /**
  * 
- * @param {[TemplateStringsArray, ...any[]][]} array 
+ * @param {[TemplateStringsArray, ...any[]]} array 
  * @returns {[TemplateStringsArray, ...any[]]}
  */
 export function internalMerge(array) {
@@ -99,40 +99,30 @@ export function internalMerge(array) {
  export function sqlFlatten(_object) {
   const object = _object;
   /** @type {import("../../lib/types").WritableTemplateStringsArray} */
-  let r = [""];
+  const r = [""];
   r.raw = [""];
   const r2 = /** @type {TemplateStringsArray} */ (r);
 
   /** @type {import("../../lib/types").WritableTemplateStringsArray} */
-  let rd = ["", ""];
+  const rd = ["", ""];
   rd.raw = ["", ""];
   const rd2 = /** @type {TemplateStringsArray} */ (rd);
 
   if (object == null || typeof object === "string" || typeof object === "number" || typeof object === "boolean") return [rd2, object];
 
-  // [TemplateStringsArray, ...any[]][]
   if (Array.isArray(object) && (typeof object[0] !== "object" || !('raw' in object[0]))) {
-    return internalMerge(object.map(sqlFlatten))
+    const object2 = /** @type {[TemplateStringsArray, ...any[]][]} */ object;
+
+    /** @type {import("../../lib/types").WritableTemplateStringsArray} */
+    const r = Array(object2.length+1).fill("")
+    r.raw = Array(object2.length+1).fill("")
+    return sqlFlatten([/** @type {TemplateStringsArray} */ (r), ...object2])
   }
 
-  // [TemplateStringsArray, ...any[]]
   if (Array.isArray(object) && typeof object[0] === "object" && 'raw' in object[0]) {
-    return internalMerge(object[0].map((_, i) => {
-      if (i == object[0].length - 1) {
-        /** @type {import("../../lib/types").WritableTemplateStringsArray} */
-        let rf = [object[0][i]];
-        rf.raw = [object[0].raw[i]]
-        const rf2 = /** @type {TemplateStringsArray} */ (rf);
+    const object2 = /** @type {[TemplateStringsArray, ...any[]]} */ object;
+    const flattenedArgs = object2.slice(1).map(sqlFlatten)
 
-        return [rf2];
-      } else {
-        /** @type {import("../../lib/types").WritableTemplateStringsArray} */
-        let rm = [object[0][i], ""];
-        rm.raw = [object[0][i], ""];
-        const rm2 = /** @type {TemplateStringsArray} */ (rm);
-        return /** @type {[TemplateStringsArray, ...any[]]} */ ([rm2, sqlFlatten(object[i+1])])
-      }
-    }))
   }
 }
 
