@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // SPDX-FileCopyrightText: 2021 Moritz Hedtke <Moritz.Hedtke@t-online.de>
 import "./form/pw-form.js";
+import "./entity-list/pw-entitylist.js";
 import { adoptStyles, html, LitElement } from "lit";
 import { bootstrapCss } from "./index.js";
 import { HistoryController } from "./history-controller.js";
@@ -50,10 +51,13 @@ export let PwApp = class PwApp extends LitElement {
 
   /** @override */ render() {
     this.last = this.current;
-    this.current =
-      this.history.url.pathname === "/login"
-        ? pwLogin()
-        : Promise.resolve(html`Not Found`);
+    if (this.history.url.pathname === "/login") {
+      this.current = pwLogin()
+    } else if (this.history.url.pathname === "/users") {
+      this.current = Promise.resolve(html`<pw-entitylist></pw-entitylist>`)
+    } else {
+      this.current = Promise.resolve(html`Not Found`);
+    }
     return html`
       ${bootstrapCss}
       <nav
