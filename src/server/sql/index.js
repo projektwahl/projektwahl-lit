@@ -58,16 +58,17 @@ export function sql(strings, ...keys) {
   /** @type {import("../../lib/types").WritableTemplateStringsArray} */
   const r = [""];
   r.raw = [""];
-  const r2 = /** @type {TemplateStringsArray} */ (r);
 
   /** @type {import("../../lib/types").WritableTemplateStringsArray} */
   const rd = ["", ""];
   rd.raw = ["", ""];
-  const rd2 = /** @type {TemplateStringsArray} */ (rd);
 
   if (Array.isArray(object) && object.every(p => Array.isArray(p) && typeof p[0] === "object" && 'raw' in p[0])) {
     const object2 = /** @type {[TemplateStringsArray, ...any[]][]} */ (object);
-    const flattenedArgs = object2.map(sqlFlatten)
+
+    console.log("array", object2)
+
+    const flattenedArgs = object2//.map(sqlFlatten)
 
     /** @type {import("../../lib/types").WritableTemplateStringsArray} */
     let r = [""];
@@ -92,26 +93,35 @@ export function sql(strings, ...keys) {
   if (Array.isArray(object) && typeof object[0] === "object" && 'raw' in object[0]) {
     const object2 = /** @type {[TemplateStringsArray, ...any[]]} */ (object);
 
+    console.log("template", object2)
+
     if (object2.length == 1) return object2;
     
     const mapped2 = object2[0].map(unsafe) // this should be one longer
 
-    const mapped = object.slice(1)
+    const mapped = object.slice(1).map(sqlFlatten)
 
-    return sqlFlatten(mapped2.flatMap((m, i) => i == mapped.length ? [m] : [m, mapped[i]]))
+    const flattened = mapped2.flatMap((m, i) => i == mapped.length ? [m] : [m, mapped[i]])
+
+    console.log("flattened", flattened)
+
+    return sqlFlatten(flattened)
   }
 
-  return [rd2, object];
+  console.log("other", object)
+
+  return [/** @type {TemplateStringsArray} */ (rd), object];
 }
 
-console.log(sqlFlatten(sql`SELECT * FROM test`))
-console.log(sqlFlatten(sql`SE ${"hill"}`))
-console.log(sqlFlatten(sql`SELECT ${sql`* FROM test`} WHERE ${1}`))
+//console.log(sqlFlatten(sql`SELECT * FROM test`))
+console.log(sqlFlatten(sql`SELECT ${"hill"}`))
+//console.log(sqlFlatten(sql`SELECT ${sql`* FROM test`} WHERE ${1}`))
 /** @type {any[]} */
 let list = ["id", "title", "info"];
-
+/*
 console.log(sqlFlatten(sql`SELECT "id", "title", "info", "place" FROM projects WHERE 1 ${list.map(
   (v) => sql`AND ( ${unsafe(v)} < 5 )`
 )} OR NOT ... params() ORDER BY ${list.map(
   (v) => sql`${unsafe(v)} ASC`
 )} LIMIT 1337`));
+*/
