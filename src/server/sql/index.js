@@ -84,8 +84,8 @@ sql`SELECT "id", "title", "info", "place" FROM projects WHERE 1 ${list.map(
   if (object == null || typeof object === "string" || typeof object === "number" || typeof object === "boolean") return [rd2, object];
 
   if (Array.isArray(object) && (typeof object[0] !== "object" || !('raw' in object[0]))) {
-    const object2 = /** @type {[TemplateStringsArray, ...any[]][]} */ object;
-    const flattenedArgs = object2.map(sqlFlatten) // TODO maybe can be removed?
+    const object2 = /** @type {[TemplateStringsArray, ...any[]][]} */ (object);
+    const flattenedArgs = object2 // TODO maybe can be removed?
 
     /** @type {import("../../lib/types").WritableTemplateStringsArray} */
     let r = [""];
