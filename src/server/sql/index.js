@@ -32,31 +32,7 @@ export function unsafe(string) {
  */
 export function sql(strings, ...keys) {
   // TODO FIXME maybe flatten here this should be way easier...
-
-  return [strings, ...keys];
-
-  return {
-    /**
-     * @template T
-     */
-    execute: async () => {
-      return /** @type {T} */ (/** @type {unknown} */ (undefined));
-    },
-  };
-}
-
-// array of templates
-// templates
-// other primitives
-
-/**
- *
- * @param {string|[TemplateStringsArray, ...any[]]|[TemplateStringsArray, ...any[]][]|boolean|number|null} _object
- * @returns {[TemplateStringsArray, ...any[]]} this must be one with flattened keys (so only primitives)
- */
- export function sqlFlatten(_object) {
-  console.log(_object)
-  const object = _object;
+  // so the parameter is either an array of flat templates, a flat template or a primitive value
   /** @type {import("../../lib/types").WritableTemplateStringsArray} */
   const r = [""];
   r.raw = [""];
@@ -65,12 +41,24 @@ export function sql(strings, ...keys) {
   const rd = ["", ""];
   rd.raw = ["", ""];
 
-  if (Array.isArray(object) && object.every(p => Array.isArray(p) && typeof p[0] === "object" && 'raw' in p[0])) {
+  // maybe map strings and all keys together into an array of flat templates or primitives
+  // then extract the flat templates again?
+
+
+
+
+
+  
+
+
+  // reduce each key in keys from array to single flat template
+  // maybe just combine this with reducing the other keys at the same time?
+  if (object.every(p => Array.isArray(p) && typeof p[0] === "object" && 'raw' in p[0])) {
     const object2 = /** @type {[TemplateStringsArray, ...any[]][]} */ (object);
 
     console.log("array", object2)
 
-    const flattenedArgs = object2//.map(sqlFlatten)
+    const flattenedArgs = object2
 
     /** @type {import("../../lib/types").WritableTemplateStringsArray} */
     let r = [""];
@@ -101,7 +89,7 @@ export function sql(strings, ...keys) {
     
     const mapped2 = object2[0].map(unsafe) // this should be one longer
 
-    const mapped = object.slice(1).map(sqlFlatten)
+    const mapped = object.slice(1)
 
     const flattened = mapped2.flatMap((m, i) => i == mapped.length ? [m] : [m, mapped[i]])
 
@@ -113,16 +101,25 @@ export function sql(strings, ...keys) {
   console.log("other", object)
 
   return [/** @type {TemplateStringsArray} */ (rd), object];
+
+  return {
+    /**
+     * @template T
+     */
+    then: async () => {
+      return /** @type {T} */ (/** @type {unknown} */ (undefined));
+    },
+  };
 }
 
-console.log(sqlFlatten(sql`SELECT * FROM test`))
-console.log(sqlFlatten(sql`SELECT ${"hill"}`))
-console.log(sqlFlatten(sql`SELECT ${sql`* FROM test`} WHERE ${1}`))
+console.log(sql`SELECT * FROM test`)
+console.log(sql`SELECT ${"hill"}`)
+console.log(sql`SELECT ${sql`* FROM test`} WHERE ${1}`)
 /** @type {any[]} */
 let list = ["id", "title", "info"];
 
-console.log(sqlFlatten(sql`SELECT "id", "title", "info", "place" FROM projects WHERE 1 ${list.map(
+console.log(sql`SELECT "id", "title", "info", "place" FROM projects WHERE 1 ${list.map(
   (v) => sql`AND ( ${unsafe(v)} < 5 )`
 )} OR NOT ... params() ORDER BY ${list.map(
   (v) => sql`${unsafe(v)} ASC`
-)} LIMIT 1337`));
+)} LIMIT 1337`);
