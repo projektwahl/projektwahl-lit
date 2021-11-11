@@ -127,18 +127,18 @@ ${repeat([1, 2, 3], i => i, (item, index) => {
   return html`<tr>
 						<th scope="row"> 
               <p class="placeholder-glow">
-                <span class="placeholder">1337</span>
+                <span class="placeholder rounded-3">1337</span>
               </p>
             </th>
 						<td>
               <p class="placeholder-glow">
-                <span class="placeholder">Long Full Name</span>
-                <span class="placeholder">Long Full Name</span>
+                <span class="placeholder rounded">Long Full Name</span>
+                <span class="placeholder rounded">Long Full Name</span>
               </p>
             </td>
 						<td>
               <p class="placeholder-glow">
-                <span class="placeholder">helper</span>
+                <span class="placeholder rounded">helper</span>
               </p>
             </td>
 						<td>
