@@ -1,12 +1,37 @@
 {
-    "private": true,
-    "workspaces": [
-        "packages/*"
-    ],
-    "packageManager": "yarn@3.1.0",
-    "devDependencies": {
-        "eslint": "^8.1.0",
-        "prettier": "^2.4.1",
-        "typescript": "^4.4.4"
-    }
+  "name": "projektwahl-lit",
+  "version": "0.0.1",
+  "author": {
+    "name": "Moritz Hedtke",
+    "email": "Moritz.Hedtke@t-online.de"
+  },
+  "bugs": {
+    "url": "https://github.com/mohe2015/projektwahl-lit/issues"
+  },
+  "homepage": "https://github.com/mohe2015/projektwahl-lit",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/mohe2015/projektwahl-lit.git"
+  },
+  "description": "Software to manage choosing projects and automatically assigning people to projects.",
+  "type": "module",
+  "scripts": {
+    "format": "prettier --write .",
+    "lint": "eslint .",
+    "fix:lint": "eslint --fix .",
+    "setup": "node ./src/server/setup.js",
+    "server": "node --experimental-loader hot-esm --experimental-import-meta-resolve src/server/index.js"
+  },
+  "license": "AGPL-3.0-or-later",
+  "dependencies": {
+    "@lit-labs/motion": "^1.0.1",
+    "hot-esm": "github:vinsonchuong/hot-esm#456dc02e6bfcc5e403f93c3a77ce10e3125fc305",
+    "lit": "^2.0.2",
+    "postgres": "beta",
+    "typescript": "^4.5.1-rc",
+    "zod": "^3.11.6"
+  },
+  "devDependencies": {
+    "@types/node": "^16.11.6"
+  }
 }

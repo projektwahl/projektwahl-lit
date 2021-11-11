@@ -3,7 +3,7 @@
 {
   description = "projektwahl-lit's development flake";
 
-  inputs.nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
+  inputs.nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable-small";
   inputs.flake-utils.url = "github:numtide/flake-utils";
 
   outputs = { self, nixpkgs, flake-utils }:
@@ -14,18 +14,66 @@
           devShell = pkgs.mkShell {
             nativeBuildInputs = [
               pkgs.bashInteractive
-              pkgs.nodejs-16_x
-              (pkgs.yarn.override { nodejs = pkgs.nodejs-16_x; })
+              pkgs.nodejs-17_x
+              #(pkgs.yarn.override { nodejs = pkgs.nodejs-17_x; })
               pkgs.postgresql_14
-              pkgs.reuse
-              pkgs.nixpkgs-fmt
+              #pkgs.reuse
+              #pkgs.nixpkgs-fmt
               pkgs.nodePackages.npm-check-updates
-              pkgs.cbc
+              #pkgs.cbc
               pkgs.glpk
-              pkgs.lp_solve
-              pkgs.diffoscope
+              #pkgs.lp_solve
+              #pkgs.diffoscope
             ];
           };
+
+          # sudo nixos-container create projektwahl --flake .#x86_64-linux
+          # sudo nixos-container start projektwahl
+          # sudo nixos-container update --flake .#x86_64-linux projektwahl
+          # psql --host projektwahl --user projektwahl
+          nixosConfigurations = nixpkgs.lib.nixosSystem {
+            inherit system;
+            modules = [
+              ({ config, ... }: {
+                boot.isContainer = true;
+
+                networking.hostName = "projektwahl-lit";
+
+                services.postgresql = {
+                  enable = true;
+                  package = pkgs.postgresql_14;
+                  enableTCPIP = true;
+                  authentication = "hostnossl all all 10.233.3.1 255.255.0.0 scram-sha-256";
+                };
+
+                systemd.services.projektwahl-init = {
+                  after = [ "postgresql.service" ];
+                  wants = [ "postgresql.service" ];
+                  wantedBy = [ "multi-user.target" ];
+
+                  serviceConfig = {
+                    Type = "oneshot";
+                    User = "postgres";
+                    Group = "postgres";
+                    ExecStart = let psqlSetupCommands = pkgs.writeText "projektwahl-init.sql" ''
+                      SELECT 'CREATE ROLE "projektwahl" LOGIN PASSWORD ''\'''\'projektwahl''\'''\''
+                      WHERE
+                      NOT
+                      EXISTS
+                      (SELECT FROM pg_roles WHERE rolname = '
+                      projektwahl')\gexec
+                    SELECT 'CREATE DATABASE "projektwahl" OWNER "projektwahl" TEMPLATE template0 ENCODING UTF8' WHERE NOT EXISTS (SELECT FROM pg_database WHERE datname = 'projektwahl')\gexec
+                    \c 'projektwahl'
+                    ''; in "${config.services.postgresql.package}/bin/psql -f ${psqlSetupCommands}";
+                    };
+                  };
+
+                  networking.firewall.allowedTCPPorts = [ 5432 ];
+
+                  system.stateVersion = "21.11";
+            })];};
         }
       );
 }
+
+

@@ -11,9 +11,9 @@ Software to manage choosing projects and automatically assigning people to proje
 
 ```bash
 nix develop
-yarn
-yarn dlx @yarnpkg/sdks vscode
+npm ci
 ```
+
 https://docs.joshuatz.com/cheatsheets/js/jsdoc/
 
 TODO use https://www.npmjs.com/package/@lit-labs/task
