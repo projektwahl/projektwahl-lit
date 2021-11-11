@@ -1,3 +1,4 @@
+import { sql } from "./database.js";
 import { sql2, unsafe2 } from "./sql/index.js";
 
 /**
@@ -102,4 +103,8 @@ const value = fetchData(
   }
 );
 
-console.log(value);
+console.log(value)
+
+console.log(await sql(...value));
+
+await sql.end()
