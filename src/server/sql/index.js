@@ -31,6 +31,8 @@ export function unsafe(string) {
  * @returns {any}
  */
 export function sql(strings, ...keys) {
+  // TODO FIXME maybe flatten here this should be way easier...
+
   return [strings, ...keys];
 
   return {
@@ -113,15 +115,14 @@ export function sql(strings, ...keys) {
   return [/** @type {TemplateStringsArray} */ (rd), object];
 }
 
-//console.log(sqlFlatten(sql`SELECT * FROM test`))
+console.log(sqlFlatten(sql`SELECT * FROM test`))
 console.log(sqlFlatten(sql`SELECT ${"hill"}`))
-//console.log(sqlFlatten(sql`SELECT ${sql`* FROM test`} WHERE ${1}`))
+console.log(sqlFlatten(sql`SELECT ${sql`* FROM test`} WHERE ${1}`))
 /** @type {any[]} */
 let list = ["id", "title", "info"];
-/*
+
 console.log(sqlFlatten(sql`SELECT "id", "title", "info", "place" FROM projects WHERE 1 ${list.map(
   (v) => sql`AND ( ${unsafe(v)} < 5 )`
 )} OR NOT ... params() ORDER BY ${list.map(
   (v) => sql`${unsafe(v)} ASC`
 )} LIMIT 1337`));
-*/
