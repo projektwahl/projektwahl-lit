@@ -1,7 +1,4 @@
 // https://github.com/porsager/postgres/
-
-import { inspect } from "node:util";
-
 // https://www.postgresql.org/docs/current/protocol.html
 
 // postgres can "Extended Query" execute BEGIN; and COMMIT;? seems like yes
@@ -34,8 +31,7 @@ export function sql(_strings, ..._keys) {
   const strings = _strings;
   const keys = _keys;
   console.log("sql", strings, keys)
-  // TODO FIXME maybe flatten here this should be way easier...
-  // so the parameter is either an array of flat templates, a flat template or a primitive value
+
   /** @type {import("../../lib/types").WritableTemplateStringsArray} */
   const r = [""];
   r.raw = [""];
@@ -44,12 +40,9 @@ export function sql(_strings, ..._keys) {
   const rd = ["", ""];
   rd.raw = ["", ""];
 
-  // maybe map strings and all keys together into an array of flat templates or primitives
-  // then extract the flat templates again?
-
   const stringsAsTemplates = strings.map(unsafe)
 
-  // array of templates?
+  // array of templates
   /** @type {[TemplateStringsArray, ...(string|string[]|boolean|number)[]][]} */
   const flattened = stringsAsTemplates.flatMap((m, i) => {
     if (i == keys.length) {
@@ -103,8 +96,8 @@ console.log(sql`SELECT ${sql`* FROM test`} WHERE ${1}`)
 /** @type {any[]} */
 let list = ["id", "title", "info"];
 
-console.log(sql`SELECT "id", "title", "info", "place" FROM projects WHERE 1 ${list.map(
-  (v) => sql`AND ( ${unsafe(v)} < 5 )`
+console.log(sql`SELECT "id", "title", "info", "place" FROM projects WHERE 1${list.map(
+  (v) => sql` AND (${unsafe(v)} < ${1})`
 )} OR NOT ... params() ORDER BY ${list.map(
-  (v) => sql`${unsafe(v)} ASC`
+  (v) => sql`${unsafe(v)} ASC, `
 )} LIMIT 1337`);
