@@ -110,8 +110,11 @@ sql`SELECT "id", "title", "info", "place" FROM projects WHERE 1 ${list.map(
   if (Array.isArray(object) && typeof object[0] === "object" && 'raw' in object[0]) {
     const object2 = /** @type {[TemplateStringsArray, ...any[]]} */ object;
     
+    const mapped2 = object2[0].map(unsafe) // this should be one longer
+
     const mapped = object.slice(1).map(sqlFlatten)
-    const mapped2 = object2[0].map(unsafe)
+
+    return sqlFlatten(mapped2.flatMap((m, i) => i == mapped.length ? [m] : [m, mapped[i]]))
   }
 }
 
