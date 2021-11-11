@@ -83,7 +83,7 @@ sql`SELECT "id", "title", "info", "place" FROM projects WHERE 1 ${list.map(
 
   if (object == null || typeof object === "string" || typeof object === "number" || typeof object === "boolean") return [rd2, object];
 
-  if (Array.isArray(object) && (typeof object[0] !== "object" || !('raw' in object[0]))) {
+  if (Array.isArray(object) && object.every(p => Array.isArray(p) && typeof p[0] === "object" && 'raw' in p[0])) {
     const object2 = /** @type {[TemplateStringsArray, ...any[]][]} */ (object);
     const flattenedArgs = object2 // TODO maybe can be removed?
 
