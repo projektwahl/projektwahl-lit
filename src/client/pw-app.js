@@ -11,7 +11,6 @@ import { until } from "lit/directives/until.js";
 import { repeat } from "lit/directives/repeat.js";
 import { pwLogin } from "./routes/login/pw-login.js";
 import { setupHmr } from "./hmr.js";
-import { animateReset } from "./reset-animation-directive.js";
 
 // TODO FIXME show more details if possible (maybe error page)
 window.addEventListener("error", function (event) {
@@ -125,20 +124,20 @@ export let PwApp = class PwApp extends LitElement {
 
   <tbody>
 ${repeat(Array.from(Array(parseInt(this.history.url.searchParams.get("count"))), (_, i) => i), (item, index) => {
-  return animateReset(html`<tr>
+  return html`<tr class="placeholder-glow">
 						<th scope="row"> 
-              <p class="placeholder-glow">
+              <p>
                 <span class="placeholder rounded">1337</span>
               </p>
             </th>
 						<td>
-              <p class="placeholder-glow">
+              <p>
                 <span class="placeholder rounded">Long Full Name</span>
                 <span class="placeholder rounded">Long Full Name</span>
               </p>
             </td>
 						<td>
-              <p class="placeholder-glow">
+              <p>
                 <span class="placeholder rounded">helper</span>
               </p>
             </td>
@@ -152,7 +151,7 @@ ${repeat(Array.from(Array(parseInt(this.history.url.searchParams.get("count"))),
 								<i class="bi bi-box-arrow-in-right"></i>
 							</button>
 						</td>
-					</tr>`)
+					</tr>`
 })}
 </tbody>
 </table>
