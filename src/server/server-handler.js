@@ -193,10 +193,9 @@ export async function serverHandler(stream, headers) {
           { endStream: true }
         );
       }
-    } else {
+    } else if (url.pathname.startsWith("/src") || url.pathname.startsWith("/node_modules")) {
       // TODO FIXME injection
       // TODO FIXME caching (server+clientside)
-      try {
         let filename = "." + url.pathname;
         //console.log("mod", filename)
         let contents = await readFile(filename, {
@@ -245,7 +244,7 @@ export async function serverHandler(stream, headers) {
           ":status": 200,
         });
         stream.end(contents);
-      } catch (error) {
+      } else {
         stream.respondWithFile(
           "./src/client/index.html",
           {
@@ -255,5 +254,4 @@ export async function serverHandler(stream, headers) {
           {}
         );
       }
-    }
 }
