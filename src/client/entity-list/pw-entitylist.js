@@ -26,6 +26,7 @@ export let PwEntityList = class extends LitElement {
   }
 
   /** @override */ render() {
+      console.log(this.history.url)
     if (
         this.title === undefined
       ) {
