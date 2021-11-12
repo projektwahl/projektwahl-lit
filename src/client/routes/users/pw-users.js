@@ -29,10 +29,10 @@ export let PwUsers = class extends LitElement {
      */
     this._apiTask = new Task(
         this,
-        ([userId]) =>
-          fetch(`/api/test?${this.history.url.searchParams}`)
+        ([searchParams]) =>
+          fetch(`/api/test?${searchParams}`)
             .then(response => response.json()),
-        () => [this.userId]
+        () => [this.history.url.searchParams]
       )
   }
 

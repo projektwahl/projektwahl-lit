@@ -5,6 +5,9 @@ import { pathToFileURL } from "node:url";
 import { sql } from "./database.js";
 import { request } from "./express.js";
 import { checkPassword } from "./password.js";
+import { loginHandler } from "./routes/login/index.js";
+import { sleepHandler } from "./routes/sleep/index.js";
+import { usersHandler } from "./routes/users/index.js";
 
 const startTime = Date.now();
 
@@ -93,98 +96,8 @@ export async function serverHandler(stream, headers) {
     } else if (url.pathname.startsWith("/api")) {
       console.log("what", url.pathname)
 
-      let executed = await request("GET", "/api/v1/sleep", function (req) {
-        return new Promise((resolve, reject) => {
-          setTimeout(() => {
-            resolve([
-              {
-                "content-type": "text/json; charset=utf-8",
-                ":status": 200,
-              },
-              undefined,
-            ]);
-          }, 1000);
-        });
-      })(stream, headers);
-
-      executed =
-        executed ||
-        (await request("GET", "/api/v1/update", async function (req) {
-          return [
-            {
-              "content-type": "text/json; charset=utf-8",
-              ":status": 200,
-            },
-            startTime,
-          ];
-        })(stream, headers));
-
-      executed =
-        executed ||
-        (await request("POST", "/api/v1/login", async function (body) {
-          console.log(body)
-          /** @type {[import("../lib/types").Existing<Pick<import("../lib/types").RawUserType, "id"|"username"|"password_hash"|"password_salt">>?]} */
-          const [dbUser] =
-            await sql`SELECT id, username, password_hash, password_salt, type FROM users WHERE username = ${body.username} LIMIT 1`;
-
-          if (dbUser === undefined) {
-            return [{
-              "content-type": "text/json; charset=utf-8",
-              ":status": 200,
-            }, {
-              result: "failure",
-              failure: {
-                username: "Nutzer existiert nicht!",
-              },
-            }];
-          }
-
-          console.log(dbUser)
-          if (
-            dbUser.password_hash == null ||
-            !(await checkPassword(
-              dbUser.password_hash,
-              dbUser.password_salt,
-              body.password
-            ))
-          ) {
-            return [{
-              "content-type": "text/json; charset=utf-8",
-              ":status": 200,
-            }, {
-              result: "failure",
-              failure: {
-                password: "Falsches Passwort!",
-              },
-            }];
-          }
-
-          /** @type {[Pick<import("../lib/types").RawSessionType, "session_id">]} */
-          const [session] = await sql.begin("READ WRITE", async (sql) => {
-            return await sql`INSERT INTO sessions (user_id) VALUES (${dbUser.id}) RETURNING session_id`;
-          });
-
-          /** @type {import("node:http2").OutgoingHttpHeaders} */
-          const headers = {
-            "content-type": "text/json; charset=utf-8",
-            ":status": 200,
-            "set-cookie": [`strict_id=${
-              session.session_id
-            }; Secure; SameSite=Strict; HttpOnly; Max-Age=${48 * 60 * 60};`,
-            `lax_id=${
-              session.session_id
-            }; Secure; SameSite=Lax; HttpOnly; Max-Age=${48 * 60 * 60};`],
-            [sensitiveHeaders]: ["set-cookie"],
-          };
-          return [
-            headers,
-            {
-              result: "success",
-              success: undefined,
-            },
-          ];
-        })(stream, headers));
-
+      let executed = loginHandler(stream, headers) || sleepHandler(stream, headers) || usersHandler(stream, headers);
+        
       if (!executed) {
         stream.respond(
           {
