@@ -123,11 +123,11 @@ export let PwApp = class PwApp extends LitElement {
 		</thead>
 
   <tbody>
-${repeat([1, 2, 3], i => i, (item, index) => {
+${repeat(Array.from(Array(50), (_, i) => i), i => i, (item, index) => {
   return html`<tr>
 						<th scope="row"> 
               <p class="placeholder-glow">
-                <span class="placeholder rounded-3">1337</span>
+                <span class="placeholder rounded">1337</span>
               </p>
             </th>
 						<td>
@@ -143,11 +143,11 @@ ${repeat([1, 2, 3], i => i, (item, index) => {
             </td>
 						<td>
 					
-              <a class="btn btn-secondary" href="/users/edit/{entity.id}" role="button">
+              <a class="btn btn-secondary disabled" aria-disabled="true" href="/users/edit/{entity.id}" role="button">
                 <i class="bi bi-pen"></i>
               </a>
 						
-							<button class="btn btn-secondary" type="button">
+							<button disabled class="btn btn-secondary" type="button">
 								<i class="bi bi-box-arrow-in-right"></i>
 							</button>
 						</td>

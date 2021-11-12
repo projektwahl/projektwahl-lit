@@ -35,7 +35,7 @@ export let PwEntityList = class extends LitElement {
     return html`
       ${bootstrapCss}
 <div style="position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);">
-${html`
+${true ? "" : html`
 <div class="spinner-grow text-primary" role="status">
         <span class="visually-hidden">Loading...</span>
     </div>`
@@ -47,16 +47,20 @@ ${html`
     <slot name="buttons"></slot>
 </div>
 <div class="col-3">
-    <!-- svelte-ignore a11y-no-onchange -->
     <select
-        .value=${"10"}
+        @change=${(/** @type {Event} */ event) => {
+            const url = new URL(window.location.href);
+            url.searchParams.set("count", event.target.value);
+            HistoryController.goto(url)
+        }}
+        .value=${this.history.url.searchParams.get("count")}
         class="form-select"
         aria-label="Default select example"
     >
-        <option value=${10}>10 pro Seite</option>
-        <option value=${25}>25 pro Seite</option>
-        <option value=${50}>50 pro Seite</option>
-        <option value=${100}>100 pro Seite</option>
+        <option value="10">10 pro Seite</option>
+        <option value="25">25 pro Seite</option>
+        <option value="50">50 pro Seite</option>
+        <option value="100">100 pro Seite</option>
     </select>
 </div>
 </div>
