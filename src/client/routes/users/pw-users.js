@@ -7,6 +7,7 @@ import { bootstrapCss } from "../../index.js";
 import { HistoryController } from "../../history-controller.js";
 import { repeat } from "lit/directives/repeat.js";
 import { setupHmr } from "../../hmr.js";
+import {Task, TaskStatus} from "@lit-labs/task";
 
 export let PwUsers = class extends LitElement {
   /** @override */ static get properties() {
@@ -22,6 +23,17 @@ export let PwUsers = class extends LitElement {
      * @private
      */
     this.history = new HistoryController(this);
+
+    /**
+     * @private
+     */
+    this._apiTask = new Task(
+        this,
+        ([userId]) =>
+          fetch(`/api/test?${this.history.url.searchParams}`)
+            .then(response => response.json()),
+        () => [this.userId]
+      )
   }
 
   /** @override */ render() {
@@ -95,7 +107,8 @@ export let PwUsers = class extends LitElement {
 		</thead>
 
   <tbody>
-${repeat(Array.from(Array(parseInt(this.history.url.searchParams.get("count"))), (_, i) => i), (item, index) => {
+  ${this._apiTask.render({
+      pending: () => repeat(Array.from(Array(parseInt(this.history.url.searchParams.get("count") || "25")), (_, i) => i), (item, index) => {
   return html`<tr class="placeholder-glow">
 						<th scope="row"> 
               <p>
@@ -124,6 +137,37 @@ ${repeat(Array.from(Array(parseInt(this.history.url.searchParams.get("count"))),
 							</button>
 						</td>
 					</tr>`
+}),
+complete: (user) => html`<tr class="placeholder-glow">
+						<th scope="row"> 
+              <p>
+                <span>1337</span>
+              </p>
+            </th>
+						<td>
+              <p>
+                <span>Long Full Name</span>
+                <span>Long Full Name</span>
+              </p>
+            </td>
+						<td>
+              <p>
+                <span>helper</span>
+              </p>
+            </td>
+						<td>
+					
+              <a class="btn btn-secondary disabled" aria-disabled="true" href="/users/edit/{entity.id}" role="button">
+                <i class="bi bi-pen"></i>
+              </a>
+						
+							<button disabled class="btn btn-secondary" type="button">
+								<i class="bi bi-box-arrow-in-right"></i>
+							</button>
+						</td>
+					</tr>`,
+error: () => html`error`,
+initial: () => html`hi`,
 })}
 </tbody>
 </table>
