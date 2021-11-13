@@ -38,7 +38,7 @@ export let PwEntityList = class extends LitElement {
       >
         ${true
           ? ""
-          : html` <div class="spinner-grow text-primary" role="status">
+          : html`<div class="spinner-grow text-primary" role="status">
               <span class="visually-hidden">Loading...</span>
             </div>`}
       </div>

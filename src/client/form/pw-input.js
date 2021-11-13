@@ -4,7 +4,6 @@ import { html, LitElement, noChange } from "lit";
 import { bootstrapCss } from "../index.js";
 import { HistoryController } from "../history-controller.js";
 import { isErr } from "../../lib/result.js";
-import { promise } from "./promise-directive.js";
 
 /** @template T */
 export class PwInput extends LitElement {

@@ -6,8 +6,8 @@ import { createRef, ref } from "lit/directives/ref.js";
 import { bootstrapCss } from "../index.js";
 import { HistoryController } from "../history-controller.js";
 import { myFetch } from "../utils.js";
-import { promise } from "./promise-directive.js";
 import { isErr } from "../../lib/result.js";
+import { Task } from "@lit-labs/task/task.js";
 
 /**
  * @template {keyof import("../../lib/routes").routes} P
@@ -39,8 +39,17 @@ export class PwForm extends LitElement {
     /** @type {import("lit/directives/ref").Ref<HTMLFormElement>} */
     this.form = createRef();
 
-    /** @type {Promise<import("../../lib/types").OptionalResult<import("../../lib/routes").routes[P],{ network?: string } & { [key in keyof import("../../lib/routes").routes[P]]?: string }>>} */
-    this.result = Promise.resolve({ result: "none" });
+    /**
+     * @private
+     */
+     this._loginTask = new Task(
+      this,
+      ([]) =>
+        fetch(this.url).then((response) =>
+          response.json()
+        ),
+      () => []
+    );
   }
 
   submit = (/** @type {SubmitEvent} */ event) => {
@@ -104,23 +113,11 @@ if ('FormDataEvent' in window) {
 
         <div class="row justify-content-center">
           <div class="col-md-7 col-lg-8">
-            ${promise(
-              /** @type {Promise<import("../../lib/types").OptionalResult<import("../../lib/routes").routes[P],{network?: string;} & { [key in keyof import("../../lib/routes").routes[P]]?: string }>>} */ (
-                this.result
-              ),
-              /** @type {symbol | import("lit").TemplateResult | undefined} */ (
-                noChange
-              ),
-              (v) =>
-                isErr(v) && v.failure.network !== undefined
-                  ? html` <div class="alert alert-danger" role="alert">
-                      ${v.failure.network}
-                    </div>`
-                  : undefined,
-              (v) => html` <div class="alert alert-danger" role="alert">
-                Unbekannter Fehler!
-              </div>`
-            )}
+            ${this._loginTask.render({
+              error: (error) => html` <div class="alert alert-danger" role="alert">
+                      ${error}
+                    </div>`,
+            })}
 
             <form
               ${ref(this.form)}
@@ -132,12 +129,12 @@ if ('FormDataEvent' in window) {
 
               <button
                 type="submit"
-                ?disabled=${promise(
-                  this.result,
-                  true,
-                  () => false,
-                  () => false
-                )}
+                ?disabled=${this._loginTask.render({
+                  pending: () => true,
+                  complete: () => 1,
+                  error: () => false,
+                  initial: () => false,
+                })}
                 class="btn btn-primary"
               >
                 ${this.actionText}
