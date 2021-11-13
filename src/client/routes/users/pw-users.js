@@ -70,8 +70,9 @@ export let PwUsers = class extends LitElement {
       
 				<th class="">Aktionen</th>
 			</tr>
-      <!--
-			<tr class="row align-middle">
+      
+
+			<tr>
 	
 
       <th scope="col">
@@ -103,7 +104,8 @@ export let PwUsers = class extends LitElement {
 	/>
 </th>
 
-			</tr>-->
+			</tr>
+
 		</thead>
 
   <tbody>
@@ -138,10 +140,10 @@ export let PwUsers = class extends LitElement {
 						</td>
 					</tr>`
 }),
-complete: (user) => html`<tr class="placeholder-glow">
+complete: (result) => result.map(value => html`<tr>
 						<th scope="row"> 
               <p>
-                <span>1337</span>
+                <span>${value.username}</span>
               </p>
             </th>
 						<td>
@@ -165,7 +167,7 @@ complete: (user) => html`<tr class="placeholder-glow">
 								<i class="bi bi-box-arrow-in-right"></i>
 							</button>
 						</td>
-					</tr>`,
+					</tr>`),
 error: () => html`error`,
 initial: () => html`hi`,
 })}
