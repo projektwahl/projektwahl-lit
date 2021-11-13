@@ -160,24 +160,22 @@ export let PwUsers = class extends LitElement {
                     (value) => html`<tr>
                       <th scope="row">
                         <p>
-                          <span>${value.username}</span>
+                          ${value.id}
                         </p>
                       </th>
                       <td>
                         <p>
-                          <span>Long Full Name</span>
-                          <span>Long Full Name</span>
+                          ${value.username}
                         </p>
                       </td>
                       <td>
                         <p>
-                          <span>helper</span>
+                          ${value.type}
                         </p>
                       </td>
                       <td>
                         <a
-                          class="btn btn-secondary disabled"
-                          aria-disabled="true"
+                          class="btn btn-secondary"
                           href="/users/edit/{entity.id}"
                           role="button"
                         >
@@ -185,7 +183,6 @@ export let PwUsers = class extends LitElement {
                         </a>
 
                         <button
-                          disabled
                           class="btn btn-secondary"
                           type="button"
                         >
