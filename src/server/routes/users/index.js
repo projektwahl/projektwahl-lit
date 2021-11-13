@@ -37,18 +37,18 @@ const value = fetchData(
  * @param {import("http2").IncomingHttpHeaders} headers
  */
 export async function usersHandler(stream, headers) {
-  (await request("GET", "/api/v1/update", async function (req) {
+  console.log("ji");
+  return (await request("GET", "/api/v1/users", async function (req) {
+    console.log("jo")
 
-    console.log(await sql(...value));
+    let result = await sql(...value);
 
     return [
       {
         "content-type": "text/json; charset=utf-8",
         ":status": 200,
       },
-      {
-          "test": 1
-      }
+      result
     ];
   })(stream, headers));
 }

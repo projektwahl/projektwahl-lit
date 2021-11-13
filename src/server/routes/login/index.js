@@ -7,8 +7,10 @@ import { request } from "../../express.js";
  * @param {import("http2").IncomingHttpHeaders} headers
  */
 export async function loginHandler(stream, headers) {
-(await request("POST", "/api/v1/login", async function (body) {
-    console.log(body)
+  console.log("A")
+return (await request("POST", "/api/v1/login", async function (body) {
+  console.log("b")  
+  console.log(body)
     /** @type {[import("../lib/types").Existing<Pick<import("../lib/types").RawUserType, "id"|"username"|"password_hash"|"password_salt">>?]} */
     const [dbUser] =
       await sql`SELECT id, username, password_hash, password_salt, type FROM users WHERE username = ${body.username} LIMIT 1`;

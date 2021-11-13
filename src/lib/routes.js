@@ -8,6 +8,12 @@ export const loginInputSchema = z
   })
   .strict();
 
+export const rawUserSchema = z.object({
+  id: z.number(),
+  type: z.string(), // TODO FIXME
+  username: z.string(),
+})
+
 export const loginOutputSchema = result(z.void(), z.record(z.string()));
 
 /* @type {{ [r in "/api/v1/login"|"/api/v1/sleep"]: { request: ZodType<any>, response: ZodType<any> } }} */
@@ -23,5 +29,9 @@ export const routes = /** @type {const} */ ({
   "/api/v1/update": {
     request: z.undefined(),
     response: z.number(),
+  },
+  "/api/v1/users": {
+    request: z.undefined(),
+    response: z.array(rawUserSchema),
   },
 });

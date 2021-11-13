@@ -77,7 +77,6 @@ export async function serverHandler(stream, headers) {
         }
       );
     } else if (url.pathname === "/api/v1/hmr") {
-      console.log("sse start")
       stream.respond({
         ':status': 200,
         'content-type': 'text/event-stream',
@@ -86,17 +85,13 @@ export async function serverHandler(stream, headers) {
       for await (const f of getDirs("./src/client")) {
         (async () => {
           for await (const event of watch(f)) {
-            
-            console.log("sse", event)
             stream.write(`data: ${f}/${event.filename}\n\n`)
-            
           }
         })();
       }
     } else if (url.pathname.startsWith("/api")) {
-      console.log("what", url.pathname)
-
-      let executed = loginHandler(stream, headers) || sleepHandler(stream, headers) || usersHandler(stream, headers);
+      let executed = (await loginHandler(stream, headers)) || 
+      (await sleepHandler(stream, headers)) || (await usersHandler(stream, headers));
         
       if (!executed) {
         stream.respond(
