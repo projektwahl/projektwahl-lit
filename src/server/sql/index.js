@@ -40,7 +40,7 @@ export function sql2(_strings, ..._keys) {
   const rd = ["", ""];
   rd.raw = ["", ""];
 
-  const stringsAsTemplates = strings.map(unsafe2)
+  const stringsAsTemplates = strings.map(unsafe2);
 
   // array of templates
   /** @type {[TemplateStringsArray, ...(string|string[]|boolean|number)[]][]} */
@@ -49,16 +49,25 @@ export function sql2(_strings, ..._keys) {
       return [m];
     }
     // array of flat template strings
-    if (Array.isArray(keys[i]) && keys[i].every(p => Array.isArray(p) && typeof p[0] === "object" && 'raw' in p[0])) {
-      return [m, ...keys[i]]
+    if (
+      Array.isArray(keys[i]) &&
+      keys[i].every(
+        (p) => Array.isArray(p) && typeof p[0] === "object" && "raw" in p[0]
+      )
+    ) {
+      return [m, ...keys[i]];
     }
     // flat template string
-    if (Array.isArray(keys[i]) && typeof keys[i][0] === "object" && 'raw' in keys[i][0]) {
+    if (
+      Array.isArray(keys[i]) &&
+      typeof keys[i][0] === "object" &&
+      "raw" in keys[i][0]
+    ) {
       return [m, keys[i]];
     }
     // primitive
     return [m, [rd, keys[i]]];
-  })
+  });
   //console.log("flattened", flattened)
 
   const result = flattened.reduce((previous, current) => {
@@ -66,34 +75,39 @@ export function sql2(_strings, ..._keys) {
     const templateStrings = [
       ...previous[0].slice(0, -1),
       previous[0].slice(-1)[0] + current[0][0],
-      ...current[0].slice(1)
+      ...current[0].slice(1),
     ];
     templateStrings.raw = [
       ...previous[0].raw.slice(0, -1),
       previous[0].raw.slice(-1)[0] + current[0].raw[0],
-      ...current[0].raw.slice(1)
+      ...current[0].raw.slice(1),
     ];
-    return /** @type {[TemplateStringsArray, ...any[]]} */ ([/** @type {TemplateStringsArray} */ (templateStrings), ...previous.slice(1), ...current.slice(1)]);
+    return /** @type {[TemplateStringsArray, ...any[]]} */ ([
+      /** @type {TemplateStringsArray} */ (templateStrings),
+      ...previous.slice(1),
+      ...current.slice(1),
+    ]);
   }, /** @type {[TemplateStringsArray, ...any[]]} */ ([r]));
 
   //console.log("result", result)
 
-  return result
+  return result;
 }
 
 /**
- * 
- * @param {[TemplateStringsArray, ...(string|string[]|boolean|number)[]]} sql 
+ *
+ * @param {[TemplateStringsArray, ...(string|string[]|boolean|number)[]]} sql
  */
 export function sql2ToString(sql) {
-  return sql[0].map((s, i) => {
-    if (i+1 == sql.length) {
-      return s;
-    }
-    return s + JSON.stringify(sql[i+1]);
-  }).join("")
+  return sql[0]
+    .map((s, i) => {
+      if (i + 1 == sql.length) {
+        return s;
+      }
+      return s + JSON.stringify(sql[i + 1]);
+    })
+    .join("");
 }
-
 
 /*
 console.log(sql2`SELECT * FROM test`)

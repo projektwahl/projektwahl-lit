@@ -47,7 +47,7 @@ export class PwForm extends LitElement {
     event.preventDefault();
 
     // ts-expect-error doesn't contain files so this is fine
-    const formData = /*new URLSearchParams(*/new FormData(this.form.value);
+    const formData = /*new URLSearchParams(*/ new FormData(this.form.value);
 
     let jsonData = Object.fromEntries(formData.entries());
 

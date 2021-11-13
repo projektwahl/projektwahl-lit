@@ -12,7 +12,7 @@ export const rawUserSchema = z.object({
   id: z.number(),
   type: z.string(), // TODO FIXME
   username: z.string(),
-})
+});
 
 export const loginOutputSchema = result(z.void(), z.record(z.string()));
 

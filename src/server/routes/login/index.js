@@ -7,27 +7,30 @@ import { request } from "../../express.js";
  * @param {import("http2").IncomingHttpHeaders} headers
  */
 export async function loginHandler(stream, headers) {
-  console.log("A")
-return (await request("POST", "/api/v1/login", async function (body) {
-  console.log("b")  
-  console.log(body)
+  console.log("A");
+  return await request("POST", "/api/v1/login", async function (body) {
+    console.log("b");
+    console.log(body);
     /** @type {[import("../lib/types").Existing<Pick<import("../lib/types").RawUserType, "id"|"username"|"password_hash"|"password_salt">>?]} */
     const [dbUser] =
       await sql`SELECT id, username, password_hash, password_salt, type FROM users WHERE username = ${body.username} LIMIT 1`;
 
     if (dbUser === undefined) {
-      return [{
-        "content-type": "text/json; charset=utf-8",
-        ":status": 200,
-      }, {
-        result: "failure",
-        failure: {
-          username: "Nutzer existiert nicht!",
+      return [
+        {
+          "content-type": "text/json; charset=utf-8",
+          ":status": 200,
         },
-      }];
+        {
+          result: "failure",
+          failure: {
+            username: "Nutzer existiert nicht!",
+          },
+        },
+      ];
     }
 
-    console.log(dbUser)
+    console.log(dbUser);
     if (
       dbUser.password_hash == null ||
       !(await checkPassword(
@@ -36,15 +39,18 @@ return (await request("POST", "/api/v1/login", async function (body) {
         body.password
       ))
     ) {
-      return [{
-        "content-type": "text/json; charset=utf-8",
-        ":status": 200,
-      }, {
-        result: "failure",
-        failure: {
-          password: "Falsches Passwort!",
+      return [
+        {
+          "content-type": "text/json; charset=utf-8",
+          ":status": 200,
         },
-      }];
+        {
+          result: "failure",
+          failure: {
+            password: "Falsches Passwort!",
+          },
+        },
+      ];
     }
 
     /** @type {[Pick<import("../lib/types").RawSessionType, "session_id">]} */
@@ -56,12 +62,14 @@ return (await request("POST", "/api/v1/login", async function (body) {
     const headers = {
       "content-type": "text/json; charset=utf-8",
       ":status": 200,
-      "set-cookie": [`strict_id=${
-        session.session_id
-      }; Secure; SameSite=Strict; HttpOnly; Max-Age=${48 * 60 * 60};`,
-      `lax_id=${
-        session.session_id
-      }; Secure; SameSite=Lax; HttpOnly; Max-Age=${48 * 60 * 60};`],
+      "set-cookie": [
+        `strict_id=${
+          session.session_id
+        }; Secure; SameSite=Strict; HttpOnly; Max-Age=${48 * 60 * 60};`,
+        `lax_id=${
+          session.session_id
+        }; Secure; SameSite=Lax; HttpOnly; Max-Age=${48 * 60 * 60};`,
+      ],
       [sensitiveHeaders]: ["set-cookie"],
     };
     return [
@@ -71,5 +79,5 @@ return (await request("POST", "/api/v1/login", async function (body) {
         success: undefined,
       },
     ];
-  })(stream, headers));
+  })(stream, headers);
 }

@@ -53,9 +53,9 @@ export let PwApp = class PwApp extends LitElement {
   /** @override */ render() {
     this.last = this.current;
     if (this.history.url.pathname === "/login") {
-      this.current = pwLogin()
+      this.current = pwLogin();
     } else if (this.history.url.pathname === "/users") {
-      this.current = Promise.resolve(html`<pw-users></pw-users>`)
+      this.current = Promise.resolve(html`<pw-users></pw-users>`);
     } else {
       this.current = Promise.resolve(html`Not Found`);
     }
@@ -156,8 +156,8 @@ export let PwApp = class PwApp extends LitElement {
       ${until(this.current, this.last)}
     `;
   }
-}
+};
 
-setupHmr(PwApp, import.meta.url)
+setupHmr(PwApp, import.meta.url);
 
 customElements.define("pw-app", PwApp);

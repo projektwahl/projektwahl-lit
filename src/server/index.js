@@ -36,21 +36,21 @@ if (cluster.isPrimary) {
   }
 } else {
   */
-  /*
+/*
   openssl req -x509 -newkey rsa:2048 -nodes -sha256 -subj '/CN=localhost' -keyout localhost-privkey.pem -out localhost-cert.pem
   */
 
-  global.server = createSecureServer({
-    key: readFileSync("localhost-privkey.pem"),
-    cert: readFileSync("localhost-cert.pem"),
-  });
-  server.on("error", (err) => console.error(err));
+global.server = createSecureServer({
+  key: readFileSync("localhost-privkey.pem"),
+  cert: readFileSync("localhost-cert.pem"),
+});
+server.on("error", (err) => console.error(err));
 
-  server.on("stream", async (stream, headers) => {
-    await (await import(`./server-handler.js`)).serverHandler(stream, headers);
-  });
+server.on("stream", async (stream, headers) => {
+  await (await import(`./server-handler.js`)).serverHandler(stream, headers);
+});
 
-  server.listen(8443, () => {});
+server.listen(8443, () => {});
 //}
 
 //repl.start({})
