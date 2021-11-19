@@ -12,6 +12,13 @@ Software to manage choosing projects and automatically assigning people to proje
 ```bash
 nix develop
 npm ci
+cd lit
+npm ci
+npm run bootstrap
+npx lerna link convert
+npm run build
+cd packages/labs/task
+npm link
 ```
 
 https://docs.joshuatz.com/cheatsheets/js/jsdoc/

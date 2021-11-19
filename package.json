@@ -27,6 +27,7 @@
     "@lit-labs/motion": "^1.0.1",
     "@lit-labs/task": "^1.0.0",
     "hot-esm": "github:vinsonchuong/hot-esm#456dc02e6bfcc5e403f93c3a77ce10e3125fc305",
+    "lerna": "^4.0.0",
     "lit": "^2.0.2",
     "postgres": "beta",
     "typescript": "^4.5.1-rc",
