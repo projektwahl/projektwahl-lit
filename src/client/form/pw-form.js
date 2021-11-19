@@ -18,7 +18,7 @@ export class PwForm extends LitElement {
       url: { attribute: false },
       actionText: { type: String },
       fakeSlot: { attribute: false },
-      result: { state: true },
+      _task: { state: true },
       forceTask: { state: true },
     };
   }
@@ -45,7 +45,7 @@ export class PwForm extends LitElement {
     /**
      * @private
      */
-     this._loginTask = new Task(
+     this._task = new Task(
       this,
       async ([]) => {
         console.log("pw-form task")
@@ -116,7 +116,7 @@ if ('FormDataEvent' in window) {
 
         <div class="row justify-content-center">
           <div class="col-md-7 col-lg-8">
-            ${this._loginTask.render({
+            ${this._task.render({
               error: (error) => html` <div class="alert alert-danger" role="alert">
                       ${error}
                     </div>`,
@@ -132,7 +132,7 @@ if ('FormDataEvent' in window) {
 
               <button
                 type="submit"
-                ?disabled=${this._loginTask.render({
+                ?disabled=${this._task.render({
                   pending: () => true,
                   complete: () => true,
                   error: () => false,

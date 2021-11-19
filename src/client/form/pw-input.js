@@ -14,7 +14,7 @@ export class PwInput extends LitElement {
       name: { type: String },
       autocomplete: { type: String },
       randomId: { state: true },
-      result: { attribute: false },
+      task: { attribute: false },
     };
   }
 
@@ -39,8 +39,8 @@ export class PwInput extends LitElement {
     /** @type {string} */
     this.randomId;
 
-    /** @type {Promise<import("../types").OptionalResult<T, { network?: string } & { [key in keyof T]?: string }>>} */
-    this.result;
+    /** @type {import("@lit-labs/task").Task} */
+    this.task;
   }
 
   // because forms in shadow root are garbage
@@ -54,7 +54,7 @@ export class PwInput extends LitElement {
       this.type === undefined ||
       this.name === undefined ||
       this.autocomplete === undefined ||
-      this.result === undefined
+      this.task === undefined
     ) {
       throw new Error("component not fully initialized");
     }
@@ -65,39 +65,27 @@ export class PwInput extends LitElement {
         <label for=${this.randomId} class="form-label">${this.label}:</label>
         <input
           type=${this.type}
-          class="form-control ${promise(
-            /** @type {Promise<import("../types").OptionalResult<T,{ network?: string } & { [key in keyof T]?: string }>>} */ (
-              this.result
-            ),
-            /** @type {string | symbol | undefined} */ (noChange),
-            (v) =>
-              isErr(v) && v.failure[this.name] !== undefined
+          class="form-control ${this.task.render({
+            error: (v) => "none",
+            pending: () => "",
+            complete: (v) => isErr(v) && v.failure[this.name] !== undefined
                 ? "is-invalid"
-                : (isErr(v) && v.failure.network !== undefined) ||
-                  v.result === "none"
-                ? undefined
                 : "is-valid",
-            (e) => undefined
-          )}"
+            initial: () => "",
+          })}"
           name=${this.name.toString()}
           id=${this.randomId}
           aria-describedby="${this.randomId}-feedback"
           autocomplete=${this.autocomplete}
-          ?disabled=${promise(
-            this.result,
-            true,
-            () => false,
-            () => false
-          )}
+          ?disabled=${this.task.render({
+            complete: () => false,
+            error: () => false,
+            pending: () => true,
+            initial: () => false,
+          })}
         />
-        ${promise(
-          /** @type {Promise<import("../types").OptionalResult<T,{ network?: string } & { [key in keyof T]?: string }>>} */ (
-            this.result
-          ),
-          /** @type {import("lit").TemplateResult | symbol | undefined} */ (
-            noChange
-          ),
-          (v) =>
+        ${this.task.render({
+          complete: (v) =>
             isErr(v) && v.failure[this.name] !== undefined
               ? html` <div
                   id="${this.randomId}-feedback"
@@ -106,8 +94,10 @@ export class PwInput extends LitElement {
                   ${v.failure[this.name]}
                 </div>`
               : undefined,
-          (e) => undefined
-        )}
+            error: () => undefined,
+            initial: () => undefined,
+            pending: () => noChange
+        })}
       </div>
     `;
   }
