@@ -7,7 +7,7 @@ import { bootstrapCss } from "../index.js";
 import { HistoryController } from "../history-controller.js";
 import { myFetch } from "../utils.js";
 import { isErr } from "../../lib/result.js";
-import { Task } from "@lit-labs/task/task.js";
+import { Task } from "@lit-labs/task";
 
 /**
  * @template {keyof import("../../lib/routes").routes} P

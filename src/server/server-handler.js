@@ -104,7 +104,8 @@ export async function serverHandler(stream, headers) {
     }
   } else if (
     url.pathname.startsWith("/src") ||
-    url.pathname.startsWith("/node_modules")
+    url.pathname.startsWith("/node_modules") ||
+    url.pathname.startsWith("/lit")
   ) {
     // TODO FIXME injection
     // TODO FIXME caching (server+clientside)

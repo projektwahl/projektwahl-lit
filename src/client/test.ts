@@ -1,4 +1,4 @@
-import type { Task } from "@lit-labs/task/task.js";
+import type { Task } from "@lit-labs/task";
 
 const task: Task = undefined!;
 

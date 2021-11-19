@@ -15,10 +15,14 @@ npm ci
 cd lit
 npm ci
 npm run bootstrap
-npx lerna link convert
 npm run build
+npx lerna link convert
 cd packages/labs/task
 npm link
+cd ../../../..
+npm link @lit-labs/task
+
+# maybe npx lerna bootstrap --hoist also helps
 ```
 
 https://docs.joshuatz.com/cheatsheets/js/jsdoc/
