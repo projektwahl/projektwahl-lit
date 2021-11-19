@@ -19,6 +19,7 @@ export class PwForm extends LitElement {
       actionText: { type: String },
       fakeSlot: { attribute: false },
       result: { state: true },
+      forceTask: { state: true },
     };
   }
 
@@ -39,41 +40,43 @@ export class PwForm extends LitElement {
     /** @type {import("lit/directives/ref").Ref<HTMLFormElement>} */
     this.form = createRef();
 
+    this.forceTask = undefined;
+
     /**
      * @private
      */
      this._loginTask = new Task(
       this,
-      ([]) =>
-        fetch(this.url).then((response) =>
-          response.json()
-        ),
-      () => []
+      async ([]) => {
+        console.log("pw-form task")
+         // ts-expect-error doesn't contain files so this is fine
+        const formData = /*new URLSearchParams(*/ new FormData(this.form.value);
+
+        let jsonData = Object.fromEntries(formData.entries());
+
+        this.result = myFetch(this.url, {
+          method: "POST",
+          headers: {
+            "content-type": "text/json",
+          },
+          body: JSON.stringify(jsonData),
+        });
+        // https://lit.dev/docs/components/events/#dispatching-events
+        const resultEvent = new CustomEvent("form-result", {
+          detail: this.result,
+          bubbles: true,
+          composed: true,
+        });
+        this.dispatchEvent(resultEvent);
+      },
+      () => [this.forceTask]
     );
   }
 
   submit = (/** @type {SubmitEvent} */ event) => {
     event.preventDefault();
 
-    // ts-expect-error doesn't contain files so this is fine
-    const formData = /*new URLSearchParams(*/ new FormData(this.form.value);
-
-    let jsonData = Object.fromEntries(formData.entries());
-
-    this.result = myFetch(this.url, {
-      method: "POST",
-      headers: {
-        "content-type": "text/json",
-      },
-      body: JSON.stringify(jsonData),
-    });
-    // https://lit.dev/docs/components/events/#dispatching-events
-    const resultEvent = new CustomEvent("form-result", {
-      detail: this.result,
-      bubbles: true,
-      composed: true,
-    });
-    this.dispatchEvent(resultEvent);
+    this.forceTask = (this.forceTask || 0) + 1;
   };
 
   // https://www.chromestatus.com/feature/4708990554472448
@@ -131,7 +134,7 @@ if ('FormDataEvent' in window) {
                 type="submit"
                 ?disabled=${this._loginTask.render({
                   pending: () => true,
-                  complete: () => 1,
+                  complete: () => true,
                   error: () => false,
                   initial: () => false,
                 })}
