@@ -14,8 +14,8 @@
           devShell = pkgs.mkShell {
             nativeBuildInputs = [
               pkgs.bashInteractive
-              (pkgs.nodejs-17_x.override { enableNpm = false; })
-              (pkgs.yarn.override { nodejs = pkgs.nodejs-17_x; })
+              (pkgs.nodejs-17_x.override { enableNpm = true; })
+              #(pkgs.yarn.override { nodejs = pkgs.nodejs-17_x; })
               pkgs.postgresql_14
               #pkgs.reuse
               #pkgs.nixpkgs-fmt
