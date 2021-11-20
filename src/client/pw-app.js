@@ -3,7 +3,7 @@
 import "./routes/users/pw-users.js";
 import "./form/pw-form.js";
 import "./entity-list/pw-entitylist.js";
-import { html, LitElement } from "lit";
+import { html, LitElement, ReactiveElement } from "lit";
 import { bootstrapCss } from "./index.js";
 import { HistoryController } from "./history-controller.js";
 import { aClick } from "./pw-a.js";
@@ -20,6 +20,9 @@ window.addEventListener("error", function (event) {
 window.addEventListener("unhandledrejection", function (event) {
   alert("unknown error: " + event.reason);
 });
+
+ReactiveElement.enableWarning?.("migration");
+ReactiveElement.enableWarning?.("change-in-update");
 
 export let PwApp = class PwApp extends LitElement {
   /** @override */ static get properties() {

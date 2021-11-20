@@ -14,7 +14,12 @@ export class PwInput extends LitElement {
       name: { type: String },
       autocomplete: { type: String },
       randomId: { state: true },
-      task: { attribute: false },
+      task: {
+        attribute: false,
+        hasChanged: (oldValue, newValue) => {
+          return true; // TODO FIXME bug in @lit-labs/task
+        }
+      },
     };
   }
 
@@ -58,6 +63,8 @@ export class PwInput extends LitElement {
     ) {
       throw new Error("component not fully initialized");
     }
+
+    console.log("pw-input rerender")
 
     return html`
       ${bootstrapCss}

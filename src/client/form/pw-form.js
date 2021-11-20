@@ -7,7 +7,6 @@ import { bootstrapCss } from "../index.js";
 import { HistoryController } from "../history-controller.js";
 import { myFetch } from "../utils.js";
 import { isErr } from "../../lib/result.js";
-import { Task } from "@lit-labs/task";
 
 /**
  * @template {keyof import("../../lib/routes").routes} P
@@ -15,9 +14,7 @@ import { Task } from "@lit-labs/task";
 export class PwForm extends LitElement {
   /** @override */ static get properties() {
     return {
-      url: { attribute: false },
       actionText: { type: String },
-      fakeSlot: { attribute: false },
       _task: { state: true },
       forceTask: { state: true },
     };
@@ -28,8 +25,14 @@ export class PwForm extends LitElement {
 
     /** @private */ this.history = new HistoryController(this);
 
-    /** @type {P} */
-    this.url;
+    /* @type {P} */
+    //this.url;
+
+    /**
+     * @private
+     * @type {import("@lit-labs/task").Task}
+     */
+     this._task;
 
     /** @type {string} */
     this.actionText;
@@ -38,39 +41,7 @@ export class PwForm extends LitElement {
     this.fakeSlot;
 
     /** @type {import("lit/directives/ref").Ref<HTMLFormElement>} */
-    this.form = createRef();
-
-    this.forceTask = undefined;
-
-    /**
-     * @private
-     */
-     this._task = new Task(
-      this,
-      async ([]) => {
-        console.log("pw-form task")
-         // ts-expect-error doesn't contain files so this is fine
-        const formData = /*new URLSearchParams(*/ new FormData(this.form.value);
-
-        let jsonData = Object.fromEntries(formData.entries());
-
-        this.result = myFetch(this.url, {
-          method: "POST",
-          headers: {
-            "content-type": "text/json",
-          },
-          body: JSON.stringify(jsonData),
-        });
-        // https://lit.dev/docs/components/events/#dispatching-events
-        const resultEvent = new CustomEvent("form-result", {
-          detail: this.result,
-          bubbles: true,
-          composed: true,
-        });
-        this.dispatchEvent(resultEvent);
-      },
-      () => [this.forceTask]
-    );
+    this.form = createRef();    
   }
 
   submit = (/** @type {SubmitEvent} */ event) => {
@@ -78,6 +49,10 @@ export class PwForm extends LitElement {
 
     this.forceTask = (this.forceTask || 0) + 1;
   };
+
+  getInputs = () => {
+
+  }
 
   // https://www.chromestatus.com/feature/4708990554472448
   // https://www.reddit.com/r/PolymerJS/comments/f00gd0/litelement_formassociated_custom_elements_form/
@@ -100,14 +75,11 @@ if ('FormDataEvent' in window) {
   }
 */
   /** @override */ render() {
-    if (this.url === undefined || this.actionText === undefined) {
+    if (this.actionText === undefined) {
       throw new Error("component not fully initialized");
     }
 
-    const keyframeOptions = {
-      duration: 500,
-      fill: "both",
-    };
+    console.log("rerender")
 
     return html`
       ${bootstrapCss}
@@ -128,19 +100,20 @@ if ('FormDataEvent' in window) {
               action="/no-javascript"
               @submit=${this.submit}
             >
-              ${this.fakeSlot}
+              ${this.getInputs()}
 
               <button
                 type="submit"
                 ?disabled=${this._task.render({
                   pending: () => true,
-                  complete: () => true,
+                  complete: () => false,
                   error: () => false,
                   initial: () => false,
                 })}
                 class="btn btn-primary"
               >
                 ${this.actionText}
+                ${this._task.status}
               </button>
             </form>
           </div>
