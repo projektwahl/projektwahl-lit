@@ -50,6 +50,9 @@ export class PwForm extends LitElement {
     this.forceTask = (this.forceTask || 0) + 1;
   };
 
+  // TODO FIXME really important
+  // get the inputs from there and check that the errors returned from the server don't contain additional
+  // attributes. Otherwise we're eating errors and that's not healthy
   getInputs = () => {
 
   }
