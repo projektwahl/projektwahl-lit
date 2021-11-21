@@ -11,6 +11,8 @@ import { isOk } from "../../../lib/result.js";
 import { setupHmr } from "../../hmr.js";
 import { createRef, ref } from "lit/directives/ref.js";
 
+// TODO FIXME implement edit
+
 /**
  * @extends PwForm<"/api/v1/users/create">
  */
@@ -96,7 +98,7 @@ export class PwUserCreate extends PwForm {
     ></pw-input>
 
     <pw-input
-      type="text"
+      type="number"
       label="Jahrgang"
       name="age"
       .task=${this._task}

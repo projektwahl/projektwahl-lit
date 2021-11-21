@@ -7,6 +7,7 @@ import { request } from "./express.js";
 import { checkPassword } from "./password.js";
 import { loginHandler } from "./routes/login/index.js";
 import { sleepHandler } from "./routes/sleep/index.js";
+import { createUsersHandler } from "./routes/users/create-or-update.js";
 import { usersHandler } from "./routes/users/index.js";
 
 const startTime = Date.now();
@@ -92,6 +93,7 @@ export async function serverHandler(stream, headers) {
     let executed =
       (await loginHandler(stream, headers)) ||
       (await sleepHandler(stream, headers)) ||
+      (await createUsersHandler(stream, headers)) ||
       (await usersHandler(stream, headers));
 
     if (!executed) {
