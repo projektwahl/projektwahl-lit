@@ -119,7 +119,7 @@ export async function serverHandler(stream, headers) {
     // TODO FIXME single and double quotes
     contents = await replaceAsync(
       contents,
-      /import( )?"([^"]+)"/g,
+      /import( )?["']([^"']+)["']/g,
       async (match, args) => {
         //console.log(match)
         //console.log(args)
@@ -133,7 +133,7 @@ export async function serverHandler(stream, headers) {
     );
     contents = await replaceAsync(
       contents,
-      /([*} ])from ?"([^"]+)"/g,
+      /([*} ])from ?["']([^"']+)["']/g,
       async (match, args) => {
         //console.log(match)
         //console.log(args)

@@ -47,7 +47,12 @@ global.server = createSecureServer({
 server.on("error", (err) => console.error(err));
 
 server.on("stream", async (stream, headers) => {
-  await (await import(`./server-handler.js`)).serverHandler(stream, headers);
+  try {
+    await (await import(`./server-handler.js`)).serverHandler(stream, headers);
+  } catch (error) {
+    // don't take down the entire server
+    console.error(error)
+  }
 });
 
 server.listen(8443, () => {});

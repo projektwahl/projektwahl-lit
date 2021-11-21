@@ -4,6 +4,7 @@ import { html, LitElement, noChange } from "lit";
 import { bootstrapCss } from "../index.js";
 import { HistoryController } from "../history-controller.js";
 import { isErr } from "../../lib/result.js";
+import { ifDefined } from "lit/directives/if-defined.js";
 
 /** @template T */
 export class PwInput extends LitElement {
@@ -58,7 +59,6 @@ export class PwInput extends LitElement {
       this.label === undefined ||
       this.type === undefined ||
       this.name === undefined ||
-      this.autocomplete === undefined ||
       this.task === undefined
     ) {
       throw new Error("component not fully initialized");
@@ -83,7 +83,7 @@ export class PwInput extends LitElement {
           name=${this.name.toString()}
           id=${this.randomId}
           aria-describedby="${this.randomId}-feedback"
-          autocomplete=${this.autocomplete}
+          autocomplete=${ifDefined(this.autocomplete)}
           ?disabled=${this.task.render({
             complete: () => false,
             error: () => false,

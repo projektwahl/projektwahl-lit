@@ -3,6 +3,7 @@
 import "./routes/users/pw-users.js";
 import "./form/pw-form.js";
 import "./entity-list/pw-entitylist.js";
+import "./routes/users/pw-user-create.js";
 import { html, LitElement, ReactiveElement } from "lit";
 import { bootstrapCss } from "./index.js";
 import { HistoryController } from "./history-controller.js";
@@ -59,6 +60,8 @@ export let PwApp = class PwApp extends LitElement {
       this.current = pwLogin();
     } else if (this.history.url.pathname === "/users") {
       this.current = Promise.resolve(html`<pw-users></pw-users>`);
+    } else if (this.history.url.pathname === "/users/create") {
+      this.current = Promise.resolve(html`<pw-user-create></pw-user-create>`);
     } else {
       this.current = Promise.resolve(html`Not Found`);
     }
