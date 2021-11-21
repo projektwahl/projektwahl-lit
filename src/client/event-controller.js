@@ -6,40 +6,15 @@ import { directive, Directive, PartType } from 'lit/directive.js';
 
 /** @typedef {import('lit').ReactiveController} ReactiveController */
 
-class EventDirective extends Directive {
-
-  constructor(/** @type {import('lit/directive.js').PartInfo} */ partInfo) {
-    super(partInfo);
-
-    if (
-      partInfo.type !== PartType.ELEMENT
-    ) {
-      throw new Error('The `eventDirective` must be used in element position');
-    }
-  }
-
-  /** @override */ update(/** @type {import('lit/directive.js').ElementPart} */ part, /** @type {[EventController]} */ [controller]) {
-    console.log("jo", part.element.value)
-    controller.value = part.element.value
-    return this.render();
-  }
-
-  render() {
-    return undefined
-  }
-}
-
-const eventDirective = directive(EventDirective);
-
 /** @implements {ReactiveController} */
 export class EventController {
-    constructor(/** @type {import("lit").ReactiveControllerHost} */ host) {
+    constructor(/** @type {import("lit").ReactiveControllerHost} */ host, value) {
       /** @type {import("lit").ReactiveControllerHost} */
       this.host = host;
       host.addController(this);
 
       /** @type {any | undefined} */
-      this.value;
+      this.value = value;
   
       /** @type {(this: Window, ev: Event) => void} */
       this.listener = (event) => {
@@ -50,8 +25,4 @@ export class EventController {
     }
 
     hostConnected() {}
-
-    directive() {
-      return eventDirective(this);
-    }
 }  

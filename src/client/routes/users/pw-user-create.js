@@ -71,8 +71,6 @@ export class PwUserCreate extends PwForm {
 
   /** @override */ getInputs = () => {
     return html` 
-    ${"test" + this.typeChangeController.value}
-
     <pw-input
       type="text"
       label="Name"
@@ -82,14 +80,14 @@ export class PwUserCreate extends PwForm {
 
     <div class="mb-3">
       <label for="users-type" class="form-label">Nutzerart:</label>
-      <select @change=${this.typeChangeController.listener} class="form-select" name="type" id="users-type">
+      <select .value=${this.typeChangeController.value} @change=${this.typeChangeController.listener} class="form-select" name="type" id="users-type">
         <option value="voter">Schüler</option>
         <option value="helper">Helfer</option>
         <option value="admin">Admin</option>
       </select>
     </div>
 
-    ${ this.typeChangeController?.value === "voter" ?
+    ${ this.typeChangeController.value === "voter" ?
     html`<pw-input
       type="text"
       label="Klasse"
