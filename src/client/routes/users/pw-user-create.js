@@ -9,7 +9,6 @@ import { PwForm } from "../../form/pw-form.js";
 import { HistoryController } from "../../history-controller.js";
 import { isOk } from "../../../lib/result.js";
 import { setupHmr } from "../../hmr.js";
-import { EventController } from "../../event-controller.js";
 import { createRef, ref } from "lit/directives/ref.js";
 
 /**
@@ -22,6 +21,7 @@ export class PwUserCreate extends PwForm {
       actionText: { type: String },
       _task: { state: true },
       forceTask: { state: true },
+      type: {state: true}
     };
   }
 
@@ -38,7 +38,7 @@ export class PwUserCreate extends PwForm {
      */
      this.history = new HistoryController(this);
 
-    this.typeChangeController = new EventController(this, "voter");
+    this.type = "voter";
     
     /**
      * @private
@@ -80,14 +80,14 @@ export class PwUserCreate extends PwForm {
 
     <div class="mb-3">
       <label for="users-type" class="form-label">Nutzerart:</label>
-      <select .value=${this.typeChangeController.value} @change=${this.typeChangeController.listener} class="form-select" name="type" id="users-type">
+      <select .value=${this.type} @change=${(event) => this.type = event.target.value} class="form-select" name="type" id="users-type">
         <option value="voter">Schüler</option>
         <option value="helper">Helfer</option>
         <option value="admin">Admin</option>
       </select>
     </div>
 
-    ${ this.typeChangeController.value === "voter" ?
+    ${ this.type === "voter" ?
     html`<pw-input
       type="text"
       label="Klasse"
