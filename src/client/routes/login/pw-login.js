@@ -6,6 +6,8 @@ import "../../form/pw-form.js";
 import { Task } from "@lit-labs/task";
 import { myFetch } from "../../utils.js";
 import { PwForm } from "../../form/pw-form.js";
+import { HistoryController } from "../../history-controller.js";
+import { isOk } from "../../../lib/result.js";
 
 // https://lit.dev/docs/components/lifecycle/
 // updateComplete
@@ -42,6 +44,11 @@ export class PwLogin extends PwForm {
     this.forceTask = undefined;
 
     this.actionText = "Login";
+
+    /**
+     * @private
+     */
+     this.history = new HistoryController(this);
     
     /**
      * @private
@@ -63,6 +70,11 @@ export class PwLogin extends PwForm {
           },
           body: JSON.stringify(jsonData),
         });
+
+        if (isOk(result)) {
+          HistoryController.goto(new URL("/", window.location.href), {});
+        }
+
         console.log(result)
         return result
         /*// https://lit.dev/docs/components/events/#dispatching-events

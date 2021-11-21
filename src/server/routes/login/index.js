@@ -1,5 +1,7 @@
+import { sensitiveHeaders } from "node:http2";
 import { sql } from "../../database.js";
 import { request } from "../../express.js";
+import { checkPassword } from "../../password.js";
 
 /**
  *
@@ -11,7 +13,7 @@ export async function loginHandler(stream, headers) {
   return await request("POST", "/api/v1/login", async function (body) {
     console.log("b");
     console.log(body);
-    /** @type {[import("../lib/types").Existing<Pick<import("../lib/types").RawUserType, "id"|"username"|"password_hash"|"password_salt">>?]} */
+    /** @type {[import("../../../lib/types").Existing<Pick<import("../../../lib/types").RawUserType, "id"|"username"|"password_hash"|"password_salt">>?]} */
     const [dbUser] =
       await sql`SELECT id, username, password_hash, password_salt, type FROM users WHERE username = ${body.username} LIMIT 1`;
 
@@ -53,7 +55,7 @@ export async function loginHandler(stream, headers) {
       ];
     }
 
-    /** @type {[Pick<import("../lib/types").RawSessionType, "session_id">]} */
+    /** @type {[Pick<import("../../../lib/types").RawSessionType, "session_id">]} */
     const [session] = await sql.begin("READ WRITE", async (sql) => {
       return await sql`INSERT INTO sessions (user_id) VALUES (${dbUser.id}) RETURNING session_id`;
     });
