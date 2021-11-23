@@ -14,6 +14,7 @@ export class PwInput extends LitElement {
       label: { type: String },
       type: { type: String },
       name: { type: String },
+      options: { attribute: false },
       autocomplete: { type: String },
       randomId: { state: true },
       task: {
@@ -22,6 +23,7 @@ export class PwInput extends LitElement {
           return true; // TODO FIXME bug in @lit-labs/task
         }
       },
+      value: { state: true },
     };
   }
 
@@ -48,6 +50,12 @@ export class PwInput extends LitElement {
 
     /** @type {import("@lit-labs/task").Task} */
     this.task;
+
+    /** @type {import("lit").TemplateResult} */
+    this.options;
+
+    /** @type {string} */
+    this.value;
   }
 
   // because forms in shadow root are garbage
@@ -82,7 +90,7 @@ export class PwInput extends LitElement {
           })}"
         aria-describedby="${this.randomId}-feedback"
         name=${this.name.toString()}
-        id=${this.randomId} 
+        id=${this.randomId}
       />
       <label class="form-check-label" for=${this.randomId}>${this.label}</label>
       ${this.task.render({
@@ -100,12 +108,31 @@ export class PwInput extends LitElement {
             pending: () => noChange
         })}
     </div>`: (this.type === "select" ? html`<div class="mb-3">
-      <label for="users-type" class="form-label">Nutzerart:</label>
-      <select .value=${this.type} @change=${(event) => this.type = event.target.value} class="form-select" name="type" id="users-type">
-        <option value="voter">Schüler</option>
-        <option value="helper">Helfer</option>
-        <option value="admin">Admin</option>
+      <label for=${this.randomId} class="form-label">${this.label}:</label>
+      <select aria-describedby="${this.randomId}-feedback" .value=${this.value} @change=${(event) => this.value = event.target.value} class="form-select ${this.task.render({
+            error: (v) => "",
+            pending: () => "",
+            complete: (v) => isErr(v) && v.failure[this.name] !== undefined
+                ? "is-invalid"
+                : "is-valid",
+            initial: () => "",
+          })}" name=${this.name.toString()} id=${this.randomId}>
+        ${this.options}
       </select>
+      ${this.task.render({
+          complete: (v) =>
+            isErr(v) && v.failure[this.name] !== undefined
+              ? html` <div
+                  id="${this.randomId}-feedback"
+                  class="invalid-feedback"
+                >
+                  ${v.failure[this.name]}
+                </div>`
+              : undefined,
+            error: () => undefined,
+            initial: () => undefined,
+            pending: () => noChange
+        })}
     </div>` :
       html`<div class="mb-3">
         <label for=${this.randomId} class="form-label">${this.label}:</label>

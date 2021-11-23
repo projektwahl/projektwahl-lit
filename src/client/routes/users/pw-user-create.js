@@ -80,7 +80,10 @@ export class PwUserCreate extends PwForm {
       .task=${this._task}
     ></pw-input>
 
-    <pw-input tpye="select"></pw-input>
+    <pw-input type="select" label="Nutzerart" name="type" .options=${html`<option value="voter">Schüler</option>
+      <option value="helper">Helfer</option>
+      <option value="admin">Admin</option>`} .task=${this._task}>
+    </pw-input>
 
     ${ this.type === "voter" ?
     html`<pw-input
