@@ -59,7 +59,7 @@ export const routes = /** @type {const} */ ({
   },
   "/api/v1/users/create": {
     request: rawUserSchema,
-    response: z.undefined(),
+    response: result(z.null(), z.record(z.string())),
   },
   "/api/v1/users": {
     request: z.undefined(),

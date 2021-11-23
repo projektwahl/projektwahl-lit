@@ -25,6 +25,7 @@ export const failureResult = (/** @type {ZodRecord<any>} */ zodObject) =>
     })
     .strict();
 
+// TODO FIXME this creates bad error messages - switch on enum "result" value
 export const result = (
   /** @type {ZodType<any>} */ successZodObject,
   /** @type {ZodRecord<any>} */ failureZodObject
