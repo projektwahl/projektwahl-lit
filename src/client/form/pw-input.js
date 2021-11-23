@@ -23,7 +23,7 @@ export class PwInput extends LitElement {
           return true; // TODO FIXME bug in @lit-labs/task
         }
       },
-      value: { state: true },
+      value: { type: String },
     };
   }
 
@@ -109,7 +109,7 @@ export class PwInput extends LitElement {
         })}
     </div>`: (this.type === "select" ? html`<div class="mb-3">
       <label for=${this.randomId} class="form-label">${this.label}:</label>
-      <select aria-describedby="${this.randomId}-feedback" .value=${this.value} @change=${(event) => this.value = event.target.value} class="form-select ${this.task.render({
+      <select aria-describedby="${this.randomId}-feedback" .value=${this.value} class="form-select ${this.task.render({
             error: (v) => "",
             pending: () => "",
             complete: (v) => isErr(v) && v.failure[this.name] !== undefined

@@ -5,14 +5,14 @@ import { z, ZodObject, ZodRecord, ZodType } from "zod";
 
 export const noneResult = z
   .object({
-    result: z.literal("none"),
+    result: z.enum(["none"]),
   })
   .strict();
 
 export const successResult = (/** @type {ZodType<any>} */ zodObject) =>
   z
     .object({
-      result: z.literal("success"),
+      result: z.enum(["success"]),
       success: zodObject,
     })
     .strict();
@@ -20,7 +20,7 @@ export const successResult = (/** @type {ZodType<any>} */ zodObject) =>
 export const failureResult = (/** @type {ZodRecord<any>} */ zodObject) =>
   z
     .object({
-      result: z.literal("failure"),
+      result: z.enum(["failure"]),
       failure: zodObject,
     })
     .strict();

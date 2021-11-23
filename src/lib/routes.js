@@ -17,22 +17,22 @@ export const loginInputSchema = z
 export const rawUserHelperOrAdminSchema = z.object({
   //id: z.number(),
   type: z.enum(["helper", "admin"]), // TODO FIXME
-  username: z.string(),
+  username: z.string().min(3),
   password: z.string().optional(), // TODO FIXME hash it
   away: z.string().refine(val => /^(on)|(off)$/, {message:"muss on/off sein"}).transform(v => v === "on"),
-})
+}).strict()
 
 export const rawUserVoterSchema = z.object({
   //id: z.number(),
   type: z.enum(["voter"]), // TODO FIXME
-  username: z.string(),
+  username: z.string().min(3),
   password: z.string().optional(), // TODO FIXME hash it
   group: z.string().optional(),
   age: z.string().refine((val) => /^\d+$/.test(val), {message: "Keine Zahl"}).transform(Number).refine(val => val > 0 && val < 200, {message:"yeah genau so alt biste - das kannste mir nicht erzählen"}).optional(),
   away: z.string().refine(val => /^(on)|(off)$/, {message:"muss on/off sein"}).transform(v => v === "on"),
-})
+}).strict()
 
-export const rawUserSchema = rawUserHelperOrAdminSchema.merge(rawUserVoterSchema)
+export const rawUserSchema = rawUserHelperOrAdminSchema.or(rawUserVoterSchema)
 
 /*.refine(v => {
   v.type !== "voter" || (v.group !== null && v.age !== null)
