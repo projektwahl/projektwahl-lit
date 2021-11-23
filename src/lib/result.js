@@ -31,17 +31,17 @@ export const result = (
   /** @type {ZodRecord<any>} */ failureZodObject
 ) => successResult(successZodObject).or(failureResult(failureZodObject));
 
-/** @type {<T,E extends { [key: string]: string } = { [key in keyof T]: string }>(result: import("projektwahl-lit-lib/src/types").OptionalResult<T, E>) => result is import("projektwahl-lit/src/lib/types").FailureResult<T, E>} */
+/** @type {<T,E extends { [key: string]: string } = { [key in keyof T]: string }>(result: import("../lib/types.js").OptionalResult<T, E>) => result is import("../lib/types.js").FailureResult<T, E>} */
 export const isErr = (result) => {
   return result.result === "failure";
 };
 
-/** @type {<T,E extends { [key: string]: string } = { [key in keyof T]: string }>(result: import("projektwahl-lit-lib/src/types").OptionalResult<T, E>) => result is import("projektwahl-lit/src/lib/types").SuccessResult<T, E>} */
+/** @type {<T,E extends { [key: string]: string } = { [key in keyof T]: string }>(result: import("../lib/types.js").OptionalResult<T, E>) => result is import("../lib/types.js").SuccessResult<T, E>} */
 export const isOk = (result) => {
   return result.result === "success";
 };
 
-/** @type {<T,E extends { [key: string]: string } = { [key in keyof T]: string }>(value: T) => import("projektwahl-lit-lib/src/types").SuccessResult<T, E>} */
+/** @type {<T,E extends { [key: string]: string } = { [key in keyof T]: string }>(value: T) => import("../lib/types.js").SuccessResult<T, E>} */
 export const ok = (value) => {
   return {
     result: "success",
@@ -49,7 +49,7 @@ export const ok = (value) => {
   };
 };
 
-/** @type {<T,E extends { [key: string]: string } = { [key in keyof T]: string }>(error: E) => import("projektwahl-lit/src/lib/types").FailureResult<T, E>} */
+/** @type {<T,E extends { [key: string]: string } = { [key in keyof T]: string }>(error: E) => import("../lib/types.js").FailureResult<T, E>} */
 export const err = (error) => {
   return {
     result: "failure",
@@ -57,7 +57,7 @@ export const err = (error) => {
   };
 };
 
-/** @type {<U,T,E extends { [key: string]: string } = { [key in keyof T]: string },>(result: import("projektwahl-lit/src/lib/types").Result<T, E>, op: (v: T) => import("projektwahl-lit/src/lib/types").Result<U, E>) => import("projektwahl-lit/src/lib/types").Result<U, E>} */
+/** @type {<U,T,E extends { [key: string]: string } = { [key in keyof T]: string },>(result: import("../lib/types.js").Result<T, E>, op: (v: T) => import("../lib/types.js").Result<U, E>) => import("../lib/types.js").Result<U, E>} */
 export function andThen(result, op) {
   if (!isOk(result)) {
     return result;
@@ -65,12 +65,12 @@ export function andThen(result, op) {
   return op(result.success);
 }
 
-/** @type {<T,E extends { [key: string]: string } = { [key in keyof T]: string }>(result: import("projektwahl-lit/src/lib/types").SuccessResult<T, E>) => T} */
+/** @type {<T,E extends { [key: string]: string } = { [key in keyof T]: string }>(result: import("../lib/types.js").SuccessResult<T, E>) => T} */
 export function safeUnwrap(result) {
   return result.success;
 }
 
-/** @type {<T,E extends { [key: string]: string } = { [key in keyof T]: string }>(result: import("projektwahl-lit/src/lib/types").OptionalResult<T, E>) => T} */
+/** @type {<T,E extends { [key: string]: string } = { [key in keyof T]: string }>(result: import("../lib/types.js").OptionalResult<T, E>) => T} */
 export function unwrap(result) {
   if (isOk(result)) {
     return result.success;
@@ -78,12 +78,12 @@ export function unwrap(result) {
   throw new Error("can't unwrap Err");
 }
 
-/** @type {<T,E extends { [key: string]: string } = { [key in keyof T]: string }>(result: import("projektwahl-lit/src/lib/types").FailureResult<T, E>) => E} */
+/** @type {<T,E extends { [key: string]: string } = { [key in keyof T]: string }>(result: import("../lib/types.js").FailureResult<T, E>) => E} */
 export function safeUnwrapErr(result) {
   return result.failure;
 }
 
-/** @type {<T,E extends { [key: string]: string } = { [key in keyof T]: string }>(result: import("projektwahl-lit/src/lib/types").OptionalResult<T, E>, defaultResult: T) => T} */
+/** @type {<T,E extends { [key: string]: string } = { [key in keyof T]: string }>(result: import("../lib/types.js").OptionalResult<T, E>, defaultResult: T) => T} */
 export function orDefault(result, defaultResult) {
   if (isOk(result)) {
     return safeUnwrap(result);
@@ -91,7 +91,7 @@ export function orDefault(result, defaultResult) {
   return defaultResult;
 }
 
-/** @type {<Q,T,E extends { [key: string]: string } = { [key in keyof T]: string }>(result: import("projektwahl-lit/src/lib/types").OptionalResult<T, E>, fun: (val: T) => Q, defaultResult: Q) => Q} */
+/** @type {<Q,T,E extends { [key: string]: string } = { [key in keyof T]: string }>(result: import("../lib/types.js").OptionalResult<T, E>, fun: (val: T) => Q, defaultResult: Q) => Q} */
 export function mapOr(result, fun, defaultResult) {
   if (isOk(result)) {
     return fun(safeUnwrap(result));
@@ -99,7 +99,7 @@ export function mapOr(result, fun, defaultResult) {
   return defaultResult;
 }
 
-/** @type {<T,E extends { [key: string]: string } = { [key in keyof T]: string }>(result: import("projektwahl-lit/src/lib/types").OptionalResult<T, E>, defaultError: E) => E} */
+/** @type {<T,E extends { [key: string]: string } = { [key in keyof T]: string }>(result: import("../lib/types.js").OptionalResult<T, E>, defaultError: E) => E} */
 export function errOrDefault(result, defaultError) {
   if (isErr(result)) {
     return safeUnwrapErr(result);
