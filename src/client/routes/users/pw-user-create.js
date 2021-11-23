@@ -80,14 +80,7 @@ export class PwUserCreate extends PwForm {
       .task=${this._task}
     ></pw-input>
 
-    <div class="mb-3">
-      <label for="users-type" class="form-label">Nutzerart:</label>
-      <select .value=${this.type} @change=${(event) => this.type = event.target.value} class="form-select" name="type" id="users-type">
-        <option value="voter">Schüler</option>
-        <option value="helper">Helfer</option>
-        <option value="admin">Admin</option>
-      </select>
-    </div>
+    <pw-input tpye="select"></pw-input>
 
     ${ this.type === "voter" ?
     html`<pw-input
@@ -105,16 +98,7 @@ export class PwUserCreate extends PwForm {
     ></pw-input>` : undefined
     }
 
-    <div class="mb-3 form-check">
-      <input
-        type="checkbox"
-        class="form-check-input"
-        name="away"
-        id="users-away"
-      />
-      <label class="form-check-label" for="users-away">Abwesend</label>
-    </div>
-    
+    <pw-input type="checkbox" label="Abwesend" name="away" .task=${this._task}></pw-input>
     `;
   }
 }

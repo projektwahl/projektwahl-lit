@@ -24,7 +24,9 @@ export function request(method, path, handler) {
           const body =
             headers[":method"] === "POST" ? await json(stream) : undefined;
 
-          const requestBody = zod2result(routes[path].request.safeParse(body));
+          const parsed = routes[path].request.safeParse(body);
+          console.log(parsed)
+          const requestBody = zod2result(parsed);
           if (requestBody.result == "success") {
             const [new_headers, responseBody] = await handler(
               requestBody.success

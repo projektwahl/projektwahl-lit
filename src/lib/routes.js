@@ -13,13 +13,18 @@ export const loginInputSchema = z
 // the api should be typed with the input there
 
 export const rawUserSchema = z.object({
-  id: z.number(),
+  //id: z.number(),
   type: z.string(), // TODO FIXME
   name: z.string(),
-  password: z.string(),
-  group: z.string(),
-  age: z.string().refine((val) => /^\d+$/.test(val)).transform(Number).refine(val => val > 0 && val < 200, {message:"yeah genau so alt biste - das kannste mir nicht erzählen"}),
-  away: z.boolean(),
+  password: z.string().optional(), // TODO FIXME hash it
+  group: z.string().optional(),
+  age: z.string().refine((val) => /^\d+$/.test(val), {message: "Keine Zahl"}).transform(Number).refine(val => val > 0 && val < 200, {message:"yeah genau so alt biste - das kannste mir nicht erzählen"}).optional(),
+  away: z.string().refine(val => /^(on)|(off)$/, {message:"muss on/off sein"}).transform(v => v === "on"),
+}).refine(v => {
+  v.type !== "voter" || (v.group !== null && v.age !== null)
+}, {
+  message: "Ein Schüler muss einer Klasse und einem Jahrgang zugewiesen sein",
+  path: ["type"]
 });
 
 export const loginOutputSchema = result(z.void(), z.record(z.string()));
