@@ -8,13 +8,14 @@ import { hashPassword } from "../../password.js";
  * @param {import("http2").IncomingHttpHeaders} headers
  */
  export async function createUsersHandler(stream, headers) {
+   // TODO FIXME create or update multiple
     return await request("POST", "/api/v1/users/create", async function (user) {
   
-      console.log("jo")
+      return await sql.begin('READ WRITE', async (sql) => {
 
       let [row] =
-						await sql`INSERT INTO users (name, password_hash, type, "group", age, away) VALUES (${
-							user.name ?? null
+						await sql`INSERT INTO users (username, password_hash, type, "group", age, away) VALUES (${
+							user.username ?? null
 						}, ${user.password ? await hashPassword(user.password) : null}, ${user.type ?? null}, ${
 							user.group ?? null
 						}, ${user.age ? user.age : null /* for csv import */}, ${
@@ -30,6 +31,8 @@ import { hashPassword } from "../../password.js";
         },
         {},
       ];
+    })
+
     })(stream, headers);
   }
   

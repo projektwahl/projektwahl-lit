@@ -76,7 +76,7 @@ export class PwUserCreate extends PwForm {
     <pw-input
       type="text"
       label="Name"
-      name="name"
+      name="username"
       .task=${this._task}
     ></pw-input>
 

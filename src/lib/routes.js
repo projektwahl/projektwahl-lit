@@ -1,6 +1,8 @@
 import { z, ZodType } from "zod";
 import { result } from "./result.js";
 
+// TODO FIXME make all of these strict so unknown properties create errors
+
 export const loginInputSchema = z
   .object({
     username: z.string().min(3).max(100),
@@ -12,20 +14,32 @@ export const loginInputSchema = z
 // https://github.com/colinhacks/zod#what-about-transforms
 // the api should be typed with the input there
 
-export const rawUserSchema = z.object({
+export const rawUserHelperOrAdminSchema = z.object({
   //id: z.number(),
-  type: z.string(), // TODO FIXME
-  name: z.string(),
+  type: z.enum(["helper", "admin"]), // TODO FIXME
+  username: z.string(),
+  password: z.string().optional(), // TODO FIXME hash it
+  away: z.string().refine(val => /^(on)|(off)$/, {message:"muss on/off sein"}).transform(v => v === "on"),
+})
+
+export const rawUserVoterSchema = z.object({
+  //id: z.number(),
+  type: z.enum(["voter"]), // TODO FIXME
+  username: z.string(),
   password: z.string().optional(), // TODO FIXME hash it
   group: z.string().optional(),
   age: z.string().refine((val) => /^\d+$/.test(val), {message: "Keine Zahl"}).transform(Number).refine(val => val > 0 && val < 200, {message:"yeah genau so alt biste - das kannste mir nicht erzählen"}).optional(),
   away: z.string().refine(val => /^(on)|(off)$/, {message:"muss on/off sein"}).transform(v => v === "on"),
-}).refine(v => {
+})
+
+export const rawUserSchema = rawUserHelperOrAdminSchema.merge(rawUserVoterSchema)
+
+/*.refine(v => {
   v.type !== "voter" || (v.group !== null && v.age !== null)
 }, {
   message: "Ein Schüler muss einer Klasse und einem Jahrgang zugewiesen sein",
   path: ["type"]
-});
+});*/
 
 export const loginOutputSchema = result(z.void(), z.record(z.string()));
 
