@@ -24,29 +24,18 @@ export class PwOrder extends LitElement {
       width: 2em;
       margin-left: -2.5em;
       background-image: url("https://icons.getbootstrap.com/assets/icons/sort-up.svg");
-      background-position: left center;
-      border-radius: 2em;
-      transition: background-position .15s ease-in-out;
+      background-position: center center;
 
-      float: left;
 
       height: 1em;
       margin-top: .25em;
       background-color: #fff;
       background-repeat: no-repeat;
       background-size: contain;
-      border: 1px solid rgba(0,0,0,.25);
       appearance: none;
-      color-adjust: exact;
-
-      margin: 0;
-      font-family: inherit;
-      font-size: inherit;
-      line-height: inherit;
     }
     
     input:checked {
-      background-position: right center;
       background-image: url("https://icons.getbootstrap.com/assets/icons/sort-down.svg");
     }
     `
