@@ -2,9 +2,6 @@
 // SPDX-FileCopyrightText: 2021 Moritz Hedtke <Moritz.Hedtke@t-online.de>
 import { html, LitElement, noChange } from "lit";
 import { bootstrapCss } from "../index.js";
-import { HistoryController } from "../history-controller.js";
-import { isErr } from "../../lib/result.js";
-import { ifDefined } from "lit/directives/if-defined.js";
 import { setupHmr } from "../hmr.js";
 import { css } from "lit";
 
@@ -21,17 +18,14 @@ export class PwOrder extends LitElement {
   }
 
   /** @override */ static styles = css`input {
-      width: 2em;
-      margin-left: -2.5em;
+      width: 1.5em;
+      height: 1.5em;
+
       background-image: url("https://icons.getbootstrap.com/assets/icons/sort-up.svg");
       background-position: center center;
-
-
-      height: 1em;
-      margin-top: .25em;
-      background-color: #fff;
       background-repeat: no-repeat;
       background-size: contain;
+      
       appearance: none;
     }
     
@@ -50,9 +44,7 @@ export class PwOrder extends LitElement {
     return html`
       ${bootstrapCss}
 
-      <div class="form-check form-switch">
-        <input type="checkbox">
-      </div>
+      <input type="checkbox">
     `;
   }
 }
