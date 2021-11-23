@@ -2,6 +2,7 @@
 // SPDX-FileCopyrightText: 2021 Moritz Hedtke <Moritz.Hedtke@t-online.de>
 import "../../form/pw-form.js";
 import "../../entity-list/pw-entitylist.js";
+import "../../entity-list/pw-order.js";
 import { html, LitElement } from "lit";
 import { bootstrapCss } from "../../index.js";
 import { HistoryController } from "../../history-controller.js";
@@ -38,6 +39,9 @@ export let PwUsers = class extends LitElement {
   /** @override */ render() {
     return html`
       ${bootstrapCss}
+
+      <pw-order></pw-order>
+
       <pw-entitylist title="Nutzende">
         <div slot="response" class="container">
           <table class="table">
