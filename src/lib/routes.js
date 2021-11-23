@@ -15,24 +15,24 @@ export const loginInputSchema = z
 // the api should be typed with the input there
 
 export const rawUserHelperOrAdminSchema = z.object({
-  //id: z.number(),
   type: z.enum(["helper", "admin"]), // TODO FIXME
   username: z.string().min(3),
-  password: z.string().optional(), // TODO FIXME hash it
   away: z.string().refine(val => /^(on)|(off)$/, {message:"muss on/off sein"}).transform(v => v === "on"),
 }).strict()
 
 export const rawUserVoterSchema = z.object({
-  //id: z.number(),
   type: z.enum(["voter"]), // TODO FIXME
   username: z.string().min(3),
-  password: z.string().optional(), // TODO FIXME hash it
   group: z.string().optional(),
   age: z.string().refine((val) => /^\d+$/.test(val), {message: "Keine Zahl"}).transform(Number).refine(val => val > 0 && val < 200, {message:"yeah genau so alt biste - das kannste mir nicht erzählen"}).optional(),
   away: z.string().refine(val => /^(on)|(off)$/, {message:"muss on/off sein"}).transform(v => v === "on"),
 }).strict()
 
 export const rawUserSchema = rawUserHelperOrAdminSchema.or(rawUserVoterSchema)
+
+export const withId = (/** @type {ZodType<any>} */ schema) => schema.or(z.object({
+    id: z.number(),
+}))
 
 /*.refine(v => {
   v.type !== "voter" || (v.group !== null && v.age !== null)
@@ -63,6 +63,6 @@ export const routes = /** @type {const} */ ({
   },
   "/api/v1/users": {
     request: z.undefined(),
-    response: z.array(rawUserSchema),
+    response: z.array(withId(rawUserSchema)),
   },
 });

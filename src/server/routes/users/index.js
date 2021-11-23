@@ -5,7 +5,7 @@ import { sql2 } from "../../sql/index.js";
 
 const value = fetchData(
   "users",
-  ["id", "type", "username", "password_hash"],
+  ["id", "type", "username"],
   {
     id: "nulls-first",
     type: "nulls-first",
