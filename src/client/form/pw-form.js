@@ -52,9 +52,14 @@ export class PwForm extends LitElement {
 
   // TODO FIXME really important
   // get the inputs from there and check that the errors returned from the server don't contain additional
-  // attributes. Otherwise we're eating errors and that's not healthy
+  // this needs to be done dynamically as e.g. the create user form dynamically changes the form inputs
+  // attributes. Otherwise we're eating errors and that's not healthy.xit
   getInputs = () => {
 
+  }
+
+  /** @private */ getCurrentInputElements() {
+    return [...this.renderRoot.querySelectorAll('pw-input')].map(e => e.name);
   }
 
   // https://www.chromestatus.com/feature/4708990554472448
@@ -83,6 +88,7 @@ if ('FormDataEvent' in window) {
     }
 
     console.log("rerender")
+    console.log(this.getCurrentInputElements())
 
     return html`
       ${bootstrapCss}
@@ -92,7 +98,19 @@ if ('FormDataEvent' in window) {
         <div class="row justify-content-center">
           <div class="col-md-7 col-lg-8">
             ${this._task.render({
-              error: (error) => html` <div class="alert alert-danger" role="alert">
+              complete: (data) => {
+                if (isErr(data)) {
+                  const errors = Object.entries(data.failure).filter(([k,v]) => !this.getCurrentInputElements().includes(k)).map(([k,v]) => html`${k}: ${v}<br />`)
+                  if (errors.length > 0) {
+                    return html`<div class="alert alert-danger" role="alert">
+                      Es sind Fehler aufgetreten!<br />
+                      ${errors}
+                    </div>`
+                  }
+                }
+                return html``
+              },
+              error: (error) => html`<div class="alert alert-danger" role="alert">
                       ${error}
                     </div>`,
             })}
