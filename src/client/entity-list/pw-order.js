@@ -23,7 +23,7 @@ export class PwOrder extends LitElement {
   /** @override */ static styles = css`input {
       width: 2em;
       margin-left: -2.5em;
-      background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='-4 -4 8 8'%3e%3ccircle r='3' fill='rgba%280, 0, 0, 0.25%29'/%3e%3c/svg%3e");
+      background-image: url("https://icons.getbootstrap.com/assets/icons/sort-up.svg");
       background-position: left center;
       border-radius: 2em;
       transition: background-position .15s ease-in-out;
@@ -47,11 +47,7 @@ export class PwOrder extends LitElement {
     
     input:checked {
       background-position: right center;
-      background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='-4 -4 8 8'%3e%3ccircle r='3' fill='%23fff'/%3e%3c/svg%3e");
-    }
-
-    input:focus {
-      background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='-4 -4 8 8'%3e%3ccircle r='3' fill='%2386b7fe'/%3e%3c/svg%3e");
+      background-image: url("https://icons.getbootstrap.com/assets/icons/sort-down.svg");
     }
     `
 
