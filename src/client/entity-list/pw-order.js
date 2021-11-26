@@ -7,14 +7,18 @@ import { css } from "lit";
 
 /** @template T */
 export class PwOrder extends LitElement {
+
   /** @override */ static get properties() {
     return {
-
+      title: { type: String }
     };
   }
-  
+
   constructor() {
     super();
+
+    /** @type {string} */
+    this.title;
   }
 
   /** @override */ static styles = css`
@@ -37,7 +41,7 @@ export class PwOrder extends LitElement {
 
   /** @override */ render() {
     if (
-      false
+      this.title === undefined
     ) {
       throw new Error("component not fully initialized");
     }
@@ -47,7 +51,7 @@ export class PwOrder extends LitElement {
 
   <div style="display: flex;">
   <input type="checkbox" class="myCheckbox" id="flexCheckDefault"><label for="flexCheckDefault">
-    Default checkbox
+    ${this.title}
   </label>
   </div>
 

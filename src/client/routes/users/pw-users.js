@@ -57,17 +57,17 @@ export let PwUsers = class extends LitElement {
               <tr>
 
 <th class="table-cell-hover" scope="col">
-                <pw-order></pw-order>
+                <pw-order title="ID"></pw-order>
                 </th>
 
 
 <th class="table-cell-hover" scope="col">
-                <pw-order></pw-order>
+                <pw-order title="Name"></pw-order>
                 </th>
 
 
 <th class="table-cell-hover" scope="col">
-                <pw-order></pw-order>
+                <pw-order title="Typ"></pw-order>
                 </th>
 
                 <th class="">Aktionen</th>
