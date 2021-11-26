@@ -9,6 +9,7 @@ import { HistoryController } from "../../history-controller.js";
 import { repeat } from "lit/directives/repeat.js";
 import { setupHmr } from "../../hmr.js";
 import { Task, TaskStatus } from "@lit-labs/task";
+import { css } from "lit";
 
 export let PwUsers = class extends LitElement {
   /** @override */ static get properties() {
@@ -36,12 +37,21 @@ export let PwUsers = class extends LitElement {
     );
   }
 
+  /** @override */ static styles = css`
+  .table-cell-hover:hover {
+		--bs-table-accent-bg: var(--bs-table-hover-bg);
+		color: var(--bs-table-hover-color);
+	}
+  `
+  
   /** @override */ render() {
     return html`
       ${bootstrapCss}
 
+      <div class="container">
+
       <pw-entitylist title="Nutzende">
-        <div slot="response" class="container">
+        <div slot="response">
           <table class="table">
             <thead>
               <tr>
@@ -191,6 +201,8 @@ export let PwUsers = class extends LitElement {
           </table>
         </div>
       </pw-entitylist>
+
+      </div>
     `;
   }
 };
