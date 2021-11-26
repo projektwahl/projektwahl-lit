@@ -40,35 +40,24 @@ export let PwUsers = class extends LitElement {
     return html`
       ${bootstrapCss}
 
-      <pw-order></pw-order>
-
       <pw-entitylist title="Nutzende">
         <div slot="response" class="container">
           <table class="table">
             <thead>
               <tr>
-                <th class="table-cell-hover" scope="col">
-                  {id}<i
-                    class="bi-arrow-{curr == 'ASC' ? 'up' : curr == 'DESC' ? 'down' : 'down-up'}"
-                    role="img"
-                    aria-label="Nach {title} sortieren"
-                  ></i>
+
+<th class="table-cell-hover" scope="col">
+                <pw-order></pw-order>
                 </th>
 
-                <th class="table-cell-hover" scope="col">
-                  {username}<i
-                    class="bi-arrow-{curr == 'ASC' ? 'up' : curr == 'DESC' ? 'down' : 'down-up'}"
-                    role="img"
-                    aria-label="Nach {title} sortieren"
-                  ></i>
+
+<th class="table-cell-hover" scope="col">
+                <pw-order></pw-order>
                 </th>
 
-                <th class="table-cell-hover" scope="col">
-                  {type}<i
-                    class="bi-arrow-{curr == 'ASC' ? 'up' : curr == 'DESC' ? 'down' : 'down-up'}"
-                    role="img"
-                    aria-label="Nach {title} sortieren"
-                  ></i>
+
+<th class="table-cell-hover" scope="col">
+                <pw-order></pw-order>
                 </th>
 
                 <th class="">Aktionen</th>

@@ -12,27 +12,28 @@ export class PwOrder extends LitElement {
 
     };
   }
-
+  
   constructor() {
     super();
   }
 
-  /** @override */ static styles = css`input {
-      width: 1.5em;
-      height: 1.5em;
+  /** @override */ static styles = css`
+  .myCheckbox {
+    width: 1.5em;
+    height: 1.5em;
 
-      background-image: url("https://icons.getbootstrap.com/assets/icons/sort-up.svg");
-      background-position: center center;
-      background-repeat: no-repeat;
-      background-size: contain;
-      
-      appearance: none;
-    }
+    background-image: url("https://icons.getbootstrap.com/assets/icons/sort-up.svg");
+    background-position: center center;
+    background-repeat: no-repeat;
+    background-size: contain;
     
-    input:checked {
-      background-image: url("https://icons.getbootstrap.com/assets/icons/sort-down.svg");
-    }
-    `
+    appearance: none;
+  }
+  
+  .myCheckbox:checked {
+    background-image: url("https://icons.getbootstrap.com/assets/icons/sort-down.svg");
+  }
+  `
 
   /** @override */ render() {
     if (
@@ -44,7 +45,12 @@ export class PwOrder extends LitElement {
     return html`
       ${bootstrapCss}
 
-      <input type="checkbox">
+  <div style="display: flex;">
+  <input type="checkbox" class="myCheckbox" id="flexCheckDefault"><label for="flexCheckDefault">
+    Default checkbox
+  </label>
+  </div>
+
     `;
   }
 }

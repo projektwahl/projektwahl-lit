@@ -12,6 +12,7 @@ import { classMap } from "lit/directives/class-map.js";
 import { until } from "lit/directives/until.js";
 import { pwLogin } from "./routes/login/pw-login.js";
 import { setupHmr } from "./hmr.js";
+import { css } from "lit";
 
 // TODO FIXME show more details if possible (maybe error page)
 window.addEventListener("error", function (event) {
