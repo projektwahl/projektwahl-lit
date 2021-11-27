@@ -19,7 +19,7 @@ export let PwUsers = class extends LitElement {
       abortController: { state: true }
     };
   }
-
+  
   constructor() {
     super();
 
@@ -31,6 +31,9 @@ export let PwUsers = class extends LitElement {
     /** @type {AbortController} */
     this.abortController = new AbortController();
 
+    /** @type {Timeout} */
+    this.timer;
+
     /**
      * @private
      */
@@ -38,15 +41,6 @@ export let PwUsers = class extends LitElement {
       this,
       // TODO FIXME it seems like the types here are wrong
       async ([searchParams, /** @type {AbortController} */ abortController]) => {
-        // TODO FIXME this doesn't work for initial render
-        // TODO FIXME we probably need debounce for the input parameters
-        await sleep();
-
-        if (abortController.signal.aborted) {
-          console.log("aborted")
-          return;
-        }
-
         let response = await fetch(`/api/v1/users?${searchParams}`);
         return await response.json();
       },
@@ -73,9 +67,10 @@ export let PwUsers = class extends LitElement {
             <form ${ref(this.formRef)} @input=${(e) => {
               const urlSearchParams = new URLSearchParams(new FormData(this.formRef.value));
 
-              this.abortController.abort();
-              this.abortController = new AbortController();
-              HistoryController.goto(new URL(`?${urlSearchParams}`, window.location.href))
+              clearTimeout(this.timer)
+              this.timer = setTimeout(() => {
+                HistoryController.goto(new URL(`?${urlSearchParams}`, window.location.href))
+              }, 250);
             }}>
               <table class="table">
                 <thead>
