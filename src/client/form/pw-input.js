@@ -21,7 +21,7 @@ export class PwInput extends LitElement {
         attribute: false,
         hasChanged: (oldValue, newValue) => {
           return true; // TODO FIXME bug in @lit-labs/task
-        }
+        },
       },
       value: { type: String },
     };
@@ -73,105 +73,122 @@ export class PwInput extends LitElement {
       throw new Error("component not fully initialized");
     }
 
-
     return html`
       ${bootstrapCss}
-      ${this.type === "checkbox" ? html`<div class="mb-3 form-check">
-      <input type="hidden" name=${this.name.toString()} value="off">
-      <input
-        type="checkbox"
-        class="form-check-input ${this.task.render({
-            error: (v) => "",
-            pending: () => "",
-            complete: (v) => isErr(v) && v.failure[this.name] !== undefined
-                ? "is-invalid"
-                : "is-valid",
-            initial: () => "",
-          })}"
-        aria-describedby="${this.randomId}-feedback"
-        name=${this.name.toString()}
-        id=${this.randomId}
-      />
-      <label class="form-check-label" for=${this.randomId}>${this.label}</label>
-      ${this.task.render({
-          complete: (v) =>
-            isErr(v) && v.failure[this.name] !== undefined
-              ? html` <div
-                  id="${this.randomId}-feedback"
-                  class="invalid-feedback"
-                >
-                  ${v.failure[this.name]}
-                </div>`
-              : undefined,
-            error: () => undefined,
-            initial: () => undefined,
-            pending: () => noChange
-        })}
-    </div>`: (this.type === "select" ? html`<div class="mb-3">
-      <label for=${this.randomId} class="form-label">${this.label}:</label>
-      <select aria-describedby="${this.randomId}-feedback" .value=${this.value} class="form-select ${this.task.render({
-            error: (v) => "",
-            pending: () => "",
-            complete: (v) => isErr(v) && v.failure[this.name] !== undefined
-                ? "is-invalid"
-                : "is-valid",
-            initial: () => "",
-          })}" name=${this.name.toString()} id=${this.randomId}>
-        ${this.options}
-      </select>
-      ${this.task.render({
-          complete: (v) =>
-            isErr(v) && v.failure[this.name] !== undefined
-              ? html` <div
-                  id="${this.randomId}-feedback"
-                  class="invalid-feedback"
-                >
-                  ${v.failure[this.name]}
-                </div>`
-              : undefined,
-            error: () => undefined,
-            initial: () => undefined,
-            pending: () => noChange
-        })}
-    </div>` :
-      html`<div class="mb-3">
-        <label for=${this.randomId} class="form-label">${this.label}:</label>
-        <input
-          type=${this.type}
-          class="form-control ${this.task.render({
-            error: (v) => "",
-            pending: () => "",
-            complete: (v) => isErr(v) && v.failure[this.name] !== undefined
-                ? "is-invalid"
-                : "is-valid",
-            initial: () => "",
-          })}"
-          name=${this.name.toString()}
-          id=${this.randomId}
-          aria-describedby="${this.randomId}-feedback"
-          autocomplete=${ifDefined(this.autocomplete)}
-          ?disabled=${this.task.render({
-            complete: () => false,
-            error: () => false,
-            pending: () => true,
-            initial: () => false,
-          })}
-        />
-        ${this.task.render({
-          complete: (v) =>
-            isErr(v) && v.failure[this.name] !== undefined
-              ? html` <div
-                  id="${this.randomId}-feedback"
-                  class="invalid-feedback"
-                >
-                  ${v.failure[this.name]}
-                </div>`
-              : undefined,
-            error: () => undefined,
-            initial: () => undefined,
-            pending: () => noChange
-        })}
-      </div>`)}
+      ${this.type === "checkbox"
+        ? html`<div class="mb-3 form-check">
+            <input type="hidden" name=${this.name.toString()} value="off" />
+            <input
+              type="checkbox"
+              class="form-check-input ${this.task.render({
+                error: (v) => "",
+                pending: () => "",
+                complete: (v) =>
+                  isErr(v) && v.failure[this.name] !== undefined
+                    ? "is-invalid"
+                    : "is-valid",
+                initial: () => "",
+              })}"
+              aria-describedby="${this.randomId}-feedback"
+              name=${this.name.toString()}
+              id=${this.randomId}
+            />
+            <label class="form-check-label" for=${this.randomId}
+              >${this.label}</label
+            >
+            ${this.task.render({
+              complete: (v) =>
+                isErr(v) && v.failure[this.name] !== undefined
+                  ? html` <div
+                      id="${this.randomId}-feedback"
+                      class="invalid-feedback"
+                    >
+                      ${v.failure[this.name]}
+                    </div>`
+                  : undefined,
+              error: () => undefined,
+              initial: () => undefined,
+              pending: () => noChange,
+            })}
+          </div>`
+        : this.type === "select"
+        ? html`<div class="mb-3">
+            <label for=${this.randomId} class="form-label"
+              >${this.label}:</label
+            >
+            <select
+              aria-describedby="${this.randomId}-feedback"
+              .value=${this.value}
+              class="form-select ${this.task.render({
+                error: (v) => "",
+                pending: () => "",
+                complete: (v) =>
+                  isErr(v) && v.failure[this.name] !== undefined
+                    ? "is-invalid"
+                    : "is-valid",
+                initial: () => "",
+              })}"
+              name=${this.name.toString()}
+              id=${this.randomId}
+            >
+              ${this.options}
+            </select>
+            ${this.task.render({
+              complete: (v) =>
+                isErr(v) && v.failure[this.name] !== undefined
+                  ? html` <div
+                      id="${this.randomId}-feedback"
+                      class="invalid-feedback"
+                    >
+                      ${v.failure[this.name]}
+                    </div>`
+                  : undefined,
+              error: () => undefined,
+              initial: () => undefined,
+              pending: () => noChange,
+            })}
+          </div>`
+        : html`<div class="mb-3">
+            <label for=${this.randomId} class="form-label"
+              >${this.label}:</label
+            >
+            <input
+              type=${this.type}
+              class="form-control ${this.task.render({
+                error: (v) => "",
+                pending: () => "",
+                complete: (v) =>
+                  isErr(v) && v.failure[this.name] !== undefined
+                    ? "is-invalid"
+                    : "is-valid",
+                initial: () => "",
+              })}"
+              name=${this.name.toString()}
+              id=${this.randomId}
+              aria-describedby="${this.randomId}-feedback"
+              autocomplete=${ifDefined(this.autocomplete)}
+              ?disabled=${this.task.render({
+                complete: () => false,
+                error: () => false,
+                pending: () => true,
+                initial: () => false,
+              })}
+            />
+            ${this.task.render({
+              complete: (v) =>
+                isErr(v) && v.failure[this.name] !== undefined
+                  ? html` <div
+                      id="${this.randomId}-feedback"
+                      class="invalid-feedback"
+                    >
+                      ${v.failure[this.name]}
+                    </div>`
+                  : undefined,
+              error: () => undefined,
+              initial: () => undefined,
+              pending: () => noChange,
+            })}
+          </div>`}
     `;
   }
 }

@@ -45,7 +45,9 @@ export let PwEntityList = class extends LitElement {
       <h1 class="text-center">${this.title}</h1>
       <div class="row justify-content-between">
         <div class="col-auto">
-	        <a class="btn btn-primary" href={createUrl} role="button">{title} erstellen</a>
+          <a class="btn btn-primary" href="{createUrl}" role="button"
+            >{title} erstellen</a
+          >
           <slot name="buttons"></slot>
         </div>
         <div class="col-3">

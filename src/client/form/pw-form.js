@@ -32,7 +32,7 @@ export class PwForm extends LitElement {
      * @private
      * @type {import("@lit-labs/task").Task}
      */
-     this._task;
+    this._task;
 
     /** @type {string} */
     this.actionText;
@@ -41,7 +41,7 @@ export class PwForm extends LitElement {
     this.fakeSlot;
 
     /** @type {import("lit/directives/ref").Ref<HTMLFormElement>} */
-    this.form = createRef();    
+    this.form = createRef();
   }
 
   submit = (/** @type {SubmitEvent} */ event) => {
@@ -54,12 +54,10 @@ export class PwForm extends LitElement {
   // get the inputs from there and check that the errors returned from the server don't contain additional
   // this needs to be done dynamically as e.g. the create user form dynamically changes the form inputs
   // attributes. Otherwise we're eating errors and that's not healthy.xit
-  getInputs = () => {
-
-  }
+  getInputs = () => {};
 
   /** @private */ getCurrentInputElements() {
-    return [...this.renderRoot.querySelectorAll('pw-input')].map(e => e.name);
+    return [...this.renderRoot.querySelectorAll("pw-input")].map((e) => e.name);
   }
 
   // https://www.chromestatus.com/feature/4708990554472448
@@ -87,8 +85,8 @@ if ('FormDataEvent' in window) {
       throw new Error("component not fully initialized");
     }
 
-    console.log("rerender")
-    console.log(this.getCurrentInputElements())
+    console.log("rerender");
+    console.log(this.getCurrentInputElements());
 
     return html`
       ${bootstrapCss}
@@ -100,19 +98,26 @@ if ('FormDataEvent' in window) {
             ${this._task.render({
               complete: (data) => {
                 if (isErr(data)) {
-                  const errors = Object.entries(data.failure).filter(([k,v]) => !this.getCurrentInputElements().includes(k)).map(([k,v]) => html`${k}: ${v}<br />`)
+                  const errors = Object.entries(data.failure)
+                    .filter(
+                      ([k, v]) => !this.getCurrentInputElements().includes(k)
+                    )
+                    .map(([k, v]) => html`${k}: ${v}<br />`);
                   if (errors.length > 0) {
                     return html`<div class="alert alert-danger" role="alert">
                       Es sind Fehler aufgetreten!<br />
                       ${errors}
-                    </div>`
+                    </div>`;
                   }
                 }
-                return html``
+                return html``;
               },
-              error: (error) => html`<div class="alert alert-danger" role="alert">
-                      ${error}
-                    </div>`,
+              error: (error) => html`<div
+                class="alert alert-danger"
+                role="alert"
+              >
+                ${error}
+              </div>`,
             })}
 
             <form
@@ -133,8 +138,7 @@ if ('FormDataEvent' in window) {
                 })}
                 class="btn btn-primary"
               >
-                ${this.actionText}
-                ${this._task.status}
+                ${this.actionText} ${this._task.status}
               </button>
             </form>
           </div>

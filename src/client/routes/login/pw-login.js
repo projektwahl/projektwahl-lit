@@ -48,16 +48,16 @@ export class PwLogin extends PwForm {
     /**
      * @private
      */
-     this.history = new HistoryController(this);
-    
+    this.history = new HistoryController(this);
+
     /**
      * @private
      */
-     this._task = new Task(
+    this._task = new Task(
       this,
       async ([]) => {
-        console.log("pw-form task")
-         // ts-expect-error doesn't contain files so this is fine
+        console.log("pw-form task");
+        // ts-expect-error doesn't contain files so this is fine
         const formData = /*new URLSearchParams(*/ new FormData(this.form.value);
 
         // @ts-expect-error bad typings
@@ -75,8 +75,8 @@ export class PwLogin extends PwForm {
           HistoryController.goto(new URL("/", window.location.href), {});
         }
 
-        console.log(result)
-        return result
+        console.log(result);
+        return result;
         /*// https://lit.dev/docs/components/events/#dispatching-events
         const resultEvent = new CustomEvent("form-result", {
           detail: this.result,
@@ -88,25 +88,24 @@ export class PwLogin extends PwForm {
       },
       () => [this.forceTask]
     );
-    
   }
 
   /** @override */ getInputs = () => {
     return html` <pw-input
-      type="text"
-      autocomplete="username"
-      label="Name"
-      name="username"
-      .task=${this._task}
-    ></pw-input>
-    <pw-input
-      label="Passwort"
-      name="password"
-      type="password"
-      autocomplete="current-password"
-      .task=${this._task}
-    ></pw-input>`;
-  }
+        type="text"
+        autocomplete="username"
+        label="Name"
+        name="username"
+        .task=${this._task}
+      ></pw-input>
+      <pw-input
+        label="Passwort"
+        name="password"
+        type="password"
+        autocomplete="current-password"
+        .task=${this._task}
+      ></pw-input>`;
+  };
 
   /** @override */ submit = (/** @type {SubmitEvent} */ event) => {
     event.preventDefault();

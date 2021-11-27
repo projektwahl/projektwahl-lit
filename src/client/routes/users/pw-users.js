@@ -38,179 +38,162 @@ export let PwUsers = class extends LitElement {
   }
 
   /** @override */ static styles = css`
-  .table-cell-hover:hover {
-		--bs-table-accent-bg: var(--bs-table-hover-bg);
-		color: var(--bs-table-hover-color);
-	}
-  `
-  
+    .table-cell-hover:hover {
+      --bs-table-accent-bg: var(--bs-table-hover-bg);
+      color: var(--bs-table-hover-color);
+    }
+  `;
+
   /** @override */ render() {
     return html`
       ${bootstrapCss}
 
       <div class="container">
+        <pw-entitylist title="Nutzende">
+          <div slot="response">
+            <table class="table">
+              <thead>
+                <tr>
+                  <th class="table-cell-hover p-0" scope="col">
+                    <pw-order title="ID"></pw-order>
+                  </th>
 
-      <pw-entitylist title="Nutzende">
-        <div slot="response">
-          <table class="table">
-            <thead>
-              <tr>
+                  <th class="table-cell-hover p-0" scope="col">
+                    <pw-order title="Name"></pw-order>
+                  </th>
 
-<th class="table-cell-hover p-0" scope="col">
-                <pw-order title="ID"></pw-order>
-                </th>
+                  <th class="table-cell-hover p-0" scope="col">
+                    <pw-order title="Typ"></pw-order>
+                  </th>
 
+                  <th class="table-cell-hover">Aktionen</th>
+                </tr>
 
-<th class="table-cell-hover p-0" scope="col">
-                <pw-order title="Name"></pw-order>
-                </th>
+                <tr>
+                  <th scope="col">
+                    <input
+                      bind:value="{$query.filters[name]}"
+                      type="text"
+                      class="form-control"
+                      id="projects-filter-{name}"
+                    />
+                  </th>
 
+                  <th scope="col">
+                    <input
+                      bind:value="{$query.filters[name]}"
+                      type="text"
+                      class="form-control"
+                      id="projects-filter-{name}"
+                    />
+                  </th>
 
-<th class="table-cell-hover p-0" scope="col">
-                <pw-order title="Typ"></pw-order>
-                </th>
+                  <th scope="col">
+                    <input
+                      bind:value="{$query.filters[name]}"
+                      type="text"
+                      class="form-control"
+                      id="projects-filter-{name}"
+                    />
+                  </th>
 
-                <th class="table-cell-hover">Aktionen</th>
-              </tr>
+                  <th scope="col">
+                    <button class="btn btn-secondary" type="button">
+                      <i class="bi bi-arrow-clockwise"></i>
+                    </button>
+                  </th>
+                </tr>
+              </thead>
 
-              <tr>
-                <th scope="col">
-                  <input
-                    bind:value="{$query.filters[name]}"
-                    type="text"
-                    class="form-control"
-                    id="projects-filter-{name}"
-                  />
-                </th>
-
-                <th scope="col">
-                  <input
-                    bind:value="{$query.filters[name]}"
-                    type="text"
-                    class="form-control"
-                    id="projects-filter-{name}"
-                  />
-                </th>
-
-                <th scope="col">
-                  <input
-                    bind:value="{$query.filters[name]}"
-                    type="text"
-                    class="form-control"
-                    id="projects-filter-{name}"
-                  />
-                </th>
-
-                <th scope="col">
-                  <button
-                    class="btn btn-secondary"
-                    type="button"
-                  >
-                    <i class="bi bi-arrow-clockwise"></i>
-                  </button>
-                </th>
-              </tr>
-            </thead>
-
-            <tbody>
-              ${this._apiTask.render({
-                pending: () =>
-                  repeat(
-                    Array.from(
-                      Array(
-                        parseInt(
-                          this.history.url.searchParams.get("count") || "25"
-                        )
+              <tbody>
+                ${this._apiTask.render({
+                  pending: () =>
+                    repeat(
+                      Array.from(
+                        Array(
+                          parseInt(
+                            this.history.url.searchParams.get("count") || "25"
+                          )
+                        ),
+                        (_, i) => i
                       ),
-                      (_, i) => i
+                      (item, index) => {
+                        return html`<tr class="placeholder-glow">
+                          <th scope="row">
+                            <p>
+                              <span class="placeholder rounded">1337</span>
+                            </p>
+                          </th>
+                          <td>
+                            <p>
+                              <span class="placeholder rounded"
+                                >Long Full Name</span
+                              >
+                              <span class="placeholder rounded"
+                                >Long Full Name</span
+                              >
+                            </p>
+                          </td>
+                          <td>
+                            <p>
+                              <span class="placeholder rounded">helper</span>
+                            </p>
+                          </td>
+                          <td>
+                            <a
+                              class="btn btn-secondary disabled"
+                              aria-disabled="true"
+                              href="/users/edit/{entity.id}"
+                              role="button"
+                            >
+                              <i class="bi bi-pen"></i>
+                            </a>
+
+                            <button
+                              disabled
+                              class="btn btn-secondary"
+                              type="button"
+                            >
+                              <i class="bi bi-box-arrow-in-right"></i>
+                            </button>
+                          </td>
+                        </tr>`;
+                      }
                     ),
-                    (item, index) => {
-                      return html`<tr class="placeholder-glow">
+                  complete: (result) =>
+                    result.map(
+                      (value) => html`<tr>
                         <th scope="row">
-                          <p>
-                            <span class="placeholder rounded">1337</span>
-                          </p>
+                          <p>${value.id}</p>
                         </th>
                         <td>
-                          <p>
-                            <span class="placeholder rounded"
-                              >Long Full Name</span
-                            >
-                            <span class="placeholder rounded"
-                              >Long Full Name</span
-                            >
-                          </p>
+                          <p>${value.username}</p>
                         </td>
                         <td>
-                          <p>
-                            <span class="placeholder rounded">helper</span>
-                          </p>
+                          <p>${value.type}</p>
                         </td>
                         <td>
                           <a
-                            class="btn btn-secondary disabled"
-                            aria-disabled="true"
+                            class="btn btn-secondary"
                             href="/users/edit/{entity.id}"
                             role="button"
                           >
                             <i class="bi bi-pen"></i>
                           </a>
 
-                          <button
-                            disabled
-                            class="btn btn-secondary"
-                            type="button"
-                          >
+                          <button class="btn btn-secondary" type="button">
                             <i class="bi bi-box-arrow-in-right"></i>
                           </button>
                         </td>
-                      </tr>`;
-                    }
-                  ),
-                complete: (result) =>
-                  result.map(
-                    (value) => html`<tr>
-                      <th scope="row">
-                        <p>
-                          ${value.id}
-                        </p>
-                      </th>
-                      <td>
-                        <p>
-                          ${value.username}
-                        </p>
-                      </td>
-                      <td>
-                        <p>
-                          ${value.type}
-                        </p>
-                      </td>
-                      <td>
-                        <a
-                          class="btn btn-secondary"
-                          href="/users/edit/{entity.id}"
-                          role="button"
-                        >
-                          <i class="bi bi-pen"></i>
-                        </a>
-
-                        <button
-                          class="btn btn-secondary"
-                          type="button"
-                        >
-                          <i class="bi bi-box-arrow-in-right"></i>
-                        </button>
-                      </td>
-                    </tr>`
-                  ),
-                error: () => html`error`,
-                initial: () => html`hi`,
-              })}
-            </tbody>
-          </table>
-        </div>
-      </pw-entitylist>
-
+                      </tr>`
+                    ),
+                  error: () => html`error`,
+                  initial: () => html`hi`,
+                })}
+              </tbody>
+            </table>
+          </div>
+        </pw-entitylist>
       </div>
     `;
   }

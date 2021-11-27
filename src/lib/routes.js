@@ -14,25 +14,45 @@ export const loginInputSchema = z
 // https://github.com/colinhacks/zod#what-about-transforms
 // the api should be typed with the input there
 
-export const rawUserHelperOrAdminSchema = z.object({
-  type: z.enum(["helper", "admin"]), // TODO FIXME
-  username: z.string().min(3),
-  away: z.string().refine(val => /^(on)|(off)$/, {message:"muss on/off sein"}).transform(v => v === "on"),
-}).strict()
+export const rawUserHelperOrAdminSchema = z
+  .object({
+    type: z.enum(["helper", "admin"]), // TODO FIXME
+    username: z.string().min(3),
+    away: z
+      .string()
+      .refine((val) => /^(on)|(off)$/, { message: "muss on/off sein" })
+      .transform((v) => v === "on"),
+  })
+  .strict();
 
-export const rawUserVoterSchema = z.object({
-  type: z.enum(["voter"]), // TODO FIXME
-  username: z.string().min(3),
-  group: z.string().optional(),
-  age: z.string().refine((val) => /^\d+$/.test(val), {message: "Keine Zahl"}).transform(Number).refine(val => val > 0 && val < 200, {message:"yeah genau so alt biste - das kannste mir nicht erzählen"}).optional(),
-  away: z.string().refine(val => /^(on)|(off)$/, {message:"muss on/off sein"}).transform(v => v === "on"),
-}).strict()
+export const rawUserVoterSchema = z
+  .object({
+    type: z.enum(["voter"]), // TODO FIXME
+    username: z.string().min(3),
+    group: z.string().optional(),
+    age: z
+      .string()
+      .refine((val) => /^\d+$/.test(val), { message: "Keine Zahl" })
+      .transform(Number)
+      .refine((val) => val > 0 && val < 200, {
+        message: "yeah genau so alt biste - das kannste mir nicht erzählen",
+      })
+      .optional(),
+    away: z
+      .string()
+      .refine((val) => /^(on)|(off)$/, { message: "muss on/off sein" })
+      .transform((v) => v === "on"),
+  })
+  .strict();
 
-export const rawUserSchema = rawUserHelperOrAdminSchema.or(rawUserVoterSchema)
+export const rawUserSchema = rawUserHelperOrAdminSchema.or(rawUserVoterSchema);
 
-export const withId = (/** @type {ZodType<any>} */ schema) => schema.or(z.object({
-    id: z.number(),
-}))
+export const withId = (/** @type {ZodType<any>} */ schema) =>
+  schema.or(
+    z.object({
+      id: z.number(),
+    })
+  );
 
 /*.refine(v => {
   v.type !== "voter" || (v.group !== null && v.age !== null)

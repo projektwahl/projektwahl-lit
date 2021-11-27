@@ -51,7 +51,7 @@ server.on("stream", async (stream, headers) => {
     await (await import(`./server-handler.js`)).serverHandler(stream, headers);
   } catch (error) {
     // don't take down the entire server
-    console.error(error)
+    console.error(error);
   }
 });
 

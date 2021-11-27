@@ -15,9 +15,13 @@ export const myFetch = async (url, options) => {
   if (!response.ok) {
     try {
       const additionalInfo = await response.text();
-      throw new Error(`Failed to request ${url}: ${response.status} ${response.statusText}\nAdditional information: ${additionalInfo}`)   
+      throw new Error(
+        `Failed to request ${url}: ${response.status} ${response.statusText}\nAdditional information: ${additionalInfo}`
+      );
     } catch (error) {
-      throw new Error(`Failed to request ${url}: ${response.status} ${response.statusText}\n`)   
+      throw new Error(
+        `Failed to request ${url}: ${response.status} ${response.statusText}\n`
+      );
     }
   }
   const result = await response.json();

@@ -23,7 +23,7 @@ export class PwUserCreate extends PwForm {
       actionText: { type: String },
       _task: { state: true },
       forceTask: { state: true },
-      type: {state: true}
+      type: { state: true },
     };
   }
 
@@ -38,14 +38,14 @@ export class PwUserCreate extends PwForm {
     /**
      * @private
      */
-     this.history = new HistoryController(this);
+    this.history = new HistoryController(this);
 
     this.type = "voter";
-    
+
     /**
      * @private
      */
-     this._task = new Task(
+    this._task = new Task(
       this,
       async ([]) => {
         const formData = new FormData(this.form.value);
@@ -65,45 +65,58 @@ export class PwUserCreate extends PwForm {
           HistoryController.goto(new URL("/", window.location.href), {});
         }
 
-        return result
+        return result;
       },
       () => [this.forceTask]
     );
   }
 
   /** @override */ getInputs = () => {
-    return html` 
-    <pw-input
-      type="text"
-      label="Name"
-      name="username"
-      .task=${this._task}
-    ></pw-input>
+    return html`
+      <pw-input
+        type="text"
+        label="Name"
+        name="username"
+        .task=${this._task}
+      ></pw-input>
 
-    <pw-input .value=${this.type} @change=${(event) => this.type = event.target.value} type="select" label="Nutzerart" name="type" .options=${html`<option value="voter">Schüler</option>
-      <option value="helper">Helfer</option>
-      <option value="admin">Admin</option>`} .task=${this._task}>
-    </pw-input>
+      <pw-input
+        .value=${this.type}
+        @change=${(event) => (this.type = event.target.value)}
+        type="select"
+        label="Nutzerart"
+        name="type"
+        .options=${html`<option value="voter">Schüler</option>
+          <option value="helper">Helfer</option>
+          <option value="admin">Admin</option>`}
+        .task=${this._task}
+      >
+      </pw-input>
 
-    ${ this.type === "voter" ?
-    html`<pw-input
-      type="text"
-      label="Klasse"
-      name="group"
-      .task=${this._task}
-    ></pw-input>
+      ${this.type === "voter"
+        ? html`<pw-input
+              type="text"
+              label="Klasse"
+              name="group"
+              .task=${this._task}
+            ></pw-input>
 
-    <pw-input
-      type="number"
-      label="Jahrgang"
-      name="age"
-      .task=${this._task}
-    ></pw-input>` : undefined
-    }
+            <pw-input
+              type="number"
+              label="Jahrgang"
+              name="age"
+              .task=${this._task}
+            ></pw-input>`
+        : undefined}
 
-    <pw-input type="checkbox" label="Abwesend" name="away" .task=${this._task}></pw-input>
+      <pw-input
+        type="checkbox"
+        label="Abwesend"
+        name="away"
+        .task=${this._task}
+      ></pw-input>
     `;
-  }
+  };
 }
 customElements.define("pw-user-create", PwUserCreate);
 
