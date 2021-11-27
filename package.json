@@ -30,10 +30,10 @@
     "lerna": "^4.0.0",
     "lit": "^2.0.2",
     "postgres": "beta",
-    "typescript": "^4.5.1-rc",
+    "typescript": "^4.5.2",
     "zod": "^3.11.6"
   },
   "devDependencies": {
-    "@types/node": "^16.11.7"
+    "@types/node": "^16.11.10"
   }
 }
