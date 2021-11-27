@@ -27,3 +27,15 @@ export const myFetch = async (url, options) => {
   const result = await response.json();
   return result;
 };
+
+/**
+ * 
+ * @returns {Promise<void>}
+ */
+export const sleep = () => {
+  return new Promise((resolve, reject) => {
+    setTimeout(() => {
+      resolve();
+    }, 500);
+  });
+}

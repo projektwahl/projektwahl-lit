@@ -10,10 +10,14 @@ import { repeat } from "lit/directives/repeat.js";
 import { setupHmr } from "../../hmr.js";
 import { Task, TaskStatus } from "@lit-labs/task";
 import { css } from "lit";
+import {createRef, ref} from 'lit/directives/ref.js';
+import { sleep } from "../../utils.js";
 
 export let PwUsers = class extends LitElement {
   /** @override */ static get properties() {
-    return {};
+    return {
+      abortController: { state: true }
+    };
   }
 
   constructor() {
@@ -24,17 +28,32 @@ export let PwUsers = class extends LitElement {
      */
     this.history = new HistoryController(this);
 
+    /** @type {AbortController} */
+    this.abortController = new AbortController();
+
     /**
      * @private
      */
     this._apiTask = new Task(
       this,
-      ([searchParams]) =>
-        fetch(`/api/v1/users?${searchParams}`).then((response) =>
-          response.json()
-        ),
-      () => [this.history.url.searchParams]
+      // TODO FIXME it seems like the types here are wrong
+      async ([searchParams, /** @type {AbortController} */ abortController]) => {
+        // TODO FIXME this doesn't work for initial render
+        // TODO FIXME we probably need debounce for the input parameters
+        await sleep();
+
+        if (abortController.signal.aborted) {
+          console.log("aborted")
+          return;
+        }
+
+        let response = await fetch(`/api/v1/users?${searchParams}`);
+        return await response.json();
+      },
+      () => [this.history.url.searchParams, this.abortController]
     );
+
+    this.formRef = createRef();
   }
 
   /** @override */ static styles = css`
@@ -51,7 +70,13 @@ export let PwUsers = class extends LitElement {
       <div class="container">
         <pw-entitylist title="Nutzende">
           <div slot="response">
-            <form>
+            <form ${ref(this.formRef)} @input=${(e) => {
+              const urlSearchParams = new URLSearchParams(new FormData(this.formRef.value));
+
+              this.abortController.abort();
+              this.abortController = new AbortController();
+              HistoryController.goto(new URL(`?${urlSearchParams}`, window.location.href))
+            }}>
               <table class="table">
                 <thead>
                   <tr>
