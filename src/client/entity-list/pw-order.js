@@ -23,8 +23,8 @@ export class PwOrder extends LitElement {
 
   /** @override */ static styles = css`
   .myCheckbox {
-    width: 1.5em;
-    height: 1.5em;
+    width: 2.5em;
+    height: 2.5em;
 
     background-image: url("https://icons.getbootstrap.com/assets/icons/sort-up.svg");
     background-position: center center;
@@ -50,7 +50,7 @@ export class PwOrder extends LitElement {
       ${bootstrapCss}
 
   <div style="display: flex;">
-  <input type="checkbox" class="myCheckbox" id="flexCheckDefault"><label for="flexCheckDefault">
+  <input type="checkbox" class="myCheckbox" id="flexCheckDefault"><label class="w-100 pb-2 pt-2" for="flexCheckDefault">
     ${this.title}
   </label>
   </div>

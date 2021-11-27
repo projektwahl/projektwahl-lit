@@ -56,21 +56,21 @@ export let PwUsers = class extends LitElement {
             <thead>
               <tr>
 
-<th class="table-cell-hover" scope="col">
+<th class="table-cell-hover p-0" scope="col">
                 <pw-order title="ID"></pw-order>
                 </th>
 
 
-<th class="table-cell-hover" scope="col">
+<th class="table-cell-hover p-0" scope="col">
                 <pw-order title="Name"></pw-order>
                 </th>
 
 
-<th class="table-cell-hover" scope="col">
+<th class="table-cell-hover p-0" scope="col">
                 <pw-order title="Typ"></pw-order>
                 </th>
 
-                <th class="">Aktionen</th>
+                <th class="table-cell-hover">Aktionen</th>
               </tr>
 
               <tr>
@@ -99,6 +99,15 @@ export let PwUsers = class extends LitElement {
                     class="form-control"
                     id="projects-filter-{name}"
                   />
+                </th>
+
+                <th scope="col">
+                  <button
+                    class="btn btn-secondary"
+                    type="button"
+                  >
+                    <i class="bi bi-arrow-clockwise"></i>
+                  </button>
                 </th>
               </tr>
             </thead>
