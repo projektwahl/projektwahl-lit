@@ -65,58 +65,7 @@ export async function serverHandler(stream, headers) {
 
   console.log(url.toString())
 
-  if (url.pathname === "/") {
-    let contents = html`<!DOCTYPE html>
-    <html lang="en">
-      <head>
-        <!-- Required meta tags -->
-        <meta charset="utf-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1" />
-    
-        <!--
-    SPDX-License-Identifier: AGPL-3.0-or-later
-    SPDX-FileCopyrightText: 2021 Moritz Hedtke <Moritz.Hedtke@t-online.de>
-    -->
-        <style>
-          body {
-            overflow-y: scroll;
-          }
-        </style>
-        <link
-          href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css"
-          rel="stylesheet"
-          integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3"
-          crossorigin="anonymous"
-        />
-        <link
-          rel="stylesheet"
-          href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.0/font/bootstrap-icons.css"
-        />
-    
-        <title>Hello, world!</title>
-      </head>
-      <body>
-        <script
-          onerror="javascript:alert('Failed to load')"
-          type="module"
-          src="/src/client/pw-app.js"
-        ></script>
-        <noscript>Bitte aktiviere JavaScript!</noscript>
-    
-        <pw-app initial=${url.toString()}></pw-app>
-      </body>
-    </html>
-    `
-
-    const ssrResult = render(contents);
-
-    stream.respond({
-      "content-type": "text/html; charset=utf-8",
-      ":status": 200,
-    });
-    Readable.from(ssrResult).pipe(stream)
-    //stream.end()
-  } else if (url.pathname === "/favicon.ico") {
+  if (url.pathname === "/favicon.ico") {
     stream.respond(
       {
         ":status": 404,
@@ -204,13 +153,55 @@ export async function serverHandler(stream, headers) {
     });
     stream.end(contents);
   } else {
-    stream.respondWithFile(
-      "./src/client/index.html",
-      {
-        "content-type": "text/html; charset=utf-8",
-        ":status": 200,
-      },
-      {}
-    );
+    let contents = html`<!DOCTYPE html>
+    <html lang="en">
+      <head>
+        <!-- Required meta tags -->
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+    
+        <!--
+    SPDX-License-Identifier: AGPL-3.0-or-later
+    SPDX-FileCopyrightText: 2021 Moritz Hedtke <Moritz.Hedtke@t-online.de>
+    -->
+        <style>
+          body {
+            overflow-y: scroll;
+          }
+        </style>
+        <link
+          href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css"
+          rel="stylesheet"
+          integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3"
+          crossorigin="anonymous"
+        />
+        <link
+          rel="stylesheet"
+          href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.0/font/bootstrap-icons.css"
+        />
+    
+        <title>Hello, world!</title>
+      </head>
+      <body>
+        <script
+          onerror="javascript:alert('Failed to load')"
+          type="module"
+          src="/src/client/pw-app.js"
+        ></script>
+        <noscript>Bitte aktiviere JavaScript!</noscript>
+    
+        <pw-app initial=${url.toString()}></pw-app>
+      </body>
+    </html>
+    `
+
+    const ssrResult = render(contents);
+
+    stream.respond({
+      "content-type": "text/html; charset=utf-8",
+      ":status": 200,
+    });
+    Readable.from(ssrResult).pipe(stream)
+    //stream.end()
   }
 }
