@@ -12,6 +12,7 @@ import { Task, TaskStatus } from "@lit-labs/task";
 import { css } from "lit";
 import {createRef, ref} from 'lit/directives/ref.js';
 import { sleep } from "../../utils.js";
+import { noChange } from "lit";
 
 export let PwUsers = class extends LitElement {
   /** @override */ static get properties() {
@@ -126,63 +127,12 @@ export let PwUsers = class extends LitElement {
                   </tr>
                 </thead>
 
+<!-- TODO FIXME add loading indicator overlay -->
+
                 <tbody>
                   ${this._apiTask.render({
-                    pending: () =>
-                      repeat(
-                        Array.from(
-                          Array(
-                            parseInt(
-                              this.history.url.searchParams.get("count") || "25"
-                            )
-                          ),
-                          (_, i) => i
-                        ),
-                        (item, index) => {
-                          return html`<tr class="placeholder-glow">
-                            <th scope="row">
-                              <p>
-                                <span class="placeholder rounded">1337</span>
-                              </p>
-                            </th>
-                            <td>
-                              <p>
-                                <span class="placeholder rounded"
-                                  >Long Full Name</span
-                                >
-                                <span class="placeholder rounded"
-                                  >Long Full Name</span
-                                >
-                              </p>
-                            </td>
-                            <td>
-                              <p>
-                                <span class="placeholder rounded">helper</span>
-                              </p>
-                            </td>
-                            <td>
-                              <a
-                                class="btn btn-secondary disabled"
-                                aria-disabled="true"
-                                href="/users/edit/{entity.id}"
-                                role="button"
-                              >
-                                <i class="bi bi-pen"></i>
-                              </a>
-
-                              <button
-                                disabled
-                                class="btn btn-secondary"
-                                type="button"
-                              >
-                                <i class="bi bi-box-arrow-in-right"></i>
-                              </button>
-                            </td>
-                          </tr>`;
-                        }
-                      ),
-                    complete: (result) =>
-                      result.map(
+                    pending: () => { console.log("pending"); return noChange },
+                    complete: (result) => { console.log("complete"); return result.map(
                         (value) => html`<tr>
                           <th scope="row">
                             <p>${value.id}</p>
@@ -207,9 +157,9 @@ export let PwUsers = class extends LitElement {
                             </button>
                           </td>
                         </tr>`
-                      ),
-                    error: () => html`error`,
-                    initial: () => html`hi`,
+                      )},
+                    error: () => {console.log("error"); return html`error` },
+                    initial: () => {console.log("initial"); return html`hi`},
                   })}
                 </tbody>
               </table>
