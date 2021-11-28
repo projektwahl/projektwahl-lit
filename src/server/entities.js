@@ -37,35 +37,42 @@ export function fetchData(
     .flatMap((v) => [sql2`,`, sql2`${unsafe2(v[0])} ${unsafe2(v[1])}`])
     .slice(1);
 
-  let queries = query.sorting.map((value, index, array) => {
-    const part = query.sorting.slice(0, index + 1);
-
-    let parts = part
-      .flatMap((value, index) => {
-        return [
-          sql2` AND `,
-          sql2`${(query.paginationCursor ?? {})[value[0]] ?? null} ${
-            index === part.length - 1
-              ? value[1] === "ASC"
-                ? sql2`<`
-                : sql2`>`
-              : sql2`IS NOT DISTINCT FROM`
-          } ${unsafe2(value[0] ?? null)}`,
-        ];
-      })
-      .slice(1);
-
+  if (query.paginationCursor === null) {
     return sql2`(SELECT ${unsafe2(fieldsToSelect.join(", "))} FROM ${unsafe2(
       table
-    )} WHERE${customFilterQuery(
+    )} WHERE ${customFilterQuery(
       sanitizedData
-    )} (${parts}) ORDER BY ${orderByQuery} LIMIT ${
-      query.paginationLimit + 1
-    })`;
-  });
+    )} ORDER BY ${orderByQuery} LIMIT ${query.paginationLimit + 1})`;
+  } else {
+    let queries = query.sorting.map((value, index, array) => {
+      const part = query.sorting.slice(0, index + 1);
 
-  return sql2`${queries
-    .flatMap((v) => [sql2`\nUNION ALL\n`, v])
-    .slice(1)} LIMIT ${query.paginationLimit + 1}`;
-  
+      let parts = part
+        .flatMap((value, index) => {
+          return [
+            sql2` AND `,
+            sql2`${query.paginationCursor[value[0]] ?? null} ${
+              index === part.length - 1
+                ? value[1] === "ASC"
+                  ? sql2`<`
+                  : sql2`>`
+                : sql2`IS NOT DISTINCT FROM`
+            } ${unsafe2(value[0] ?? null)}`,
+          ];
+        })
+        .slice(1);
+
+      return sql2`(SELECT ${unsafe2(fieldsToSelect.join(", "))} FROM ${unsafe2(
+        table
+      )} WHERE ${customFilterQuery(
+        sanitizedData
+      )} AND (${parts}) ORDER BY ${orderByQuery} LIMIT ${
+        query.paginationLimit + 1
+      })`;
+    });
+
+    return sql2`${queries
+      .flatMap((v) => [sql2`\nUNION ALL\n`, v])
+      .slice(1)} LIMIT ${query.paginationLimit + 1}`;
+  }
 }

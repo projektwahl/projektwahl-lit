@@ -42,7 +42,7 @@ export async function usersHandler(stream, headers) {
         name: "test",
       },
       (query) => {
-        return sql2``;
+        return sql2`TRUE`;
       }
     );
 
