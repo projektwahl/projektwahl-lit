@@ -9,6 +9,10 @@ import { loginHandler } from "./routes/login/index.js";
 import { sleepHandler } from "./routes/sleep/index.js";
 import { createUsersHandler } from "./routes/users/create-or-update.js";
 import { usersHandler } from "./routes/users/index.js";
+import {render} from '@lit-labs/ssr/lib/render-with-global-dom-shim.js';
+import {PwApp} from '../client/pw-app.js'
+import { Readable } from "node:stream";
+import { unsafeHTML } from "lit/directives/unsafe-html.js";
 
 const startTime = Date.now();
 
@@ -59,14 +63,18 @@ export async function serverHandler(stream, headers) {
   let url = new URL(headers[":path"], "https://localhost:8443");
 
   if (url.pathname === "/") {
-    stream.respondWithFile(
-      "./src/client/index.html",
-      {
-        "content-type": "text/html; charset=utf-8",
-        ":status": 200,
-      },
-      {}
-    );
+    let contents = await readFile("./src/client/index.html", {
+      encoding: "utf-8",
+    });
+
+    const ssrResult = render(unsafeHTML(contents));
+
+    stream.respond({
+      "content-type": "text/html; charset=utf-8",
+      ":status": 200,
+    });
+    Readable.from(ssrResult).pipe(stream)
+    //stream.end()
   } else if (url.pathname === "/favicon.ico") {
     stream.respond(
       {
