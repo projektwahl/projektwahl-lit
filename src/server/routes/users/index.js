@@ -29,7 +29,7 @@ export async function usersHandler(stream, headers) {
           name: url.searchParams.get("f_name"),
           type: url.searchParams.get("f_type"),
         },
-        paginationCursor: { username: "aaaa", type: "voter" },
+        paginationCursor: null,
         paginationDirection: "forwards",
         paginationLimit: 10,
         sorting: [
