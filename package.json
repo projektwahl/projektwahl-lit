@@ -29,15 +29,17 @@
     "hot-esm": "github:vinsonchuong/hot-esm#456dc02e6bfcc5e403f93c3a77ce10e3125fc305",
     "lit": "^2.0.2",
     "postgres": "github:porsager/postgres#4a6669c1b623bb89fcf5a9d13dd09aa69c679811",
-    "typescript": "^4.5.2",
     "zod": "^3.11.6"
   },
   "dependenciesComments": {
     "hot-esm": "1.2.2",
+    "lit": "monorepos can't be installed from git afaik and also it probably doesnt work by default",
     "postgres": "v2.0.0-beta.11",
-    "zod": "doesn't work from git because no prepare script. Should probably be installable withouth any building"
+    "typescript": "installing the dependencies is probably more dangerous...",
+    "zod": "doesn't work from git because no prepare script. Should probably be installable without any building"
   },
   "devDependencies": {
-    "@types/node": "^16.11.10"
+    "@types/node": "^16.11.10",
+    "typescript": "^4.5.2"
   }
 }
