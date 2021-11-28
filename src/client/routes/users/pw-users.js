@@ -45,7 +45,7 @@ export let PwUsers = class extends LitElement {
         let response = await fetch(`/api/v1/users?${searchParams}`);
         return await response.json();
       },
-      () => [this.history.url.searchParams, this.abortController]
+      () => [(this.history.url ?? new URL(this.initialUrl)).searchParams, this.abortController]
     );
 
     this.formRef = createRef();

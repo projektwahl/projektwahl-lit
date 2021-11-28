@@ -31,6 +31,7 @@ export let PwApp = class PwApp extends LitElement {
     return {
       last: { state: true },
       current: { state: true },
+      initial: { type: String }
     };
   }
 
@@ -53,15 +54,20 @@ export let PwApp = class PwApp extends LitElement {
      * @type {Promise<import("lit").TemplateResult>}
      */
     this.current;
+
+    /** @type {string} */
+    this.initial;
   }
 
   /** @override */ render() {
+    console.log(this.initial)
+
     this.last = this.current;
-    if (this.history.url.pathname === "/login") {
+    if ((this.history.url ?? new URL(this.initial)).pathname === "/login") {
       this.current = pwLogin();
-    } else if (this.history.url.pathname === "/users") {
+    } else if ((this.history.url ?? new URL(this.initial)).pathname === "/users") {
       this.current = Promise.resolve(html`<pw-users></pw-users>`);
-    } else if (this.history.url.pathname === "/users/create") {
+    } else if ((this.history.url ?? new URL(this.initial)).pathname === "/users/create") {
       this.current = Promise.resolve(html`<pw-user-create></pw-user-create>`);
     } else {
       this.current = Promise.resolve(html`Not Found`);
@@ -90,7 +96,7 @@ export let PwApp = class PwApp extends LitElement {
                 <a
                   @click=${aClick}
                   class="nav-link ${classMap({
-                    active: this.history.url.pathname === "/",
+                    active: (this.history.url ?? new URL(this.initial)).pathname === "/",
                   })}"
                   aria-current="page"
                   href="/"
@@ -101,7 +107,7 @@ export let PwApp = class PwApp extends LitElement {
                 <a
                   @click=${aClick}
                   class="nav-link ${classMap({
-                    active: this.history.url.pathname === "/users",
+                    active: (this.history.url ?? new URL(this.initial)).pathname === "/users",
                   })}"
                   href="/users"
                   >Nutzer</a
@@ -111,7 +117,7 @@ export let PwApp = class PwApp extends LitElement {
                 <a
                   @click=${aClick}
                   class="nav-link ${classMap({
-                    active: this.history.url.pathname === "/projects",
+                    active: (this.history.url ?? new URL(this.initial)).pathname === "/projects",
                   })}"
                   href="/projects"
                   >Projekte</a
@@ -121,7 +127,7 @@ export let PwApp = class PwApp extends LitElement {
                 <a
                   @click=${aClick}
                   class="nav-link ${classMap({
-                    active: this.history.url.pathname === "/election",
+                    active: (this.history.url ?? new URL(this.initial)).pathname === "/election",
                   })}"
                   href="/election"
                   >Wahl</a
@@ -138,7 +144,7 @@ export let PwApp = class PwApp extends LitElement {
                 <a
                   @click=${aClick}
                   class="nav-link ${classMap({
-                    active: this.history.url.pathname === "/login",
+                    active: (this.history.url ?? new URL(this.initial)).pathname === "/login",
                   })}"
                   href="/login"
                   >Anmelden</a
