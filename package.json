@@ -28,13 +28,14 @@
     "@lit-labs/task": "^1.0.0",
     "hot-esm": "github:vinsonchuong/hot-esm#456dc02e6bfcc5e403f93c3a77ce10e3125fc305",
     "lit": "^2.0.2",
-    "postgres": "beta",
+    "postgres": "github:porsager/postgres#4a6669c1b623bb89fcf5a9d13dd09aa69c679811",
     "typescript": "^4.5.2",
-    "zod": "github:colinhacks/zod#fdd708493e4422dba6453908af55ef0d58767c03"
+    "zod": "^3.11.6"
   },
   "dependenciesComments": {
     "hot-esm": "1.2.2",
-    "zod": "3.11.6"
+    "postgres": "v2.0.0-beta.11",
+    "zod": "doesn't work from git because no prepare script. Should probably be installable withouth any building"
   },
   "devDependencies": {
     "@types/node": "^16.11.10"
