@@ -13,6 +13,7 @@ import { until } from "lit/directives/until.js";
 import { pwLogin } from "./routes/login/pw-login.js";
 import { setupHmr } from "./hmr.js";
 import { css } from "lit";
+import { pwUsers } from "./routes/users/pw-users.js";
 /*
 // TODO FIXME show more details if possible (maybe error page)
 window.addEventListener("error", function (event) {
@@ -38,7 +39,7 @@ export const nextPage = (/** @type {URL} */ url) => {
   if (url.pathname === "/login") {
     return pwLogin();
   } else if (url.pathname === "/users") {
-    return Promise.resolve(html`<pw-users></pw-users>`);
+    return pwUsers(url);
   } else if (url.pathname === "/users/create") {
     return Promise.resolve(html`<pw-user-create></pw-user-create>`);
   } else {

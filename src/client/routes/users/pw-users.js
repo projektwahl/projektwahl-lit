@@ -14,10 +14,21 @@ import {createRef, ref} from 'lit/directives/ref.js';
 import { sleep } from "../../utils.js";
 import { noChange } from "lit";
 
+export const pwUsers = async (/** @type {URL} */ url) => {
+  return html`<pw-users .initial=${await taskFunction([url.searchParams])}></pw-users>`
+}
+
+const taskFunction = async (/** @type {[URLSearchParams]} */ [searchParams]) => {
+  let response = await fetch(new URL(`/api/v1/users?${searchParams}`, window.location.href));
+  return await response.json();
+}
+
 export let PwUsers = class extends LitElement {
   /** @override */ static get properties() {
     return {
-      abortController: { state: true }
+      task: { attribute: false },
+      initial: { attribute: false },
+      initialUsed: { state: true }
     };
   }
   
@@ -29,26 +40,23 @@ export let PwUsers = class extends LitElement {
      */
     this.history = new HistoryController(this);
 
-    /** @type {AbortController} */
-    this.abortController = new AbortController();
-
     /** @type {Timeout} */
     this.timer;
 
     /**
      * @private
      */
-    this._apiTask = new Task(
-      this,
-      // TODO FIXME it seems like the types here are wrong
-      async ([searchParams, /** @type {AbortController} */ abortController]) => {
-        let response = await fetch(`/api/v1/users?${searchParams}`);
-        return await response.json();
-      },
-      () => [(this.history.url ?? new URL(this.initialUrl)).searchParams, this.abortController]
-    );
+    this._apiTask;
 
     this.formRef = createRef();
+
+    /** @type {boolean} */
+    this.initialUsed = false;
+
+    /**
+     * @type {Promise<import("lit").TemplateResult> | undefined}
+     */
+    this.initial;
   }
 
   /** @override */ static styles = css`
@@ -59,6 +67,16 @@ export let PwUsers = class extends LitElement {
   `;
 
   /** @override */ render() {
+    this._apiTask = new Task(
+      this,
+      taskFunction,
+      () => /** @type {[URLSearchParams]} */ ([this.history.url.searchParams])
+    );
+    if (this.initial !== undefined && !this.initialUsed) {
+      this.initialUsed = true;
+      this._apiTask.status = TaskStatus.COMPLETE;
+      this._apiTask._value = this.initial;
+    }
     return html`
       ${bootstrapCss}
 
