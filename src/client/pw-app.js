@@ -26,12 +26,33 @@ window.addEventListener("unhandledrejection", function (event) {
 ReactiveElement.enableWarning?.("migration");
 ReactiveElement.enableWarning?.("change-in-update");
 
+// TODO FIXME create a pw-app directive that can be awaited on the server side.
+// so we actually get server side rendering with datae
+
+export const pwApp = async (/** @type {URL} */ url) => {
+  let page = await nextPage(url)
+  return html`<pw-app .initial=${Promise.resolve(page)}></pw-app>`
+}
+
+export const nextPage = (/** @type {URL} */ url) => {
+  if (url.pathname === "/login") {
+    return pwLogin();
+  } else if (url.pathname === "/users") {
+    return Promise.resolve(html`<pw-users></pw-users>`);
+  } else if (url.pathname === "/users/create") {
+    return Promise.resolve(html`<pw-user-create></pw-user-create>`);
+  } else {
+    return Promise.resolve(html`Not Found`);
+  }
+}
+
 export let PwApp = class PwApp extends LitElement {
   /** @override */ static get properties() {
     return {
       last: { state: true },
       current: { state: true },
-      initial: { type: String }
+      initial: { attribute: false },
+      initialUsed: { state: true }
     };
   }
 
@@ -55,22 +76,22 @@ export let PwApp = class PwApp extends LitElement {
      */
     this.current;
 
-    /** @type {string} */
+    /** @type {boolean} */
+    this.initialUsed = false;
+
+    /**
+     * @type {Promise<import("lit").TemplateResult> | undefined}
+     */
     this.initial;
   }
 
   /** @override */ render() {
-    console.log(this.initial)
-
-    this.last = this.current;
-    if ((this.history.url ?? new URL(this.initial)).pathname === "/login") {
-      this.current = pwLogin();
-    } else if ((this.history.url ?? new URL(this.initial)).pathname === "/users") {
-      this.current = Promise.resolve(html`<pw-users></pw-users>`);
-    } else if ((this.history.url ?? new URL(this.initial)).pathname === "/users/create") {
-      this.current = Promise.resolve(html`<pw-user-create></pw-user-create>`);
+    if (this.initial !== undefined && !this.initialUsed) {
+      this.initialUsed = true;
+      this.current = this.initial;
     } else {
-      this.current = Promise.resolve(html`Not Found`);
+      this.last = this.current;
+      this.current = nextPage(this.history.url);
     }
     return html`
       ${bootstrapCss}
@@ -96,7 +117,7 @@ export let PwApp = class PwApp extends LitElement {
                 <a
                   @click=${aClick}
                   class="nav-link ${classMap({
-                    active: (this.history.url ?? new URL(this.initial)).pathname === "/",
+                    active: this.history.url.pathname === "/",
                   })}"
                   aria-current="page"
                   href="/"
@@ -107,7 +128,7 @@ export let PwApp = class PwApp extends LitElement {
                 <a
                   @click=${aClick}
                   class="nav-link ${classMap({
-                    active: (this.history.url ?? new URL(this.initial)).pathname === "/users",
+                    active: this.history.url.pathname === "/users",
                   })}"
                   href="/users"
                   >Nutzer</a
@@ -117,7 +138,7 @@ export let PwApp = class PwApp extends LitElement {
                 <a
                   @click=${aClick}
                   class="nav-link ${classMap({
-                    active: (this.history.url ?? new URL(this.initial)).pathname === "/projects",
+                    active: this.history.url.pathname === "/projects",
                   })}"
                   href="/projects"
                   >Projekte</a
@@ -127,7 +148,7 @@ export let PwApp = class PwApp extends LitElement {
                 <a
                   @click=${aClick}
                   class="nav-link ${classMap({
-                    active: (this.history.url ?? new URL(this.initial)).pathname === "/election",
+                    active: this.history.url.pathname === "/election",
                   })}"
                   href="/election"
                   >Wahl</a
@@ -144,7 +165,7 @@ export let PwApp = class PwApp extends LitElement {
                 <a
                   @click=${aClick}
                   class="nav-link ${classMap({
-                    active: (this.history.url ?? new URL(this.initial)).pathname === "/login",
+                    active: this.history.url.pathname === "/login",
                   })}"
                   href="/login"
                   >Anmelden</a

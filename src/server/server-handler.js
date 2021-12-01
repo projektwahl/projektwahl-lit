@@ -10,7 +10,7 @@ import { sleepHandler } from "./routes/sleep/index.js";
 import { createUsersHandler } from "./routes/users/create-or-update.js";
 import { usersHandler } from "./routes/users/index.js";
 import {render} from '@lit-labs/ssr/lib/render-with-global-dom-shim.js';
-import {PwApp} from '../client/pw-app.js'
+import {pwApp, PwApp} from '../client/pw-app.js'
 import { Readable } from "node:stream";
 import { unsafeHTML } from "lit/directives/unsafe-html.js";
 import { html } from "lit";
@@ -184,17 +184,17 @@ export async function serverHandler(stream, headers) {
       </head>
       <body>
         <script
-          onerror="javascript:alert('Failed to load')"
           type="module"
           src="/src/client/pw-app.js"
         ></script>
-        <noscript>Bitte aktiviere JavaScript!</noscript>
     
-        <pw-app initial=${url.toString()}></pw-app>
+        ${await pwApp(url)}
       </body>
     </html>
     `
 
+    // TODO FIXME IMPORTANT this doesn't work for parallel rendering
+    global.historyControllerUrl = url;
     const ssrResult = render(contents);
 
     stream.respond({
