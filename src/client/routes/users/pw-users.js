@@ -15,7 +15,10 @@ import { sleep } from "../../utils.js";
 import { noChange } from "lit";
 
 export const pwUsers = async (/** @type {URL} */ url) => {
-  return html`<pw-users .initial=${await taskFunction([url.searchParams])}></pw-users>`
+  //let result = await taskFunction([url.searchParams]);
+  //console.log(result)
+  //return html`<pw-users .initial=${result}></pw-users>`
+  return html`<pw-users></pw-users>`
 }
 
 const taskFunction = async (/** @type {[URLSearchParams]} */ [searchParams]) => {
@@ -31,7 +34,7 @@ export let PwUsers = class extends LitElement {
     return {
       task: { attribute: false },
       initial: { attribute: false },
-      initialUsed: { state: true }
+      initialRender: { state: true }
     };
   }
   
@@ -54,7 +57,7 @@ export let PwUsers = class extends LitElement {
     this.formRef = createRef();
 
     /** @type {boolean} */
-    this.initialUsed = false;
+    this.initialRender = false;
 
     /**
      * @type {Promise<import("lit").TemplateResult> | undefined}
@@ -70,16 +73,22 @@ export let PwUsers = class extends LitElement {
   `;
 
   /** @override */ render() {
-    this._apiTask = new Task(
-      this,
-      taskFunction,
-      () => /** @type {[URLSearchParams]} */ ([this.history.url.searchParams])
-    );
-    if (this.initial !== undefined && !this.initialUsed) {
-      this.initialUsed = true;
-      this._apiTask.status = TaskStatus.COMPLETE;
-      this._apiTask._value = this.initial;
+    if (!this.initialRender) {
+      this.initialRender = true;
+
+      this._apiTask = new Task(
+        this,
+        taskFunction,
+        () => /** @type {[URLSearchParams]} */ ([this.history.url.searchParams])
+      );
+
+      // TODO FIXME goddammit the private attributes get minified
+      //this._apiTask.status = TaskStatus.COMPLETE;
+      //this._apiTask._value = this.initial;
+
     }
+    console.log(this._apiTask)
+
     return html`
       ${bootstrapCss}
 

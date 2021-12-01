@@ -87,6 +87,8 @@ export let PwApp = class PwApp extends LitElement {
   }
 
   /** @override */ render() {
+    console.log("pw-app rerender")
+
     if (this.initial !== undefined && !this.initialUsed) {
       this.initialUsed = true;
       this.current = this.initial;
