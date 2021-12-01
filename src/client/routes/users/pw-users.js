@@ -19,7 +19,10 @@ export const pwUsers = async (/** @type {URL} */ url) => {
 }
 
 const taskFunction = async (/** @type {[URLSearchParams]} */ [searchParams]) => {
-  let response = await fetch(new URL(`/api/v1/users?${searchParams}`, window.location.href));
+  console.log(window.location.href)
+  let response = await fetch(new URL(`/api/v1/users?${searchParams}`, window.location.href), {
+    //agent: new Agent({rejectUnauthorized: false})
+  });
   return await response.json();
 }
 

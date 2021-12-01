@@ -152,7 +152,7 @@ export async function serverHandler(stream, headers) {
     });
     stream.end(contents);
   } else {
-    let contents = html`<!DOCTYPE html>
+    let rawContents = `<!DOCTYPE html>
     <html lang="en">
       <head>
         <!-- Required meta tags -->
@@ -186,21 +186,28 @@ export async function serverHandler(stream, headers) {
           type="module"
           src="/src/client/pw-app.js"
         ></script>
+        <noscript>Bitte aktiviere JavaScript!</noscript>
     
-        ${await pwApp(url)}
+        <pw-app></pw-app>
       </body>
     </html>
     `
+    // ${await pwApp(url)}
+
+    // current issue: https://github.com/lit/lit/issues/2329
 
     // TODO FIXME IMPORTANT this doesn't work for parallel rendering
-    window.location.href = url;
-    const ssrResult = render(contents);
+    // TODO FIXME SECURITY THE DOMAIN NEEDS TO BE FORCED TO OUR VALUE OTHERWISE THIS IS PRONE TO ATTACKS
+    //window.location.href = url;
+    //const ssrResult = render(contents);
 
     stream.respond({
       "content-type": "text/html; charset=utf-8",
       ":status": 200,
     });
-    Readable.from(ssrResult).pipe(stream)
+    //Readable.from(ssrResult).pipe(stream)
     //stream.end()
+
+    stream.end(rawContents)
   }
 }
