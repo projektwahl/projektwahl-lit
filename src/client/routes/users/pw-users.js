@@ -15,10 +15,9 @@ import { sleep } from "../../utils.js";
 import { noChange } from "lit";
 
 export const pwUsers = async (/** @type {URL} */ url) => {
-  //let result = await taskFunction([url.searchParams]);
-  //console.log(result)
-  //return html`<pw-users .initial=${result}></pw-users>`
-  return html`<pw-users></pw-users>`
+  let result = await taskFunction([url.searchParams]);
+  console.log(result)
+  return html`<pw-users .initial=${result}></pw-users>`
 }
 
 const taskFunction = async (/** @type {[URLSearchParams]} */ [searchParams]) => {
@@ -82,10 +81,11 @@ export let PwUsers = class extends LitElement {
         () => /** @type {[URLSearchParams]} */ ([this.history.url.searchParams])
       );
 
-      // TODO FIXME goddammit the private attributes get minified
-      //this._apiTask.status = TaskStatus.COMPLETE;
-      //this._apiTask._value = this.initial;
-
+      if (this.initial !== undefined) {
+        // TODO FIXME goddammit the private attributes get minified
+        this._apiTask.status = TaskStatus.COMPLETE;
+        this._apiTask.P = this.initial;
+      }
     }
     console.log(this._apiTask)
 
