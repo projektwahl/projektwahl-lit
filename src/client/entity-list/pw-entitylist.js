@@ -26,7 +26,6 @@ export let PwEntityList = class extends LitElement {
   }
 
   /** @override */ render() {
-    console.log((this.history.url ?? new URL(this.initialUrl)));
     if (this.title === undefined) {
       throw new Error("component not fully initialized");
     }

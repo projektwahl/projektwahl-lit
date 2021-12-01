@@ -85,9 +85,6 @@ if ('FormDataEvent' in window) {
       throw new Error("component not fully initialized");
     }
 
-    console.log("rerender");
-    console.log(this.getCurrentInputElements());
-
     return html`
       ${bootstrapCss}
       <main class="container">

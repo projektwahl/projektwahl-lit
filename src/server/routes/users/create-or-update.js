@@ -21,7 +21,6 @@ export async function createUsersHandler(stream, headers) {
             user.age ? user.age : null /* for csv import */
           }, ${user.away ?? false}) RETURNING id;`;
 
-        console.log(row);
 
         return [
           {

@@ -56,7 +56,6 @@ export class PwLogin extends PwForm {
     this._task = new Task(
       this,
       async ([]) => {
-        console.log("pw-form task");
         // ts-expect-error doesn't contain files so this is fine
         const formData = /*new URLSearchParams(*/ new FormData(this.form.value);
 
@@ -75,7 +74,6 @@ export class PwLogin extends PwForm {
           HistoryController.goto(new URL("/", window.location.href), {});
         }
 
-        console.log(result);
         return result;
         /*// https://lit.dev/docs/components/events/#dispatching-events
         const resultEvent = new CustomEvent("form-result", {

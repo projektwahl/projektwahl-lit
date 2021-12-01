@@ -13,7 +13,7 @@ export class HistoryController {
     host.addController(this);
 
     /** @type {URL} */
-    this.url = new URL(window.location.href || global.historyControllerUrl);
+    this.url = new URL(window.location.href);
 
     /** @type {HistoryState} */
     this.state = window.history?.state;

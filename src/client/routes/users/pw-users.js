@@ -131,8 +131,8 @@ export let PwUsers = class extends LitElement {
 
                 <tbody>
                   ${this._apiTask.render({
-                    pending: () => { console.log("pending"); return noChange },
-                    complete: (result) => { console.log("complete"); return result.map(
+                    pending: () => { return noChange },
+                    complete: (result) => { return result.map(
                         (value) => html`<tr>
                           <th scope="row">
                             <p>${value.id}</p>
@@ -158,8 +158,8 @@ export let PwUsers = class extends LitElement {
                           </td>
                         </tr>`
                       )},
-                    error: () => {console.log("error"); return html`error` },
-                    initial: () => {console.log("initial"); return html`hi`},
+                    error: () => {return html`error` },
+                    initial: () => {return html`hi`},
                   })}
                 </tbody>
               </table>

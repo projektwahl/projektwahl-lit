@@ -63,7 +63,6 @@ export async function serverHandler(stream, headers) {
   // TODO FIXME respond can throw
   let url = new URL(headers[":path"], "https://localhost:8443");
 
-  console.log(url.toString())
 
   if (url.pathname === "/favicon.ico") {
     stream.respond(
@@ -194,7 +193,7 @@ export async function serverHandler(stream, headers) {
     `
 
     // TODO FIXME IMPORTANT this doesn't work for parallel rendering
-    global.historyControllerUrl = url;
+    window.location.href = url;
     const ssrResult = render(contents);
 
     stream.respond({
