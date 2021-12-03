@@ -39,7 +39,7 @@ export class PwOrder extends LitElement {
 
     return html`
       ${bootstrapCss}
-      <button name="${this.name}" type="submit" class="btn w-100 text-start" id=${this.randomId}>
+      <button name="${this.name}" type="button" class="btn w-100 text-start" id=${this.randomId}>
         <i
           class="bi-arrow-down-up"
           role="img"
