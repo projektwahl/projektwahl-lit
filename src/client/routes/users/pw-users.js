@@ -102,10 +102,20 @@ export let PwUsers = class extends LitElement {
               this.timer = setTimeout(() => {
                 HistoryController.goto(new URL(`?${urlSearchParams}`, window.location.href))
               }, 250);
+            }} @submit=${(/** @type {SubmitEvent} */ e) => {
+              e.preventDefault();
+
+              const urlSearchParams = new URLSearchParams(new FormData(this.formRef.value));
+
+              HistoryController.goto(new URL(`?${urlSearchParams}`, window.location.href))
             }}>
               <table class="table">
                 <thead>
                   <tr>
+                    <!--
+                      do not support this without javascript because there is literally zero useful ways to do this useful.
+                      the only nice way is probably submit buttons that do things like "oder_by_id_asc" and then redirect to the new state (because you need to remove the old state)
+                    -->
                     <th class="table-cell-hover p-0" scope="col">
                       <pw-order name="o_id" title="ID"></pw-order>
                     </th>
