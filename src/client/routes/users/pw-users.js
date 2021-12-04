@@ -103,12 +103,13 @@ export let PwUsers = class extends LitElement {
             <form
               ${ref(this.formRef)}
               @input=${(e) => {
-                const urlSearchParams = new URLSearchParams(
-                  new FormData(this.formRef.value)
-                );
-
                 clearTimeout(this.timer);
                 this.timer = setTimeout(() => {
+                  const urlSearchParams = new URLSearchParams(
+                    new FormData(this.formRef.value)
+                  );
+                  urlSearchParams.delete("order");
+                  this.history.url.searchParams.getAll("order").forEach((v) => urlSearchParams.append("order", v));
                   HistoryController.goto(
                     new URL(`?${urlSearchParams}`, window.location.href)
                   );
