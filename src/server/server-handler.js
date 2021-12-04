@@ -14,6 +14,8 @@ import { pwApp, PwApp } from "../client/pw-app.js";
 import { Readable } from "node:stream";
 import { unsafeHTML } from "lit/directives/unsafe-html.js";
 import { html } from "lit";
+import { openidLoginHandler } from "./routes/login/openid-login.js";
+import { openidRedirectHandler } from "./routes/login/redirect.js";
 
 const startTime = Date.now();
 
@@ -88,6 +90,8 @@ export async function serverHandler(stream, headers) {
   } else if (url.pathname.startsWith("/api")) {
     let executed =
       (await loginHandler(stream, headers)) ||
+      (await openidLoginHandler(stream, headers)) ||
+      (await openidRedirectHandler(stream, headers)) ||
       (await sleepHandler(stream, headers)) ||
       (await createUsersHandler(stream, headers)) ||
       (await usersHandler(stream, headers));

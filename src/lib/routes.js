@@ -69,6 +69,14 @@ export const routes = /** @type {const} */ ({
     request: loginInputSchema,
     response: loginOutputSchema,
   },
+  "/api/v1/openid-login": {
+    request: z.any(),
+    response: z.any(),
+  },
+  "/api/v1/redirect": {
+    request: z.any(),
+    response: z.any(),
+  },
   "/api/v1/sleep": {
     request: z.undefined(),
     response: z.undefined(),
