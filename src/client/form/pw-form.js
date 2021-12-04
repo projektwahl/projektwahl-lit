@@ -6,7 +6,6 @@ import { createRef, ref } from "lit/directives/ref.js";
 import { bootstrapCss } from "../index.js";
 import { HistoryController } from "../history-controller.js";
 import { myFetch } from "../utils.js";
-import { promise } from "./promise-directive.js";
 import { isErr } from "../../lib/result.js";
 
 /**
@@ -15,10 +14,9 @@ import { isErr } from "../../lib/result.js";
 export class PwForm extends LitElement {
   /** @override */ static get properties() {
     return {
-      url: { attribute: false },
       actionText: { type: String },
-      fakeSlot: { attribute: false },
-      result: { state: true },
+      _task: { state: true },
+      forceTask: { state: true },
     };
   }
 
@@ -27,8 +25,14 @@ export class PwForm extends LitElement {
 
     /** @private */ this.history = new HistoryController(this);
 
-    /** @type {P} */
-    this.url;
+    /* @type {P} */
+    //this.url;
+
+    /**
+     * @private
+     * @type {import("@lit-labs/task").Task}
+     */
+    this._task;
 
     /** @type {string} */
     this.actionText;
@@ -38,34 +42,23 @@ export class PwForm extends LitElement {
 
     /** @type {import("lit/directives/ref").Ref<HTMLFormElement>} */
     this.form = createRef();
-
-    /** @type {Promise<import("../../lib/types").OptionalResult<import("../../lib/routes").routes[P],{ network?: string } & { [key in keyof import("../../lib/routes").routes[P]]?: string }>>} */
-    this.result = Promise.resolve({ result: "none" });
   }
 
   submit = (/** @type {SubmitEvent} */ event) => {
     event.preventDefault();
 
-    // ts-expect-error doesn't contain files so this is fine
-    const formData = /*new URLSearchParams(*/new FormData(this.form.value);
-
-    let jsonData = Object.fromEntries(formData.entries());
-
-    this.result = myFetch(this.url, {
-      method: "POST",
-      headers: {
-        "content-type": "text/json",
-      },
-      body: JSON.stringify(jsonData),
-    });
-    // https://lit.dev/docs/components/events/#dispatching-events
-    const resultEvent = new CustomEvent("form-result", {
-      detail: this.result,
-      bubbles: true,
-      composed: true,
-    });
-    this.dispatchEvent(resultEvent);
+    this.forceTask = (this.forceTask || 0) + 1;
   };
+
+  // TODO FIXME really important
+  // get the inputs from there and check that the errors returned from the server don't contain additional
+  // this needs to be done dynamically as e.g. the create user form dynamically changes the form inputs
+  // attributes. Otherwise we're eating errors and that's not healthy.xit
+  getInputs = () => {};
+
+  /** @private */ getCurrentInputElements() {
+    return [...this.renderRoot.querySelectorAll("pw-input")].map((e) => e.name);
+  }
 
   // https://www.chromestatus.com/feature/4708990554472448
   // https://www.reddit.com/r/PolymerJS/comments/f00gd0/litelement_formassociated_custom_elements_form/
@@ -88,14 +81,9 @@ if ('FormDataEvent' in window) {
   }
 */
   /** @override */ render() {
-    if (this.url === undefined || this.actionText === undefined) {
+    if (this.actionText === undefined) {
       throw new Error("component not fully initialized");
     }
-
-    const keyframeOptions = {
-      duration: 500,
-      fill: "both",
-    };
 
     return html`
       ${bootstrapCss}
@@ -104,23 +92,30 @@ if ('FormDataEvent' in window) {
 
         <div class="row justify-content-center">
           <div class="col-md-7 col-lg-8">
-            ${promise(
-              /** @type {Promise<import("../../lib/types").OptionalResult<import("../../lib/routes").routes[P],{network?: string;} & { [key in keyof import("../../lib/routes").routes[P]]?: string }>>} */ (
-                this.result
-              ),
-              /** @type {symbol | import("lit").TemplateResult | undefined} */ (
-                noChange
-              ),
-              (v) =>
-                isErr(v) && v.failure.network !== undefined
-                  ? html` <div class="alert alert-danger" role="alert">
-                      ${v.failure.network}
-                    </div>`
-                  : undefined,
-              (v) => html` <div class="alert alert-danger" role="alert">
-                Unbekannter Fehler!
-              </div>`
-            )}
+            ${this._task.render({
+              complete: (data) => {
+                if (isErr(data)) {
+                  const errors = Object.entries(data.failure)
+                    .filter(
+                      ([k, v]) => !this.getCurrentInputElements().includes(k)
+                    )
+                    .map(([k, v]) => html`${k}: ${v}<br />`);
+                  if (errors.length > 0) {
+                    return html`<div class="alert alert-danger" role="alert">
+                      Es sind Fehler aufgetreten!<br />
+                      ${errors}
+                    </div>`;
+                  }
+                }
+                return html``;
+              },
+              error: (error) => html`<div
+                class="alert alert-danger"
+                role="alert"
+              >
+                ${error}
+              </div>`,
+            })}
 
             <form
               ${ref(this.form)}
@@ -128,19 +123,19 @@ if ('FormDataEvent' in window) {
               action="/no-javascript"
               @submit=${this.submit}
             >
-              ${this.fakeSlot}
+              ${this.getInputs()}
 
               <button
                 type="submit"
-                ?disabled=${promise(
-                  this.result,
-                  true,
-                  () => false,
-                  () => false
-                )}
+                ?disabled=${this._task.render({
+                  pending: () => true,
+                  complete: () => false,
+                  error: () => false,
+                  initial: () => false,
+                })}
                 class="btn btn-primary"
               >
-                ${this.actionText}
+                ${this.actionText} ${this._task.status}
               </button>
             </form>
           </div>

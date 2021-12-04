@@ -3,7 +3,9 @@
 
 /** @typedef {Record<string, unknown>} HistoryState */
 
-/** @implements {import("lit").ReactiveController} */
+/** @typedef {import('lit').ReactiveController} ReactiveController */
+
+/** @implements {ReactiveController} */
 export class HistoryController {
   constructor(/** @type {import("lit").ReactiveControllerHost} */ host) {
     /** @type {import("lit").ReactiveControllerHost} */
@@ -11,10 +13,10 @@ export class HistoryController {
     host.addController(this);
 
     /** @type {URL} */
-    this.url;
+    this.url = new URL(window.location.href);
 
     /** @type {HistoryState} */
-    this.state;
+    this.state = window.history?.state;
 
     /** @private @type {(this: Window, ev: PopStateEvent) => void} */
     this.popstateListener;

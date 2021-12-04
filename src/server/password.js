@@ -36,16 +36,18 @@ async function getKeyMaterial(password) {
  */
 async function hashPasswordWithSalt(password, salt) {
   let keyMaterial = await getKeyMaterial(password);
-  return Buffer.from(await webcrypto.subtle.deriveBits(
-    {
-      name: "PBKDF2",
-      salt: salt,
-      iterations: 100000,
-      hash: "SHA-256",
-    },
-    keyMaterial,
-    256
-  ));
+  return Buffer.from(
+    await webcrypto.subtle.deriveBits(
+      {
+        name: "PBKDF2",
+        salt: salt,
+        iterations: 100000,
+        hash: "SHA-256",
+      },
+      keyMaterial,
+      256
+    )
+  );
 }
 
 /**

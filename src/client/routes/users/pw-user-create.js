@@ -8,32 +8,22 @@ import { myFetch } from "../../utils.js";
 import { PwForm } from "../../form/pw-form.js";
 import { HistoryController } from "../../history-controller.js";
 import { isOk } from "../../../lib/result.js";
+import { setupHmr } from "../../hmr.js";
+import { createRef, ref } from "lit/directives/ref.js";
 
-// https://lit.dev/docs/components/lifecycle/
-// updateComplete
-
-/**
- * @returns {Promise<import("lit").TemplateResult>}
- */
-export const pwLogin = async () => {
-  const content = await fetch("/api/v1/sleep").then((r) => r.text());
-  return html`<pw-login .data=${content}></pw-login>`;
-};
-
-// maybe let this extend PwForm?
-// I think this is the easiest way
-// otherwise I think some information needs to propagated in some way
+// TODO FIXME implement edit
 
 /**
- * @extends PwForm<"/api/v1/login">
+ * @extends PwForm<"/api/v1/users/create">
  */
-export class PwLogin extends PwForm {
+export class PwUserCreate extends PwForm {
   /** @override */ static get properties() {
     return {
       url: { attribute: false },
       actionText: { type: String },
       _task: { state: true },
       forceTask: { state: true },
+      type: { state: true },
     };
   }
 
@@ -43,12 +33,14 @@ export class PwLogin extends PwForm {
     /** @type {number|undefined} */
     this.forceTask = undefined;
 
-    this.actionText = "Login";
+    this.actionText = "Account erstellen/aktualisieren";
 
     /**
      * @private
      */
     this.history = new HistoryController(this);
+
+    this.type = "voter";
 
     /**
      * @private
@@ -56,13 +48,12 @@ export class PwLogin extends PwForm {
     this._task = new Task(
       this,
       async ([]) => {
-        // ts-expect-error doesn't contain files so this is fine
-        const formData = /*new URLSearchParams(*/ new FormData(this.form.value);
+        const formData = new FormData(this.form.value);
 
         // @ts-expect-error bad typings
         let jsonData = Object.fromEntries(formData.entries());
 
-        let result = await myFetch("/api/v1/login", {
+        let result = await myFetch("/api/v1/users/create", {
           method: "POST",
           headers: {
             "content-type": "text/json",
@@ -75,40 +66,58 @@ export class PwLogin extends PwForm {
         }
 
         return result;
-        /*// https://lit.dev/docs/components/events/#dispatching-events
-        const resultEvent = new CustomEvent("form-result", {
-          detail: this.result,
-          bubbles: true,
-          composed: true,
-        });
-        this.dispatchEvent(resultEvent);
-        */
       },
       () => [this.forceTask]
     );
   }
 
   /** @override */ getInputs = () => {
-    return html` <pw-input
+    return html`
+      <pw-input
         type="text"
-        autocomplete="username"
         label="Name"
         name="username"
         .task=${this._task}
       ></pw-input>
+
       <pw-input
-        label="Passwort"
-        name="password"
-        type="password"
-        autocomplete="current-password"
+        .value=${this.type}
+        @change=${(event) => (this.type = event.target.value)}
+        type="select"
+        label="Nutzerart"
+        name="type"
+        .options=${html`<option value="voter">Schüler</option>
+          <option value="helper">Helfer</option>
+          <option value="admin">Admin</option>`}
         .task=${this._task}
-      ></pw-input>`;
-  };
+      >
+      </pw-input>
 
-  /** @override */ submit = (/** @type {SubmitEvent} */ event) => {
-    event.preventDefault();
+      ${this.type === "voter"
+        ? html`<pw-input
+              type="text"
+              label="Klasse"
+              name="group"
+              .task=${this._task}
+            ></pw-input>
 
-    this.forceTask = (this.forceTask || 0) + 1;
+            <pw-input
+              type="number"
+              label="Jahrgang"
+              name="age"
+              .task=${this._task}
+            ></pw-input>`
+        : undefined}
+
+      <pw-input
+        type="checkbox"
+        label="Abwesend"
+        name="away"
+        .task=${this._task}
+      ></pw-input>
+    `;
   };
 }
-customElements.define("pw-login", PwLogin);
+customElements.define("pw-user-create", PwUserCreate);
+
+setupHmr(PwUserCreate, import.meta.url);

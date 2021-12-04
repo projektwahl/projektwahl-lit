@@ -15,8 +15,7 @@ export function fetchData(
   table,
   fieldsToSelect,
   orderByInfo,
-  _query,
-  sanitizedData,
+  _query, // TODO FIXME sanitize
   customFilterQuery
 ) {
   const query = _query;
@@ -40,7 +39,9 @@ export function fetchData(
   if (query.paginationCursor === null) {
     return sql2`(SELECT ${unsafe2(fieldsToSelect.join(", "))} FROM ${unsafe2(
       table
-    )} WHERE ORDER BY ${orderByQuery} LIMIT ${query.paginationLimit + 1})`;
+    )} WHERE ${customFilterQuery(
+      query
+    )} ORDER BY ${orderByQuery} LIMIT ${query.paginationLimit + 1})`;
   } else {
     let queries = query.sorting.map((value, index, array) => {
       const part = query.sorting.slice(0, index + 1);
@@ -62,9 +63,9 @@ export function fetchData(
 
       return sql2`(SELECT ${unsafe2(fieldsToSelect.join(", "))} FROM ${unsafe2(
         table
-      )} WHERE${customFilterQuery(
-        sanitizedData
-      )} (${parts}) ORDER BY ${orderByQuery} LIMIT ${
+      )} WHERE ${customFilterQuery(
+        query
+      )} AND (${parts}) ORDER BY ${orderByQuery} LIMIT ${
         query.paginationLimit + 1
       })`;
     });
@@ -74,39 +75,3 @@ export function fetchData(
       .slice(1)} LIMIT ${query.paginationLimit + 1}`;
   }
 }
-
-const value = fetchData(
-  "users",
-  ["id", "type", "username", "password_hash"],
-  {
-    id: "nulls-first",
-    type: "nulls-first",
-    username: "nulls-first",
-    password_hash: "nulls-first",
-  },
-  {
-    filters: {},
-    paginationCursor: { username: "aaaa", type: "voter" },
-    paginationDirection: "forwards",
-    paginationLimit: 10,
-    sorting: [
-      ["type", "DESC"],
-      ["username", "ASC"],
-      ["id", "DESC"],
-    ],
-  },
-  {
-    name: "test",
-  },
-  (query) => {
-    return sql2``;
-  }
-);
-
-console.log(value)
-
-console.log(sql2ToString(value))
-
-console.log(await sql(...value));
-
-await sql.end()

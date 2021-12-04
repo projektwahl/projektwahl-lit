@@ -1,7 +1,10 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // SPDX-FileCopyrightText: 2021 Moritz Hedtke <Moritz.Hedtke@t-online.de>
+import "./routes/users/pw-users.js";
 import "./form/pw-form.js";
-import { adoptStyles, html, LitElement } from "lit";
+import "./entity-list/pw-entitylist.js";
+import "./routes/users/pw-user-create.js";
+import { html, LitElement, ReactiveElement } from "lit";
 import { bootstrapCss } from "./index.js";
 import { HistoryController } from "./history-controller.js";
 import { aClick } from "./pw-a.js";
@@ -9,7 +12,9 @@ import { classMap } from "lit/directives/class-map.js";
 import { until } from "lit/directives/until.js";
 import { pwLogin } from "./routes/login/pw-login.js";
 import { setupHmr } from "./hmr.js";
-
+import { css } from "lit";
+import { pwUsers } from "./routes/users/pw-users.js";
+/*
 // TODO FIXME show more details if possible (maybe error page)
 window.addEventListener("error", function (event) {
   alert("unknown error: " + event.message);
@@ -17,13 +22,38 @@ window.addEventListener("error", function (event) {
 
 window.addEventListener("unhandledrejection", function (event) {
   alert("unknown error: " + event.reason);
-});
+});*/
+
+ReactiveElement.enableWarning?.("migration");
+ReactiveElement.enableWarning?.("change-in-update");
+
+// TODO FIXME create a pw-app directive that can be awaited on the server side.
+// so we actually get server side rendering with datae
+
+export const pwApp = async (/** @type {URL} */ url) => {
+  let page = await nextPage(url);
+  return html`<pw-app .initial=${Promise.resolve(page)}></pw-app>`;
+};
+
+export const nextPage = (/** @type {URL} */ url) => {
+  if (url.pathname === "/login") {
+    return pwLogin();
+  } else if (url.pathname === "/users") {
+    return pwUsers(url);
+  } else if (url.pathname === "/users/create") {
+    return Promise.resolve(html`<pw-user-create></pw-user-create>`);
+  } else {
+    return Promise.resolve(html`Not Found`);
+  }
+};
 
 export let PwApp = class PwApp extends LitElement {
   /** @override */ static get properties() {
     return {
       last: { state: true },
       current: { state: true },
+      initial: { attribute: false },
+      initialUsed: { state: true },
     };
   }
 
@@ -46,14 +76,26 @@ export let PwApp = class PwApp extends LitElement {
      * @type {Promise<import("lit").TemplateResult>}
      */
     this.current;
+
+    /** @type {boolean} */
+    this.initialUsed = false;
+
+    /**
+     * @type {Promise<import("lit").TemplateResult> | undefined}
+     */
+    this.initial;
   }
 
   /** @override */ render() {
-    this.last = this.current;
-    this.current =
-      this.history.url.pathname === "/login"
-        ? pwLogin()
-        : Promise.resolve(html`Not Found`);
+    console.log("pw-app rerender");
+
+    if (this.initial !== undefined && !this.initialUsed) {
+      this.initialUsed = true;
+      this.current = this.initial;
+    } else {
+      this.last = this.current;
+      this.current = nextPage(this.history.url);
+    }
     return html`
       ${bootstrapCss}
       <nav
@@ -151,8 +193,8 @@ export let PwApp = class PwApp extends LitElement {
       ${until(this.current, this.last)}
     `;
   }
-}
+};
 
-setupHmr(PwApp, import.meta.url)
+setupHmr(PwApp, import.meta.url);
 
 customElements.define("pw-app", PwApp);

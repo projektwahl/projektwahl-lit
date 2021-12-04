@@ -11,46 +11,31 @@
   >
 >} */
 export const myFetch = async (url, options) => {
-  try {
-    const response = await fetch(url, options);
-    if (!response.ok) {
-      try {
-        const additionalInfo = await response.text();
-        return {
-          result: "failure",
-          failure: {
-            network: `Failed to request ${url}: ${response.status} ${response.statusText}\nAdditional information: ${additionalInfo}`,
-          },
-        };
-      } catch (/** @type {unknown} */ error) {
-        return {
-          result: "failure",
-          failure: {
-            network: `Failed to request ${url}: ${response.status} ${response.statusText}`,
-          },
-        };
-      }
-    }
-    const result = await response.json();
-    return result;
-  } catch (error) {
-    console.error(error);
-    if (error instanceof TypeError) {
-      return {
-        result: "failure",
-        failure: {
-          network: `Failed to request ${url}: ${
-            error.message
-          }\nAdditional information: ${error.stack ?? "none"}`,
-        },
-      };
-    } else {
-      return {
-        result: "failure",
-        failure: {
-          network: `Failed to request ${url}: Unknown error see console.`,
-        },
-      };
+  const response = await fetch(url, options);
+  if (!response.ok) {
+    try {
+      const additionalInfo = await response.text();
+      throw new Error(
+        `Failed to request ${url}: ${response.status} ${response.statusText}\nAdditional information: ${additionalInfo}`
+      );
+    } catch (error) {
+      throw new Error(
+        `Failed to request ${url}: ${response.status} ${response.statusText}\n`
+      );
     }
   }
+  const result = await response.json();
+  return result;
+};
+
+/**
+ *
+ * @returns {Promise<void>}
+ */
+export const sleep = () => {
+  return new Promise((resolve, reject) => {
+    setTimeout(() => {
+      resolve();
+    }, 500);
+  });
 };
