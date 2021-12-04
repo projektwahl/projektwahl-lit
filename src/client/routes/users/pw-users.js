@@ -33,7 +33,8 @@ export let PwUsers = class extends LitElement {
     return {
       task: { attribute: false },
       initial: { attribute: false },
-      initialRender: { state: true }
+      initialRender: { state: true },
+
     };
   }
   
@@ -111,7 +112,7 @@ export let PwUsers = class extends LitElement {
                       the only nice way is probably submit buttons that do things like "oder_by_id_asc" and then redirect to the new state (because you need to remove the old state)
                     -->
                     <th class="table-cell-hover p-0" scope="col">
-                      <pw-order @click=${} name="o_id" title="ID"></pw-order>
+                      <pw-order  name="o_id" title="ID"></pw-order>
                     </th>
 
                     <th class="table-cell-hover p-0" scope="col">

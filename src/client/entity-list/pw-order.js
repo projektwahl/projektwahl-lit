@@ -4,6 +4,7 @@ import { html, LitElement, noChange } from "lit";
 import { bootstrapCss } from "../index.js";
 import { setupHmr } from "../hmr.js";
 import { css } from "lit";
+import { HistoryController } from "../history-controller.js";
 
 /** @template T */
 export class PwOrder extends LitElement {
@@ -30,6 +31,8 @@ export class PwOrder extends LitElement {
 
     /** @type {string} */
     this.randomId = "id" + Math.random().toString().replace(".", "");
+
+    this.history = new HistoryController(this);
   }
 
   /** @override */ render() {
@@ -39,9 +42,36 @@ export class PwOrder extends LitElement {
 
     return html`
       ${bootstrapCss}
-      <button name="${this.name}" type="button" class="btn w-100 text-start" id=${this.randomId}>
+      <button @click=${(e) => {
+                        const urlSearchParams = this.history.url.searchParams;
+
+                        let order = [...urlSearchParams.getAll("order")]
+
+                        let oldElementIndex = order.findIndex((e) => e.startsWith(this.name + '-'));
+                        let oldElement;
+                        if (oldElementIndex == -1) {
+                          oldElement = `${this.name}-downup`;
+                        } else {
+                          oldElement = order.splice(oldElementIndex, 1)[0];
+                        }
+                        let newElement;
+                        switch (oldElement.split('-')[1]) {
+                          case 'downup':
+                            newElement = 'up';
+                            break;
+                          case 'up':
+                            newElement = 'down';
+                            break;
+                          default:
+                            newElement = null;
+                        }
+                        urlSearchParams.delete("order");
+                        [...order, ...(newElement !== null ? [oldElement.split('-')[0] + '-' + newElement]:[])].forEach((v) => urlSearchParams.append("order", v))
+
+                        HistoryController.goto(new URL(`?${urlSearchParams}`, window.location.href))
+                      }} name="${this.name}" type="button" class="btn w-100 text-start" id=${this.randomId}>
         <i
-          class="bi-arrow-down-up"
+          class="bi-arrow-${this.history.url.searchParams.getAll("order").find((e) => e.startsWith(this.name + '-'))?.split('-')[1] ?? 'down-up'}"
           role="img"
           aria-label="Nach {title} sortieren"
         ></i> ${this.title}
