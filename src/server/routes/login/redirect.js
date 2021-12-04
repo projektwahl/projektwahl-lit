@@ -20,6 +20,7 @@ export async function openidRedirectHandler(stream, headers) {
     // https://github.com/AzureAD/microsoft-authentication-library-for-js/tree/dev/lib/msal-browser
     // https://docs.microsoft.com/en-us/azure/active-directory/develop/scenario-spa-app-registration
     // USE single tenant as for all others we need permissions
+    // https://portal.azure.com/
     
     // https://github.com/projektwahl/projektwahl-sveltekit/blob/work/src/routes/login/index.json.ts
     // https://github.com/projektwahl/projektwahl-sveltekit/blob/work/src/routes/redirect/index.ts_old
@@ -30,10 +31,11 @@ export async function openidRedirectHandler(stream, headers) {
     
     console.log(result)
 
+    console.log(result.claims())
 
-    const userinfo = await client.userinfo(result, {});
+    //const userinfo = await client.userinfo(result, {});
 
-    console.log(userinfo)
+    //console.log(userinfo)
 
     /** @type {import("node:http2").OutgoingHttpHeaders} */
     const responseHeaders = {
