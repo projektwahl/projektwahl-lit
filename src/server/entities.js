@@ -15,8 +15,7 @@ export function fetchData(
   table,
   fieldsToSelect,
   orderByInfo,
-  _query,
-  sanitizedData,
+  _query, // TODO FIXME sanitize
   customFilterQuery
 ) {
   const query = _query;
@@ -41,7 +40,7 @@ export function fetchData(
     return sql2`(SELECT ${unsafe2(fieldsToSelect.join(", "))} FROM ${unsafe2(
       table
     )} WHERE ${customFilterQuery(
-      sanitizedData
+      query
     )} ORDER BY ${orderByQuery} LIMIT ${query.paginationLimit + 1})`;
   } else {
     let queries = query.sorting.map((value, index, array) => {
@@ -65,7 +64,7 @@ export function fetchData(
       return sql2`(SELECT ${unsafe2(fieldsToSelect.join(", "))} FROM ${unsafe2(
         table
       )} WHERE ${customFilterQuery(
-        sanitizedData
+        query
       )} AND (${parts}) ORDER BY ${orderByQuery} LIMIT ${
         query.paginationLimit + 1
       })`;

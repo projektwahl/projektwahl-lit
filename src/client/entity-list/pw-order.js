@@ -60,10 +60,10 @@ export class PwOrder extends LitElement {
           let newElement;
           switch (oldElement.split("-")[1]) {
             case "downup":
-              newElement = "up";
+              newElement = "ASC";
               break;
-            case "up":
-              newElement = "down";
+            case "ASC":
+              newElement = "DESC";
               break;
             default:
               newElement = null;
@@ -86,10 +86,13 @@ export class PwOrder extends LitElement {
         id=${this.randomId}
       >
         <i
-          class="bi-arrow-${this.history.url.searchParams
+          class="bi-arrow-${(() => {
+            let value = this.history.url.searchParams
             .getAll("order")
             .find((e) => e.startsWith(this.name + "-"))
-            ?.split("-")[1] ?? "down-up"}"
+            ?.split("-")[1];
+            return value === "ASC" ? "up" : (value === "DESC" ? "down" : "down-up")
+          })()}"
           role="img"
           aria-label="Nach {title} sortieren"
         ></i>

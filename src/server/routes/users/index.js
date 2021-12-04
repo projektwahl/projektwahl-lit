@@ -25,9 +25,9 @@ export async function usersHandler(stream, headers) {
       },
       {
         filters: {
-          id: url.searchParams.get("f_id"),
-          name: url.searchParams.get("f_name"),
-          type: url.searchParams.get("f_type"),
+          id: url.searchParams.get("f_id") ?? '',
+          username: url.searchParams.get("f_username") ?? '',
+          type: url.searchParams.get("f_type") ?? '',
         },
         paginationCursor: null,
         paginationDirection: "forwards",
@@ -38,18 +38,10 @@ export async function usersHandler(stream, headers) {
 I think in the UI we will never be able to implement this without javascript and without reloading at every change
 
 */
-
-        sorting: [
-          ["type", url.searchParams.has("o_type") ? "ASC" : "DESC"],
-          ["username", url.searchParams.has("o_name") ? "ASC" : "DESC"],
-          ["id", url.searchParams.has("o_id") ? "ASC" : "DESC"],
-        ],
-      },
-      {
-        name: "test",
+        sorting: url.searchParams.getAll("order").map(o => o.split("-")) // TODO FIXME validate
       },
       (query) => {
-        return sql2`TRUE`;
+        return sql2`username LIKE ${'%' + query.filters.username + '%'}`;
       }
     );
 

@@ -39,6 +39,7 @@ export let PwUsers = class extends LitElement {
       task: { attribute: false },
       initial: { attribute: false },
       initialRender: { state: true },
+      debouncedUrl: { state: true },
     };
   }
 
@@ -80,6 +81,7 @@ export let PwUsers = class extends LitElement {
     if (!this.initialRender) {
       this.initialRender = true;
 
+      // TODO FIXME somehow debounce (as we currently do a full navigation this probably has to be done somewhere else)
       this._apiTask = new Task(
         this,
         taskFunction,
@@ -103,18 +105,17 @@ export let PwUsers = class extends LitElement {
             <form
               ${ref(this.formRef)}
               @input=${(e) => {
-                clearTimeout(this.timer);
-                this.timer = setTimeout(() => {
-                  const urlSearchParams = new URLSearchParams(
-                    new FormData(this.formRef.value)
-                  );
-                  urlSearchParams.delete("order");
-                  this.history.url.searchParams.getAll("order").forEach((v) => urlSearchParams.append("order", v));
-                  HistoryController.goto(
-                    new URL(`?${urlSearchParams}`, window.location.href)
-                  );
-                }, 250);
+                const urlSearchParams = new URLSearchParams(
+                  new FormData(this.formRef.value)
+                );
+                urlSearchParams.delete("order");
+                this.history.url.searchParams.getAll("order").forEach((v) => urlSearchParams.append("order", v));
+                HistoryController.goto(
+                  new URL(`?${urlSearchParams}`, window.location.href)
+                );
               }}
+
+              @submit=${(e) => e.preventDefault()}
             >
               <table class="table">
                 <thead>
@@ -124,15 +125,15 @@ export let PwUsers = class extends LitElement {
                       the only nice way is probably submit buttons that do things like "oder_by_id_asc" and then redirect to the new state (because you need to remove the old state)
                     -->
                     <th class="table-cell-hover p-0" scope="col">
-                      <pw-order name="o_id" title="ID"></pw-order>
+                      <pw-order name="id" title="ID"></pw-order>
                     </th>
 
                     <th class="table-cell-hover p-0" scope="col">
-                      <pw-order name="o_name" title="Name"></pw-order>
+                      <pw-order name="username" title="Name"></pw-order>
                     </th>
 
                     <th class="table-cell-hover p-0" scope="col">
-                      <pw-order name="o_type" title="Typ"></pw-order>
+                      <pw-order name="type" title="Typ"></pw-order>
                     </th>
 
                     <th class="table-cell-hover">Aktionen</th>
@@ -145,15 +146,17 @@ export let PwUsers = class extends LitElement {
                         type="text"
                         class="form-control"
                         id="projects-filter-{name}"
+                        value=${this.history.url.searchParams.get("f_id")}
                       />
                     </th>
 
                     <th scope="col">
                       <input
-                        name="f_name"
+                        name="f_username"
                         type="text"
                         class="form-control"
                         id="projects-filter-{name}"
+                        value=${this.history.url.searchParams.get("f_username")}
                       />
                     </th>
 
@@ -163,6 +166,7 @@ export let PwUsers = class extends LitElement {
                         type="text"
                         class="form-control"
                         id="projects-filter-{name}"
+                        value=${this.history.url.searchParams.get("f_type")}
                       />
                     </th>
 
