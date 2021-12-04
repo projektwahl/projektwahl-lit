@@ -29,7 +29,7 @@ export const myFetch = async (url, options) => {
 };
 
 /**
- * 
+ *
  * @returns {Promise<void>}
  */
 export const sleep = () => {
@@ -38,4 +38,4 @@ export const sleep = () => {
       resolve();
     }, 500);
   });
-}
+};

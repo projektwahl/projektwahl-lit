@@ -31,9 +31,9 @@ ReactiveElement.enableWarning?.("change-in-update");
 // so we actually get server side rendering with datae
 
 export const pwApp = async (/** @type {URL} */ url) => {
-  let page = await nextPage(url)
-  return html`<pw-app .initial=${Promise.resolve(page)}></pw-app>`
-}
+  let page = await nextPage(url);
+  return html`<pw-app .initial=${Promise.resolve(page)}></pw-app>`;
+};
 
 export const nextPage = (/** @type {URL} */ url) => {
   if (url.pathname === "/login") {
@@ -45,7 +45,7 @@ export const nextPage = (/** @type {URL} */ url) => {
   } else {
     return Promise.resolve(html`Not Found`);
   }
-}
+};
 
 export let PwApp = class PwApp extends LitElement {
   /** @override */ static get properties() {
@@ -53,7 +53,7 @@ export let PwApp = class PwApp extends LitElement {
       last: { state: true },
       current: { state: true },
       initial: { attribute: false },
-      initialUsed: { state: true }
+      initialUsed: { state: true },
     };
   }
 
@@ -87,7 +87,7 @@ export let PwApp = class PwApp extends LitElement {
   }
 
   /** @override */ render() {
-    console.log("pw-app rerender")
+    console.log("pw-app rerender");
 
     if (this.initial !== undefined && !this.initialUsed) {
       this.initialUsed = true;

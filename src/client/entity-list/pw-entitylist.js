@@ -56,7 +56,9 @@ export let PwEntityList = class extends LitElement {
               url.searchParams.set("count", event.target.value);
               HistoryController.goto(url);
             }}
-            .value=${(this.history.url ?? new URL(this.initialUrl)).searchParams.get("count")}
+            .value=${(
+              this.history.url ?? new URL(this.initialUrl)
+            ).searchParams.get("count")}
             class="form-select"
             aria-label="Default select example"
           >

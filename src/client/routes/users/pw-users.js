@@ -10,23 +10,28 @@ import { repeat } from "lit/directives/repeat.js";
 import { setupHmr } from "../../hmr.js";
 import { Task, TaskStatus } from "@lit-labs/task";
 import { css } from "lit";
-import {createRef, ref} from 'lit/directives/ref.js';
+import { createRef, ref } from "lit/directives/ref.js";
 import { sleep } from "../../utils.js";
 import { noChange } from "lit";
 
 export const pwUsers = async (/** @type {URL} */ url) => {
   let result = await taskFunction([url.searchParams]);
-  console.log(result)
-  return html`<pw-users .initial=${result}></pw-users>`
-}
+  console.log(result);
+  return html`<pw-users .initial=${result}></pw-users>`;
+};
 
-const taskFunction = async (/** @type {[URLSearchParams]} */ [searchParams]) => {
-  console.log(window.location.href)
-  let response = await fetch(new URL(`/api/v1/users?${searchParams}`, window.location.href), {
-    //agent: new Agent({rejectUnauthorized: false})
-  });
+const taskFunction = async (
+  /** @type {[URLSearchParams]} */ [searchParams]
+) => {
+  console.log(window.location.href);
+  let response = await fetch(
+    new URL(`/api/v1/users?${searchParams}`, window.location.href),
+    {
+      //agent: new Agent({rejectUnauthorized: false})
+    }
+  );
   return await response.json();
-}
+};
 
 export let PwUsers = class extends LitElement {
   /** @override */ static get properties() {
@@ -34,10 +39,9 @@ export let PwUsers = class extends LitElement {
       task: { attribute: false },
       initial: { attribute: false },
       initialRender: { state: true },
-
     };
   }
-  
+
   constructor() {
     super();
 
@@ -88,7 +92,7 @@ export let PwUsers = class extends LitElement {
         this._apiTask.P = this.initial;
       }
     }
-    console.log(this._apiTask)
+    console.log(this._apiTask);
 
     return html`
       ${bootstrapCss}
@@ -96,14 +100,21 @@ export let PwUsers = class extends LitElement {
       <div class="container">
         <pw-entitylist title="Nutzende">
           <div slot="response">
-            <form ${ref(this.formRef)} @input=${(e) => {
-              const urlSearchParams = new URLSearchParams(new FormData(this.formRef.value));
+            <form
+              ${ref(this.formRef)}
+              @input=${(e) => {
+                const urlSearchParams = new URLSearchParams(
+                  new FormData(this.formRef.value)
+                );
 
-              clearTimeout(this.timer)
-              this.timer = setTimeout(() => {
-                HistoryController.goto(new URL(`?${urlSearchParams}`, window.location.href))
-              }, 250);
-            }}>
+                clearTimeout(this.timer);
+                this.timer = setTimeout(() => {
+                  HistoryController.goto(
+                    new URL(`?${urlSearchParams}`, window.location.href)
+                  );
+                }, 250);
+              }}
+            >
               <table class="table">
                 <thead>
                   <tr>
@@ -112,7 +123,7 @@ export let PwUsers = class extends LitElement {
                       the only nice way is probably submit buttons that do things like "oder_by_id_asc" and then redirect to the new state (because you need to remove the old state)
                     -->
                     <th class="table-cell-hover p-0" scope="col">
-                      <pw-order  name="o_id" title="ID"></pw-order>
+                      <pw-order name="o_id" title="ID"></pw-order>
                     </th>
 
                     <th class="table-cell-hover p-0" scope="col">
@@ -162,12 +173,15 @@ export let PwUsers = class extends LitElement {
                   </tr>
                 </thead>
 
-<!-- TODO FIXME add loading indicator overlay -->
+                <!-- TODO FIXME add loading indicator overlay -->
 
                 <tbody>
                   ${this._apiTask.render({
-                    pending: () => { return noChange },
-                    complete: (result) => { return result.map(
+                    pending: () => {
+                      return noChange;
+                    },
+                    complete: (result) => {
+                      return result.map(
                         (value) => html`<tr>
                           <th scope="row">
                             <p>${value.id}</p>
@@ -192,9 +206,14 @@ export let PwUsers = class extends LitElement {
                             </button>
                           </td>
                         </tr>`
-                      )},
-                    error: () => {return html`error` },
-                    initial: () => {return html`hi`},
+                      );
+                    },
+                    error: () => {
+                      return html`error`;
+                    },
+                    initial: () => {
+                      return html`hi`;
+                    },
                   })}
                 </tbody>
               </table>

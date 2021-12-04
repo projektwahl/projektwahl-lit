@@ -34,15 +34,15 @@ export async function usersHandler(stream, headers) {
         paginationLimit: 10,
         // TODO FIXME the order should be user specified
         // TODO FIXME also unordered needs to be an option in the ui
-/*
+        /*
 I think in the UI we will never be able to implement this without javascript and without reloading at every change
 
 */
 
         sorting: [
-          ["type", url.searchParams.has("o_type")?"ASC":"DESC"],
-          ["username", url.searchParams.has("o_name")?"ASC":"DESC"],
-          ["id", url.searchParams.has("o_id")?"ASC":"DESC"],
+          ["type", url.searchParams.has("o_type") ? "ASC" : "DESC"],
+          ["username", url.searchParams.has("o_name") ? "ASC" : "DESC"],
+          ["id", url.searchParams.has("o_id") ? "ASC" : "DESC"],
         ],
       },
       {

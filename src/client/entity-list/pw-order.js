@@ -42,39 +42,58 @@ export class PwOrder extends LitElement {
 
     return html`
       ${bootstrapCss}
-      <button @click=${(e) => {
-                        const urlSearchParams = this.history.url.searchParams;
+      <button
+        @click=${(e) => {
+          const urlSearchParams = this.history.url.searchParams;
 
-                        let order = [...urlSearchParams.getAll("order")]
+          let order = [...urlSearchParams.getAll("order")];
 
-                        let oldElementIndex = order.findIndex((e) => e.startsWith(this.name + '-'));
-                        let oldElement;
-                        if (oldElementIndex == -1) {
-                          oldElement = `${this.name}-downup`;
-                        } else {
-                          oldElement = order.splice(oldElementIndex, 1)[0];
-                        }
-                        let newElement;
-                        switch (oldElement.split('-')[1]) {
-                          case 'downup':
-                            newElement = 'up';
-                            break;
-                          case 'up':
-                            newElement = 'down';
-                            break;
-                          default:
-                            newElement = null;
-                        }
-                        urlSearchParams.delete("order");
-                        [...order, ...(newElement !== null ? [oldElement.split('-')[0] + '-' + newElement]:[])].forEach((v) => urlSearchParams.append("order", v))
+          let oldElementIndex = order.findIndex((e) =>
+            e.startsWith(this.name + "-")
+          );
+          let oldElement;
+          if (oldElementIndex == -1) {
+            oldElement = `${this.name}-downup`;
+          } else {
+            oldElement = order.splice(oldElementIndex, 1)[0];
+          }
+          let newElement;
+          switch (oldElement.split("-")[1]) {
+            case "downup":
+              newElement = "up";
+              break;
+            case "up":
+              newElement = "down";
+              break;
+            default:
+              newElement = null;
+          }
+          urlSearchParams.delete("order");
+          [
+            ...order,
+            ...(newElement !== null
+              ? [oldElement.split("-")[0] + "-" + newElement]
+              : []),
+          ].forEach((v) => urlSearchParams.append("order", v));
 
-                        HistoryController.goto(new URL(`?${urlSearchParams}`, window.location.href))
-                      }} name="${this.name}" type="button" class="btn w-100 text-start" id=${this.randomId}>
+          HistoryController.goto(
+            new URL(`?${urlSearchParams}`, window.location.href)
+          );
+        }}
+        name="${this.name}"
+        type="button"
+        class="btn w-100 text-start"
+        id=${this.randomId}
+      >
         <i
-          class="bi-arrow-${this.history.url.searchParams.getAll("order").find((e) => e.startsWith(this.name + '-'))?.split('-')[1] ?? 'down-up'}"
+          class="bi-arrow-${this.history.url.searchParams
+            .getAll("order")
+            .find((e) => e.startsWith(this.name + "-"))
+            ?.split("-")[1] ?? "down-up"}"
           role="img"
           aria-label="Nach {title} sortieren"
-        ></i> ${this.title}
+        ></i>
+        ${this.title}
       </button>
     `;
   }

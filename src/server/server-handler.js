@@ -9,8 +9,8 @@ import { loginHandler } from "./routes/login/index.js";
 import { sleepHandler } from "./routes/sleep/index.js";
 import { createUsersHandler } from "./routes/users/create-or-update.js";
 import { usersHandler } from "./routes/users/index.js";
-import {render} from '@lit-labs/ssr/lib/render-with-global-dom-shim.js';
-import {pwApp, PwApp} from '../client/pw-app.js'
+import { render } from "@lit-labs/ssr/lib/render-with-global-dom-shim.js";
+import { pwApp, PwApp } from "../client/pw-app.js";
 import { Readable } from "node:stream";
 import { unsafeHTML } from "lit/directives/unsafe-html.js";
 import { html } from "lit";
@@ -62,7 +62,6 @@ export async function serverHandler(stream, headers) {
 
   // TODO FIXME respond can throw
   let url = new URL(headers[":path"], "https://localhost:8443");
-
 
   if (url.pathname === "/favicon.ico") {
     stream.respond(
@@ -191,7 +190,7 @@ export async function serverHandler(stream, headers) {
         <pw-app></pw-app>
       </body>
     </html>
-    `
+    `;
     // ${await pwApp(url)}
 
     // current issue: https://github.com/lit/lit/issues/2329
@@ -208,6 +207,6 @@ export async function serverHandler(stream, headers) {
     //Readable.from(ssrResult).pipe(stream)
     //stream.end()
 
-    stream.end(rawContents)
+    stream.end(rawContents);
   }
 }
