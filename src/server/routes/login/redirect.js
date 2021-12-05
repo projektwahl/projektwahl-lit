@@ -78,7 +78,7 @@ export async function openidRedirectHandler(stream, headers) {
       }; Secure; SameSite=Lax; HttpOnly; Max-Age=${48 * 60 * 60};`,
       `username=${
         dbUser.username
-      }; Secure; SameSite=Strict; Max-Age=${48 * 60 * 60};`,
+      }; Secure; SameSite=Strict; Path=/; Max-Age=${48 * 60 * 60};`,
     ],
     [sensitiveHeaders]: ["set-cookie"],
   };

@@ -14,6 +14,7 @@ import { pwLogin } from "./routes/login/pw-login.js";
 import { setupHmr } from "./hmr.js";
 import { css } from "lit";
 import { pwUsers } from "./routes/users/pw-users.js";
+import Cookies from 'js-cookie'
 /*
 // TODO FIXME show more details if possible (maybe error page)
 window.addEventListener("error", function (event) {
@@ -159,11 +160,11 @@ export let PwApp = class PwApp extends LitElement {
               </li>
             </ul>
             <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
-              <li class="nav-item">
+              ${Cookies.get("username") ? html`<li class="nav-item">
                 <a @click=${aClick} class="nav-link" href="#"
-                  >{$session.user.name} abmelden</a
+                  >${Cookies.get("username")} abmelden</a
                 >
-              </li>
+              </li>` : html`
               <li class="nav-item">
                 <a
                   @click=${aClick}
@@ -171,9 +172,9 @@ export let PwApp = class PwApp extends LitElement {
                     active: this.history.url.pathname === "/login",
                   })}"
                   href="/login"
-                  >Anmelden</a
+                  >Anmelden ${JSON.stringify(Cookies.get())}</a
                 >
-              </li>
+              </li>`}
             </ul>
           </div>
         </div>

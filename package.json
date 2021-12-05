@@ -28,6 +28,7 @@
     "@lit-labs/ssr": "^1.0.0",
     "@lit-labs/task": "^1.0.0",
     "hot-esm": "github:vinsonchuong/hot-esm#456dc02e6bfcc5e403f93c3a77ce10e3125fc305",
+    "js-cookie": "^3.0.1",
     "lit": "^2.0.2",
     "openid-client": "^5.1.0",
     "postgres": "github:porsager/postgres#4a6669c1b623bb89fcf5a9d13dd09aa69c679811",
@@ -41,6 +42,7 @@
     "zod": "doesn't work from git because no prepare script. Should probably be installable without any building"
   },
   "devDependencies": {
+    "@types/js-cookie": "^3.0.1",
     "@types/node": "^16.11.10",
     "typescript": "^4.5.2"
   }
