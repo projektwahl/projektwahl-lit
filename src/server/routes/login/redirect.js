@@ -24,24 +24,73 @@ export async function openidRedirectHandler(stream, headers) {
     
     // https://github.com/projektwahl/projektwahl-sveltekit/blob/work/src/routes/login/index.json.ts
     // https://github.com/projektwahl/projektwahl-sveltekit/blob/work/src/routes/redirect/index.ts_old
-    const result = await client.callback(`${"https://localhost:8443"}/api/v1/redirect`, {
-      session_state: url.searchParams.get('session_state'),
-      code: url.searchParams.get('code'),
-    });
-    
-    console.log(result)
 
-    console.log(result.claims())
+    try {
+      const result = await client.callback(`${"https://localhost:8443"}/api/v1/redirect`, {
+        session_state: url.searchParams.get('session_state'),
+        code: url.searchParams.get('code'),
+      });
+      
+      console.log(result)
 
-    const userinfo = await client.userinfo(result, {});
+      console.log(result.claims())
 
-    console.log(userinfo)
+
+    //const userinfo = await client.userinfo(result, {});
+
+    //console.log(userinfo)
 
     /** @type {[import("../../../lib/types").Existing<Pick<import("../../../lib/types").RawUserType, "id"|"username"|"password_hash"|"password_salt">>?]} */
     const [dbUser] =
-      await sql`SELECT id, username, type FROM users WHERE openid_id = ${result.claims().sub} LIMIT 1`;
+    await sql`SELECT id, username, type FROM users WHERE openid_id = ${result.claims().sub} LIMIT 1`;
 
-    if (dbUser === undefined) {
+  if (dbUser === undefined) {
+    return [
+      {
+        "content-type": "text/json; charset=utf-8",
+        ":status": 200,
+      },
+      {
+        result: "failure",
+        failure: {
+          username: "Nutzer existiert nicht!",
+        },
+      },
+    ];
+  }
+
+  /** @type {[Pick<import("../../../lib/types").RawSessionType, "session_id">]} */
+  const [session] = await sql.begin("READ WRITE", async (sql) => {
+    return await sql`INSERT INTO sessions (user_id) VALUES (${dbUser.id}) RETURNING session_id`;
+  });
+
+  /** @type {import("node:http2").OutgoingHttpHeaders} */
+  const responseHeaders = {
+    "content-type": "text/json; charset=utf-8",
+    ":status": 302,
+    "location": "https://localhost:8443/",
+    "set-cookie": [
+      `strict_id=${
+        session.session_id
+      }; Secure; SameSite=Strict; HttpOnly; Max-Age=${48 * 60 * 60};`,
+      `lax_id=${
+        session.session_id
+      }; Secure; SameSite=Lax; HttpOnly; Max-Age=${48 * 60 * 60};`,
+      `username=${
+        dbUser.username
+      }; Secure; SameSite=Strict; Max-Age=${48 * 60 * 60};`,
+    ],
+    [sensitiveHeaders]: ["set-cookie"],
+  };
+  return [
+    responseHeaders,
+    {
+      result: "success",
+      success: undefined,
+    },
+  ];
+    } catch (error) {
+      let _error = /** @type {Error} */ (error);
       return [
         {
           "content-type": "text/json; charset=utf-8",
@@ -50,41 +99,12 @@ export async function openidRedirectHandler(stream, headers) {
         {
           result: "failure",
           failure: {
-            username: "Nutzer existiert nicht!",
+            login: _error.message,
           },
         },
       ];
     }
 
-    /** @type {[Pick<import("../../../lib/types").RawSessionType, "session_id">]} */
-    const [session] = await sql.begin("READ WRITE", async (sql) => {
-      return await sql`INSERT INTO sessions (user_id) VALUES (${dbUser.id}) RETURNING session_id`;
-    });
-
-    /** @type {import("node:http2").OutgoingHttpHeaders} */
-    const responseHeaders = {
-      "content-type": "text/json; charset=utf-8",
-      ":status": 200,
-      "set-cookie": [
-        `strict_id=${
-          session.session_id
-        }; Secure; SameSite=Strict; HttpOnly; Max-Age=${48 * 60 * 60};`,
-        `lax_id=${
-          session.session_id
-        }; Secure; SameSite=Lax; HttpOnly; Max-Age=${48 * 60 * 60};`,
-        `username=${
-          dbUser.username
-        }; Secure; SameSite=Strict; Max-Age=${48 * 60 * 60};`,
-      ],
-      [sensitiveHeaders]: ["set-cookie"],
-    };
-    return [
-      responseHeaders,
-      {
-        result: "success",
-        success: undefined,
-      },
-    ];
 
 
   })(stream, headers);
