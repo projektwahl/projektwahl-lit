@@ -17,7 +17,7 @@ export async function sleepHandler(stream, headers) {
           },
           undefined,
         ]);
-      }, 1000);
+      }, 100);
     });
   })(stream, headers);
 }

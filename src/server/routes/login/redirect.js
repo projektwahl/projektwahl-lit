@@ -72,6 +72,9 @@ export async function openidRedirectHandler(stream, headers) {
         `lax_id=${
           session.session_id
         }; Secure; SameSite=Lax; HttpOnly; Max-Age=${48 * 60 * 60};`,
+        `username=${
+          dbUser.username
+        }; Secure; SameSite=Strict; Max-Age=${48 * 60 * 60};`,
       ],
       [sensitiveHeaders]: ["set-cookie"],
     };

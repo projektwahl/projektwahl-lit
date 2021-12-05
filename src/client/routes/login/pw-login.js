@@ -16,7 +16,7 @@ import { isOk } from "../../../lib/result.js";
  * @returns {Promise<import("lit").TemplateResult>}
  */
 export const pwLogin = async () => {
-  const content = await fetch("/api/v1/sleep").then((r) => r.text());
+  const content = 0;//await fetch("/api/v1/sleep").then((r) => r.text());
   return html`<pw-login .data=${content}></pw-login>`;
 };
 
@@ -89,7 +89,12 @@ export class PwLogin extends PwForm {
   }
 
   /** @override */ getInputs = () => {
-    return html` <pw-input
+    return html`
+    <a class="btn btn-primary btn-lg w-100 my-5" href="/api/v1/openid-login" role="button">Mit Schulaccount anmelden</a>
+
+    <h3 class="text-center">Als Gast anmelden</h3>
+
+    <pw-input
         type="text"
         autocomplete="username"
         label="Name"
