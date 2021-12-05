@@ -29,6 +29,7 @@ END $$;
 CREATE TABLE IF NOT EXISTS users (
   id SERIAL PRIMARY KEY NOT NULL,
   username VARCHAR(64) UNIQUE NOT NULL,
+  openid_id VARCHAR(256) UNIQUE,
   password_hash BYTEA,
   password_salt BYTEA,
   type user_type NOT NULL,

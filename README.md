@@ -23,6 +23,11 @@ cd ../../../..
 npm link @lit-labs/task
 
 # maybe npx lerna bootstrap --hoist also helps
+
+
+npm run setup
+
+UPDATE users SET openid_id = 'XjGZGMJqAWgiJYYhaEtpb1tNhJklPgwsXdIkLiiC0jA' WHERE username = 'admin';
 ```
 
 https://docs.joshuatz.com/cheatsheets/js/jsdoc/

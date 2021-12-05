@@ -33,14 +33,47 @@ export async function openidRedirectHandler(stream, headers) {
 
     console.log(result.claims())
 
-    //const userinfo = await client.userinfo(result, {});
+    const userinfo = await client.userinfo(result, {});
 
-    //console.log(userinfo)
+    console.log(userinfo)
+
+    /** @type {[import("../../../lib/types").Existing<Pick<import("../../../lib/types").RawUserType, "id"|"username"|"password_hash"|"password_salt">>?]} */
+    const [dbUser] =
+      await sql`SELECT id, username, type FROM users WHERE openid_id = ${result.claims().sub} LIMIT 1`;
+
+    if (dbUser === undefined) {
+      return [
+        {
+          "content-type": "text/json; charset=utf-8",
+          ":status": 200,
+        },
+        {
+          result: "failure",
+          failure: {
+            username: "Nutzer existiert nicht!",
+          },
+        },
+      ];
+    }
+
+    /** @type {[Pick<import("../../../lib/types").RawSessionType, "session_id">]} */
+    const [session] = await sql.begin("READ WRITE", async (sql) => {
+      return await sql`INSERT INTO sessions (user_id) VALUES (${dbUser.id}) RETURNING session_id`;
+    });
 
     /** @type {import("node:http2").OutgoingHttpHeaders} */
     const responseHeaders = {
       "content-type": "text/json; charset=utf-8",
       ":status": 200,
+      "set-cookie": [
+        `strict_id=${
+          session.session_id
+        }; Secure; SameSite=Strict; HttpOnly; Max-Age=${48 * 60 * 60};`,
+        `lax_id=${
+          session.session_id
+        }; Secure; SameSite=Lax; HttpOnly; Max-Age=${48 * 60 * 60};`,
+      ],
+      [sensitiveHeaders]: ["set-cookie"],
     };
     return [
       responseHeaders,
@@ -49,5 +82,7 @@ export async function openidRedirectHandler(stream, headers) {
         success: undefined,
       },
     ];
+
+
   })(stream, headers);
 }
