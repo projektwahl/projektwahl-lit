@@ -3,6 +3,21 @@
 
 import { Issuer } from "openid-client";
 
+if (!process.env['OPENID_URL']) {
+  console.error("OPENID_URL not set!")
+  process.exit(1);
+}
+
+if (!process.env['CLIENT_ID']) {
+  console.error("CLIENT_ID not set!")
+  process.exit(1);
+}
+
+if (!process.env['CLIENT_SECRET']) {
+  console.error("CLIENT_SECRET not set!")
+  process.exit(1);
+}
+
 const issuer = await Issuer.discover(process.env['OPENID_URL']);
 const Client = issuer.Client;
 export const client = new Client({
