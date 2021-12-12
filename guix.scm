@@ -1,36 +1,38 @@
 (use-modules (guix)
-            (gnu packages web)
+             (gnu packages web)
              (guix build-system gnu)
-(guix packages)
+             (guix packages)
              (guix git-download)
              (gnu packages)
-              (guix gexp)
-              (guix build utils)
+             (guix gexp)
+             (guix build utils)
              (gnu packages base)
              (srfi srfi-1)
              (gnu packages package-management)
              (guix build-system node)
              (guix licenses))
 
-; https://issues.guix.gnu.org/51838#66
-; [PATCH v3 06/43]
-; https://debbugs.gnu.org/cgi/bugreport.cgi?bug=51838
+;; ~/Documents/guix/etc/indent-code.el guix.scm 
 
-; guix pull --url=/home/moritz/Documents/guix --profile=/tmp/guix.master --disable-authentication
-; GUIX_PROFILE="/tmp/guix.master"
-; . "$GUIX_PROFILE/etc/profile"
-; guix build --verbosity=3 --file=/home/moritz/Documents/projektwahl-lit/guix.scm 
+;; https://issues.guix.gnu.org/51838#66
+;; [PATCH v3 06/43]
+;; https://debbugs.gnu.org/cgi/bugreport.cgi?bug=51838
 
-; https://news.ycombinator.com/item?id=19808225
-; https://dustycloud.org/blog/javascript-packaging-dystopia/
-; https://github.com/jellelicht/guix/pull/1
-; https://www.mail-archive.com/guix-devel@gnu.org/msg48964.html
-; https://git.ngyro.com/guix-npm
+;; guix pull --url=/home/moritz/Documents/guix --profile=/tmp/guix.master --disable-authentication
+;; GUIX_PROFILE="/tmp/guix.master"
+;; . "$GUIX_PROFILE/etc/profile"
+;; guix build --verbosity=3 --file=/home/moritz/Documents/projektwahl-lit/guix.scm 
 
-; https://guix.gnu.org/manual/en/html_node/G_002dExpressions.html
-; in G-Expressions quasiqote etc has different syntax (#~ #$ #$@)
+;; https://news.ycombinator.com/item?id=19808225
+;; https://dustycloud.org/blog/javascript-packaging-dystopia/
+;; https://github.com/jellelicht/guix/pull/1
+;; https://www.mail-archive.com/guix-devel@gnu.org/msg48964.html
+;; https://git.ngyro.com/guix-npm
 
-; guix package --verbosity=3 --install-from-file=guix.scm
+;; https://guix.gnu.org/manual/en/html_node/G_002dExpressions.html
+;; in G-Expressions quasiqote etc has different syntax (#~ #$ #$@)
+
+;; guix package --verbosity=3 --install-from-file=guix.scm
 
 (define-public lit-html
   (package
@@ -50,8 +52,8 @@
      '(#:tests?
        #f ; would need additional dependencies
        #:absent-dependencies
-          '("@types/trusted-types")
-        #:phases
+       '("@types/trusted-types")
+       #:phases
        (modify-phases %standard-phases
          ;; The default configure phase fails due to various packages
          ;; being missing, as we don't have them packaged yet.
@@ -59,17 +61,17 @@
          (add-after 'unpack 'change-directory
            (lambda _
              (chdir "packages/lit-html")))
-            
-          (replace 'build 
+         
+         (replace 'build 
            (lambda* (#:key inputs #:allow-other-keys)
-(begin
- (let ((esbuild (string-append (assoc-ref inputs "esbuild")
-                                           "/bin/esbuild")))
-               (apply invoke  
-                      `(,esbuild . ,(append (find-files "src" "\\.ts$")
-                       '("--platform=browser"
-                       "--outdir=src")))))))
-         ))))
+             (begin
+               (let ((esbuild (string-append (assoc-ref inputs "esbuild")
+                                             "/bin/esbuild")))
+                 (apply invoke  
+                        (cons esbuild (append (find-files "src" "\\.ts$")
+                                              '("--platform=browser"
+                                                "--outdir=src")))))))
+           ))))
     (native-inputs
      `(("esbuild" ,esbuild)))
     (home-page "https://github.com/lit/lit")
