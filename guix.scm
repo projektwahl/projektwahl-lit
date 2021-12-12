@@ -5,7 +5,10 @@
              (guix git-download)
              (gnu packages)
               (guix gexp)
+              (guix build utils)
              (gnu packages base)
+             (srfi srfi-1)
+             (gnu packages package-management)
              (guix build-system node)
              (guix licenses))
 
@@ -24,7 +27,11 @@
 ; https://www.mail-archive.com/guix-devel@gnu.org/msg48964.html
 ; https://git.ngyro.com/guix-npm
 
+; https://guix.gnu.org/manual/en/html_node/G_002dExpressions.html
+; in G-Expressions quasiqote etc has different syntax (#~ #$ #$@)
+
 ; guix package --verbosity=3 --install-from-file=guix.scm
+
 (define-public lit-html
   (package
     (name "lit-html")
@@ -40,7 +47,7 @@
                 "1hi9v08jaj8nyiansbk2yayv21ayya52as6q8viiri5avf8i3nlk"))))
     (build-system node-build-system)
     (arguments
-     `(#:tests?
+     '(#:tests?
        #f ; would need additional dependencies
        #:absent-dependencies
           '("@types/trusted-types")
@@ -53,16 +60,16 @@
            (lambda _
              (chdir "packages/lit-html")))
             
-          (replace 'build
+          (replace 'build 
            (lambda* (#:key inputs #:allow-other-keys)
-             (let ((esbuild (string-append (assoc-ref inputs "esbuild")
+(begin
+ (let ((esbuild (string-append (assoc-ref inputs "esbuild")
                                            "/bin/esbuild")))
-               `(invoke esbuild
-                      ,@(find-files "gnu/services" "\\.scm$")
-                       "--platform=browser" 
-                       "**/*.ts"))))
-
-            )))
+               (apply invoke  
+                      `(,esbuild . ,(append (find-files "." "\\.ts$")
+                       '("--platform=browser"
+                       "--outdir=.")))))))
+         ))))
     (native-inputs
      `(("esbuild" ,esbuild)))
     (home-page "https://github.com/lit/lit")
