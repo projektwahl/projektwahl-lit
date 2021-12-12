@@ -66,9 +66,9 @@
  (let ((esbuild (string-append (assoc-ref inputs "esbuild")
                                            "/bin/esbuild")))
                (apply invoke  
-                      `(,esbuild . ,(append (find-files "." "\\.ts$")
+                      `(,esbuild . ,(append (find-files "src" "\\.ts$")
                        '("--platform=browser"
-                       "--outdir=.")))))))
+                       "--outdir=src")))))))
          ))))
     (native-inputs
      `(("esbuild" ,esbuild)))
