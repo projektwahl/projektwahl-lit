@@ -950,23 +950,38 @@
     (name "projektwahl-lit")
     (version "0.1.0")
     (source 
-              (origin
-            (method url-fetch)
-            (uri "file:///home/moritz/Documents/projektwahl-lit")
-            (sha256
-               (base32
-                "11v3jxd7q7fabzbxywswlxjm1sgz51wzr2fm4qyh5ab25hk32ckh"))
-              (modules '((guix build utils)))
-            ;(snippet '(begin (
-            ;  (delete-file-recursively ".git")
-            ;  (delete-file-recursively "guix.scm"))))
-              )
-            
-            )
+     (origin
+       (method url-fetch)
+       (uri "file:///home/moritz/Documents/projektwahl-lit")
+       (sha256
+        (base32
+         "11v3jxd7q7fabzbxywswlxjm1sgz51wzr2fm4qyh5ab25hk32ckh"))
+       (modules '((guix build utils)))
+                                        ;(snippet '(begin (
+                                        ;  (delete-file-recursively ".git")
+                                        ;  (delete-file-recursively "guix.scm"))))
+       )
+     
+     )
+    
     (build-system node-build-system)
+    (arguments
+     '(
+       #:absent-dependencies
+       '("typescript" "@types/node" "@types/js-cookie")
+       ))
     (inputs
      `(
        ("zod" ,zod)
+       ("openid-client" ,openid-client)
+       ("lit" ,lit)
+       ("js-cookie" ,js-cookie)
+       ("@lit-labs/task" ,lit-labs-task)
+       ("@lit-labs/ssr" ,lit-labs-ssr)
+       ("@lit-labs/motion" ,lit-labs-motion)
+       ("postgres" ,postgres)
+
+
        ))
     (home-page "https://github.com/panva/node-openid-client")
     (synopsis "OpenID Certified™ Relying Party (OpenID Connect/OAuth 2.0 Client) implementation for Node.js.")
