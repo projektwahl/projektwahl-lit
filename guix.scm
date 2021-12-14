@@ -10,7 +10,7 @@
              (srfi srfi-1)
              (gnu packages package-management)
              (guix build-system node)
-              ((guix licenses) #:prefix license:))
+             ((guix licenses) #:prefix license:))
 
 ;; ~/Documents/guix/etc/indent-code.el guix.scm 
 
@@ -286,11 +286,11 @@
        '("@esm-bundle/chai"
          "@types/chai"
          "@types/mocha"
-          "@types/trusted-types"
-          "@web/test-runner-mocha"
-          "@web/dev-server"
-           "chokidar-cli"
-          "concurrently"
+         "@types/trusted-types"
+         "@web/test-runner-mocha"
+         "@web/dev-server"
+         "chokidar-cli"
+         "concurrently"
          "internal-scripts"
          "mocha"
          "rollup"
@@ -340,8 +340,8 @@
        #f ; would need additional dependencies
        #:absent-dependencies
        '("rollup"
-    "typescript"
-    "internal-scripts")
+         "typescript"
+         "internal-scripts")
        #:phases
        (modify-phases %standard-phases
          (add-after 'unpack 'change-directory
@@ -390,35 +390,35 @@
        #f ; would need additional dependencies
        #:absent-dependencies
        '("node-fetch"
-    "parse5"
-    "resolve"
-    ;; dev dependencies:
-    "@koa/router"
-    "@open-wc/testing-karma"
-    "@open-wc/testing"
-    "@types/chai"
-    "@types/command-line-args"
-    "@types/koa__router"
-    "@types/koa-cors"
-    "@types/koa-static"
-    "@types/koa"
-    "@types/mocha"
-    "@types/node-fetch"
-    "@types/node"
-    "@types/parse5"
-    "@types/resolve"
-    "@web/test-runner"
-    "@webcomponents/template-shadowroot"
-    "chai"
-    "command-line-args"
-    "deepmerge"
-    "koa-cors"
-    "koa-node-resolve"
-    "koa-static"
-    "koa"
-    "mocha"
-    "typescript"
-    "uvu")
+         "parse5"
+         "resolve"
+         ;; dev dependencies:
+         "@koa/router"
+         "@open-wc/testing-karma"
+         "@open-wc/testing"
+         "@types/chai"
+         "@types/command-line-args"
+         "@types/koa__router"
+         "@types/koa-cors"
+         "@types/koa-static"
+         "@types/koa"
+         "@types/mocha"
+         "@types/node-fetch"
+         "@types/node"
+         "@types/parse5"
+         "@types/resolve"
+         "@web/test-runner"
+         "@webcomponents/template-shadowroot"
+         "chai"
+         "command-line-args"
+         "deepmerge"
+         "koa-cors"
+         "koa-node-resolve"
+         "koa-static"
+         "koa"
+         "mocha"
+         "typescript"
+         "uvu")
        #:phases
        (modify-phases %standard-phases
          (add-after 'unpack 'change-directory
@@ -439,9 +439,9 @@
      `(("esbuild" ,esbuild)))
     (inputs
      `(
-      ("@lit-labs/ssr-client" ,lit-labs-ssr-client)
+       ("@lit-labs/ssr-client" ,lit-labs-ssr-client)
        ("@lit/reactive-element" ,lit-reactive-element)
-        ("lit-element" ,lit-element)
+       ("lit-element" ,lit-element)
        ("lit" ,lit)
        ("lit-html" ,lit-html)))
     (home-page "https://github.com/lit/lit")
@@ -469,16 +469,16 @@
        #f ; would need additional dependencies
        #:absent-dependencies
        '("@esm-bundle/chai"
-    "@types/chai"
-    "@types/mocha"
-    "@types/trusted-types"
-    "@web/test-runner-mocha"
-    "chokidar-cli"
-    "concurrently"
-    "mocha"
-    "rollup"
-    "typescript"
-    "internal-scripts")
+         "@types/chai"
+         "@types/mocha"
+         "@types/trusted-types"
+         "@web/test-runner-mocha"
+         "chokidar-cli"
+         "concurrently"
+         "mocha"
+         "rollup"
+         "typescript"
+         "internal-scripts")
        #:phases
        (modify-phases %standard-phases
          (add-after 'unpack 'change-directory
@@ -529,27 +529,27 @@
        #f ; would need additional dependencies
        #:absent-dependencies
        '("browserstack-runner"
-    "eslint"
-    "eslint-config-standard"
-    "eslint-plugin-promise"
-    "eslint-plugin-html"
-    "eslint-plugin-markdown"
-    "grunt"
-    "grunt-compare-size"
-    "grunt-contrib-connect"
-    "grunt-contrib-nodeunit"
-    "grunt-contrib-qunit"
-    "grunt-contrib-watch"
-    "grunt-exec"
-    "gzip-js"
-    "prettier"
-    "qunit"
-    "release-it"
-    "rollup"
-    "rollup-plugin-filesize"
-    "rollup-plugin-license"
-    "rollup-plugin-terser"
-    "standard")
+         "eslint"
+         "eslint-config-standard"
+         "eslint-plugin-promise"
+         "eslint-plugin-html"
+         "eslint-plugin-markdown"
+         "grunt"
+         "grunt-compare-size"
+         "grunt-contrib-connect"
+         "grunt-contrib-nodeunit"
+         "grunt-contrib-qunit"
+         "grunt-contrib-watch"
+         "grunt-exec"
+         "gzip-js"
+         "prettier"
+         "qunit"
+         "release-it"
+         "rollup"
+         "rollup-plugin-filesize"
+         "rollup-plugin-license"
+         "rollup-plugin-terser"
+         "standard")
        #:phases
        (modify-phases %standard-phases
          (replace 'build 
@@ -558,7 +558,7 @@
                (let ((esbuild (string-append (assoc-ref inputs "esbuild")
                                              "/bin/esbuild")))
                  (invoke esbuild "src/api.mjs" "--bundle" "--platform=browser"
-                                                "--outfile=dist/js.cookie.mjs"))))
+                         "--outfile=dist/js.cookie.mjs"))))
            ))))
     (native-inputs
      `(("esbuild" ,esbuild)))
@@ -584,35 +584,35 @@
                 "0vz6s8f0izldfh5h40rwfdpn0s21nnwqqv36a0k4lcvai90m5khv"))
               (modules '((guix build utils)))
               (snippet '(delete-file-recursively "dist"))
-                ))
+              ))
     (build-system node-build-system)
     (arguments
      '(#:tests?
        #f ; would need additional dependencies
        #:absent-dependencies
        '("@types/node"
-    "ava"
-    "bowser"
-    "c8"
-    "esbuild"
-    "glob"
-    "got"
-    "karma"
-    "karma-browserstack-launcher"
-    "karma-qunit"
-    "karma-summary-reporter"
-    "nock"
-    "npm-run-all"
-    "p-throttle"
-    "patch-package"
-    "prettier"
-    "qunit"
-    "rollup"
-    "tar"
-    "timekeeper"
-    "typedoc"
-    "typedoc-plugin-markdown"
-    "typescript")
+         "ava"
+         "bowser"
+         "c8"
+         "esbuild"
+         "glob"
+         "got"
+         "karma"
+         "karma-browserstack-launcher"
+         "karma-qunit"
+         "karma-summary-reporter"
+         "nock"
+         "npm-run-all"
+         "p-throttle"
+         "patch-package"
+         "prettier"
+         "qunit"
+         "rollup"
+         "tar"
+         "timekeeper"
+         "typedoc"
+         "typedoc-plugin-markdown"
+         "typescript")
        #:phases
        (modify-phases %standard-phases
          (replace 'build 
@@ -620,8 +620,15 @@
              (begin
                (let ((esbuild (string-append (assoc-ref inputs "esbuild")
                                              "/bin/esbuild")))
-                 (invoke esbuild "./src" "--platform=browser"
+                 (apply invoke  
+                        (cons esbuild (append (find-files "src" "\\.ts$")
+                                              '("--platform=browser"
+                                                "--outdir=dist/browser"))))
+                 (apply invoke  
+                        (cons esbuild (append (find-files "src" "\\.ts$")
+                                              '("--platform=node"
                                                 "--outdir=dist/node/esm"))))
+                 )))
            ))))
     (native-inputs
      `(("esbuild" ,esbuild)))
