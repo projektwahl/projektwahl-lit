@@ -659,22 +659,22 @@
        #f ; would need additional dependencies
        #:absent-dependencies
        '("browserify"
-    "gulp"
-    "gulp-browserify"
-    "gulp-coveralls"
-    "gulp-exec"
-    "gulp-istanbul"
-    "gulp-jshint"
-    "gulp-mocha"
-    "gulp-rename"
-    "gulp-replace"
-    "gulp-uglify"
-    "jshint"
-    "jshint-stylish"
-    "karma"
-    "karma-chrome-launcher"
-    "karma-mocha"
-    "mocha")
+         "gulp"
+         "gulp-browserify"
+         "gulp-coveralls"
+         "gulp-exec"
+         "gulp-istanbul"
+         "gulp-jshint"
+         "gulp-mocha"
+         "gulp-rename"
+         "gulp-replace"
+         "gulp-uglify"
+         "jshint"
+         "jshint-stylish"
+         "karma"
+         "karma-chrome-launcher"
+         "karma-mocha"
+         "mocha")
        #:phases
        (modify-phases %standard-phases
          (replace 'build 
@@ -717,7 +717,7 @@
          "eslint-config-airbnb-base"
          "eslint-plugin-import"
          "nyc")
-     ))
+       ))
     (home-page "https://github.com/panva/oidc-token-hash")
     (synopsis "Create and validate hashes pushed by OpenID Connect providers to ID Tokens.")
     (description "Create and validate hashes pushed by OpenID Connect providers to ID Tokens.")
@@ -744,7 +744,7 @@
        #f ; would need additional dependencies
        #:absent-dependencies
        '("tap")
-     ))
+       ))
     (home-page "https://github.com/isaacs/yallist")
     (synopsis "Yet Another Linked List")
     (description "Yet Another Linked List")
@@ -770,8 +770,8 @@
        #f ; would need additional dependencies
        #:absent-dependencies
        '("tap" "benchmark")
-     ))
-     (inputs
+       ))
+    (inputs
      `(
        ("yallist" ,yallist)))
     (home-page "https://github.com/isaacs/node-lru-cache")
@@ -805,21 +805,21 @@
        #f ; would need additional dependencies
        #:absent-dependencies
        '("@types/node"
-    "@types/passport"
-    "base64url"
-    "chai"
-    "jose2"
-    "mocha"
-    "nock"
-    "nyc"
-    "prettier"
-    "readable-mock-req"
-    "sinon"
-    "timekeeper")
+         "@types/passport"
+         "base64url"
+         "chai"
+         "jose2"
+         "mocha"
+         "nock"
+         "nyc"
+         "prettier"
+         "readable-mock-req"
+         "sinon"
+         "timekeeper")
        #:phases
        (modify-phases %standard-phases
          
-           )))
+         )))
     (inputs
      `(
        ("oidc-token-hash" ,oidc-token-hash)
@@ -832,7 +832,118 @@
     (description "OpenID Certified™ Relying Party (OpenID Connect/OAuth 2.0 Client) implementation for Node.js.")
     (license license:expat)))
 
-openid-client
+
+
+
+
+(define-public postgres
+  (package
+    (name "postgres")
+    (version "2.0.0-beta.11")
+    (source (origin
+              (method git-fetch)
+              (uri (git-reference
+                    (url "https://github.com/porsager/postgres")
+                    (commit (string-append "v" version))))
+              (file-name (git-file-name name version))
+              (sha256
+               (base32
+                "0yzvg12csk4fjw7j5r0z3spymnq5cz36s702j6c9z4z37k8di3z1"))
+              (modules '((guix build utils)))))
+    (build-system node-build-system)
+    (arguments
+     '(#:tests?
+       #f ; would need additional dependencies
+       #:absent-dependencies
+       '()
+       #:phases
+       (modify-phases %standard-phases
+         
+         )))
+    (inputs
+     `(
+       
+       ))
+    (home-page "https://github.com/porsager/postgres")
+    (synopsis "Postgres.js - The Fastest full featured PostgreSQL client for Node.js")
+    (description "Postgres.js - The Fastest full featured PostgreSQL client for Node.js")
+    (license license:expat)))
+
+
+
+(define-public zod
+  (package
+    (name "zod")
+    (version "3.11.6")
+    (source (origin
+              (method git-fetch)
+              (uri (git-reference
+                    (url "https://github.com/colinhacks/zod")
+                    (commit (string-append "v" version))))
+              (file-name (git-file-name name version))
+              (sha256
+               (base32
+                "1jh1m0qj8rg91w3bfvsbfhhm81knnkslqqx5xjanzbyj7107j2sd"))
+              (modules '((guix build utils)))
+              (snippet '(substitute* "tsconfig.base.json"
+                          (("\"es5\"") "\"es6\"")))
+              ))
+    (build-system node-build-system)
+    (arguments
+     '(#:tests?
+       #f ; would need additional dependencies
+       #:absent-dependencies
+       '("@rollup/plugin-typescript"
+         "@types/benchmark"
+         "@types/jest"
+         "@types/node"
+         "@typescript-eslint/eslint-plugin"
+         "@typescript-eslint/parser"
+         "benchmark"
+         "dependency-cruiser"
+         "eslint"
+         "eslint-config-prettier"
+         "eslint-plugin-ban"
+         "eslint-plugin-import"
+         "eslint-plugin-simple-import-sort"
+         "eslint-plugin-unused-imports"
+         "husky"
+         "jest"
+         "lint-staged"
+         "make-coverage-badge"
+         "nodemon"
+         "prettier"
+         "rollup"
+         "rollup-plugin-uglify"
+         "ts-jest"
+         "ts-node"
+         "tslib"
+         "typescript")
+       #:phases
+       (modify-phases %standard-phases
+         (replace 'build 
+           (lambda* (#:key inputs #:allow-other-keys)
+             (begin
+               (let ((esbuild (string-append (assoc-ref inputs "esbuild")
+                                             "/bin/esbuild")))
+                 (invoke esbuild "src/index.ts" "--bundle"
+                         "--outfile=lib/index.mjs"))))
+           
+           )
+         )))
+    (native-inputs
+     `(("esbuild" ,esbuild)))
+    (inputs
+     `(
+       
+       ))
+    
+    (home-page "https://github.com/colinhacks/zod")
+    (synopsis "TypeScript-first schema validation with static type inference")
+    (description "TypeScript-first schema validation with static type inference")
+    (license license:expat)))
+
+zod
 
 ;; https://git.savannah.gnu.org/cgit/guix.git/
 ;; https://git.savannah.gnu.org/gitweb/?p=guix.git&view=view+git+repository
