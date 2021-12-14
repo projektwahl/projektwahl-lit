@@ -943,7 +943,34 @@
     (description "TypeScript-first schema validation with static type inference")
     (license license:expat)))
 
-zod
+
+
+(define-public projektwahl-lit
+  (package
+    (name "projektwahl-lit")
+    (version "0.1.0")
+    (source 
+              (origin
+            (method url-fetch)
+            (uri "file://.")
+            (sha256
+               (base32
+                "11v3jxd7q7fxbzbxywswlxjm1sgz51wzr2fm4qyh5ab25hk32ckh"))
+              (modules '((guix build utils)))
+            (snippet '(delete-file-recursively "guix.scm"))
+            
+            ))
+    (build-system node-build-system)
+    (inputs
+     `(
+       ("jose" ,jose)
+       ))
+    (home-page "https://github.com/panva/node-openid-client")
+    (synopsis "OpenID Certified™ Relying Party (OpenID Connect/OAuth 2.0 Client) implementation for Node.js.")
+    (description "OpenID Certified™ Relying Party (OpenID Connect/OAuth 2.0 Client) implementation for Node.js.")
+    (license license:agpl3)))
+
+projektwahl-lit
 
 ;; https://git.savannah.gnu.org/cgit/guix.git/
 ;; https://git.savannah.gnu.org/gitweb/?p=guix.git&view=view+git+repository
