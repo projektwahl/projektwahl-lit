@@ -635,6 +635,8 @@
     (description "\"JSON Web Almost Everything\" - JWA, JWS, JWE, JWT, JWK, JWKS with no dependencies using runtime's native crypto in Node.js, Browser, Cloudflare Workers, Electron, and Deno.")
     (license license:expat)))
 
+
+
 (define-public object-hash
   (package
     (name "object-hash")
@@ -691,7 +693,39 @@
     (description "Generate hashes from javascript objects in node and the browser.")
     (license license:expat)))
 
-object-hash
+
+(define-public oidc-token-hash
+  (package
+    (name "oidc-token-hash")
+    (version "5.0.1")
+    (source (origin
+              (method git-fetch)
+              (uri (git-reference
+                    (url "https://github.com/panva/oidc-token-hash")
+                    (commit (string-append "v" version))))
+              (file-name (git-file-name name version))
+              (sha256
+               (base32
+                "1b0kpppahgv1nds9n9j3qczy4ijg2102gha5vmd97qi8rp13c011"))
+              ))
+    (build-system node-build-system)
+    (arguments
+     '(#:tests?
+       #f ; would need additional dependencies
+       #:absent-dependencies
+       '("eslint"
+         "eslint-config-airbnb-base"
+         "eslint-plugin-import"
+         "nyc")
+     ))
+    (native-inputs
+     `(("esbuild" ,esbuild)))
+    (home-page "https://github.com/panva/oidc-token-hash")
+    (synopsis " Create and validate hashes pushed by OpenID Connect providers to ID Tokens.")
+    (description " Create and validate hashes pushed by OpenID Connect providers to ID Tokens.")
+    (license license:expat)))
+
+oidc-token-hash
 
 ;; https://git.savannah.gnu.org/cgit/guix.git/
 ;; https://git.savannah.gnu.org/gitweb/?p=guix.git&view=view+git+repository
