@@ -952,18 +952,21 @@
     (source 
               (origin
             (method url-fetch)
-            (uri "file://.")
+            (uri "file:///home/moritz/Documents/projektwahl-lit")
             (sha256
                (base32
-                "11v3jxd7q7fxbzbxywswlxjm1sgz51wzr2fm4qyh5ab25hk32ckh"))
+                "11v3jxd7q7fabzbxywswlxjm1sgz51wzr2fm4qyh5ab25hk32ckh"))
               (modules '((guix build utils)))
-            (snippet '(delete-file-recursively "guix.scm"))
+            ;(snippet '(begin (
+            ;  (delete-file-recursively ".git")
+            ;  (delete-file-recursively "guix.scm"))))
+              )
             
-            ))
+            )
     (build-system node-build-system)
     (inputs
      `(
-       ("jose" ,jose)
+       ("zod" ,zod)
        ))
     (home-page "https://github.com/panva/node-openid-client")
     (synopsis "OpenID Certified™ Relying Party (OpenID Connect/OAuth 2.0 Client) implementation for Node.js.")
