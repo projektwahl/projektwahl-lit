@@ -264,4 +264,110 @@
     (description "Lit is a simple library for building fast, lightweight web components.")
     (license bsd-3)))
 
-lit
+
+(define-public lit-labs-motion
+  (package
+    (name "lit-labs-motion")
+    (version "1.0.1")
+    (source (origin
+              (method git-fetch)
+              (uri (git-reference
+                    (url "https://github.com/lit/lit")
+                    (commit (string-append "@lit-labs/motion@" version))))
+              (file-name (git-file-name name version))
+              (sha256
+               (base32
+                "1wyzkfzj58zhz667gyggcz3rj1mqdxg57iwi7apycmbxv3f1ynb9"))))
+    (build-system node-build-system)
+    (arguments
+     '(#:tests?
+       #f ; would need additional dependencies
+       #:absent-dependencies
+       '("@esm-bundle/chai"
+         "@types/chai"
+         "@types/mocha"
+          "@types/trusted-types"
+          "@web/test-runner-mocha"
+          "@web/dev-server"
+           "chokidar-cli"
+          "concurrently"
+         "internal-scripts"
+         "mocha"
+         "rollup"
+         "typescript")
+       #:phases
+       (modify-phases %standard-phases
+         (add-after 'unpack 'change-directory
+           (lambda _
+             (chdir "packages/labs/motion")))
+         
+         (replace 'build 
+           (lambda* (#:key inputs #:allow-other-keys)
+             (begin
+               (let ((esbuild (string-append (assoc-ref inputs "esbuild")
+                                             "/bin/esbuild")))
+                 (apply invoke  
+                        (cons esbuild (append (find-files "src" "\\.ts$")
+                                              '("--platform=browser"
+                                                "--outdir=src")))))))
+           ))))
+    (native-inputs
+     `(("esbuild" ,esbuild)))
+    (inputs
+     `(
+       ("lit" ,lit)))
+    (home-page "https://github.com/lit/lit")
+    (synopsis "simple library for building fast, lightweight web components.")
+    (description "Lit is a simple library for building fast, lightweight web components.")
+    (license bsd-3)))
+
+(define-public lit-labs-ssr-client
+  (package
+    (name "lit-labs-ssr-client")
+    (version "1.0.0")
+    (source (origin
+              (method git-fetch)
+              (uri (git-reference
+                    (url "https://github.com/lit/lit")
+                    (commit (string-append "@lit-labs/ssr-client@" version))))
+              (file-name (git-file-name name version))
+              (sha256
+               (base32
+                "1fpxn8xqi2s1dzi3wl6yyp1krid62pbcna5gqmn8ismk91dvsg91"))))
+    (build-system node-build-system)
+    (arguments
+     '(#:tests?
+       #f ; would need additional dependencies
+       #:absent-dependencies
+       '("rollup"
+    "typescript"
+    "internal-scripts")
+       #:phases
+       (modify-phases %standard-phases
+         (add-after 'unpack 'change-directory
+           (lambda _
+             (chdir "packages/labs/ssr-client")))
+         
+         (replace 'build 
+           (lambda* (#:key inputs #:allow-other-keys)
+             (begin
+               (let ((esbuild (string-append (assoc-ref inputs "esbuild")
+                                             "/bin/esbuild")))
+                 (apply invoke  
+                        (cons esbuild (append (find-files "src" "\\.ts$")
+                                              '("--platform=browser"
+                                                "--outdir=src")))))))
+           ))))
+    (native-inputs
+     `(("esbuild" ,esbuild)))
+    (inputs
+     `(
+       ("@lit/reactive-element" ,lit-reactive-element)
+       ("lit" ,lit)
+       ("lit-html" ,lit-html)))
+    (home-page "https://github.com/lit/lit")
+    (synopsis "simple library for building fast, lightweight web components.")
+    (description "Lit is a simple library for building fast, lightweight web components.")
+    (license bsd-3)))
+
+lit-labs-ssr-client
