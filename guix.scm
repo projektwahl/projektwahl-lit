@@ -197,11 +197,71 @@
     (native-inputs
      `(("esbuild" ,esbuild)))
     (inputs
-     `(("lit-html" ,lit-html)
-       ("@lit/reactive-element" ,lit-reactive-element)))
+     `(("@lit/reactive-element" ,lit-reactive-element)
+       ("lit-html" ,lit-html)))
     (home-page "https://github.com/lit/lit")
     (synopsis "simple library for building fast, lightweight web components.")
     (description "Lit is a simple library for building fast, lightweight web components.")
     (license bsd-3)))
 
-lit-element
+
+(define-public lit
+  (package
+    (name "lit")
+    (version "2.0.2")
+    (source (origin
+              (method git-fetch)
+              (uri (git-reference
+                    (url "https://github.com/lit/lit")
+                    (commit (string-append "lit@" version))))
+              (file-name (git-file-name name version))
+              (sha256
+               (base32
+                "04vh8rnj45p4lxxzqk6z942vw19ns2q3mjgdy00pxnjc7ccnwf6j"))))
+    (build-system node-build-system)
+    (arguments
+     '(#:tests?
+       #f ; would need additional dependencies
+       #:absent-dependencies
+       '("@esm-bundle/chai"
+         "@types/chai"
+         "@types/mocha"
+         "@webcomponents/shadycss"
+         "@webcomponents/template"
+         "@webcomponents/webcomponentsjs"
+         "chokidar-cli"
+         "downlevel-dts"
+         "internal-scripts"
+         "mocha"
+         "rollup"
+         "tslib"
+         "typescript")
+       #:phases
+       (modify-phases %standard-phases
+         (add-after 'unpack 'change-directory
+           (lambda _
+             (chdir "packages/lit")))
+         
+         (replace 'build 
+           (lambda* (#:key inputs #:allow-other-keys)
+             (begin
+               (let ((esbuild (string-append (assoc-ref inputs "esbuild")
+                                             "/bin/esbuild")))
+                 (apply invoke  
+                        (cons esbuild (append (find-files "src" "\\.ts$")
+                                              '("--platform=browser"
+                                                "--outdir=src")))))))
+           ))))
+    (native-inputs
+     `(("esbuild" ,esbuild)))
+    (inputs
+     `(
+       ("@lit/reactive-element" ,lit-reactive-element)
+       ("lit-element" ,lit-element)
+       ("lit-html" ,lit-html)))
+    (home-page "https://github.com/lit/lit")
+    (synopsis "simple library for building fast, lightweight web components.")
+    (description "Lit is a simple library for building fast, lightweight web components.")
+    (license bsd-3)))
+
+lit
