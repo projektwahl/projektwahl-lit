@@ -370,4 +370,139 @@
     (description "Lit is a simple library for building fast, lightweight web components.")
     (license bsd-3)))
 
-lit-labs-ssr-client
+
+(define-public lit-labs-ssr
+  (package
+    (name "lit-labs-ssr")
+    (version "1.0.0")
+    (source (origin
+              (method git-fetch)
+              (uri (git-reference
+                    (url "https://github.com/lit/lit")
+                    (commit "53e642868d2f06429dfd9bb33e89e2baa3b45b64"))) ; (string-append "@lit-labs/ssr@" version)
+              (file-name (git-file-name name version))
+              (sha256
+               (base32
+                "064p0vjmdqpnmx9yazym36ffvrlwj9qknq3wr8pyrjnxj5a5c6r0"))))
+    (build-system node-build-system)
+    (arguments
+     '(#:tests?
+       #f ; would need additional dependencies
+       #:absent-dependencies
+       '("node-fetch"
+    "parse5"
+    "resolve"
+    ;; dev dependencies:
+    "@koa/router"
+    "@open-wc/testing-karma"
+    "@open-wc/testing"
+    "@types/chai"
+    "@types/command-line-args"
+    "@types/koa__router"
+    "@types/koa-cors"
+    "@types/koa-static"
+    "@types/koa"
+    "@types/mocha"
+    "@types/node-fetch"
+    "@types/node"
+    "@types/parse5"
+    "@types/resolve"
+    "@web/test-runner"
+    "@webcomponents/template-shadowroot"
+    "chai"
+    "command-line-args"
+    "deepmerge"
+    "koa-cors"
+    "koa-node-resolve"
+    "koa-static"
+    "koa"
+    "mocha"
+    "typescript"
+    "uvu")
+       #:phases
+       (modify-phases %standard-phases
+         (add-after 'unpack 'change-directory
+           (lambda _
+             (chdir "packages/labs/ssr")))
+         
+         (replace 'build 
+           (lambda* (#:key inputs #:allow-other-keys)
+             (begin
+               (let ((esbuild (string-append (assoc-ref inputs "esbuild")
+                                             "/bin/esbuild")))
+                 (apply invoke  
+                        (cons esbuild (append (find-files "src" "\\.ts$")
+                                              '("--platform=browser"
+                                                "--outdir=src")))))))
+           ))))
+    (native-inputs
+     `(("esbuild" ,esbuild)))
+    (inputs
+     `(
+      ("@lit-labs/ssr-client" ,lit-labs-ssr-client)
+       ("@lit/reactive-element" ,lit-reactive-element)
+        ("lit-element" ,lit-element)
+       ("lit" ,lit)
+       ("lit-html" ,lit-html)))
+    (home-page "https://github.com/lit/lit")
+    (synopsis "simple library for building fast, lightweight web components.")
+    (description "Lit is a simple library for building fast, lightweight web components.")
+    (license bsd-3)))
+
+
+(define-public lit-labs-task
+  (package
+    (name "lit-labs-task")
+    (version "1.0.0")
+    (source (origin
+              (method git-fetch)
+              (uri (git-reference
+                    (url "https://github.com/lit/lit")
+                    (commit (string-append "@lit-labs/task@" version))))
+              (file-name (git-file-name name version))
+              (sha256
+               (base32
+                "1fpxn8xqi2s1dzi3wl6yyp1krid62pbcna5gqmn8ismk91dvsg91"))))
+    (build-system node-build-system)
+    (arguments
+     '(#:tests?
+       #f ; would need additional dependencies
+       #:absent-dependencies
+       '("@esm-bundle/chai"
+    "@types/chai"
+    "@types/mocha"
+    "@types/trusted-types"
+    "@web/test-runner-mocha"
+    "chokidar-cli"
+    "concurrently"
+    "mocha"
+    "rollup"
+    "typescript"
+    "internal-scripts")
+       #:phases
+       (modify-phases %standard-phases
+         (add-after 'unpack 'change-directory
+           (lambda _
+             (chdir "packages/labs/task")))
+         
+         (replace 'build 
+           (lambda* (#:key inputs #:allow-other-keys)
+             (begin
+               (let ((esbuild (string-append (assoc-ref inputs "esbuild")
+                                             "/bin/esbuild")))
+                 (apply invoke  
+                        (cons esbuild (append (find-files "src" "\\.ts$")
+                                              '("--platform=browser"
+                                                "--outdir=src")))))))
+           ))))
+    (native-inputs
+     `(("esbuild" ,esbuild)))
+    (inputs
+     `(
+       ("@lit/reactive-element" ,lit-reactive-element)))
+    (home-page "https://github.com/lit/lit")
+    (synopsis "simple library for building fast, lightweight web components.")
+    (description "Lit is a simple library for building fast, lightweight web components.")
+    (license bsd-3)))
+
+lit-labs-task
