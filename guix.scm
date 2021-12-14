@@ -567,7 +567,69 @@
     (description "A simple, lightweight JavaScript API for handling browser cookies.")
     (license expat)))
 
-js-cookie
+;; this is slowly getting ridicolous - this package has the dist at the specified tag
+;; we're currently checking out the revision with one patch version behind - we should probably just rm -r dist
+(define-public jose
+  (package
+    (name "jose")
+    (version "4.3.7")
+    (source (origin
+              (method git-fetch)
+              (uri (git-reference
+                    (url "https://github.com/panva/jose")
+                    (commit (string-append "v" version))))
+              (file-name (git-file-name name version))
+              (sha256
+               (base32
+                "0325as36wpanqllxj8h569z6bj7rg77fl8wifhlmclppgkzbsa1l"))
+              (snippet (delete-file-recursively "dist"))
+                ))
+    (build-system node-build-system)
+    (arguments
+     '(#:tests?
+       #f ; would need additional dependencies
+       #:absent-dependencies
+       '("@types/node"
+    "ava"
+    "bowser"
+    "c8"
+    "esbuild"
+    "glob"
+    "got"
+    "karma"
+    "karma-browserstack-launcher"
+    "karma-qunit"
+    "karma-summary-reporter"
+    "nock"
+    "npm-run-all"
+    "p-throttle"
+    "patch-package"
+    "prettier"
+    "qunit"
+    "rollup"
+    "tar"
+    "timekeeper"
+    "typedoc"
+    "typedoc-plugin-markdown"
+    "typescript")
+       #:phases
+       (modify-phases %standard-phases
+         (replace 'build 
+           (lambda* (#:key inputs #:allow-other-keys)
+             (begin
+               (let ((esbuild (string-append (assoc-ref inputs "esbuild")
+                                             "/bin/esbuild")))
+                 (invoke esbuild "./src" "--platform=browser"
+                                                "--outdir=dist/node/esm"))))
+           ))))
+    (native-inputs
+     `(("esbuild" ,esbuild)))
+    (home-page "https://github.com/panva/jose")
+    (synopsis "\"JSON Web Almost Everything\" - JWA, JWS, JWE, JWT, JWK, JWKS with no dependencies using runtime's native crypto in Node.js, Browser, Cloudflare Workers, Electron, and Deno")
+    (description "\"JSON Web Almost Everything\" - JWA, JWS, JWE, JWT, JWK, JWKS with no dependencies using runtime's native crypto in Node.js, Browser, Cloudflare Workers, Electron, and Deno.")
+    (license expat)))
+
+jose
 
 ;; https://git.savannah.gnu.org/cgit/guix.git/
 ;; https://git.savannah.gnu.org/gitweb/?p=guix.git&view=view+git+repository
