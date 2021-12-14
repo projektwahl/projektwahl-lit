@@ -718,14 +718,121 @@
          "eslint-plugin-import"
          "nyc")
      ))
-    (native-inputs
-     `(("esbuild" ,esbuild)))
     (home-page "https://github.com/panva/oidc-token-hash")
-    (synopsis " Create and validate hashes pushed by OpenID Connect providers to ID Tokens.")
-    (description " Create and validate hashes pushed by OpenID Connect providers to ID Tokens.")
+    (synopsis "Create and validate hashes pushed by OpenID Connect providers to ID Tokens.")
+    (description "Create and validate hashes pushed by OpenID Connect providers to ID Tokens.")
     (license license:expat)))
 
-oidc-token-hash
+
+(define-public yallist
+  (package
+    (name "yallist")
+    (version "4.0.0")
+    (source (origin
+              (method git-fetch)
+              (uri (git-reference
+                    (url "https://github.com/isaacs/yallist")
+                    (commit (string-append "v" version))))
+              (file-name (git-file-name name version))
+              (sha256
+               (base32
+                "0dx5wpvcgzwc56di99sjh75rd3208ddsgw7sggh37rj5bcn546i9"))
+              ))
+    (build-system node-build-system)
+    (arguments
+     '(#:tests?
+       #f ; would need additional dependencies
+       #:absent-dependencies
+       '("tap")
+     ))
+    (home-page "https://github.com/isaacs/yallist")
+    (synopsis "Yet Another Linked List")
+    (description "Yet Another Linked List")
+    (license license:isc)))
+
+(define-public lru-cache
+  (package
+    (name "lru-cache")
+    (version "6.0.0")
+    (source (origin
+              (method git-fetch)
+              (uri (git-reference
+                    (url "https://github.com/isaacs/node-lru-cache")
+                    (commit (string-append "v" version))))
+              (file-name (git-file-name name version))
+              (sha256
+               (base32
+                "1ds6c7ay1343g8m1p25shi4sl9xmlc9skwfq03xyvg007mnr7bx1"))
+              ))
+    (build-system node-build-system)
+    (arguments
+     '(#:tests?
+       #f ; would need additional dependencies
+       #:absent-dependencies
+       '("tap" "benchmark")
+     ))
+     (inputs
+     `(
+       ("yallist" ,yallist)))
+    (home-page "https://github.com/isaacs/node-lru-cache")
+    (synopsis "A cache object that deletes the least-recently-used items.")
+    (description "A cache object that deletes the least-recently-used items.")
+    (license license:isc)))
+
+
+
+
+
+
+
+(define-public openid-client
+  (package
+    (name "openid-client")
+    (version "5.1.0")
+    (source (origin
+              (method git-fetch)
+              (uri (git-reference
+                    (url "https://github.com/panva/node-openid-client")
+                    (commit (string-append "v" version))))
+              (file-name (git-file-name name version))
+              (sha256
+               (base32
+                "1frphrngpqvc15dyqkrncw4ydadvyfd3107q6j7bn4ah339j5zi1"))
+              (modules '((guix build utils)))))
+    (build-system node-build-system)
+    (arguments
+     '(#:tests?
+       #f ; would need additional dependencies
+       #:absent-dependencies
+       '("@types/node"
+    "@types/passport"
+    "base64url"
+    "chai"
+    "jose2"
+    "mocha"
+    "nock"
+    "nyc"
+    "prettier"
+    "readable-mock-req"
+    "sinon"
+    "timekeeper")
+       #:phases
+       (modify-phases %standard-phases
+         
+           )))
+    (inputs
+     `(
+       ("oidc-token-hash" ,oidc-token-hash)
+       ("object-hash" ,object-hash)
+       ("lru-cache" ,lru-cache)
+       ("jose" ,jose)
+       ))
+    (home-page "https://github.com/panva/node-openid-client")
+    (synopsis "OpenID Certified™ Relying Party (OpenID Connect/OAuth 2.0 Client) implementation for Node.js.")
+    (description "OpenID Certified™ Relying Party (OpenID Connect/OAuth 2.0 Client) implementation for Node.js.")
+    (license license:expat)))
+
+openid-client
 
 ;; https://git.savannah.gnu.org/cgit/guix.git/
 ;; https://git.savannah.gnu.org/gitweb/?p=guix.git&view=view+git+repository
