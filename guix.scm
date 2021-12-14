@@ -505,4 +505,69 @@
     (description "Lit is a simple library for building fast, lightweight web components.")
     (license bsd-3)))
 
-lit-labs-task
+
+
+
+
+
+(define-public js-cookie
+  (package
+    (name "js-cookie")
+    (version "3.0.1")
+    (source (origin
+              (method git-fetch)
+              (uri (git-reference
+                    (url "https://github.com/js-cookie/js-cookie")
+                    (commit (string-append "v" version))))
+              (file-name (git-file-name name version))
+              (sha256
+               (base32
+                "0kxxgvfzq4wpiy3hxym7amikphfwcndq282xz20krmgzfbm0fx0y"))))
+    (build-system node-build-system)
+    (arguments
+     '(#:tests?
+       #f ; would need additional dependencies
+       #:absent-dependencies
+       '("browserstack-runner"
+    "eslint"
+    "eslint-config-standard"
+    "eslint-plugin-promise"
+    "eslint-plugin-html"
+    "eslint-plugin-markdown"
+    "grunt"
+    "grunt-compare-size"
+    "grunt-contrib-connect"
+    "grunt-contrib-nodeunit"
+    "grunt-contrib-qunit"
+    "grunt-contrib-watch"
+    "grunt-exec"
+    "gzip-js"
+    "prettier"
+    "qunit"
+    "release-it"
+    "rollup"
+    "rollup-plugin-filesize"
+    "rollup-plugin-license"
+    "rollup-plugin-terser"
+    "standard")
+       #:phases
+       (modify-phases %standard-phases
+         (replace 'build 
+           (lambda* (#:key inputs #:allow-other-keys)
+             (begin
+               (let ((esbuild (string-append (assoc-ref inputs "esbuild")
+                                             "/bin/esbuild")))
+                 (invoke esbuild "src/api.mjs" "--bundle" "--platform=browser"
+                                                "--outfile=dist/js.cookie.mjs"))))
+           ))))
+    (native-inputs
+     `(("esbuild" ,esbuild)))
+    (home-page "https://github.com/js-cookie/js-cookie")
+    (synopsis "simple, lightweight JavaScript API for handling browser cookies")
+    (description "A simple, lightweight JavaScript API for handling browser cookies.")
+    (license expat)))
+
+js-cookie
+
+;; https://git.savannah.gnu.org/cgit/guix.git/
+;; https://git.savannah.gnu.org/gitweb/?p=guix.git&view=view+git+repository
