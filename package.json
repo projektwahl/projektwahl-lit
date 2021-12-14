@@ -20,7 +20,7 @@
     "lint": "eslint .",
     "fix:lint": "eslint --fix .",
     "setup": "node ./src/server/setup.js",
-    "server": "node --experimental-loader hot-esm --experimental-import-meta-resolve src/server/index.js"
+    "server": "node --experimental-import-meta-resolve src/server/index.js"
   },
   "license": "AGPL-3.0-or-later",
   "dependencies": {

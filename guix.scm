@@ -22,6 +22,8 @@
 ;; GUIX_PROFILE="/tmp/guix.master"
 ;; . "$GUIX_PROFILE/etc/profile"
 ;; guix build --verbosity=3 --file=/home/moritz/Documents/projektwahl-lit/guix.scm 
+;; guix build --root=./result --file=./guix.scm 
+;; node --experimental-import-meta-resolve ./result/lib/node_modules/projektwahl-lit/src/server/index.js
 
 ;; https://news.ycombinator.com/item?id=19808225
 ;; https://dustycloud.org/blog/javascript-packaging-dystopia/
@@ -250,7 +252,7 @@
                  (apply invoke  
                         (cons esbuild (append (find-files "src" "\\.ts$")
                                               '("--platform=browser"
-                                                "--outdir=src")))))))
+                                                "--outdir=.")))))))
            ))))
     (native-inputs
      `(("esbuild" ,esbuild)))
@@ -433,7 +435,7 @@
                  (apply invoke  
                         (cons esbuild (append (find-files "src" "\\.ts$")
                                               '("--platform=browser"
-                                                "--outdir=src")))))))
+                                                "--outdir=.")))))))
            ))))
     (native-inputs
      `(("esbuild" ,esbuild)))
