@@ -567,8 +567,6 @@
     (description "A simple, lightweight JavaScript API for handling browser cookies.")
     (license license:expat)))
 
-;; this is slowly getting ridicolous - this package has the dist at the specified tag
-;; we're currently checking out the revision with one patch version behind - we should probably just rm -r dist
 (define-public jose
   (package
     (name "jose")
@@ -637,7 +635,63 @@
     (description "\"JSON Web Almost Everything\" - JWA, JWS, JWE, JWT, JWK, JWKS with no dependencies using runtime's native crypto in Node.js, Browser, Cloudflare Workers, Electron, and Deno.")
     (license license:expat)))
 
-jose
+(define-public object-hash
+  (package
+    (name "object-hash")
+    (version "2.2.0")
+    (source (origin
+              (method git-fetch)
+              (uri (git-reference
+                    (url "https://github.com/puleos/object-hash")
+                    (commit (string-append "v" version))))
+              (file-name (git-file-name name version))
+              (sha256
+               (base32
+                "11v3jxd7q7fxazbxywswlxjm1sgz51wzr2fm4qyh5ab25hk32ckh"))
+              (modules '((guix build utils)))
+              (snippet '(delete-file-recursively "dist"))
+              ))
+    (build-system node-build-system)
+    (arguments
+     '(#:tests?
+       #f ; would need additional dependencies
+       #:absent-dependencies
+       '("browserify"
+    "gulp"
+    "gulp-browserify"
+    "gulp-coveralls"
+    "gulp-exec"
+    "gulp-istanbul"
+    "gulp-jshint"
+    "gulp-mocha"
+    "gulp-rename"
+    "gulp-replace"
+    "gulp-uglify"
+    "jshint"
+    "jshint-stylish"
+    "karma"
+    "karma-chrome-launcher"
+    "karma-mocha"
+    "mocha")
+       #:phases
+       (modify-phases %standard-phases
+         (replace 'build 
+           (lambda* (#:key inputs #:allow-other-keys)
+             (begin
+               (let ((esbuild (string-append (assoc-ref inputs "esbuild")
+                                             "/bin/esbuild")))
+                 (invoke esbuild "index.js" "--bundle" "--platform=node"
+                         "--outfile=dist/object_hash.js")
+                 )))
+           ))))
+    (native-inputs
+     `(("esbuild" ,esbuild)))
+    (home-page "https://github.com/puleos/object-hash")
+    (synopsis "Generate hashes from javascript objects in node and the browser.")
+    (description "Generate hashes from javascript objects in node and the browser.")
+    (license license:expat)))
+
+object-hash
 
 ;; https://git.savannah.gnu.org/cgit/guix.git/
 ;; https://git.savannah.gnu.org/gitweb/?p=guix.git&view=view+git+repository
