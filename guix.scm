@@ -79,4 +79,96 @@
     (description "Lit is a simple library for building fast, lightweight web components.")
     (license bsd-3)))
 
-lit-html
+(define-public lit-reactive-element
+  (package
+    (name "lit-reactive-element")
+    (version "1.0.2")
+    (source (origin
+              (method git-fetch)
+              (uri (git-reference
+                    (url "https://github.com/lit/lit")
+                    (commit (string-append "@lit/reactive-element@" version))))
+              (file-name (git-file-name name version))
+              (sha256
+               (base32
+                "3hi9v08jaj8nyiansbk2yaxv21ayya52as6q8viiri5avf8i3nlk"))))
+    (build-system node-build-system)
+    (arguments
+     '(#:tests?
+       #f ; would need additional dependencies
+       #:absent-dependencies
+       '()
+       #:phases
+       (modify-phases %standard-phases
+         ;; The default configure phase fails due to various packages
+         ;; being missing, as we don't have them packaged yet.
+         (delete 'configure)
+         (add-after 'unpack 'change-directory
+           (lambda _
+             (chdir "packages/reactive-element")))
+         
+         (replace 'build 
+           (lambda* (#:key inputs #:allow-other-keys)
+             (begin
+               (let ((esbuild (string-append (assoc-ref inputs "esbuild")
+                                             "/bin/esbuild")))
+                 (apply invoke  
+                        (cons esbuild (append (find-files "src" "\\.ts$")
+                                              '("--platform=browser"
+                                                "--outdir=src")))))))
+           ))))
+    (native-inputs
+     `(("esbuild" ,esbuild)))
+    (inputs
+      `(("lit-html" ,lit-html)
+        ("@lit/reactive-element" ,lit-reactive-element)))
+    (home-page "https://github.com/lit/lit")
+    (synopsis "simple library for building fast, lightweight web components.")
+    (description "Lit is a simple library for building fast, lightweight web components.")
+    (license bsd-3)))
+
+
+(define-public lit-element
+  (package
+    (name "lit-element")
+    (version "3.0.2")
+    (source (origin
+              (method git-fetch)
+              (uri (git-reference
+                    (url "https://github.com/lit/lit")
+                    (commit (string-append "lit-element@" version))))
+              (file-name (git-file-name name version))
+              (sha256
+               (base32
+                "3hi9v08jaj8nyiansbk2yayv21ayya52as6q8viiri5avf8i3nlk"))))
+    (build-system node-build-system)
+    (arguments
+     '(#:tests?
+       #f ; would need additional dependencies
+       #:phases
+       (modify-phases %standard-phases
+         ;; The default configure phase fails due to various packages
+         ;; being missing, as we don't have them packaged yet.
+         ;(delete 'configure)
+         (add-after 'unpack 'change-directory
+           (lambda _
+             (chdir "packages/lit-element")))
+         
+         (replace 'build 
+           (lambda* (#:key inputs #:allow-other-keys)
+             (begin
+               (let ((esbuild (string-append (assoc-ref inputs "esbuild")
+                                             "/bin/esbuild")))
+                 (apply invoke  
+                        (cons esbuild (append (find-files "src" "\\.ts$")
+                                              '("--platform=browser"
+                                                "--outdir=src")))))))
+           ))))
+    (native-inputs
+     `(("esbuild" ,esbuild)))
+    (home-page "https://github.com/lit/lit")
+    (synopsis "simple library for building fast, lightweight web components.")
+    (description "Lit is a simple library for building fast, lightweight web components.")
+    (license bsd-3)))
+
+lit-element
