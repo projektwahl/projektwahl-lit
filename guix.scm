@@ -10,7 +10,7 @@
              (srfi srfi-1)
              (gnu packages package-management)
              (guix build-system node)
-             (guix licenses))
+              ((guix licenses) #:prefix license:))
 
 ;; ~/Documents/guix/etc/indent-code.el guix.scm 
 
@@ -87,7 +87,7 @@
     (home-page "https://github.com/lit/lit")
     (synopsis "simple library for building fast, lightweight web components.")
     (description "Lit is a simple library for building fast, lightweight web components.")
-    (license bsd-3)))
+    (license license:bsd-3)))
 
 (define-public lit-reactive-element
   (package
@@ -144,7 +144,7 @@
     (home-page "https://github.com/lit/lit")
     (synopsis "simple library for building fast, lightweight web components.")
     (description "Lit is a simple library for building fast, lightweight web components.")
-    (license bsd-3)))
+    (license license:bsd-3)))
 
 
 (define-public lit-element
@@ -202,7 +202,7 @@
     (home-page "https://github.com/lit/lit")
     (synopsis "simple library for building fast, lightweight web components.")
     (description "Lit is a simple library for building fast, lightweight web components.")
-    (license bsd-3)))
+    (license license:bsd-3)))
 
 
 (define-public lit
@@ -262,7 +262,7 @@
     (home-page "https://github.com/lit/lit")
     (synopsis "simple library for building fast, lightweight web components.")
     (description "Lit is a simple library for building fast, lightweight web components.")
-    (license bsd-3)))
+    (license license:bsd-3)))
 
 
 (define-public lit-labs-motion
@@ -319,7 +319,7 @@
     (home-page "https://github.com/lit/lit")
     (synopsis "simple library for building fast, lightweight web components.")
     (description "Lit is a simple library for building fast, lightweight web components.")
-    (license bsd-3)))
+    (license license:bsd-3)))
 
 (define-public lit-labs-ssr-client
   (package
@@ -368,7 +368,7 @@
     (home-page "https://github.com/lit/lit")
     (synopsis "simple library for building fast, lightweight web components.")
     (description "Lit is a simple library for building fast, lightweight web components.")
-    (license bsd-3)))
+    (license license:bsd-3)))
 
 
 (define-public lit-labs-ssr
@@ -447,7 +447,7 @@
     (home-page "https://github.com/lit/lit")
     (synopsis "simple library for building fast, lightweight web components.")
     (description "Lit is a simple library for building fast, lightweight web components.")
-    (license bsd-3)))
+    (license license:bsd-3)))
 
 
 (define-public lit-labs-task
@@ -503,7 +503,7 @@
     (home-page "https://github.com/lit/lit")
     (synopsis "simple library for building fast, lightweight web components.")
     (description "Lit is a simple library for building fast, lightweight web components.")
-    (license bsd-3)))
+    (license license:bsd-3)))
 
 
 
@@ -565,7 +565,7 @@
     (home-page "https://github.com/js-cookie/js-cookie")
     (synopsis "simple, lightweight JavaScript API for handling browser cookies")
     (description "A simple, lightweight JavaScript API for handling browser cookies.")
-    (license expat)))
+    (license license:expat)))
 
 ;; this is slowly getting ridicolous - this package has the dist at the specified tag
 ;; we're currently checking out the revision with one patch version behind - we should probably just rm -r dist
@@ -581,8 +581,9 @@
               (file-name (git-file-name name version))
               (sha256
                (base32
-                "0325as36wpanqllxj8h569z6bj7rg77fl8wifhlmclppgkzbsa1l"))
-              (snippet (delete-file-recursively "dist"))
+                "0vz6s8f0izldfh5h40rwfdpn0s21nnwqqv36a0k4lcvai90m5khv"))
+              (modules '((guix build utils)))
+              (snippet '(delete-file-recursively "dist"))
                 ))
     (build-system node-build-system)
     (arguments
@@ -627,7 +628,7 @@
     (home-page "https://github.com/panva/jose")
     (synopsis "\"JSON Web Almost Everything\" - JWA, JWS, JWE, JWT, JWK, JWKS with no dependencies using runtime's native crypto in Node.js, Browser, Cloudflare Workers, Electron, and Deno")
     (description "\"JSON Web Almost Everything\" - JWA, JWS, JWE, JWT, JWK, JWKS with no dependencies using runtime's native crypto in Node.js, Browser, Cloudflare Workers, Electron, and Deno.")
-    (license expat)))
+    (license license:expat)))
 
 jose
 
