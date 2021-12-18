@@ -7,7 +7,7 @@ import { createUsersHandler } from "./routes/users/create-or-update.js";
 import { usersHandler } from "./routes/users/index.js";
 import { openidLoginHandler } from "./routes/login/openid-login.js";
 import { openidRedirectHandler } from "./routes/login/redirect.js";
-import path, { relative } from "path/posix";
+import path, { extname, relative } from "path/posix";
 import { z } from "zod";
 
 //const startTime = Date.now();
@@ -101,14 +101,9 @@ export async function serverHandler(stream, headers) {
     // TODO FIXME AUDIT
     // curl --insecure --path-as-is -v https://localhost:8443/../src/index.js
 
-    console.log("original", path);
     let filename = resolve("." + path);
 
     let baseUrl = resolve(fileURLToPath(import.meta.url), "../../..");
-
-    console.log("filename", filename);
-    console.log("baseUrl", baseUrl);
-    console.log(join(baseUrl, "/src/"));
 
     if (
       filename.startsWith(join(baseUrl, "/src/")) ||
@@ -122,40 +117,44 @@ export async function serverHandler(stream, headers) {
           encoding: "utf-8",
         });
 
-        contents = await replaceAsync(
-          contents,
-          /import( )?["']([^"']+)["']/g,
-          async (match, args) => {
-            let url = await import.meta.resolve(
-              args[1],
-              pathToFileURL(filename)
-            );
+        if (extname(filename) === ".js") {
 
-            url = relative(
-              resolve(fileURLToPath(import.meta.url), "../../.."),
-              fileURLToPath(url)
-            );
+          contents = await replaceAsync(
+            contents,
+            /import( )?["']([^"']+)["']/g,
+            async (match, args) => {
+              let url = await import.meta.resolve(
+                args[1],
+                pathToFileURL(filename)
+              );
 
-            return `import "/${url}"`;
-          }
-        );
-        contents = await replaceAsync(
-          contents,
-          /([*} ])from ?["']([^"']+)["']/g,
-          async (match, args) => {
-            let url = await import.meta.resolve(
-              args[1],
-              pathToFileURL(filename)
-            );
+              url = relative(
+                resolve(fileURLToPath(import.meta.url), "../../.."),
+                fileURLToPath(url)
+              );
 
-            url = relative(
-              resolve(fileURLToPath(import.meta.url), "../../.."),
-              fileURLToPath(url)
-            );
+              return `import "/${url}"`;
+            }
+          );
+          contents = await replaceAsync(
+            contents,
+            /([*} ])from ?["']([^"']+)["']/g,
+            async (match, args) => {
+              let url = await import.meta.resolve(
+                args[1],
+                pathToFileURL(filename)
+              );
 
-            return `${args[0]} from "/${url}"`;
-          }
-        );
+              url = relative(
+                resolve(fileURLToPath(import.meta.url), "../../.."),
+                fileURLToPath(url)
+              );
+
+              return `${args[0]} from "/${url}"`;
+            }
+          );
+
+        }
 
         stream.respond({
           "content-type": "application/javascript; charset=utf-8",

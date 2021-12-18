@@ -14,15 +14,19 @@ import { pwLogin } from "./routes/login/pw-login.js";
 import { setupHmr } from "./hmr.js";
 import { pwUsers } from "./routes/users/pw-users.js";
 import Cookies from "js-cookie";
+
 /*
 // TODO FIXME show more details if possible (maybe error page)
 window.addEventListener("error", function (event) {
+  console.error(event.error)
   alert("unknown error: " + event.message);
 });
 
 window.addEventListener("unhandledrejection", function (event) {
+  console.error(event.promise)
   alert("unknown error: " + event.reason);
-});*/
+});
+*/
 
 ReactiveElement.enableWarning?.("migration");
 ReactiveElement.enableWarning?.("change-in-update");
@@ -36,14 +40,18 @@ export const pwApp = async (/** @type {URL} */ url) => {
 };
 
 export const nextPage = (/** @type {URL} */ url) => {
-  if (url.pathname === "/login") {
-    return pwLogin();
-  } else if (url.pathname === "/users") {
-    return pwUsers(url);
-  } else if (url.pathname === "/users/create") {
-    return Promise.resolve(html`<pw-user-create></pw-user-create>`);
-  } else {
-    return Promise.resolve(html`Not Found`);
+  try {
+    if (url.pathname === "/login") {
+      return pwLogin();
+    } else if (url.pathname === "/users") {
+      return pwUsers(url);
+    } else if (url.pathname === "/users/create") {
+      return Promise.resolve(html`<pw-user-create></pw-user-create>`);
+    } else {
+      return Promise.resolve(html`Not Found`);
+    }
+  } catch (error) {
+    return Promise.resolve(html`Error: ${error}`);
   }
 };
 
