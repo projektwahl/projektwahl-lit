@@ -1,6 +1,7 @@
 {
   "name": "projektwahl-lit",
   "version": "0.0.1",
+  "license": "AGPL-3.0-or-later",
   "author": {
     "name": "Moritz Hedtke",
     "email": "Moritz.Hedtke@t-online.de"
@@ -16,13 +17,12 @@
   "description": "Software to manage choosing projects and automatically assigning people to projects.",
   "type": "module",
   "scripts": {
-    "format": "prettier --write .",
-    "lint": "eslint .",
-    "fix:lint": "eslint --fix .",
+    "format": "npx prettier --write .",
+    "lint": "npx eslint .",
+    "fix:lint": "npx eslint --fix .",
     "setup": "node ./src/server/setup.js",
-    "server": "node --experimental-import-meta-resolve src/server/index.js"
+    "server": "node --experimental-import-meta-resolve ./src/server/index.js"
   },
-  "license": "AGPL-3.0-or-later",
   "dependencies": {
     "@lit-labs/motion": "^1.0.1",
     "@lit-labs/ssr": "^1.0.0",

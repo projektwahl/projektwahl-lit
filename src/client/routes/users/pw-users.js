@@ -109,12 +109,13 @@ export let PwUsers = class extends LitElement {
                   new FormData(this.formRef.value)
                 );
                 urlSearchParams.delete("order");
-                this.history.url.searchParams.getAll("order").forEach((v) => urlSearchParams.append("order", v));
+                this.history.url.searchParams
+                  .getAll("order")
+                  .forEach((v) => urlSearchParams.append("order", v));
                 HistoryController.goto(
                   new URL(`?${urlSearchParams}`, window.location.href)
                 );
               }}
-
               @submit=${(e) => e.preventDefault()}
             >
               <table class="table">

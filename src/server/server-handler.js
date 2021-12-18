@@ -128,10 +128,13 @@ export async function serverHandler(stream, headers) {
         //console.log(args)
         let url = await import.meta.resolve(args[1], pathToFileURL(filename));
         //console.log(url)
-        
-        url = path.relative(path.resolve(fileURLToPath(import.meta.url), "../../.."), fileURLToPath(url))
 
-        console.log(url)
+        url = path.relative(
+          path.resolve(fileURLToPath(import.meta.url), "../../.."),
+          fileURLToPath(url)
+        );
+
+        console.log(url);
 
         return `import "/${url}"`;
       }
@@ -144,10 +147,13 @@ export async function serverHandler(stream, headers) {
         //console.log(args)
         let url = await import.meta.resolve(args[1], pathToFileURL(filename));
         //console.log(url)
-        
-        url = path.relative(path.resolve(fileURLToPath(import.meta.url), "../../.."), fileURLToPath(url))
 
-        console.log(url)
+        url = path.relative(
+          path.resolve(fileURLToPath(import.meta.url), "../../.."),
+          fileURLToPath(url)
+        );
+
+        console.log(url);
 
         return `${args[0]} from "/${url}"`;
       }

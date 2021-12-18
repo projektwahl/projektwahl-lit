@@ -39,9 +39,9 @@ export function fetchData(
   if (query.paginationCursor === null) {
     return sql2`(SELECT ${unsafe2(fieldsToSelect.join(", "))} FROM ${unsafe2(
       table
-    )} WHERE ${customFilterQuery(
-      query
-    )} ORDER BY ${orderByQuery} LIMIT ${query.paginationLimit + 1})`;
+    )} WHERE ${customFilterQuery(query)} ORDER BY ${orderByQuery} LIMIT ${
+      query.paginationLimit + 1
+    })`;
   } else {
     let queries = query.sorting.map((value, index, array) => {
       const part = query.sorting.slice(0, index + 1);

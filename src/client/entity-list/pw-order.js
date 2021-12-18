@@ -88,10 +88,14 @@ export class PwOrder extends LitElement {
         <i
           class="bi-arrow-${(() => {
             let value = this.history.url.searchParams
-            .getAll("order")
-            .find((e) => e.startsWith(this.name + "-"))
-            ?.split("-")[1];
-            return value === "ASC" ? "up" : (value === "DESC" ? "down" : "down-up")
+              .getAll("order")
+              .find((e) => e.startsWith(this.name + "-"))
+              ?.split("-")[1];
+            return value === "ASC"
+              ? "up"
+              : value === "DESC"
+              ? "down"
+              : "down-up";
           })()}"
           role="img"
           aria-label="Nach {title} sortieren"
