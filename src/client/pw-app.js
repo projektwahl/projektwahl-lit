@@ -15,6 +15,16 @@ import { pwLogin } from "./routes/login/pw-login.js";
 import { setupHmr } from "./hmr.js";
 import { pwUsers } from "./routes/users/pw-users.js";
 import Cookies from "js-cookie";
+import {configureLocalization} from '@lit/localize';
+
+// Generated via output.localeCodesModule
+import {sourceLocale, targetLocales} from './generated_locales/locales.js';
+
+export const {getLocale, setLocale} = configureLocalization({
+  sourceLocale,
+  targetLocales,
+  loadLocale: (locale) => import(`/generated_locales/${locale}.js`),
+});
 
 /*
 // TODO FIXME show more details if possible (maybe error page)
@@ -43,6 +53,7 @@ export const pwApp = async (/** @type {URL} */ url) => {
 export const nextPage = async (/** @type {URL} */ url) => {
   try {
     if (url.pathname === "/login") {
+      setLocale("de")
       return await pwLogin();
     } else if (url.pathname === "/users") {
       return await pwUsers(url);

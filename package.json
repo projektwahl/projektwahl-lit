@@ -21,7 +21,9 @@
     "lint": "eslint .",
     "fix:lint": "eslint --fix .",
     "setup": "node ./src/server/setup.js",
-    "server": "node --experimental-import-meta-resolve ./src/server/index.js"
+    "server": "node --experimental-import-meta-resolve ./src/server/index.js",
+    "localize-extract": "lit-localize extract",
+    "localize-build": "lit-localize build"
   },
   "dependencies": {
     "@lit-labs/motion": "^1.0.1",

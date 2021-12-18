@@ -5,7 +5,8 @@
   "inputFiles": ["./src/client/**/*.js"],
   "output": {
     "outputDir": "./src/client/generated_locales/",
-    "mode": "runtime"
+    "mode": "runtime",
+    "localeCodesModule": "./src/client/generated_locales/locales.js"
   },
   "interchange": {
     "format": "xliff",
