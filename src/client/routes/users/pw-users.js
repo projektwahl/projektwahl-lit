@@ -14,14 +14,12 @@ import { noChange } from "lit";
 
 export const pwUsers = async (/** @type {URL} */ url) => {
   let result = await taskFunction([url.searchParams]);
-  console.log(result);
   return html`<pw-users .initial=${result}></pw-users>`;
 };
 
 const taskFunction = async (
   /** @type {[URLSearchParams]} */ [searchParams]
 ) => {
-  console.log(window.location.href);
   let response = await fetch(
     new URL(`/api/v1/users?${searchParams}`, window.location.href),
     {
@@ -92,7 +90,6 @@ export let PwUsers = class extends LitElement {
         this._apiTask.P = this.initial;
       }
     }
-    console.log(this._apiTask);
 
     return html`
       ${bootstrapCss}
