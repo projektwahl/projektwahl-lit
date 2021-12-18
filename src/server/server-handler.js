@@ -120,7 +120,6 @@ export async function serverHandler(stream, headers) {
         });
 
         if (extname(filename) === ".js") {
-
           contents = await replaceAsync(
             contents,
             /import( )?["']([^"']+)["']/g,
@@ -155,7 +154,6 @@ export async function serverHandler(stream, headers) {
               return `${args[0]} from "/${url}"`;
             }
           );
-
         }
 
         stream.respond({

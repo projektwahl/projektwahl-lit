@@ -7,8 +7,10 @@
 
 /** @implements {ReactiveController} */
 export class HistoryController {
-
-  constructor(/** @type {import("lit").ReactiveControllerHost} */ host, /** @type {RegExp} */ urlPattern) {
+  constructor(
+    /** @type {import("lit").ReactiveControllerHost} */ host,
+    /** @type {RegExp} */ urlPattern
+  ) {
     /** @type {import("lit").ReactiveControllerHost} */
     this.host = host;
     host.addController(this);

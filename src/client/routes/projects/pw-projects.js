@@ -98,7 +98,11 @@ export let PwUsers = class extends LitElement {
       <div class="container">
         <pw-entitylist title="Accounts">
           <div slot="buttons">
-            <a @click=${aClick} class="btn btn-primary" href="/users/create" role="button"
+            <a
+              @click=${aClick}
+              class="btn btn-primary"
+              href="/users/create"
+              role="button"
               >Account erstellen</a
             >
           </div>

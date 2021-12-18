@@ -62,8 +62,8 @@ export const rawProjectSchema = z.object({
   max_participants: z.number(),
   presentation_type: z.string(),
   requirements: z.string(),
-  random_assignments: z.boolean()
-})
+  random_assignments: z.boolean(),
+});
 
 export const withId = (/** @type {import("zod").ZodType<any>} */ schema) =>
   schema.or(

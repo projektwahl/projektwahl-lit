@@ -12,6 +12,7 @@ import { css } from "lit";
 import { createRef, ref } from "lit/directives/ref.js";
 import { noChange } from "lit";
 import { aClick } from "../../pw-a.js";
+import { msg } from "@lit/localize";
 
 export const pwUsers = async (/** @type {URL} */ url) => {
   let result = await taskFunction([url.searchParams]);
@@ -96,9 +97,13 @@ export let PwUsers = class extends LitElement {
       ${bootstrapCss}
 
       <div class="container">
-        <pw-entitylist title="Accounts">
+        <pw-entitylist title="${msg("Users")}">
           <div slot="buttons">
-            <a @click=${aClick} class="btn btn-primary" href="/users/create" role="button"
+            <a
+              @click=${aClick}
+              class="btn btn-primary"
+              href="/users/create"
+              role="button"
               >Account erstellen</a
             >
           </div>

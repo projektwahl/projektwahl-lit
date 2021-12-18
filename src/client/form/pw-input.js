@@ -64,18 +64,24 @@ export class PwInput extends LitElement {
   }
 
   myformdataEventListener = (/** @type {CustomEvent} */ event) => {
-    console.log("pw-input"+Math.random(), event)
-  }
+    console.log("pw-input" + Math.random(), event);
+  };
 
   /** @override */ connectedCallback() {
-    super.connectedCallback()
-    console.log(this.closest("form"))
-    this.closest("form")?.addEventListener("myformdata", this.myformdataEventListener)
+    super.connectedCallback();
+    console.log(this.closest("form"));
+    this.closest("form")?.addEventListener(
+      "myformdata",
+      this.myformdataEventListener
+    );
   }
 
   /** @override */ disconnectedCallback() {
-    super.disconnectedCallback()
-    this.closest("form")?.removeEventListener("myformdata", this.myformdataEventListener)
+    super.disconnectedCallback();
+    this.closest("form")?.removeEventListener(
+      "myformdata",
+      this.myformdataEventListener
+    );
   }
 
   /** @override */ render() {
