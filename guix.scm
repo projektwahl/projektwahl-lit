@@ -12,6 +12,14 @@
              (guix build-system node)
              ((guix licenses) #:prefix license:))
 
+;; https://notabug.org/ZelphirKaltstahl/gnu-guile-gnu-guix-packaging-guide/src/master/gnu-guix-patch-guide.md
+;; export PATH=/var/guix/profiles/per-user/root/current-guix/bin
+;; guix environment guix
+;; ./bootstrap
+;; ./configure --localstatedir=/var
+;; ./pre-inst-env guix build --root=./result --file=/home/moritz/Documents/projektwahl-lit/guix.scm
+;; node --experimental-import-meta-resolve ./result/lib/node_modules/projektwahl-lit/src/server/index.js
+
 ;; ~/Documents/guix/etc/indent-code.el guix.scm 
 
 ;; https://issues.guix.gnu.org/51838
@@ -21,9 +29,24 @@
 ;; guix pull --url=/home/moritz/Documents/guix --profile=/tmp/guix.master --disable-authentication
 ;; GUIX_PROFILE="/tmp/guix.master"
 ;; . "$GUIX_PROFILE/etc/profile"
-;; guix build --verbosity=3 --file=/home/moritz/Documents/projektwahl-lit/guix.scm 
+;; guix build --verbosity=3 --file=/home/moritz/Documents/projektwahl-lit/guix.scm
 ;; guix build --root=./result --file=./guix.scm 
 ;; node --experimental-import-meta-resolve ./result/lib/node_modules/projektwahl-lit/src/server/index.js
+
+;; https://github.com/pjotrp/guix-notes/blob/master/HACKING.org#building-the-package
+
+;; THIS WORKS:
+;; export PATH=/var/guix/profiles/per-user/root/current-guix/bin
+;; guix environment -C guix
+;; guix environment -C guix guile guile-readline
+;; guix repl
+;; (use-modules (ice-9 readline))
+;; (activate-readline)
+;; ,load "/home/moritz/Documents/projektwahl-lit/guix.scm"
+
+
+;; GUIX_PROFILE="/home/moritz/.config/guix/current"
+;; . "$GUIX_PROFILE/etc/profile"
 
 ;; https://news.ycombinator.com/item?id=19808225
 ;; https://dustycloud.org/blog/javascript-packaging-dystopia/
