@@ -4,7 +4,7 @@ import { createSecureServer } from "node:http2";
 import { readFileSync } from "node:fs";
 import "./routes/login/openid-client.js";
 
-const numCPUs = 1; // cpus().length;
+//const numCPUs = 1; // cpus().length;
 
 // npm run server
 /*

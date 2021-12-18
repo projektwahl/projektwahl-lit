@@ -102,7 +102,7 @@ export let PwUsers = class extends LitElement {
           <div slot="response">
             <form
               ${ref(this.formRef)}
-              @input=${(e) => {
+              @input=${() => {
                 const urlSearchParams = new URLSearchParams(
                   new FormData(this.formRef.value)
                 );

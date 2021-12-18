@@ -28,7 +28,7 @@ export async function createUsersHandler(stream, headers) {
           },
           {
             result: "success",
-            success: null,
+            success: row.id,
           },
         ];
       });

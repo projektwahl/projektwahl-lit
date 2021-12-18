@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // SPDX-FileCopyrightText: 2021 Moritz Hedtke <Moritz.Hedtke@t-online.de>
-import { html, LitElement, noChange } from "lit";
+import { html, LitElement } from "lit";
 import { bootstrapCss } from "../index.js";
 import { setupHmr } from "../hmr.js";
 import { HistoryController } from "../history-controller.js";
@@ -42,7 +42,7 @@ export class PwOrder extends LitElement {
     return html`
       ${bootstrapCss}
       <button
-        @click=${(e) => {
+        @click=${() => {
           const urlSearchParams = this.history.url.searchParams;
 
           let order = [...urlSearchParams.getAll("order")];

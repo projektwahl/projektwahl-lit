@@ -9,7 +9,7 @@ import { openidLoginHandler } from "./routes/login/openid-login.js";
 import { openidRedirectHandler } from "./routes/login/redirect.js";
 import path from "path/posix";
 
-const startTime = Date.now();
+//const startTime = Date.now();
 
 /**
  *

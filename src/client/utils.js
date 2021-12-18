@@ -33,7 +33,7 @@ export const myFetch = async (url, options) => {
  * @returns {Promise<void>}
  */
 export const sleep = () => {
-  return new Promise((resolve, reject) => {
+  return new Promise((resolve) => {
     setTimeout(() => {
       resolve();
     }, 500);

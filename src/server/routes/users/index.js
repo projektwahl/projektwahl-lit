@@ -9,7 +9,7 @@ import { sql2 } from "../../sql/index.js";
  * @param {import("http2").IncomingHttpHeaders} headers
  */
 export async function usersHandler(stream, headers) {
-  return await request("GET", "/api/v1/users", async function (req) {
+  return await request("GET", "/api/v1/users", async function () {
     const url = new URL(headers[":path"], "https://localhost:8443");
 
     // TODO FIXME validation

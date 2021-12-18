@@ -7,7 +7,7 @@ import { client } from "./openid-client.js";
  * @param {import("http2").IncomingHttpHeaders} headers
  */
 export async function openidLoginHandler(stream, headers) {
-  return await request("GET", "/api/v1/openid-login", async function (body) {
+  return await request("GET", "/api/v1/openid-login", async function () {
     // https://github.com/AzureAD/microsoft-authentication-library-for-js/tree/dev/lib/msal-browser
     // https://docs.microsoft.com/en-us/azure/active-directory/develop/scenario-spa-app-registration
     // USE single tenant as for all others we need permissions

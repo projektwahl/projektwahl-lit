@@ -99,7 +99,7 @@ if ('FormDataEvent' in window) {
                 if (isErr(data)) {
                   const errors = Object.entries(data.failure)
                     .filter(
-                      ([k, v]) => !this.getCurrentInputElements().includes(k)
+                      ([k]) => !this.getCurrentInputElements().includes(k)
                     )
                     .map(([k, v]) => html`${k}: ${v}<br />`);
                   if (errors.length > 0) {

@@ -42,7 +42,7 @@ export function fetchData(
       query.paginationLimit + 1
     })`;
   } else {
-    let queries = query.sorting.map((value, index, array) => {
+    let queries = query.sorting.map((value, index) => {
       const part = query.sorting.slice(0, index + 1);
 
       let parts = part

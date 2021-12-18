@@ -1,4 +1,4 @@
-import { z, ZodType } from "zod";
+import { z } from "zod";
 import { result } from "./result.js";
 
 // TODO FIXME make all of these strict so unknown properties create errors
@@ -20,7 +20,7 @@ export const rawUserHelperOrAdminSchema = z
     username: z.string().min(3),
     away: z
       .string()
-      .refine((val) => /^(on)|(off)$/, { message: "muss on/off sein" })
+      .refine((val) => /^(on)|(off)$/.test(val), { message: "muss on/off sein" })
       .transform((v) => v === "on"),
   })
   .strict();
@@ -40,7 +40,7 @@ export const rawUserVoterSchema = z
       .optional(),
     away: z
       .string()
-      .refine((val) => /^(on)|(off)$/, { message: "muss on/off sein" })
+      .refine((val) => /^(on)|(off)$/.test(val), { message: "muss on/off sein" })
       .transform((v) => v === "on"),
   })
   .strict();

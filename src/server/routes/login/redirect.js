@@ -9,7 +9,7 @@ import { client } from "./openid-client.js";
  * @param {import("http2").IncomingHttpHeaders} headers
  */
 export async function openidRedirectHandler(stream, headers) {
-  return await request("GET", "/api/v1/redirect", async function (body) {
+  return await request("GET", "/api/v1/redirect", async function () {
     let url = new URL(headers[":path"], "https://localhost:8443");
 
     console.log(url.searchParams.get("session_state"));

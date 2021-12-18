@@ -6,7 +6,7 @@ window.customElements.define = (name, ...rest) => {
   }
 };
 
-export function setupHmr(clazz, url) {
+export function setupHmr(/*_clazz, _url*/) {
   /*
   // https://github.com/open-wc/open-wc/blob/master/packages/dev-server-hmr/src/wcHmrRuntime.js
   clazz.connectedElements = new Set();

@@ -19,7 +19,7 @@ export class PwInput extends LitElement {
       randomId: { state: true },
       task: {
         attribute: false,
-        hasChanged: (oldValue, newValue) => {
+        hasChanged: () => {
           return true; // TODO FIXME bug in @lit-labs/task
         },
       },
@@ -81,7 +81,7 @@ export class PwInput extends LitElement {
             <input
               type="checkbox"
               class="form-check-input ${this.task.render({
-                error: (v) => "",
+                error: () => "",
                 pending: () => "",
                 complete: (v) =>
                   isErr(v) && v.failure[this.name] !== undefined
@@ -120,7 +120,7 @@ export class PwInput extends LitElement {
               aria-describedby="${this.randomId}-feedback"
               .value=${this.value}
               class="form-select ${this.task.render({
-                error: (v) => "",
+                error: () => "",
                 pending: () => "",
                 complete: (v) =>
                   isErr(v) && v.failure[this.name] !== undefined
@@ -155,7 +155,7 @@ export class PwInput extends LitElement {
             <input
               type=${this.type}
               class="form-control ${this.task.render({
-                error: (v) => "",
+                error: () => "",
                 pending: () => "",
                 complete: (v) =>
                   isErr(v) && v.failure[this.name] !== undefined
