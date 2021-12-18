@@ -112,7 +112,9 @@ async function gitClonePackage([pkgpath, pkg], package_json, refs) {
       console.log(result);
 
       return result.stdout.trim();
-    } catch (error) {}
+    } catch (error) {
+      console.error(error)
+    }
   }
 
   for (const ref of refs) {
@@ -214,10 +216,9 @@ for (const [pkgpath, pkg] of Object.entries(package_lock.packages)) {
   console.log(package_json.name);
   console.log(package_json.version);
 
-  package_json.repository = package_json.repository;
   if (typeof package_json.repository === "object")
     package_json.repository = package_json.repository.url;
-  if (/^[a-zA-Z0-9-]+\/[a-zA-Z0-9-\.]+$/.test(package_json.repository)) {
+  if (/^[a-zA-Z0-9-]+\/[a-zA-Z0-9-.]+$/.test(package_json.repository)) {
     package_json.repository =
       "https://github.com/" + package_json.repository + ".git";
   }

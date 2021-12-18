@@ -58,7 +58,7 @@ export class MyCustomResolver implements Resolver {
     );
     //console.log("nextdescriptor:", nextDescriptor)
 
-    let candidates = await opts.resolver.getCandidates(
+    const candidates = await opts.resolver.getCandidates(
       nextDescriptor,
       dependencies,
       opts

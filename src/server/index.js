@@ -1,4 +1,3 @@
-/// <reference path="index.d.ts" />
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // SPDX-FileCopyrightText: 2021 Moritz Hedtke <Moritz.Hedtke@t-online.de>
 import { createSecureServer } from "node:http2";
@@ -41,7 +40,8 @@ if (cluster.isPrimary) {
   openssl req -x509 -newkey rsa:2048 -nodes -sha256 -subj '/CN=localhost' -keyout localhost-privkey.pem -out localhost-cert.pem
   */
 
-global.server = createSecureServer({
+// globalThis
+const server = createSecureServer({
   key: readFileSync("localhost-privkey.pem"),
   cert: readFileSync("localhost-cert.pem"),
 });
