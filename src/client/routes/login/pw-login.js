@@ -55,7 +55,7 @@ export class PwLogin extends PwForm {
      */
     this._task = new Task(
       this,
-      async ([]) => {
+      async () => {
         // ts-expect-error doesn't contain files so this is fine
         const formData = /*new URLSearchParams(*/ new FormData(this.form.value);
 

@@ -47,7 +47,7 @@ export class PwUserCreate extends PwForm {
      */
     this._task = new Task(
       this,
-      async ([]) => {
+      async () => {
         const formData = new FormData(this.form.value);
 
         // @ts-expect-error bad typings

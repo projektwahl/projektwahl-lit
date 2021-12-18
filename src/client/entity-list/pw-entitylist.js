@@ -35,11 +35,11 @@ export let PwEntityList = class extends LitElement {
       <div
         style="position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);"
       >
-        ${true
+        ${/*true
           ? ""
           : html`<div class="spinner-grow text-primary" role="status">
               <span class="visually-hidden">Loading...</span>
-            </div>`}
+        </div>`*/""}
       </div>
       <h1 class="text-center">${this.title}</h1>
       <div class="row justify-content-between">

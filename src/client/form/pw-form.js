@@ -54,7 +54,10 @@ export class PwForm extends LitElement {
   // get the inputs from there and check that the errors returned from the server don't contain additional
   // this needs to be done dynamically as e.g. the create user form dynamically changes the form inputs
   // attributes. Otherwise we're eating errors and that's not healthy.xit
-  getInputs = () => {};
+  /** @abstract @type {() => import("lit").TemplateResult} */
+  getInputs = () => {
+    throw new Error("getInputs must be implemented by subclass")
+  };
 
   /** @private */ getCurrentInputElements() {
     return [...this.renderRoot.querySelectorAll("pw-input")].map((e) => e.name);
