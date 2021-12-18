@@ -47,32 +47,6 @@ export type FailureResult<
 export type New<T> = T & { id?: number };
 export type Existing<T> = T & { id: number };
 
-export type RawUserType = {
-  username: string;
-  password_hash: Uint8Array;
-  password_salt: Uint8Array;
-  type: "helper" | "admin" | "voter";
-  group: string | null;
-  age: number | null;
-  away: boolean;
-  project_leader_id: number | null;
-  force_in_project_id: number | null;
-};
-
-export type RawProjectType = {
-  title: string;
-  info: string;
-  place: string;
-  costs: number;
-  min_age: number;
-  max_age: number;
-  min_participants: number;
-  max_participants: number;
-  presentation_type: string;
-  requirements: string;
-  random_assignments: boolean;
-};
-
 export type RawSessionType = {
   session_id: string;
   created_at: Date;

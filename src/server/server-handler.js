@@ -9,6 +9,7 @@ import { openidLoginHandler } from "./routes/login/openid-login.js";
 import { openidRedirectHandler } from "./routes/login/redirect.js";
 import path, { extname, relative } from "path/posix";
 import { z } from "zod";
+import { createProjectsHandler } from "./routes/projects/create-or-update.js";
 
 //const startTime = Date.now();
 
@@ -87,6 +88,7 @@ export async function serverHandler(stream, headers) {
       (await openidRedirectHandler(stream, headers)) ||
       (await sleepHandler(stream, headers)) ||
       (await createUsersHandler(stream, headers)) ||
+      (await createProjectsHandler(stream, headers)) ||
       (await usersHandler(stream, headers));
 
     if (!executed) {
