@@ -3,6 +3,7 @@
 // SPDX-FileCopyrightText: 2021 Moritz Hedtke <Moritz.Hedtke@t-online.de>
 import { createSecureServer } from "node:http2";
 import { readFileSync } from "node:fs";
+import './routes/login/openid-client.js';
 
 const numCPUs = 1; // cpus().length;
 
@@ -55,7 +56,9 @@ server.on("stream", async (stream, headers) => {
   }
 });
 
-server.listen(8443, () => {});
+server.listen(8443, () => {
+  console.log("Server started at https://localhost:8443/")
+});
 //}
 
 //repl.start({})
