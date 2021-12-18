@@ -7,7 +7,8 @@ import { createUsersHandler } from "./routes/users/create-or-update.js";
 import { usersHandler } from "./routes/users/index.js";
 import { openidLoginHandler } from "./routes/login/openid-login.js";
 import { openidRedirectHandler } from "./routes/login/redirect.js";
-import path from "path/posix";
+import path, { relative } from "path/posix";
+import { z } from "zod";
 
 //const startTime = Date.now();
 
@@ -52,10 +53,9 @@ async function replaceAsync(str, regex, asyncFn) {
  * @param {import("http").IncomingHttpHeaders} headers
  */
 export async function serverHandler(stream, headers) {
-  //console.log("start"+ headers[":path"]+"end")
+  const path = z.string().parse(headers[":path"]);
 
-  // TODO FIXME respond can throw
-  let url = new URL(headers[":path"], "https://localhost:8443");
+  let url = new URL(path, "https://localhost:8443");
 
   if (url.pathname === "/favicon.ico") {
     stream.respond(
@@ -80,6 +80,7 @@ export async function serverHandler(stream, headers) {
       })();
     }
   } else if (url.pathname.startsWith("/api")) {
+    // TODO FIXME store this in a routing table and automatically extract types from that
     let executed =
       (await loginHandler(stream, headers)) ||
       (await openidLoginHandler(stream, headers)) ||
@@ -104,28 +105,20 @@ export async function serverHandler(stream, headers) {
     // TODO FIXME injection
     // TODO FIXME caching (server+clientside)
     let filename = "." + url.pathname;
-    //console.log("mod", filename)
     let contents = await readFile(filename, {
       encoding: "utf-8",
     });
-    //console.log(contents)
 
-    // TODO FIXME single and double quotes
     contents = await replaceAsync(
       contents,
       /import( )?["']([^"']+)["']/g,
       async (match, args) => {
-        //console.log(match)
-        //console.log(args)
         let url = await import.meta.resolve(args[1], pathToFileURL(filename));
-        //console.log(url)
 
-        url = path.relative(
-          path.resolve(fileURLToPath(import.meta.url), "../../.."),
+        url = relative(
+          resolve(fileURLToPath(import.meta.url), "../../.."),
           fileURLToPath(url)
         );
-
-        console.log(url);
 
         return `import "/${url}"`;
       }
@@ -134,22 +127,16 @@ export async function serverHandler(stream, headers) {
       contents,
       /([*} ])from ?["']([^"']+)["']/g,
       async (match, args) => {
-        //console.log(match)
-        //console.log(args)
         let url = await import.meta.resolve(args[1], pathToFileURL(filename));
-        //console.log(url)
 
-        url = path.relative(
-          path.resolve(fileURLToPath(import.meta.url), "../../.."),
+        url = relative(
+          resolve(fileURLToPath(import.meta.url), "../../.."),
           fileURLToPath(url)
         );
-
-        console.log(url);
 
         return `${args[0]} from "/${url}"`;
       }
     );
-    //console.log(contents)
 
     stream.respond({
       "content-type": "application/javascript; charset=utf-8",
@@ -158,45 +145,45 @@ export async function serverHandler(stream, headers) {
     stream.end(contents);
   } else {
     let rawContents = `<!DOCTYPE html>
-    <html lang="en">
-      <head>
-        <!-- Required meta tags -->
-        <meta charset="utf-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1" />
-    
-        <!--
-    SPDX-License-Identifier: AGPL-3.0-or-later
-    SPDX-FileCopyrightText: 2021 Moritz Hedtke <Moritz.Hedtke@t-online.de>
-    -->
-        <style>
-          body {
-            overflow-y: scroll;
-          }
-        </style>
-        <link
-          href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css"
-          rel="stylesheet"
-          integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3"
-          crossorigin="anonymous"
-        />
-        <link
-          rel="stylesheet"
-          href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.0/font/bootstrap-icons.css"
-        />
-    
-        <title>Hello, world!</title>
-      </head>
-      <body>
-        <script
-          type="module"
-          src="/src/client/pw-app.js"
-        ></script>
-        <noscript>Bitte aktiviere JavaScript!</noscript>
-    
-        <pw-app></pw-app>
-      </body>
-    </html>
-    `;
+  <html lang="en">
+    <head>
+      <!-- Required meta tags -->
+      <meta charset="utf-8" />
+      <meta name="viewport" content="width=device-width, initial-scale=1" />
+  
+      <!--
+  SPDX-License-Identifier: AGPL-3.0-or-later
+  SPDX-FileCopyrightText: 2021 Moritz Hedtke <Moritz.Hedtke@t-online.de>
+  -->
+      <style>
+        body {
+          overflow-y: scroll;
+        }
+      </style>
+      <link
+        href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css"
+        rel="stylesheet"
+        integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3"
+        crossorigin="anonymous"
+      />
+      <link
+        rel="stylesheet"
+        href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.0/font/bootstrap-icons.css"
+      />
+  
+      <title>Hello, world!</title>
+    </head>
+    <body>
+      <script
+        type="module"
+        src="/src/client/pw-app.js"
+      ></script>
+      <noscript>Bitte aktiviere JavaScript!</noscript>
+  
+      <pw-app></pw-app>
+    </body>
+  </html>
+  `;
     // ${await pwApp(url)}
 
     // current issue: https://github.com/lit/lit/issues/2329

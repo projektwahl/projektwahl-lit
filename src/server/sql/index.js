@@ -48,21 +48,18 @@ export function sql2(_strings, ..._keys) {
     if (i == keys.length) {
       return [m];
     }
-    // array of flat template strings
+    // array of flat template strings.
+    const val = keys[i];
     if (
-      Array.isArray(keys[i]) &&
-      keys[i].every(
+      Array.isArray(val) &&
+      [...val].every(
         (p) => Array.isArray(p) && typeof p[0] === "object" && "raw" in p[0]
       )
     ) {
-      return [m, ...keys[i]];
+      return [m, ...val];
     }
     // flat template string
-    if (
-      Array.isArray(keys[i]) &&
-      typeof keys[i][0] === "object" &&
-      "raw" in keys[i][0]
-    ) {
+    if (Array.isArray(val) && typeof val[0] === "object" && "raw" in val[0]) {
       return [m, keys[i]];
     }
     // primitive

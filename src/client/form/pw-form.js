@@ -55,7 +55,7 @@ export class PwForm extends LitElement {
   // attributes. Otherwise we're eating errors and that's not healthy.xit
   /** @abstract @type {() => import("lit").TemplateResult} */
   getInputs = () => {
-    throw new Error("getInputs must be implemented by subclass")
+    throw new Error("getInputs must be implemented by subclass");
   };
 
   /** @private */ getCurrentInputElements() {
