@@ -35,11 +35,11 @@ export let PwEntityList = class extends LitElement {
       <div
         style="position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);"
       >
-        ${true
+        ${/*true
           ? ""
           : html`<div class="spinner-grow text-primary" role="status">
               <span class="visually-hidden">Loading...</span>
-            </div>`}
+        </div>`*/""}
       </div>
       <h1 class="text-center">${this.title}</h1>
       <div class="row justify-content-between">
@@ -56,9 +56,7 @@ export let PwEntityList = class extends LitElement {
               url.searchParams.set("count", event.target.value);
               HistoryController.goto(url);
             }}
-            .value=${(
-              this.history.url ?? new URL(this.initialUrl)
-            ).searchParams.get("count")}
+            .value=${this.history.url.searchParams.get("count")}
             class="form-select"
             aria-label="Default select example"
           >

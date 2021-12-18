@@ -1,10 +1,10 @@
-/// <reference path="index.d.ts" />
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // SPDX-FileCopyrightText: 2021 Moritz Hedtke <Moritz.Hedtke@t-online.de>
 import { createSecureServer } from "node:http2";
 import { readFileSync } from "node:fs";
+import "./routes/login/openid-client.js";
 
-const numCPUs = 1; // cpus().length;
+//const numCPUs = 1; // cpus().length;
 
 // npm run server
 /*
@@ -40,7 +40,8 @@ if (cluster.isPrimary) {
   openssl req -x509 -newkey rsa:2048 -nodes -sha256 -subj '/CN=localhost' -keyout localhost-privkey.pem -out localhost-cert.pem
   */
 
-global.server = createSecureServer({
+// globalThis
+const server = createSecureServer({
   key: readFileSync("localhost-privkey.pem"),
   cert: readFileSync("localhost-cert.pem"),
 });
@@ -55,7 +56,9 @@ server.on("stream", async (stream, headers) => {
   }
 });
 
-server.listen(8443, () => {});
+server.listen(8443, () => {
+  console.log("Server started at https://localhost:8443/");
+});
 //}
 
 //repl.start({})

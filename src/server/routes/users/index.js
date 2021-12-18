@@ -9,7 +9,7 @@ import { sql2 } from "../../sql/index.js";
  * @param {import("http2").IncomingHttpHeaders} headers
  */
 export async function usersHandler(stream, headers) {
-  return await request("GET", "/api/v1/users", async function (req) {
+  return await request("GET", "/api/v1/users", async function () {
     const url = new URL(headers[":path"], "https://localhost:8443");
 
     // TODO FIXME validation
@@ -25,9 +25,9 @@ export async function usersHandler(stream, headers) {
       },
       {
         filters: {
-          id: url.searchParams.get("f_id") ?? '',
-          username: url.searchParams.get("f_username") ?? '',
-          type: url.searchParams.get("f_type") ?? '',
+          id: url.searchParams.get("f_id") ?? "",
+          username: url.searchParams.get("f_username") ?? "",
+          type: url.searchParams.get("f_type") ?? "",
         },
         paginationCursor: null,
         paginationDirection: "forwards",
@@ -38,10 +38,10 @@ export async function usersHandler(stream, headers) {
 I think in the UI we will never be able to implement this without javascript and without reloading at every change
 
 */
-        sorting: url.searchParams.getAll("order").map(o => o.split("-")) // TODO FIXME validate
+        sorting: url.searchParams.getAll("order").map((o) => o.split("-")), // TODO FIXME validate
       },
       (query) => {
-        return sql2`username LIKE ${'%' + query.filters.username + '%'}`;
+        return sql2`username LIKE ${"%" + query.filters.username + "%"}`;
       }
     );
 

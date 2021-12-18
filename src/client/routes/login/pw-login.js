@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // SPDX-FileCopyrightText: 2021 Moritz Hedtke <Moritz.Hedtke@t-online.de>
-import { html, LitElement } from "lit";
+import { html } from "lit";
 import "../../form/pw-input.js";
 import "../../form/pw-form.js";
 import { Task } from "@lit-labs/task";
@@ -16,7 +16,7 @@ import { isOk } from "../../../lib/result.js";
  * @returns {Promise<import("lit").TemplateResult>}
  */
 export const pwLogin = async () => {
-  const content = await fetch("/api/v1/sleep").then((r) => r.text());
+  const content = 0; //await fetch("/api/v1/sleep").then((r) => r.text());
   return html`<pw-login .data=${content}></pw-login>`;
 };
 
@@ -55,7 +55,7 @@ export class PwLogin extends PwForm {
      */
     this._task = new Task(
       this,
-      async ([]) => {
+      async () => {
         // ts-expect-error doesn't contain files so this is fine
         const formData = /*new URLSearchParams(*/ new FormData(this.form.value);
 
@@ -89,7 +89,16 @@ export class PwLogin extends PwForm {
   }
 
   /** @override */ getInputs = () => {
-    return html` <pw-input
+    return html` <a
+        class="btn btn-primary btn-lg w-100 my-5"
+        href="/api/v1/openid-login"
+        role="button"
+        >Mit Schulaccount anmelden</a
+      >
+
+      <h3 class="text-center">Als Gast anmelden</h3>
+
+      <pw-input
         type="text"
         autocomplete="username"
         label="Name"

@@ -6,12 +6,10 @@ import "../../entity-list/pw-order.js";
 import { html, LitElement } from "lit";
 import { bootstrapCss } from "../../index.js";
 import { HistoryController } from "../../history-controller.js";
-import { repeat } from "lit/directives/repeat.js";
 import { setupHmr } from "../../hmr.js";
 import { Task, TaskStatus } from "@lit-labs/task";
 import { css } from "lit";
 import { createRef, ref } from "lit/directives/ref.js";
-import { sleep } from "../../utils.js";
 import { noChange } from "lit";
 
 export const pwUsers = async (/** @type {URL} */ url) => {
@@ -104,17 +102,18 @@ export let PwUsers = class extends LitElement {
           <div slot="response">
             <form
               ${ref(this.formRef)}
-              @input=${(e) => {
+              @input=${() => {
                 const urlSearchParams = new URLSearchParams(
                   new FormData(this.formRef.value)
                 );
                 urlSearchParams.delete("order");
-                this.history.url.searchParams.getAll("order").forEach((v) => urlSearchParams.append("order", v));
+                this.history.url.searchParams
+                  .getAll("order")
+                  .forEach((v) => urlSearchParams.append("order", v));
                 HistoryController.goto(
                   new URL(`?${urlSearchParams}`, window.location.href)
                 );
               }}
-
               @submit=${(e) => e.preventDefault()}
             >
               <table class="table">

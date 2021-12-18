@@ -1,11 +1,10 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // SPDX-FileCopyrightText: 2021 Moritz Hedtke <Moritz.Hedtke@t-online.de>
 import "./pw-input.js";
-import { html, LitElement, noChange } from "lit";
+import { html, LitElement } from "lit";
 import { createRef, ref } from "lit/directives/ref.js";
 import { bootstrapCss } from "../index.js";
 import { HistoryController } from "../history-controller.js";
-import { myFetch } from "../utils.js";
 import { isErr } from "../../lib/result.js";
 
 /**
@@ -54,7 +53,10 @@ export class PwForm extends LitElement {
   // get the inputs from there and check that the errors returned from the server don't contain additional
   // this needs to be done dynamically as e.g. the create user form dynamically changes the form inputs
   // attributes. Otherwise we're eating errors and that's not healthy.xit
-  getInputs = () => {};
+  /** @abstract @type {() => import("lit").TemplateResult} */
+  getInputs = () => {
+    throw new Error("getInputs must be implemented by subclass")
+  };
 
   /** @private */ getCurrentInputElements() {
     return [...this.renderRoot.querySelectorAll("pw-input")].map((e) => e.name);
@@ -97,7 +99,7 @@ if ('FormDataEvent' in window) {
                 if (isErr(data)) {
                   const errors = Object.entries(data.failure)
                     .filter(
-                      ([k, v]) => !this.getCurrentInputElements().includes(k)
+                      ([k]) => !this.getCurrentInputElements().includes(k)
                     )
                     .map(([k, v]) => html`${k}: ${v}<br />`);
                   if (errors.length > 0) {

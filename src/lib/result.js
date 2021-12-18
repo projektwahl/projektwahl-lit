@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // SPDX-FileCopyrightText: 2021 Moritz Hedtke <Moritz.Hedtke@t-online.de>
 
-import { z, ZodObject, ZodRecord, ZodType } from "zod";
+import { z } from "zod";
 
 export const noneResult = z
   .object({
@@ -109,7 +109,7 @@ export function errOrDefault(result, defaultError) {
 
 const zoderr2err = (/** @type {import("zod").z.ZodIssue[]} */ arr) => {
   const initialValue = {};
-  // @ts-expect-error
+  // @ts-expect-error this is hard to type
   return arr.reduce((/** @type {Record<string, string>} */ acc, cval) => {
     const myAttribute = cval.path[0];
     acc[myAttribute] = (acc[myAttribute] || "") + cval.message + ". ";
@@ -131,7 +131,7 @@ export function zod2result(input) {
   if (input.success) {
     return ok(input.data);
   } else {
-    // @ts-expect-error
+    // @ts-expect-error this is hard to type
     return err(zoderr2err(input.error.issues)); // TODO FIXME
   }
 }

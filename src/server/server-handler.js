@@ -1,21 +1,15 @@
 import { readdir, readFile, watch } from "node:fs/promises";
-import { sensitiveHeaders } from "node:http2";
 import { resolve } from "node:path";
-import { pathToFileURL } from "node:url";
-import { sql } from "./database.js";
-import { request } from "./express.js";
-import { checkPassword } from "./password.js";
+import { fileURLToPath, pathToFileURL } from "node:url";
 import { loginHandler } from "./routes/login/index.js";
 import { sleepHandler } from "./routes/sleep/index.js";
 import { createUsersHandler } from "./routes/users/create-or-update.js";
 import { usersHandler } from "./routes/users/index.js";
-import { render } from "@lit-labs/ssr/lib/render-with-global-dom-shim.js";
-import { pwApp, PwApp } from "../client/pw-app.js";
-import { Readable } from "node:stream";
-import { unsafeHTML } from "lit/directives/unsafe-html.js";
-import { html } from "lit";
+import { openidLoginHandler } from "./routes/login/openid-login.js";
+import { openidRedirectHandler } from "./routes/login/redirect.js";
+import path from "path/posix";
 
-const startTime = Date.now();
+//const startTime = Date.now();
 
 /**
  *
@@ -88,6 +82,8 @@ export async function serverHandler(stream, headers) {
   } else if (url.pathname.startsWith("/api")) {
     let executed =
       (await loginHandler(stream, headers)) ||
+      (await openidLoginHandler(stream, headers)) ||
+      (await openidRedirectHandler(stream, headers)) ||
       (await sleepHandler(stream, headers)) ||
       (await createUsersHandler(stream, headers)) ||
       (await usersHandler(stream, headers));
@@ -123,9 +119,14 @@ export async function serverHandler(stream, headers) {
         //console.log(args)
         let url = await import.meta.resolve(args[1], pathToFileURL(filename));
         //console.log(url)
-        url = url.substring(
-          "file:///home/moritz/Documents/projektwahl-lit/".length
+
+        url = path.relative(
+          path.resolve(fileURLToPath(import.meta.url), "../../.."),
+          fileURLToPath(url)
         );
+
+        console.log(url);
+
         return `import "/${url}"`;
       }
     );
@@ -137,9 +138,14 @@ export async function serverHandler(stream, headers) {
         //console.log(args)
         let url = await import.meta.resolve(args[1], pathToFileURL(filename));
         //console.log(url)
-        url = url.substring(
-          "file:///home/moritz/Documents/projektwahl-lit/".length
+
+        url = path.relative(
+          path.resolve(fileURLToPath(import.meta.url), "../../.."),
+          fileURLToPath(url)
         );
+
+        console.log(url);
+
         return `${args[0]} from "/${url}"`;
       }
     );

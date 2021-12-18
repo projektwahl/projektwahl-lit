@@ -67,6 +67,9 @@ export async function loginHandler(stream, headers) {
         `lax_id=${
           session.session_id
         }; Secure; SameSite=Lax; HttpOnly; Max-Age=${48 * 60 * 60};`,
+        `username=${
+          dbUser.username
+        }; Secure; SameSite=Strict; Path=/; Max-Age=${48 * 60 * 60};`,
       ],
       [sensitiveHeaders]: ["set-cookie"],
     };

@@ -1,5 +1,4 @@
-import { sql } from "./database.js";
-import { sql2, sql2ToString, unsafe2 } from "./sql/index.js";
+import { sql2, unsafe2 } from "./sql/index.js";
 
 /**
  * @template T
@@ -39,11 +38,11 @@ export function fetchData(
   if (query.paginationCursor === null) {
     return sql2`(SELECT ${unsafe2(fieldsToSelect.join(", "))} FROM ${unsafe2(
       table
-    )} WHERE ${customFilterQuery(
-      query
-    )} ORDER BY ${orderByQuery} LIMIT ${query.paginationLimit + 1})`;
+    )} WHERE ${customFilterQuery(query)} ORDER BY ${orderByQuery} LIMIT ${
+      query.paginationLimit + 1
+    })`;
   } else {
-    let queries = query.sorting.map((value, index, array) => {
+    let queries = query.sorting.map((value, index) => {
       const part = query.sorting.slice(0, index + 1);
 
       let parts = part
