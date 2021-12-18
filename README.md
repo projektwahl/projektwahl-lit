@@ -32,3 +32,7 @@ DATABASE_URL=postgres://projektwahl:projektwahl@projektwahl/projektwahl OPENID_U
 ## Security
 
 See [SECURITY.md](SECURITY.md)
+
+## Browser support
+
+This application will probably never work without JavaScript as this would require bad API design because forms are just terrible.

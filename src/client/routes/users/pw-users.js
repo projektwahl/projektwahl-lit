@@ -98,7 +98,12 @@ export let PwUsers = class extends LitElement {
       ${bootstrapCss}
 
       <div class="container">
-        <pw-entitylist title="Nutzende">
+        <pw-entitylist title="Accounts">
+          <div slot="buttons">
+            <a class="btn btn-primary" href="/users/create" role="button"
+              >Account erstellen</a
+            >
+          </div>
           <div slot="response">
             <form
               ${ref(this.formRef)}

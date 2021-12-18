@@ -51,7 +51,7 @@ export const rawUserVoterSchema = z
 
 export const rawUserSchema = rawUserHelperOrAdminSchema.or(rawUserVoterSchema);
 
-export const withId = (/** @type {ZodType<any>} */ schema) =>
+export const withId = (/** @type {import("zod").ZodType<any>} */ schema) =>
   schema.or(
     z.object({
       id: z.number(),
@@ -91,7 +91,7 @@ export const routes = /** @type {const} */ ({
   },
   "/api/v1/users/create": {
     request: rawUserSchema,
-    response: result(z.null(), z.record(z.string())),
+    response: result(withId(z.object({})), z.record(z.string())),
   },
   "/api/v1/users": {
     request: z.undefined(),
