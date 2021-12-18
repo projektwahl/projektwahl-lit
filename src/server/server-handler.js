@@ -1,7 +1,7 @@
 import { readdir, readFile, watch } from "node:fs/promises";
 import { sensitiveHeaders } from "node:http2";
 import { resolve } from "node:path";
-import { pathToFileURL } from "node:url";
+import { fileURLToPath, pathToFileURL } from "node:url";
 import { sql } from "./database.js";
 import { request } from "./express.js";
 import { checkPassword } from "./password.js";
@@ -16,6 +16,7 @@ import { unsafeHTML } from "lit/directives/unsafe-html.js";
 import { html } from "lit";
 import { openidLoginHandler } from "./routes/login/openid-login.js";
 import { openidRedirectHandler } from "./routes/login/redirect.js";
+import path from "path/posix";
 
 const startTime = Date.now();
 
@@ -127,9 +128,11 @@ export async function serverHandler(stream, headers) {
         //console.log(args)
         let url = await import.meta.resolve(args[1], pathToFileURL(filename));
         //console.log(url)
-        url = url.substring(
-          "file:///home/moritz/Documents/projektwahl-lit/".length
-        );
+        
+        url = path.relative(path.resolve(fileURLToPath(import.meta.url), "../../.."), fileURLToPath(url))
+
+        console.log(url)
+
         return `import "/${url}"`;
       }
     );
@@ -141,9 +144,11 @@ export async function serverHandler(stream, headers) {
         //console.log(args)
         let url = await import.meta.resolve(args[1], pathToFileURL(filename));
         //console.log(url)
-        url = url.substring(
-          "file:///home/moritz/Documents/projektwahl-lit/".length
-        );
+        
+        url = path.relative(path.resolve(fileURLToPath(import.meta.url), "../../.."), fileURLToPath(url))
+
+        console.log(url)
+
         return `${args[0]} from "/${url}"`;
       }
     );
