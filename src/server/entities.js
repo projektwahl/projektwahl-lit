@@ -1,5 +1,4 @@
-import { sql } from "./database.js";
-import { sql2, sql2ToString, unsafe2 } from "./sql/index.js";
+import { sql2, unsafe2 } from "./sql/index.js";
 
 /**
  * @template T

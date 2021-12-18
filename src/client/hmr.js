@@ -1,4 +1,3 @@
-import { adoptStyles, LitElement } from "lit";
 
 const originalDefine = window.customElements.define;
 window.customElements.define = (name, ...rest) => {

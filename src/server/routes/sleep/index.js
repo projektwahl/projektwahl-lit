@@ -1,4 +1,3 @@
-import { sql } from "../../database.js";
 import { request } from "../../express.js";
 
 /**

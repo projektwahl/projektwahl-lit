@@ -1,8 +1,6 @@
 import { sensitiveHeaders } from "node:http2";
 import { sql } from "../../database.js";
 import { request } from "../../express.js";
-import { checkPassword } from "../../password.js";
-import { Issuer } from "openid-client";
 import { client } from "./openid-client.js";
 
 /**

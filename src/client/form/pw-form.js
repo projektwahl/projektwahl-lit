@@ -1,11 +1,10 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // SPDX-FileCopyrightText: 2021 Moritz Hedtke <Moritz.Hedtke@t-online.de>
 import "./pw-input.js";
-import { html, LitElement, noChange } from "lit";
+import { html, LitElement } from "lit";
 import { createRef, ref } from "lit/directives/ref.js";
 import { bootstrapCss } from "../index.js";
 import { HistoryController } from "../history-controller.js";
-import { myFetch } from "../utils.js";
 import { isErr } from "../../lib/result.js";
 
 /**

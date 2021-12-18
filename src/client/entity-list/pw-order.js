@@ -3,7 +3,6 @@
 import { html, LitElement, noChange } from "lit";
 import { bootstrapCss } from "../index.js";
 import { setupHmr } from "../hmr.js";
-import { css } from "lit";
 import { HistoryController } from "../history-controller.js";
 
 /** @template T */
