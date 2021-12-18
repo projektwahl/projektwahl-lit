@@ -39,19 +39,21 @@ export const pwApp = async (/** @type {URL} */ url) => {
   return html`<pw-app .initial=${Promise.resolve(page)}></pw-app>`;
 };
 
-export const nextPage = (/** @type {URL} */ url) => {
+export const nextPage = async (/** @type {URL} */ url) => {
   try {
     if (url.pathname === "/login") {
-      return pwLogin();
+      return await pwLogin();
     } else if (url.pathname === "/users") {
-      return pwUsers(url);
+      return await pwUsers(url);
     } else if (url.pathname === "/users/create") {
-      return Promise.resolve(html`<pw-user-create></pw-user-create>`);
+      return html`<pw-user-create></pw-user-create>`;
     } else {
-      return Promise.resolve(html`Not Found`);
+      return html`Not Found`;
     }
   } catch (error) {
-    return Promise.resolve(html`Error: ${error}`);
+    return html`<div class="alert alert-danger" role="alert">
+      Error: ${error}
+    </div>`;
   }
 };
 
