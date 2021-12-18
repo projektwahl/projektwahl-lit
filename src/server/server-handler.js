@@ -1,5 +1,5 @@
 import { readdir, readFile, watch } from "node:fs/promises";
-import { resolve } from "node:path";
+import { join, resolve } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 import { loginHandler } from "./routes/login/index.js";
 import { sleepHandler } from "./routes/sleep/index.js";
@@ -97,54 +97,81 @@ export async function serverHandler(stream, headers) {
         { endStream: true }
       );
     }
-  } else if (
-    url.pathname.startsWith("/src") ||
-    url.pathname.startsWith("/node_modules") ||
-    url.pathname.startsWith("/lit")
-  ) {
-    // TODO FIXME injection
-    // TODO FIXME caching (server+clientside)
-    let filename = "." + url.pathname;
-    let contents = await readFile(filename, {
-      encoding: "utf-8",
-    });
-
-    contents = await replaceAsync(
-      contents,
-      /import( )?["']([^"']+)["']/g,
-      async (match, args) => {
-        let url = await import.meta.resolve(args[1], pathToFileURL(filename));
-
-        url = relative(
-          resolve(fileURLToPath(import.meta.url), "../../.."),
-          fileURLToPath(url)
-        );
-
-        return `import "/${url}"`;
-      }
-    );
-    contents = await replaceAsync(
-      contents,
-      /([*} ])from ?["']([^"']+)["']/g,
-      async (match, args) => {
-        let url = await import.meta.resolve(args[1], pathToFileURL(filename));
-
-        url = relative(
-          resolve(fileURLToPath(import.meta.url), "../../.."),
-          fileURLToPath(url)
-        );
-
-        return `${args[0]} from "/${url}"`;
-      }
-    );
-
-    stream.respond({
-      "content-type": "application/javascript; charset=utf-8",
-      ":status": 200,
-    });
-    stream.end(contents);
   } else {
-    let rawContents = `<!DOCTYPE html>
+    // TODO FIXME AUDIT
+    // curl --insecure --path-as-is -v https://localhost:8443/../src/index.js
+
+    console.log("original", path);
+    let filename = resolve("." + path);
+
+    let baseUrl = resolve(fileURLToPath(import.meta.url), "../../..");
+
+    console.log("filename", filename);
+    console.log("baseUrl", baseUrl);
+    console.log(join(baseUrl, "/src/"));
+
+    if (
+      filename.startsWith(join(baseUrl, "/src/")) ||
+      filename.startsWith(join(baseUrl, "/node_modules/")) ||
+      filename.startsWith(join(baseUrl, "/lit/"))
+    ) {
+      // TODO FIXME caching (server+clientside)
+
+      try {
+        let contents = await readFile(filename, {
+          encoding: "utf-8",
+        });
+
+        contents = await replaceAsync(
+          contents,
+          /import( )?["']([^"']+)["']/g,
+          async (match, args) => {
+            let url = await import.meta.resolve(
+              args[1],
+              pathToFileURL(filename)
+            );
+
+            url = relative(
+              resolve(fileURLToPath(import.meta.url), "../../.."),
+              fileURLToPath(url)
+            );
+
+            return `import "/${url}"`;
+          }
+        );
+        contents = await replaceAsync(
+          contents,
+          /([*} ])from ?["']([^"']+)["']/g,
+          async (match, args) => {
+            let url = await import.meta.resolve(
+              args[1],
+              pathToFileURL(filename)
+            );
+
+            url = relative(
+              resolve(fileURLToPath(import.meta.url), "../../.."),
+              fileURLToPath(url)
+            );
+
+            return `${args[0]} from "/${url}"`;
+          }
+        );
+
+        stream.respond({
+          "content-type": "application/javascript; charset=utf-8",
+          ":status": 200,
+        });
+        stream.end(contents);
+      } catch (error) {
+        stream.respond(
+          {
+            ":status": 404,
+          },
+          { endStream: true }
+        );
+      }
+    } else {
+      let rawContents = `<!DOCTYPE html>
   <html lang="en">
     <head>
       <!-- Required meta tags -->
@@ -184,22 +211,23 @@ export async function serverHandler(stream, headers) {
     </body>
   </html>
   `;
-    // ${await pwApp(url)}
+      // ${await pwApp(url)}
 
-    // current issue: https://github.com/lit/lit/issues/2329
+      // current issue: https://github.com/lit/lit/issues/2329
 
-    // TODO FIXME IMPORTANT this doesn't work for parallel rendering
-    // TODO FIXME SECURITY THE DOMAIN NEEDS TO BE FORCED TO OUR VALUE OTHERWISE THIS IS PRONE TO ATTACKS
-    //window.location.href = url;
-    //const ssrResult = render(contents);
+      // TODO FIXME IMPORTANT this doesn't work for parallel rendering
+      // TODO FIXME SECURITY THE DOMAIN NEEDS TO BE FORCED TO OUR VALUE OTHERWISE THIS IS PRONE TO ATTACKS
+      //window.location.href = url;
+      //const ssrResult = render(contents);
 
-    stream.respond({
-      "content-type": "text/html; charset=utf-8",
-      ":status": 200,
-    });
-    //Readable.from(ssrResult).pipe(stream)
-    //stream.end()
+      stream.respond({
+        "content-type": "text/html; charset=utf-8",
+        ":status": 200,
+      });
+      //Readable.from(ssrResult).pipe(stream)
+      //stream.end()
 
-    stream.end(rawContents);
+      stream.end(rawContents);
+    }
   }
 }
