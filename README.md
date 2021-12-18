@@ -10,6 +10,31 @@ Software to manage choosing projects and automatically assigning people to proje
 ## Setup
 
 ```bash
+git clone --branch openid https://github.com/projektwahl/projektwahl-lit.git
+cd projektwahl-lit/
+# you need nodejs 16 or 17
+npm install
+DATABASE_URL=postgres://projektwahl:projektwahl@projektwahl/projektwahl npm run setup
+DATABASE_URL=postgres://projektwahl:projektwahl@projektwahl/projektwahl OPENID_URL=openid_url CLIENT_ID=client_id CLIENT_SECRET=secret npm run server
+# https://localhost:8443/
+
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+## Notes
+
+```bash
 nix develop
 npm ci
 cd lit
