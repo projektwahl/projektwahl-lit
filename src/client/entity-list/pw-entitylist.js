@@ -22,7 +22,7 @@ export let PwEntityList = class extends LitElement {
     /**
      * @private
      */
-    this.history = new HistoryController(this);
+    this.history = new HistoryController(this, /.*/);
   }
 
   /** @override */ render() {

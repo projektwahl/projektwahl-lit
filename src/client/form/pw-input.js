@@ -31,7 +31,7 @@ export class PwInput extends LitElement {
     super();
     this.randomId = "id" + Math.random().toString().replace(".", "");
 
-    /** @private */ this.history = new HistoryController(this);
+    /** @private */ this.history = new HistoryController(this, /.*/);
 
     /** @type {string} */
     this.label;

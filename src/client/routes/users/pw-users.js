@@ -47,7 +47,7 @@ export let PwUsers = class extends LitElement {
     /**
      * @private
      */
-    this.history = new HistoryController(this);
+    this.history = new HistoryController(this, /\/users/);
 
     /** @type {Timeout} */
     this.timer;

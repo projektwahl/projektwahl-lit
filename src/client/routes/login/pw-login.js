@@ -48,7 +48,7 @@ export class PwLogin extends PwForm {
     /**
      * @private
      */
-    this.history = new HistoryController(this);
+    this.history = new HistoryController(this, /.*/);
 
     /**
      * @private

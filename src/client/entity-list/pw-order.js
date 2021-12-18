@@ -31,7 +31,7 @@ export class PwOrder extends LitElement {
     /** @type {string} */
     this.randomId = "id" + Math.random().toString().replace(".", "");
 
-    this.history = new HistoryController(this);
+    this.history = new HistoryController(this, /.*/);
   }
 
   /** @override */ render() {

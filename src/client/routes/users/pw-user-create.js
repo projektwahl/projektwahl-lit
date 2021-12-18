@@ -37,7 +37,7 @@ export class PwUserCreate extends PwForm {
     /**
      * @private
      */
-    this.history = new HistoryController(this);
+    this.history = new HistoryController(this, /.*/);
 
     this.type = "voter";
 

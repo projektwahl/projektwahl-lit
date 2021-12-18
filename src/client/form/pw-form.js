@@ -22,7 +22,7 @@ export class PwForm extends LitElement {
   constructor() {
     super();
 
-    /** @private */ this.history = new HistoryController(this);
+    /** @private */ this.history = new HistoryController(this, /.*/);
 
     /* @type {P} */
     //this.url;

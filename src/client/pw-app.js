@@ -77,7 +77,7 @@ export let PwApp = class PwApp extends LitElement {
     /**
      * @private
      */
-    this.history = new HistoryController(this);
+    this.history = new HistoryController(this, /.*/);
 
     /**
      * @private
