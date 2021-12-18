@@ -44,6 +44,15 @@ export class PwForm extends LitElement {
   submit = (/** @type {SubmitEvent} */ event) => {
     event.preventDefault();
 
+    const formDataEvent = new CustomEvent("myformdata", {
+      bubbles: true,
+      composed: true,
+      detail: {}
+    })
+    this.form.value?.dispatchEvent(formDataEvent)
+    console.log(formDataEvent)
+    // TODO FIXME
+
     this.forceTask = (this.forceTask || 0) + 1;
   };
 

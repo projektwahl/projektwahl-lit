@@ -47,6 +47,8 @@ export class PwProjectCreate extends PwForm {
         // @ts-expect-error bad typings
         let jsonData = Object.fromEntries(formData.entries());
 
+        console.log(jsonData)
+
         let result = await myFetch("/api/v1/projects/create", {
           method: "POST",
           headers: {

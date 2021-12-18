@@ -8,5 +8,8 @@ declare global {
       url: URL;
       state: HistoryState;
     }>;
+    myformdata: CustomEvent<{
+
+    }>;
   }
 }
