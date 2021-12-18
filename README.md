@@ -12,7 +12,7 @@ Software to manage choosing projects and automatically assigning people to proje
 - Node 16/17
 - npm
 - Postgresql database
-- OpenID credentials (will not be required in the future)
+- OpenID credentials (optional)
 
 ## Setup
 
