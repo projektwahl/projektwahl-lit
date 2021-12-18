@@ -4,6 +4,7 @@ import "./routes/users/pw-users.js";
 import "./form/pw-form.js";
 import "./entity-list/pw-entitylist.js";
 import "./routes/users/pw-user-create.js";
+import "./routes/projects/pw-project-create.js";
 import { html, LitElement, ReactiveElement } from "lit";
 import { bootstrapCss } from "./index.js";
 import { HistoryController } from "./history-controller.js";
@@ -47,6 +48,8 @@ export const nextPage = async (/** @type {URL} */ url) => {
       return await pwUsers(url);
     } else if (url.pathname === "/users/create") {
       return html`<pw-user-create></pw-user-create>`;
+    } else if (url.pathname === "/projects/create") {
+      return html`<pw-project-create></pw-project-create>`;
     } else {
       return html`Not Found`;
     }

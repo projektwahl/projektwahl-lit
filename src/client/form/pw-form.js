@@ -14,7 +14,6 @@ export class PwForm extends LitElement {
   /** @override */ static get properties() {
     return {
       actionText: { type: String },
-      _task: { state: true },
       forceTask: { state: true },
     };
   }
@@ -28,7 +27,6 @@ export class PwForm extends LitElement {
     //this.url;
 
     /**
-     * @private
      * @type {import("@lit-labs/task").Task}
      */
     this._task;
