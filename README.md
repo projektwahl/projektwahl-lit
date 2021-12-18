@@ -28,3 +28,7 @@ DATABASE_URL=postgres://projektwahl:projektwahl@projektwahl/projektwahl OPENID_U
 ## Firefox
 
 `about:config`: `layout.css.constructable-stylesheets.enabled = true`
+
+## Security
+
+See [SECURITY.md](SECURITY.md)
