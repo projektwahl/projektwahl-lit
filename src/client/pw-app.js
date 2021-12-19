@@ -23,7 +23,7 @@ import {sourceLocale, targetLocales} from './generated_locales/locales.js';
 export const {getLocale, setLocale} = configureLocalization({
   sourceLocale,
   targetLocales,
-  loadLocale: (locale) => import(`/generated_locales/${locale}.js`),
+  loadLocale: (locale) => import(`/src/client/generated_locales/${locale}.js`),
 });
 
 /*
