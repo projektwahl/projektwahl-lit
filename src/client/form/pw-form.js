@@ -113,7 +113,7 @@ if ('FormDataEvent' in window) {
                     .map(([k, v]) => html`${k}: ${v}<br />`);
                   if (errors.length > 0) {
                     return html`<div class="alert alert-danger" role="alert">
-                      ${msg("Es sind Fehler aufgetreten!")}<br />
+                      ${msg("Some errors occurred!")}<br />
                       ${errors}
                     </div>`;
                   }
