@@ -7,7 +7,7 @@ import { isErr } from "../../lib/result.js";
 import { ifDefined } from "lit/directives/if-defined.js";
 import { setupHmr } from "../hmr.js";
 import { msg } from "@lit/localize";
-import { createRef, ref } from "lit/directives/ref";
+import { createRef, ref } from "lit/directives/ref.js";
 
 /** @template T */
 export class PwTextInput extends LitElement {
@@ -15,6 +15,7 @@ export class PwTextInput extends LitElement {
     return {
       label: { type: String },
       name: { type: String },
+      type: { type: String },
       autocomplete: { type: String },
       randomId: { state: true },
       task: {
@@ -38,6 +39,9 @@ export class PwTextInput extends LitElement {
 
     /** @type {keyof T} */
     this.name;
+
+    /** @type {"text" | "password"} */
+    this.type = "text";
 
     /** @type {"username" | "current-password"} */
     this.autocomplete;
@@ -63,7 +67,7 @@ export class PwTextInput extends LitElement {
   myformdataEventListener = (/** @type {CustomEvent} */ event) => {
     console.log("pw-input" + Math.random(), event);
 
-    event.detail[this.name] = this.input.value?.value
+    event.detail[this.name] = this.input.value?.value;
   };
 
   /** @override */ connectedCallback() {
@@ -98,7 +102,7 @@ export class PwTextInput extends LitElement {
         <label for=${this.randomId} class="form-label">${this.label}:</label>
         <input
           ${ref(this.input)}
-          type="text"
+          type=${this.type}
           class="form-control ${this.task.render({
             error: () => "",
             pending: () => "",

@@ -7,7 +7,7 @@ import { isErr } from "../../lib/result.js";
 import { ifDefined } from "lit/directives/if-defined.js";
 import { setupHmr } from "../hmr.js";
 import { msg } from "@lit/localize";
-import { createRef, ref } from "lit/directives/ref";
+import { createRef, ref } from "lit/directives/ref.js";
 
 /** @template T */
 export class PwSelectInput extends LitElement {
@@ -63,7 +63,7 @@ export class PwSelectInput extends LitElement {
   myformdataEventListener = (/** @type {CustomEvent} */ event) => {
     console.log("pw-input" + Math.random(), event);
 
-    event.detail[this.name] = this.input.value?.value
+    event.detail[this.name] = this.input.value?.value;
   };
 
   /** @override */ connectedCallback() {

@@ -1,7 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // SPDX-FileCopyrightText: 2021 Moritz Hedtke <Moritz.Hedtke@t-online.de>
 import { html } from "lit";
-import "../../form/pw-input.js";
 import "../../form/pw-form.js";
 import { Task } from "@lit-labs/task";
 import { myFetch } from "../../utils.js";
@@ -10,6 +9,9 @@ import { HistoryController } from "../../history-controller.js";
 import { isOk } from "../../../lib/result.js";
 import { setupHmr } from "../../hmr.js";
 import { msg } from "@lit/localize";
+import "../../form/pw-number-input.js";
+import "../../form/pw-text-input.js";
+import "../../form/pw-checkbox-input.js";
 
 // TODO FIXME implement edit
 
@@ -72,70 +74,61 @@ export class PwProjectCreate extends PwForm {
 
   /** @override */ getInputs = () => {
     return html`
-      <pw-input
-        type="text"
+      <pw-text-input
         label=${msg("Title")}
         name="title"
         .task=${this._task}
-      ></pw-input>
+      ></pw-text-input>
 
-      <pw-input
-        type="text"
+      <pw-text-input
         label=${msg("Info")}
         name="info"
         .task=${this._task}
-      ></pw-input>
+      ></pw-text-input>
 
-      <pw-input
-        type="text"
+      <pw-text-input
         label=${msg("Location")}
         name="location"
         .task=${this._task}
-      ></pw-input>
+      ></pw-text-input>
 
-      <pw-input
-        type="number"
+      <pw-number-input
         label=${msg("Costs")}
         name="costs"
         .task=${this._task}
-      ></pw-input>
+      ></pw-number-input>
 
-      <pw-input
-        type="number"
+      <pw-number-input
         label=${msg("Minimum age")}
         name="min_age"
         .task=${this._task}
-      ></pw-input>
+      ></pw-number-input>
 
-      <pw-input
-        type="number"
+      <pw-number-input
         label=${msg("Maximum age")}
         name="max_age"
         .task=${this._task}
-      ></pw-input>
+      ></pw-number-input>
 
-      <pw-input
-        type="number"
+      <pw-number-input
         label=${msg("Minimum participants")}
         name="min_participants"
         .task=${this._task}
-      ></pw-input>
+      ></pw-number-input>
 
-      <pw-input
-        type="number"
+      <pw-number-input
         label=${msg("Maximum participants")}
         name="max_participants"
         .task=${this._task}
-      ></pw-input>
+      ></pw-number-input>
 
       <!-- Betreuer, Projektleiter (Schüler) -->
 
-      <pw-input
-        type="checkbox"
+      <pw-checkbox-input
         label=${msg("Allow random assignments")}
         name="random_assignments"
         .task=${this._task}
-      ></pw-input>
+      ></pw-checkbox-input>
     `;
   };
 }

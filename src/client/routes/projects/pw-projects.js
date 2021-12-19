@@ -13,6 +13,7 @@ import { createRef, ref } from "lit/directives/ref.js";
 import { noChange } from "lit";
 import { aClick } from "../../pw-a.js";
 import { msg } from "@lit/localize";
+import "../users/pw-users.js";
 
 export const pwProjects = async (/** @type {URL} */ url) => {
   let result = await taskFunction([url.searchParams]);

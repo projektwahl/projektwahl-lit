@@ -1,7 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // SPDX-FileCopyrightText: 2021 Moritz Hedtke <Moritz.Hedtke@t-online.de>
 import { html } from "lit";
-import "../../form/pw-input.js";
 import "../../form/pw-form.js";
 import { Task } from "@lit-labs/task";
 import { myFetch } from "../../utils.js";
@@ -9,6 +8,7 @@ import { PwForm } from "../../form/pw-form.js";
 import { HistoryController } from "../../history-controller.js";
 import { isOk } from "../../../lib/result.js";
 import { msg } from "@lit/localize";
+import "../../form/pw-text-input.js";
 
 // https://lit.dev/docs/components/lifecycle/
 // updateComplete
@@ -33,6 +33,7 @@ export class PwLogin extends PwForm {
     return {
       url: { attribute: false },
       actionText: { type: String },
+      data: { attribute: false },
       _task: { state: true },
       forceTask: { state: true },
     };
@@ -96,20 +97,19 @@ export class PwLogin extends PwForm {
 
       <h3 class="text-center">${msg("Login as guest")}</h3>
 
-      <pw-input
-        type="text"
+      <pw-text-input
         autocomplete="username"
         label="${msg("Username")}"
         name="username"
         .task=${this._task}
-      ></pw-input>
-      <pw-input
+      ></pw-text-input>
+      <pw-text-input
         label="${msg("Password")}"
         name="password"
         type="password"
         autocomplete="current-password"
         .task=${this._task}
-      ></pw-input>`;
+      ></pw-text-input>`;
   };
 
   /** @override */ submit = (/** @type {SubmitEvent} */ event) => {

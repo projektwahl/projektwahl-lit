@@ -1,7 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // SPDX-FileCopyrightText: 2021 Moritz Hedtke <Moritz.Hedtke@t-online.de>
 import { html } from "lit";
-import "../../form/pw-input.js";
 import "../../form/pw-form.js";
 import { Task } from "@lit-labs/task";
 import { myFetch } from "../../utils.js";
@@ -10,6 +9,10 @@ import { HistoryController } from "../../history-controller.js";
 import { isOk } from "../../../lib/result.js";
 import { setupHmr } from "../../hmr.js";
 import { msg } from "@lit/localize";
+import "../../form/pw-checkbox-input.js";
+import "../../form/pw-number-input.js";
+import "../../form/pw-select-input.js";
+import "../../form/pw-text-input.js";
 
 // TODO FIXME implement edit
 
@@ -70,17 +73,15 @@ export class PwUserCreate extends PwForm {
 
   /** @override */ getInputs = () => {
     return html`
-      <pw-input
-        type="text"
+      <pw-text-input
         label=${msg("Username")}
         name="username"
         .task=${this._task}
-      ></pw-input>
+      ></pw-text-input>
 
-      <pw-input
+      <pw-select-input
         .value=${this.type}
         @change=${(event) => (this.type = event.target.value)}
-        type="select"
         label=${msg("User type")}
         name="type"
         .options=${html`<option value="voter">Schüler</option>
@@ -88,30 +89,27 @@ export class PwUserCreate extends PwForm {
           <option value="admin">Admin</option>`}
         .task=${this._task}
       >
-      </pw-input>
+      </pw-select-input>
 
       ${this.type === "voter"
-        ? html`<pw-input
-              type="text"
+        ? html`<pw-text-input
               label=${msg("Group")}
               name="group"
               .task=${this._task}
-            ></pw-input>
+            ></pw-text-input>
 
-            <pw-input
-              type="number"
+            <pw-number-input
               label=${msg("Age")}
               name="age"
               .task=${this._task}
-            ></pw-input>`
+            ></pw-number-input>`
         : undefined}
 
-      <pw-input
-        type="checkbox"
+      <pw-checkbox-input
         label=${msg("Away")}
         name="away"
         .task=${this._task}
-      ></pw-input>
+      ></pw-checkbox-input>
     `;
   };
 }
