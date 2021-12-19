@@ -7,6 +7,7 @@ import { isErr } from "../../lib/result.js";
 import { ifDefined } from "lit/directives/if-defined.js";
 import { setupHmr } from "../hmr.js";
 import { msg } from "@lit/localize";
+import { createRef, ref } from "lit/directives/ref";
 
 /** @template T */
 export class PwSelectInput extends LitElement {
@@ -49,6 +50,9 @@ export class PwSelectInput extends LitElement {
 
     /** @type {string} */
     this.value;
+
+    /** @type {import("lit/directives/ref").Ref<HTMLInputElement>} */
+    this.input = createRef();
   }
 
   // because forms in shadow root are garbage
@@ -59,7 +63,7 @@ export class PwSelectInput extends LitElement {
   myformdataEventListener = (/** @type {CustomEvent} */ event) => {
     console.log("pw-input" + Math.random(), event);
 
-    //event.detail[this.name] =
+    event.detail[this.name] = this.input.value?.value
   };
 
   /** @override */ connectedCallback() {
@@ -93,6 +97,7 @@ export class PwSelectInput extends LitElement {
       <div class="mb-3">
         <label for=${this.randomId} class="form-label">${this.label}:</label>
         <select
+          ${ref(this.input)}
           aria-describedby="${this.randomId}-feedback"
           .value=${this.value}
           class="form-select ${this.task.render({

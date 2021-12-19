@@ -7,6 +7,7 @@ import { isErr } from "../../lib/result.js";
 import { ifDefined } from "lit/directives/if-defined.js";
 import { setupHmr } from "../hmr.js";
 import { msg } from "@lit/localize";
+import { createRef, ref } from "lit/directives/ref";
 
 /** @template T */
 export class PwNumberInput extends LitElement {
@@ -45,6 +46,9 @@ export class PwNumberInput extends LitElement {
 
     /** @type {string} */
     this.value;
+
+    /** @type {import("lit/directives/ref").Ref<HTMLInputElement>} */
+    this.input = createRef();
   }
 
   // because forms in shadow root are garbage
@@ -55,7 +59,7 @@ export class PwNumberInput extends LitElement {
   myformdataEventListener = (/** @type {CustomEvent} */ event) => {
     console.log("pw-input" + Math.random(), event);
 
-    //event.detail[this.name] =
+    event.detail[this.name] = this.input.value?.value
   };
 
   /** @override */ connectedCallback() {
@@ -89,6 +93,7 @@ export class PwNumberInput extends LitElement {
       <div class="mb-3">
         <label for=${this.randomId} class="form-label">${this.label}:</label>
         <input
+          ${ref(this.input)}
           type="number"
           class="form-control ${this.task.render({
             error: () => "",
@@ -102,7 +107,6 @@ export class PwNumberInput extends LitElement {
           name=${this.name.toString()}
           id=${this.randomId}
           aria-describedby="${this.randomId}-feedback"
-          autocomplete=${ifDefined(this.autocomplete)}
           ?disabled=${this.task.render({
             complete: () => false,
             error: () => false,

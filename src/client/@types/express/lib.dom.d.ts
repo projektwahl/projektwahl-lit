@@ -8,6 +8,9 @@ declare global {
       url: URL;
       state: HistoryState;
     }>;
+  }
+
+  interface HTMLElementEventMap {
     myformdata: CustomEvent<{}>;
   }
 }

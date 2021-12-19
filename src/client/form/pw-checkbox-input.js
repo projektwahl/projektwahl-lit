@@ -7,6 +7,7 @@ import { isErr } from "../../lib/result.js";
 import { ifDefined } from "lit/directives/if-defined.js";
 import { setupHmr } from "../hmr.js";
 import { msg } from "@lit/localize";
+import { createRef, ref } from "lit/directives/ref";
 
 /** @template T */
 export class PwCheckboxInput extends LitElement {
@@ -45,6 +46,9 @@ export class PwCheckboxInput extends LitElement {
 
     /** @type {string} */
     this.value;
+
+    /** @type {import("lit/directives/ref").Ref<HTMLInputElement>} */
+    this.input = createRef();
   }
 
   // because forms in shadow root are garbage
@@ -55,7 +59,7 @@ export class PwCheckboxInput extends LitElement {
   myformdataEventListener = (/** @type {CustomEvent} */ event) => {
     console.log("pw-input" + Math.random(), event);
 
-    //event.detail[this.name] =
+    event.detail[this.name] = this.input.value?.value
   };
 
   /** @override */ connectedCallback() {
@@ -89,6 +93,7 @@ export class PwCheckboxInput extends LitElement {
       <div class="mb-3 form-check">
         <input type="hidden" name=${this.name.toString()} value="off" />
         <input
+          ${ref(this.input)}
           type="checkbox"
           class="form-check-input ${this.task.render({
             error: () => "",
