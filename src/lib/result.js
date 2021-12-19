@@ -49,7 +49,7 @@ export const ok = (value) => {
   };
 };
 
-/** @type {<T,E extends { [key: string]: string } = { [key in keyof T]: string }>(error: E) => import("../lib/types.js").FailureResult<T, E>} */
+/** @type {<T,E extends { [key: string]: string | undefined } = { [key in keyof T]: string | undefined }>(error: E) => import("../lib/types.js").FailureResult<T, E>} */
 export const err = (error) => {
   return {
     result: "failure",
@@ -107,31 +107,31 @@ export function errOrDefault(result, defaultError) {
   return defaultError;
 }
 
-const zoderr2err = (/** @type {import("zod").z.ZodIssue[]} */ arr) => {
-  const initialValue = {};
-  // @ts-expect-error this is hard to type
-  return arr.reduce((/** @type {Record<string, string>} */ acc, cval) => {
-    const myAttribute = cval.path[0];
-    acc[myAttribute] = (acc[myAttribute] || "") + cval.message + ". ";
-    return acc;
-  }, initialValue);
-};
-
-/** @type {<Input, Output>(input:
-    | {
+/**
+ * @template Output 
+ * @template Input
+ * @param input {{
         success: true;
         data: Output;
       }
     | {
         success: false;
         error: import("zod").ZodError<Input>;
-      }
-) => import("../lib/types").Result<Output>} */
+      }}
+ * @returns {import("../lib/types").Result<Output>}}
+ */
 export function zod2result(input) {
   if (input.success) {
     return ok(input.data);
   } else {
-    // @ts-expect-error this is hard to type
-    return err(zoderr2err(input.error.issues)); // TODO FIXME
+    let flattenedErrors = input.error.flatten()
+    /** @type {{[k: string]: string[];}} */
+    let errors = {
+      formErrors: flattenedErrors.formErrors,
+      ...flattenedErrors.fieldErrors
+    }
+    let errors2 = /** @type {Partial<{ [key in keyof Output]: string; }>} */ (Object.fromEntries(Object.entries(errors).map(([k, v]) => [k, v.join(". ")])))
+    let retVal = err(errors2);
+    return retVal
   }
 }
