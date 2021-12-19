@@ -91,7 +91,7 @@ let PwLogin = class PwLogin extends PwForm {
       >
 
       <h3 class="text-center">${msg("Login as guest")}</h3>
-      af
+      dsfsfdfs
 
       <pw-text-input
         autocomplete="username"
@@ -114,6 +114,8 @@ let PwLogin = class PwLogin extends PwForm {
     this.forceTask = (this.forceTask || 0) + 1;
   };
 }
+
+console.log("jo", new URL(import.meta.url).pathname)
 
 PwLogin = setupHmr(import.meta.url, "PwLogin", PwLogin);
 

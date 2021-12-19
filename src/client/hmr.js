@@ -243,7 +243,7 @@ eventSource.addEventListener("message", async function (event) {
 
     console.log("update", updatedUrl.toString(), name, response[name])
 
-    register(updatedUrl.toString(), name, response[name])
+    //register(updatedUrl.toString(), name, response[name])
   }
 });
 
