@@ -124,7 +124,11 @@ export function zod2result(input) {
   if (input.success) {
     return ok(input.data);
   } else {
+    console.log(input.error)
     let flattenedErrors = input.error.flatten()
+    console.log(flattenedErrors)
+    console.log(input.error.issues[0].unionErrors)
+
     /** @type {{[k: string]: string[];}} */
     let errors = {
       formErrors: flattenedErrors.formErrors,

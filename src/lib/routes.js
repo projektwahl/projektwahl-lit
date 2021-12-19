@@ -48,7 +48,6 @@ export const withId = (/** @type {import("zod").ZodType<any>} */ schema) =>
       .object({
         id: z.number(),
       })
-      .strict()
   );
 
 export const loginOutputSchema = result(z.void(), z.record(z.string()));
