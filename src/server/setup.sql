@@ -15,8 +15,6 @@ CREATE TABLE IF NOT EXISTS projects (
   max_age INTEGER NOT NULL,
   min_participants INTEGER NOT NULL,
   max_participants INTEGER NOT NULL,
-  presentation_type VARCHAR(512) NOT NULL,
-  requirements VARCHAR(1024) NOT NULL,
   random_assignments BOOLEAN NOT NULL DEFAULT FALSE
 );
 

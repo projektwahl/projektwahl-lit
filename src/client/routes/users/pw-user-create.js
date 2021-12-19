@@ -48,17 +48,19 @@ export class PwUserCreate extends PwForm {
     this._task = new Task(
       this,
       async () => {
-        const formData = new FormData(this.form.value);
-
-        // @ts-expect-error bad typings
-        let jsonData = Object.fromEntries(formData.entries());
+        const formDataEvent = new CustomEvent("myformdata", {
+          bubbles: true,
+          composed: true,
+          detail: {},
+        });
+        this.form.value?.dispatchEvent(formDataEvent);
 
         let result = await myFetch("/api/v1/users/create", {
           method: "POST",
           headers: {
             "content-type": "text/json",
           },
-          body: JSON.stringify(jsonData),
+          body: JSON.stringify(formDataEvent.detail),
         });
 
         if (isOk(result)) {

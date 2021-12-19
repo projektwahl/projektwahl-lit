@@ -42,12 +42,6 @@ export async function createProjectsHandler(stream, headers) {
     max_participants = CASE WHEN ${
       project.max_participants !== undefined
     } THEN ${project.max_participants ?? null} ELSE max_participants END,
-    presentation_type = CASE WHEN ${
-      project.presentation_type !== undefined
-    } THEN ${project.presentation_type ?? null} ELSE presentation_type END,
-    requirements = CASE WHEN ${project.requirements !== undefined} THEN ${
-                project.requirements ?? null
-              } ELSE requirements END,
     random_assignments = CASE WHEN ${
       project.random_assignments !== undefined
     } THEN ${project.random_assignments ?? null} ELSE random_assignments END
@@ -57,7 +51,7 @@ export async function createProjectsHandler(stream, headers) {
             // (CASE WHEN ${project.title !== undefined} THEN ${project.title ?? null} ELSE DEFAULT END,
             // would be dream but is a syntax error. we probably need to build the queries custom
             [row] = await sql.begin("READ WRITE", async (sql) => {
-              return await sql`INSERT INTO projects (title, info, place, costs, min_age, max_age, min_participants, max_participants, presentation_type, requirements, random_assignments) VALUES
+              return await sql`INSERT INTO projects (title, info, place, costs, min_age, max_age, min_participants, max_participants, random_assignments) VALUES
     (${project.title ?? null},
     ${project.info ?? null},
     ${project.place ?? null},
@@ -66,8 +60,6 @@ export async function createProjectsHandler(stream, headers) {
     ${project.max_age ?? null},
     ${project.min_participants ?? null},
     ${project.max_participants ?? null},
-    ${project.presentation_type ?? null},
-    ${project.requirements ?? null},
     ${project.random_assignments ?? false})
     RETURNING id;`;
             });

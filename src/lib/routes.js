@@ -10,42 +10,24 @@ export const loginInputSchema = z
   })
   .strict();
 
-// TODO FIXME
-// https://github.com/colinhacks/zod#what-about-transforms
-// the api should be typed with the input there
-
 export const rawUserHelperOrAdminSchema = z
   .object({
-    type: z.enum(["helper", "admin"]), // TODO FIXME
+    type: z.enum(["helper", "admin"]),
     username: z.string().min(3),
-    away: z
-      .string()
-      .refine((val) => /^(on)|(off)$/.test(val), {
-        message: "muss on/off sein",
-      })
-      .transform((v) => v === "on"),
+    away: z.boolean(),
   })
   .strict();
 
 export const rawUserVoterSchema = z
   .object({
-    type: z.enum(["voter"]), // TODO FIXME
+    type: z.enum(["voter"]),
     username: z.string().min(3),
     group: z.string().optional(),
-    age: z
-      .string()
-      .refine((val) => /^\d+$/.test(val), { message: "Keine Zahl" })
-      .transform(Number)
+    age: z.number()
       .refine((val) => val > 0 && val < 200, {
         message: "yeah genau so alt biste - das kannste mir nicht erzählen",
-      })
-      .optional(),
-    away: z
-      .string()
-      .refine((val) => /^(on)|(off)$/.test(val), {
-        message: "muss on/off sein",
-      })
-      .transform((v) => v === "on"),
+      }),
+    away: z.boolean(),
   })
   .strict();
 
@@ -60,8 +42,6 @@ export const rawProjectSchema = z.object({
   max_age: z.number(),
   min_participants: z.number(),
   max_participants: z.number(),
-  presentation_type: z.string(),
-  requirements: z.string(),
   random_assignments: z.boolean(),
 });
 

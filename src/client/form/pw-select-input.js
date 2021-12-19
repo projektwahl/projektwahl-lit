@@ -51,7 +51,7 @@ export class PwSelectInput extends LitElement {
     /** @type {string} */
     this.value;
 
-    /** @type {import("lit/directives/ref").Ref<HTMLInputElement>} */
+    /** @type {import("lit/directives/ref").Ref<HTMLSelectElement>} */
     this.input = createRef();
   }
 
@@ -61,9 +61,7 @@ export class PwSelectInput extends LitElement {
   }
 
   myformdataEventListener = (/** @type {CustomEvent} */ event) => {
-    console.log("pw-input" + Math.random(), event);
-
-    event.detail[this.name] = this.input.value?.value;
+    event.detail[this.name] = this.input.value?.selectedIndex == -1 ? null : this.input.value?.value;
   };
 
   /** @override */ connectedCallback() {

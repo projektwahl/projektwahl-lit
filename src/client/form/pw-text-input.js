@@ -65,8 +65,6 @@ export class PwTextInput extends LitElement {
   }
 
   myformdataEventListener = (/** @type {CustomEvent} */ event) => {
-    console.log("pw-input" + Math.random(), event);
-
     event.detail[this.name] = this.input.value?.value;
   };
 

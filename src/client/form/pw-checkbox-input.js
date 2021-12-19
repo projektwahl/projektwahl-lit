@@ -56,9 +56,7 @@ export class PwCheckboxInput extends LitElement {
   }
 
   myformdataEventListener = (/** @type {CustomEvent} */ event) => {
-    console.log("pw-input" + Math.random(), event);
-
-    event.detail[this.name] = this.input.value?.value;
+    event.detail[this.name] = this.input.value?.checked;
   };
 
   /** @override */ connectedCallback() {

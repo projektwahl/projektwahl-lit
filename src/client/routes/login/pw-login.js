@@ -10,9 +10,6 @@ import { isOk } from "../../../lib/result.js";
 import { msg } from "@lit/localize";
 import "../../form/pw-text-input.js";
 
-// https://lit.dev/docs/components/lifecycle/
-// updateComplete
-
 /**
  * @returns {Promise<import("lit").TemplateResult>}
  */
@@ -20,10 +17,6 @@ export const pwLogin = async () => {
   const content = 0; //await fetch("/api/v1/sleep").then((r) => r.text());
   return html`<pw-login .data=${content}></pw-login>`;
 };
-
-// maybe let this extend PwForm?
-// I think this is the easiest way
-// otherwise I think some information needs to propagated in some way
 
 /**
  * @extends PwForm<"/api/v1/login">
@@ -55,18 +48,19 @@ export class PwLogin extends PwForm {
     this._task = new Task(
       this,
       async () => {
-        // ts-expect-error doesn't contain files so this is fine
-        const formData = /*new URLSearchParams(*/ new FormData(this.form.value);
-
-        // @ts-expect-error bad typings
-        let jsonData = Object.fromEntries(formData.entries());
+        const formDataEvent = new CustomEvent("myformdata", {
+          bubbles: true,
+          composed: true,
+          detail: {},
+        });
+        this.form.value?.dispatchEvent(formDataEvent);
 
         let result = await myFetch("/api/v1/login", {
           method: "POST",
           headers: {
             "content-type": "text/json",
           },
-          body: JSON.stringify(jsonData),
+          body: JSON.stringify(formDataEvent.detail),
         });
 
         if (isOk(result)) {
