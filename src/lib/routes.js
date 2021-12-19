@@ -13,7 +13,7 @@ export const loginInputSchema = z
 export const rawUserHelperOrAdminSchema = z
   .object({
     type: z.enum(["helper", "admin"]),
-    username: z.string().min(3),
+    username: z.string().min(3).max(100),
     away: z.boolean(),
   })
   .strict();
@@ -21,12 +21,9 @@ export const rawUserHelperOrAdminSchema = z
 export const rawUserVoterSchema = z
   .object({
     type: z.enum(["voter"]),
-    username: z.string().min(3),
-    group: z.string().optional(),
-    age: z.number()
-      .refine((val) => val > 0 && val < 200, {
-        message: "yeah genau so alt biste - das kannste mir nicht erzählen",
-      }),
+    username: z.string().min(3).max(100),
+    group: z.string().min(1).max(100),
+    age: z.number().min(0).max(200),
     away: z.boolean(),
   })
   .strict();
@@ -34,22 +31,24 @@ export const rawUserVoterSchema = z
 export const rawUserSchema = rawUserHelperOrAdminSchema.or(rawUserVoterSchema);
 
 export const rawProjectSchema = z.object({
-  title: z.string(),
-  info: z.string(),
-  place: z.string(),
-  costs: z.number(),
-  min_age: z.number(),
-  max_age: z.number(),
-  min_participants: z.number(),
-  max_participants: z.number(),
+  title: z.string().min(3).max(1024),
+  info: z.string().min(1).max(8192),
+  place: z.string().min(1).max(1024),
+  costs: z.number().min(0).max(100),
+  min_age: z.number().min(0).max(200),
+  max_age: z.number().min(0).max(200),
+  min_participants: z.number().min(1).max(1000),
+  max_participants: z.number().min(1).max(1000),
   random_assignments: z.boolean(),
 });
 
 export const withId = (/** @type {import("zod").ZodType<any>} */ schema) =>
   schema.or(
-    z.object({
-      id: z.number(),
-    })
+    z
+      .object({
+        id: z.number(),
+      })
+      .strict()
   );
 
 export const loginOutputSchema = result(z.void(), z.record(z.string()));

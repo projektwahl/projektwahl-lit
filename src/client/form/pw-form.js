@@ -58,7 +58,14 @@ export class PwForm extends LitElement {
   };
 
   /** @private */ getCurrentInputElements() {
-    return [...this.renderRoot.querySelectorAll("pw-input")].map((e) => e.name);
+    const formDataEvent = new CustomEvent("myformdata", {
+      bubbles: true,
+      composed: true,
+      detail: {},
+    });
+    this.form.value?.dispatchEvent(formDataEvent);
+
+    return Object.keys(formDataEvent.detail);
   }
 
   // https://www.chromestatus.com/feature/4708990554472448

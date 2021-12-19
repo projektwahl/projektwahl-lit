@@ -61,7 +61,8 @@ export class PwSelectInput extends LitElement {
   }
 
   myformdataEventListener = (/** @type {CustomEvent} */ event) => {
-    event.detail[this.name] = this.input.value?.selectedIndex == -1 ? null : this.input.value?.value;
+    event.detail[this.name] =
+      this.input.value?.selectedIndex == -1 ? null : this.input.value?.value;
   };
 
   /** @override */ connectedCallback() {

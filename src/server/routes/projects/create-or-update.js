@@ -1,6 +1,5 @@
 import { sql } from "../../database.js";
 import { request } from "../../express.js";
-import { hashPassword } from "../../password.js";
 
 /**
  *
@@ -14,28 +13,27 @@ export async function createProjectsHandler(stream, headers) {
     "/api/v1/projects/create",
     async function (project) {
       try {
-        return await sql.begin("READ WRITE", async (sql) => {
+        let [row] = await sql.begin("READ WRITE", async (sql) => {
           if (project.id !== undefined) {
-            [row] = await sql.begin("READ WRITE", async (sql) => {
-              return await sql`UPDATE projects SET
+            return await sql`UPDATE projects SET
     title = CASE WHEN ${project.title !== undefined} THEN ${
-                project.title ?? null
-              } ELSE title END,
+              project.title ?? null
+            } ELSE title END,
     info = CASE WHEN ${project.info !== undefined} THEN ${
-                project.info ?? null
-              } ELSE info END,
+              project.info ?? null
+            } ELSE info END,
     place = CASE WHEN ${project.place !== undefined} THEN ${
-                project.place ?? null
-              } ELSE place END,
+              project.place ?? null
+            } ELSE place END,
     costs = CASE WHEN ${project.costs !== undefined} THEN ${
-                project.costs ?? null
-              } ELSE costs END,
+              project.costs ?? null
+            } ELSE costs END,
     min_age = CASE WHEN ${project.min_age !== undefined} THEN ${
-                project.min_age ?? null
-              } ELSE min_age END,
+              project.min_age ?? null
+            } ELSE min_age END,
     max_age = CASE WHEN ${project.max_age !== undefined} THEN ${
-                project.max_age ?? null
-              } ELSE max_age END,
+              project.max_age ?? null
+            } ELSE max_age END,
     min_participants = CASE WHEN ${
       project.min_participants !== undefined
     } THEN ${project.min_participants ?? null} ELSE max_participants END,
@@ -46,12 +44,10 @@ export async function createProjectsHandler(stream, headers) {
       project.random_assignments !== undefined
     } THEN ${project.random_assignments ?? null} ELSE random_assignments END
     WHERE id = ${project.id} RETURNING id;`;
-            });
           } else {
-            // (CASE WHEN ${project.title !== undefined} THEN ${project.title ?? null} ELSE DEFAULT END,
-            // would be dream but is a syntax error. we probably need to build the queries custom
-            [row] = await sql.begin("READ WRITE", async (sql) => {
-              return await sql`INSERT INTO projects (title, info, place, costs, min_age, max_age, min_participants, max_participants, random_assignments) VALUES
+            // TODO FIXME we can use our nice query building here
+            // or postgres also has builtin features for insert and update
+            return await sql`INSERT INTO projects (title, info, place, costs, min_age, max_age, min_participants, max_participants, random_assignments) VALUES
     (${project.title ?? null},
     ${project.info ?? null},
     ${project.place ?? null},
@@ -62,20 +58,19 @@ export async function createProjectsHandler(stream, headers) {
     ${project.max_participants ?? null},
     ${project.random_assignments ?? false})
     RETURNING id;`;
-            });
           }
-
-          return [
-            {
-              "content-type": "text/json; charset=utf-8",
-              ":status": 200,
-            },
-            {
-              result: "success",
-              success: row,
-            },
-          ];
         });
+
+        return [
+          {
+            "content-type": "text/json; charset=utf-8",
+            ":status": 200,
+          },
+          {
+            result: "success",
+            success: row,
+          },
+        ];
       } catch (/** @type {unknown} */ error) {
         if (error instanceof Error && error.name === "PostgresError") {
           const postgresError = /** @type {PostgresError} */ error;
