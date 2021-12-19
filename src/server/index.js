@@ -3,44 +3,41 @@
 import { createSecureServer } from "node:http2";
 import { readFileSync } from "node:fs";
 import "./routes/login/openid-client.js";
+import cluster from "cluster";
+import { watch } from "node:fs/promises";
+import { getDirs } from "./server-handler.js";
+import { promisify } from "node:util";
 
-//const numCPUs = 1; // cpus().length;
-
-// npm run server
-/*
 if (cluster.isPrimary) {
-  //console.log(`Primary is running`);
+  console.log(`Primary is running`);
 
-  // Fork workers.
-  for (let i = 0; i < numCPUs; i++) {
-    cluster.fork();
-  }
+  cluster.fork(); 
 
-  cluster.on("exit", (worker, code, signal) => {});
-
-  for await (const f of getDirs("./src/server")) {
+  for await (const f of getDirs("./src")) {
     (async () => {
       for await (const event of watch(f)) {
-        //console.log(event)
         let oldWorkers = { ...cluster.workers };
-        for (let i = 0; i < numCPUs; i++) {
-          console.log("new");
-          cluster.fork();
-        }
-        for (const id in oldWorkers) {
-          console.log(`worker ${id} died`);
-          oldWorkers[id]?.process.kill("SIGTERM");
-        }
+         
+        cluster.fork().on("listening", (address) => {
+          for (const id in oldWorkers) {
+            oldWorkers[id]?.on("disconnect", () => {
+              console.log("worker actually disconnected")
+            })
+            oldWorkers[id]?.on("exit", () => {
+              console.log("worker exited")
+            })
+            oldWorkers[id]?.disconnect();
+          }
+        })
       }
     })();
   }
 } else {
-  */
+
 /*
   openssl req -x509 -newkey rsa:2048 -nodes -sha256 -subj '/CN=localhost' -keyout localhost-privkey.pem -out localhost-cert.pem
   */
 
-// globalThis
 const server = createSecureServer({
   key: readFileSync("localhost-privkey.pem"),
   cert: readFileSync("localhost-cert.pem"),
@@ -52,6 +49,7 @@ server.on("stream", async (stream, headers) => {
     await (await import(`./server-handler.js`)).serverHandler(stream, headers);
   } catch (error) {
     // don't take down the entire server
+    // TODO FIXME try sending a 500 in a try catch
     console.error(error);
   }
 });
@@ -59,7 +57,14 @@ server.on("stream", async (stream, headers) => {
 server.listen(8443, () => {
   console.log("Server started at https://localhost:8443/");
 });
-//}
+
+cluster.worker?.on("disconnect", async () => {
+  console.log("i should disconnect")
+  let connections = await promisify(server.getConnections)()
+  console.log(connections)
+})
+
+}
 
 //repl.start({})
 

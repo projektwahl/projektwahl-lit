@@ -18,7 +18,7 @@ import { createProjectsHandler } from "./routes/projects/create-or-update.js";
  * @param {string} dir
  * @returns {AsyncIterable<string>}
  */
-async function* getDirs(dir) {
+export async function* getDirs(dir) {
   yield dir;
   const dirents = await readdir(dir, { withFileTypes: true });
   for (const dirent of dirents) {
