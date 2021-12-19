@@ -15,12 +15,12 @@ import { pwLogin } from "./routes/login/pw-login.js";
 import { setupHmr } from "./hmr.js";
 import { pwUsers } from "./routes/users/pw-users.js";
 import Cookies from "js-cookie";
-import {configureLocalization, msg, str} from '@lit/localize';
+import { configureLocalization, msg, str } from "@lit/localize";
 
 // Generated via output.localeCodesModule
-import {sourceLocale, targetLocales} from './generated_locales/locales.js';
+import { sourceLocale, targetLocales } from "./generated_locales/locales.js";
 
-export const {getLocale, setLocale} = configureLocalization({
+export const { getLocale, setLocale } = configureLocalization({
   sourceLocale,
   targetLocales,
   loadLocale: (locale) => import(`/src/client/generated_locales/${locale}.js`),
@@ -53,7 +53,7 @@ export const pwApp = async (/** @type {URL} */ url) => {
 export const nextPage = async (/** @type {URL} */ url) => {
   try {
     if (url.pathname === "/login") {
-      setLocale("de")
+      setLocale("de");
       return await pwLogin();
     } else if (url.pathname === "/users") {
       return await pwUsers(url);
@@ -124,7 +124,9 @@ export let PwApp = class PwApp extends LitElement {
         class="navbar navbar-expand-lg navbar-light bg-light shadow p-3 mb-5"
       >
         <div class="container-fluid">
-          <a @click=${aClick} class="navbar-brand" href="/">${msg("Projektwahl")}</a>
+          <a @click=${aClick} class="navbar-brand" href="/"
+            >${msg("Projektwahl")}</a
+          >
           <button
             class="navbar-toggler"
             type="button"

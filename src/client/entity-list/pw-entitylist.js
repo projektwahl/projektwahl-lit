@@ -60,10 +60,26 @@ export let PwEntityList = class extends LitElement {
             class="form-select"
             aria-label="Default select example"
           >
-            <option value="10">${((/** @type {number} */ count) => msg(str`${count} per page`))(10)}</option>
-            <option value="25">${((/** @type {number} */ count) => msg(str`${count} per page`))(25)}</option>
-            <option value="50">${((/** @type {number} */ count) => msg(str`${count} per page`))(50)}</option>
-            <option value="100">${((/** @type {number} */ count) => msg(str`${count} per page`))(100)}</option>
+            <option value="10">
+              ${((/** @type {number} */ count) => msg(str`${count} per page`))(
+                10
+              )}
+            </option>
+            <option value="25">
+              ${((/** @type {number} */ count) => msg(str`${count} per page`))(
+                25
+              )}
+            </option>
+            <option value="50">
+              ${((/** @type {number} */ count) => msg(str`${count} per page`))(
+                50
+              )}
+            </option>
+            <option value="100">
+              ${((/** @type {number} */ count) => msg(str`${count} per page`))(
+                100
+              )}
+            </option>
           </select>
         </div>
       </div>

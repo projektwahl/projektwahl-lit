@@ -39,7 +39,7 @@ export class PwLogin extends PwForm {
   }
 
   /** @override */ get actionText() {
-    return msg("Login")
+    return msg("Login");
   }
 
   constructor() {
