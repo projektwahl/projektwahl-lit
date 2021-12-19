@@ -13,7 +13,6 @@ LitElement.hotReplacedCallback = function hotReplacedCallback() {
 LitElement.prototype.hotReplacedCallback = function hotReplacedCallback() {
   // delete styles to ensure that they get recalculated, including picking up
   // changes from parent classes
-  delete this.constructor._styles;
   this.constructor.finalizeStyles();
   if (window.ShadowRoot && this.renderRoot instanceof window.ShadowRoot) {
     adoptStyles(this.renderRoot, this.constructor.elementStyles);
@@ -241,7 +240,10 @@ eventSource.addEventListener("message", async function (event) {
     let response = await import(`${updatedUrl.toString()}?${Date.now()}`);
 
     const name = hmrClasses.get(updatedUrl.toString())
-    register(updatedUrl, name, response[name])
+
+    console.log("update", updatedUrl.toString(), name, response[name])
+
+    register(updatedUrl.toString(), name, response[name])
   }
 });
 
@@ -253,9 +255,9 @@ eventSource.addEventListener("message", async function (event) {
  * @return T
  */
 export function setupHmr(importMetaUrl, name, clazz) {
-  if (clazz === undefined) return; // TODO FIXME fix all callers
-
   hmrClasses.set(importMetaUrl, name)
   
+  console.log("register", importMetaUrl, name, clazz)
+
   return register(importMetaUrl, name, clazz)
 }

@@ -133,5 +133,3 @@ export class PwProjectCreate extends PwForm {
   };
 }
 customElements.define("pw-project-create", PwProjectCreate);
-
-setupHmr(PwProjectCreate, import.meta.url);

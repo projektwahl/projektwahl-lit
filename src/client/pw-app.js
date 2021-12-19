@@ -220,6 +220,4 @@ export let PwApp = class PwApp extends LitElement {
   }
 };
 
-setupHmr(PwApp, import.meta.url);
-
 customElements.define("pw-app", PwApp);

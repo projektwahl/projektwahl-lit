@@ -22,7 +22,7 @@ export const pwLogin = async () => {
 /**
  * @extends PwForm<"/api/v1/login">
  */
-const _PwLogin = class extends PwForm {
+let PwLogin = class PwLogin extends PwForm {
   /** @override */ static get properties() {
     return {
       url: { attribute: false },
@@ -91,7 +91,7 @@ const _PwLogin = class extends PwForm {
       >
 
       <h3 class="text-center">${msg("Login as guest")}</h3>
-      affdfffs
+      af
 
       <pw-text-input
         autocomplete="username"
@@ -115,6 +115,8 @@ const _PwLogin = class extends PwForm {
   };
 }
 
-export const PwLogin = setupHmr(import.meta.url, "PwLogin", _PwLogin);
+PwLogin = setupHmr(import.meta.url, "PwLogin", PwLogin);
 
 customElements.define("pw-login", PwLogin);
+
+export { PwLogin }

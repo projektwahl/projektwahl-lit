@@ -132,5 +132,3 @@ export class PwNumberInput extends LitElement {
   }
 }
 customElements.define("pw-number-input", PwNumberInput);
-
-setupHmr(PwNumberInput, import.meta.url);

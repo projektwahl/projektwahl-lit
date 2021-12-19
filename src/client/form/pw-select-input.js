@@ -133,4 +133,3 @@ export class PwSelectInput extends LitElement {
 }
 customElements.define("pw-select-input", PwSelectInput);
 
-setupHmr(PwSelectInput, import.meta.url);

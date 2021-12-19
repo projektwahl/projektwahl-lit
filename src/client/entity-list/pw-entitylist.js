@@ -137,6 +137,4 @@ export let PwEntityList = class extends LitElement {
   }
 };
 
-setupHmr(PwEntityList, import.meta.url);
-
 customElements.define("pw-entitylist", PwEntityList);
