@@ -9,6 +9,7 @@ import { PwForm } from "../../form/pw-form.js";
 import { HistoryController } from "../../history-controller.js";
 import { isOk } from "../../../lib/result.js";
 import { setupHmr } from "../../hmr.js";
+import { msg } from "@lit/localize";
 
 // TODO FIXME implement edit
 
@@ -26,23 +27,20 @@ export class PwUserCreate extends PwForm {
     };
   }
 
+  /** @override */ get actionText() {
+    return msg("Create/Update account");
+  }
+
   constructor() {
     super();
 
     /** @type {number|undefined} */
     this.forceTask = undefined;
 
-    this.actionText = "Account erstellen/aktualisieren";
-
-    /**
-     * @private
-     */
-    this.history = new HistoryController(this, /.*/);
-
     this.type = "voter";
 
     /**
-     * @private
+     * @override
      */
     this._task = new Task(
       this,
@@ -74,7 +72,7 @@ export class PwUserCreate extends PwForm {
     return html`
       <pw-input
         type="text"
-        label="Name"
+        label=${msg("Username")}
         name="username"
         .task=${this._task}
       ></pw-input>
@@ -83,7 +81,7 @@ export class PwUserCreate extends PwForm {
         .value=${this.type}
         @change=${(event) => (this.type = event.target.value)}
         type="select"
-        label="Nutzerart"
+        label=${msg("User type")}
         name="type"
         .options=${html`<option value="voter">Schüler</option>
           <option value="helper">Helfer</option>
@@ -95,14 +93,14 @@ export class PwUserCreate extends PwForm {
       ${this.type === "voter"
         ? html`<pw-input
               type="text"
-              label="Klasse"
+              label=${msg("Group")}
               name="group"
               .task=${this._task}
             ></pw-input>
 
             <pw-input
               type="number"
-              label="Jahrgang"
+              label=${msg("Age")}
               name="age"
               .task=${this._task}
             ></pw-input>`
@@ -110,7 +108,7 @@ export class PwUserCreate extends PwForm {
 
       <pw-input
         type="checkbox"
-        label="Abwesend"
+        label=${msg("Away")}
         name="away"
         .task=${this._task}
       ></pw-input>

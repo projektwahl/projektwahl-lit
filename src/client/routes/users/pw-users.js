@@ -104,7 +104,7 @@ export let PwUsers = class extends LitElement {
               class="btn btn-primary"
               href="/users/create"
               role="button"
-              >Account erstellen</a
+              >${msg("Create account")}</a
             >
           </div>
           <div slot="response">
@@ -132,18 +132,18 @@ export let PwUsers = class extends LitElement {
                       the only nice way is probably submit buttons that do things like "oder_by_id_asc" and then redirect to the new state (because you need to remove the old state)
                     -->
                     <th class="table-cell-hover p-0" scope="col">
-                      <pw-order name="id" title="ID"></pw-order>
+                      <pw-order name="id" title=${msg("ID")}></pw-order>
                     </th>
 
                     <th class="table-cell-hover p-0" scope="col">
-                      <pw-order name="username" title="Name"></pw-order>
+                      <pw-order name="username" title=${msg("Name")}></pw-order>
                     </th>
 
                     <th class="table-cell-hover p-0" scope="col">
-                      <pw-order name="type" title="Typ"></pw-order>
+                      <pw-order name="type" title=${msg("Type")}></pw-order>
                     </th>
 
-                    <th class="table-cell-hover">Aktionen</th>
+                    <th class="table-cell-hover">${msg("Actions")}</th>
                   </tr>
 
                   <tr>

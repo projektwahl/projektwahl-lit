@@ -1,11 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<xliff xmlns="urn:oasis:names:tc:xliff:document:1.2" version="1.2">
-  <file target-language="de" source-language="en" original="lit-localize-inputs" datatype="plaintext">
-    <body>
-      <trans-unit id="s586d6bd2eca2da93">
-        <source>Users</source>
-        <target>Accounts</target>
-      </trans-unit>
-    </body>
-  </file>
+<xliff version="1.2" xmlns="urn:oasis:names:tc:xliff:document:1.2">
+<file target-language="de" source-language="en" original="lit-localize-inputs" datatype="plaintext">
+<body>
+<trans-unit id="s01dc5a60edf9e053">
+  <source>component not fully initialized</source>
+</trans-unit>
+<trans-unit id="s586d6bd2eca2da93">
+  <source>Users</source>
+  <target>Accounts</target>
+</trans-unit>
+</body>
+</file>
 </xliff>

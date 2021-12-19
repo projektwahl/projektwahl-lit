@@ -4,6 +4,7 @@ import { html, LitElement } from "lit";
 import { bootstrapCss } from "../index.js";
 import { HistoryController } from "../history-controller.js";
 import { setupHmr } from "../hmr.js";
+import { msg, str } from "@lit/localize";
 
 /** @template T */
 export let PwEntityList = class extends LitElement {
@@ -27,7 +28,7 @@ export let PwEntityList = class extends LitElement {
 
   /** @override */ render() {
     if (this.title === undefined) {
-      throw new Error("component not fully initialized");
+      throw new Error(msg("component not fully initialized"));
     }
 
     return html`
@@ -59,15 +60,15 @@ export let PwEntityList = class extends LitElement {
             class="form-select"
             aria-label="Default select example"
           >
-            <option value="10">10 pro Seite</option>
-            <option value="25">25 pro Seite</option>
-            <option value="50">50 pro Seite</option>
-            <option value="100">100 pro Seite</option>
+            <option value="10">${msg(str`${10} per page`)}</option>
+            <option value="25">${msg(str`${25} per page`)}</option>
+            <option value="50">${msg(str`${50} per page`)}</option>
+            <option value="100">${msg(str`${100} per page`)}</option>
           </select>
         </div>
       </div>
       <slot name="response"></slot>
-      <nav aria-label="Navigation der Nutzerliste">
+      <nav aria-label="${msg("navigation of user list")}">
         <ul class="pagination justify-content-center">
           <!-- { # await only works in blocks -->
           <li
@@ -81,7 +82,7 @@ export let PwEntityList = class extends LitElement {
               }}
               class="page-link"
               href="/"
-              aria-label="Vorherige Seite"
+              aria-label="${msg("previous page")}"
               tabindex=${
                 -1 /*mapOr($response, v => v.previousCursor, null) ? undefined : -1*/
               }
@@ -103,7 +104,7 @@ export let PwEntityList = class extends LitElement {
               }}
               class="page-link"
               href="/"
-              aria-label="Nächste Seite"
+              aria-label="${msg("next page")}"
               tabindex=${
                 /*mapOr($response, v => v.nextCursor, null) ? undefined : -1*/ -1
               }

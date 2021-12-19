@@ -9,6 +9,7 @@ import { PwForm } from "../../form/pw-form.js";
 import { HistoryController } from "../../history-controller.js";
 import { isOk } from "../../../lib/result.js";
 import { setupHmr } from "../../hmr.js";
+import { msg } from "@lit/localize";
 
 // TODO FIXME implement edit
 
@@ -26,13 +27,15 @@ export class PwProjectCreate extends PwForm {
     };
   }
 
+  /** @override */ get actionText() {
+    return msg("Create/Update project");
+  }
+
   constructor() {
     super();
 
     /** @type {number|undefined} */
     this.forceTask = undefined;
-
-    this.actionText = "Projekt erstellen/aktualisieren";
 
     this.type = "voter";
 
@@ -71,56 +74,56 @@ export class PwProjectCreate extends PwForm {
     return html`
       <pw-input
         type="text"
-        label="Titel"
+        label=${msg("Title")}
         name="title"
         .task=${this._task}
       ></pw-input>
 
       <pw-input
         type="text"
-        label="Info"
+        label=${msg("Info")}
         name="info"
         .task=${this._task}
       ></pw-input>
 
       <pw-input
         type="text"
-        label="Ort/Raum"
+        label=${msg("Location")}
         name="location"
         .task=${this._task}
       ></pw-input>
 
       <pw-input
         type="number"
-        label="Kosten"
+        label=${msg("Costs")}
         name="costs"
         .task=${this._task}
       ></pw-input>
 
       <pw-input
         type="number"
-        label="minimale Jahrgangsstufe"
+        label=${msg("Minimum age")}
         name="min_age"
         .task=${this._task}
       ></pw-input>
 
       <pw-input
         type="number"
-        label="maximale Jahrgangsstufe"
+        label=${msg("Maximum age")}
         name="max_age"
         .task=${this._task}
       ></pw-input>
 
       <pw-input
         type="number"
-        label="minimale Teilnehmer"
+        label=${msg("Minimum participants")}
         name="min_participants"
         .task=${this._task}
       ></pw-input>
 
       <pw-input
         type="number"
-        label="maximale Teilnehmer"
+        label=${msg("Maximum participants")}
         name="max_participants"
         .task=${this._task}
       ></pw-input>
@@ -129,8 +132,8 @@ export class PwProjectCreate extends PwForm {
 
       <pw-input
         type="checkbox"
-        label="Abwesend"
-        name="away"
+        label=${msg("Allow random assignments")}
+        name="random_assignments"
         .task=${this._task}
       ></pw-input>
     `;

@@ -6,6 +6,7 @@ import { HistoryController } from "../history-controller.js";
 import { isErr } from "../../lib/result.js";
 import { ifDefined } from "lit/directives/if-defined.js";
 import { setupHmr } from "../hmr.js";
+import { msg } from "@lit/localize";
 
 /** @template T */
 export class PwInput extends LitElement {
@@ -91,7 +92,7 @@ export class PwInput extends LitElement {
       this.name === undefined ||
       this.task === undefined
     ) {
-      throw new Error("component not fully initialized");
+      throw new Error(msg("component not fully initialized"));
     }
 
     return html`

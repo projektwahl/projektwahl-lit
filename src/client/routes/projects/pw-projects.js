@@ -12,8 +12,9 @@ import { css } from "lit";
 import { createRef, ref } from "lit/directives/ref.js";
 import { noChange } from "lit";
 import { aClick } from "../../pw-a.js";
+import { msg } from "@lit/localize";
 
-export const pwUsers = async (/** @type {URL} */ url) => {
+export const pwProjects = async (/** @type {URL} */ url) => {
   let result = await taskFunction([url.searchParams]);
   return html`<pw-users .initial=${result}></pw-users>`;
 };
@@ -22,7 +23,7 @@ const taskFunction = async (
   /** @type {[URLSearchParams]} */ [searchParams]
 ) => {
   let response = await fetch(
-    new URL(`/api/v1/users?${searchParams}`, window.location.href),
+    new URL(`/api/v1/projects?${searchParams}`, window.location.href),
     {
       //agent: new Agent({rejectUnauthorized: false})
     }
@@ -30,7 +31,7 @@ const taskFunction = async (
   return await response.json();
 };
 
-export let PwUsers = class extends LitElement {
+export let PwProjects = class extends LitElement {
   /** @override */ static get properties() {
     return {
       task: { attribute: false },
@@ -46,7 +47,7 @@ export let PwUsers = class extends LitElement {
     /**
      * @private
      */
-    this.history = new HistoryController(this, /\/users/);
+    this.history = new HistoryController(this, /\/projects/);
 
     /** @type {Timeout} */
     this.timer;
@@ -96,14 +97,14 @@ export let PwUsers = class extends LitElement {
       ${bootstrapCss}
 
       <div class="container">
-        <pw-entitylist title="Accounts">
+        <pw-entitylist title=${msg("Projects")}>
           <div slot="buttons">
             <a
               @click=${aClick}
               class="btn btn-primary"
-              href="/users/create"
+              href="/projects/create"
               role="button"
-              >Account erstellen</a
+              >${msg("Create project")}</a
             >
           </div>
           <div slot="response">
@@ -131,18 +132,18 @@ export let PwUsers = class extends LitElement {
                       the only nice way is probably submit buttons that do things like "oder_by_id_asc" and then redirect to the new state (because you need to remove the old state)
                     -->
                     <th class="table-cell-hover p-0" scope="col">
-                      <pw-order name="id" title="ID"></pw-order>
+                      <pw-order name="id" title=${msg("ID")}></pw-order>
                     </th>
 
                     <th class="table-cell-hover p-0" scope="col">
-                      <pw-order name="username" title="Name"></pw-order>
+                      <pw-order name="username" title=${msg("Name")}></pw-order>
                     </th>
 
                     <th class="table-cell-hover p-0" scope="col">
-                      <pw-order name="type" title="Typ"></pw-order>
+                      <pw-order name="type" title=${msg("Type")}></pw-order>
                     </th>
 
-                    <th class="table-cell-hover">Aktionen</th>
+                    <th class="table-cell-hover">${msg("Actions")}</th>
                   </tr>
 
                   <tr>
@@ -236,6 +237,6 @@ export let PwUsers = class extends LitElement {
   }
 };
 
-setupHmr(PwUsers, import.meta.url);
+setupHmr(PwProjects, import.meta.url);
 
-customElements.define("pw-users", PwUsers);
+customElements.define("pw-projects", PwProjects);
