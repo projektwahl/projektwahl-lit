@@ -10,6 +10,7 @@ import { openidRedirectHandler } from "./routes/login/redirect.js";
 import path, { extname, relative } from "path/posix";
 import { z } from "zod";
 import { createProjectsHandler } from "./routes/projects/create-or-update.js";
+import { cwd } from "node:process";
 
 //const startTime = Date.now();
 
@@ -68,6 +69,7 @@ export async function serverHandler(stream, headers) {
       }
     );
   } else if (url.pathname === "/api/v1/hmr") {
+    console.log("got request")
     stream.respond({
       ":status": 200,
       "content-type": "text/event-stream",
@@ -76,7 +78,11 @@ export async function serverHandler(stream, headers) {
     for await (const f of getDirs("./src/client")) {
       (async () => {
         for await (const event of watch(f)) {
-          stream.write(`data: ${f}/${event.filename}\n\n`);
+          let baseUrl = resolve(fileURLToPath(import.meta.url), "../../..");
+          
+          let url = relative(baseUrl, join(f, event.filename))
+
+          stream.write(`data: ${url}\n\n`);
         }
       })();
     }
@@ -103,7 +109,7 @@ export async function serverHandler(stream, headers) {
     // TODO FIXME AUDIT
     // curl --insecure --path-as-is -v https://localhost:8443/../src/index.js
 
-    let filename = resolve("." + path);
+    let filename = resolve("." + url.pathname);
 
     let baseUrl = resolve(fileURLToPath(import.meta.url), "../../..");
 

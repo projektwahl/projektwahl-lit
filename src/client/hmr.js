@@ -1,5 +1,8 @@
+import { adoptStyles, LitElement } from "lit";
+
 const originalDefine = window.customElements.define;
-window.customElements.define = (name, ...rest) => {
+
+window.customElements.define = (/** @type {string} */ name, /** @type {[any]} */ ...rest) => {
   if (!window.customElements.get(name)) {
     originalDefine.call(window.customElements, name, ...rest);
   }
@@ -7,11 +10,10 @@ window.customElements.define = (name, ...rest) => {
 
 /**
  *
- * @param {{ new(): import("lit").LitElement }} _clazz
- * @param {string} _url
+ * @param {typeof import("lit").LitElement} clazz
+ * @param {string} url
  */
-export function setupHmr(_clazz, _url) {
-  /*
+export function setupHmr(clazz, url) {
   // https://github.com/open-wc/open-wc/blob/master/packages/dev-server-hmr/src/wcHmrRuntime.js
   clazz.connectedElements = new Set();
 
@@ -29,6 +31,7 @@ export function setupHmr(_clazz, _url) {
   // static callback
   LitElement.hotReplacedCallback = function hotReplacedCallback() {
     console.log("static callback");
+    // @ts-ignore private
     this.finalize();
   };
 
@@ -53,6 +56,7 @@ export function setupHmr(_clazz, _url) {
     let updatedUrl = new URL(event.data, document.location.origin);
     let currentUrl = new URL(url);
 
+    console.log(`${updatedUrl} ${currentUrl}`)
     if (updatedUrl.toString() == currentUrl.toString()) {
       console.log("hmr updating self");
 
@@ -60,6 +64,7 @@ export function setupHmr(_clazz, _url) {
 
       console.log(response);
 
+      // @ts-ignore private
       clazz.prototype.render =
         response[clazz.prototype.constructor.name].prototype.render;
 
@@ -69,5 +74,4 @@ export function setupHmr(_clazz, _url) {
       });
     }
   });
-  */
 }

@@ -9,6 +9,7 @@ import { HistoryController } from "../../history-controller.js";
 import { isOk } from "../../../lib/result.js";
 import { msg } from "@lit/localize";
 import "../../form/pw-text-input.js";
+import { setupHmr } from "../../hmr.js";
 
 /**
  * @returns {Promise<import("lit").TemplateResult>}
@@ -90,6 +91,7 @@ export class PwLogin extends PwForm {
       >
 
       <h3 class="text-center">${msg("Login as guest")}</h3>
+      affdfff
 
       <pw-text-input
         autocomplete="username"
@@ -113,3 +115,5 @@ export class PwLogin extends PwForm {
   };
 }
 customElements.define("pw-login", PwLogin);
+
+setupHmr(PwLogin, import.meta.url)
