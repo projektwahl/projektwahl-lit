@@ -5,7 +5,7 @@ import { result } from "./result.js";
 
 export const loginInputSchema = z
   .object({
-    username: z.string().min(1).max(100),
+    username: z.string().min(4).max(100),
     password: z.string().min(6).max(1024),
   })
   .strict();

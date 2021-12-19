@@ -20,13 +20,7 @@ if (cluster.isPrimary) {
          
         cluster.fork().on("listening", (address) => {
           for (const id in oldWorkers) {
-            oldWorkers[id]?.on("disconnect", () => {
-              console.log("worker actually disconnected")
-            })
-            oldWorkers[id]?.on("exit", () => {
-              console.log("worker exited")
-            })
-            oldWorkers[id]?.disconnect();
+            oldWorkers[id]?.send("shutdown", () => {});
           }
         })
       }
@@ -54,16 +48,38 @@ server.on("stream", async (stream, headers) => {
   }
 });
 
-server.listen(8443, () => {
-  console.log("Server started at https://localhost:8443/");
-});
+/** @type {import("node:http2").ServerHttp2Session[]} */
+let sessions = [];
 
-cluster.worker?.on("disconnect", async () => {
-  console.log("i should disconnect")
-  let connections = await promisify(server.getConnections)()
-  console.log(connections)
+server.on("session", (session) => {
+  sessions.push(session)
+
+  session.on("close", () => {
+    // TODO FIXME this is super SLOW
+    sessions = sessions.filter(s => s === session)
+  })
 })
 
+server.listen(8443, () => {
+  console.log(`[${cluster.worker?.id}] Server started at https://localhost:8443/`);
+});
+
+cluster.worker?.on("message", async (message) => {
+  //let getConnections = promisify(server.getConnections).bind(server)
+  //console.log(await getConnections())
+
+  if (message === "shutdown") {
+    console.log(`[${cluster.worker?.id}] Shutting down`);
+    server.close()
+
+    sessions.forEach(session => {
+      session.close()
+    })
+
+    cluster.worker?.removeAllListeners("message")
+    cluster.worker?.kill()
+  }
+});
 }
 
 //repl.start({})
