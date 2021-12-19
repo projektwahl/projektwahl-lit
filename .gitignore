@@ -2,3 +2,4 @@
 # SPDX-FileCopyrightText: 2021 Moritz Hedtke <Moritz.Hedtke@t-online.de>
 node_modules
 .tmp
+src/client/generated_locales/

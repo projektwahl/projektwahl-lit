@@ -28,3 +28,17 @@ DATABASE_URL=postgres://projektwahl:projektwahl@projektwahl/projektwahl OPENID_U
 ## Firefox
 
 `about:config`: `layout.css.constructable-stylesheets.enabled = true`
+
+## Security
+
+See [SECURITY.md](SECURITY.md)
+
+## Translation
+
+<a href="https://weblate.selfmade4u.de/engage/projektwahl/">
+<img src="https://weblate.selfmade4u.de/widgets/projektwahl/-/open-graph.png" alt="Translation status" />
+</a>
+
+## Browser support
+
+This application will probably never work without JavaScript as this would require bad API design because forms are just terrible.

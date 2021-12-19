@@ -4,6 +4,7 @@ import "./routes/users/pw-users.js";
 import "./form/pw-form.js";
 import "./entity-list/pw-entitylist.js";
 import "./routes/users/pw-user-create.js";
+import "./routes/projects/pw-project-create.js";
 import { html, LitElement, ReactiveElement } from "lit";
 import { bootstrapCss } from "./index.js";
 import { HistoryController } from "./history-controller.js";
@@ -14,15 +15,29 @@ import { pwLogin } from "./routes/login/pw-login.js";
 import { setupHmr } from "./hmr.js";
 import { pwUsers } from "./routes/users/pw-users.js";
 import Cookies from "js-cookie";
+import {configureLocalization, msg, str} from '@lit/localize';
+
+// Generated via output.localeCodesModule
+import {sourceLocale, targetLocales} from './generated_locales/locales.js';
+
+export const {getLocale, setLocale} = configureLocalization({
+  sourceLocale,
+  targetLocales,
+  loadLocale: (locale) => import(`/src/client/generated_locales/${locale}.js`),
+});
+
 /*
 // TODO FIXME show more details if possible (maybe error page)
 window.addEventListener("error", function (event) {
+  console.error(event.error)
   alert("unknown error: " + event.message);
 });
 
 window.addEventListener("unhandledrejection", function (event) {
+  console.error(event.promise)
   alert("unknown error: " + event.reason);
-});*/
+});
+*/
 
 ReactiveElement.enableWarning?.("migration");
 ReactiveElement.enableWarning?.("change-in-update");
@@ -35,15 +50,24 @@ export const pwApp = async (/** @type {URL} */ url) => {
   return html`<pw-app .initial=${Promise.resolve(page)}></pw-app>`;
 };
 
-export const nextPage = (/** @type {URL} */ url) => {
-  if (url.pathname === "/login") {
-    return pwLogin();
-  } else if (url.pathname === "/users") {
-    return pwUsers(url);
-  } else if (url.pathname === "/users/create") {
-    return Promise.resolve(html`<pw-user-create></pw-user-create>`);
-  } else {
-    return Promise.resolve(html`Not Found`);
+export const nextPage = async (/** @type {URL} */ url) => {
+  try {
+    if (url.pathname === "/login") {
+      setLocale("de")
+      return await pwLogin();
+    } else if (url.pathname === "/users") {
+      return await pwUsers(url);
+    } else if (url.pathname === "/users/create") {
+      return html`<pw-user-create></pw-user-create>`;
+    } else if (url.pathname === "/projects/create") {
+      return html`<pw-project-create></pw-project-create>`;
+    } else {
+      return msg(str`Not Found`);
+    }
+  } catch (error) {
+    return html`<div class="alert alert-danger" role="alert">
+      ${msg(str`Error: ${error}`)}
+    </div>`;
   }
 };
 
@@ -69,7 +93,7 @@ export let PwApp = class PwApp extends LitElement {
     /**
      * @private
      */
-    this.history = new HistoryController(this);
+    this.history = new HistoryController(this, /.*/);
 
     /**
      * @private
@@ -87,8 +111,6 @@ export let PwApp = class PwApp extends LitElement {
   }
 
   /** @override */ render() {
-    console.log("pw-app rerender");
-
     if (this.initial !== undefined && !this.initialUsed) {
       this.initialUsed = true;
       this.current = this.initial;
@@ -102,7 +124,7 @@ export let PwApp = class PwApp extends LitElement {
         class="navbar navbar-expand-lg navbar-light bg-light shadow p-3 mb-5"
       >
         <div class="container-fluid">
-          <a @click=${aClick} class="navbar-brand" href="/">Projektwahl</a>
+          <a @click=${aClick} class="navbar-brand" href="/">${msg("Projektwahl")}</a>
           <button
             class="navbar-toggler"
             type="button"
@@ -110,7 +132,7 @@ export let PwApp = class PwApp extends LitElement {
             data-bs-target="#navbarSupportedContent"
             aria-controls="navbarSupportedContent"
             aria-expanded="false"
-            aria-label="Toggle navigation"
+            aria-label=${msg("Toggle navigation")}
           >
             <span class="navbar-toggler-icon"></span>
           </button>
@@ -124,7 +146,7 @@ export let PwApp = class PwApp extends LitElement {
                   })}"
                   aria-current="page"
                   href="/"
-                  >Start</a
+                  >${msg("Home")}</a
                 >
               </li>
               <li class="nav-item">
@@ -134,7 +156,7 @@ export let PwApp = class PwApp extends LitElement {
                     active: this.history.url.pathname === "/users",
                   })}"
                   href="/users"
-                  >Nutzer</a
+                  >${msg("Accounts")}</a
                 >
               </li>
               <li>
@@ -144,7 +166,7 @@ export let PwApp = class PwApp extends LitElement {
                     active: this.history.url.pathname === "/projects",
                   })}"
                   href="/projects"
-                  >Projekte</a
+                  >${msg("Projects")}</a
                 >
               </li>
               <li>
@@ -154,7 +176,7 @@ export let PwApp = class PwApp extends LitElement {
                     active: this.history.url.pathname === "/election",
                   })}"
                   href="/election"
-                  >Wahl</a
+                  >${msg("Election")}</a
                 >
               </li>
             </ul>
@@ -162,7 +184,7 @@ export let PwApp = class PwApp extends LitElement {
               ${Cookies.get("username")
                 ? html`<li class="nav-item">
                     <a @click=${aClick} class="nav-link" href="#"
-                      >${Cookies.get("username")} abmelden</a
+                      >${msg(str`Logout ${Cookies.get("username")}`)}</a
                     >
                   </li>`
                 : html` <li class="nav-item">
@@ -172,7 +194,7 @@ export let PwApp = class PwApp extends LitElement {
                         active: this.history.url.pathname === "/login",
                       })}"
                       href="/login"
-                      >Anmelden ${JSON.stringify(Cookies.get())}</a
+                      >${msg(str`Login ${JSON.stringify(Cookies.get())}`)}</a
                     >
                   </li>`}
             </ul>
@@ -186,7 +208,7 @@ export let PwApp = class PwApp extends LitElement {
         ${until(
           this.current.then(() => undefined),
           html`<div class="spinner-grow text-primary" role="status">
-            <span class="visually-hidden">Loading...</span>
+            <span class="visually-hidden">${msg("Loading...")}</span>
           </div>`
         )}
       </div>

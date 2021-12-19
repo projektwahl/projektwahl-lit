@@ -6,6 +6,7 @@ import { createRef, ref } from "lit/directives/ref.js";
 import { bootstrapCss } from "../index.js";
 import { HistoryController } from "../history-controller.js";
 import { isErr } from "../../lib/result.js";
+import { msg } from "@lit/localize";
 
 /**
  * @template {keyof import("../../lib/routes").routes} P
@@ -13,28 +14,27 @@ import { isErr } from "../../lib/result.js";
 export class PwForm extends LitElement {
   /** @override */ static get properties() {
     return {
-      actionText: { type: String },
-      _task: { state: true },
       forceTask: { state: true },
     };
+  }
+
+  /** @returns {string} */
+  get actionText() {
+    throw new Error("not implemented");
   }
 
   constructor() {
     super();
 
-    /** @private */ this.history = new HistoryController(this);
+    /** @private */ this.history = new HistoryController(this, /.*/);
 
     /* @type {P} */
     //this.url;
 
     /**
-     * @private
      * @type {import("@lit-labs/task").Task}
      */
     this._task;
-
-    /** @type {string} */
-    this.actionText;
 
     /** @type {import("lit").TemplateResult} */
     this.fakeSlot;
@@ -46,6 +46,15 @@ export class PwForm extends LitElement {
   submit = (/** @type {SubmitEvent} */ event) => {
     event.preventDefault();
 
+    const formDataEvent = new CustomEvent("myformdata", {
+      bubbles: true,
+      composed: true,
+      detail: {},
+    });
+    this.form.value?.dispatchEvent(formDataEvent);
+    console.log(formDataEvent);
+    // TODO FIXME
+
     this.forceTask = (this.forceTask || 0) + 1;
   };
 
@@ -55,7 +64,7 @@ export class PwForm extends LitElement {
   // attributes. Otherwise we're eating errors and that's not healthy.xit
   /** @abstract @type {() => import("lit").TemplateResult} */
   getInputs = () => {
-    throw new Error("getInputs must be implemented by subclass")
+    throw new Error(msg("getInputs must be implemented by subclass"));
   };
 
   /** @private */ getCurrentInputElements() {
@@ -84,7 +93,7 @@ if ('FormDataEvent' in window) {
 */
   /** @override */ render() {
     if (this.actionText === undefined) {
-      throw new Error("component not fully initialized");
+      throw new Error(msg("component not fully initialized"));
     }
 
     return html`
@@ -104,7 +113,7 @@ if ('FormDataEvent' in window) {
                     .map(([k, v]) => html`${k}: ${v}<br />`);
                   if (errors.length > 0) {
                     return html`<div class="alert alert-danger" role="alert">
-                      Es sind Fehler aufgetreten!<br />
+                      ${msg("Some errors occurred!")}<br />
                       ${errors}
                     </div>`;
                   }

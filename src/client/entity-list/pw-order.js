@@ -4,6 +4,7 @@ import { html, LitElement } from "lit";
 import { bootstrapCss } from "../index.js";
 import { setupHmr } from "../hmr.js";
 import { HistoryController } from "../history-controller.js";
+import { msg, str } from "@lit/localize";
 
 /** @template T */
 export class PwOrder extends LitElement {
@@ -31,12 +32,12 @@ export class PwOrder extends LitElement {
     /** @type {string} */
     this.randomId = "id" + Math.random().toString().replace(".", "");
 
-    this.history = new HistoryController(this);
+    this.history = new HistoryController(this, /.*/);
   }
 
   /** @override */ render() {
     if (this.title === undefined || this.name === undefined) {
-      throw new Error("component not fully initialized");
+      throw new Error(msg("component not fully initialized"));
     }
 
     return html`
@@ -97,7 +98,7 @@ export class PwOrder extends LitElement {
               : "down-up";
           })()}"
           role="img"
-          aria-label="Nach {title} sortieren"
+          aria-label="${msg(str`sort by ${this.title}`)}"
         ></i>
         ${this.title}
       </button>

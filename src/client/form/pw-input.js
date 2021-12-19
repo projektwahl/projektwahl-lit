@@ -6,6 +6,7 @@ import { HistoryController } from "../history-controller.js";
 import { isErr } from "../../lib/result.js";
 import { ifDefined } from "lit/directives/if-defined.js";
 import { setupHmr } from "../hmr.js";
+import { msg } from "@lit/localize";
 
 /** @template T */
 export class PwInput extends LitElement {
@@ -31,7 +32,7 @@ export class PwInput extends LitElement {
     super();
     this.randomId = "id" + Math.random().toString().replace(".", "");
 
-    /** @private */ this.history = new HistoryController(this);
+    /** @private */ this.history = new HistoryController(this, /.*/);
 
     /** @type {string} */
     this.label;
@@ -63,6 +64,27 @@ export class PwInput extends LitElement {
     return this;
   }
 
+  myformdataEventListener = (/** @type {CustomEvent} */ event) => {
+    console.log("pw-input" + Math.random(), event);
+  };
+
+  /** @override */ connectedCallback() {
+    super.connectedCallback();
+    console.log(this.closest("form"));
+    this.closest("form")?.addEventListener(
+      "myformdata",
+      this.myformdataEventListener
+    );
+  }
+
+  /** @override */ disconnectedCallback() {
+    super.disconnectedCallback();
+    this.closest("form")?.removeEventListener(
+      "myformdata",
+      this.myformdataEventListener
+    );
+  }
+
   /** @override */ render() {
     if (
       this.label === undefined ||
@@ -70,7 +92,7 @@ export class PwInput extends LitElement {
       this.name === undefined ||
       this.task === undefined
     ) {
-      throw new Error("component not fully initialized");
+      throw new Error(msg("component not fully initialized"));
     }
 
     return html`

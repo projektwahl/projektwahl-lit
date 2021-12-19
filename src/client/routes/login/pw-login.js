@@ -8,6 +8,7 @@ import { myFetch } from "../../utils.js";
 import { PwForm } from "../../form/pw-form.js";
 import { HistoryController } from "../../history-controller.js";
 import { isOk } from "../../../lib/result.js";
+import { msg } from "@lit/localize";
 
 // https://lit.dev/docs/components/lifecycle/
 // updateComplete
@@ -37,21 +38,18 @@ export class PwLogin extends PwForm {
     };
   }
 
+  /** @override */ get actionText() {
+    return msg("Login")
+  }
+
   constructor() {
     super();
 
     /** @type {number|undefined} */
     this.forceTask = undefined;
 
-    this.actionText = "Login";
-
     /**
-     * @private
-     */
-    this.history = new HistoryController(this);
-
-    /**
-     * @private
+     * @override
      */
     this._task = new Task(
       this,
@@ -93,20 +91,20 @@ export class PwLogin extends PwForm {
         class="btn btn-primary btn-lg w-100 my-5"
         href="/api/v1/openid-login"
         role="button"
-        >Mit Schulaccount anmelden</a
+        >${msg("Login with third party account")}</a
       >
 
-      <h3 class="text-center">Als Gast anmelden</h3>
+      <h3 class="text-center">${msg("Login as guest")}</h3>
 
       <pw-input
         type="text"
         autocomplete="username"
-        label="Name"
+        label="${msg("Username")}"
         name="username"
         .task=${this._task}
       ></pw-input>
       <pw-input
-        label="Passwort"
+        label="${msg("Password")}"
         name="password"
         type="password"
         autocomplete="current-password"

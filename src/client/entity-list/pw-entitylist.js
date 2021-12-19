@@ -4,6 +4,7 @@ import { html, LitElement } from "lit";
 import { bootstrapCss } from "../index.js";
 import { HistoryController } from "../history-controller.js";
 import { setupHmr } from "../hmr.js";
+import { msg, str } from "@lit/localize";
 
 /** @template T */
 export let PwEntityList = class extends LitElement {
@@ -22,12 +23,12 @@ export let PwEntityList = class extends LitElement {
     /**
      * @private
      */
-    this.history = new HistoryController(this);
+    this.history = new HistoryController(this, /.*/);
   }
 
   /** @override */ render() {
     if (this.title === undefined) {
-      throw new Error("component not fully initialized");
+      throw new Error(msg("component not fully initialized"));
     }
 
     return html`
@@ -35,18 +36,17 @@ export let PwEntityList = class extends LitElement {
       <div
         style="position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);"
       >
-        ${/*true
+        ${
+          /*true
           ? ""
           : html`<div class="spinner-grow text-primary" role="status">
               <span class="visually-hidden">Loading...</span>
-        </div>`*/""}
+        </div>`*/ ""
+        }
       </div>
       <h1 class="text-center">${this.title}</h1>
       <div class="row justify-content-between">
         <div class="col-auto">
-          <a class="btn btn-primary" href="{createUrl}" role="button"
-            >{title} erstellen</a
-          >
           <slot name="buttons"></slot>
         </div>
         <div class="col-3">
@@ -60,15 +60,15 @@ export let PwEntityList = class extends LitElement {
             class="form-select"
             aria-label="Default select example"
           >
-            <option value="10">10 pro Seite</option>
-            <option value="25">25 pro Seite</option>
-            <option value="50">50 pro Seite</option>
-            <option value="100">100 pro Seite</option>
+            <option value="10">${((/** @type {number} */ count) => msg(str`${count} per page`))(10)}</option>
+            <option value="25">${((/** @type {number} */ count) => msg(str`${count} per page`))(25)}</option>
+            <option value="50">${((/** @type {number} */ count) => msg(str`${count} per page`))(50)}</option>
+            <option value="100">${((/** @type {number} */ count) => msg(str`${count} per page`))(100)}</option>
           </select>
         </div>
       </div>
       <slot name="response"></slot>
-      <nav aria-label="Navigation der Nutzerliste">
+      <nav aria-label="${msg("navigation of user list")}">
         <ul class="pagination justify-content-center">
           <!-- { # await only works in blocks -->
           <li
@@ -82,7 +82,7 @@ export let PwEntityList = class extends LitElement {
               }}
               class="page-link"
               href="/"
-              aria-label="Vorherige Seite"
+              aria-label="${msg("previous page")}"
               tabindex=${
                 -1 /*mapOr($response, v => v.previousCursor, null) ? undefined : -1*/
               }
@@ -104,7 +104,7 @@ export let PwEntityList = class extends LitElement {
               }}
               class="page-link"
               href="/"
-              aria-label="Nächste Seite"
+              aria-label="${msg("next page")}"
               tabindex=${
                 /*mapOr($response, v => v.nextCursor, null) ? undefined : -1*/ -1
               }

@@ -14,9 +14,9 @@ import { msg } from "@lit/localize";
 // TODO FIXME implement edit
 
 /**
- * @extends PwForm<"/api/v1/users/create">
+ * @extends PwForm<"/api/v1/projects/create">
  */
-export class PwUserCreate extends PwForm {
+export class PwProjectCreate extends PwForm {
   /** @override */ static get properties() {
     return {
       url: { attribute: false },
@@ -28,7 +28,7 @@ export class PwUserCreate extends PwForm {
   }
 
   /** @override */ get actionText() {
-    return msg("Create/Update account");
+    return msg("Create/Update project");
   }
 
   constructor() {
@@ -50,7 +50,9 @@ export class PwUserCreate extends PwForm {
         // @ts-expect-error bad typings
         let jsonData = Object.fromEntries(formData.entries());
 
-        let result = await myFetch("/api/v1/users/create", {
+        console.log(jsonData);
+
+        let result = await myFetch("/api/v1/projects/create", {
           method: "POST",
           headers: {
             "content-type": "text/json",
@@ -72,49 +74,71 @@ export class PwUserCreate extends PwForm {
     return html`
       <pw-input
         type="text"
-        label=${msg("Username")}
-        name="username"
+        label=${msg("Title")}
+        name="title"
         .task=${this._task}
       ></pw-input>
 
       <pw-input
-        .value=${this.type}
-        @change=${(event) => (this.type = event.target.value)}
-        type="select"
-        label=${msg("User type")}
-        name="type"
-        .options=${html`<option value="voter">Schüler</option>
-          <option value="helper">Helfer</option>
-          <option value="admin">Admin</option>`}
+        type="text"
+        label=${msg("Info")}
+        name="info"
         .task=${this._task}
-      >
-      </pw-input>
+      ></pw-input>
 
-      ${this.type === "voter"
-        ? html`<pw-input
-              type="text"
-              label=${msg("Group")}
-              name="group"
-              .task=${this._task}
-            ></pw-input>
+      <pw-input
+        type="text"
+        label=${msg("Location")}
+        name="location"
+        .task=${this._task}
+      ></pw-input>
 
-            <pw-input
-              type="number"
-              label=${msg("Age")}
-              name="age"
-              .task=${this._task}
-            ></pw-input>`
-        : undefined}
+      <pw-input
+        type="number"
+        label=${msg("Costs")}
+        name="costs"
+        .task=${this._task}
+      ></pw-input>
+
+      <pw-input
+        type="number"
+        label=${msg("Minimum age")}
+        name="min_age"
+        .task=${this._task}
+      ></pw-input>
+
+      <pw-input
+        type="number"
+        label=${msg("Maximum age")}
+        name="max_age"
+        .task=${this._task}
+      ></pw-input>
+
+      <pw-input
+        type="number"
+        label=${msg("Minimum participants")}
+        name="min_participants"
+        .task=${this._task}
+      ></pw-input>
+
+      <pw-input
+        type="number"
+        label=${msg("Maximum participants")}
+        name="max_participants"
+        .task=${this._task}
+      ></pw-input>
+
+      <!-- Betreuer, Projektleiter (Schüler) -->
 
       <pw-input
         type="checkbox"
-        label=${msg("Away")}
-        name="away"
+        label=${msg("Allow random assignments")}
+        name="random_assignments"
         .task=${this._task}
       ></pw-input>
     `;
   };
 }
-customElements.define("pw-user-create", PwUserCreate);
+customElements.define("pw-project-create", PwProjectCreate);
 
-setupHmr(PwUserCreate, import.meta.url);
+setupHmr(PwProjectCreate, import.meta.url);

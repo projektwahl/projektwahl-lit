@@ -30,6 +30,7 @@ export function request(method, path, handler) {
             const [new_headers, responseBody] = await handler(
               requestBody.success
             );
+            console.log(responseBody);
             routes[path].response.parse(responseBody);
             stream.respond(new_headers);
             stream.end(JSON.stringify(responseBody));

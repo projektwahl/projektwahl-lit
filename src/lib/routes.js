@@ -20,7 +20,9 @@ export const rawUserHelperOrAdminSchema = z
     username: z.string().min(3),
     away: z
       .string()
-      .refine((val) => /^(on)|(off)$/.test(val), { message: "muss on/off sein" })
+      .refine((val) => /^(on)|(off)$/.test(val), {
+        message: "muss on/off sein",
+      })
       .transform((v) => v === "on"),
   })
   .strict();
@@ -40,26 +42,35 @@ export const rawUserVoterSchema = z
       .optional(),
     away: z
       .string()
-      .refine((val) => /^(on)|(off)$/.test(val), { message: "muss on/off sein" })
+      .refine((val) => /^(on)|(off)$/.test(val), {
+        message: "muss on/off sein",
+      })
       .transform((v) => v === "on"),
   })
   .strict();
 
 export const rawUserSchema = rawUserHelperOrAdminSchema.or(rawUserVoterSchema);
 
-export const withId = (/** @type {ZodType<any>} */ schema) =>
+export const rawProjectSchema = z.object({
+  title: z.string(),
+  info: z.string(),
+  place: z.string(),
+  costs: z.number(),
+  min_age: z.number(),
+  max_age: z.number(),
+  min_participants: z.number(),
+  max_participants: z.number(),
+  presentation_type: z.string(),
+  requirements: z.string(),
+  random_assignments: z.boolean(),
+});
+
+export const withId = (/** @type {import("zod").ZodType<any>} */ schema) =>
   schema.or(
     z.object({
       id: z.number(),
     })
   );
-
-/*.refine(v => {
-  v.type !== "voter" || (v.group !== null && v.age !== null)
-}, {
-  message: "Ein Schüler muss einer Klasse und einem Jahrgang zugewiesen sein",
-  path: ["type"]
-});*/
 
 export const loginOutputSchema = result(z.void(), z.record(z.string()));
 
@@ -87,7 +98,11 @@ export const routes = /** @type {const} */ ({
   },
   "/api/v1/users/create": {
     request: rawUserSchema,
-    response: result(z.null(), z.record(z.string())),
+    response: result(withId(z.object({})), z.record(z.string())),
+  },
+  "/api/v1/projects/create": {
+    request: rawProjectSchema,
+    response: result(withId(z.object({})), z.record(z.string())),
   },
   "/api/v1/users": {
     request: z.undefined(),

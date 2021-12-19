@@ -7,10 +7,15 @@
 
 /** @implements {ReactiveController} */
 export class HistoryController {
-  constructor(/** @type {import("lit").ReactiveControllerHost} */ host) {
+  constructor(
+    /** @type {import("lit").ReactiveControllerHost} */ host,
+    /** @type {RegExp} */ urlPattern
+  ) {
     /** @type {import("lit").ReactiveControllerHost} */
     this.host = host;
     host.addController(this);
+
+    this.urlPattern = urlPattern;
 
     /** @type {URL} */
     this.url = new URL(window.location.href);
@@ -30,17 +35,21 @@ export class HistoryController {
     this.popstateListener = (/** @type {PopStateEvent} */ event) => {
       this.url = new URL(window.location.href);
       this.state = /** @type {HistoryState} */ (event.state);
-      this.host.requestUpdate();
+      if (this.urlPattern.test(this.url.pathname)) {
+        this.host.requestUpdate();
+      }
     };
     window.addEventListener("popstate", this.popstateListener);
+
     this.navigateListener = (
       /** @type {CustomEvent<{url: URL;state: HistoryState;}>} */ event
     ) => {
       this.url = event.detail.url;
       this.state = event.detail.state;
-      this.host.requestUpdate();
+      if (this.urlPattern.test(this.url.pathname)) {
+        this.host.requestUpdate();
+      }
     };
-
     window.addEventListener("navigate", this.navigateListener);
   }
   hostDisconnected() {
