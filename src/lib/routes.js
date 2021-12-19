@@ -28,7 +28,18 @@ export const rawUserVoterSchema = z
   })
   .strict();
 
-export const rawUserSchema = rawUserHelperOrAdminSchema.or(rawUserVoterSchema);
+export const rawUserSchema = z.object({
+  type: z.enum(["helper", "admin", "voter"])
+}).passthrough().superRefine((value, ctx) => {
+  let schema = value.type === "voter" ? rawUserVoterSchema : rawUserHelperOrAdminSchema;
+  let parsed = schema.safeParse(value)
+  if (!parsed.success) {
+    parsed.error.issues.forEach(ctx.addIssue)
+  }
+}).transform(value => {
+  let schema = value.type === "voter" ? rawUserVoterSchema : rawUserHelperOrAdminSchema;
+  return schema.parse(value)
+})
 
 export const rawProjectSchema = z.object({
   title: z.string().min(3).max(1024),
