@@ -53,7 +53,7 @@ export const pwApp = async (/** @type {URL} */ url) => {
 export const nextPage = async (/** @type {URL} */ url) => {
   try {
     if (url.pathname === "/login") {
-      setLocale("de");
+      //setLocale("de");
       return await pwLogin();
     } else if (url.pathname === "/users") {
       return await pwUsers(url);
@@ -120,6 +120,8 @@ let PwApp = class PwApp extends LitElement {
     }
     return html`
       ${bootstrapCss}
+
+      ff
       
       <nav
         class="navbar navbar-expand-lg navbar-light bg-light shadow p-3 mb-5"

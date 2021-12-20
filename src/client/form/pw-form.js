@@ -6,11 +6,12 @@ import { bootstrapCss } from "../index.js";
 import { HistoryController } from "../history-controller.js";
 import { isErr } from "../../lib/result.js";
 import { msg } from "@lit/localize";
+import { setupHmr } from "../hmr.js";
 
 /**
  * @template {keyof import("../../lib/routes").routes} P
  */
-export class PwForm extends LitElement {
+let PwForm = class PwForm extends LitElement {
   /** @override */ static get properties() {
     return {
       forceTask: { state: true },
@@ -152,4 +153,11 @@ if ('FormDataEvent' in window) {
     `;
   }
 }
+
+console.log("jo", new URL(import.meta.url).pathname)
+
+PwForm = setupHmr(import.meta.url, "PwForm", PwForm);
+
 customElements.define("pw-form", PwForm);
+
+export { PwForm }

@@ -91,7 +91,7 @@ let PwLogin = class PwLogin extends PwForm {
       >
 
       <h3 class="text-center">${msg("Login as guest")}</h3>
-      dsfsfdfs
+      
 
       <pw-text-input
         autocomplete="username"
