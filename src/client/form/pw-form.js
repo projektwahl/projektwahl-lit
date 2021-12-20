@@ -54,7 +54,7 @@ let PwForm = class PwForm extends LitElement {
   // this needs to be done dynamically as e.g. the create user form dynamically changes the form inputs
   // attributes. Otherwise we're eating errors and that's not healthy.xit
   /** @abstract @type {() => import("lit").TemplateResult} */
-  getInputs = () => {
+  getInputs() {
     throw new Error(msg("getInputs must be implemented by subclass"));
   };
 
