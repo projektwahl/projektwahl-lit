@@ -74,10 +74,10 @@ await sql.begin("READ WRITE", async (sql) => {
 			}
 		});
 		const keycloakUser = await userResponse.json();
-		console.log(keycloakUser);
+		console.log(keycloakUser)^;
 		*/
 
-    /** @type {[import("../lib/types").Existing<import("../lib/types").RawUserType>]} */
+    /** @type {[import("../lib/routes.js").withId(import("../lib/routes.js").rawUserSchema>)]} */
     const [user] =
       await sql`INSERT INTO users (username, type, "group", age) VALUES (${`user${Math.random()}`}, 'voter', 'a', 10) ON CONFLICT DO NOTHING RETURNING *;`;
     shuffleArray(projects);

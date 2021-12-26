@@ -38,6 +38,6 @@ type BaseQuery<C> = {
   };
 };
 
-interface WritableTemplateStringsArray extends Array<string> {
+export interface WritableTemplateStringsArray extends Array<string> {
   raw?: string[];
 }

@@ -1,4 +1,4 @@
-import { z } from "zod";
+import { z, ZodNumber } from "zod";
 import { result } from "./result.js";
 
 export const loginInputSchema = z
@@ -51,13 +51,13 @@ export const rawProjectSchema = z.object({
   random_assignments: z.boolean(),
 }).strict();
 
-export const withId = (/** @type {import("zod").ZodType<any>} */ schema) =>
-  schema.or(
-    z
-      .object({
-        id: z.number(),
-      })
-  );
+/**
+ * @template {z.AnyZodObject} T
+ * @param {T} schema
+ * @returns {z.ZodObject<z.extendShape<T, { id: ZodNumber }>>}
+ */
+export const withId = (schema) =>
+  schema.merge(z.object({ id: z.number() }));
 
 export const loginOutputSchema = result(z.void(), z.record(z.string()));
 

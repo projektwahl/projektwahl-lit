@@ -7,7 +7,7 @@ import { routes } from "../lib/routes";
  * @template {import("../lib/routes").keys} P
  * @param {P} url 
  * @param {RequestInit | undefined} options 
- * @returns {Promise<import("../lib/result.js").result<import("../lib/routes").routes[P],{ network?: string } & { [key in keyof import("../lib/routes").routes[P]]?: string }>>}
+ * @returns {Promise<import("../lib/routes").routes[P]["response"]>}
  */
 export const myFetch = async (url, options) => {
   const response = await fetch(url.toString(), options);
@@ -24,8 +24,7 @@ export const myFetch = async (url, options) => {
     }
   }
   const result = await response.json();
-  const lha = routes[url]
-  return result;
+  return routes[url].response.parse(result)
 };
 
 /**
