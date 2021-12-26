@@ -3,17 +3,14 @@
 
 import { routes } from "../lib/routes";
 
-/** @type {<P extends keyof import("../lib/routes").routes>(
-  url: P,
-  options: RequestInit | undefined
-) => Promise<
-  import("../lib/result.js").result<
-    import("../lib/routes").routes[P],
-    { network?: string } & { [key in keyof import("../lib/routes").routes[P]]?: string }
-  >
->} */
+/**
+ * @template {keyof import("../lib/routes").routes} P
+ * @param {P} url 
+ * @param {RequestInit | undefined} options 
+ * @returns {Promise<import("../lib/result.js").result<import("../lib/routes").routes[P],{ network?: string } & { [key in keyof import("../lib/routes").routes[P]]?: string }>>}
+ */
 export const myFetch = async (url, options) => {
-  const response = await fetch(url, options);
+  const response = await fetch(url.toString(), options);
   if (!response.ok) {
     try {
       const additionalInfo = await response.text();
@@ -27,6 +24,7 @@ export const myFetch = async (url, options) => {
     }
   }
   const result = await response.json();
+  const lha = routes[url]
   return result;
 };
 

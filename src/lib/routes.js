@@ -1,8 +1,6 @@
 import { z } from "zod";
 import { result } from "./result.js";
 
-// TODO FIXME make all of these strict so unknown properties create errors
-
 export const loginInputSchema = z
   .object({
     username: z.string().min(4).max(100),
@@ -51,7 +49,7 @@ export const rawProjectSchema = z.object({
   min_participants: z.number().min(1).max(1000),
   max_participants: z.number().min(1).max(1000),
   random_assignments: z.boolean(),
-});
+}).strict();
 
 export const withId = (/** @type {import("zod").ZodType<any>} */ schema) =>
   schema.or(
