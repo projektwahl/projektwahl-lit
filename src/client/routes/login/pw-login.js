@@ -119,8 +119,6 @@ let PwLogin = class PwLogin extends PwForm {
   };
 }
 
-console.log("jo", new URL(import.meta.url).pathname)
-
 PwLogin = setupHmr(import.meta.url, "PwLogin", PwLogin);
 
 customElements.define("pw-login", PwLogin);

@@ -154,8 +154,6 @@ if ('FormDataEvent' in window) {
   }
 }
 
-console.log("jo", new URL(import.meta.url).pathname)
-
 PwForm = setupHmr(import.meta.url, "PwForm", PwForm);
 
 customElements.define("pw-form", PwForm);

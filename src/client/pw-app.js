@@ -120,8 +120,6 @@ let PwApp = class PwApp extends LitElement {
     }
     return html`
       ${bootstrapCss}
-
-      ff
       
       <nav
         class="navbar navbar-expand-lg navbar-light bg-light shadow p-3 mb-5"
@@ -222,8 +220,6 @@ let PwApp = class PwApp extends LitElement {
     `;
   }
 };
-
-console.log("jo", new URL(import.meta.url).pathname)
 
 PwApp = setupHmr(import.meta.url, "PwApp", PwApp);
 
