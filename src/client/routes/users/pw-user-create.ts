@@ -30,6 +30,8 @@ export class PwUserCreate extends PwForm<"/api/v1/users/create"> {
     return msg("Create/Update account");
   }
 
+  type;
+
   constructor() {
     super();
 
@@ -79,7 +81,7 @@ export class PwUserCreate extends PwForm<"/api/v1/users/create"> {
 
       <pw-select-input
         .value=${this.type}
-        @change=${(event) => (this.type = event.target.value)}
+        @change=${(event: Event) => (this.type = event.target.value)}
         label=${msg("User type")}
         name="type"
         .options=${html`<option value="voter">Schüler</option>

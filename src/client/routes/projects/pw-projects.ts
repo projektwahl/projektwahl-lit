@@ -198,10 +198,10 @@ class PwProjects<T> extends LitElement {
                             <p>${value.id}</p>
                           </th>
                           <td>
-                            <p>${value.username}</p>
+                            <p>${value.title}</p>
                           </td>
                           <td>
-                            <p>${value.type}</p>
+                            <p>${value.info}</p>
                           </td>
                           <td>
                             <a
