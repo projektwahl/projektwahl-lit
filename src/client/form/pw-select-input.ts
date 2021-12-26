@@ -25,40 +25,38 @@ export class PwSelectInput<T> extends LitElement {
     };
   }
 
+  randomId;
+
+  private history;
+
+  label!: string;
+
+  name!: keyof T;
+
+  task!: import("@lit-labs/task").Task<any, import("zod").infer<typeof import("../../lib/result.js").anyResult>>;
+
+  value!: string;
+
+  input;
+
+  options!: import("lit").TemplateResult;
+
   constructor() {
     super();
     this.randomId = "id" + Math.random().toString().replace(".", "");
 
-    /** @private */ this.history = new HistoryController(this, /.*/);
-
-    /** @type {string} */
-    this.label;
-
-    /** @type {keyof T} */
-    this.name;
-
-    /** @type {string} */
-    this.randomId;
-
-    /** @type {import("@lit-labs/task").Task<any, import("zod").infer<typeof import("../../lib/result.js").anyResult>>} */
-    this.task;
-
-    /** @type {import("lit").TemplateResult} */
-    this.options;
-
-    /** @type {string} */
-    this.value;
+    this.history = new HistoryController(this, /.*/);
 
     /** @type {import("lit/directives/ref").Ref<HTMLSelectElement>} */
     this.input = createRef();
   }
 
   // because forms in shadow root are garbage
-  /** @protected @override */ createRenderRoot() {
+  protected override createRenderRoot() {
     return this;
   }
 
-  myformdataEventListener = (/** @type {CustomEvent} */ event) => {
+  myformdataEventListener = (event: CustomEvent) => {
     event.detail[this.name] =
       this.input.value?.selectedIndex == -1 ? null : this.input.value?.value;
   };

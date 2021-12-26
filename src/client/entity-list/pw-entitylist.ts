@@ -6,22 +6,20 @@ import { HistoryController } from "../history-controller.js";
 import { setupHmr } from "../hmr.js";
 import { msg, str } from "@lit/localize";
 
-export let PwEntityList = class <T> extends LitElement {
-  override static get properties() {
+export class PwEntityList<T> extends LitElement {
+  static override get properties() {
     return {
       title: { type: String },
     };
   }
 
+  private history;
+
   constructor() {
     super();
 
-    /** @type {string} */
     this.title;
 
-    /**
-     * @private
-     */
     this.history = new HistoryController(this, /.*/);
   }
 
@@ -52,7 +50,7 @@ export let PwEntityList = class <T> extends LitElement {
           <select
             @change=${(event: Event) => {
               const url = new URL(window.location.href);
-              url.searchParams.set("count", event.target.value);
+              url.searchParams.set("count", event.target?.value);
               HistoryController.goto(url);
             }}
             .value=${this.history.url.searchParams.get("count")}
@@ -60,22 +58,22 @@ export let PwEntityList = class <T> extends LitElement {
             aria-label="Default select example"
           >
             <option value="10">
-              ${((/** @type {number} */ count: number) => msg(str`${count} per page`))(
+              ${((count: number) => msg(str`${count} per page`))(
                 10
               )}
             </option>
             <option value="25">
-              ${((/** @type {number} */ count: number) => msg(str`${count} per page`))(
+              ${((count: number) => msg(str`${count} per page`))(
                 25
               )}
             </option>
             <option value="50">
-              ${((/** @type {number} */ count: number) => msg(str`${count} per page`))(
+              ${((count: number) => msg(str`${count} per page`))(
                 50
               )}
             </option>
             <option value="100">
-              ${((/** @type {number} */ count: number) => msg(str`${count} per page`))(
+              ${((count: number) => msg(str`${count} per page`))(
                 100
               )}
             </option>
@@ -90,7 +88,7 @@ export let PwEntityList = class <T> extends LitElement {
             class="page-item {mapOr($response, v => v.previousCursor, null) ? '' : 'disabled'}"
           >
             <a
-              @click=${(e) => {
+              @click=${(e: Event) => {
                 e.preventDefault();
                 //($query.paginationCursor = mapOr($response, v => v.previousCursor, null)),
                 //    ($query.paginationDirection = 'backwards');
@@ -112,7 +110,7 @@ export let PwEntityList = class <T> extends LitElement {
             class="page-item {mapOr($response, v => v.nextCursor, null) ? '' : 'disabled'}}"
           >
             <a
-              @click=${(e) => {
+              @click=${(e: Event) => {
                 e.preventDefault();
                 //($query.paginationCursor = mapOr($response, v => v.nextCursor, null)),
                 //    ($query.paginationDirection = 'forwards');

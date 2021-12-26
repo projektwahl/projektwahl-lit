@@ -6,8 +6,9 @@ import { bootstrapCss } from "../index.js";
 import { HistoryController } from "../history-controller.js";
 import { msg } from "@lit/localize";
 import { setupHmr } from "../hmr.js";
+import type { routes } from "../../lib/routes.js";
 
-class PwForm<P extends keyof routes> extends LitElement {
+class PwForm<P extends keyof typeof routes> extends LitElement {
   static override get properties() {
     return {
       forceTask: { state: true },
@@ -18,21 +19,21 @@ class PwForm<P extends keyof routes> extends LitElement {
     throw new Error("not implemented");
   }
 
+  private history;
+
+  _task!: import("@lit-labs/task").Task<any, import("zod").infer<typeof import("../../lib/result.js").anyResult>>;
+
+  fakeSlot!: import("lit").TemplateResult;
+
+  form: import("lit/directives/ref").Ref<HTMLFormElement>;
+
+  forceTask!: number;
+
   constructor() {
     super();
 
-    /** @private */ this.history = new HistoryController(this, /.*/);
+    this.history = new HistoryController(this, /.*/);
 
-    /* @type {P} */
-    //this.url;
-
-    /** @type {import("@lit-labs/task").Task<any, import("zod").infer<typeof import("../../lib/result.js").anyResult>>} */
-    this._task;
-
-    /** @type {import("lit").TemplateResult} */
-    this.fakeSlot;
-
-    /** @type {import("lit/directives/ref").Ref<HTMLFormElement>} */
     this.form = createRef();
   }
 

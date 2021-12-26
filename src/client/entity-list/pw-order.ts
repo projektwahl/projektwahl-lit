@@ -6,9 +6,8 @@ import { setupHmr } from "../hmr.js";
 import { HistoryController } from "../history-controller.js";
 import { msg, str } from "@lit/localize";
 
-/** @template T */
-export class PwOrder extends LitElement {
-  override static get properties() {
+export class PwOrder<T> extends LitElement {
+  static override get properties() {
     return {
       title: { type: String },
       name: { type: String },
@@ -16,20 +15,21 @@ export class PwOrder extends LitElement {
   }
 
   // because forms in shadow root are garbage
-  /** @protected @override */ createRenderRoot() {
+  protected override createRenderRoot() {
     return this;
   }
+
+  name!: string;
+
+  title!: string;
+
+  randomId;
+
+  history;
 
   constructor() {
     super();
 
-    /** @type {string} */
-    this.title;
-
-    /** @type {string} */
-    this.name;
-
-    /** @type {string} */
     this.randomId = "id" + Math.random().toString().replace(".", "");
 
     this.history = new HistoryController(this, /.*/);
@@ -77,7 +77,7 @@ export class PwOrder extends LitElement {
           ].forEach((v) => urlSearchParams.append("order", v));
 
           HistoryController.goto(
-            new URL(`?${urlSearchParams}`, window.location.href)
+            new URL(`?${urlSearchParams}`, window.location.href), {}
           );
         }}
         name="${this.name}"

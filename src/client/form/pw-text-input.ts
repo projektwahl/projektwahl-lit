@@ -26,34 +26,32 @@ export class PwTextInput<T> extends LitElement {
     };
   }
 
+  randomId;
+
+  private history;
+
+  label!: string;
+
+  name!: keyof T;
+
+  type: "text" | "password";
+
+  autocomplete!: "username" | "current-password";
+
+  task!: import("@lit-labs/task").Task<any, import("zod").infer<typeof import("../../lib/result.js").anyResult>>;
+
+  input: import("lit/directives/ref").Ref<HTMLInputElement>;
+
+  value!: string;
+
   constructor() {
     super();
     this.randomId = "id" + Math.random().toString().replace(".", "");
 
-    /** @private */ this.history = new HistoryController(this, /.*/);
+    this.history = new HistoryController(this, /.*/);
 
-    /** @type {string} */
-    this.label;
-
-    /** @type {keyof T} */
-    this.name;
-
-    /** @type {"text" | "password"} */
     this.type = "text";
 
-    /** @type {"username" | "current-password"} */
-    this.autocomplete;
-
-    /** @type {string} */
-    this.randomId;
-
-    /** @type {import("@lit-labs/task").Task<any, import("zod").infer<typeof import("../../lib/result.js").anyResult>>} */
-    this.task;
-
-    /** @type {string} */
-    this.value;
-
-    /** @type {import("lit/directives/ref").Ref<HTMLInputElement>} */
     this.input = createRef();
   }
 

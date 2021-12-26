@@ -1,40 +1,39 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // SPDX-FileCopyrightText: 2021 Moritz Hedtke <Moritz.Hedtke@t-online.de>
+import type { ReactiveController, ReactiveControllerHost } from "lit";
 
-import type { ReactiveControllerHost } from "lit";
+export type HistoryState = Record<string, unknown>;
 
-/** @typedef {Record<string, unknown>} HistoryState */
+export class HistoryController implements ReactiveController {
 
-/** @typedef {import('lit').ReactiveController} ReactiveController */
+  host;
 
-/** @implements {ReactiveController} */
-export class HistoryController {
+  urlPattern;
+
+  url;
+
+  state: HistoryState;
+
+  private popstateListener?: (this: Window, ev: PopStateEvent) => void;
+
+  private navigateListener?: (this: Window,event: CustomEvent<{url: URL;state: HistoryState;}>) => void;
+
   constructor(
     host: ReactiveControllerHost,
     urlPattern: RegExp
   ) {
-    /** @type {import("lit").ReactiveControllerHost} */
-    this.host = host;
-    host.addController(this);
+    (this.host = host).addController(this);
 
     this.urlPattern = urlPattern;
 
-    /** @type {URL} */
     this.url = new URL(window.location.href);
 
-    /** @type {HistoryState} */
     this.state = window.history?.state;
-
-    /** @private @type {(this: Window, ev: PopStateEvent) => void} */
-    this.popstateListener;
-
-    /** @private @type {(this: Window,event: CustomEvent<{url: URL;state: HistoryState;}>) => void} */
-    this.navigateListener;
   }
   hostConnected() {
     this.url = new URL(window.location.href);
-    this.state = /** @type HistoryState */ (window.history.state);
-    this.popstateListener = (/** @type {PopStateEvent} */ event: PopStateEvent) => {
+    this.state = window.history.state as HistoryState;
+    this.popstateListener = (event: PopStateEvent) => {
       this.url = new URL(window.location.href);
       this.state = /** @type {HistoryState} */ (event.state);
       if (this.urlPattern.test(this.url.pathname)) {
@@ -43,9 +42,7 @@ export class HistoryController {
     };
     window.addEventListener("popstate", this.popstateListener);
 
-    this.navigateListener = (
-      /** @type {CustomEvent<{url: URL;state: HistoryState;}>} */ event: CustomEvent<{ url: URL; state: HistoryState; }>
-    ) => {
+    this.navigateListener = (event) => {
       this.url = event.detail.url;
       this.state = event.detail.state;
       if (this.urlPattern.test(this.url.pathname)) {
@@ -55,8 +52,8 @@ export class HistoryController {
     window.addEventListener("navigate", this.navigateListener);
   }
   hostDisconnected() {
-    window.removeEventListener("popstate", this.popstateListener);
-    window.removeEventListener("navigate", this.navigateListener);
+    window.removeEventListener("popstate", this.popstateListener!);
+    window.removeEventListener("navigate", this.navigateListener!);
   }
 
   static goto(url: URL, state: HistoryState) {

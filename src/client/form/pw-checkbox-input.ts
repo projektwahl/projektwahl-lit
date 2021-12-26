@@ -8,7 +8,7 @@ import { msg } from "@lit/localize";
 import { createRef, ref } from "lit/directives/ref.js";
 
 export class PwCheckboxInput<T> extends LitElement {
-  override static get properties() {
+  static override get properties() {
     return {
       label: { type: String },
       name: { type: String },
@@ -23,33 +23,33 @@ export class PwCheckboxInput<T> extends LitElement {
     };
   }
 
+  randomId;
+
+  private history;
+
+  label!: string;
+
+  name!: keyof T;
+
+  task!: import("@lit-labs/task").Task<any, import("zod").infer<typeof import("../../lib/result.js").anyResult>>;
+
+  value!: string;
+
+  input: import("lit/directives/ref").Ref<HTMLInputElement>;
+
   constructor() {
     super();
     this.randomId = "id" + Math.random().toString().replace(".", "");
 
-    /** @private */ this.history = new HistoryController(this, /.*/);
+    this.history = new HistoryController(this, /.*/);
 
-    /** @type {string} */
-    this.label;
-
-    /** @type {keyof T} */
-    this.name;
-
-    /** @type {string} */
     this.randomId;
 
-    /** @type {import("@lit-labs/task").Task<any, import("zod").infer<typeof import("../../lib/result.js").anyResult>>} */
-    this.task;
-
-    /** @type {string} */
-    this.value;
-
-    /** @type {import("lit/directives/ref").Ref<HTMLInputElement>} */
     this.input = createRef();
   }
 
   // because forms in shadow root are garbage
-  /** @protected @override */ createRenderRoot() {
+  protected override createRenderRoot() {
     return this;
   }
 
