@@ -6,7 +6,6 @@ import { Task } from "@lit-labs/task";
 import { myFetch } from "../../utils.js";
 import { PwForm } from "../../form/pw-form.js";
 import { HistoryController } from "../../history-controller.js";
-import { isOk } from "../../../lib/result.js";
 import { msg } from "@lit/localize";
 import "../../form/pw-text-input.js";
 import { setupHmr } from "../../hmr.js";
@@ -64,7 +63,7 @@ let PwLogin = class PwLogin extends PwForm {
           body: JSON.stringify(formDataEvent.detail),
         });
 
-        if (isOk(result)) {
+        if (result.success) {
           HistoryController.goto(new URL("/", window.location.href), {});
         }
 

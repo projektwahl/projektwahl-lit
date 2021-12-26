@@ -4,7 +4,6 @@ import { html, LitElement } from "lit";
 import { createRef, ref } from "lit/directives/ref.js";
 import { bootstrapCss } from "../index.js";
 import { HistoryController } from "../history-controller.js";
-import { isErr } from "../../lib/result.js";
 import { msg } from "@lit/localize";
 import { setupHmr } from "../hmr.js";
 
@@ -31,9 +30,7 @@ let PwForm = class PwForm extends LitElement {
     /* @type {P} */
     //this.url;
 
-    /**
-     * @type {import("@lit-labs/task").Task}
-     */
+    /** @type {import("@lit-labs/task").Task<any, import("zod").infer<typeof import("../../lib/result.js").anyResult>>} */
     this._task;
 
     /** @type {import("lit").TemplateResult} */
@@ -103,8 +100,8 @@ if ('FormDataEvent' in window) {
           <div class="col-md-7 col-lg-8">
             ${this._task.render({
               complete: (data) => {
-                if (isErr(data)) {
-                  const errors = Object.entries(data.failure)
+                if (!data.success) {
+                  const errors = Object.entries(data.error)
                     .filter(
                       ([k]) => !this.getCurrentInputElements().includes(k)
                     )

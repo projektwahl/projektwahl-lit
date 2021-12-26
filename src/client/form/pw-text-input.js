@@ -3,7 +3,6 @@
 import { html, LitElement, noChange } from "lit";
 import { bootstrapCss } from "../index.js";
 import { HistoryController } from "../history-controller.js";
-import { isErr } from "../../lib/result.js";
 import { ifDefined } from "lit/directives/if-defined.js";
 import { setupHmr } from "../hmr.js";
 import { msg } from "@lit/localize";
@@ -49,7 +48,7 @@ export class PwTextInput extends LitElement {
     /** @type {string} */
     this.randomId;
 
-    /** @type {import("@lit-labs/task").Task} */
+    /** @type {import("@lit-labs/task").Task<any, import("zod").infer<typeof import("../../lib/result.js").anyResult>>} */
     this.task;
 
     /** @type {string} */
@@ -105,7 +104,7 @@ export class PwTextInput extends LitElement {
             error: () => "",
             pending: () => "",
             complete: (v) =>
-              isErr(v) && v.failure[this.name] !== undefined
+              !v.success && v.error[this.name] !== undefined
                 ? "is-invalid"
                 : "is-valid",
             initial: () => "",
@@ -123,12 +122,12 @@ export class PwTextInput extends LitElement {
         />
         ${this.task.render({
           complete: (v) =>
-            isErr(v) && v.failure[this.name] !== undefined
+            !v.success && v.error[this.name] !== undefined
               ? html` <div
                   id="${this.randomId}-feedback"
                   class="invalid-feedback"
                 >
-                  ${v.failure[this.name]}
+                  ${v.error[this.name]}
                 </div>`
               : undefined,
           error: () => undefined,
