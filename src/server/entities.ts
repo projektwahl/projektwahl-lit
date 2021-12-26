@@ -1,22 +1,12 @@
 import { sql2, unsafe2 } from "./sql/index.js";
 
-/**
- * @template T
- * @param {string} table
- * @param {string[]} fieldsToSelect
- * @param {{ [field: string]: 'nulls-first'|'nulls-last' }} orderByInfo
- * @param {import("../lib/types").BaseQuery<T>} _query
- * @param {T} sanitizedData
- * @param {(query: T) => [TemplateStringsArray, ...(string|string[]|boolean|number)[]]} customFilterQuery
- * @returns {[TemplateStringsArray, ...(string|string[]|boolean|number)[]]}
- */
-export function fetchData(
-  table,
-  fieldsToSelect,
-  orderByInfo,
-  _query, // TODO FIXME sanitize
-  customFilterQuery
-) {
+export function fetchData<T>(
+  table: string,
+  fieldsToSelect: string[],
+  orderByInfo: { [field: string]: 'nulls-first' | 'nulls-last'; },
+  _query: import("../lib/types").BaseQuery<T>, // TODO FIXME sanitize
+  customFilterQuery: (query: T) => [TemplateStringsArray, ...(string | string[] | boolean | number)[]]
+): [TemplateStringsArray, ...(string | string[] | boolean | number)[]] {
   const query = _query;
 
   // orderBy needs to be reversed for backwards pagination

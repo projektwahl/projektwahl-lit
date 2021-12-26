@@ -1,12 +1,7 @@
 import { sql } from "../../database.js";
 import { request } from "../../express.js";
 
-/**
- *
- * @param {import("http2").ServerHttp2Stream} stream
- * @param {import("http2").IncomingHttpHeaders} headers
- */
-export async function createProjectsHandler(stream, headers) {
+export async function createProjectsHandler(stream: import("http2").ServerHttp2Stream, headers: import("http2").IncomingHttpHeaders) {
   // TODO FIXME create or update multiple
   return await request(
     "POST",
@@ -71,7 +66,7 @@ export async function createProjectsHandler(stream, headers) {
             success: row,
           },
         ];
-      } catch (/** @type {unknown} */ error) {
+      } catch (/** @type {unknown} */ error: unknown) {
         if (error instanceof Error && error.name === "PostgresError") {
           const postgresError = /** @type {PostgresError} */ error;
           if (

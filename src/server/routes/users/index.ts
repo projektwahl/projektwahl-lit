@@ -3,12 +3,7 @@ import { fetchData } from "../../entities.js";
 import { request } from "../../express.js";
 import { sql2 } from "../../sql/index.js";
 
-/**
- *
- * @param {import("http2").ServerHttp2Stream} stream
- * @param {import("http2").IncomingHttpHeaders} headers
- */
-export async function usersHandler(stream, headers) {
+export async function usersHandler(stream: import("http2").ServerHttp2Stream, headers: import("http2").IncomingHttpHeaders) {
   return await request("GET", "/api/v1/users", async function () {
     const url = new URL(headers[":path"], "https://localhost:8443");
 

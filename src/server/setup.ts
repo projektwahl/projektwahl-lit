@@ -3,11 +3,7 @@
 import { sql } from "./database.js";
 import { hashPassword } from "./password.js";
 
-/**
- * @template T
- * @param {T[]} array
- */
-const shuffleArray = (array) => {
+const shuffleArray = <T>(array: T[]) => {
   for (let i = array.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1));
     const temp = array[i];

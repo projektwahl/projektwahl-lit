@@ -3,18 +3,13 @@
 
 import { zod2result } from "../lib/result.js";
 import { json } from "node:stream/consumers";
-import { routes } from "../lib/routes.js";
 import { URL } from "url";
+import { routes } from "../lib/routes.js";
 
-/** @type {<P extends keyof routes>(method: string, path: P, handler: (r: import("zod").infer<typeof routes[P]["request"]>) => Promise<[import("http2").OutgoingHttpHeaders, import("zod").infer<typeof routes[P]["response"]>]>) => ((stream: import("http2").ServerHttp2Stream, headers: import("http2").IncomingHttpHeaders) => Promise<boolean>)} */
-export function request(method, path, handler) {
+export function request<P extends keyof typeof routes>(method: string, path: P, handler: (r: import("zod").infer<typeof routes[P]["request"]>) => ((stream: import("http2").ServerHttp2Stream, headers: import("http2").IncomingHttpHeaders) => Promise<boolean>)) {
   let fn =
-    /**
-     *
-     * @param {import("http2").ServerHttp2Stream} stream
-     * @param {import("http2").IncomingHttpHeaders} headers
-     */
-    async (stream, headers) => {
+    
+    async (stream: import("http2").ServerHttp2Stream, headers: import("http2").IncomingHttpHeaders) => {
       try {
         let url = new URL(headers[":path"], "https://localhost:8443");
         if (

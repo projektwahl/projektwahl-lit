@@ -3,12 +3,7 @@ import { sql } from "../../database.js";
 import { request } from "../../express.js";
 import { checkPassword } from "../../password.js";
 
-/**
- *
- * @param {import("http2").ServerHttp2Stream} stream
- * @param {import("http2").IncomingHttpHeaders} headers
- */
-export async function loginHandler(stream, headers) {
+export async function loginHandler(stream: import("http2").ServerHttp2Stream, headers: import("http2").IncomingHttpHeaders) {
   return await request("POST", "/api/v1/login", async function (body) {
     /** @type {[import("../../../lib/types").Existing<Pick<import("../../../lib/types").RawUserType, "id"|"username"|"password_hash"|"password_salt">>?]} */
     const [dbUser] =
@@ -57,7 +52,7 @@ export async function loginHandler(stream, headers) {
     });
 
     /** @type {import("node:http2").OutgoingHttpHeaders} */
-    const headers = {
+    const headers: import("node:http2").OutgoingHttpHeaders = {
       "content-type": "text/json; charset=utf-8",
       ":status": 200,
       "set-cookie": [

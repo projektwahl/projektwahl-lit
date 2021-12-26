@@ -2,12 +2,7 @@ import { sql } from "../../database.js";
 import { request } from "../../express.js";
 import { hashPassword } from "../../password.js";
 
-/**
- *
- * @param {import("http2").ServerHttp2Stream} stream
- * @param {import("http2").IncomingHttpHeaders} headers
- */
-export async function createUsersHandler(stream, headers) {
+export async function createUsersHandler(stream: import("http2").ServerHttp2Stream, headers: import("http2").IncomingHttpHeaders) {
   // TODO FIXME create or update multiple
   return await request("POST", "/api/v1/users/create", async function (user) {
     try {

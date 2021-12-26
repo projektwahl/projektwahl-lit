@@ -42,10 +42,9 @@ export const rawProjectSchema = z.object({
 
 export const loginOutputSchema = result(z.void(), z.record(z.string()));
 
-/** @typedef {"/api/v1/login"|"/api/v1/openid-login"|"/api/v1/redirect"|"/api/v1/sleep"|"/api/v1/update"|"/api/v1/users/create"|"/api/v1/projects/create"|"/api/v1/users"|"/api/v1/projects"} keys */
+type keys = "/api/v1/login"|"/api/v1/openid-login"|"/api/v1/redirect"|"/api/v1/sleep"|"/api/v1/update"|"/api/v1/users/create"|"/api/v1/projects/create"|"/api/v1/users"|"/api/v1/projects";
 
-/** @type {{ [r in keys]: { request: import("zod").ZodType<any>, response: import("zod").ZodType<any> } }} */
-export const routes = /** @type {const} */ ({
+export const routes: { [r in keys]: { request: import("zod").ZodType<any>, response: import("zod").ZodType<any> } } = {
   "/api/v1/login": {
     request: loginInputSchema,
     response: loginOutputSchema,
@@ -82,4 +81,4 @@ export const routes = /** @type {const} */ ({
     request: z.undefined(),
     response: z.array(rawProjectSchema.extend({ id: z.number() })),
   },
-});
+} as const;

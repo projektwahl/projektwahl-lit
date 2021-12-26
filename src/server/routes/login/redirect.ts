@@ -3,12 +3,7 @@ import { sql } from "../../database.js";
 import { request } from "../../express.js";
 import { client } from "./openid-client.js";
 
-/**
- *
- * @param {import("http2").ServerHttp2Stream} stream
- * @param {import("http2").IncomingHttpHeaders} headers
- */
-export async function openidRedirectHandler(stream, headers) {
+export async function openidRedirectHandler(stream: import("http2").ServerHttp2Stream, headers: import("http2").IncomingHttpHeaders) {
   return await request("GET", "/api/v1/redirect", async function () {
     let url = new URL(headers[":path"], "https://localhost:8443");
 
@@ -67,7 +62,7 @@ export async function openidRedirectHandler(stream, headers) {
       });
 
       /** @type {import("node:http2").OutgoingHttpHeaders} */
-      const responseHeaders = {
+      const responseHeaders: import("node:http2").OutgoingHttpHeaders = {
         "content-type": "text/json; charset=utf-8",
         ":status": 302,
         location: "https://localhost:8443/",

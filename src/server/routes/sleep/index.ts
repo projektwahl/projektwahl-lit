@@ -1,11 +1,6 @@
 import { request } from "../../express.js";
 
-/**
- *
- * @param {import("http2").ServerHttp2Stream} stream
- * @param {import("http2").IncomingHttpHeaders} headers
- */
-export async function sleepHandler(stream, headers) {
+export async function sleepHandler(stream: import("http2").ServerHttp2Stream, headers: import("http2").IncomingHttpHeaders) {
   return await request("GET", "/api/v1/sleep", function () {
     return new Promise((resolve) => {
       setTimeout(() => {

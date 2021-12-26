@@ -1,12 +1,7 @@
 import { request } from "../../express.js";
 import { client } from "./openid-client.js";
 
-/**
- *
- * @param {import("http2").ServerHttp2Stream} stream
- * @param {import("http2").IncomingHttpHeaders} headers
- */
-export async function openidLoginHandler(stream, headers) {
+export async function openidLoginHandler(stream: import("http2").ServerHttp2Stream, headers: import("http2").IncomingHttpHeaders) {
   return await request("GET", "/api/v1/openid-login", async function () {
     // https://github.com/AzureAD/microsoft-authentication-library-for-js/tree/dev/lib/msal-browser
     // https://docs.microsoft.com/en-us/azure/active-directory/develop/scenario-spa-app-registration
@@ -22,7 +17,7 @@ export async function openidLoginHandler(stream, headers) {
     console.log(url);
 
     /** @type {import("node:http2").OutgoingHttpHeaders} */
-    const headers = {
+    const headers: import("node:http2").OutgoingHttpHeaders = {
       "content-type": "text/json; charset=utf-8",
       ":status": 302,
       location: url,

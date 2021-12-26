@@ -15,12 +15,7 @@ import { projectsHandler } from "./routes/projects/index.js";
 
 //const startTime = Date.now();
 
-/**
- *
- * @param {string} dir
- * @returns {AsyncIterable<string>}
- */
-export async function* getDirs(dir) {
+export async function* getDirs(dir: string): AsyncIterable<string> {
   yield dir;
   const dirents = await readdir(dir, { withFileTypes: true });
   for (const dirent of dirents) {
@@ -31,16 +26,9 @@ export async function* getDirs(dir) {
   }
 }
 
-/**
- *
- * @param {string} str
- * @param {RegExp} regex
- * @param {(match: string, args: any) => Promise<string>} asyncFn
- * @returns {Promise<string>}
- */
-async function replaceAsync(str, regex, asyncFn) {
+async function replaceAsync(str: string, regex: RegExp, asyncFn: (match: string, args: any) => Promise<string>): Promise<string> {
   /** @type {Promise<string>[]} */
-  const promises = [];
+  const promises: Promise<string>[] = [];
   str.replaceAll(regex, (match, ...args) => {
     const promise = asyncFn(match, args);
     promises.push(promise);
@@ -50,12 +38,7 @@ async function replaceAsync(str, regex, asyncFn) {
   return str.replaceAll(regex, () => /** @type {string} */ (data.shift()));
 }
 
-/**
- *
- * @param {import("http2").ServerHttp2Stream} stream
- * @param {import("http").IncomingHttpHeaders} headers
- */
-export async function serverHandler(stream, headers) {
+export async function serverHandler(stream: import("http2").ServerHttp2Stream, headers: import("http").IncomingHttpHeaders) {
   const path = z.string().parse(headers[":path"]);
 
   let url = new URL(path, "https://localhost:8443");
