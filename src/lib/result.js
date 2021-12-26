@@ -4,27 +4,27 @@
 import { z } from "zod";
 
 /**
- * @template {import("zod").ZodTypeAny} T
- * @param {T} zodObject 
- * @returns {z.ZodObject<{ success: true, data: T;}, "strict", z.ZodTypeAny>}
+ * @template {import("zod").ZodTypeAny} D
+ * @param {D} zodObject
+ * @returns {z.ZodObject<{ success: z.ZodLiteral<true>, data: D;}, "strict", z.ZodTypeAny>}
  */
 export const successResult = (zodObject) =>
   z
     .object({
-      success: true,
+      success: z.literal(true),
       data: zodObject,
     })
     .strict();
 
 /**
- * @template {import("zod").ZodTypeAny} T
- * @param {T} zodObject 
- * @returns {z.ZodObject<{ success: false, error: T;}, "strict", z.ZodTypeAny>}
+ * @template {import("zod").ZodTypeAny} E
+ * @param {E} zodObject 
+ * @returns {z.ZodObject<{ success: z.ZodLiteral<false>, error: E;}, "strict", z.ZodTypeAny>}
  */
 export const failureResult = (zodObject) =>
   z
     .object({
-      success: false,
+      success: z.literal(false),
       error: zodObject,
     })
     .strict();
@@ -35,7 +35,7 @@ export const failureResult = (zodObject) =>
  * @template {import("zod").ZodTypeAny} E
  * @param {D} successZodObject 
  * @param {E} failureZodObject 
- * @returns {z.ZodUnion<[z.ZodObject<{ data: D;}, "strict", z.ZodTypeAny>,z.ZodObject<{ error: E;}, "strict", z.ZodTypeAny>]>}
+ * @returns {z.ZodUnion<[z.ZodObject<{ success: z.ZodLiteral<true>, data: D;}, "strict", z.ZodTypeAny>, z.ZodObject<{ success: z.ZodLiteral<false>, error: E;}, "strict", z.ZodTypeAny>]>}
  */
 export const result = (successZodObject, failureZodObject) => z.union([successResult(successZodObject), failureResult(failureZodObject)]);
 

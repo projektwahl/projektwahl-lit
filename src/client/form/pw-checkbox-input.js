@@ -109,12 +109,12 @@ export class PwCheckboxInput extends LitElement {
         >
         ${this.task.render({
           complete: (v) =>
-            isErr(v) && v.failure[this.name] !== undefined
+            !v.success && v.error[this.name] !== undefined
               ? html` <div
                   id="${this.randomId}-feedback"
                   class="invalid-feedback"
                 >
-                  ${v.failure[this.name]}
+                  ${v.error[this.name]}
                 </div>`
               : undefined,
           error: () => undefined,
