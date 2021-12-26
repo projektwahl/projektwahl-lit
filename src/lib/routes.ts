@@ -26,18 +26,7 @@ export const rawUserVoterSchema = z
   })
   .strict();
 
-export const rawUserSchema = z.object({
-  type: z.enum(["helper", "admin", "voter"])
-}).passthrough().superRefine((value, ctx) => {
-  let schema = value.type === "voter" ? rawUserVoterSchema : rawUserHelperOrAdminSchema;
-  let parsed = schema.safeParse(value)
-  if (!parsed.success) {
-    parsed.error.issues.forEach(ctx.addIssue)
-  }
-}).transform(value => {
-  let schema = value.type === "voter" ? rawUserVoterSchema : rawUserHelperOrAdminSchema;
-  return schema.parse(value)
-})
+export const rawUserSchema = z.union([rawUserVoterSchema, rawUserHelperOrAdminSchema])
 
 export const rawProjectSchema = z.object({
   title: z.string().min(3).max(1024),
@@ -50,14 +39,6 @@ export const rawProjectSchema = z.object({
   max_participants: z.number().min(1).max(1000),
   random_assignments: z.boolean(),
 }).strict();
-
-/**
- * @template {z.AnyZodObject} T
- * @param {T} schema
- * @returns {z.ZodObject<z.extendShape<T, { id: ZodNumber }>>}
- */
-export const withId = (schema) =>
-  z.object({ id: z.number() }).extend(schema);
 
 export const loginOutputSchema = result(z.void(), z.record(z.string()));
 
@@ -87,18 +68,18 @@ export const routes = /** @type {const} */ ({
   },
   "/api/v1/users/create": {
     request: rawUserSchema,
-    response: result(withId(z.object({})), z.record(z.string())),
+    response: result(z.object({}).extend({ id: z.number() }), z.record(z.string())),
   },
   "/api/v1/projects/create": {
     request: rawProjectSchema,
-    response: result(withId(z.object({})), z.record(z.string())),
+    response: result(z.object({}).extend({ id: z.number() }), z.record(z.string())),
   },
   "/api/v1/users": {
     request: z.undefined(),
-    response: z.array(withId(rawUserSchema)),
+    response: z.array(z.union([rawUserVoterSchema.extend({ id: z.number() }), rawUserHelperOrAdminSchema.extend({ id: z.number() })])),
   },
   "/api/v1/projects": {
     request: z.undefined(),
-    response: z.array(withId(rawProjectSchema)),
+    response: z.array(rawProjectSchema.extend({ id: z.number() })),
   },
 });

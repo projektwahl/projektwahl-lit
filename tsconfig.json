@@ -13,7 +13,7 @@
     "noEmit": true,
     "allowJs": true,
     "checkJs": true,
-    "importsNotUsedAsValues": "error"
+    "importsNotUsedAsValues": "error",
   },
   "include": ["**/*.ts", "**/*.js"]
 }

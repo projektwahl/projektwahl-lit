@@ -123,11 +123,20 @@ export async function serverHandler(stream, headers) {
       // TODO FIXME caching (server+clientside)
 
       try {
-        let contents = await readFile(filename, {
-          encoding: "utf-8",
-        });
+        let contents;
+        try {
+          contents = await readFile(filename, {
+            encoding: "utf-8",
+          });
+        } catch (err) {
+          if (filename.endsWith(".js")) {
+            contents = await readFile(filename.slice(0, -3)+".ts", {
+              encoding: "utf-8",
+            });
+          }
+        }
 
-        if (extname(filename) === ".js") {
+        if (extname(filename) === ".js" || extname(filename) === ".ts") {
           contents = await replaceAsync(
             contents,
             /import( )?["']([^"']+)["']/g,
