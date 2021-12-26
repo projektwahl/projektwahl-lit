@@ -117,4 +117,3 @@ export class PwUserCreate extends PwForm {
 }
 customElements.define("pw-user-create", PwUserCreate);
 
-setupHmr(PwUserCreate, import.meta.url);

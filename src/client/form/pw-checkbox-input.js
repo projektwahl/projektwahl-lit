@@ -127,5 +127,3 @@ export class PwCheckboxInput extends LitElement {
   }
 }
 customElements.define("pw-checkbox-input", PwCheckboxInput);
-
-setupHmr(PwCheckboxInput, import.meta.url);

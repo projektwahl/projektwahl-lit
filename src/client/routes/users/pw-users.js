@@ -237,6 +237,5 @@ export let PwUsers = class extends LitElement {
   }
 };
 
-setupHmr(PwUsers, import.meta.url);
 
 customElements.define("pw-users", PwUsers);

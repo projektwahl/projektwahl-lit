@@ -106,5 +106,3 @@ export class PwOrder extends LitElement {
   }
 }
 customElements.define("pw-order", PwOrder);
-
-setupHmr(PwOrder, import.meta.url);

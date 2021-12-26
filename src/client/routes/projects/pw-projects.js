@@ -238,6 +238,5 @@ export let PwProjects = class extends LitElement {
   }
 };
 
-setupHmr(PwProjects, import.meta.url);
 
 customElements.define("pw-projects", PwProjects);

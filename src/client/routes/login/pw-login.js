@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // SPDX-FileCopyrightText: 2021 Moritz Hedtke <Moritz.Hedtke@t-online.de>
-import { html } from "lit";
+import { css, html } from "lit";
 import "../../form/pw-form.js";
 import { Task } from "@lit-labs/task";
 import { myFetch } from "../../utils.js";
@@ -22,7 +22,7 @@ export const pwLogin = async () => {
 /**
  * @extends PwForm<"/api/v1/login">
  */
-export class PwLogin extends PwForm {
+let PwLogin = class PwLogin extends PwForm {
   /** @override */ static get properties() {
     return {
       url: { attribute: false },
@@ -82,7 +82,11 @@ export class PwLogin extends PwForm {
     );
   }
 
-  /** @override */ getInputs = () => {
+  /** @override static styles = css`h3 {
+    color: blue;
+  }`*/
+
+  /** @override */ getInputs() {
     return html` <a
         class="btn btn-primary btn-lg w-100 my-5"
         href="/api/v1/openid-login"
@@ -91,7 +95,7 @@ export class PwLogin extends PwForm {
       >
 
       <h3 class="text-center">${msg("Login as guest")}</h3>
-      affdfff
+      
 
       <pw-text-input
         autocomplete="username"
@@ -114,6 +118,9 @@ export class PwLogin extends PwForm {
     this.forceTask = (this.forceTask || 0) + 1;
   };
 }
+
+PwLogin = setupHmr(import.meta.url, "PwLogin", PwLogin);
+
 customElements.define("pw-login", PwLogin);
 
-setupHmr(PwLogin, import.meta.url)
+export { PwLogin }

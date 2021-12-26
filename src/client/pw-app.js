@@ -20,11 +20,11 @@ import { configureLocalization, msg, str } from "@lit/localize";
 // Generated via output.localeCodesModule
 import { sourceLocale, targetLocales } from "./generated_locales/locales.js";
 
-export const { getLocale, setLocale } = configureLocalization({
+/**export const { getLocale, setLocale } = configureLocalization({
   sourceLocale,
   targetLocales,
   loadLocale: (locale) => import(`/src/client/generated_locales/${locale}.js`),
-});
+});*/
 
 /*
 // TODO FIXME show more details if possible (maybe error page)
@@ -53,7 +53,7 @@ export const pwApp = async (/** @type {URL} */ url) => {
 export const nextPage = async (/** @type {URL} */ url) => {
   try {
     if (url.pathname === "/login") {
-      setLocale("de");
+      //setLocale("de");
       return await pwLogin();
     } else if (url.pathname === "/users") {
       return await pwUsers(url);
@@ -71,7 +71,7 @@ export const nextPage = async (/** @type {URL} */ url) => {
   }
 };
 
-export let PwApp = class PwApp extends LitElement {
+let PwApp = class PwApp extends LitElement {
   /** @override */ static get properties() {
     return {
       last: { state: true },
@@ -120,6 +120,7 @@ export let PwApp = class PwApp extends LitElement {
     }
     return html`
       ${bootstrapCss}
+      
       <nav
         class="navbar navbar-expand-lg navbar-light bg-light shadow p-3 mb-5"
       >
@@ -220,6 +221,8 @@ export let PwApp = class PwApp extends LitElement {
   }
 };
 
-setupHmr(PwApp, import.meta.url);
+PwApp = setupHmr(import.meta.url, "PwApp", PwApp);
 
 customElements.define("pw-app", PwApp);
+
+export { PwApp }

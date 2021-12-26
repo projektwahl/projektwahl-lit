@@ -141,4 +141,3 @@ export class PwTextInput extends LitElement {
 }
 customElements.define("pw-text-input", PwTextInput);
 
-setupHmr(PwTextInput, import.meta.url);
