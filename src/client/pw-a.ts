@@ -14,7 +14,7 @@ export const aClick = (/** @type {MouseEvent} */ event) => {
 
 // this works really bad because bootstrap css styles usually need context information which is not there with this.
 export class PwADontUse extends LitElement {
-  /** @override */ static get properties() {
+  override static get properties() {
     return {
       href: { type: String },
       class: { type: String },
@@ -49,7 +49,7 @@ export class PwADontUse extends LitElement {
     HistoryController.goto(new URL(this.href, window.location.href), {});
   };
 
-  /** @override */ render() {
+  override render() {
     return html`${bootstrapCss}<a
         href=${ifDefined(this.href)}
         class=${ifDefined(this.class)}

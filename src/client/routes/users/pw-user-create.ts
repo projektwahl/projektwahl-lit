@@ -19,7 +19,7 @@ import "../../form/pw-text-input.js";
  * @extends PwForm<"/api/v1/users/create">
  */
 export class PwUserCreate extends PwForm {
-  /** @override */ static get properties() {
+  override static get properties() {
     return {
       url: { attribute: false },
       actionText: { type: String },
@@ -29,7 +29,7 @@ export class PwUserCreate extends PwForm {
     };
   }
 
-  /** @override */ get actionText() {
+  override get actionText() {
     return msg("Create/Update account");
   }
 
@@ -72,7 +72,7 @@ export class PwUserCreate extends PwForm {
     );
   }
 
-  /** @override */ getInputs = () => {
+  override getInputs = () => {
     return html`
       <pw-text-input
         label=${msg("Username")}

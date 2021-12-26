@@ -7,7 +7,7 @@ import { setupHmr } from "../hmr.js";
 import { msg, str } from "@lit/localize";
 
 export let PwEntityList = class <T> extends LitElement {
-  /** @override */ static get properties() {
+  override static get properties() {
     return {
       title: { type: String },
     };
@@ -25,7 +25,7 @@ export let PwEntityList = class <T> extends LitElement {
     this.history = new HistoryController(this, /.*/);
   }
 
-  /** @override */ render() {
+  override render() {
     if (this.title === undefined) {
       throw new Error(msg("component not fully initialized"));
     }

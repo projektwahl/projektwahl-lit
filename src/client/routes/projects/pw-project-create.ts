@@ -18,7 +18,7 @@ import "../../form/pw-checkbox-input.js";
  * @extends PwForm<"/api/v1/projects/create">
  */
 export class PwProjectCreate extends PwForm {
-  /** @override */ static get properties() {
+  override static get properties() {
     return {
       url: { attribute: false },
       actionText: { type: String },
@@ -28,7 +28,7 @@ export class PwProjectCreate extends PwForm {
     };
   }
 
-  /** @override */ get actionText() {
+  override get actionText() {
     return msg("Create/Update project");
   }
 
@@ -71,7 +71,7 @@ export class PwProjectCreate extends PwForm {
     );
   }
 
-  /** @override */ getInputs = () => {
+  override getInputs = () => {
     return html`
       <pw-text-input
         label=${msg("Title")}

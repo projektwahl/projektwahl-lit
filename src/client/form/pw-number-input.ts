@@ -8,9 +8,8 @@ import { setupHmr } from "../hmr.js";
 import { msg } from "@lit/localize";
 import { createRef, ref } from "lit/directives/ref.js";
 
-/** @template T */
-export class PwNumberInput extends LitElement {
-  /** @override */ static get properties() {
+export class PwNumberInput<T> extends LitElement {
+  override static get properties() {
     return {
       label: { type: String },
       name: { type: String },
@@ -55,12 +54,12 @@ export class PwNumberInput extends LitElement {
     return this;
   }
 
-  myformdataEventListener = (/** @type {CustomEvent} */ event) => {
+  myformdataEventListener = (event: CustomEvent) => {
     event.detail[this.name] =
       this.input.value?.value === "" ? null : this.input.value?.valueAsNumber;
   };
 
-  /** @override */ connectedCallback() {
+  override connectedCallback() {
     super.connectedCallback();
     console.log(this.closest("form"));
     this.closest("form")?.addEventListener(
@@ -69,7 +68,7 @@ export class PwNumberInput extends LitElement {
     );
   }
 
-  /** @override */ disconnectedCallback() {
+  override disconnectedCallback() {
     super.disconnectedCallback();
     this.closest("form")?.removeEventListener(
       "myformdata",
@@ -77,7 +76,7 @@ export class PwNumberInput extends LitElement {
     );
   }
 
-  /** @override */ render() {
+  override render() {
     if (
       this.label === undefined ||
       this.name === undefined ||

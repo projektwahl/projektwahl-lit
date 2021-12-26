@@ -22,7 +22,7 @@ export const pwLogin = async () => {
  * @extends PwForm<"/api/v1/login">
  */
 let PwLogin = class PwLogin extends PwForm {
-  /** @override */ static get properties() {
+  override static get properties() {
     return {
       url: { attribute: false },
       actionText: { type: String },
@@ -32,7 +32,7 @@ let PwLogin = class PwLogin extends PwForm {
     };
   }
 
-  /** @override */ get actionText() {
+  override get actionText() {
     return msg("Login");
   }
 
@@ -85,7 +85,7 @@ let PwLogin = class PwLogin extends PwForm {
     color: blue;
   }`*/
 
-  /** @override */ getInputs() {
+  override getInputs() {
     return html` <a
         class="btn btn-primary btn-lg w-100 my-5"
         href="/api/v1/openid-login"
@@ -111,7 +111,7 @@ let PwLogin = class PwLogin extends PwForm {
       ></pw-text-input>`;
   };
 
-  /** @override */ submit = (/** @type {SubmitEvent} */ event) => {
+  override submit = (/** @type {SubmitEvent} */ event) => {
     event.preventDefault();
 
     this.forceTask = (this.forceTask || 0) + 1;

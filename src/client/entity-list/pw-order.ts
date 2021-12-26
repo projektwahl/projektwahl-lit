@@ -8,7 +8,7 @@ import { msg, str } from "@lit/localize";
 
 /** @template T */
 export class PwOrder extends LitElement {
-  /** @override */ static get properties() {
+  override static get properties() {
     return {
       title: { type: String },
       name: { type: String },
@@ -35,7 +35,7 @@ export class PwOrder extends LitElement {
     this.history = new HistoryController(this, /.*/);
   }
 
-  /** @override */ render() {
+  override render() {
     if (this.title === undefined || this.name === undefined) {
       throw new Error(msg("component not fully initialized"));
     }

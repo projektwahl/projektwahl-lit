@@ -13,7 +13,7 @@ import { createRef, ref } from "lit/directives/ref.js";
 import { noChange } from "lit";
 import { aClick } from "../../pw-a.js";
 import { msg } from "@lit/localize";
-import "../projects/pw-projects.js";
+import "./pw-projects.js";
 
 export const pwProjects = async (/** @type {URL} */ url) => {
   let result = await taskFunction([url.searchParams]);
@@ -33,7 +33,7 @@ const taskFunction = async (
 };
 
 export let PwProjects = class extends LitElement {
-  /** @override */ static get properties() {
+  override static get properties() {
     return {
       task: { attribute: false },
       initial: { attribute: false },
@@ -69,14 +69,14 @@ export let PwProjects = class extends LitElement {
     this.initial;
   }
 
-  /** @override */ static styles = css`
+  override static styles = css`
     .table-cell-hover:hover {
       --bs-table-accent-bg: var(--bs-table-hover-bg);
       color: var(--bs-table-hover-color);
     }
   `;
 
-  /** @override */ render() {
+  override render() {
     if (!this.initialRender) {
       this.initialRender = true;
 

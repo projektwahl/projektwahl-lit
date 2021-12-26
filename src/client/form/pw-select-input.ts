@@ -10,7 +10,7 @@ import { createRef, ref } from "lit/directives/ref.js";
 
 /** @template T */
 export class PwSelectInput extends LitElement {
-  /** @override */ static get properties() {
+  override static get properties() {
     return {
       label: { type: String },
       name: { type: String },
@@ -64,7 +64,7 @@ export class PwSelectInput extends LitElement {
       this.input.value?.selectedIndex == -1 ? null : this.input.value?.value;
   };
 
-  /** @override */ connectedCallback() {
+  override connectedCallback() {
     super.connectedCallback();
     console.log(this.closest("form"));
     this.closest("form")?.addEventListener(
@@ -73,7 +73,7 @@ export class PwSelectInput extends LitElement {
     );
   }
 
-  /** @override */ disconnectedCallback() {
+  override disconnectedCallback() {
     super.disconnectedCallback();
     this.closest("form")?.removeEventListener(
       "myformdata",
@@ -81,7 +81,7 @@ export class PwSelectInput extends LitElement {
     );
   }
 
-  /** @override */ render() {
+  override render() {
     if (
       this.label === undefined ||
       this.name === undefined ||

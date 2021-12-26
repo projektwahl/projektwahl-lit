@@ -32,7 +32,7 @@ const taskFunction = async (
 };
 
 export let PwUsers = class extends LitElement {
-  /** @override */ static get properties() {
+  override static get properties() {
     return {
       task: { attribute: false },
       initial: { attribute: false },
@@ -68,14 +68,14 @@ export let PwUsers = class extends LitElement {
     this.initial;
   }
 
-  /** @override */ static styles = css`
+  override static styles = css`
     .table-cell-hover:hover {
       --bs-table-accent-bg: var(--bs-table-hover-bg);
       color: var(--bs-table-hover-color);
     }
   `;
 
-  /** @override */ render() {
+  override render() {
     if (!this.initialRender) {
       this.initialRender = true;
 

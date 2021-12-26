@@ -7,9 +7,8 @@ import { setupHmr } from "../hmr.js";
 import { msg } from "@lit/localize";
 import { createRef, ref } from "lit/directives/ref.js";
 
-/** @template T */
-export class PwCheckboxInput extends LitElement {
-  /** @override */ static get properties() {
+export class PwCheckboxInput<T> extends LitElement {
+  override static get properties() {
     return {
       label: { type: String },
       name: { type: String },
@@ -54,11 +53,11 @@ export class PwCheckboxInput extends LitElement {
     return this;
   }
 
-  myformdataEventListener = (/** @type {CustomEvent} */ event) => {
+  myformdataEventListener = (event: CustomEvent) => {
     event.detail[this.name] = this.input.value?.checked;
   };
 
-  /** @override */ connectedCallback() {
+  override connectedCallback() {
     super.connectedCallback();
     console.log(this.closest("form"));
     this.closest("form")?.addEventListener(
@@ -67,7 +66,7 @@ export class PwCheckboxInput extends LitElement {
     );
   }
 
-  /** @override */ disconnectedCallback() {
+  override disconnectedCallback() {
     super.disconnectedCallback();
     this.closest("form")?.removeEventListener(
       "myformdata",
@@ -75,7 +74,7 @@ export class PwCheckboxInput extends LitElement {
     );
   }
 
-  /** @override */ render() {
+  override render() {
     if (
       this.label === undefined ||
       this.name === undefined ||

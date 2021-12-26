@@ -75,7 +75,7 @@ export const nextPage = async (/** @type {URL} */ url) => {
 };
 
 let PwApp = class PwApp extends LitElement {
-  /** @override */ static get properties() {
+  override static get properties() {
     return {
       last: { state: true },
       current: { state: true },
@@ -113,7 +113,7 @@ let PwApp = class PwApp extends LitElement {
     this.initial;
   }
 
-  /** @override */ render() {
+  override render() {
     if (this.initial !== undefined && !this.initialUsed) {
       this.initialUsed = true;
       this.current = this.initial;

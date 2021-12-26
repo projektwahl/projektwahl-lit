@@ -10,15 +10,14 @@ import { setupHmr } from "../hmr.js";
 /**
  * @template {keyof import("../../lib/routes").routes} P
  */
-let PwForm = class PwForm extends LitElement {
-  /** @override */ static get properties() {
+let PwForm = class PwForm<T> extends LitElement {
+  override static get properties() {
     return {
       forceTask: { state: true },
     };
   }
 
-  /** @returns {string} */
-  get actionText() {
+  get actionText(): string {
     throw new Error("not implemented");
   }
 
@@ -40,7 +39,7 @@ let PwForm = class PwForm extends LitElement {
     this.form = createRef();
   }
 
-  submit = (/** @type {SubmitEvent} */ event) => {
+  submit = (event: SubmitEvent) => {
     event.preventDefault();
 
     this.forceTask = (this.forceTask || 0) + 1;
@@ -51,7 +50,7 @@ let PwForm = class PwForm extends LitElement {
   // this needs to be done dynamically as e.g. the create user form dynamically changes the form inputs
   // attributes. Otherwise we're eating errors and that's not healthy.xit
   /** @abstract @type {() => import("lit").TemplateResult} */
-  getInputs() {
+  getInputs(): import("lit").TemplateResult {
     throw new Error(msg("getInputs must be implemented by subclass"));
   };
 
@@ -86,7 +85,7 @@ if ('FormDataEvent' in window) {
     return this;
   }
 */
-  /** @override */ render() {
+  override render() {
     if (this.actionText === undefined) {
       throw new Error(msg("component not fully initialized"));
     }
