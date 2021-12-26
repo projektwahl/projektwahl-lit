@@ -19,6 +19,7 @@ import { configureLocalization, msg, str } from "@lit/localize";
 
 // Generated via output.localeCodesModule
 import { sourceLocale, targetLocales } from "./generated_locales/locales.js";
+import { pwProjects } from "./routes/projects/pw-projects.js";
 
 /**export const { getLocale, setLocale } = configureLocalization({
   sourceLocale,
@@ -59,6 +60,8 @@ export const nextPage = async (/** @type {URL} */ url) => {
       return await pwUsers(url);
     } else if (url.pathname === "/users/create") {
       return html`<pw-user-create></pw-user-create>`;
+    } else if (url.pathname === "/projects") {
+      return await pwProjects(url);
     } else if (url.pathname === "/projects/create") {
       return html`<pw-project-create></pw-project-create>`;
     } else {

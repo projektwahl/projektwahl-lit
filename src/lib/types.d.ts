@@ -3,52 +3,6 @@
 
 // TODO FIXME remove all this and convert to zod
 
-export type OptionalResult<
-  T,
-  E extends Partial<{ [key: string]: string }> = Partial<{
-    [key in keyof T]: string;
-  }>
-> = Result<T, E> | NoneResult<T, E>;
-
-export type Result<
-  T,
-  E extends Partial<{ [key: string]: string }> = Partial<{
-    [key in keyof T]: string;
-  }>
-> = SuccessResult<T, E> | FailureResult<T, E>;
-
-export type NoneResult<
-  T,
-  E extends Partial<{ [key: string]: string }> = Partial<{
-    [key in keyof T]: string;
-  }>
-> = {
-  result: "none";
-};
-
-export type SuccessResult<
-  T,
-  E extends Partial<{ [key: string]: string }> = Partial<{
-    [key in keyof T]: string;
-  }>
-> = {
-  result: "success";
-  success: T;
-};
-
-export type FailureResult<
-  T,
-  E extends Partial<{ [key: string]: string }> = Partial<{
-    [key in keyof T]: string;
-  }>
-> = {
-  result: "failure";
-  failure: E;
-};
-
-export type New<T> = T & { id?: number };
-export type Existing<T> = T & { id: number };
-
 export type RawSessionType = {
   session_id: string;
   created_at: Date;

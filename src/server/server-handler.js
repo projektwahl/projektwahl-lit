@@ -11,6 +11,7 @@ import path, { extname, relative } from "path/posix";
 import { z } from "zod";
 import { createProjectsHandler } from "./routes/projects/create-or-update.js";
 import { cwd } from "node:process";
+import { projectsHandler } from "./routes/projects/index.js";
 
 //const startTime = Date.now();
 
@@ -95,6 +96,7 @@ export async function serverHandler(stream, headers) {
       (await sleepHandler(stream, headers)) ||
       (await createUsersHandler(stream, headers)) ||
       (await createProjectsHandler(stream, headers)) ||
+      (await projectsHandler(stream, headers)) ||
       (await usersHandler(stream, headers));
 
     if (!executed) {

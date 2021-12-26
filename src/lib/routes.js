@@ -97,4 +97,8 @@ export const routes = /** @type {const} */ ({
     request: z.undefined(),
     response: z.array(withId(rawUserSchema)),
   },
+  "/api/v1/projects": {
+    request: z.undefined(),
+    response: z.array(withId(rawProjectSchema)),
+  },
 });

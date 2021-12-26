@@ -13,11 +13,11 @@ import { createRef, ref } from "lit/directives/ref.js";
 import { noChange } from "lit";
 import { aClick } from "../../pw-a.js";
 import { msg } from "@lit/localize";
-import "../users/pw-users.js";
+import "../projects/pw-projects.js";
 
 export const pwProjects = async (/** @type {URL} */ url) => {
   let result = await taskFunction([url.searchParams]);
-  return html`<pw-users .initial=${result}></pw-users>`;
+  return html`<pw-projects .initial=${result}></pw-projects>`;
 };
 
 const taskFunction = async (
@@ -208,7 +208,7 @@ export let PwProjects = class extends LitElement {
                           <td>
                             <a
                               class="btn btn-secondary"
-                              href="/users/edit/{entity.id}"
+                              href="/projects/edit/{entity.id}"
                               role="button"
                             >
                               <i class="bi bi-pen"></i>

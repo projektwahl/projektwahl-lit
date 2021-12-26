@@ -41,72 +41,6 @@ export const isOk = (result) => {
   return result.result === "success";
 };
 
-/** @type {<T,E extends { [key: string]: string } = { [key in keyof T]: string }>(value: T) => import("../lib/types.js").SuccessResult<T, E>} */
-export const ok = (value) => {
-  return {
-    result: "success",
-    success: value,
-  };
-};
-
-/** @type {<T,E extends { [key: string]: string | undefined } = { [key in keyof T]: string | undefined }>(error: E) => import("../lib/types.js").FailureResult<T, E>} */
-export const err = (error) => {
-  return {
-    result: "failure",
-    failure: error,
-  };
-};
-
-/** @type {<U,T,E extends { [key: string]: string } = { [key in keyof T]: string },>(result: import("../lib/types.js").Result<T, E>, op: (v: T) => import("../lib/types.js").Result<U, E>) => import("../lib/types.js").Result<U, E>} */
-export function andThen(result, op) {
-  if (!isOk(result)) {
-    return result;
-  }
-  return op(result.success);
-}
-
-/** @type {<T,E extends { [key: string]: string } = { [key in keyof T]: string }>(result: import("../lib/types.js").SuccessResult<T, E>) => T} */
-export function safeUnwrap(result) {
-  return result.success;
-}
-
-/** @type {<T,E extends { [key: string]: string } = { [key in keyof T]: string }>(result: import("../lib/types.js").OptionalResult<T, E>) => T} */
-export function unwrap(result) {
-  if (isOk(result)) {
-    return result.success;
-  }
-  throw new Error("can't unwrap Err");
-}
-
-/** @type {<T,E extends { [key: string]: string } = { [key in keyof T]: string }>(result: import("../lib/types.js").FailureResult<T, E>) => E} */
-export function safeUnwrapErr(result) {
-  return result.failure;
-}
-
-/** @type {<T,E extends { [key: string]: string } = { [key in keyof T]: string }>(result: import("../lib/types.js").OptionalResult<T, E>, defaultResult: T) => T} */
-export function orDefault(result, defaultResult) {
-  if (isOk(result)) {
-    return safeUnwrap(result);
-  }
-  return defaultResult;
-}
-
-/** @type {<Q,T,E extends { [key: string]: string } = { [key in keyof T]: string }>(result: import("../lib/types.js").OptionalResult<T, E>, fun: (val: T) => Q, defaultResult: Q) => Q} */
-export function mapOr(result, fun, defaultResult) {
-  if (isOk(result)) {
-    return fun(safeUnwrap(result));
-  }
-  return defaultResult;
-}
-
-/** @type {<T,E extends { [key: string]: string } = { [key in keyof T]: string }>(result: import("../lib/types.js").OptionalResult<T, E>, defaultError: E) => E} */
-export function errOrDefault(result, defaultError) {
-  if (isErr(result)) {
-    return safeUnwrapErr(result);
-  }
-  return defaultError;
-}
-
 /**
  * @template Output 
  * @template Input
@@ -118,21 +52,33 @@ export function errOrDefault(result, defaultError) {
         success: false;
         error: import("zod").ZodError<Input>;
       }}
- * @returns {import("../lib/types").Result<Output>}}
+ * @returns {{
+        success: true;
+        result: Output;
+      }
+    | {
+        success: false;
+        failure: Partial<{ [key in keyof Output]: string; }>;
+      }}
  */
 export function zod2result(input) {
   if (input.success) {
-    return ok(input.data);
+    return {
+      success: true,
+      result: input.data // TODO FIXME return our own result type to data and error instead of result and failure to match this.
+    };
   } else {
-    let flattenedErrors = input.error.flatten()
+    const flattenedErrors = input.error.flatten()
 
     /** @type {{[k: string]: string[];}} */
-    let errors = {
+    const errors = {
       ...(flattenedErrors.formErrors.length == 0 ? {} : {formErrors: flattenedErrors.formErrors}),
       ...flattenedErrors.fieldErrors
     }
-    let errors2 = /** @type {Partial<{ [key in keyof Output]: string; }>} */ (Object.fromEntries(Object.entries(errors).map(([k, v]) => [k, v.join(". ")])))
-    let retVal = err(errors2);
-    return retVal
+    const errors2 = /** @type {Partial<{ [key in keyof Output]: string; }>} */ (Object.fromEntries(Object.entries(errors).map(([k, v]) => [k, v.join(". ")])))
+    return {
+      success: false,
+      failure: errors2
+    };
   }
 }
