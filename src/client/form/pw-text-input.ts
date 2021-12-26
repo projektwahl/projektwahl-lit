@@ -60,7 +60,7 @@ export class PwTextInput<T> extends LitElement {
     return this;
   }
 
-  myformdataEventListener = (/** @type {CustomEvent} */ event) => {
+  myformdataEventListener = (event: CustomEvent) => {
     event.detail[this.name] = this.input.value?.value;
   };
 

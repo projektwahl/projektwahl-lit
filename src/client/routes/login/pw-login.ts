@@ -15,7 +15,7 @@ export const pwLogin = async (): Promise<import("lit").TemplateResult> => {
   return html`<pw-login .data=${content}></pw-login>`;
 };
 
-let PwLogin = class PwLogin extends PwForm<"/api/v1/login"> {
+class PwLogin extends PwForm<"/api/v1/login"> {
   static override get properties() {
     return {
       url: { attribute: false },
@@ -111,8 +111,6 @@ let PwLogin = class PwLogin extends PwForm<"/api/v1/login"> {
     this.forceTask = (this.forceTask || 0) + 1;
   };
 }
-
-PwLogin = setupHmr(import.meta.url, "PwLogin", PwLogin);
 
 customElements.define("pw-login", PwLogin);
 

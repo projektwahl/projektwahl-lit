@@ -27,7 +27,7 @@ class PwForm<P extends keyof typeof routes> extends LitElement {
 
   form: import("lit/directives/ref").Ref<HTMLFormElement>;
 
-  forceTask!: number;
+  forceTask: number | undefined;
 
   constructor() {
     super();
@@ -148,8 +148,6 @@ if ('FormDataEvent' in window) {
   }
 }
 
-const _PwForm = setupHmr(import.meta.url, "PwForm", PwForm);
+customElements.define("pw-form", PwForm);
 
-customElements.define("pw-form", _PwForm);
-
-export { _PwForm as PwForm }
+export { PwForm }

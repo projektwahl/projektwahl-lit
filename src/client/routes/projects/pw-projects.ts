@@ -14,6 +14,8 @@ import { noChange } from "lit";
 import { aClick } from "../../pw-a.js";
 import { msg } from "@lit/localize";
 import "./pw-projects.js";
+import type { routes } from "../../../lib/routes.js";
+import type { z } from "zod";
 
 export const pwProjects = async (url: URL) => {
   let result = await taskFunction([url.searchParams]);
@@ -41,34 +43,31 @@ class PwProjects<T> extends LitElement {
     };
   }
 
+  private history;
+
+  timer: Timeout;
+
+  private _apiTask!: Task<[URLSearchParams], z.infer<typeof routes["/api/v1/projects"]["response"]>>;
+
+  formRef;
+
+  initialRender: boolean;
+
+  initial: Promise<import("lit").TemplateResult> | undefined;
+
   constructor() {
     super();
 
-    /**
-     * @private
-     */
     this.history = new HistoryController(this, /\/projects/);
-
-    /** @type {Timeout} */
-    this.timer;
-
-    /**
-     * @private
-     */
-    this._apiTask;
 
     this.formRef = createRef();
 
-    /** @type {boolean} */
     this.initialRender = false;
 
-    /**
-     * @type {Promise<import("lit").TemplateResult> | undefined}
-     */
     this.initial;
   }
 
-  override static styles = css`
+  static override styles = css`
     .table-cell-hover:hover {
       --bs-table-accent-bg: var(--bs-table-hover-bg);
       color: var(--bs-table-hover-color);
@@ -83,7 +82,7 @@ class PwProjects<T> extends LitElement {
       this._apiTask = new Task(
         this,
         taskFunction,
-        () => /** @type {[URLSearchParams]} */ ([this.history.url.searchParams])
+        () => [this.history.url.searchParams] as [URLSearchParams]
       );
 
       if (this.initial !== undefined) {
@@ -119,10 +118,10 @@ class PwProjects<T> extends LitElement {
                   .getAll("order")
                   .forEach((v) => urlSearchParams.append("order", v));
                 HistoryController.goto(
-                  new URL(`?${urlSearchParams}`, window.location.href)
+                  new URL(`?${urlSearchParams}`, window.location.href), {}
                 );
               }}
-              @submit=${(e) => e.preventDefault()}
+              @submit=${(e: Event) => e.preventDefault()}
             >
               <table class="table">
                 <thead>

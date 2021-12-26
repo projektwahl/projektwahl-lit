@@ -35,8 +35,6 @@ export class PwProjectCreate extends PwForm<"/api/v1/projects/create"> {
     /** @type {number|undefined} */
     this.forceTask = undefined;
 
-    this.type = "voter";
-
     /**
      * @override
      */
