@@ -3,32 +3,32 @@
 
 // TODO FIXME remove all this and convert to zod
 
-export type RawSessionType = {
+type RawSessionType = {
   session_id: string;
   created_at: Date;
   updated_at: Date;
   user_id: number;
 };
 
-export type RawChoiceType = {
+type RawChoiceType = {
   user_id: number;
   project_id: number;
   rank: number;
 };
 
-export type ResettableChoiceType = {
+type ResettableChoiceType = {
   user_id: number;
   project_id: number;
   rank: number | null;
 };
 
-export type EntityResponseBody<T> = {
+type EntityResponseBody<T> = {
   entities: Array<T>;
   previousCursor: T | null;
   nextCursor: T | null;
 };
 
-export type BaseQuery<C> = {
+type BaseQuery<C> = {
   paginationDirection: "forwards" | "backwards";
   paginationCursor: C | null; // if this is null the start is at start/end depending on paginationDirection
   sorting: [keyof C, "ASC" | "DESC"][];
@@ -38,6 +38,6 @@ export type BaseQuery<C> = {
   };
 };
 
-export interface WritableTemplateStringsArray extends Array<string> {
+interface WritableTemplateStringsArray extends Array<string> {
   raw?: string[];
 }

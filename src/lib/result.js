@@ -1,81 +1,67 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // SPDX-FileCopyrightText: 2021 Moritz Hedtke <Moritz.Hedtke@t-online.de>
 
-import { z } from "zod";
+import { z, ZodObject } from "zod";
 
-export const noneResult = z
-  .object({
-    result: z.enum(["none"]),
-  })
-  .strict();
+const Dog = z.object({
+  name: z.string(),
+  age: z.number(),
+});
 
-export const successResult = (/** @type {ZodType<any>} */ zodObject) =>
+/**
+ * @template {import("zod").ZodTypeAny} T
+ * @param {T} zodObject 
+ * @returns {z.ZodObject<{ data: T;}, "strict", z.ZodTypeAny>}
+ */
+export const successResult = (zodObject) =>
   z
     .object({
-      result: z.enum(["success"]),
-      success: zodObject,
+      data: zodObject,
     })
     .strict();
 
-export const failureResult = (/** @type {ZodRecord<any>} */ zodObject) =>
+/**
+ * @template {import("zod").ZodTypeAny} T
+ * @param {T} zodObject 
+ * @returns {z.ZodObject<{ error: T;}, "strict", z.ZodTypeAny>}
+ */
+export const failureResult = (zodObject) =>
   z
     .object({
-      result: z.enum(["failure"]),
-      failure: zodObject,
+      error: zodObject,
     })
     .strict();
 
 // TODO FIXME this creates bad error messages - switch on enum "result" value
-export const result = (
-  /** @type {ZodType<any>} */ successZodObject,
-  /** @type {ZodRecord<any>} */ failureZodObject
-) => successResult(successZodObject).or(failureResult(failureZodObject));
-
-/** @type {<T,E extends { [key: string]: string } = { [key in keyof T]: string }>(result: import("../lib/types.js").OptionalResult<T, E>) => result is import("../lib/types.js").FailureResult<T, E>} */
-export const isErr = (result) => {
-  return result.result === "failure";
-};
-
-/** @type {<T,E extends { [key: string]: string } = { [key in keyof T]: string }>(result: import("../lib/types.js").OptionalResult<T, E>) => result is import("../lib/types.js").SuccessResult<T, E>} */
-export const isOk = (result) => {
-  return result.result === "success";
-};
-
 /**
- * @template Output 
- * @template Input
- * @param input {{
-        success: true;
-        data: Output;
-      }
-    | {
-        success: false;
-        error: import("zod").ZodError<Input>;
-      }}
- * @returns {{
-        success: true;
-        result: Output;
-      }
-    | {
-        success: false;
-        failure: Partial<{ [key in keyof Output]: string; }>;
-      }}
+ * @template {import("zod").ZodTypeAny} D
+ * @template {import("zod").ZodTypeAny} E
+ * @param {D} successZodObject 
+ * @param {E} failureZodObject 
+ * @returns {z.ZodUnion<[z.ZodObject<{ data: D;}, "strict", z.ZodTypeAny>,z.ZodObject<{ error: E;}, "strict", z.ZodTypeAny>]>}
  */
-export function zod2result(input) {
-  if (input.success) {
-    return {
-      success: true,
-      result: input.data // TODO FIXME return our own result type to data and error instead of result and failure to match this.
-    };
+export const result = (successZodObject, failureZodObject) => z.union([successResult(successZodObject), failureResult(failureZodObject)]);
+
+export const anyResult = result(z.any(), z.any());
+
+/** @type {z.infer<anyResult>} */
+let test;
+
+export const zod2result = /** 
+  @template {z.ZodTypeAny} T
+  @type <T extends z.ZodTypeAny>(schema: T, input: unknown) => z.infer<T> */ (schema, input) => {
+  const result = schema.safeParse(input);
+  if (result.success) {
+    return input;
   } else {
-    const flattenedErrors = input.error.flatten()
+    const flattenedErrors = result.error.flatten()
 
     /** @type {{[k: string]: string[];}} */
     const errors = {
       ...(flattenedErrors.formErrors.length == 0 ? {} : {formErrors: flattenedErrors.formErrors}),
       ...flattenedErrors.fieldErrors
     }
-    const errors2 = /** @type {Partial<{ [key in keyof Output]: string; }>} */ (Object.fromEntries(Object.entries(errors).map(([k, v]) => [k, v.join(". ")])))
+    const errors2 = /** @type {Partial<{ [key in keyof z.infer<T>]: string; }>} */ (Object.fromEntries(Object.entries(errors).map(([k, v]) => [k, v.join(". ")])))
     return {
       success: false,
       failure: errors2

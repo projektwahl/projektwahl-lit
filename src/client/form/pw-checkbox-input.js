@@ -3,7 +3,6 @@
 import { html, LitElement, noChange } from "lit";
 import { bootstrapCss } from "../index.js";
 import { HistoryController } from "../history-controller.js";
-import { isErr } from "../../lib/result.js";
 import { setupHmr } from "../hmr.js";
 import { msg } from "@lit/localize";
 import { createRef, ref } from "lit/directives/ref.js";
@@ -40,7 +39,10 @@ export class PwCheckboxInput extends LitElement {
     /** @type {string} */
     this.randomId;
 
-    /** @type {import("@lit-labs/task").Task} */
+    /** @type {import("../../lib/result.js").anyResult<number>} */
+    let test;
+
+    /** @type {import("@lit-labs/task").Task<any, z.infer<>>} */
     this.task;
 
     /** @type {string} */
@@ -96,7 +98,7 @@ export class PwCheckboxInput extends LitElement {
             error: () => "",
             pending: () => "",
             complete: (v) =>
-              isErr(v) && v.failure[this.name] !== undefined
+              !v.success && v.failure[this.name] !== undefined
                 ? "is-invalid"
                 : "is-valid",
             initial: () => "",

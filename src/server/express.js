@@ -23,14 +23,11 @@ export function request(method, path, handler) {
         ) {
           const body =
             headers[":method"] === "POST" ? await json(stream) : undefined;
-
-          const parsed = routes[path].request.safeParse(body);
-          const requestBody = zod2result(parsed);
-          if (requestBody.result == "success") {
+          const requestBody = zod2result(routes[path].request, body);
+          if (requestBody.success) {
             const [new_headers, responseBody] = await handler(
-              requestBody.success
+              requestBody.data
             );
-            console.log(responseBody);
             routes[path].response.parse(responseBody);
             stream.respond(new_headers);
             stream.end(JSON.stringify(responseBody));
