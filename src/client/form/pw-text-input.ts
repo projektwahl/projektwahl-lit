@@ -8,9 +8,8 @@ import { setupHmr } from "../hmr.js";
 import { msg } from "@lit/localize";
 import { createRef, ref } from "lit/directives/ref.js";
 
-/** @template T */
-export class PwTextInput extends LitElement {
-  override static get properties() {
+export class PwTextInput<T> extends LitElement {
+  static override get properties() {
     return {
       label: { type: String },
       name: { type: String },

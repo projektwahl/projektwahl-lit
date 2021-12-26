@@ -3,12 +3,7 @@
 
 import { z } from "zod";
 
-/**
- * @template {import("zod").ZodTypeAny} D
- * @param {D} zodObject
- * @returns {z.ZodObject<{ success: z.ZodLiteral<true>, data: D;}, "strict", z.ZodTypeAny>}
- */
-export const successResult = (zodObject) =>
+export const successResult = <D extends import("zod").ZodTypeAny>(zodObject: D): z.ZodObject<{ success: z.ZodLiteral<true>; data: D; }, "strict", z.ZodTypeAny> =>
   z
     .object({
       success: z.literal(true),
@@ -16,12 +11,7 @@ export const successResult = (zodObject) =>
     })
     .strict();
 
-/**
- * @template {import("zod").ZodTypeAny} E
- * @param {E} zodObject 
- * @returns {z.ZodObject<{ success: z.ZodLiteral<false>, error: E;}, "strict", z.ZodTypeAny>}
- */
-export const failureResult = (zodObject) =>
+export const failureResult = <E extends import("zod").ZodTypeAny>(zodObject: E): z.ZodObject<{ success: z.ZodLiteral<false>; error: E; }, "strict", z.ZodTypeAny> =>
   z
     .object({
       success: z.literal(false),
@@ -30,20 +20,11 @@ export const failureResult = (zodObject) =>
     .strict();
 
 // TODO FIXME this creates bad error messages - switch on enum "result" value
-/**
- * @template {import("zod").ZodTypeAny} D
- * @template {import("zod").ZodTypeAny} E
- * @param {D} successZodObject 
- * @param {E} failureZodObject 
- * @returns {z.ZodUnion<[z.ZodObject<{ success: z.ZodLiteral<true>, data: D;}, "strict", z.ZodTypeAny>, z.ZodObject<{ success: z.ZodLiteral<false>, error: E;}, "strict", z.ZodTypeAny>]>}
- */
-export const result = (successZodObject, failureZodObject) => z.union([successResult(successZodObject), failureResult(failureZodObject)]);
+export const result = <D extends import("zod").ZodTypeAny, E extends import("zod").ZodTypeAny>(successZodObject: D, failureZodObject: E): z.ZodUnion<[z.ZodObject<{ success: z.ZodLiteral<true>; data: D; }, "strict", z.ZodTypeAny>, z.ZodObject<{ success: z.ZodLiteral<false>; error: E; }, "strict", z.ZodTypeAny>]> => z.union([successResult(successZodObject), failureResult(failureZodObject)]);
 
 export const anyResult = result(z.any(), z.any());
 
-export const zod2result = /** 
-  @template {z.ZodTypeAny} T
-  @type <T extends z.ZodTypeAny>(schema: T, input: unknown) => z.infer<T> */ (schema, input) => {
+export const zod2result = <T extends z.ZodTypeAny>(schema: T, input: unknown): z.infer<T> => {
   const result = schema.safeParse(input);
   if (result.success) {
     return input;
@@ -51,7 +32,7 @@ export const zod2result = /**
     const flattenedErrors = result.error.flatten()
 
     /** @type {{[k: string]: string[];}} */
-    const errors = {
+    const errors: { [k: string]: string[]; } = {
       ...(flattenedErrors.formErrors.length == 0 ? {} : {formErrors: flattenedErrors.formErrors}),
       ...flattenedErrors.fieldErrors
     }

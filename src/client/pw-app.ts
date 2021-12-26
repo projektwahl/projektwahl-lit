@@ -46,12 +46,12 @@ ReactiveElement.enableWarning?.("change-in-update");
 // TODO FIXME create a pw-app directive that can be awaited on the server side.
 // so we actually get server side rendering with datae
 
-export const pwApp = async (/** @type {URL} */ url) => {
+export const pwApp = async (url: URL) => {
   let page = await nextPage(url);
   return html`<pw-app .initial=${Promise.resolve(page)}></pw-app>`;
 };
 
-export const nextPage = async (/** @type {URL} */ url) => {
+export const nextPage = async (url: URL) => {
   try {
     if (url.pathname === "/login") {
       //setLocale("de");
@@ -74,8 +74,8 @@ export const nextPage = async (/** @type {URL} */ url) => {
   }
 };
 
-let PwApp = class PwApp extends LitElement {
-  override static get properties() {
+ class PwApp extends LitElement {
+  static override get properties() {
     return {
       last: { state: true },
       current: { state: true },
@@ -223,8 +223,6 @@ let PwApp = class PwApp extends LitElement {
     `;
   }
 };
-
-PwApp = setupHmr(import.meta.url, "PwApp", PwApp);
 
 customElements.define("pw-app", PwApp);
 

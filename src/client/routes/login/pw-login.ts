@@ -10,19 +10,13 @@ import { msg } from "@lit/localize";
 import "../../form/pw-text-input.js";
 import { setupHmr } from "../../hmr.js";
 
-/**
- * @returns {Promise<import("lit").TemplateResult>}
- */
-export const pwLogin = async () => {
+export const pwLogin = async (): Promise<import("lit").TemplateResult> => {
   const content = 0; //await fetch("/api/v1/sleep").then((r) => r.text());
   return html`<pw-login .data=${content}></pw-login>`;
 };
 
-/**
- * @extends PwForm<"/api/v1/login">
- */
-let PwLogin = class PwLogin extends PwForm {
-  override static get properties() {
+let PwLogin = class PwLogin extends PwForm<"/api/v1/login"> {
+  static override get properties() {
     return {
       url: { attribute: false },
       actionText: { type: String },
@@ -111,7 +105,7 @@ let PwLogin = class PwLogin extends PwForm {
       ></pw-text-input>`;
   };
 
-  override submit = (/** @type {SubmitEvent} */ event) => {
+  override submit = (/** @type {SubmitEvent} */ event: SubmitEvent) => {
     event.preventDefault();
 
     this.forceTask = (this.forceTask || 0) + 1;

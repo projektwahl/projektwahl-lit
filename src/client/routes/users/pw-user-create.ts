@@ -15,11 +15,8 @@ import "../../form/pw-text-input.js";
 
 // TODO FIXME implement edit
 
-/**
- * @extends PwForm<"/api/v1/users/create">
- */
-export class PwUserCreate extends PwForm {
-  override static get properties() {
+export class PwUserCreate extends PwForm<"/api/v1/users/create"> {
+  static override get properties() {
     return {
       url: { attribute: false },
       actionText: { type: String },

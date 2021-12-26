@@ -9,7 +9,7 @@ import { msg } from "@lit/localize";
 import { createRef, ref } from "lit/directives/ref.js";
 
 export class PwNumberInput<T> extends LitElement {
-  override static get properties() {
+  static override get properties() {
     return {
       label: { type: String },
       name: { type: String },

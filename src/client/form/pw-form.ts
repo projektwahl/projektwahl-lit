@@ -7,11 +7,8 @@ import { HistoryController } from "../history-controller.js";
 import { msg } from "@lit/localize";
 import { setupHmr } from "../hmr.js";
 
-/**
- * @template {keyof import("../../lib/routes").routes} P
- */
-let PwForm = class PwForm<T> extends LitElement {
-  override static get properties() {
+class PwForm<P extends keyof routes> extends LitElement {
+  static override get properties() {
     return {
       forceTask: { state: true },
     };
@@ -150,8 +147,8 @@ if ('FormDataEvent' in window) {
   }
 }
 
-PwForm = setupHmr(import.meta.url, "PwForm", PwForm);
+const _PwForm = setupHmr(import.meta.url, "PwForm", PwForm);
 
-customElements.define("pw-form", PwForm);
+customElements.define("pw-form", _PwForm);
 
-export { PwForm }
+export { _PwForm as PwForm }

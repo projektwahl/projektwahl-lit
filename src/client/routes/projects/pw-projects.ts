@@ -15,13 +15,12 @@ import { aClick } from "../../pw-a.js";
 import { msg } from "@lit/localize";
 import "./pw-projects.js";
 
-export const pwProjects = async (/** @type {URL} */ url) => {
+export const pwProjects = async (url: URL) => {
   let result = await taskFunction([url.searchParams]);
   return html`<pw-projects .initial=${result}></pw-projects>`;
 };
 
-const taskFunction = async (
-  /** @type {[URLSearchParams]} */ [searchParams]
+const taskFunction = async ([searchParams]: [URLSearchParams]
 ) => {
   let response = await fetch(
     new URL(`/api/v1/projects?${searchParams}`, window.location.href),
@@ -32,8 +31,8 @@ const taskFunction = async (
   return await response.json();
 };
 
-export let PwProjects = class extends LitElement {
-  override static get properties() {
+class PwProjects<T> extends LitElement {
+  static override get properties() {
     return {
       task: { attribute: false },
       initial: { attribute: false },

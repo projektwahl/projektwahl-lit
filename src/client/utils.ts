@@ -3,13 +3,7 @@
 
 import { routes } from "../lib/routes.js";
 
-/**
- * @template {import("../lib/routes").keys} P
- * @param {P} url 
- * @param {RequestInit | undefined} options 
- * @returns {Promise<import("../lib/routes").routes[P]["response"]>}
- */
-export const myFetch = async (url, options) => {
+export const myFetch = async <P extends import("../lib/routes").keys>(url: P, options: RequestInit | undefined): Promise<import("../lib/routes").routes[P]["response"]> => {
   const response = await fetch(url.toString(), options);
   if (!response.ok) {
     try {
@@ -27,11 +21,7 @@ export const myFetch = async (url, options) => {
   return routes[url].response.parse(result)
 };
 
-/**
- *
- * @returns {Promise<void>}
- */
-export const sleep = () => {
+export const sleep = (): Promise<void> => {
   return new Promise((resolve) => {
     setTimeout(() => {
       resolve();

@@ -14,13 +14,12 @@ import { noChange } from "lit";
 import { aClick } from "../../pw-a.js";
 import { msg } from "@lit/localize";
 
-export const pwUsers = async (/** @type {URL} */ url) => {
+export const pwUsers = async (url: URL) => {
   let result = await taskFunction([url.searchParams]);
   return html`<pw-users .initial=${result}></pw-users>`;
 };
 
-const taskFunction = async (
-  /** @type {[URLSearchParams]} */ [searchParams]
+const taskFunction = async ([searchParams]: [URLSearchParams]
 ) => {
   let response = await fetch(
     new URL(`/api/v1/users?${searchParams}`, window.location.href),
@@ -31,8 +30,8 @@ const taskFunction = async (
   return await response.json();
 };
 
-export let PwUsers = class extends LitElement {
-  override static get properties() {
+class PwUsers extends LitElement {
+  static override get properties() {
     return {
       task: { attribute: false },
       initial: { attribute: false },
@@ -68,7 +67,7 @@ export let PwUsers = class extends LitElement {
     this.initial;
   }
 
-  override static styles = css`
+  static override styles = css`
     .table-cell-hover:hover {
       --bs-table-accent-bg: var(--bs-table-hover-bg);
       color: var(--bs-table-hover-color);

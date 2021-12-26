@@ -14,11 +14,8 @@ import "../../form/pw-checkbox-input.js";
 
 // TODO FIXME implement edit
 
-/**
- * @extends PwForm<"/api/v1/projects/create">
- */
-export class PwProjectCreate extends PwForm {
-  override static get properties() {
+export class PwProjectCreate extends PwForm<"/api/v1/projects/create"> {
+  static override get properties() {
     return {
       url: { attribute: false },
       actionText: { type: String },

@@ -1,6 +1,8 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // SPDX-FileCopyrightText: 2021 Moritz Hedtke <Moritz.Hedtke@t-online.de>
 
+import type { ReactiveControllerHost } from "lit";
+
 /** @typedef {Record<string, unknown>} HistoryState */
 
 /** @typedef {import('lit').ReactiveController} ReactiveController */
@@ -8,8 +10,8 @@
 /** @implements {ReactiveController} */
 export class HistoryController {
   constructor(
-    /** @type {import("lit").ReactiveControllerHost} */ host,
-    /** @type {RegExp} */ urlPattern
+    host: ReactiveControllerHost,
+    urlPattern: RegExp
   ) {
     /** @type {import("lit").ReactiveControllerHost} */
     this.host = host;
@@ -32,7 +34,7 @@ export class HistoryController {
   hostConnected() {
     this.url = new URL(window.location.href);
     this.state = /** @type HistoryState */ (window.history.state);
-    this.popstateListener = (/** @type {PopStateEvent} */ event) => {
+    this.popstateListener = (/** @type {PopStateEvent} */ event: PopStateEvent) => {
       this.url = new URL(window.location.href);
       this.state = /** @type {HistoryState} */ (event.state);
       if (this.urlPattern.test(this.url.pathname)) {
@@ -42,7 +44,7 @@ export class HistoryController {
     window.addEventListener("popstate", this.popstateListener);
 
     this.navigateListener = (
-      /** @type {CustomEvent<{url: URL;state: HistoryState;}>} */ event
+      /** @type {CustomEvent<{url: URL;state: HistoryState;}>} */ event: CustomEvent<{ url: URL; state: HistoryState; }>
     ) => {
       this.url = event.detail.url;
       this.state = event.detail.state;
@@ -57,7 +59,7 @@ export class HistoryController {
     window.removeEventListener("navigate", this.navigateListener);
   }
 
-  static goto(/** @type {URL} */ url, /** @type {HistoryState} */ state) {
+  static goto(url: URL, state: HistoryState) {
     window.history.pushState(state, "", url);
     const event = new CustomEvent("navigate", {
       bubbles: true,

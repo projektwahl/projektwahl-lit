@@ -6,7 +6,7 @@ import { HistoryController } from "./history-controller.js";
 import { ifDefined } from "lit/directives/if-defined.js";
 
 // TODO FIXME https://lit.dev/docs/components/events/#shadowdom-retargeting just use the approach shown there
-export const aClick = (/** @type {MouseEvent} */ event) => {
+export const aClick = (event: MouseEvent) => {
   event.preventDefault();
   let target = /** @type {HTMLAnchorElement} */ (event.target);
   HistoryController.goto(new URL(target.href, window.location.href), {});
@@ -14,7 +14,7 @@ export const aClick = (/** @type {MouseEvent} */ event) => {
 
 // this works really bad because bootstrap css styles usually need context information which is not there with this.
 export class PwADontUse extends LitElement {
-  override static get properties() {
+  static override get properties() {
     return {
       href: { type: String },
       class: { type: String },
@@ -24,7 +24,7 @@ export class PwADontUse extends LitElement {
   }
 
   // with this this may actually be usable again
-  /** @protected @override */ createRenderRoot() {
+  protected override createRenderRoot() {
     return this;
   }
 
@@ -44,7 +44,7 @@ export class PwADontUse extends LitElement {
     this.ariaCurrent;
   }
 
-  clickHandler = (/** @type {MouseEvent} */ event) => {
+  clickHandler = (event: MouseEvent) => {
     event.preventDefault();
     HistoryController.goto(new URL(this.href, window.location.href), {});
   };
