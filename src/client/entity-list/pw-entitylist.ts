@@ -6,8 +6,7 @@ import { HistoryController } from "../history-controller.js";
 import { setupHmr } from "../hmr.js";
 import { msg, str } from "@lit/localize";
 
-/** @template T */
-export let PwEntityList = class extends LitElement {
+export let PwEntityList = class <T> extends LitElement {
   /** @override */ static get properties() {
     return {
       title: { type: String },
@@ -51,7 +50,7 @@ export let PwEntityList = class extends LitElement {
         </div>
         <div class="col-3">
           <select
-            @change=${(/** @type {Event} */ event) => {
+            @change=${(event: Event) => {
               const url = new URL(window.location.href);
               url.searchParams.set("count", event.target.value);
               HistoryController.goto(url);
@@ -61,22 +60,22 @@ export let PwEntityList = class extends LitElement {
             aria-label="Default select example"
           >
             <option value="10">
-              ${((/** @type {number} */ count) => msg(str`${count} per page`))(
+              ${((/** @type {number} */ count: number) => msg(str`${count} per page`))(
                 10
               )}
             </option>
             <option value="25">
-              ${((/** @type {number} */ count) => msg(str`${count} per page`))(
+              ${((/** @type {number} */ count: number) => msg(str`${count} per page`))(
                 25
               )}
             </option>
             <option value="50">
-              ${((/** @type {number} */ count) => msg(str`${count} per page`))(
+              ${((/** @type {number} */ count: number) => msg(str`${count} per page`))(
                 50
               )}
             </option>
             <option value="100">
-              ${((/** @type {number} */ count) => msg(str`${count} per page`))(
+              ${((/** @type {number} */ count: number) => msg(str`${count} per page`))(
                 100
               )}
             </option>
