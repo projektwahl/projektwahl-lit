@@ -57,7 +57,7 @@ export const rawProjectSchema = z.object({
  * @returns {z.ZodObject<z.extendShape<T, { id: ZodNumber }>>}
  */
 export const withId = (schema) =>
-  schema.merge(z.object({ id: z.number() }));
+  z.object({ id: z.number() }).extend(schema);
 
 export const loginOutputSchema = result(z.void(), z.record(z.string()));
 
