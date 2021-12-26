@@ -8,7 +8,7 @@ import { ifDefined } from "lit/directives/if-defined.js";
 // TODO FIXME https://lit.dev/docs/components/events/#shadowdom-retargeting just use the approach shown there
 export const aClick = (event: MouseEvent) => {
   event.preventDefault();
-  let target = /** @type {HTMLAnchorElement} */ (event.target);
+  let target = event.target as HTMLAnchorElement;
   HistoryController.goto(new URL(target.href, window.location.href), {});
 };
 
@@ -28,20 +28,16 @@ export class PwADontUse extends LitElement {
     return this;
   }
 
+  href!: string;
+
+  class!: string | undefined;
+
+  role: "button" | undefined;
+
+  ariaCurrent!: "page" | "step" | "location" | "date" | "time" | "true" | "false"
+
   constructor() {
     super();
-
-    /** @type {string} */
-    this.href;
-
-    /** @type {string | undefined} */
-    this.class;
-
-    /** @type {"button" | undefined} */
-    this.role;
-
-    /** @type {"page" | "step" | "location" | "date" | "time" | "true" | "false"} */
-    this.ariaCurrent;
   }
 
   clickHandler = (event: MouseEvent) => {

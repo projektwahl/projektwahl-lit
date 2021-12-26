@@ -247,14 +247,7 @@ eventSource.addEventListener("message", async function (event) {
   }
 });
 
-/**
- * @template T
- * @param {string} importMetaUrl 
- * @param {string} name 
- * @param {T} clazz 
- * @return T
- */
-export function setupHmr(importMetaUrl, name, clazz) {
+export function setupHmr<T>(importMetaUrl: string, name: string, clazz: T) {
   hmrClasses.set(importMetaUrl, name)
   
   console.log("register", importMetaUrl, name, clazz)

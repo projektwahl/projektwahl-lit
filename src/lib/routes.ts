@@ -42,7 +42,7 @@ export const rawProjectSchema = z.object({
 
 export const loginOutputSchema = result(z.void(), z.record(z.string()));
 
-type keys = "/api/v1/login"|"/api/v1/openid-login"|"/api/v1/redirect"|"/api/v1/sleep"|"/api/v1/update"|"/api/v1/users/create"|"/api/v1/projects/create"|"/api/v1/users"|"/api/v1/projects";
+export type keys = "/api/v1/login"|"/api/v1/openid-login"|"/api/v1/redirect"|"/api/v1/sleep"|"/api/v1/update"|"/api/v1/users/create"|"/api/v1/projects/create"|"/api/v1/users"|"/api/v1/projects";
 
 function identity<T extends { [r in keys]: { request: import("zod").ZodType<any>, response: import("zod").ZodType<any> } }>(v: T) {
   return v;

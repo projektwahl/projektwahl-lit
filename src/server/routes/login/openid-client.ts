@@ -1,8 +1,8 @@
-import { Issuer } from "openid-client";
+import { Client, Issuer } from "openid-client";
 
 // OPENID_URL=https://login.microsoftonline.com/e92856e2-3074-46ed-a008-cf3da07639d1/v2.0 CLIENT_ID=0d214c62-06cc-4122-b448-55e18cca42c4
 
-let client = null;
+let client: Client | null = null;
 
 if (process.env["OPENID_URL"]) {
   if (!process.env["CLIENT_ID"]) {

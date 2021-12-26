@@ -14,7 +14,7 @@ import { until } from "lit/directives/until.js";
 import { pwLogin } from "./routes/login/pw-login.js";
 import { setupHmr } from "./hmr.js";
 import { pwUsers } from "./routes/users/pw-users.js";
-import Cookies from "js-cookie";
+import { get as getCookies } from "js-cookie";
 import { configureLocalization, msg, str } from "@lit/localize";
 
 // Generated via output.localeCodesModule
@@ -65,7 +65,7 @@ export const nextPage = async (url: URL) => {
     } else if (url.pathname === "/projects/create") {
       return html`<pw-project-create></pw-project-create>`;
     } else {
-      return msg(str`Not Found`);
+      return msg(html`Not Found`);
     }
   } catch (error) {
     return html`<div class="alert alert-danger" role="alert">
@@ -84,33 +84,22 @@ export const nextPage = async (url: URL) => {
     };
   }
 
+  private last: Promise<import("lit").TemplateResult> | undefined;
+
+  private history;
+
+  private current: Promise<import("lit").TemplateResult> | undefined;
+
+  initialUsed: boolean;
+
+  initial: Promise<import("lit").TemplateResult> | undefined;
+
   constructor() {
     super();
 
-    /**
-     * @private
-     * @type {Promise<import("lit").TemplateResult> | undefined}
-     */
-    this.last;
-
-    /**
-     * @private
-     */
     this.history = new HistoryController(this, /.*/);
 
-    /**
-     * @private
-     * @type {Promise<import("lit").TemplateResult>}
-     */
-    this.current;
-
-    /** @type {boolean} */
     this.initialUsed = false;
-
-    /**
-     * @type {Promise<import("lit").TemplateResult> | undefined}
-     */
-    this.initial;
   }
 
   override render() {
@@ -187,10 +176,10 @@ export const nextPage = async (url: URL) => {
               </li>
             </ul>
             <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
-              ${Cookies.get("username")
+              ${getCookies("username")
                 ? html`<li class="nav-item">
                     <a @click=${aClick} class="nav-link" href="#"
-                      >${msg(str`Logout ${Cookies.get("username")}`)}</a
+                      >${msg(str`Logout ${getCookies("username")}`)}</a
                     >
                   </li>`
                 : html` <li class="nav-item">
@@ -200,7 +189,7 @@ export const nextPage = async (url: URL) => {
                         active: this.history.url.pathname === "/login",
                       })}"
                       href="/login"
-                      >${msg(str`Login ${JSON.stringify(Cookies.get())}`)}</a
+                      >${msg(str`Login ${JSON.stringify(getCookies("username"))}`)}</a
                     >
                   </li>`}
             </ul>
