@@ -1,21 +1,17 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // SPDX-FileCopyrightText: 2021 Moritz Hedtke <Moritz.Hedtke@t-online.de>
 
-import { z, ZodObject } from "zod";
-
-const Dog = z.object({
-  name: z.string(),
-  age: z.number(),
-});
+import { z } from "zod";
 
 /**
  * @template {import("zod").ZodTypeAny} T
  * @param {T} zodObject 
- * @returns {z.ZodObject<{ data: T;}, "strict", z.ZodTypeAny>}
+ * @returns {z.ZodObject<{ success: true, data: T;}, "strict", z.ZodTypeAny>}
  */
 export const successResult = (zodObject) =>
   z
     .object({
+      success: true,
       data: zodObject,
     })
     .strict();
@@ -23,11 +19,12 @@ export const successResult = (zodObject) =>
 /**
  * @template {import("zod").ZodTypeAny} T
  * @param {T} zodObject 
- * @returns {z.ZodObject<{ error: T;}, "strict", z.ZodTypeAny>}
+ * @returns {z.ZodObject<{ success: false, error: T;}, "strict", z.ZodTypeAny>}
  */
 export const failureResult = (zodObject) =>
   z
     .object({
+      success: false,
       error: zodObject,
     })
     .strict();
@@ -43,9 +40,6 @@ export const failureResult = (zodObject) =>
 export const result = (successZodObject, failureZodObject) => z.union([successResult(successZodObject), failureResult(failureZodObject)]);
 
 export const anyResult = result(z.any(), z.any());
-
-/** @type {z.infer<anyResult>} */
-let test;
 
 export const zod2result = /** 
   @template {z.ZodTypeAny} T

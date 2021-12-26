@@ -39,10 +39,7 @@ export class PwCheckboxInput extends LitElement {
     /** @type {string} */
     this.randomId;
 
-    /** @type {import("../../lib/result.js").anyResult<number>} */
-    let test;
-
-    /** @type {import("@lit-labs/task").Task<any, z.infer<>>} */
+    /** @type {import("@lit-labs/task").Task<any, import("zod").infer<typeof import("../../lib/result.js").anyResult>>} */
     this.task;
 
     /** @type {string} */
@@ -98,7 +95,7 @@ export class PwCheckboxInput extends LitElement {
             error: () => "",
             pending: () => "",
             complete: (v) =>
-              !v.success && v.failure[this.name] !== undefined
+              !v.success && v.error[this.name] !== undefined
                 ? "is-invalid"
                 : "is-valid",
             initial: () => "",
