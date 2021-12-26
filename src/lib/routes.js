@@ -61,7 +61,9 @@ export const withId = (/** @type {import("zod").ZodType<any>} */ schema) =>
 
 export const loginOutputSchema = result(z.void(), z.record(z.string()));
 
-/* @type {{ [r in "/api/v1/login"|"/api/v1/sleep"]: { request: ZodType<any>, response: ZodType<any> } }} */
+/** @typedef {"/api/v1/login"|"/api/v1/openid-login"|"/api/v1/redirect"|"/api/v1/sleep"|"/api/v1/update"|"/api/v1/users/create"|"/api/v1/projects/create"|"/api/v1/users"|"/api/v1/projects"} keys */
+
+/** @type {{ [r in keys]: { request: import("zod").ZodType<any>, response: import("zod").ZodType<any> } }} */
 export const routes = /** @type {const} */ ({
   "/api/v1/login": {
     request: loginInputSchema,

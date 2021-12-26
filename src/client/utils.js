@@ -4,7 +4,7 @@
 import { routes } from "../lib/routes";
 
 /**
- * @template {keyof import("../lib/routes").routes} P
+ * @template {import("../lib/routes").keys} P
  * @param {P} url 
  * @param {RequestInit | undefined} options 
  * @returns {Promise<import("../lib/result.js").result<import("../lib/routes").routes[P],{ network?: string } & { [key in keyof import("../lib/routes").routes[P]]?: string }>>}
