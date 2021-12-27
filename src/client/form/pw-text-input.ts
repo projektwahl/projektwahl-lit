@@ -61,7 +61,7 @@ export class PwTextInput<T> extends LitElement {
   }
 
   myformdataEventListener = (event: CustomEvent) => {
-    event.detail[this.name] = this.input.value?.value;
+    event.detail[this.name] = this.input.value!.value;
   };
 
   override connectedCallback() {

@@ -25,7 +25,7 @@ export const pwProjects = async (url: URL) => {
 const taskFunction = async ([searchParams]: [URLSearchParams]
 ) => {
   let response = await fetch(
-    new URL(`/api/v1/projects?${searchParams}`, window.location.href),
+    new URL(`/api/v1/projects?${searchParams}`, window.location.href).toString(),
     {
       //agent: new Agent({rejectUnauthorized: false})
     }
@@ -45,8 +45,6 @@ class PwProjects<T> extends LitElement {
 
   private history;
 
-  timer: Timeout;
-
   private _apiTask!: Task<[URLSearchParams], z.infer<typeof routes["/api/v1/projects"]["response"]>>;
 
   formRef;
@@ -60,7 +58,7 @@ class PwProjects<T> extends LitElement {
 
     this.history = new HistoryController(this, /\/projects/);
 
-    this.formRef = createRef();
+    this.formRef = createRef<HTMLFormElement>();
 
     this.initialRender = false;
 
@@ -88,6 +86,7 @@ class PwProjects<T> extends LitElement {
       if (this.initial !== undefined) {
         // TODO FIXME goddammit the private attributes get minified
         this._apiTask.status = TaskStatus.COMPLETE;
+        // @ts-expect-error See https://github.com/lit/lit/issues/2367
         this._apiTask.P = this.initial;
       }
     }
@@ -110,7 +109,7 @@ class PwProjects<T> extends LitElement {
             <form
               ${ref(this.formRef)}
               @input=${() => {
-                const urlSearchParams = new URLSearchParams(
+                const urlSearchParams = new URLSearchParams( // @ts-expect-error probably wrong typings
                   new FormData(this.formRef.value)
                 );
                 urlSearchParams.delete("order");

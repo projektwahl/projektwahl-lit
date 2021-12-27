@@ -50,8 +50,8 @@ export class PwEntityList<T> extends LitElement {
           <select
             @change=${(event: Event) => {
               const url = new URL(window.location.href);
-              url.searchParams.set("count", event.target?.value);
-              HistoryController.goto(url);
+              url.searchParams.set("count", (event.target as HTMLSelectElement).value);
+              HistoryController.goto(url, {});
             }}
             .value=${this.history.url.searchParams.get("count")}
             class="form-select"

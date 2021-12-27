@@ -1,6 +1,8 @@
 // SPDX-License-Identifier: MIT
 // SPDX-FileCopyrightText: 2018 open-wc
 
+// @ts-nocheck
+/* eslint-disable no-param-reassign, no-console */
 
 // Adapted from https://github.com/open-wc/open-wc/blob/master/packages/dev-server-hmr/src/presets/litElement.js licensed under MIT License
 import { adoptStyles, LitElement } from 'lit';
@@ -20,11 +22,7 @@ LitElement.prototype.hotReplacedCallback = function hotReplacedCallback() {
   this.requestUpdate();
 };
 
-
 // Adapted from https://github.com/open-wc/open-wc/blob/master/packages/dev-server-hmr/src/wcHmrRuntime.js licensed under MIT License
-
-// @ts-nocheck
-/* eslint-disable no-param-reassign, no-console */
 
 // override global define to allow double registrations
 const originalDefine = window.customElements.define;
@@ -242,8 +240,6 @@ eventSource.addEventListener("message", async function (event) {
     const name = hmrClasses.get(updatedUrl.toString())
 
     console.log("update", updatedUrl.toString(), name, response[name])
-
-    //register(updatedUrl.toString(), name, response[name])
   }
 });
 

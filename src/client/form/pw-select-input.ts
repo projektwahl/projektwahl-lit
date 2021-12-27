@@ -47,8 +47,7 @@ export class PwSelectInput<T> extends LitElement {
 
     this.history = new HistoryController(this, /.*/);
 
-    /** @type {import("lit/directives/ref").Ref<HTMLSelectElement>} */
-    this.input = createRef();
+    this.input = createRef<HTMLSelectElement>();
   }
 
   // because forms in shadow root are garbage
@@ -58,7 +57,7 @@ export class PwSelectInput<T> extends LitElement {
 
   myformdataEventListener = (event: CustomEvent) => {
     event.detail[this.name] =
-      this.input.value?.selectedIndex == -1 ? null : this.input.value?.value;
+      this.input.value!.selectedIndex == -1 ? null : this.input.value!.value;
   };
 
   override connectedCallback() {
