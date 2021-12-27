@@ -12,6 +12,7 @@ import { z } from "zod";
 import { createOrUpdateProjectsHandler } from "./routes/projects/create-or-update.js";
 import { cwd } from "node:process";
 import { projectsHandler } from "./routes/projects/index.js";
+import esbuild from 'esbuild'
 
 //const startTime = Date.now();
 
@@ -27,7 +28,6 @@ export async function* getDirs(dir: string): AsyncIterable<string> {
 }
 
 async function replaceAsync(str: string, regex: RegExp, asyncFn: (match: string, args: any) => Promise<string>): Promise<string> {
-  /** @type {Promise<string>[]} */
   const promises: Promise<string>[] = [];
   str.replaceAll(regex, (match, ...args) => {
     const promise = asyncFn(match, args);
@@ -116,6 +116,11 @@ export async function serverHandler(stream: import("http2").ServerHttp2Stream, h
             contents = await readFile(filename.slice(0, -3)+".ts", {
               encoding: "utf-8",
             });
+            const result = await esbuild.transform(contents, {
+              
+            })
+            console.warn(result.warnings)
+            contents = result.code
           } else {
             throw err;
           }

@@ -14,7 +14,7 @@ import { until } from "lit/directives/until.js";
 import { pwLogin } from "./routes/login/pw-login.js";
 import { setupHmr } from "./hmr.js";
 import { pwUsers } from "./routes/users/pw-users.js";
-import { get as getCookies } from "js-cookie";
+import jscookie from "js-cookie";
 import { configureLocalization, msg, str } from "@lit/localize";
 
 // Generated via output.localeCodesModule
@@ -176,10 +176,10 @@ export const nextPage = async (url: URL) => {
               </li>
             </ul>
             <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
-              ${getCookies("username")
+              ${jscookie.get("username")
                 ? html`<li class="nav-item">
                     <a @click=${aClick} class="nav-link" href="#"
-                      >${msg(str`Logout ${getCookies("username")}`)}</a
+                      >${msg(str`Logout ${jscookie.get("username")}`)}</a
                     >
                   </li>`
                 : html` <li class="nav-item">
@@ -189,7 +189,7 @@ export const nextPage = async (url: URL) => {
                         active: this.history.url.pathname === "/login",
                       })}"
                       href="/login"
-                      >${msg(str`Login ${JSON.stringify(getCookies("username"))}`)}</a
+                      >${msg(str`Login ${JSON.stringify(jscookie.get("username"))}`)}</a
                     >
                   </li>`}
             </ul>

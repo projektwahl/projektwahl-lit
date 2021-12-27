@@ -1,4 +1,4 @@
-import { PostgresError } from "postgres";
+import postgres from "postgres";
 import { sql } from "../../database.js";
 import { request } from "../../express.js";
 
@@ -67,8 +67,8 @@ export async function createOrUpdateProjectsHandler(stream: import("http2").Serv
             data: row,
           },
         ];
-      } catch (/** @type {unknown} */ error: unknown) {
-        if (error instanceof PostgresError) {
+      } catch (error: unknown) {
+        if (error instanceof postgres.PostgresError) {
           if (
             error.code === "23505" &&
             error.constraint_name === "users_username_key"
