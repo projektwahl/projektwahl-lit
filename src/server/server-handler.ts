@@ -100,6 +100,7 @@ export async function serverHandler(stream: import("http2").ServerHttp2Stream, h
 
     if (
       filename.startsWith(join(baseUrl, "/src/")) ||
+      filename.startsWith(join(baseUrl, "/dist/")) ||
       filename.startsWith(join(baseUrl, "/node_modules/")) ||
       filename.startsWith(join(baseUrl, "/lit/"))
     ) {
