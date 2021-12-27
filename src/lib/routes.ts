@@ -8,27 +8,39 @@ export const loginInputSchema = z
   })
   .strict();
 
+const rawUserCommon = {
+  id: z.number(),
+  username: z.string().min(3).max(100),
+  openid_id: z.string().optional(),
+  password_hash: z.string(),
+  password_salt: z.string(),
+  away: z.boolean(),
+  project_leader_id: z.number(),
+  password_changed: z.boolean(),
+  force_in_project_id: z.number(),
+  computed_in_project_id: z.number(),
+}
+
 export const rawUserHelperOrAdminSchema = z
   .object({
     type: z.enum(["helper", "admin"]),
-    username: z.string().min(3).max(100),
-    away: z.boolean(),
+    ...rawUserCommon
   })
   .strict();
 
 export const rawUserVoterSchema = z
   .object({
     type: z.enum(["voter"]),
-    username: z.string().min(3).max(100),
     group: z.string().min(1).max(100),
     age: z.number().min(0).max(200),
-    away: z.boolean(),
+    ...rawUserCommon
   })
   .strict();
 
 export const rawUserSchema = z.union([rawUserVoterSchema, rawUserHelperOrAdminSchema])
 
 export const rawProjectSchema = z.object({
+  id: z.number(),
   title: z.string().min(3).max(1024),
   info: z.string().min(1).max(8192),
   place: z.string().min(1).max(1024),

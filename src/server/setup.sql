@@ -31,14 +31,13 @@ CREATE TABLE IF NOT EXISTS users (
   password_hash BYTEA,
   password_salt BYTEA,
   type user_type NOT NULL,
-  project_leader_id INTEGER, -- TODO FIXME maybe m:n as somebody could theoretically be in multiple projects?
+  project_leader_id INTEGER, -- TODO FIXME maybe m:n as somebody could theoretically be leader in multiple projects?
   "group" VARCHAR(16),
   age INTEGER,
   away BOOLEAN NOT NULL DEFAULT FALSE,
   password_changed BOOLEAN NOT NULL DEFAULT FALSE,
   force_in_project_id INTEGER, -- this should still be stored here even with openid as we can't join on it otherwise
   computed_in_project_id INTEGER, -- this should still be stored here even with openid as we can't join on it otherwise
-  -- TODO maybe add computed_in_project_id so you can manually force people in a project and this doesn't break when calculating
   FOREIGN KEY (project_leader_id)
     REFERENCES projects(id)
     ON UPDATE RESTRICT

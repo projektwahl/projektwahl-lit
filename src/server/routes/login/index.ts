@@ -7,7 +7,7 @@ import { checkPassword } from "../../password.js";
 
 export async function loginHandler(stream: import("http2").ServerHttp2Stream, headers: import("http2").IncomingHttpHeaders) {
   return await request("POST", "/api/v1/login", async function (body) {
-    const dbUser = z.union([rawUserVoterSchema.extend({ id: z.number(), password_hash: z.string(), password_salt: z.string() }), rawUserHelperOrAdminSchema.extend({ id: z.number(), password_hash: z.string(), password_salt: z.string() })]).parse((await sql`SELECT id, username, password_hash, password_salt, type FROM users WHERE username = ${body.username} LIMIT 1`)[0]);
+    const dbUser = z.union([rawUserVoterSchema, rawUserHelperOrAdminSchema]).parse((await sql`SELECT id, username, password_hash, password_salt, type FROM users WHERE username = ${body.username} LIMIT 1`)[0]);
 
     if (dbUser === undefined) {
       return [
