@@ -1,3 +1,4 @@
+import { routes } from "../../../lib/routes.js";
 import { sql } from "../../database.js";
 import { fetchData } from "../../entities.js";
 import { request } from "../../express.js";
@@ -5,7 +6,7 @@ import { sql2 } from "../../sql/index.js";
 
 export async function usersHandler(stream: import("http2").ServerHttp2Stream, headers: import("http2").IncomingHttpHeaders) {
   return await request("GET", "/api/v1/users", async function () {
-    const url = new URL(headers[":path"], "https://localhost:8443");
+    const url = new URL(headers[":path"]!, "https://localhost:8443");
 
     // TODO FIXME validation
 
@@ -40,7 +41,7 @@ I think in the UI we will never be able to implement this without javascript and
       }
     );
 
-    let result = await sql(...value);
+    let result = routes["/api/v1/users"].response.parse(await sql(...value));
 
     return [
       {

@@ -1,6 +1,8 @@
 // https://github.com/porsager/postgres/
 // https://www.postgresql.org/docs/current/protocol.html
 
+import type { WritableTemplateStringsArray } from "../../lib/types";
+
 // postgres can "Extended Query" execute BEGIN; and COMMIT;? seems like yes
 // https://www.postgresql.org/docs/current/protocol-message-types.html
 // https://www.postgresql.org/docs/current/protocol-message-formats.html
@@ -9,12 +11,10 @@
 
 // https://github.com/porsager/postgres-benchmarks
 
-
 export function unsafe2(string: string): [TemplateStringsArray, ...any[]] {
-  /** @type {import("../../lib/types").WritableTemplateStringsArray} */
   let r: import("../../lib/types").WritableTemplateStringsArray = [string];
   r.raw = [string];
-  return [/** @type {TemplateStringsArray} */ (r)];
+  return [r as TemplateStringsArray];
 }
 
 export function sql2(_strings: TemplateStringsArray, ..._keys: (string | [TemplateStringsArray, ...(string | string[] | boolean | number)[]] | [TemplateStringsArray, ...(string | string[] | boolean | number)[]][] | string[] | boolean | number)[]): [TemplateStringsArray, ...(string | string[] | boolean | number)[]] {
@@ -22,18 +22,15 @@ export function sql2(_strings: TemplateStringsArray, ..._keys: (string | [Templa
   const keys = _keys;
   //console.log("sql", strings, keys)
 
-  /** @type {import("../../lib/types").WritableTemplateStringsArray} */
   const r: import("../../lib/types").WritableTemplateStringsArray = [""];
   r.raw = [""];
 
-  /** @type {import("../../lib/types").WritableTemplateStringsArray} */
   const rd: import("../../lib/types").WritableTemplateStringsArray = ["", ""];
   rd.raw = ["", ""];
 
   const stringsAsTemplates = strings.map(unsafe2);
 
   // array of templates
-  /** @type {[TemplateStringsArray, ...(string|string[]|boolean|number)[]][]} */
   const flattened: [TemplateStringsArray, ...(string | string[] | boolean | number)[]][] = stringsAsTemplates.flatMap((m, i) => {
     if (i == keys.length) {
       return [m];
@@ -58,8 +55,7 @@ export function sql2(_strings: TemplateStringsArray, ..._keys: (string | [Templa
   //console.log("flattened", flattened)
 
   const result = flattened.reduce((previous, current) => {
-    /** @type {import("../../lib/types").WritableTemplateStringsArray} */
-    const templateStrings: import("../../lib/types").WritableTemplateStringsArray = [
+    const templateStrings: WritableTemplateStringsArray = [
       ...previous[0].slice(0, -1),
       previous[0].slice(-1)[0] + current[0][0],
       ...current[0].slice(1),
@@ -69,12 +65,12 @@ export function sql2(_strings: TemplateStringsArray, ..._keys: (string | [Templa
       previous[0].raw.slice(-1)[0] + current[0].raw[0],
       ...current[0].raw.slice(1),
     ];
-    return /** @type {[TemplateStringsArray, ...any[]]} */ ([
-      /** @type {TemplateStringsArray} */ (templateStrings),
+    return [
+      templateStrings as TemplateStringsArray,
       ...previous.slice(1),
       ...current.slice(1),
-    ]);
-  }, /** @type {[TemplateStringsArray, ...any[]]} */ ([r]));
+    ] as [TemplateStringsArray, ...any[]];
+  }, ([r]) as [TemplateStringsArray, ...any[]]);
 
   //console.log("result", result)
 
