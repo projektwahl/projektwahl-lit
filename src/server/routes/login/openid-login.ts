@@ -9,7 +9,7 @@ export async function openidLoginHandler(stream: import("http2").ServerHttp2Stre
 
     // https://github.com/projektwahl/projektwahl-sveltekit/blob/work/src/routes/login/index.json.ts
     // https://github.com/projektwahl/projektwahl-sveltekit/blob/work/src/routes/redirect/index.ts_old
-    const url = client.authorizationUrl({
+    const url = client!.authorizationUrl({
       redirect_uri: `${"https://localhost:8443"}/api/v1/redirect`,
       scope: "openid email profile",
     });

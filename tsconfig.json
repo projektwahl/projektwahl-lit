@@ -14,6 +14,7 @@
     "allowJs": true,
     "checkJs": true,
     "importsNotUsedAsValues": "error",
+    "allowSyntheticDefaultImports": true
   },
   "include": ["**/*.ts", "**/*.js"]
 }

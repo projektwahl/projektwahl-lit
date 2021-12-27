@@ -5,7 +5,9 @@ import { client } from "./openid-client.js";
 
 export async function openidRedirectHandler(stream: import("http2").ServerHttp2Stream, headers: import("http2").IncomingHttpHeaders) {
   return await request("GET", "/api/v1/redirect", async function () {
-    let url = new URL(headers[":path"], "https://localhost:8443");
+    let url = new URL(headers[":path"]!, "https://localhost:8443");
+
+    // TODO FIXME validate searchParams with zod
 
     console.log(url.searchParams.get("session_state"));
     console.log(url.searchParams.get("code"));
@@ -19,7 +21,7 @@ export async function openidRedirectHandler(stream: import("http2").ServerHttp2S
     // https://github.com/projektwahl/projektwahl-sveltekit/blob/work/src/routes/redirect/index.ts_old
 
     try {
-      const result = await client.callback(
+      const result = await client!.callback(
         `${"https://localhost:8443"}/api/v1/redirect`,
         {
           session_state: url.searchParams.get("session_state"),
@@ -87,7 +89,6 @@ export async function openidRedirectHandler(stream: import("http2").ServerHttp2S
         },
       ];
     } catch (error) {
-      let _error = /** @type {Error} */ (error);
       return [
         {
           "content-type": "text/json; charset=utf-8",
@@ -96,7 +97,7 @@ export async function openidRedirectHandler(stream: import("http2").ServerHttp2S
         {
           result: "failure",
           failure: {
-            login: _error.message,
+            login: error,
           },
         },
       ];

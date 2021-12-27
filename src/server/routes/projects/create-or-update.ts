@@ -1,11 +1,11 @@
 import { sql } from "../../database.js";
 import { request } from "../../express.js";
 
-export async function createProjectsHandler(stream: import("http2").ServerHttp2Stream, headers: import("http2").IncomingHttpHeaders) {
+export async function createOrUpdateProjectsHandler(stream: import("http2").ServerHttp2Stream, headers: import("http2").IncomingHttpHeaders) {
   // TODO FIXME create or update multiple
   return await request(
     "POST",
-    "/api/v1/projects/create",
+    "/api/v1/projects/create-or-update",
     async function (project) {
       try {
         let [row] = await sql.begin("READ WRITE", async (sql) => {
@@ -62,8 +62,8 @@ export async function createProjectsHandler(stream: import("http2").ServerHttp2S
             ":status": 200,
           },
           {
-            result: "success",
-            success: row,
+            success: true as const,
+            data: row,
           },
         ];
       } catch (/** @type {unknown} */ error: unknown) {
@@ -80,8 +80,8 @@ export async function createProjectsHandler(stream: import("http2").ServerHttp2S
                 ":status": 200,
               },
               {
-                result: "failure",
-                failure: {
+                success: false as const,
+                error: {
                   username: "Nutzer mit diesem Namen existiert bereits!",
                 },
               },
@@ -95,8 +95,8 @@ export async function createProjectsHandler(stream: import("http2").ServerHttp2S
             ":status": 500,
           },
           {
-            result: "failure",
-            failure: {
+            success: false as const,
+            error: {
               unknown: "Interner Fehler!",
             },
           },
