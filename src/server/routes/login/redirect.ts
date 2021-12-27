@@ -1,4 +1,6 @@
 import { sensitiveHeaders } from "node:http2";
+import { z } from "zod";
+import { rawUserHelperOrAdminSchema, rawUserSchema, rawUserVoterSchema } from "../../../lib/routes.js";
 import { sql } from "../../database.js";
 import { request } from "../../express.js";
 import { client } from "./openid-client.js";
@@ -7,10 +9,10 @@ export async function openidRedirectHandler(stream: import("http2").ServerHttp2S
   return await request("GET", "/api/v1/redirect", async function () {
     let url = new URL(headers[":path"]!, "https://localhost:8443");
 
-    // TODO FIXME validate searchParams with zod
-
-    console.log(url.searchParams.get("session_state"));
-    console.log(url.searchParams.get("code"));
+    const searchParams = z.object({
+      session_state: z.string(),
+      code: z.string()
+    }).parse(Object.fromEntries(url.searchParams as any));
 
     // https://github.com/AzureAD/microsoft-authentication-library-for-js/tree/dev/lib/msal-browser
     // https://docs.microsoft.com/en-us/azure/active-directory/develop/scenario-spa-app-registration
@@ -23,10 +25,7 @@ export async function openidRedirectHandler(stream: import("http2").ServerHttp2S
     try {
       const result = await client!.callback(
         `${"https://localhost:8443"}/api/v1/redirect`,
-        {
-          session_state: url.searchParams.get("session_state"),
-          code: url.searchParams.get("code"),
-        }
+        searchParams
       );
 
       console.log(result);
@@ -37,11 +36,12 @@ export async function openidRedirectHandler(stream: import("http2").ServerHttp2S
 
       //console.log(userinfo)
 
-      /** @type {[import("../../../lib/types").Existing<Pick<import("../../../lib/types").RawUserType, "id"|"username"|"password_hash"|"password_salt">>?]} */
-      const [dbUser] =
-        await sql`SELECT id, username, type FROM users WHERE openid_id = ${
+      const dbUser = z.union([
+        rawUserVoterSchema.pick({id: true,username: true, password_hash: true, password_salt: true}),
+        rawUserHelperOrAdminSchema.pick({id: true,username: true, password_hash: true, password_salt: true}),
+      ]).parse((await sql`SELECT id, username, type FROM users WHERE openid_id = ${
           result.claims().sub
-        } LIMIT 1`;
+        } LIMIT 1`)[0])
 
       if (dbUser === undefined) {
         return [

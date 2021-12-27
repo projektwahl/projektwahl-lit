@@ -40,6 +40,13 @@ export const rawProjectSchema = z.object({
   random_assignments: z.boolean(),
 }).strict();
 
+export const rawSessionType = z.object({
+  session_id: z.string(),
+  created_at: z.date(),
+  updated_at: z.date(),
+  user_id: z.number(),
+});
+
 export const loginOutputSchema = result(z.null(), z.record(z.string()));
 
 export type keys = "/api/v1/login"|"/api/v1/openid-login"|"/api/v1/redirect"|"/api/v1/sleep"|"/api/v1/update"|"/api/v1/users/create-or-update"|"/api/v1/projects/create-or-update"|"/api/v1/users"|"/api/v1/projects";

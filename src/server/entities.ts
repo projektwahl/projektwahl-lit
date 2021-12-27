@@ -5,7 +5,7 @@ export function fetchData<T extends { id: number; [index: string]: string | stri
   fieldsToSelect: string[],
   orderByInfo: { [field: string]: 'nulls-first' | 'nulls-last'; },
   _query: import("../lib/types").BaseQuery<T>, // TODO FIXME sanitize
-  customFilterQuery: (query: T) => [TemplateStringsArray, ...(string | string[] | boolean | number)[]]
+  customFilterQuery: (query: { [key in keyof T]?: T[key] | undefined; }) => [TemplateStringsArray, ...(string | string[] | boolean | number)[]]
 ): [TemplateStringsArray, ...(string | string[] | boolean | number)[]] {
   const query = _query;
 
@@ -30,7 +30,7 @@ export function fetchData<T extends { id: number; [index: string]: string | stri
   if (paginationCursor === null) {
     return sql2`(SELECT ${unsafe2(fieldsToSelect.join(", "))} FROM ${unsafe2(
       table
-    )} WHERE ${customFilterQuery(query)} ORDER BY ${orderByQuery} LIMIT ${
+    )} WHERE ${customFilterQuery(query.filters)} ORDER BY ${orderByQuery} LIMIT ${
       query.paginationLimit + 1
     })`;
   } else {
@@ -55,7 +55,7 @@ export function fetchData<T extends { id: number; [index: string]: string | stri
       return sql2`(SELECT ${unsafe2(fieldsToSelect.join(", "))} FROM ${unsafe2(
         table
       )} WHERE ${customFilterQuery(
-        query
+        query.filters
       )} AND (${parts}) ORDER BY ${orderByQuery} LIMIT ${
         query.paginationLimit + 1
       })`;

@@ -3,12 +3,6 @@
 
 // TODO FIXME remove all this and convert to zod
 
-type RawSessionType = {
-  session_id: string;
-  created_at: Date;
-  updated_at: Date;
-  user_id: number;
-};
 
 type RawChoiceType = {
   user_id: number;
