@@ -40,7 +40,7 @@ export const rawProjectSchema = z.object({
   random_assignments: z.boolean(),
 }).strict();
 
-export const loginOutputSchema = result(z.void(), z.record(z.string()));
+export const loginOutputSchema = result(z.null(), z.record(z.string()));
 
 export type keys = "/api/v1/login"|"/api/v1/openid-login"|"/api/v1/redirect"|"/api/v1/sleep"|"/api/v1/update"|"/api/v1/users/create"|"/api/v1/projects/create"|"/api/v1/users"|"/api/v1/projects";
 

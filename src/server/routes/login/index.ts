@@ -5,7 +5,6 @@ import { checkPassword } from "../../password.js";
 
 export async function loginHandler(stream: import("http2").ServerHttp2Stream, headers: import("http2").IncomingHttpHeaders) {
   return await request("POST", "/api/v1/login", async function (body) {
-    /** @type {[import("../../../lib/types").Existing<Pick<import("../../../lib/types").RawUserType, "id"|"username"|"password_hash"|"password_salt">>?]} */
     const [dbUser] =
       await sql`SELECT id, username, password_hash, password_salt, type FROM users WHERE username = ${body.username} LIMIT 1`;
 
@@ -13,11 +12,11 @@ export async function loginHandler(stream: import("http2").ServerHttp2Stream, he
       return [
         {
           "content-type": "text/json; charset=utf-8",
-          ":status": 200,
+          ":status": "200",
         },
         {
-          result: "failure",
-          failure: {
+          success: false as const,
+          error: {
             username: "Nutzer existiert nicht!",
           },
         },
@@ -35,11 +34,11 @@ export async function loginHandler(stream: import("http2").ServerHttp2Stream, he
       return [
         {
           "content-type": "text/json; charset=utf-8",
-          ":status": 200,
+          ":status": "200",
         },
         {
-          result: "failure",
-          failure: {
+          success: false as const,
+          error: {
             password: "Falsches Passwort!",
           },
         },
@@ -71,8 +70,8 @@ export async function loginHandler(stream: import("http2").ServerHttp2Stream, he
     return [
       headers,
       {
-        result: "success",
-        success: undefined,
+        success: true as const,
+        data: null,
       },
     ];
   })(stream, headers);

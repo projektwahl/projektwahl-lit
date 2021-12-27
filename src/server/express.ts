@@ -5,13 +5,15 @@ import { zod2result } from "../lib/result.js";
 import { json } from "node:stream/consumers";
 import { URL } from "url";
 import { routes } from "../lib/routes.js";
+import type { IncomingHttpHeaders, OutgoingHttpHeaders, ServerHttp2Stream } from "node:http2";
+import type { z } from "zod";
 
-export function request<P extends keyof typeof routes>(method: string, path: P, handler: (r: import("zod").infer<typeof routes[P]["request"]>) => ((stream: import("http2").ServerHttp2Stream, headers: import("http2").IncomingHttpHeaders) => Promise<boolean>)) {
+export function request<P extends keyof typeof routes>(method: string, path: P, handler: (r: z.infer<typeof routes[P]["request"]>) => Promise<[OutgoingHttpHeaders, z.infer<typeof routes[P]["response"]>]>): ((stream: ServerHttp2Stream, headers: IncomingHttpHeaders) => Promise<boolean>) {
   let fn =
     
     async (stream: import("http2").ServerHttp2Stream, headers: import("http2").IncomingHttpHeaders) => {
       try {
-        let url = new URL(headers[":path"], "https://localhost:8443");
+        let url = new URL(headers[":path"]!, "https://localhost:8443");
         if (
           headers[":method"] === method &&
           new RegExp(path).test(/** @type {string} */ (url.pathname))
