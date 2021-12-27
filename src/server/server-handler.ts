@@ -106,25 +106,9 @@ export async function serverHandler(stream: import("http2").ServerHttp2Stream, h
       // TODO FIXME caching (server+clientside)
 
       try {
-        let contents;
-        try {
-          contents = await readFile(filename, {
-            encoding: "utf-8",
-          });
-        } catch (err) {
-          if (filename.endsWith(".js")) {
-            contents = await readFile(filename.slice(0, -3)+".ts", {
-              encoding: "utf-8",
-            });
-            const result = await esbuild.transform(contents, {
-              
-            })
-            console.warn(result.warnings)
-            contents = result.code
-          } else {
-            throw err;
-          }
-        }
+        let contents = await readFile(filename, {
+          encoding: "utf-8",
+        });
 
         if (extname(filename) === ".js" || extname(filename) === ".ts") {
           contents = await replaceAsync(
