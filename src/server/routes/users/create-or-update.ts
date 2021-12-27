@@ -1,10 +1,11 @@
+import { z } from "zod";
 import { sql } from "../../database.js";
 import { request } from "../../express.js";
 import { hashPassword } from "../../password.js";
 
-export async function createUsersHandler(stream: import("http2").ServerHttp2Stream, headers: import("http2").IncomingHttpHeaders) {
+export async function createOrUpdateUsersHandler(stream: import("http2").ServerHttp2Stream, headers: import("http2").IncomingHttpHeaders) {
   // TODO FIXME create or update multiple
-  return await request("POST", "/api/v1/users/create", async function (user) {
+  return await request("POST", "/api/v1/users/create-or-update", async function (user) {
     try {
       return await sql.begin("READ WRITE", async (sql) => {
         let [row] =
@@ -12,8 +13,8 @@ export async function createUsersHandler(stream: import("http2").ServerHttp2Stre
             user.username ?? null
           }, ${user.password ? await hashPassword(user.password) : null}, ${
             user.type ?? null
-          }, ${user.group ?? null}, ${
-            user.age ? user.age : null /* for csv import */
+          }, ${user.type === "voter" ? (user.group ?? null) : null}, ${
+            user.type === "voter" ? (user.age ?? null) : null
           }, ${user.away ?? false}) RETURNING id;`;
 
         return [
@@ -22,8 +23,8 @@ export async function createUsersHandler(stream: import("http2").ServerHttp2Stre
             ":status": 200,
           },
           {
-            result: "success",
-            success: row,
+            success: true as const,
+            data: z.object({ id: z.number() }).parse(row),
           },
         ];
       });
@@ -41,8 +42,8 @@ export async function createUsersHandler(stream: import("http2").ServerHttp2Stre
               ":status": 200,
             },
             {
-              result: "failure",
-              failure: {
+              success: false as const,
+              error: {
                 username: "Nutzer mit diesem Namen existiert bereits!",
               },
             },
@@ -56,8 +57,8 @@ export async function createUsersHandler(stream: import("http2").ServerHttp2Stre
           ":status": 500,
         },
         {
-          result: "failure",
-          failure: {
+          success: false as const,
+          error: {
             unknown: "Interner Fehler!",
           },
         },

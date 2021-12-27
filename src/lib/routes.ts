@@ -42,7 +42,7 @@ export const rawProjectSchema = z.object({
 
 export const loginOutputSchema = result(z.null(), z.record(z.string()));
 
-export type keys = "/api/v1/login"|"/api/v1/openid-login"|"/api/v1/redirect"|"/api/v1/sleep"|"/api/v1/update"|"/api/v1/users/create"|"/api/v1/projects/create-or-update"|"/api/v1/users"|"/api/v1/projects";
+export type keys = "/api/v1/login"|"/api/v1/openid-login"|"/api/v1/redirect"|"/api/v1/sleep"|"/api/v1/update"|"/api/v1/users/create-or-update"|"/api/v1/projects/create-or-update"|"/api/v1/users"|"/api/v1/projects";
 
 function identity<T extends { [r in keys]: { request: import("zod").ZodType<any>, response: import("zod").ZodType<any> } }>(v: T) {
   return v;
@@ -69,8 +69,8 @@ export const routes = identity({
     request: z.undefined(),
     response: z.number(),
   },
-  "/api/v1/users/create": {
-    request: rawUserSchema,
+  "/api/v1/users/create-or-update": {
+    request: z.union([rawUserVoterSchema.extend({ id: z.number().optional(), password: z.string().optional() }), rawUserHelperOrAdminSchema.extend({ id: z.number().optional(), password: z.string().optional() })]),
     response: result(z.object({}).extend({ id: z.number() }), z.record(z.string())),
   },
   "/api/v1/projects/create-or-update": {
