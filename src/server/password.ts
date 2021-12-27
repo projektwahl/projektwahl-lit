@@ -10,14 +10,11 @@ const argon2Options = {
 	hashLength: 256 / 8, // 32
 	parallelism: 4
 };*/
-import crypto, { webcrypto } from "node:crypto";
+import crypto from "node:crypto";
 
-/**
- *
- * @param {string} password
- * @returns {Promise<CryptoKey>}
- */
-async function getKeyMaterial(password) {
+const webcrypto = crypto.webcrypto as unknown as Crypto;
+
+async function getKeyMaterial(password: string): Promise<CryptoKey> {
   let enc = new TextEncoder();
   return webcrypto.subtle.importKey(
     "raw",
@@ -28,13 +25,7 @@ async function getKeyMaterial(password) {
   );
 }
 
-/**
- *
- * @param {string} password
- * @param {Buffer} salt
- * @returns {Promise<Buffer>}
- */
-async function hashPasswordWithSalt(password, salt) {
+async function hashPasswordWithSalt(password: string, salt: Buffer): Promise<Buffer> {
   let keyMaterial = await getKeyMaterial(password);
   return Buffer.from(
     await webcrypto.subtle.deriveBits(
@@ -50,24 +41,12 @@ async function hashPasswordWithSalt(password, salt) {
   );
 }
 
-/**
- *
- * @param {string} password
- * @returns Promise<[Buffer, Buffer]>
- */
-export async function hashPassword(password) {
+export async function hashPassword(password: string): Promise<[Buffer, Buffer]> {
   const salt = webcrypto.getRandomValues(new Uint8Array(64));
-  return [await hashPasswordWithSalt(password, salt), Buffer.from(salt)];
+  return [await hashPasswordWithSalt(password, Buffer.from(salt)), Buffer.from(salt)];
 }
 
-/**
- *
- * @param {Buffer} hash
- * @param {Buffer} salt
- * @param {string} password
- * @returns {Promise<boolean>}
- */
-export async function checkPassword(hash, salt, password) {
+export async function checkPassword(hash: Buffer, salt: Buffer, password: string): Promise<boolean> {
   return crypto.timingSafeEqual(
     await hashPasswordWithSalt(password, salt),
     hash

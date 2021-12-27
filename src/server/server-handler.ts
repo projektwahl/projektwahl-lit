@@ -3,7 +3,7 @@ import { join, resolve } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 import { loginHandler } from "./routes/login/index.js";
 import { sleepHandler } from "./routes/sleep/index.js";
-import { createUsersHandler } from "./routes/users/create-or-update.js";
+import { createOrUpdateUsersHandler } from "./routes/users/create-or-update.js";
 import { usersHandler } from "./routes/users/index.js";
 import { openidLoginHandler } from "./routes/login/openid-login.js";
 import { openidRedirectHandler } from "./routes/login/redirect.js";
@@ -35,7 +35,7 @@ async function replaceAsync(str: string, regex: RegExp, asyncFn: (match: string,
     return "";
   });
   const data = await Promise.all(promises);
-  return str.replaceAll(regex, () => /** @type {string} */ (data.shift()));
+  return str.replaceAll(regex, () => data.shift() as string);
 }
 
 export async function serverHandler(stream: import("http2").ServerHttp2Stream, headers: import("http").IncomingHttpHeaders) {
@@ -77,7 +77,7 @@ export async function serverHandler(stream: import("http2").ServerHttp2Stream, h
       (await openidLoginHandler(stream, headers)) ||
       (await openidRedirectHandler(stream, headers)) ||
       (await sleepHandler(stream, headers)) ||
-      (await createUsersHandler(stream, headers)) ||
+      (await createOrUpdateUsersHandler(stream, headers)) ||
       (await createOrUpdateProjectsHandler(stream, headers)) ||
       (await projectsHandler(stream, headers)) ||
       (await usersHandler(stream, headers));
@@ -116,6 +116,8 @@ export async function serverHandler(stream: import("http2").ServerHttp2Stream, h
             contents = await readFile(filename.slice(0, -3)+".ts", {
               encoding: "utf-8",
             });
+          } else {
+            throw err;
           }
         }
 
@@ -124,7 +126,7 @@ export async function serverHandler(stream: import("http2").ServerHttp2Stream, h
             contents,
             /import( )?["']([^"']+)["']/g,
             async (match, args) => {
-              let url = await import.meta.resolve(
+              let url = await import.meta.resolve!(
                 args[1],
                 pathToFileURL(filename)
               );
@@ -141,7 +143,7 @@ export async function serverHandler(stream: import("http2").ServerHttp2Stream, h
             contents,
             /([*} ])from ?["']([^"']+)["']/g,
             async (match, args) => {
-              let url = await import.meta.resolve(
+              let url = await import.meta.resolve!(
                 args[1],
                 pathToFileURL(filename)
               );

@@ -13,7 +13,7 @@ const shuffleArray = <T>(array: T[]) => {
 };
 
 await sql.begin("READ WRITE", async (sql) => {
-  await sql.file("./src/server/setup.sql", /** @type {any} */ (undefined), {
+  await sql.file("./src/server/setup.sql", undefined as any, {
     cache: false, // TODO FIXME doesnt seem to work properly
   });
 

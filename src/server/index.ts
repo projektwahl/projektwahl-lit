@@ -62,8 +62,7 @@ server.on("stream", async (stream, headers) => {
   }
 });
 
-/** @type {import("node:http2").ServerHttp2Session[]} */
-let sessions = [];
+let sessions: import("node:http2").ServerHttp2Session[] = [];
 
 server.on("session", (session) => {
   sessions.push(session)
