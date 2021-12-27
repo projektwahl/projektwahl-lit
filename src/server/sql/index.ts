@@ -11,9 +11,9 @@ import type { WritableTemplateStringsArray } from "../../lib/types";
 
 // https://github.com/porsager/postgres-benchmarks
 
-export function unsafe2(string: string): [TemplateStringsArray, ...any[]] {
-  let r: import("../../lib/types").WritableTemplateStringsArray = [string];
-  r.raw = [string];
+export function unsafe2(string: string | number | symbol): [TemplateStringsArray, ...any[]] {
+  let r: import("../../lib/types").WritableTemplateStringsArray = [string.toString()];
+  r.raw = [string.toString()];
   return [r as TemplateStringsArray];
 }
 

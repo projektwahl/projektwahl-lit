@@ -1,6 +1,6 @@
 import { sql2, unsafe2 } from "./sql/index.js";
 
-export function fetchData<T>(
+export function fetchData<T extends { id: number; [index: string]: string | string[] | boolean | number }>(
   table: string,
   fieldsToSelect: string[],
   orderByInfo: { [field: string]: 'nulls-first' | 'nulls-last'; },
@@ -25,7 +25,9 @@ export function fetchData<T>(
     .flatMap((v) => [sql2`,`, sql2`${unsafe2(v[0])} ${unsafe2(v[1])}`])
     .slice(1);
 
-  if (query.paginationCursor === null) {
+  const paginationCursor = query.paginationCursor;
+
+  if (paginationCursor === null) {
     return sql2`(SELECT ${unsafe2(fieldsToSelect.join(", "))} FROM ${unsafe2(
       table
     )} WHERE ${customFilterQuery(query)} ORDER BY ${orderByQuery} LIMIT ${
@@ -39,7 +41,7 @@ export function fetchData<T>(
         .flatMap((value, index) => {
           return [
             sql2` AND `,
-            sql2`${query.paginationCursor[value[0]] ?? null} ${
+            sql2`${paginationCursor[value[0]]} ${
               index === part.length - 1
                 ? value[1] === "ASC"
                   ? sql2`<`
