@@ -1,12 +1,13 @@
 import { sensitiveHeaders } from "node:http2";
+import { z } from "zod";
+import { rawUserHelperOrAdminSchema, rawUserSchema, rawUserVoterSchema } from "../../../lib/routes.js";
 import { sql } from "../../database.js";
 import { request } from "../../express.js";
 import { checkPassword } from "../../password.js";
 
 export async function loginHandler(stream: import("http2").ServerHttp2Stream, headers: import("http2").IncomingHttpHeaders) {
   return await request("POST", "/api/v1/login", async function (body) {
-    const [dbUser] =
-      await sql`SELECT id, username, password_hash, password_salt, type FROM users WHERE username = ${body.username} LIMIT 1`;
+    const dbUser = z.union([rawUserVoterSchema.extend({ id: z.number() }), rawUserHelperOrAdminSchema.extend({ id: z.number() })]).parse((await sql`SELECT id, username, password_hash, password_salt, type FROM users WHERE username = ${body.username} LIMIT 1`)[0]);
 
     if (dbUser === undefined) {
       return [
@@ -46,8 +47,8 @@ export async function loginHandler(stream: import("http2").ServerHttp2Stream, he
     }
 
     /** @type {[Pick<import("../../../lib/types").RawSessionType, "session_id">]} */
-    const [session] = await sql.begin("READ WRITE", async (sql) => {
-      return await sql`INSERT INTO sessions (user_id) VALUES (${dbUser.id}) RETURNING session_id`;
+    const [session] = await sql.begin("READ WRITE", async (tsql) => {
+      return await tsql`INSERT INTO sessions (user_id) VALUES (${dbUser.id}) RETURNING session_id`;
     });
 
     /** @type {import("node:http2").OutgoingHttpHeaders} */

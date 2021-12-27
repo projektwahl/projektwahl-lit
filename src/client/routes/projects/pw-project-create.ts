@@ -14,7 +14,7 @@ import "../../form/pw-checkbox-input.js";
 
 // TODO FIXME implement edit
 
-export class PwProjectCreate extends PwForm<"/api/v1/projects/create"> {
+export class PwProjectCreate extends PwForm<"/api/v1/projects/create-or-update"> {
   static override get properties() {
     return {
       url: { attribute: false },
@@ -48,7 +48,7 @@ export class PwProjectCreate extends PwForm<"/api/v1/projects/create"> {
         });
         this.form.value?.dispatchEvent(formDataEvent);
 
-        let result = await myFetch("/api/v1/projects/create", {
+        let result = await myFetch("/api/v1/projects/create-or-update", {
           method: "POST",
           headers: {
             "content-type": "text/json",

@@ -15,7 +15,7 @@ import "../../form/pw-text-input.js";
 
 // TODO FIXME implement edit
 
-export class PwUserCreate extends PwForm<"/api/v1/users/create"> {
+export class PwUserCreate extends PwForm<"/api/v1/users/create-or-update"> {
   static override get properties() {
     return {
       url: { attribute: false },
@@ -53,7 +53,7 @@ export class PwUserCreate extends PwForm<"/api/v1/users/create"> {
         });
         this.form.value?.dispatchEvent(formDataEvent);
 
-        let result = await myFetch("/api/v1/users/create", {
+        let result = await myFetch("/api/v1/users/create-or-update", {
           method: "POST",
           headers: {
             "content-type": "text/json",
