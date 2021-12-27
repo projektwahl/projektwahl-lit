@@ -1,3 +1,5 @@
+import { z } from "zod";
+import { rawProjectSchema } from "../../../lib/routes.js";
 import { sql } from "../../database.js";
 import { fetchData } from "../../entities.js";
 import { request } from "../../express.js";
@@ -5,7 +7,7 @@ import { sql2 } from "../../sql/index.js";
 
 export async function projectsHandler(stream: import("http2").ServerHttp2Stream, headers: import("http2").IncomingHttpHeaders) {
   return await request("GET", "/api/v1/projects", async function () {
-    const url = new URL(headers[":path"], "https://localhost:8443");
+    const url = new URL(headers[":path"]!, "https://localhost:8443");
 
     // TODO FIXME validation
 
@@ -29,7 +31,7 @@ export async function projectsHandler(stream: import("http2").ServerHttp2Stream,
       }
     );
 
-    let result = await sql(...value);
+    let result = z.array(rawProjectSchema.extend({ id: z.number() })).parse(await sql(...value));
 
     return [
       {

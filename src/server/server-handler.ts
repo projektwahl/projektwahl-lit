@@ -9,7 +9,7 @@ import { openidLoginHandler } from "./routes/login/openid-login.js";
 import { openidRedirectHandler } from "./routes/login/redirect.js";
 import path, { extname, relative } from "path/posix";
 import { z } from "zod";
-import { createProjectsHandler } from "./routes/projects/create-or-update.js";
+import { createOrUpdateProjectsHandler } from "./routes/projects/create-or-update.js";
 import { cwd } from "node:process";
 import { projectsHandler } from "./routes/projects/index.js";
 
@@ -78,7 +78,7 @@ export async function serverHandler(stream: import("http2").ServerHttp2Stream, h
       (await openidRedirectHandler(stream, headers)) ||
       (await sleepHandler(stream, headers)) ||
       (await createUsersHandler(stream, headers)) ||
-      (await createProjectsHandler(stream, headers)) ||
+      (await createOrUpdateProjectsHandler(stream, headers)) ||
       (await projectsHandler(stream, headers)) ||
       (await usersHandler(stream, headers));
 
