@@ -1,3 +1,4 @@
+import { z } from "zod";
 import { routes } from "../../../lib/routes.js";
 import { sql } from "../../database.js";
 import { fetchData } from "../../entities.js";
@@ -8,7 +9,13 @@ export async function usersHandler(stream: import("http2").ServerHttp2Stream, he
   return await request("GET", "/api/v1/users", async function () {
     const url = new URL(headers[":path"]!, "https://localhost:8443");
 
-    // TODO FIXME validation
+    const searchParams = z.object({
+      f_id: z.number(),
+      f_username: z.string(),
+      f_type: z.string(),
+    }).parse(Object.fromEntries(url.searchParams as any));
+
+    const sorting = z.array(z.tuple([z.string(), z.enum(["ASC", "DESC"])])).parse(url.searchParams.getAll("order").map((o) => o.split("-")))
 
     const value = fetchData(
       "users",
@@ -20,11 +27,7 @@ export async function usersHandler(stream: import("http2").ServerHttp2Stream, he
         password_hash: "nulls-first",
       },
       {
-        filters: {
-          id: url.searchParams.get("f_id") ?? "",
-          username: url.searchParams.get("f_username") ?? "",
-          type: url.searchParams.get("f_type") ?? "",
-        },
+        filters: searchParams,
         paginationCursor: null,
         paginationDirection: "forwards",
         paginationLimit: 10,
@@ -34,10 +37,10 @@ export async function usersHandler(stream: import("http2").ServerHttp2Stream, he
 I think in the UI we will never be able to implement this without javascript and without reloading at every change
 
 */
-        sorting: url.searchParams.getAll("order").map((o) => o.split("-")), // TODO FIXME validate
+        sorting,
       },
       (query) => {
-        return sql2`username LIKE ${"%" + query.filters.username + "%"}`;
+        return sql2`username LIKE ${"%" + query.username + "%"}`;
       }
     );
 

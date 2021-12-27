@@ -1,3 +1,4 @@
+import { PostgresError } from "postgres";
 import { z } from "zod";
 import { sql } from "../../database.js";
 import { request } from "../../express.js";
@@ -29,11 +30,10 @@ export async function createOrUpdateUsersHandler(stream: import("http2").ServerH
         ];
       });
     } catch (/** @type {unknown} */ error) {
-      if (error instanceof Error && error.name === "PostgresError") {
-        const postgresError = /** @type {PostgresError} */ error;
+      if (error instanceof PostgresError) {
         if (
-          postgresError.code === "23505" &&
-          postgresError.constraint_name === "users_username_key"
+          error.code === "23505" &&
+          error.constraint_name === "users_username_key"
         ) {
           // unique violation
           return [
