@@ -24,7 +24,8 @@
     "server": "node --experimental-import-meta-resolve ./src/server/index.js",
     "localize-extract": "lit-localize extract",
     "localize-build": "lit-localize build",
-    "serve": "esbuild --outdir=src/ src/**/*.ts --watch"
+    "serve": "esbuild --outdir=src/ src/**/*.ts --watch",
+    "build": "esbuild --format=esm --bundle src/client/pw-app.ts --sourcemap --splitting --analyze --outdir=dist --minify-whitespace --minify-identifiers --minify-syntax --tree-shaking=true --minify"
   },
   "dependencies": {
     "@lit-labs/motion": "^1.0.1",

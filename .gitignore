@@ -4,3 +4,4 @@ node_modules
 .tmp
 src/client/generated_locales/
 *.js
+dist

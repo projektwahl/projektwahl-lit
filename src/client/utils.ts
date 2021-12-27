@@ -2,7 +2,6 @@
 // SPDX-FileCopyrightText: 2021 Moritz Hedtke <Moritz.Hedtke@t-online.de>
 
 import type { z } from "zod";
-import { routes } from "../lib/routes.js";
 
 export const myFetch = async <P extends import("../lib/routes").keys>(url: P, options: RequestInit | undefined): Promise<z.infer<typeof import("../lib/routes").routes[P]["response"]>> => {
   const response = await fetch(url.toString(), options);
@@ -19,7 +18,9 @@ export const myFetch = async <P extends import("../lib/routes").keys>(url: P, op
     }
   }
   const result = await response.json();
-  return routes[url].response.parse(result)
+  return result;
+  // TODO FIXME this doubles the bundle size
+  //return routes[url].response.parse(result)
 };
 
 export const sleep = (): Promise<void> => {
