@@ -18,7 +18,7 @@ export async function usersHandler(stream: import("http2").ServerHttp2Stream, he
     const searchParams = z.object({
       f_id: z.string().refine(s => /^\d*$/.test(s)).transform(s => s === '' ? undefined : Number(s)).optional(),
       f_username: z.string().optional(),
-      f_type: z.string().refine(s => includes(["admin", "helper", "voter"] as const, s)).transform(s => s === '' ? undefined : s).optional(),
+      f_type: z.string().refine((s: string): s is "admin" | "helper" | "voter" | "" => includes(["admin", "helper", "voter", ""] as const, s)).transform(s => s === '' ? undefined : s).optional(),
     }).parse(Object.fromEntries(url.searchParams as any));
 
     console.log(searchParams)
