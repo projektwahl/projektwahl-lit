@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { routes } from "../../../lib/routes.js";
+import { rawUserSchema, routes } from "../../../lib/routes.js";
 import { sql } from "../../database.js";
 import { fetchData } from "../../entities.js";
 import { request } from "../../express.js";
@@ -10,7 +10,7 @@ export async function usersHandler(stream: import("http2").ServerHttp2Stream, he
     const url = new URL(headers[":path"]!, "https://localhost:8443");
 
     const searchParams = z.object({
-      f_id: z.number().optional(),
+      f_id: z.string().refine(s => /^\d*$/.test(s)).transform(s => s === '' ? undefined : Number(s)),
       f_username: z.string().optional(),
       f_type: z.string().optional(),
     }).parse(Object.fromEntries(url.searchParams as any));
@@ -19,7 +19,9 @@ export async function usersHandler(stream: import("http2").ServerHttp2Stream, he
 
     const sorting = z.array(z.tuple([z.string(), z.enum(["ASC", "DESC"])])).parse(url.searchParams.getAll("order").map((o) => o.split("-")))
 
-    const value = fetchData(
+    const schema = rawUserSchema(s=>s);
+
+    const value = fetchData<z.infer<typeof schema>>(
       "users",
       ["id", "type", "username"],
       {
