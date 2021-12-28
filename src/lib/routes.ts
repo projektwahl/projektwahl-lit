@@ -41,9 +41,9 @@ export const rawUserSchema = z.union([rawUserVoterSchema, rawUserHelperOrAdminSc
 
 export const rawProjectSchema = z.object({
   id: z.number(),
-  title: z.string().min(3).max(1024),
-  info: z.string().min(1).max(8192),
-  place: z.string().min(1).max(1024),
+  title: z.string().max(1024),
+  info: z.string().max(8192),
+  place: z.string().max(1024),
   costs: z.number().min(0).max(100),
   min_age: z.number().min(0).max(200),
   max_age: z.number().min(0).max(200),
@@ -110,6 +110,17 @@ export const routes = identity({
   },
   "/api/v1/projects": {
     request: z.undefined(),
-    response: z.array(rawProjectSchema.extend({ id: z.number() })),
+    response: z.array(rawProjectSchema.pick({
+      "id": true,
+      "title": true,
+      "info": true,
+      "place": true,
+      "costs": true,
+      "min_age": true,
+      "max_age": true,
+      "min_participants": true,
+      "max_participants": true,
+      "random_assignments": true
+    })),
   },
 } as const);

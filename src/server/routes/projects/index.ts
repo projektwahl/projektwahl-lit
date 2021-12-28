@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { rawProjectSchema } from "../../../lib/routes.js";
+import { rawProjectSchema, routes } from "../../../lib/routes.js";
 import { sql } from "../../database.js";
 import { fetchData } from "../../entities.js";
 import { request } from "../../express.js";
@@ -10,8 +10,8 @@ export async function projectsHandler(stream: import("http2").ServerHttp2Stream,
     const url = new URL(headers[":path"]!, "https://localhost:8443");
 
     const searchParams = z.object({
-      f_id: z.number(),
-      f_title: z.string()
+      f_id: z.number().optional(),
+      f_title: z.string().optional()
     }).parse(Object.fromEntries(url.searchParams as any));
 
     const sorting = z.array(z.tuple([z.string(), z.enum(["ASC", "DESC"])])).parse(url.searchParams.getAll("order").map((o) => o.split("-")))
@@ -32,11 +32,12 @@ export async function projectsHandler(stream: import("http2").ServerHttp2Stream,
         sorting,
       },
       (query) => {
-        return sql2`title LIKE ${"%" + query.title + "%"}`;
+        return sql2`title LIKE ${"%" + (query.title ?? '') + "%"}`;
       }
     );
 
-    let result = z.array(rawProjectSchema.extend({ id: z.number() })).parse(await sql(...value));
+    // TODO FIXME instead allow returning anything here and only validate at caller
+    let result = routes["/api/v1/projects"]["response"].parse(await sql(...value));
 
     return [
       {
