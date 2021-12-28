@@ -37,7 +37,18 @@ export const rawUserVoterSchema = z
   })
   .strict();
 
-export const rawUserSchema = z.union([rawUserVoterSchema, rawUserHelperOrAdminSchema])
+export const rawUserSchema = (op: (arg0: z.ZodObject<{ id: z.ZodNumber; username: z.ZodString; openid_id: z.ZodOptional<z.ZodString>; password_hash: z.ZodString; password_salt: z.ZodString; away: z.ZodBoolean; project_leader_id: z.ZodNumber; password_changed: z.ZodBoolean; force_in_project_id: z.ZodNumber; computed_in_project_id: z.ZodNumber; type: z.ZodEnum<["helper", "admin"]>; }, "strict", z.ZodTypeAny, { openid_id?: string | undefined; username: string; type: "helper" | "admin"; id: number; password_hash: string; password_salt: string; away: boolean; project_leader_id: number; password_changed: boolean; force_in_project_id: number; computed_in_project_id: number; }, { openid_id?: string | undefined; username: string; type: "helper" | "admin"; id: number; password_hash: string; password_salt: string; away: boolean; project_leader_id: number; password_changed: boolean; force_in_project_id: number; computed_in_project_id: number; }> | z.ZodObject<{ id: z.ZodNumber; username: z.ZodString; openid_id: z.ZodOptional<z.ZodString>; password_hash: z.ZodString; password_salt: z.ZodString; away: z.ZodBoolean; project_leader_id: z.ZodNumber; password_changed: z.ZodBoolean; force_in_project_id: z.ZodNumber; computed_in_project_id: z.ZodNumber; type: z.ZodEnum<["voter"]>; group: z.ZodString; age: z.ZodNumber; }, "strict", z.ZodTypeAny, { openid_id?: string | undefined; username: string; type: "voter"; id: number; password_hash: string; password_salt: string; away: boolean; project_leader_id: number; password_changed: boolean; force_in_project_id: number; computed_in_project_id: number; group: string; age: number; }, { openid_id?: string | undefined; username: string; type: "voter"; id: number; password_hash: string; password_salt: string; away: boolean; project_leader_id: number; password_changed: boolean; force_in_project_id: number; computed_in_project_id: number; group: string; age: number; }>) => any) => z.object({
+  type: z.enum(["helper", "admin", "voter"])
+}).passthrough().superRefine((value, ctx) => {
+  let schema = value.type === "voter" ? op(rawUserVoterSchema) : op(rawUserHelperOrAdminSchema);
+  let parsed = schema.safeParse(value)
+  if (!parsed.success) {
+    parsed.error.issues.forEach(ctx.addIssue)
+  }
+}).transform(value => {
+  let schema = value.type === "voter" ? op(rawUserVoterSchema) : op(rawUserHelperOrAdminSchema);
+  return schema.parse(value)
+})
 
 export const rawProjectSchema = z.object({
   id: z.number(),
@@ -89,24 +100,20 @@ export const routes = identity({
     response: z.number(),
   },
   "/api/v1/users/create-or-update": {
-    request: z.union([rawUserVoterSchema.extend({ id: z.number().optional(), password: z.string().optional() }), rawUserHelperOrAdminSchema.extend({ id: z.number().optional(), password: z.string().optional() })]),
+    request: rawUserSchema(s => s),
     response: result(z.object({}).extend({ id: z.number() }), z.record(z.string())),
   },
   "/api/v1/projects/create-or-update": {
-    request: rawProjectSchema.extend({ id: z.number().optional() }),
+    request: rawProjectSchema,
     response: result(z.object({}).extend({ id: z.number() }), z.record(z.string())),
   },
   "/api/v1/users": {
     request: z.undefined(),
-    response: z.array(z.union([rawUserVoterSchema.pick({
+    response: z.array(rawUserSchema(s => s.pick({
       id: true,
       type: true,
       username: true
-    }).strict(), rawUserHelperOrAdminSchema.pick({
-      id: true,
-      type: true,
-      username: true
-    }).strict()])),
+    }))),
   },
   "/api/v1/projects": {
     request: z.undefined(),
