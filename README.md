@@ -20,6 +20,10 @@ Software to manage choosing projects and automatically assigning people to proje
 git clone --branch openid https://github.com/projektwahl/projektwahl-lit.git
 cd projektwahl-lit/
 npm install
+npm run localize-build
+
+npm run serve # run this in parallel
+
 DATABASE_URL=postgres://projektwahl:projektwahl@projektwahl/projektwahl npm run setup
 DATABASE_URL=postgres://projektwahl:projektwahl@projektwahl/projektwahl OPENID_URL=openid_url CLIENT_ID=client_id CLIENT_SECRET=secret npm run server
 # or

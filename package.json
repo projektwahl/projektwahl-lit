@@ -21,20 +21,22 @@
     "lint": "eslint .",
     "fix:lint": "eslint --fix .",
     "setup": "node ./src/server/setup.js",
-    "server": "node --experimental-import-meta-resolve ./src/server/index.js",
+    "server": "node --enable-source-maps --experimental-import-meta-resolve ./src/server/index.js",
     "localize-extract": "lit-localize extract",
-    "localize-build": "lit-localize build"
+    "localize-build": "lit-localize build",
+    "serve": "esbuild --outdir=src/ --outbase=src/ src/**/*.ts --sourcemap --watch",
+    "build": "esbuild --format=esm --bundle src/client/pw-app.ts --sourcemap --splitting --analyze --outdir=dist --minify-whitespace --minify-identifiers --minify-syntax --tree-shaking=true --minify"
   },
   "dependencies": {
     "@lit-labs/motion": "^1.0.1",
     "@lit-labs/ssr": "^1.0.0",
     "@lit-labs/task": "^1.0.0",
     "@lit/localize": "^0.11.1",
+    "esbuild": "^0.14.8",
     "js-cookie": "^3.0.1",
     "lit": "^2.0.2",
     "openid-client": "^5.1.1",
-    "postgres": "beta",
-    "prettier": "^2.5.1",
+    "postgres": "mohe2015/postgres#patch-1",
     "zod": "^3.11.6"
   },
   "dependenciesComments": {
