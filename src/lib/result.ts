@@ -39,7 +39,7 @@ export const zod2result = <T extends z.ZodTypeAny>(schema: T, input: unknown): z
     const errors2 = /** @type {Partial<{ [key in keyof z.infer<T>]: string; }>} */ (Object.fromEntries(Object.entries(errors).map(([k, v]) => [k, v.join(". ")])))
     return {
       success: false,
-      failure: errors2
+      error: errors2
     };
   }
 }

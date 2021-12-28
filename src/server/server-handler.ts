@@ -108,7 +108,8 @@ export async function serverHandler(stream: import("http2").ServerHttp2Stream, h
       // TODO FIXME caching (server+clientside)
 
       try {
-        console.log(filename)
+        //console.log(filename)
+
         const resolved = await loaderResolve(filename, {
           parentURL: import.meta.url
         }, (specifier, context, defaultResolve) => {
@@ -119,7 +120,7 @@ export async function serverHandler(stream: import("http2").ServerHttp2Stream, h
             url: targetUrl.href
           };
         })
-        console.log("resolvd", resolved.url)
+        //console.log("resolvd", resolved.url)
         const loaded = await loaderLoad(resolved.url, undefined, async (url: string) => {
           return {
             source: await readFile(fileURLToPath(url), {

@@ -50,8 +50,8 @@ export async function openidRedirectHandler(stream: import("http2").ServerHttp2S
             ":status": 200,
           },
           {
-            result: "failure",
-            failure: {
+            success: false,
+            error: {
               username: "Nutzer existiert nicht!",
             },
           },
@@ -84,8 +84,8 @@ export async function openidRedirectHandler(stream: import("http2").ServerHttp2S
       return [
         responseHeaders,
         {
-          result: "success",
-          success: undefined,
+          success: true,
+          data: undefined,
         },
       ];
     } catch (error) {
@@ -95,8 +95,8 @@ export async function openidRedirectHandler(stream: import("http2").ServerHttp2S
           ":status": 200,
         },
         {
-          result: "failure",
-          failure: {
+          success: false,
+          error: {
             login: error,
           },
         },
