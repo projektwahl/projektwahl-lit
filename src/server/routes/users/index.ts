@@ -10,9 +10,9 @@ export async function usersHandler(stream: import("http2").ServerHttp2Stream, he
     const url = new URL(headers[":path"]!, "https://localhost:8443");
 
     const searchParams = z.object({
-      f_id: z.string().refine(s => /^\d*$/.test(s)).transform(s => s === '' ? undefined : Number(s)),
-      f_username: z.string().optional(),
-      f_type: z.string().optional(),
+      id: z.string().refine(s => /^\d*$/.test(s)).transform(s => s === '' ? undefined : Number(s)),
+      username: z.string().optional(),
+      type: z.enum(["admin", "helper", "voter"]).optional(),
     }).parse(Object.fromEntries(url.searchParams as any));
 
     console.log(searchParams)
