@@ -37,16 +37,17 @@ export const rawUserVoterSchema = z
   })
   .strict();
 
-export const rawUserSchema = <Q extends AnyZodObject>(op: (arg0: z.ZodObject<{ id: z.ZodNumber; username: z.ZodString; openid_id: z.ZodOptional<z.ZodString>; password_hash: z.ZodString; password_salt: z.ZodString; away: z.ZodBoolean; project_leader_id: z.ZodNumber; password_changed: z.ZodBoolean; force_in_project_id: z.ZodNumber; computed_in_project_id: z.ZodNumber; type: z.ZodEnum<["voter", "helper", "admin"]>; group: z.ZodString; age: z.ZodNumber; }, "strict", z.ZodTypeAny, { openid_id?: string | undefined; username: string; type: "voter"; id: number; password_hash: string; password_salt: string; away: boolean; project_leader_id: number; password_changed: boolean; force_in_project_id: number; computed_in_project_id: number; group: string; age: number; }, { openid_id?: string | undefined; username: string; type: "voter"; id: number; password_hash: string; password_salt: string; away: boolean; project_leader_id: number; password_changed: boolean; force_in_project_id: number; computed_in_project_id: number; group: string; age: number; }>) => Q) => z.object({
+export const rawUserSchema = <Q extends AnyZodObject, R extends AnyZodObject>(op1: (arg0: z.ZodObject<{ id: z.ZodNumber; username: z.ZodString; openid_id: z.ZodOptional<z.ZodString>; password_hash: z.ZodString; password_salt: z.ZodString; away: z.ZodBoolean; project_leader_id: z.ZodNumber; password_changed: z.ZodBoolean; force_in_project_id: z.ZodNumber; computed_in_project_id: z.ZodNumber; type: z.ZodEnum<["voter"]>; group: z.ZodString; age: z.ZodNumber; }, "strict", z.ZodTypeAny, { openid_id?: string | undefined; type: "voter"; group: string; age: number; id: number; username: string; password_hash: string; password_salt: string; away: boolean; project_leader_id: number; password_changed: boolean; force_in_project_id: number; computed_in_project_id: number; }, { openid_id?: string | undefined; type: "voter"; group: string; age: number; id: number; username: string; password_hash: string; password_salt: string; away: boolean; project_leader_id: number; password_changed: boolean; force_in_project_id: number; computed_in_project_id: number; }>) => Q,
+                              op2: (arg0: z.ZodObject<{ id: z.ZodNumber; username: z.ZodString; openid_id: z.ZodOptional<z.ZodString>; password_hash: z.ZodString; password_salt: z.ZodString; away: z.ZodBoolean; project_leader_id: z.ZodNumber; password_changed: z.ZodBoolean; force_in_project_id: z.ZodNumber; computed_in_project_id: z.ZodNumber; type: z.ZodEnum<["helper", "admin"]>; }, "strict", z.ZodTypeAny, { openid_id?: string | undefined; type: "helper" | "admin"; id: number; username: string; password_hash: string; password_salt: string; away: boolean; project_leader_id: number; password_changed: boolean; force_in_project_id: number; computed_in_project_id: number; }, { openid_id?: string | undefined; type: "helper" | "admin"; id: number; username: string; password_hash: string; password_salt: string; away: boolean; project_leader_id: number; password_changed: boolean; force_in_project_id: number; computed_in_project_id: number; }>) => R) => z.object({
   type: z.enum(["helper", "admin", "voter"])
 }).passthrough().superRefine((value, ctx) => {
-  let schema = value.type === "voter" ? op(rawUserVoterSchema as any) : op(rawUserHelperOrAdminSchema as any);
+  let schema = value.type === "voter" ? op1(rawUserVoterSchema) : op2(rawUserHelperOrAdminSchema);
   let parsed = schema.safeParse(value)
   if (!parsed.success) {
     parsed.error.issues.forEach(ctx.addIssue)
   }
 }).transform(value => {
-  let schema = value.type === "voter" ? op(rawUserVoterSchema as any) : op(rawUserHelperOrAdminSchema as any);
+  let schema = value.type === "voter" ? op1(rawUserVoterSchema) : op2(rawUserHelperOrAdminSchema);
   return schema.parse(value)
 })
 
