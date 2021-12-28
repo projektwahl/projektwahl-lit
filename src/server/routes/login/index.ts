@@ -1,13 +1,13 @@
 import { sensitiveHeaders } from "node:http2";
 import { z } from "zod";
-import { rawSessionType, rawUserHelperOrAdminSchema, rawUserSchema, rawUserVoterSchema } from "../../../lib/routes.js";
+import { rawSessionType, rawUserSchema } from "../../../lib/routes.js";
 import { sql } from "../../database.js";
 import { request } from "../../express.js";
 import { checkPassword } from "../../password.js";
 
 export async function loginHandler(stream: import("http2").ServerHttp2Stream, headers: import("http2").IncomingHttpHeaders) {
   return await request("POST", "/api/v1/login", async function (body) {
-    const dbUser = z.union([rawUserVoterSchema, rawUserHelperOrAdminSchema]).parse((await sql`SELECT id, username, password_hash, password_salt, type FROM users WHERE username = ${body.username} LIMIT 1`)[0]);
+    const dbUser = rawUserSchema(s => s).parse((await sql`SELECT id, username, password_hash, password_salt, type FROM users WHERE username = ${body.username} LIMIT 1`)[0]);
 
     if (dbUser === undefined) {
       return [

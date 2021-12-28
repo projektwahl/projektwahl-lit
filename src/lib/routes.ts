@@ -37,16 +37,16 @@ export const rawUserVoterSchema = z
   })
   .strict();
 
-export const rawUserSchema = (op: (arg0: z.ZodObject<{ id: z.ZodNumber; username: z.ZodString; openid_id: z.ZodOptional<z.ZodString>; password_hash: z.ZodString; password_salt: z.ZodString; away: z.ZodBoolean; project_leader_id: z.ZodNumber; password_changed: z.ZodBoolean; force_in_project_id: z.ZodNumber; computed_in_project_id: z.ZodNumber; type: z.ZodEnum<["helper", "admin"]>; }, "strict", z.ZodTypeAny, { openid_id?: string | undefined; username: string; type: "helper" | "admin"; id: number; password_hash: string; password_salt: string; away: boolean; project_leader_id: number; password_changed: boolean; force_in_project_id: number; computed_in_project_id: number; }, { openid_id?: string | undefined; username: string; type: "helper" | "admin"; id: number; password_hash: string; password_salt: string; away: boolean; project_leader_id: number; password_changed: boolean; force_in_project_id: number; computed_in_project_id: number; }> | z.ZodObject<{ id: z.ZodNumber; username: z.ZodString; openid_id: z.ZodOptional<z.ZodString>; password_hash: z.ZodString; password_salt: z.ZodString; away: z.ZodBoolean; project_leader_id: z.ZodNumber; password_changed: z.ZodBoolean; force_in_project_id: z.ZodNumber; computed_in_project_id: z.ZodNumber; type: z.ZodEnum<["voter"]>; group: z.ZodString; age: z.ZodNumber; }, "strict", z.ZodTypeAny, { openid_id?: string | undefined; username: string; type: "voter"; id: number; password_hash: string; password_salt: string; away: boolean; project_leader_id: number; password_changed: boolean; force_in_project_id: number; computed_in_project_id: number; group: string; age: number; }, { openid_id?: string | undefined; username: string; type: "voter"; id: number; password_hash: string; password_salt: string; away: boolean; project_leader_id: number; password_changed: boolean; force_in_project_id: number; computed_in_project_id: number; group: string; age: number; }>) => any) => z.object({
+export const rawUserSchema = (op: (arg0: z.ZodObject<{ id: z.ZodNumber; username: z.ZodString; openid_id: z.ZodOptional<z.ZodString>; password_hash: z.ZodString; password_salt: z.ZodString; away: z.ZodBoolean; project_leader_id: z.ZodNumber; password_changed: z.ZodBoolean; force_in_project_id: z.ZodNumber; computed_in_project_id: z.ZodNumber; type: z.ZodEnum<["voter", "helper", "admin"]>; group: z.ZodString; age: z.ZodNumber; }, "strict", z.ZodTypeAny, { openid_id?: string | undefined; username: string; type: "voter"; id: number; password_hash: string; password_salt: string; away: boolean; project_leader_id: number; password_changed: boolean; force_in_project_id: number; computed_in_project_id: number; group: string; age: number; }, { openid_id?: string | undefined; username: string; type: "voter"; id: number; password_hash: string; password_salt: string; away: boolean; project_leader_id: number; password_changed: boolean; force_in_project_id: number; computed_in_project_id: number; group: string; age: number; }>) => any) => z.object({
   type: z.enum(["helper", "admin", "voter"])
 }).passthrough().superRefine((value, ctx) => {
-  let schema = value.type === "voter" ? op(rawUserVoterSchema) : op(rawUserHelperOrAdminSchema);
+  let schema = value.type === "voter" ? op(rawUserVoterSchema as any) : op(rawUserHelperOrAdminSchema as any);
   let parsed = schema.safeParse(value)
   if (!parsed.success) {
     parsed.error.issues.forEach(ctx.addIssue)
   }
 }).transform(value => {
-  let schema = value.type === "voter" ? op(rawUserVoterSchema) : op(rawUserHelperOrAdminSchema);
+  let schema = value.type === "voter" ? op(rawUserVoterSchema as any) : op(rawUserHelperOrAdminSchema as any);
   return schema.parse(value)
 })
 
@@ -100,7 +100,14 @@ export const routes = identity({
     response: z.number(),
   },
   "/api/v1/users/create-or-update": {
-    request: rawUserSchema(s => s),
+    request: rawUserSchema(s => s.pick({
+      age: true,
+      away: true,
+      group: true,
+      id: true,
+      type: true,
+      username: true
+    }).setKey("id", z.number().optional())),
     response: result(z.object({}).extend({ id: z.number() }), z.record(z.string())),
   },
   "/api/v1/projects/create-or-update": {

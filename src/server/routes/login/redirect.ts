@@ -1,6 +1,6 @@
 import { sensitiveHeaders } from "node:http2";
 import { z } from "zod";
-import { rawUserHelperOrAdminSchema, rawUserSchema, rawUserVoterSchema } from "../../../lib/routes.js";
+import { rawUserSchema } from "../../../lib/routes.js";
 import { sql } from "../../database.js";
 import { request } from "../../express.js";
 import { client } from "./openid-client.js";
@@ -36,10 +36,8 @@ export async function openidRedirectHandler(stream: import("http2").ServerHttp2S
 
       //console.log(userinfo)
 
-      const dbUser = z.union([
-        rawUserVoterSchema.pick({id: true,username: true, password_hash: true, password_salt: true}),
-        rawUserHelperOrAdminSchema.pick({id: true,username: true, password_hash: true, password_salt: true}),
-      ]).parse((await sql`SELECT id, username, type FROM users WHERE openid_id = ${
+      const dbUser = rawUserSchema(s => s.pick({id: true,username: true, password_hash: true, password_salt: true})
+        ).parse((await sql`SELECT id, username, type FROM users WHERE openid_id = ${
           result.claims().sub
         } LIMIT 1`)[0])
 
