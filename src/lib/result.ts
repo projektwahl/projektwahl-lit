@@ -30,6 +30,7 @@ export const zod2result = <T extends z.ZodTypeAny>(schema: T, input: unknown): z
     return result;
   } else {
     const flattenedErrors = result.error.flatten()
+    console.log(result.error)
 
     /** @type {{[k: string]: string[];}} */
     const errors: { [k: string]: string[]; } = {
