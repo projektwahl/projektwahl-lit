@@ -1,4 +1,4 @@
-import { AnyZodObject, z, ZodNumber } from "zod";
+import { AnyZodObject, z, ZodNumber, ZodType, ZodTypeAny } from "zod";
 import { result } from "./result.js";
 
 export const loginInputSchema = z
@@ -37,8 +37,7 @@ export const rawUserVoterSchema = z
   })
   .strict();
 
-export const rawUserSchema = <Q extends AnyZodObject, R extends AnyZodObject>(op1: (arg0: z.ZodObject<{ id: z.ZodNumber; username: z.ZodString; openid_id: z.ZodOptional<z.ZodString>; password_hash: z.ZodString; password_salt: z.ZodString; away: z.ZodBoolean; project_leader_id: z.ZodNumber; password_changed: z.ZodBoolean; force_in_project_id: z.ZodNumber; computed_in_project_id: z.ZodNumber; type: z.ZodEnum<["voter"]>; group: z.ZodString; age: z.ZodNumber; }, "strict", z.ZodTypeAny, { openid_id?: string | undefined; type: "voter"; group: string; age: number; id: number; username: string; password_hash: string; password_salt: string; away: boolean; project_leader_id: number; password_changed: boolean; force_in_project_id: number; computed_in_project_id: number; }, { openid_id?: string | undefined; type: "voter"; group: string; age: number; id: number; username: string; password_hash: string; password_salt: string; away: boolean; project_leader_id: number; password_changed: boolean; force_in_project_id: number; computed_in_project_id: number; }>) => Q,
-                              op2: (arg0: z.ZodObject<{ id: z.ZodNumber; username: z.ZodString; openid_id: z.ZodOptional<z.ZodString>; password_hash: z.ZodString; password_salt: z.ZodString; away: z.ZodBoolean; project_leader_id: z.ZodNumber; password_changed: z.ZodBoolean; force_in_project_id: z.ZodNumber; computed_in_project_id: z.ZodNumber; type: z.ZodEnum<["helper", "admin"]>; }, "strict", z.ZodTypeAny, { openid_id?: string | undefined; type: "helper" | "admin"; id: number; username: string; password_hash: string; password_salt: string; away: boolean; project_leader_id: number; password_changed: boolean; force_in_project_id: number; computed_in_project_id: number; }, { openid_id?: string | undefined; type: "helper" | "admin"; id: number; username: string; password_hash: string; password_salt: string; away: boolean; project_leader_id: number; password_changed: boolean; force_in_project_id: number; computed_in_project_id: number; }>) => R) => z.object({
+export const rawUserSchema = <R1O, R1 extends ZodType<R1O>, R2O, R2 extends ZodType<R2O>>(op1: (s: typeof rawUserVoterSchema) => R1, op2: (s: typeof rawUserHelperOrAdminSchema) => R2) => z.object({
   type: z.enum(["helper", "admin", "voter"])
 }).passthrough().superRefine((value, ctx) => {
   let schema = value.type === "voter" ? op1(rawUserVoterSchema) : op2(rawUserHelperOrAdminSchema);
@@ -47,8 +46,8 @@ export const rawUserSchema = <Q extends AnyZodObject, R extends AnyZodObject>(op
     parsed.error.issues.forEach(ctx.addIssue)
   }
 }).transform(value => {
-  let schema = value.type === "voter" ? op1(rawUserVoterSchema) : op2(rawUserHelperOrAdminSchema);
-  return schema.parse(value)
+  const result = value.type === "voter" ? op1(rawUserVoterSchema).parse(value) : op2(rawUserHelperOrAdminSchema).parse(value);
+  return result;
 })
 
 export const rawProjectSchema = z.object({
@@ -75,9 +74,24 @@ export const loginOutputSchema = result(z.null(), z.record(z.string()));
 
 export type keys = "/api/v1/login"|"/api/v1/openid-login"|"/api/v1/redirect"|"/api/v1/sleep"|"/api/v1/update"|"/api/v1/users/create-or-update"|"/api/v1/projects/create-or-update"|"/api/v1/users"|"/api/v1/projects";
 
-function identity<T extends { [r in keys]: { request: import("zod").ZodType<any>, response: import("zod").ZodType<any> } }>(v: T) {
+function identity<T extends { [r in keys]: { request: ZodType<any>, response: ZodType<any> } }>(v: T) {
   return v;
 }
+
+const usersCreateOrUpdate = s => s.pick({
+  age: true,
+  away: true,
+  group: true,
+  id: true,
+  type: true,
+  username: true
+}).setKey("id", z.number().optional())
+
+const users = s => s.pick({
+  id: true,
+  type: true,
+  username: true
+})
 
 export const routes = identity({
   "/api/v1/login": {
@@ -101,14 +115,7 @@ export const routes = identity({
     response: z.number(),
   },
   "/api/v1/users/create-or-update": {
-    request: rawUserSchema(s => s.pick({
-      age: true,
-      away: true,
-      group: true,
-      id: true,
-      type: true,
-      username: true
-    }).setKey("id", z.number().optional())),
+    request: rawUserSchema(usersCreateOrUpdate, usersCreateOrUpdate),
     response: result(z.object({}).extend({ id: z.number() }), z.record(z.string())),
   },
   "/api/v1/projects/create-or-update": {
@@ -117,11 +124,7 @@ export const routes = identity({
   },
   "/api/v1/users": {
     request: z.undefined(),
-    response: z.array(rawUserSchema(s => s.pick({
-      id: true,
-      type: true,
-      username: true
-    }))),
+    response: z.array(rawUserSchema(users, users)),
   },
   "/api/v1/projects": {
     request: z.undefined(),
