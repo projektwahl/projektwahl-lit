@@ -80,15 +80,7 @@ function identity<T extends { [r in keys]: { request: ZodType<any>, response: Zo
 
 declare type UnknownKeysParam = "passthrough" | "strict" | "strip";
 
-const usersCreateOrUpdate = <T extends {
-  age: ZodTypeAny;
-  away: ZodTypeAny;
-  group: ZodTypeAny;
-  id: ZodTypeAny;
-  type: ZodTypeAny;
-  username: ZodTypeAny;
-  [k: string]: ZodTypeAny;
-}, UnknownKeys extends UnknownKeysParam = "strip", Catchall extends ZodTypeAny = ZodTypeAny, >(s: ZodObject<T, UnknownKeys, Catchall>): (ZodObject<objectUtil.noNever<{
+const usersCreateOrUpdate = <T extends { [k: string]: ZodTypeAny;}, UnknownKeys extends UnknownKeysParam = "strip", Catchall extends ZodTypeAny = ZodTypeAny>(s: ZodObject<T, UnknownKeys, Catchall>): (ZodObject<objectUtil.noNever<{
   [k in "age" | "away" | "group" | "id" | "type" | "username"]: k extends keyof T ? T[k] : never;
 }>, UnknownKeys, Catchall>) => s.pick({
   age: true,
