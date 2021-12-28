@@ -27,7 +27,7 @@ export const anyResult = result(z.any(), z.any());
 export const zod2result = <T extends z.ZodTypeAny>(schema: T, input: unknown): z.infer<T> => {
   const result = schema.safeParse(input);
   if (result.success) {
-    return input;
+    return result;
   } else {
     const flattenedErrors = result.error.flatten()
 
