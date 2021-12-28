@@ -1,6 +1,6 @@
 import { sensitiveHeaders } from "node:http2";
-import { z } from "zod";
-import { rawUserSchema } from "../../../lib/routes.js";
+import { objectUtil, z, ZodObject, ZodTypeAny } from "zod";
+import { rawUserSchema, UnknownKeysParam } from "../../../lib/routes.js";
 import { sql } from "../../database.js";
 import { request } from "../../express.js";
 import { client } from "./openid-client.js";
@@ -36,7 +36,9 @@ export async function openidRedirectHandler(stream: import("http2").ServerHttp2S
 
       //console.log(userinfo)
 
-      const pickFn = s => s.pick({id: true,username: true, password_hash: true, password_salt: true})
+      const pickFn = <T extends { [k: string]: ZodTypeAny;}, UnknownKeys extends UnknownKeysParam = "strip", Catchall extends ZodTypeAny = ZodTypeAny>(s: ZodObject<T, UnknownKeys, Catchall>): (ZodObject<objectUtil.noNever<{
+        [k in "id" | "username" | "password_hash" | "password_salt"]: k extends keyof T ? T[k] : never;
+      }>, UnknownKeys, Catchall>) => s.pick({id: true,username: true, password_hash: true, password_salt: true})
 
       const dbUser = rawUserSchema(pickFn, pickFn).parse((await sql`SELECT id, username, type FROM users WHERE openid_id = ${
           result.claims().sub
