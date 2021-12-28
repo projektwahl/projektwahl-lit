@@ -23,13 +23,15 @@ export async function usersHandler(stream: import("http2").ServerHttp2Stream, he
 
     console.log(searchParams)
 
-    const sorting = z.array(z.tuple([z.string(), z.enum(["ASC", "DESC"])])).parse(url.searchParams.getAll("order").map((o) => o.split("-")))
+    const columns = ["id", "type", "username"] as const;
+
+    const sorting = z.array(z.tuple([z.enum(columns), z.enum(["ASC", "DESC"])])).parse(url.searchParams.getAll("order").map((o) => o.split("-")))
 
     const schema = rawUserSchema(s=>s, s=>s);
 
     const value = fetchData<z.infer<typeof schema>>(
       "users",
-      ["id", "type", "username"],
+      columns,
       {
         id: "nulls-first",
         type: "nulls-first",

@@ -16,11 +16,13 @@ export async function projectsHandler(stream: import("http2").ServerHttp2Stream,
       f_title: z.string().optional()
     }).parse(Object.fromEntries(url.searchParams as any));
 
-    const sorting = z.array(z.tuple([z.string(), z.enum(["ASC", "DESC"])])).parse(url.searchParams.getAll("order").map((o) => o.split("-")))
+    const columns = ["id", "title", "info", "place", "costs", "min_age", "max_age", "min_participants", "max_participants", "random_assignments"] as const;
+
+    const sorting = z.array(z.tuple([z.enum(columns), z.enum(["ASC", "DESC"])])).parse(url.searchParams.getAll("order").map((o) => o.split("-")))
 
     const value = fetchData<z.infer<typeof rawProjectSchema>>(
       "projects",
-      ["id", "title", "info", "place", "costs", "min_age", "max_age", "min_participants", "max_participants", "random_assignments"],
+      columns,
       {
       },
       {
