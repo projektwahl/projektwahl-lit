@@ -29,6 +29,7 @@ export function request<P extends keyof typeof routes>(method: string, path: P, 
             stream.respond(new_headers);
             stream.end(JSON.stringify(responseBody));
           } else {
+            console.log(requestBody)
             stream.respond({
               "content-type": "text/json; charset=utf-8",
               ":status": 200,

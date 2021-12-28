@@ -1,27 +1,37 @@
 import { z } from "zod";
-import { routes } from "../../../lib/routes.js";
+import { rawUserSchema, routes } from "../../../lib/routes.js";
 import { sql } from "../../database.js";
 import { fetchData } from "../../entities.js";
 import { request } from "../../express.js";
 import { sql2 } from "../../sql/index.js";
 
+function includes<T, U extends T>(arr: readonly U[], elem: T): elem is U {
+  return arr.includes(elem as any);
+}
+
 export async function usersHandler(stream: import("http2").ServerHttp2Stream, headers: import("http2").IncomingHttpHeaders) {
   return await request("GET", "/api/v1/users", async function () {
     const url = new URL(headers[":path"]!, "https://localhost:8443");
 
+    console.log(Object.fromEntries(url.searchParams as any))
+
     const searchParams = z.object({
-      f_id: z.number().optional(),
+      f_id: z.string().refine(s => /^\d*$/.test(s)).transform(s => s === '' ? undefined : Number(s)).optional(),
       f_username: z.string().optional(),
-      f_type: z.string().optional(),
+      f_type: z.string().refine((s: string): s is "admin" | "helper" | "voter" | "" => includes(["admin", "helper", "voter", ""] as const, s)).transform(s => s === '' ? undefined : s).optional(),
     }).parse(Object.fromEntries(url.searchParams as any));
 
     console.log(searchParams)
 
-    const sorting = z.array(z.tuple([z.string(), z.enum(["ASC", "DESC"])])).parse(url.searchParams.getAll("order").map((o) => o.split("-")))
+    const columns = ["id", "type", "username"] as const;
 
-    const value = fetchData(
+    const sorting = z.array(z.tuple([z.enum(columns), z.enum(["ASC", "DESC"])])).parse(url.searchParams.getAll("order").map((o) => o.split("-")))
+
+    const schema = rawUserSchema(s=>s, s=>s);
+
+    const value = fetchData<z.infer<typeof schema>>(
       "users",
-      ["id", "type", "username"],
+      columns,
       {
         id: "nulls-first",
         type: "nulls-first",
@@ -42,7 +52,7 @@ I think in the UI we will never be able to implement this without javascript and
         sorting,
       },
       (query) => {
-        return sql2`username LIKE ${"%" + (query.username ?? '') + "%"}`;
+        return sql2`username LIKE ${"%" + (query.f_username ?? '') + "%"}`;
       }
     );
 

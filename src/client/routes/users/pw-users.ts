@@ -173,9 +173,7 @@ class PwUsers extends LitElement {
                     </th>
 
                     <th scope="col">
-                      <button class="btn btn-secondary" type="submit">
-                        <i class="bi bi-arrow-clockwise"></i>
-                      </button>
+                      
                     </th>
                   </tr>
                 </thead>

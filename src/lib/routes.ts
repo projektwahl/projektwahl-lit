@@ -1,4 +1,4 @@
-import { z, ZodNumber } from "zod";
+import { AnyZodObject, objectUtil, z, ZodNumber, ZodObject, ZodRawShape, ZodType, ZodTypeAny } from "zod";
 import { result } from "./result.js";
 
 export const loginInputSchema = z
@@ -37,7 +37,18 @@ export const rawUserVoterSchema = z
   })
   .strict();
 
-export const rawUserSchema = z.union([rawUserVoterSchema, rawUserHelperOrAdminSchema])
+export const rawUserSchema = <R1O, R2O>(op1: (s: typeof rawUserVoterSchema) => ZodType<R1O>, op2: (s: typeof rawUserHelperOrAdminSchema) => ZodType<R2O>) => z.object({
+  type: z.enum(["helper", "admin", "voter"])
+}).passthrough().superRefine((value, ctx) => {
+  let schema = value.type === "voter" ? op1(rawUserVoterSchema) : op2(rawUserHelperOrAdminSchema);
+  let parsed = schema.safeParse(value)
+  if (!parsed.success) {
+    parsed.error.issues.forEach(ctx.addIssue)
+  }
+}).transform(value => {
+  const result = value.type === "voter" ? op1(rawUserVoterSchema).parse(value) : op2(rawUserHelperOrAdminSchema).parse(value);
+  return result;
+})
 
 export const rawProjectSchema = z.object({
   id: z.number(),
@@ -63,9 +74,28 @@ export const loginOutputSchema = result(z.null(), z.record(z.string()));
 
 export type keys = "/api/v1/login"|"/api/v1/openid-login"|"/api/v1/redirect"|"/api/v1/sleep"|"/api/v1/update"|"/api/v1/users/create-or-update"|"/api/v1/projects/create-or-update"|"/api/v1/users"|"/api/v1/projects";
 
-function identity<T extends { [r in keys]: { request: import("zod").ZodType<any>, response: import("zod").ZodType<any> } }>(v: T) {
+function identity<T extends { [r in keys]: { request: ZodType<any>, response: ZodType<any> } }>(v: T) {
   return v;
 }
+
+export type UnknownKeysParam = "passthrough" | "strict" | "strip";
+
+const usersCreateOrUpdate = <T extends { [k: string]: ZodTypeAny;}, UnknownKeys extends UnknownKeysParam = "strip", Catchall extends ZodTypeAny = ZodTypeAny>(s: ZodObject<T, UnknownKeys, Catchall>) => s.pick({
+  age: true,
+  away: true,
+  group: true,
+  id: true,
+  type: true,
+  username: true
+}).setKey("id", z.number().optional()).extend({
+  password: z.string().optional()
+})
+
+const users = <T extends { [k: string]: ZodTypeAny;}, UnknownKeys extends UnknownKeysParam = "strip", Catchall extends ZodTypeAny = ZodTypeAny>(s: ZodObject<T, UnknownKeys, Catchall>) => s.pick({
+  id: true,
+  type: true,
+  username: true
+})
 
 export const routes = identity({
   "/api/v1/login": {
@@ -89,24 +119,16 @@ export const routes = identity({
     response: z.number(),
   },
   "/api/v1/users/create-or-update": {
-    request: z.union([rawUserVoterSchema.extend({ id: z.number().optional(), password: z.string().optional() }), rawUserHelperOrAdminSchema.extend({ id: z.number().optional(), password: z.string().optional() })]),
+    request: rawUserSchema(usersCreateOrUpdate, usersCreateOrUpdate),
     response: result(z.object({}).extend({ id: z.number() }), z.record(z.string())),
   },
   "/api/v1/projects/create-or-update": {
-    request: rawProjectSchema.extend({ id: z.number().optional() }),
+    request: rawProjectSchema.setKey("id", z.number().optional()),
     response: result(z.object({}).extend({ id: z.number() }), z.record(z.string())),
   },
   "/api/v1/users": {
     request: z.undefined(),
-    response: z.array(z.union([rawUserVoterSchema.pick({
-      id: true,
-      type: true,
-      username: true
-    }).strict(), rawUserHelperOrAdminSchema.pick({
-      id: true,
-      type: true,
-      username: true
-    }).strict()])),
+    response: z.array(rawUserSchema(users, users)),
   },
   "/api/v1/projects": {
     request: z.undefined(),

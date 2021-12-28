@@ -1,11 +1,12 @@
+import type { BaseQuery, FilterType } from "../lib/types.js";
 import { sql2, unsafe2 } from "./sql/index.js";
 
 export function fetchData<T extends { id: number; [index: string]: string | string[] | boolean | number }>(
   table: string,
-  fieldsToSelect: string[],
+  fieldsToSelect: readonly string[],
   orderByInfo: { [field: string]: 'nulls-first' | 'nulls-last'; },
-  _query: import("../lib/types").BaseQuery<T>, // TODO FIXME sanitize
-  customFilterQuery: (query: { [key in keyof T]?: T[key] | undefined; }) => [TemplateStringsArray, ...(string | string[] | boolean | number)[]]
+  _query: BaseQuery<T>, // TODO FIXME sanitize
+  customFilterQuery: (query: FilterType<T>) => [TemplateStringsArray, ...(string | string[] | boolean | number)[]]
 ): [TemplateStringsArray, ...(string | string[] | boolean | number)[]] {
   const query = _query;
 

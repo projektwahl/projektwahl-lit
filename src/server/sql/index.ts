@@ -31,6 +31,7 @@ export function sql2(_strings: TemplateStringsArray, ..._keys: (string | [Templa
   const stringsAsTemplates = strings.map(unsafe2);
 
   // array of templates
+  // @ts-expect-error
   const flattened: [TemplateStringsArray, ...(string | string[] | boolean | number)[]][] = stringsAsTemplates.flatMap((m, i) => {
     if (i == keys.length) {
       return [m];

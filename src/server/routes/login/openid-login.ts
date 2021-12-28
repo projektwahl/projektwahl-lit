@@ -25,8 +25,8 @@ export async function openidLoginHandler(stream: import("http2").ServerHttp2Stre
     return [
       headers,
       {
-        result: "success",
-        success: undefined,
+        success: true,
+        data: undefined,
       },
     ];
   })(stream, headers);
