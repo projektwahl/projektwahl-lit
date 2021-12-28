@@ -98,7 +98,15 @@ export const routes = identity({
   },
   "/api/v1/users": {
     request: z.undefined(),
-    response: z.array(z.union([rawUserVoterSchema.extend({ id: z.number() }), rawUserHelperOrAdminSchema.extend({ id: z.number() })])),
+    response: z.array(z.union([rawUserVoterSchema.pick({
+      id: true,
+      type: true,
+      username: true
+    }).strict(), rawUserHelperOrAdminSchema.pick({
+      id: true,
+      type: true,
+      username: true
+    }).strict()])),
   },
   "/api/v1/projects": {
     request: z.undefined(),

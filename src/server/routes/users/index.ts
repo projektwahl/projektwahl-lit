@@ -10,10 +10,12 @@ export async function usersHandler(stream: import("http2").ServerHttp2Stream, he
     const url = new URL(headers[":path"]!, "https://localhost:8443");
 
     const searchParams = z.object({
-      f_id: z.number(),
-      f_username: z.string(),
-      f_type: z.string(),
+      f_id: z.number().optional(),
+      f_username: z.string().optional(),
+      f_type: z.string().optional(),
     }).parse(Object.fromEntries(url.searchParams as any));
+
+    console.log(searchParams)
 
     const sorting = z.array(z.tuple([z.string(), z.enum(["ASC", "DESC"])])).parse(url.searchParams.getAll("order").map((o) => o.split("-")))
 
@@ -40,7 +42,7 @@ I think in the UI we will never be able to implement this without javascript and
         sorting,
       },
       (query) => {
-        return sql2`username LIKE ${"%" + query.username + "%"}`;
+        return sql2`username LIKE ${"%" + (query.username ?? '') + "%"}`;
       }
     );
 

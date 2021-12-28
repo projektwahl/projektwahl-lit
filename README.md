@@ -20,6 +20,7 @@ Software to manage choosing projects and automatically assigning people to proje
 git clone --branch openid https://github.com/projektwahl/projektwahl-lit.git
 cd projektwahl-lit/
 npm install
+npm run localize-build
 
 npm run serve # run this in parallel
 
