@@ -70,12 +70,12 @@ I think in the UI we will never be able to implement this without javascript and
       }
     );
 
-    let entities = routes["/api/v1/users"].response.parse(await sql(...value));
+    let entities = routes["/api/v1/users"].response.shape.entities.parse(await sql(...value));
 
     // https://github.com/projektwahl/projektwahl-sveltekit/blob/work/src/lib/list-entities.ts#L30
 
-    let nextCursor: z.infer<typeof schema> | null = null;
-		let previousCursor: z.infer<typeof schema> | null = null;
+    let nextCursor: z.infer<typeof routes["/api/v1/users"]["response"]>["entities"][0] | null = null;
+		let previousCursor: z.infer<typeof routes["/api/v1/users"]["response"]>["entities"][0] | null = null;
 		// TODO FIXME also recalculate the other cursor because data could've been deleted in between / the filters have changed
 		if (pagination.p_direction === "forwards") {
 			previousCursor = entities[0];
@@ -91,7 +91,6 @@ I think in the UI we will never be able to implement this without javascript and
 			}
 			nextCursor = entities[entities.length - 1];
 		}
-
 
     return [
       {

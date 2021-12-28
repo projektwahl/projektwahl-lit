@@ -97,6 +97,19 @@ const users = <T extends { [k: string]: ZodTypeAny;}, UnknownKeys extends Unknow
   username: true
 })
 
+const project = rawProjectSchema.pick({
+  "id": true,
+  "title": true,
+  "info": true,
+  "place": true,
+  "costs": true,
+  "min_age": true,
+  "max_age": true,
+  "min_participants": true,
+  "max_participants": true,
+  "random_assignments": true
+})
+
 export const routes = identity({
   "/api/v1/login": {
     request: loginInputSchema,
@@ -128,21 +141,18 @@ export const routes = identity({
   },
   "/api/v1/users": {
     request: z.undefined(),
-    response: z.array(rawUserSchema(users, users)),
+    response: z.object({
+      entities: z.array(rawUserSchema(users, users)),
+      previousCursor: rawUserSchema(users, users).nullable(),
+      nextCursor: rawUserSchema(users, users).nullable(),
+    })
   },
   "/api/v1/projects": {
     request: z.undefined(),
-    response: z.array(rawProjectSchema.pick({
-      "id": true,
-      "title": true,
-      "info": true,
-      "place": true,
-      "costs": true,
-      "min_age": true,
-      "max_age": true,
-      "min_participants": true,
-      "max_participants": true,
-      "random_assignments": true
-    })),
+    response: z.object({
+      entities: z.array(project),
+      previousCursor: project.nullable(),
+      nextCursor: project.nullable(),
+    })
   },
 } as const);

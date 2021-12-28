@@ -186,7 +186,7 @@ class PwUsers extends LitElement {
                       return noChange;
                     },
                     complete: (result) => {
-                      return result.map(
+                      return result.entities.map(
                         (value) => html`<tr>
                           <th scope="row">
                             <p>${value.id}</p>
