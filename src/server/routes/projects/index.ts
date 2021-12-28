@@ -9,6 +9,8 @@ export async function projectsHandler(stream: import("http2").ServerHttp2Stream,
   return await request("GET", "/api/v1/projects", async function () {
     const url = new URL(headers[":path"]!, "https://localhost:8443");
 
+    console.log(Object.fromEntries(url.searchParams as any))
+
     const searchParams = z.object({
       f_id: z.number().optional(),
       f_title: z.string().optional()
@@ -16,16 +18,13 @@ export async function projectsHandler(stream: import("http2").ServerHttp2Stream,
 
     const sorting = z.array(z.tuple([z.string(), z.enum(["ASC", "DESC"])])).parse(url.searchParams.getAll("order").map((o) => o.split("-")))
 
-    const value = fetchData(
+    const value = fetchData<z.infer<typeof rawProjectSchema>>(
       "projects",
       ["id", "title", "info", "place", "costs", "min_age", "max_age", "min_participants", "max_participants", "random_assignments"],
       {
       },
       {
-        filters: {
-          id: searchParams.f_id,
-          title: searchParams.f_title,
-        },
+        filters: searchParams,
         paginationCursor: null,
         paginationDirection: "forwards",
         paginationLimit: 10,

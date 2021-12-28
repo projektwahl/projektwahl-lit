@@ -5,14 +5,20 @@ import { fetchData } from "../../entities.js";
 import { request } from "../../express.js";
 import { sql2 } from "../../sql/index.js";
 
+function includes<T, U extends T>(arr: readonly U[], elem: T): elem is U {
+  return arr.includes(elem as any);
+}
+
 export async function usersHandler(stream: import("http2").ServerHttp2Stream, headers: import("http2").IncomingHttpHeaders) {
   return await request("GET", "/api/v1/users", async function () {
     const url = new URL(headers[":path"]!, "https://localhost:8443");
 
+    console.log(Object.fromEntries(url.searchParams as any))
+
     const searchParams = z.object({
-      id: z.string().refine(s => /^\d*$/.test(s)).transform(s => s === '' ? undefined : Number(s)),
-      username: z.string().optional(),
-      type: z.enum(["admin", "helper", "voter"]).optional(),
+      f_id: z.string().refine(s => /^\d*$/.test(s)).transform(s => s === '' ? undefined : Number(s)).optional(),
+      f_username: z.string().optional(),
+      f_type: z.string().refine(s => includes(["admin", "helper", "voter"] as const, s)).transform(s => s === '' ? undefined : s).optional(),
     }).parse(Object.fromEntries(url.searchParams as any));
 
     console.log(searchParams)

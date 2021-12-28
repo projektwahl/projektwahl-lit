@@ -22,14 +22,16 @@ type EntityResponseBody<T> = {
   nextCursor: T | null;
 };
 
+type FilterType<Type> = {
+  [Property in keyof Type as `f_${string & Property}`]?: Type[Property]
+};
+
 type BaseQuery<C> = {
   paginationDirection: "forwards" | "backwards";
   paginationCursor: C | null; // if this is null the start is at start/end depending on paginationDirection
   sorting: [keyof C, "ASC" | "DESC"][];
   paginationLimit: number;
-  filters: {
-    [key in keyof C]?: C[key]; // boolean | string | number | string[] | null | undefined // TODO FIXME C[key]
-  };
+  filters: FilterType<C>
 };
 
 export interface WritableTemplateStringsArray extends Array<string> {
