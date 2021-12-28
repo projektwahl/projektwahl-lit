@@ -12,7 +12,7 @@ export async function projectsHandler(stream: import("http2").ServerHttp2Stream,
     console.log(Object.fromEntries(url.searchParams as any))
 
     const searchParams = z.object({
-      f_id: z.number().optional(),
+      f_id: z.string().refine(s => /^\d*$/.test(s)).transform(s => s === '' ? undefined : Number(s)).optional(),
       f_title: z.string().optional()
     }).parse(Object.fromEntries(url.searchParams as any));
 

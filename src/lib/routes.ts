@@ -123,7 +123,7 @@ export const routes = identity({
     response: result(z.object({}).extend({ id: z.number() }), z.record(z.string())),
   },
   "/api/v1/projects/create-or-update": {
-    request: rawProjectSchema,
+    request: rawProjectSchema.setKey("id", z.number().optional()),
     response: result(z.object({}).extend({ id: z.number() }), z.record(z.string())),
   },
   "/api/v1/users": {

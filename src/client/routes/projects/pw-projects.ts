@@ -134,11 +134,11 @@ class PwProjects<T> extends LitElement {
                     </th>
 
                     <th class="table-cell-hover p-0" scope="col">
-                      <pw-order name="username" title=${msg("Name")}></pw-order>
+                      <pw-order name="title" title=${msg("Title")}></pw-order>
                     </th>
 
                     <th class="table-cell-hover p-0" scope="col">
-                      <pw-order name="type" title=${msg("Type")}></pw-order>
+                      <pw-order name="info" title=${msg("Info")}></pw-order>
                     </th>
 
                     <th class="table-cell-hover">${msg("Actions")}</th>
@@ -157,28 +157,26 @@ class PwProjects<T> extends LitElement {
 
                     <th scope="col">
                       <input
-                        name="f_username"
+                        name="f_title"
                         type="text"
                         class="form-control"
                         id="projects-filter-{name}"
-                        value=${this.history.url.searchParams.get("f_username")}
+                        value=${this.history.url.searchParams.get("f_title")}
                       />
                     </th>
 
                     <th scope="col">
                       <input
-                        name="f_type"
+                        name="f_info"
                         type="text"
                         class="form-control"
                         id="projects-filter-{name}"
-                        value=${this.history.url.searchParams.get("f_type")}
+                        value=${this.history.url.searchParams.get("f_info")}
                       />
                     </th>
 
                     <th scope="col">
-                      <button class="btn btn-secondary" type="submit">
-                        <i class="bi bi-arrow-clockwise"></i>
-                      </button>
+                      
                     </th>
                   </tr>
                 </thead>
