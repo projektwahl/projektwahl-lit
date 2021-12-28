@@ -37,7 +37,7 @@ export const rawUserVoterSchema = z
   })
   .strict();
 
-export const rawUserSchema = <R1O, R1 extends ZodType<R1O>, R2O, R2 extends ZodType<R2O>>(op1: (s: typeof rawUserVoterSchema) => R1, op2: (s: typeof rawUserHelperOrAdminSchema) => R2) => z.object({
+export const rawUserSchema = <R1O, R2O>(op1: (s: typeof rawUserVoterSchema) => ZodType<R1O>, op2: (s: typeof rawUserHelperOrAdminSchema) => ZodType<R2O>) => z.object({
   type: z.enum(["helper", "admin", "voter"])
 }).passthrough().superRefine((value, ctx) => {
   let schema = value.type === "voter" ? op1(rawUserVoterSchema) : op2(rawUserHelperOrAdminSchema);
