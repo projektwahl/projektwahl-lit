@@ -16,6 +16,19 @@ export async function projectsHandler(stream: import("http2").ServerHttp2Stream,
       f_title: z.string().optional()
     }).parse(Object.fromEntries(url.searchParams as any));
 
+    const pagination = z.object({
+      p_cursor: z.string().refine(s => {
+        try {
+          JSON.parse(s);
+        } catch (e) {
+          return false;
+        }
+        return true;
+      }).transform(s => JSON.parse(s)).optional(),
+      p_direction: z.enum(["forwards", "backwards"]).default("forwards"),
+      p_limit: z.number().default(50),
+    }).parse(Object.fromEntries(url.searchParams as any))
+
     const columns = ["id", "title", "info", "place", "costs", "min_age", "max_age", "min_participants", "max_participants", "random_assignments"] as const;
 
     const sorting = z.array(z.tuple([z.enum(columns), z.enum(["ASC", "DESC"])])).parse(url.searchParams.getAll("order").map((o) => o.split("-")))
@@ -27,9 +40,9 @@ export async function projectsHandler(stream: import("http2").ServerHttp2Stream,
       },
       {
         filters: searchParams,
-        paginationCursor: null,
-        paginationDirection: "forwards",
-        paginationLimit: 10,
+        paginationCursor: pagination.p_cursor,
+        paginationDirection: pagination.p_direction,
+        paginationLimit: pagination.p_limit,
         sorting,
       },
       (query) => {

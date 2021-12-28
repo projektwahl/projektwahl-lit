@@ -21,6 +21,20 @@ export async function usersHandler(stream: import("http2").ServerHttp2Stream, he
       f_type: z.string().refine((s: string): s is "admin" | "helper" | "voter" | "" => includes(["admin", "helper", "voter", ""] as const, s)).transform(s => s === '' ? undefined : s).optional(),
     }).parse(Object.fromEntries(url.searchParams as any));
 
+    // TODO FIXME put this in entities.ts
+    const pagination = z.object({
+      p_cursor: z.string().refine(s => {
+        try {
+          JSON.parse(s);
+        } catch (e) {
+          return false;
+        }
+        return true;
+      }).transform(s => JSON.parse(s)).optional(),
+      p_direction: z.enum(["forwards", "backwards"]).default("forwards"),
+      p_limit: z.number().default(50),
+    }).parse(Object.fromEntries(url.searchParams as any))
+
     console.log(searchParams)
 
     const columns = ["id", "type", "username"] as const;
@@ -40,9 +54,9 @@ export async function usersHandler(stream: import("http2").ServerHttp2Stream, he
       },
       {
         filters: searchParams,
-        paginationCursor: null,
-        paginationDirection: "forwards",
-        paginationLimit: 10,
+        paginationCursor: pagination.p_cursor,
+        paginationDirection: pagination.p_direction,
+        paginationLimit: pagination.p_limit,
         // TODO FIXME the order should be user specified
         // TODO FIXME also unordered needs to be an option in the ui
         /*

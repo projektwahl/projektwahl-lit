@@ -5,7 +5,7 @@ export function fetchData<T extends { id: number; [index: string]: string | stri
   table: string,
   fieldsToSelect: readonly string[],
   orderByInfo: { [field: string]: 'nulls-first' | 'nulls-last'; },
-  _query: BaseQuery<T>, // TODO FIXME sanitize
+  _query: BaseQuery<T>,
   customFilterQuery: (query: FilterType<T>) => [TemplateStringsArray, ...(string | string[] | boolean | number)[]]
 ): [TemplateStringsArray, ...(string | string[] | boolean | number)[]] {
   const query = _query;
