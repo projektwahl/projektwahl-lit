@@ -13,6 +13,7 @@ import { createOrUpdateProjectsHandler } from "./routes/projects/create-or-updat
 import { cwd } from "node:process";
 import { projectsHandler } from "./routes/projects/index.js";
 import esbuild from 'esbuild'
+import {resolve as loaderResolve, load as loaderLoad} from '../loader.js'
 
 //const startTime = Date.now();
 
@@ -107,9 +108,26 @@ export async function serverHandler(stream: import("http2").ServerHttp2Stream, h
       // TODO FIXME caching (server+clientside)
 
       try {
-        let contents = await readFile(filename, {
-          encoding: "utf-8",
-        });
+        console.log(filename)
+        const resolved = await loaderResolve(filename, {
+          parentURL: import.meta.url
+        }, (specifier, context, defaultResolve) => {
+          const baseURL = pathToFileURL(`${cwd()}/`).href;
+          const { parentURL = baseURL } = context;
+          const targetUrl = new URL(specifier, parentURL)
+          return {
+            url: targetUrl.href
+          };
+        })
+        console.log("resolvd", resolved.url)
+        const loaded = await loaderLoad(resolved.url, undefined, async (url: string) => {
+          return {
+            source: await readFile(fileURLToPath(url), {
+              encoding: "utf-8",
+            })
+          };
+        })
+        let contents = loaded.source;
 
         if (extname(filename) === ".js" || extname(filename) === ".ts") {
           contents = await replaceAsync(

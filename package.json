@@ -20,11 +20,10 @@
     "format": "prettier --write .",
     "lint": "eslint .",
     "fix:lint": "eslint --fix .",
-    "setup": "node ./src/server/setup.js",
-    "server": "node --enable-source-maps --experimental-import-meta-resolve ./src/server/index.js",
+    "setup": "node --experimental-loader ./src/loader.js ./src/server/setup.js",
+    "server": "node --experimental-loader ./src/loader.js --enable-source-maps --experimental-import-meta-resolve ./src/server/index.js",
     "localize-extract": "lit-localize extract",
     "localize-build": "lit-localize build",
-    "serve": "esbuild --outdir=src/ --outbase=src/ src/**/*.ts --sourcemap --watch",
     "build": "esbuild --format=esm --bundle src/client/pw-app.ts --sourcemap --splitting --analyze --outdir=dist --minify-whitespace --minify-identifiers --minify-syntax --tree-shaking=true --minify"
   },
   "dependencies": {
