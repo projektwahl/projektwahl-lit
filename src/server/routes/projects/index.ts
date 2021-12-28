@@ -31,7 +31,7 @@ export async function projectsHandler(stream: import("http2").ServerHttp2Stream,
         sorting,
       },
       (query) => {
-        return sql2`title LIKE ${"%" + (query.title ?? '') + "%"}`;
+        return sql2`title LIKE ${"%" + (query.f_title ?? '') + "%"}`;
       }
     );
 

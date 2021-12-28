@@ -50,7 +50,7 @@ I think in the UI we will never be able to implement this without javascript and
         sorting,
       },
       (query) => {
-        return sql2`username LIKE ${"%" + (query.username ?? '') + "%"}`;
+        return sql2`username LIKE ${"%" + (query.f_username ?? '') + "%"}`;
       }
     );
 
