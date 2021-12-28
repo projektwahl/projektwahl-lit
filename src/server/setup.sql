@@ -10,7 +10,7 @@ CREATE TABLE IF NOT EXISTS projects (
   title VARCHAR(255) NOT NULL,
   info VARCHAR(4096) NOT NULL,
   place VARCHAR(256) NOT NULL,
-  costs DECIMAL(4,2) NOT NULL,
+  costs FLOAT NOT NULL,
   min_age INTEGER NOT NULL,
   max_age INTEGER NOT NULL,
   min_participants INTEGER NOT NULL,
