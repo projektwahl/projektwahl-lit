@@ -32,10 +32,10 @@ export async function usersHandler(stream: import("http2").ServerHttp2Stream, he
         return true;
       }).transform(s => JSON.parse(s)).optional(),
       p_direction: z.enum(["forwards", "backwards"]).default("forwards"),
-      p_limit: z.number().default(50),
+      p_limit: z.number().default(100),
     }).parse(Object.fromEntries(url.searchParams as any))
 
-    console.log(searchParams)
+    console.log(pagination)
 
     const columns = ["id", "type", "username"] as const;
 
@@ -70,14 +70,39 @@ I think in the UI we will never be able to implement this without javascript and
       }
     );
 
-    let result = routes["/api/v1/users"].response.parse(await sql(...value));
+    let entities = routes["/api/v1/users"].response.parse(await sql(...value));
+
+    // https://github.com/projektwahl/projektwahl-sveltekit/blob/work/src/lib/list-entities.ts#L30
+
+    let nextCursor: z.infer<typeof schema> | null = null;
+		let previousCursor: z.infer<typeof schema> | null = null;
+		// TODO FIXME also recalculate the other cursor because data could've been deleted in between / the filters have changed
+		if (pagination.p_direction === "forwards") {
+			previousCursor = entities[0];
+			if (entities.length > pagination.p_limit) {
+				entities.pop();
+				nextCursor = entities[entities.length - 1] ?? null;
+			}
+		} else if (pagination.p_direction === "backwards") {
+			entities = entities.reverse(); // fixup as we needed to switch up orders above
+			if (entities.length > pagination.p_limit) {
+				entities.shift();
+				previousCursor = entities[0] ?? null;
+			}
+			nextCursor = entities[entities.length - 1];
+		}
+
 
     return [
       {
         "content-type": "text/json; charset=utf-8",
         ":status": 200,
       },
-      result,
+      {
+        entities,
+        nextCursor,
+        previousCursor
+      },
     ];
   })(stream, headers);
 }

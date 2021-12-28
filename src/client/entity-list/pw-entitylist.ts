@@ -50,10 +50,10 @@ export class PwEntityList<T> extends LitElement {
           <select
             @change=${(event: Event) => {
               const url = new URL(window.location.href);
-              url.searchParams.set("count", (event.target as HTMLSelectElement).value);
+              url.searchParams.set("p_limit", (event.target as HTMLSelectElement).value);
               HistoryController.goto(url, {});
             }}
-            .value=${this.history.url.searchParams.get("count")}
+            .value=${this.history.url.searchParams.get("p_limit")}
             class="form-select"
             aria-label="Default select example"
           >
@@ -72,7 +72,7 @@ export class PwEntityList<T> extends LitElement {
                 50
               )}
             </option>
-            <option value="100">
+            <option selected value="100">
               ${((count: number) => msg(str`${count} per page`))(
                 100
               )}

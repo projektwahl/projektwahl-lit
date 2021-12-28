@@ -1,13 +1,13 @@
 import type { BaseQuery, FilterType } from "../lib/types.js";
 import { sql2, unsafe2 } from "./sql/index.js";
 
-export function fetchData<T extends { id: number; [index: string]: string | string[] | boolean | number }>(
+export function fetchData<T extends { id: number; [index: string]: null | string | string[] | boolean | number }>(
   table: string,
   fieldsToSelect: readonly string[],
   orderByInfo: { [field: string]: 'nulls-first' | 'nulls-last'; },
   _query: BaseQuery<T>,
-  customFilterQuery: (query: FilterType<T>) => [TemplateStringsArray, ...(string | string[] | boolean | number)[]]
-): [TemplateStringsArray, ...(string | string[] | boolean | number)[]] {
+  customFilterQuery: (query: FilterType<T>) => [TemplateStringsArray, ...(null | string | string[] | boolean | number)[]]
+): [TemplateStringsArray, ...(null | string | string[] | boolean | number)[]] {
   const query = _query;
 
   // orderBy needs to be reversed for backwards pagination
@@ -28,7 +28,7 @@ export function fetchData<T extends { id: number; [index: string]: string | stri
 
   const paginationCursor = query.paginationCursor;
 
-  if (paginationCursor === null) {
+  if (!paginationCursor) {
     return sql2`(SELECT ${unsafe2(fieldsToSelect.join(", "))} FROM ${unsafe2(
       table
     )} WHERE ${customFilterQuery(query.filters)} ORDER BY ${orderByQuery} LIMIT ${
@@ -42,7 +42,7 @@ export function fetchData<T extends { id: number; [index: string]: string | stri
         .flatMap((value, index) => {
           return [
             sql2` AND `,
-            sql2`${paginationCursor[value[0]]} ${
+            sql2`${paginationCursor ? paginationCursor[value[0]] : null} ${
               index === part.length - 1
                 ? value[1] === "ASC"
                   ? sql2`<`
@@ -62,8 +62,12 @@ export function fetchData<T extends { id: number; [index: string]: string | stri
       })`;
     });
 
-    return sql2`${queries
-      .flatMap((v) => [sql2`\nUNION ALL\n`, v])
-      .slice(1)} LIMIT ${query.paginationLimit + 1}`;
+    if (queries.length == 1) {
+      return queries[0]
+    } else {
+      return sql2`${queries
+        .flatMap((v) => [sql2`\nUNION ALL\n`, v])
+        .slice(1)} LIMIT ${query.paginationLimit + 1}`;
+    }
   }
 }

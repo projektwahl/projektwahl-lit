@@ -26,7 +26,7 @@ export async function projectsHandler(stream: import("http2").ServerHttp2Stream,
         return true;
       }).transform(s => JSON.parse(s)).optional(),
       p_direction: z.enum(["forwards", "backwards"]).default("forwards"),
-      p_limit: z.number().default(50),
+      p_limit: z.number().default(100),
     }).parse(Object.fromEntries(url.searchParams as any))
 
     const columns = ["id", "title", "info", "place", "costs", "min_age", "max_age", "min_participants", "max_participants", "random_assignments"] as const;

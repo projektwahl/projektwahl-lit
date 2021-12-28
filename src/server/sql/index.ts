@@ -11,13 +11,13 @@ import type { WritableTemplateStringsArray } from "../../lib/types";
 
 // https://github.com/porsager/postgres-benchmarks
 
-export function unsafe2(string: string | number | symbol): [TemplateStringsArray, ...any[]] {
-  let r: import("../../lib/types").WritableTemplateStringsArray = [string.toString()];
-  r.raw = [string.toString()];
+export function unsafe2(string: null | string | number | symbol): [TemplateStringsArray, ...any[]] {
+  let r: import("../../lib/types").WritableTemplateStringsArray = [String(string)];
+  r.raw = [String(string)]
   return [r as TemplateStringsArray];
 }
 
-export function sql2(_strings: TemplateStringsArray, ..._keys: (string | [TemplateStringsArray, ...(string | string[] | boolean | number)[]] | [TemplateStringsArray, ...(string | string[] | boolean | number)[]][] | string[] | boolean | number)[]): [TemplateStringsArray, ...(string | string[] | boolean | number)[]] {
+export function sql2(_strings: TemplateStringsArray, ..._keys: (null | string | [TemplateStringsArray, ...(null | string | string[] | boolean | number)[]] | [TemplateStringsArray, ...(null | string | string[] | boolean | number)[]][] | string[] | boolean | number)[]): [TemplateStringsArray, ...(null | string | string[] | boolean | number)[]] {
   const strings = _strings;
   const keys = _keys;
   //console.log("sql", strings, keys)
