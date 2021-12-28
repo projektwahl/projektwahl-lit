@@ -7,7 +7,7 @@ import { checkPassword } from "../../password.js";
 
 export async function loginHandler(stream: import("http2").ServerHttp2Stream, headers: import("http2").IncomingHttpHeaders) {
   return await request("POST", "/api/v1/login", async function (body) {
-    const dbUser = rawUserSchema(s => s).parse((await sql`SELECT id, username, password_hash, password_salt, type FROM users WHERE username = ${body.username} LIMIT 1`)[0]);
+    const dbUser = rawUserSchema(s => s, s => s).parse((await sql`SELECT id, username, password_hash, password_salt, type FROM users WHERE username = ${body.username} LIMIT 1`)[0]);
 
     if (dbUser === undefined) {
       return [

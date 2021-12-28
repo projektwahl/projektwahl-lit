@@ -1,4 +1,4 @@
-import { AnyZodObject, z, ZodNumber, ZodType, ZodTypeAny } from "zod";
+import { AnyZodObject, objectUtil, z, ZodNumber, ZodObject, ZodRawShape, ZodType, ZodTypeAny } from "zod";
 import { result } from "./result.js";
 
 export const loginInputSchema = z
@@ -78,16 +78,28 @@ function identity<T extends { [r in keys]: { request: ZodType<any>, response: Zo
   return v;
 }
 
-const usersCreateOrUpdate = s => s.pick({
+declare type UnknownKeysParam = "passthrough" | "strict" | "strip";
+
+const usersCreateOrUpdate = <T extends {
+  age: ZodTypeAny;
+  away: ZodTypeAny;
+  group: ZodTypeAny;
+  id: ZodTypeAny;
+  type: ZodTypeAny;
+  username: ZodTypeAny;
+  [k: string]: ZodTypeAny;
+}, UnknownKeys extends UnknownKeysParam = "strip", Catchall extends ZodTypeAny = ZodTypeAny, >(s: ZodObject<T, UnknownKeys, Catchall>): (ZodObject<objectUtil.noNever<{
+  [k in "age" | "away" | "group" | "id" | "type" | "username"]: k extends keyof T ? T[k] : never;
+}>, UnknownKeys, Catchall>) => s.pick({
   age: true,
   away: true,
   group: true,
   id: true,
   type: true,
   username: true
-}).setKey("id", z.number().optional())
+})//.setKey("id", z.number().optional())
 
-const users = s => s.pick({
+const users = <Q>(s: Q) => s.pick({
   id: true,
   type: true,
   username: true

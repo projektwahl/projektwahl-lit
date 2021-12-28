@@ -36,8 +36,9 @@ export async function openidRedirectHandler(stream: import("http2").ServerHttp2S
 
       //console.log(userinfo)
 
-      const dbUser = rawUserSchema(s => s.pick({id: true,username: true, password_hash: true, password_salt: true})
-        ).parse((await sql`SELECT id, username, type FROM users WHERE openid_id = ${
+      const pickFn = s => s.pick({id: true,username: true, password_hash: true, password_salt: true})
+
+      const dbUser = rawUserSchema(pickFn, pickFn).parse((await sql`SELECT id, username, type FROM users WHERE openid_id = ${
           result.claims().sub
         } LIMIT 1`)[0])
 
