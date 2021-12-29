@@ -5,7 +5,7 @@ import { bootstrapCss } from "../index.js";
 import { HistoryController } from "../history-controller.js";
 import { setupHmr } from "../hmr.js";
 import { msg, str } from "@lit/localize";
-import { createRef } from "lit/directives/ref";
+import { createRef } from "lit/directives/ref.js";
 import { Task, TaskStatus } from "@lit-labs/task";
 import type { routes } from "../../lib/routes.js";
 import type { z } from "zod";
@@ -64,9 +64,7 @@ export class PwEntityList<P extends keyof typeof routes> extends LitElement {
   }
 
   override render() {
-    if (this.title === undefined) {
-      throw new Error(msg("component not fully initialized"));
-    }
+    console.log("jo")
 
     if (!this.initialRender) {
       this.initialRender = true;
@@ -103,7 +101,7 @@ export class PwEntityList<P extends keyof typeof routes> extends LitElement {
       <h1 class="text-center">${this.title}</h1>
       <div class="row justify-content-between">
         <div class="col-auto">
-          <slot name="buttons"></slot>
+          ${this.buttons}
         </div>
         <div class="col-3">
           <select
@@ -139,7 +137,7 @@ export class PwEntityList<P extends keyof typeof routes> extends LitElement {
           </select>
         </div>
       </div>
-      <slot name="response"></slot>
+      ${this.response}
       <nav aria-label="${msg("navigation of user list")}">
         <ul class="pagination justify-content-center">
           <!-- { # await only works in blocks -->
