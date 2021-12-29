@@ -1,26 +1,66 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // SPDX-FileCopyrightText: 2021 Moritz Hedtke <Moritz.Hedtke@t-online.de>
-import { html, LitElement } from "lit";
+import { css, html, LitElement, TemplateResult } from "lit";
 import { bootstrapCss } from "../index.js";
 import { HistoryController } from "../history-controller.js";
 import { setupHmr } from "../hmr.js";
 import { msg, str } from "@lit/localize";
+import { createRef } from "lit/directives/ref";
+import { Task, TaskStatus } from "@lit-labs/task";
+import type { routes } from "../../lib/routes.js";
+import type { z } from "zod";
 
-export class PwEntityList<T> extends LitElement {
+export class PwEntityList<P extends keyof typeof routes> extends LitElement {
   static override get properties() {
     return {
-      title: { type: String },
+      task: { attribute: false },
+      initial: { attribute: false },
+      initialRender: { state: true },
+      debouncedUrl: { state: true },
     };
   }
 
-  private history;
+  static override styles = css`
+    .table-cell-hover:hover {
+      --bs-table-accent-bg: var(--bs-table-hover-bg);
+      color: var(--bs-table-hover-color);
+    }
+  `;
 
-  constructor() {
+  get title(): string {
+    throw new Error("not implemented");
+  }
+
+  get buttons(): TemplateResult {
+    throw new Error("not implemented");
+  }
+
+  get response(): TemplateResult {
+    throw new Error("not implemented");
+  }
+
+  protected _apiTask!: Task<[URLSearchParams], z.infer<typeof routes[P]["response"]>>;
+
+  formRef;
+
+  initialRender: boolean;
+
+  initial: Promise<import("lit").TemplateResult> | undefined;
+
+  protected history;
+
+  taskFunction: ([searchParams]: [URLSearchParams]) => Promise<any>;
+
+  constructor(taskFunction: ([searchParams]: [URLSearchParams]) => Promise<any>) {
     super();
 
-    this.title;
+    this.taskFunction = taskFunction;
 
     this.history = new HistoryController(this, /.*/);
+
+    this.formRef = createRef();
+
+    this.initialRender = false;
   }
 
   override render() {
@@ -28,8 +68,27 @@ export class PwEntityList<T> extends LitElement {
       throw new Error(msg("component not fully initialized"));
     }
 
+    if (!this.initialRender) {
+      this.initialRender = true;
+
+      // TODO FIXME somehow debounce (as we currently do a full navigation this probably has to be done somewhere else)
+      this._apiTask = new Task(
+        this,
+        this.taskFunction,
+        () => [this.history.url.searchParams] as [URLSearchParams]
+      );
+
+      if (this.initial !== undefined) {
+        // TODO FIXME goddammit the private attributes get minified
+        this._apiTask.status = TaskStatus.COMPLETE;
+        // @ts-expect-error See https://github.com/lit/lit/issues/2367
+        this._apiTask.P = this.initial;
+      }
+    }
+
     return html`
       ${bootstrapCss}
+      <div class="container">
       <div
         style="position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);"
       >
@@ -130,6 +189,7 @@ export class PwEntityList<T> extends LitElement {
           </li>
         </ul>
       </nav>
+      </div>
     `;
   }
 };

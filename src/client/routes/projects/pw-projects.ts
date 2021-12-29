@@ -16,6 +16,7 @@ import { msg } from "@lit/localize";
 import "./pw-projects.js";
 import type { routes } from "../../../lib/routes.js";
 import type { z } from "zod";
+import { PwEntityList } from "../../entity-list/pw-entitylist.js";
 
 export const pwProjects = async (url: URL) => {
   let result = await taskFunction([url.searchParams]);
@@ -33,7 +34,7 @@ const taskFunction = async ([searchParams]: [URLSearchParams]
   return await response.json();
 };
 
-class PwProjects<T> extends LitElement {
+class PwProjects<T> extends PwEntityList {
   static override get properties() {
     return {
       task: { attribute: false },
@@ -42,8 +43,6 @@ class PwProjects<T> extends LitElement {
       debouncedUrl: { state: true },
     };
   }
-
-  private history;
 
   private _apiTask!: Task<[URLSearchParams], z.infer<typeof routes["/api/v1/projects"]["response"]>>;
 
@@ -55,8 +54,6 @@ class PwProjects<T> extends LitElement {
 
   constructor() {
     super();
-
-    this.history = new HistoryController(this, /\/projects/);
 
     this.formRef = createRef<HTMLFormElement>();
 
