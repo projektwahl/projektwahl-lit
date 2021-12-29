@@ -1,7 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // SPDX-FileCopyrightText: 2021 Moritz Hedtke <Moritz.Hedtke@t-online.de>
 import "../../form/pw-form.js";
-import "../../entity-list/pw-entitylist.js";
 import "../../entity-list/pw-order.js";
 import { html, LitElement } from "lit";
 import { bootstrapCss } from "../../index.js";
@@ -34,76 +33,30 @@ const taskFunction = async ([searchParams]: [URLSearchParams]
   return await response.json();
 };
 
-class PwProjects<T> extends PwEntityList {
-  static override get properties() {
-    return {
-      task: { attribute: false },
-      initial: { attribute: false },
-      initialRender: { state: true },
-      debouncedUrl: { state: true },
-    };
-  }
-
-  private _apiTask!: Task<[URLSearchParams], z.infer<typeof routes["/api/v1/projects"]["response"]>>;
-
-  formRef;
-
-  initialRender: boolean;
-
-  initial: Promise<import("lit").TemplateResult> | undefined;
-
+class PwProjects<T> extends PwEntityList<"/api/v1/projects"> {
+  
   constructor() {
-    super();
-
-    this.formRef = createRef<HTMLFormElement>();
-
-    this.initialRender = false;
-
-    this.initial;
+    super(taskFunction);
   }
 
-  static override styles = css`
-    .table-cell-hover:hover {
-      --bs-table-accent-bg: var(--bs-table-hover-bg);
-      color: var(--bs-table-hover-color);
-    }
-  `;
+  override get title() {
+    return msg("Projects");
+  }
 
-  override render() {
-    if (!this.initialRender) {
-      this.initialRender = true;
-
-      // TODO FIXME somehow debounce (as we currently do a full navigation this probably has to be done somewhere else)
-      this._apiTask = new Task(
-        this,
-        taskFunction,
-        () => [this.history.url.searchParams] as [URLSearchParams]
-      );
-
-      if (this.initial !== undefined) {
-        // TODO FIXME goddammit the private attributes get minified
-        this._apiTask.status = TaskStatus.COMPLETE;
-        // @ts-expect-error See https://github.com/lit/lit/issues/2367
-        this._apiTask.P = this.initial;
-      }
-    }
-
+  override get buttons() {
     return html`
-      ${bootstrapCss}
-
-      <div class="container">
-        <pw-entitylist title=${msg("Projects")}>
-          <div slot="buttons">
-            <a
+      <a
               @click=${aClick}
               class="btn btn-primary"
               href="/projects/create"
               role="button"
               >${msg("Create project")}</a
-            >
-          </div>
-          <div slot="response">
-            <form
+            >`
+  }
+
+  override get response() {
+    return html`
+    <form
               ${ref(this.formRef)}
               @input=${() => {
                 const urlSearchParams = new URLSearchParams( // @ts-expect-error probably wrong typings
@@ -223,10 +176,7 @@ class PwProjects<T> extends PwEntityList {
                 </tbody>
               </table>
             </form>
-          </div>
-        </pw-entitylist>
-      </div>
-    `;
+    `
   }
 };
 

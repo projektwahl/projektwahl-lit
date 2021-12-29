@@ -1,7 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // SPDX-FileCopyrightText: 2021 Moritz Hedtke <Moritz.Hedtke@t-online.de>
 import "../../form/pw-form.js";
-import "../../entity-list/pw-entitylist.js";
 import "../../entity-list/pw-order.js";
 import { html, LitElement } from "lit";
 import { bootstrapCss } from "../../index.js";
