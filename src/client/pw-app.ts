@@ -20,6 +20,7 @@ import { configureLocalization, msg, str } from "@lit/localize";
 // Generated via output.localeCodesModule
 import { sourceLocale, targetLocales } from "./generated_locales/locales.js";
 import { pwProjects } from "./routes/projects/pw-projects.js";
+import { pwProject } from "./routes/projects/pw-project-create.js";
 
 /**export const { getLocale, setLocale } = configureLocalization({
   sourceLocale,
@@ -67,7 +68,7 @@ export const nextPage = async (url: URL) => {
     } else if (url.pathname === "/projects/create") {
       return html`<pw-project-create></pw-project-create>`;
     } else if (/projects\/edit\/\d+/.test(url.pathname)) {
-      return html`<pw-project-create></pw-project-create>`;
+      return pwProject();
     } else {
       return msg(html`Not Found`);
     }

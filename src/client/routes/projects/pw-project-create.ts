@@ -14,6 +14,10 @@ import "../../form/pw-checkbox-input.js";
 
 // TODO FIXME implement edit
 
+export async function pwProject() {
+  return html`<pw-project-create></pw-project-create>`
+}
+
 export class PwProjectCreate extends PwForm<"/api/v1/projects/create-or-update"> {
   static override get properties() {
     return {

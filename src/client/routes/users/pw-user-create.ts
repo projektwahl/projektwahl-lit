@@ -15,6 +15,10 @@ import "../../form/pw-text-input.js";
 
 // TODO FIXME implement edit
 
+export async function pwUser() {
+  return html`<pw-user-create></pw-user-create>`
+}
+
 export class PwUserCreate extends PwForm<"/api/v1/users/create-or-update"> {
   static override get properties() {
     return {
