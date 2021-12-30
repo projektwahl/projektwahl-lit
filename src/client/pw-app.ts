@@ -60,9 +60,13 @@ export const nextPage = async (url: URL) => {
       return await pwUsers(url);
     } else if (url.pathname === "/users/create") {
       return html`<pw-user-create></pw-user-create>`;
+    } else if (/users\/edit\/\d+/.test(url.pathname)) {
+      return html`<pw-user-create></pw-user-create>`;
     } else if (url.pathname === "/projects") {
       return await pwProjects(url);
     } else if (url.pathname === "/projects/create") {
+      return html`<pw-project-create></pw-project-create>`;
+    } else if (/projects\/edit\/\d+/.test(url.pathname)) {
       return html`<pw-project-create></pw-project-create>`;
     } else {
       return msg(html`Not Found`);

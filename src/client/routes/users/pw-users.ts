@@ -151,7 +151,7 @@ class PwUsers extends PwEntityList<"/api/v1/users"> {
                 <td>
                   <a
                     class="btn btn-secondary"
-                    href="/users/edit/{entity.id}"
+                    href="/users/edit/${value.id}"
                     role="button"
                   >
                     <i class="bi bi-pen"></i>
