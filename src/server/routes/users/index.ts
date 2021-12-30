@@ -13,95 +13,31 @@ export async function usersHandler(stream: import("http2").ServerHttp2Stream, he
   return await request("GET", "/api/v1/users", async function () {
     const url = new URL(headers[":path"]!, "https://localhost:8443");
 
-    console.log(Object.fromEntries(url.searchParams as any))
-
-    const searchParams = z.object({
+    const filters = z.object({
       f_id: z.string().refine(s => /^\d*$/.test(s)).transform(s => s === '' ? undefined : Number(s)).optional(),
       f_username: z.string().optional(),
       f_type: z.string().refine((s: string): s is "admin" | "helper" | "voter" | "" => includes(["admin", "helper", "voter", ""] as const, s)).transform(s => s === '' ? undefined : s).optional(),
     }).parse(Object.fromEntries(url.searchParams as any));
 
-    // TODO FIXME put this in entities.ts
-    const pagination = z.object({
-      p_cursor: z.string().refine(s => {
-        try {
-          JSON.parse(s);
-        } catch (e) {
-          return false;
-        }
-        return true;
-      }).transform(s => JSON.parse(s)).optional(),
-      p_direction: z.enum(["forwards", "backwards"]).default("forwards"),
-      p_limit: z.number().default(100),
-    }).parse(Object.fromEntries(url.searchParams as any))
-
-    console.log(pagination)
-
     const columns = ["id", "type", "username"] as const;
-
-    const sorting = z.array(z.tuple([z.enum(columns), z.enum(["ASC", "DESC"])])).parse(url.searchParams.getAll("order").map((o) => o.split("-")))
 
     const schema = rawUserSchema(s=>s, s=>s);
 
-    const value = fetchData<z.infer<typeof schema>>(
+    return await fetchData<z.infer<typeof schema>>(
+      "/api/v1/users",
+      headers,
       "users",
       columns,
+      filters,
       {
         id: "nulls-first",
         type: "nulls-first",
         username: "nulls-first",
         password_hash: "nulls-first",
       },
-      {
-        filters: searchParams,
-        paginationCursor: pagination.p_cursor,
-        paginationDirection: pagination.p_direction,
-        paginationLimit: pagination.p_limit,
-        // TODO FIXME the order should be user specified
-        // TODO FIXME also unordered needs to be an option in the ui
-        /*
-I think in the UI we will never be able to implement this without javascript and without reloading at every change
-
-*/
-        sorting,
-      },
       (query) => {
         return sql2`username LIKE ${"%" + (query.f_username ?? '') + "%"}`;
       }
     );
-
-    let entities = routes["/api/v1/users"].response.shape.entities.parse(await sql(...value));
-
-    // https://github.com/projektwahl/projektwahl-sveltekit/blob/work/src/lib/list-entities.ts#L30
-
-    let nextCursor: z.infer<typeof routes["/api/v1/users"]["response"]>["entities"][0] | null = null;
-		let previousCursor: z.infer<typeof routes["/api/v1/users"]["response"]>["entities"][0] | null = null;
-		// TODO FIXME also recalculate the other cursor because data could've been deleted in between / the filters have changed
-		if (pagination.p_direction === "forwards") {
-			previousCursor = entities[0];
-			if (entities.length > pagination.p_limit) {
-				entities.pop();
-				nextCursor = entities[entities.length - 1] ?? null;
-			}
-		} else if (pagination.p_direction === "backwards") {
-			entities = entities.reverse(); // fixup as we needed to switch up orders above
-			if (entities.length > pagination.p_limit) {
-				entities.shift();
-				previousCursor = entities[0] ?? null;
-			}
-			nextCursor = entities[entities.length - 1];
-		}
-
-    return [
-      {
-        "content-type": "text/json; charset=utf-8",
-        ":status": 200,
-      },
-      {
-        entities,
-        nextCursor,
-        previousCursor
-      },
-    ];
   })(stream, headers);
 }

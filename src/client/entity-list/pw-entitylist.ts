@@ -147,8 +147,10 @@ export class PwEntityList<P extends keyof typeof routes> extends LitElement {
             <a
               @click=${(e: Event) => {
                 e.preventDefault();
-                //($query.paginationCursor = mapOr($response, v => v.previousCursor, null)),
-                //    ($query.paginationDirection = 'backwards');
+                const url = new URL(window.location.href);
+                url.searchParams.set("p_cursor", JSON.stringify(this._apiTask.value?.previousCursor));
+                url.searchParams.set("p_direction", "backwards");
+                HistoryController.goto(url, {});
               }}
               class="page-link"
               href="/"
@@ -169,8 +171,10 @@ export class PwEntityList<P extends keyof typeof routes> extends LitElement {
             <a
               @click=${(e: Event) => {
                 e.preventDefault();
-                //($query.paginationCursor = mapOr($response, v => v.nextCursor, null)),
-                //    ($query.paginationDirection = 'forwards');
+                const url = new URL(window.location.href);
+                url.searchParams.set("p_cursor", JSON.stringify(this._apiTask.value?.previousCursor));
+                url.searchParams.set("p_direction", "backwards");
+                HistoryController.goto(url, {});
               }}
               class="page-link"
               href="/"
