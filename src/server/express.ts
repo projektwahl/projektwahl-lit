@@ -25,6 +25,7 @@ export function request<P extends keyof typeof routes>(method: string, path: P, 
             const [new_headers, responseBody] = await handler(
               requestBody.data
             );
+            console.log("responseBody", responseBody)
             routes[path].response.parse(responseBody);
             stream.respond(new_headers);
             stream.end(JSON.stringify(responseBody));

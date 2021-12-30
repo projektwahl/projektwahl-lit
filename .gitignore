@@ -4,5 +4,6 @@ node_modules
 .tmp
 src/client/generated_locales/
 *.js
+!src/loader.js
 dist
 *.map

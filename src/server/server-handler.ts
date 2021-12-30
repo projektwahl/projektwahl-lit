@@ -173,6 +173,7 @@ export async function serverHandler(stream: import("http2").ServerHttp2Stream, h
         });
         stream.end(contents);
       } catch (error) {
+        console.error(error)
         stream.respond(
           {
             ":status": 404,
