@@ -115,7 +115,7 @@ export async function fetchData<T extends { id: number; [index: string]: null | 
 		let previousCursor: z.infer<typeof routes[typeof path]["response"]>["entities"][0] | null = null;
 		// TODO FIXME also recalculate the other cursor because data could've been deleted in between / the filters have changed
 		if (pagination.p_direction === "forwards") {
-			previousCursor = entities[0];
+			previousCursor = entities[0] ?? null;
 			if (entities.length > pagination.p_limit) {
 				entities.pop();
 				nextCursor = entities[entities.length - 1] ?? null;
@@ -126,7 +126,7 @@ export async function fetchData<T extends { id: number; [index: string]: null | 
 				entities.shift();
 				previousCursor = entities[0] ?? null;
 			}
-			nextCursor = entities[entities.length - 1];
+			nextCursor = entities[entities.length - 1] ?? null;
 		}
 
     return [

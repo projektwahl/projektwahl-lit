@@ -9,6 +9,7 @@ import { createRef } from "lit/directives/ref.js";
 import { Task, TaskStatus } from "@lit-labs/task";
 import type { routes } from "../../lib/routes.js";
 import type { z } from "zod";
+import { classMap } from "lit/directives/class-map.js";
 
 export class PwEntityList<P extends keyof typeof routes> extends LitElement {
   static override get properties() {
@@ -69,6 +70,7 @@ export class PwEntityList<P extends keyof typeof routes> extends LitElement {
     if (!this.initialRender) {
       this.initialRender = true;
 
+      // TODO FIXME because of page navigation this currently loads twice
       // TODO FIXME somehow debounce (as we currently do a full navigation this probably has to be done somewhere else)
       this._apiTask = new Task(
         this,
@@ -140,9 +142,10 @@ export class PwEntityList<P extends keyof typeof routes> extends LitElement {
       ${this.response}
       <nav aria-label="${msg("navigation of user list")}">
         <ul class="pagination justify-content-center">
-          <!-- { # await only works in blocks -->
           <li
-            class="page-item {mapOr($response, v => v.previousCursor, null) ? '' : 'disabled'}"
+            class="page-item ${classMap({
+              disabled: this._apiTask.value?.previousCursor === null
+            })}"
           >
             <a
               @click=${(e: Event) => {
@@ -156,17 +159,19 @@ export class PwEntityList<P extends keyof typeof routes> extends LitElement {
               href="/"
               aria-label="${msg("previous page")}"
               tabindex=${
-                -1 /*mapOr($response, v => v.previousCursor, null) ? undefined : -1*/
+                this._apiTask.value?.previousCursor === null ? undefined : -1
               }
               aria-disabled=${
-                true /*!mapOr($response, v => v.previousCursor, null)*/
+                this._apiTask.value?.previousCursor === null
               }
             >
               <span aria-hidden="true">&laquo;</span>
             </a>
           </li>
           <li
-            class="page-item {mapOr($response, v => v.nextCursor, null) ? '' : 'disabled'}}"
+            class="page-item ${classMap({
+              disabled: this._apiTask.value?.nextCursor === null
+            })}"
           >
             <a
               @click=${(e: Event) => {
@@ -180,10 +185,10 @@ export class PwEntityList<P extends keyof typeof routes> extends LitElement {
               href="/"
               aria-label="${msg("next page")}"
               tabindex=${
-                /*mapOr($response, v => v.nextCursor, null) ? undefined : -1*/ -1
+                this._apiTask.value?.nextCursor === null ? undefined : -1
               }
               aria-disabled=${
-                /*!mapOr($response, v => v.nextCursor, null)*/ false
+                this._apiTask.value?.nextCursor === null
               }
             >
               <span aria-hidden="true">&raquo;</span>
