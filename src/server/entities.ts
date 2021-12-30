@@ -1,3 +1,4 @@
+import type { OutgoingHttpHeaders } from "node:http2";
 import type { Row } from "postgres";
 import { z } from "zod";
 import { keys, routes } from "../lib/routes.js";
@@ -6,14 +7,14 @@ import { sql } from "./database.js";
 import { sql2, unsafe2 } from "./sql/index.js";
 
 export async function fetchData<T extends { id: number; [index: string]: null | string | string[] | boolean | number }>(
-  path: keys,
+  path: "/api/v1/users"|"/api/v1/projects",
   headers: import("http2").IncomingHttpHeaders,
   table: string,
   columns: readonly [string, ...string[]],
   filters: any,
   orderByInfo: { [field: string]: 'nulls-first' | 'nulls-last'; },
   customFilterQuery: (query: FilterType<T>) => [TemplateStringsArray, ...(null | string | string[] | boolean | number)[]]
-) {
+): Promise<[OutgoingHttpHeaders, z.infer<typeof routes[typeof path]["response"]>]> {
   const url = new URL(headers[":path"]!, "https://localhost:8443");
 
   const pagination = z.object({
@@ -61,8 +62,9 @@ export async function fetchData<T extends { id: number; [index: string]: null | 
 
   const paginationCursor = query.paginationCursor;
 
+  let finalQuery;
   if (!paginationCursor) {
-    return sql2`(SELECT ${unsafe2(columns.join(", "))} FROM ${unsafe2(
+    finalQuery = sql2`(SELECT ${unsafe2(columns.join(", "))} FROM ${unsafe2(
       table
     )} WHERE ${customFilterQuery(query.filters)} ORDER BY ${orderByQuery} LIMIT ${
       query.paginationLimit + 1
@@ -95,7 +97,6 @@ export async function fetchData<T extends { id: number; [index: string]: null | 
       })`;
     });
 
-    let finalQuery;
     if (queries.length == 1) {
       finalQuery = queries[0]
     } else {
@@ -103,6 +104,7 @@ export async function fetchData<T extends { id: number; [index: string]: null | 
         .flatMap((v) => [sql2`\nUNION ALL\n`, v])
         .slice(1)} LIMIT ${query.paginationLimit + 1}`;
     }
+  }
 
     // [TemplateStringsArray, ...(null | string | string[] | boolean | number)[]]
     let entities = routes[path]["response"].shape.entities.parse(await sql(...finalQuery))
@@ -132,11 +134,11 @@ export async function fetchData<T extends { id: number; [index: string]: null | 
         "content-type": "text/json; charset=utf-8",
         ":status": 200,
       },
+      // TODO FIXME
       {
         entities,
         nextCursor,
         previousCursor
       },
     ];
-  }
 }
