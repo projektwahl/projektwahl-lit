@@ -44,8 +44,8 @@ export async function fetchData<T extends { id: number; [index: string]: null | 
 
   const query = _query;
 
-  if (query.sorting.length === 0) {
-    query.sorting = [["id", "ASC"]];
+  if (!query.sorting.find((e) => e[0] == "id")) {
+    query.sorting.push(["id", "ASC"]);
   }
 
   // orderBy needs to be reversed for backwards pagination
@@ -115,7 +115,9 @@ export async function fetchData<T extends { id: number; [index: string]: null | 
 		let previousCursor: z.infer<typeof routes[typeof path]["response"]>["entities"][0] | null = null;
 		// TODO FIXME also recalculate the other cursor because data could've been deleted in between / the filters have changed
 		if (pagination.p_direction === "forwards") {
-			previousCursor = entities[0] ?? null;
+      if (pagination.p_cursor) {
+			  previousCursor = entities[0] ?? null;
+      }
 			if (entities.length > pagination.p_limit) {
 				entities.pop();
 				nextCursor = entities[entities.length - 1] ?? null;
@@ -126,7 +128,9 @@ export async function fetchData<T extends { id: number; [index: string]: null | 
 				entities.shift();
 				previousCursor = entities[0] ?? null;
 			}
-			nextCursor = entities[entities.length - 1] ?? null;
+      if (pagination.p_cursor) {
+			  nextCursor = entities[entities.length - 1] ?? null;
+      }
 		}
 
     return [
