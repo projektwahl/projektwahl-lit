@@ -44,16 +44,16 @@ export async function fetchData<T extends { id: number; [index: string]: null | 
 
   const query = _query;
 
+  if (query.sorting.length === 0) {
+    query.sorting = [["id", "ASC"]];
+  }
+
   // orderBy needs to be reversed for backwards pagination
   if (query.paginationDirection === "backwards") {
     query.sorting = query.sorting.map((v) => [
       v[0],
       v[1] === "ASC" ? "DESC" : "ASC",
     ]);
-  }
-
-  if (query.sorting.length === 0) {
-    query.sorting = [["id", "ASC"]];
   }
 
   const orderByQuery = query.sorting

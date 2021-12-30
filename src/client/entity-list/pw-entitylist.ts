@@ -172,8 +172,8 @@ export class PwEntityList<P extends keyof typeof routes> extends LitElement {
               @click=${(e: Event) => {
                 e.preventDefault();
                 const url = new URL(window.location.href);
-                url.searchParams.set("p_cursor", JSON.stringify(this._apiTask.value?.previousCursor));
-                url.searchParams.set("p_direction", "backwards");
+                url.searchParams.set("p_cursor", JSON.stringify(this._apiTask.value?.nextCursor));
+                url.searchParams.set("p_direction", "forwards");
                 HistoryController.goto(url, {});
               }}
               class="page-link"
