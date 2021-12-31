@@ -7,7 +7,9 @@ import { ifDefined } from "lit/directives/if-defined.js";
 import { setupHmr } from "../hmr.js";
 import { msg } from "@lit/localize";
 import { createRef, ref } from "lit/directives/ref.js";
+import {repeat} from 'lit/directives/repeat.js';
 
+// TODO FIXME make generic over keyof T
 export class PwSelectInput<T> extends LitElement {
   static override get properties() {
     return {
@@ -43,7 +45,7 @@ export class PwSelectInput<T> extends LitElement {
 
   input;
 
-  options!: import("lit").TemplateResult;
+  options!: { value: string, text: string }[];
 
   constructor() {
     super();
@@ -96,7 +98,6 @@ export class PwSelectInput<T> extends LitElement {
         <select
           ${ref(this.input)}
           aria-describedby="${this.randomId}-feedback"
-          value=${this.initial?.[this.name]}
           class="form-select ${this.task.render({
             error: () => "",
             pending: () => "",
@@ -109,7 +110,7 @@ export class PwSelectInput<T> extends LitElement {
           name=${this.name.toString()}
           id=${this.randomId}
         >
-          ${this.options}
+          ${repeat(this.options, (o) => o.value, (o) => html`<option ?selected=${this.initial?.[this.name] === o.value} value=${o.value}>${o.text}</option>`)}
         </select>
         ${this.task.render({
           complete: (v) =>

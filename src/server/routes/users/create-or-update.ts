@@ -6,7 +6,7 @@ import { hashPassword } from "../../password.js";
 import { sql2, unsafe2 } from "../../sql/index.js";
 
 function updateField(entity: any, name: string) {
-  return sql2`${unsafe2(name)} = CASE WHEN ${entity[name] !== undefined} THEN ${entity[name] ?? null} ELSE ${unsafe2(name)} END`
+  return sql2`"${unsafe2(name)}" = CASE WHEN ${entity[name] !== undefined} THEN ${entity[name] ?? null} ELSE "${unsafe2(name)}" END`
 }
 
 export async function createOrUpdateUsersHandler(stream: import("http2").ServerHttp2Stream, headers: import("http2").IncomingHttpHeaders) {
@@ -20,7 +20,7 @@ export async function createOrUpdateUsersHandler(stream: import("http2").ServerH
             ${field("username")},
             password_hash = CASE WHEN ${user.password !== undefined} THEN ${user.password ? await hashPassword(user.password) as any as string : null} ELSE password_hash END,
             ${field("type")},
-            ${field("\"group\"")},
+            ${field("group")},
             ${field("age")},
             ${field("away")}
             WHERE id = ${user.id} RETURNING id;`

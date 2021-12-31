@@ -59,8 +59,6 @@ export class PwUserCreate extends PwForm<"/api/v1/users/create-or-update"> {
     /** @type {number|undefined} */
     this.forceTask = undefined;
 
-    this.type = this.initial?.type ?? "voter";
-
     /**
      * @override
      */
@@ -106,15 +104,15 @@ export class PwUserCreate extends PwForm<"/api/v1/users/create-or-update"> {
         @change=${(event: Event) => (this.type = (event.target as HTMLSelectElement).value)}
         label=${msg("User type")}
         name="type"
-        .options=${html`<option value="voter">Schüler</option>
-          <option value="helper">Helfer</option>
-          <option value="admin">Admin</option>`}
+        .options=${[ {value:"voter", text: "Schüler" },
+          { value: "helper", text: "Helfer" },
+          { value: "admin", text: "Admin" }]}
         .task=${this._task}
-        .value=${this.type}
+        .initial=${{ type: this.type ?? this.initial?.type ?? "voter" }}
       >
       </pw-select-input>
 
-      ${this.type === "voter"
+      ${(this.type ?? this.initial?.type ?? "voter") === "voter"
         ? html`<pw-text-input
               label=${msg("Group")}
               name="group"
