@@ -1,4 +1,4 @@
-import { AnyZodObject, objectUtil, z, ZodNumber, ZodObject, ZodRawShape, ZodType, ZodTypeAny } from "zod";
+import { AnyZodObject, objectUtil, z, ZodNumber, ZodObject, ZodRawShape, ZodType, ZodTypeAny, ZodTypeDef } from "zod";
 import { result } from "./result.js";
 
 export const loginInputSchema = z
@@ -39,7 +39,7 @@ export const rawUserVoterSchema = z
   })
   .strict();
 
-export const rawUserSchema = <R1O, R2O>(v1: ZodType<R1O>, v2: ZodType<R2O>) => z.object({
+export const rawUserSchema = <O1, D1 extends ZodTypeDef = ZodTypeDef, I1 = O1, O2, D2 extends ZodTypeDef = ZodTypeDef, I2 = O2>(v1: ZodType<O1, D1, I1>, v2: ZodType<O2, D2, I2>) => z.object({
   type: z.enum(["helper", "admin", "voter"])
 }).passthrough().superRefine((value, ctx) => {
   // KEEP this line synchronized with the one below
