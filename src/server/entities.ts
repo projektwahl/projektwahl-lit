@@ -29,7 +29,7 @@ export async function fetchData<T extends { id: number; [index: string]: null | 
       message: "The cursor is invalid. This is an internal error."
     }).transform(s => JSON.parse(s)).optional(),
     p_direction: z.enum(["forwards", "backwards"]).default("forwards"),
-    p_limit: z.number().default(100),
+    p_limit: z.string().default("100").refine(s => /^\d*$/.test(s)).transform(s => s === '' ? undefined : Number(s)),
   }).parse(Object.fromEntries(url.searchParams as any))
 
   const sorting = z.array(z.tuple([z.enum(columns), z.enum(["ASC", "DESC"])])).parse(url.searchParams.getAll("order").map((o) => o.split("-")))

@@ -70,6 +70,7 @@ export class PwEntityList<P extends keyof typeof routes> extends LitElement {
 
       // TODO FIXME because of page navigation this currently loads twice
       // TODO FIXME somehow debounce (as we currently do a full navigation this probably has to be done somewhere else)
+      // TODO FIXME probably just completely remove and let page navigation do this
       this._apiTask = new Task(
         this,
         this.taskFunction,
