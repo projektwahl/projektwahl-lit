@@ -24,8 +24,8 @@ const rawUserCommon = {
 export const rawUserHelperOrAdminSchema = z
   .object({
     type: z.enum(["helper", "admin"]),
-    group: z.null(),
-    age: z.null(),
+    group: z.string().nullable(), // TODO FIXME add validation inside database that these are null as this depends on the type value and the previous type value
+    age: z.number().nullable(),
     ...rawUserCommon
   })
   .strict();
@@ -54,18 +54,19 @@ export const rawUserSchema = <O1, D1 extends ZodTypeDef = ZodTypeDef, I1 = O1, O
     return schema.parse(value);
 })
 
+// the input needs to be a .partial() object
 export const makeCreateOrUpdate = <T extends { [k: string]: ZodTypeAny;}, UnknownKeys extends UnknownKeysParam = "strip", Catchall extends ZodTypeAny = ZodTypeAny>(s: ZodObject<T, UnknownKeys, Catchall>) => z.object({
   id: z.number().optional()
 }).passthrough().superRefine((value, ctx) => {
   // KEEP this line synchronized with the one below
-  let schema = value.id ? s.partial().setKey("id", z.number()) : s.setKey("id", z.null());
+  let schema = value.id ? s.setKey("id", z.number()) : s.required().setKey("id", z.null());
   let parsed = schema.safeParse(value)
   if (!parsed.success) {
     parsed.error.issues.forEach(ctx.addIssue)
   }
 }).transform(value => {
   // KEEP this line synchronized with the one above
-  let schema = value.id ? s.partial().setKey("id", z.number()) : s.setKey("id", z.null());
+  let schema = value.id ? s.setKey("id", z.number()) : s.required().setKey("id", z.null());
   return schema.parse(value);
 })
 
@@ -108,14 +109,15 @@ const usersCreateOrUpdate = <T extends { [k: string]: ZodTypeAny;}, UnknownKeys 
   username: true
 }).extend({
   password: z.string().optional()
-}))
+}).partial())
 
+/*
 const jo = usersCreateOrUpdate(rawUserVoterSchema)
 let a: z.infer<typeof jo>;
 
 const jo2 = usersCreateOrUpdate(rawUserHelperOrAdminSchema)
 let a2: z.infer<typeof jo2>;
-
+*/
 
 //console.log(rawUserHelperOrAdminSchema.safeParse({}))
 // TODO FIXME report upstream (picking missing keys breaks)
@@ -169,7 +171,7 @@ export const routes = identity({
     response: result(z.object({}).extend({ id: z.number() }), z.record(z.string())),
   },
   "/api/v1/projects/create-or-update": {
-    request: makeCreateOrUpdate(rawProjectSchema),
+    request: makeCreateOrUpdate(rawProjectSchema.partial()),
     response: result(z.object({}).extend({ id: z.number() }), z.record(z.string())),
   },
   "/api/v1/users": {

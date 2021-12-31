@@ -25,6 +25,7 @@ EXCEPTION
     WHEN duplicate_object THEN null;
 END $$;
 
+-- TODO ADd check that group and age is NULL if type is not voter
 CREATE TABLE IF NOT EXISTS users (
   id SERIAL PRIMARY KEY NOT NULL,
   username VARCHAR(64) UNIQUE NOT NULL,
