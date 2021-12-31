@@ -39,17 +39,19 @@ export const rawUserVoterSchema = z
   })
   .strict();
 
-export const rawUserSchema = <R1O, R2O>(op1: (s: typeof rawUserVoterSchema) => ZodType<R1O>, op2: (s: typeof rawUserHelperOrAdminSchema) => ZodType<R2O>) => z.object({
+export const rawUserSchema = <R1O, R2O>(v1: ZodType<R1O>, v2: ZodType<R2O>) => z.object({
   type: z.enum(["helper", "admin", "voter"])
 }).passthrough().superRefine((value, ctx) => {
+  // KEEP this line synchronized with the one below
   let schema = value.type === "voter" ? op1(rawUserVoterSchema) : op2(rawUserHelperOrAdminSchema);
   let parsed = schema.safeParse(value)
   if (!parsed.success) {
     parsed.error.issues.forEach(ctx.addIssue)
   }
 }).transform(value => {
-  const result = value.type === "voter" ? op1(rawUserVoterSchema).parse(value) : op2(rawUserHelperOrAdminSchema).parse(value);
-  return result;
+    // KEEP this line synchronized with the one above
+    let schema = value.type === "voter" ? op1(rawUserVoterSchema) : op2(rawUserHelperOrAdminSchema);
+    return schema.parse(value);
 })
 
 export const makeCreateOrUpdate = <T extends { [k: string]: ZodTypeAny;}, UnknownKeys extends UnknownKeysParam = "strip", Catchall extends ZodTypeAny = ZodTypeAny>(s: ZodObject<T, UnknownKeys, Catchall>) => z.object({
@@ -107,6 +109,13 @@ const usersCreateOrUpdate = <T extends { [k: string]: ZodTypeAny;}, UnknownKeys 
 }).extend({
   password: z.string().optional()
 }))
+
+const jo = usersCreateOrUpdate(rawUserVoterSchema)
+let a: z.infer<typeof jo>;
+
+const jo2 = usersCreateOrUpdate(rawUserHelperOrAdminSchema)
+let a2: z.infer<typeof jo2>;
+
 
 //console.log(rawUserHelperOrAdminSchema.safeParse({}))
 // TODO FIXME report upstream (picking missing keys breaks)
