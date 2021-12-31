@@ -93,7 +93,7 @@ export class PwSelectInput<T> extends LitElement {
         <select
           ${ref(this.input)}
           aria-describedby="${this.randomId}-feedback"
-          .value=${this.value}
+          value=${this.value}
           class="form-select ${this.task.render({
             error: () => "",
             pending: () => "",

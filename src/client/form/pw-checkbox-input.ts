@@ -90,6 +90,7 @@ export class PwCheckboxInput<T> extends LitElement {
         <input
           ${ref(this.input)}
           type="checkbox"
+          value=${this.value}
           class="form-check-input ${this.task.render({
             error: () => "",
             pending: () => "",

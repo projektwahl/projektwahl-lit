@@ -97,6 +97,7 @@ export class PwTextInput<T> extends LitElement {
         <input
           ${ref(this.input)}
           type=${this.type}
+          value=${this.value}
           class="form-control ${this.task.render({
             error: () => "",
             pending: () => "",

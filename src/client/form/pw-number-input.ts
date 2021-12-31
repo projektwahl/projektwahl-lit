@@ -90,6 +90,7 @@ export class PwNumberInput<T> extends LitElement {
         <input
           ${ref(this.input)}
           type="number"
+          value=${this.value}
           class="form-control ${this.task.render({
             error: () => "",
             pending: () => "",
