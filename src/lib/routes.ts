@@ -9,7 +9,7 @@ export const loginInputSchema = z
   .strict();
 
 const rawUserCommon = {
-  id: z.number(),
+  id: z.number().nullable(),
   username: z.string().min(3).max(100),
   openid_id: z.string().optional(),
   password_hash: z.string(),
@@ -51,7 +51,7 @@ export const rawUserSchema = <R1O, R2O>(op1: (s: typeof rawUserVoterSchema) => Z
 })
 
 export const rawProjectSchema = z.object({
-  id: z.number(),
+  id: z.number().nullable(),
   title: z.string().max(1024),
   info: z.string().max(8192),
   place: z.string().max(1024),
@@ -87,7 +87,7 @@ const usersCreateOrUpdate = <T extends { [k: string]: ZodTypeAny;}, UnknownKeys 
   id: true,
   type: true,
   username: true
-}).setKey("id", z.number().optional()).extend({
+}).extend({
   password: z.string().optional()
 })
 
@@ -136,7 +136,7 @@ export const routes = identity({
     response: result(z.object({}).extend({ id: z.number() }), z.record(z.string())),
   },
   "/api/v1/projects/create-or-update": {
-    request: rawProjectSchema.setKey("id", z.number().optional()),
+    request: rawProjectSchema,
     response: result(z.object({}).extend({ id: z.number() }), z.record(z.string())),
   },
   "/api/v1/users": {

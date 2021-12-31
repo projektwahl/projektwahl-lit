@@ -67,12 +67,13 @@ export class PwUserCreate extends PwForm<"/api/v1/users/create-or-update"> {
     this._task = new Task(
       this,
       async () => {
-        const formDataEvent = new CustomEvent("myformdata", {
+        const formDataEvent = new CustomEvent<Partial<z.infer<typeof schema>>>("myformdata", {
           bubbles: true,
           composed: true,
           detail: {},
         });
         this.form.value?.dispatchEvent(formDataEvent);
+        formDataEvent.detail.id = this.initial?.id ?? null;
 
         let result = await myFetch("/api/v1/users/create-or-update", {
           method: "POST",

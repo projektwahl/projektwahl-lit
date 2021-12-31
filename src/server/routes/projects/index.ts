@@ -25,7 +25,7 @@ export async function projectsHandler(stream: import("http2").ServerHttp2Stream,
       {
       },
       (query) => {
-        return sql2`(${!query.f_id} OR id = ${query.f_id ?? null}) AND title LIKE ${query.f_title ?? '%'}`;
+        return sql2`(${!query.f_id} OR id = ${query.f_id ?? null}) AND title LIKE ${'%' + (query.f_title ?? '') + '%'}`;
       }
     );
   })(stream, headers);
