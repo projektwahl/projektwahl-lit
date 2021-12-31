@@ -22,7 +22,12 @@ export class PwTextInput<T> extends LitElement {
           return true; // TODO FIXME bug in @lit-labs/task
         },
       },
-      value: { type: String },
+      initialTask: {
+        attribute: false,
+        hasChanged: () => {
+          return true; // TODO FIXME bug in @lit-labs/task
+        },
+      },
     };
   }
 
@@ -39,6 +44,8 @@ export class PwTextInput<T> extends LitElement {
   autocomplete!: "username" | "current-password";
 
   task!: import("@lit-labs/task").Task<any, import("zod").infer<typeof import("../../lib/result.js").anyResult>>;
+
+  initialTask: import("@lit-labs/task").Task<any, T> | undefined;
 
   input: import("lit/directives/ref").Ref<HTMLInputElement>;
 
@@ -97,7 +104,7 @@ export class PwTextInput<T> extends LitElement {
         <input
           ${ref(this.input)}
           type=${this.type}
-          value=${this.value}
+          value=${this.initialTask?.value?.[this.name]}
           class="form-control ${this.task.render({
             error: () => "",
             pending: () => "",

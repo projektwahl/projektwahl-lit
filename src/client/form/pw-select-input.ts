@@ -21,7 +21,12 @@ export class PwSelectInput<T> extends LitElement {
           return true; // TODO FIXME bug in @lit-labs/task
         },
       },
-      value: { type: String },
+      initialTask: {
+        attribute: false,
+        hasChanged: () => {
+          return true; // TODO FIXME bug in @lit-labs/task
+        },
+      },
     };
   }
 
@@ -34,6 +39,8 @@ export class PwSelectInput<T> extends LitElement {
   name!: keyof T;
 
   task!: import("@lit-labs/task").Task<any, import("zod").infer<typeof import("../../lib/result.js").anyResult>>;
+
+  initialTask: import("@lit-labs/task").Task<any, T> | undefined;
 
   value!: string;
 
@@ -93,7 +100,7 @@ export class PwSelectInput<T> extends LitElement {
         <select
           ${ref(this.input)}
           aria-describedby="${this.randomId}-feedback"
-          value=${this.value}
+          value=${this.initialTask?.value?.[this.name]}
           class="form-select ${this.task.render({
             error: () => "",
             pending: () => "",
