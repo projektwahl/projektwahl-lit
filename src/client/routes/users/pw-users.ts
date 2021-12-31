@@ -29,7 +29,7 @@ const taskFunction = async ([searchParams]: [URLSearchParams]
       //agent: new Agent({rejectUnauthorized: false})
     }
   );
-  return await response.json();
+  return await response.json(); // TODO FIXME types with myFetch?
 };
 
 class PwUsers extends PwEntityList<"/api/v1/users"> {

@@ -36,7 +36,7 @@ export async function usersHandler(stream: import("http2").ServerHttp2Stream, he
         password_hash: "nulls-first",
       },
       (query) => {
-        return sql2`username LIKE ${"%" + (query.f_username ?? '') + "%"}`;
+        return sql2`(${!query.f_id} OR id = ${query.f_id ?? null}) AND username LIKE ${query.f_username ?? '%'}`;
       }
     );
   })(stream, headers);

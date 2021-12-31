@@ -19,7 +19,7 @@ class PwForm<P extends keyof typeof routes> extends LitElement {
     throw new Error("not implemented");
   }
 
-  private history;
+  protected history;
 
   _task!: import("@lit-labs/task").Task<any, import("zod").infer<typeof import("../../lib/result.js").anyResult>>;
 
