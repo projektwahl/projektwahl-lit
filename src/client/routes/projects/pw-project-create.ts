@@ -99,13 +99,13 @@ export class PwProjectCreate extends PwForm<"/api/v1/projects/create-or-update">
     if (!this.initialRender) {
       this.initialRender = true;
 
-      if (/projects\/edit\/(\d+)/.test(this.history.url.pathname)) {
+      if (/projects\/edit\/(\d+)/.test(new URL(window.location.href).pathname)) {
         // TODO FIXME because of page navigation this currently loads twice
         // TODO FIXME somehow debounce (as we currently do a full navigation this probably has to be done somewhere else)
         this._initialTask = new Task(
           this,
           taskFunction,
-          () => [Number(this.history.url.pathname.match(/projects\/edit\/(\d+)/)![1])] as [number]
+          () => [],
         );
 
         if (this.initial !== undefined) {
