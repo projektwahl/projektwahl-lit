@@ -8,15 +8,27 @@ export async function createOrUpdateUsersHandler(stream: import("http2").ServerH
   // TODO FIXME create or update multiple
   return await request("POST", "/api/v1/users/create-or-update", async function (user) {
     try {
-      return await sql.begin("READ WRITE", async (sql) => {
-        let [row] =
-          await sql`INSERT INTO users (username, password_hash, type, "group", age, away) VALUES (${
-            user.username ?? null
-          }, ${user.password ? await hashPassword(user.password) : null}, ${
-            user.type ?? null
-          }, ${user.type === "voter" ? (user.group ?? null) : null}, ${
-            user.type === "voter" ? (user.age ?? null) : null
-          }, ${user.away ?? false}) RETURNING id;`;
+        const [row] = await sql.begin("READ WRITE", async (sql) => {
+          if (user.id !== undefined) {
+            return await sql`UPDATE users SET
+            CASE WHEN ${user.username !== undefined} THEN ${
+              user.username ?? null
+            } ELSE username END
+            , password_hash, type, "group", age, away) VALUES (, ${user.password ? await hashPassword(user.password) : null}, ${
+                user.type ?? null
+              }, ${user.type === "voter" ? (user.group ?? null) : null}, ${
+                user.type === "voter" ? (user.age ?? null) : null
+              }, ${user.away ?? false}) WHERE id = ${user.id} RETURNING id;`;
+          } else {
+            return await sql`INSERT INTO users (username, password_hash, type, "group", age, away) VALUES (${
+              user.username ?? null
+            }, ${user.password ? await hashPassword(user.password) : null}, ${
+              user.type ?? null
+            }, ${user.type === "voter" ? (user.group ?? null) : null}, ${
+              user.type === "voter" ? (user.age ?? null) : null
+            }, ${user.away ?? false}) RETURNING id;`;
+          }  
+        });
 
         return [
           {
@@ -28,7 +40,6 @@ export async function createOrUpdateUsersHandler(stream: import("http2").ServerH
             data: z.object({ id: z.number() }).parse(row),
           },
         ];
-      });
     } catch (error: unknown) {
       if (error instanceof postgres.PostgresError) {
         if (

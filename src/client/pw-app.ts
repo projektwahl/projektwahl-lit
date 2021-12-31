@@ -21,6 +21,7 @@ import { configureLocalization, msg, str } from "@lit/localize";
 import { sourceLocale, targetLocales } from "./generated_locales/locales.js";
 import { pwProjects } from "./routes/projects/pw-projects.js";
 import { pwProject } from "./routes/projects/pw-project-create.js";
+import { pwUser } from "./routes/users/pw-user-create.js";
 
 /**export const { getLocale, setLocale } = configureLocalization({
   sourceLocale,
@@ -60,7 +61,7 @@ export const nextPage = async (url: URL) => {
     } else if (url.pathname === "/users/create") {
       return html`<pw-user-create></pw-user-create>`;
     } else if (/users\/edit\/\d+/.test(url.pathname)) {
-      return html`<pw-user-create></pw-user-create>`;
+      return await pwUser(Number(url.pathname.match(/users\/edit\/(\d+)/)![1]));
     } else if (url.pathname === "/projects") {
       return await pwProjects(url);
     } else if (url.pathname === "/projects/create") {

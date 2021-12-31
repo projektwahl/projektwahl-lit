@@ -12,12 +12,26 @@ import "../../form/pw-checkbox-input.js";
 import "../../form/pw-number-input.js";
 import "../../form/pw-select-input.js";
 import "../../form/pw-text-input.js";
+import { rawUserSchema } from "../../../lib/routes.js";
+import type { z } from "zod";
 
-// TODO FIXME implement edit
+const schema = rawUserSchema(id => id, id => id);
 
-export async function pwUser() {
-  return html`<pw-user-create></pw-user-create>`
+export async function pwUser(id: number) {
+  let result = await taskFunction([id]);
+  return html`<pw-user-create .initial=${result}></pw-user-create>`
 }
+
+const taskFunction = async ([id]: [number]
+  ) => {
+    let response = await fetch(
+      new URL(`/api/v1/users/?f_id=${id}`, window.location.href).toString(),
+      {
+        //agent: new Agent({rejectUnauthorized: false})
+      }
+    );
+    return (await response.json()).entities[0];
+  };
 
 export class PwUserCreate extends PwForm<"/api/v1/users/create-or-update"> {
   static override get properties() {
@@ -27,14 +41,17 @@ export class PwUserCreate extends PwForm<"/api/v1/users/create-or-update"> {
       _task: { state: true },
       forceTask: { state: true },
       type: { state: true },
+      initial: { attribute: false },
     };
   }
 
   override get actionText() {
-    return msg("Create/Update account");
+    return this.initial ? msg("Update account") : msg("Create account");
   }
 
   type;
+
+  initial: z.infer<typeof schema> | undefined;
 
   constructor() {
     super();
@@ -42,7 +59,7 @@ export class PwUserCreate extends PwForm<"/api/v1/users/create-or-update"> {
     /** @type {number|undefined} */
     this.forceTask = undefined;
 
-    this.type = "voter";
+    this.type = this.initial?.type ?? "voter";
 
     /**
      * @override
@@ -81,10 +98,10 @@ export class PwUserCreate extends PwForm<"/api/v1/users/create-or-update"> {
         label=${msg("Username")}
         name="username"
         .task=${this._task}
+        .initial=${this.initial}
       ></pw-text-input>
 
       <pw-select-input
-        .value=${this.type}
         @change=${(event: Event) => (this.type = (event.target as HTMLSelectElement).value)}
         label=${msg("User type")}
         name="type"
@@ -92,6 +109,7 @@ export class PwUserCreate extends PwForm<"/api/v1/users/create-or-update"> {
           <option value="helper">Helfer</option>
           <option value="admin">Admin</option>`}
         .task=${this._task}
+        .value=${this.type}
       >
       </pw-select-input>
 
@@ -100,12 +118,14 @@ export class PwUserCreate extends PwForm<"/api/v1/users/create-or-update"> {
               label=${msg("Group")}
               name="group"
               .task=${this._task}
+              .initial=${this.initial}
             ></pw-text-input>
 
             <pw-number-input
               label=${msg("Age")}
               name="age"
               .task=${this._task}
+              .initial=${this.initial}
             ></pw-number-input>`
         : undefined}
 
@@ -113,6 +133,7 @@ export class PwUserCreate extends PwForm<"/api/v1/users/create-or-update"> {
         label=${msg("Away")}
         name="away"
         .task=${this._task}
+        .initial=${this.initial}
       ></pw-checkbox-input>
     `;
   };
