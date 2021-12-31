@@ -3,6 +3,11 @@ import { z } from "zod";
 import { sql } from "../../database.js";
 import { request } from "../../express.js";
 import { hashPassword } from "../../password.js";
+import { sql2, unsafe2 } from "../../sql/index.js";
+
+function updateField(entity: any, name: string) {
+  return sql2`CASE WHEN ${entity[name] !== undefined} THEN ${entity[name] ?? null} ELSE ${unsafe2(name)} END`
+}
 
 export async function createOrUpdateUsersHandler(stream: import("http2").ServerHttp2Stream, headers: import("http2").IncomingHttpHeaders) {
   // TODO FIXME create or update multiple
@@ -10,15 +15,11 @@ export async function createOrUpdateUsersHandler(stream: import("http2").ServerH
     try {
         const [row] = await sql.begin("READ WRITE", async (sql) => {
           if (user.id !== undefined) {
-            return await sql`UPDATE users SET
-            CASE WHEN ${user.username !== undefined} THEN ${
-              user.username ?? null
-            } ELSE username END
-            , password_hash, type, "group", age, away) VALUES (, ${user.password ? await hashPassword(user.password) : null}, ${
-                user.type ?? null
-              }, ${user.type === "voter" ? (user.group ?? null) : null}, ${
-                user.type === "voter" ? (user.age ?? null) : null
-              }, ${user.away ?? false}) WHERE id = ${user.id} RETURNING id;`;
+            const field = (name: string) => updateField(user, name);
+
+            const finalQuery = sql2`UPDATE users SET ${field("username")} WHERE id = ${user.id} RETURNING id;`
+
+            return await sql(...finalQuery);
           } else {
             return await sql`INSERT INTO users (username, password_hash, type, "group", age, away) VALUES (${
               user.username ?? null
