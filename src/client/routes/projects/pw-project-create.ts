@@ -52,9 +52,7 @@ export class PwProjectCreate extends PwForm<"/api/v1/projects/create-or-update">
 
   initialRender: boolean;
 
-  initial: Promise<z.infer<typeof rawProjectSchema>> | undefined;
-
-  _initialTask: Task<any, z.infer<typeof rawProjectSchema>> | undefined
+  initial: z.infer<typeof rawProjectSchema> | undefined;
 
   constructor() {
     super();
@@ -95,89 +93,62 @@ export class PwProjectCreate extends PwForm<"/api/v1/projects/create-or-update">
     );
   }
 
-  override render() {
-    if (!this.initialRender) {
-      this.initialRender = true;
-
-      if (/projects\/edit\/(\d+)/.test(new URL(window.location.href).pathname)) {
-        // TODO FIXME because of page navigation this currently loads twice
-        // TODO FIXME somehow debounce (as we currently do a full navigation this probably has to be done somewhere else)
-        this._initialTask = new Task(
-          this,
-          taskFunction,
-          () => [],
-        );
-
-        if (this.initial !== undefined) {
-          // TODO FIXME goddammit the private attributes get minified
-          this._initialTask.status = TaskStatus.COMPLETE;
-          // @ts-expect-error See https://github.com/lit/lit/issues/2367
-          this._initialTask.P = this.initial;
-        }
-      }
-    }
-
-    console.log("jo", this._initialTask?.value)
-
-    return super.render();
-  }
-
   override getInputs = () => {
     return html`
       <pw-text-input
         label=${msg("Title")}
         name="title"
         .task=${this._task}
-        .initialTask=${this._initialTask}
+        .initial=${this.initial}
       ></pw-text-input>
 
       <pw-text-input
         label=${msg("Info")}
         name="info"
         .task=${this._task}
-        .initialTask=${this._initialTask}
+        .initial=${this.initial}
       ></pw-text-input>
 
       <pw-text-input
         label=${msg("Place")}
         name="place"
         .task=${this._task}
-        .initialTask=${this._initialTask}
+        .initial=${this.initial}
       ></pw-text-input>
 
       <pw-number-input
         label=${msg("Costs")}
         name="costs"
         .task=${this._task}
-        .initialTask=${this._initialTask}
+        .initial=${this.initial}
       ></pw-number-input>
 
       <pw-number-input
         label=${msg("Minimum age")}
         name="min_age"
         .task=${this._task}
-        .initialTask=${this._initialTask}
+        .initial=${this.initial}
       ></pw-number-input>
 
       <pw-number-input
         label=${msg("Maximum age")}
         name="max_age"
         .task=${this._task}
-        .initialTask=${this._initialTask}
+        .initial=${this.initial}
       ></pw-number-input>
 
       <pw-number-input
         label=${msg("Minimum participants")}
         name="min_participants"
         .task=${this._task}
-        .initialTask=${this._initialTask}
+        .initial=${this.initial}
       ></pw-number-input>
 
       <pw-number-input
         label=${msg("Maximum participants")}
         name="max_participants"
         .task=${this._task}
-        .initialTask=${this._initialTask}
+        .initial=${this.initial}
       ></pw-number-input>
 
       <!-- Betreuer, Projektleiter (Schüler) -->
@@ -186,7 +157,7 @@ export class PwProjectCreate extends PwForm<"/api/v1/projects/create-or-update">
         label=${msg("Allow random assignments")}
         name="random_assignments"
         .task=${this._task}
-        .initialTask=${this._initialTask}
+        .initial=${this.initial}
       ></pw-checkbox-input>
     `;
   };
