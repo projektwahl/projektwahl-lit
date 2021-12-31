@@ -16,6 +16,8 @@ class PwProjectLeaderCheckbox extends LitElement {
           _task: { state: true },
           forceTask: { state: true },
           disabled: { state: true },
+          userId: { type: Number },
+          projectId: { type: Number }
         };
       }
 
@@ -25,6 +27,10 @@ class PwProjectLeaderCheckbox extends LitElement {
     any,
     any
   >;
+
+  userId!: number;
+
+  projectId!: number;
 
   disabled: boolean;
 
@@ -48,8 +54,8 @@ class PwProjectLeaderCheckbox extends LitElement {
             "content-type": "text/json",
           },
           body: JSON.stringify({
-            id: 1337,
-            project_leader_id: 1338
+            id: this.userId,
+            project_leader_id: this.projectId
           }),
         });
 

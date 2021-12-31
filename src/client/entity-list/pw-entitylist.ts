@@ -53,7 +53,7 @@ export class PwEntityList<P extends keyof typeof routes> extends LitElement {
 
   initialRender: boolean;
 
-  initial: Promise<import("lit").TemplateResult> | undefined;
+  initial: Promise<z.infer<typeof routes[P]["response"]>> | undefined;
 
   protected history;
 

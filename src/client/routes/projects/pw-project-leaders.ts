@@ -9,12 +9,21 @@ import { PwUsers, taskFunction } from "../users/pw-users.js";
 import "./pw-project-leader-checkbox.js";
 import "../../form/pw-checkbox-input.js"; 
 
-export const pwUsers = async (url: URL) => {
+export const pwProjectLeaders = async (url: URL) => {
   let result = await taskFunction([url.searchParams]);
-  return html`<pw-users .initial=${result}></pw-users>`;
+  return html`<pw-project-leaders .initial=${result}></pw-project-leaders>`;
 };
 
 class PwProjectLeaders extends PwUsers {
+  static override get properties() {
+    return {
+      ...super.properties,
+      projectId: { type: Number }
+    };
+  }
+
+  projectId: number;
+
   override get title() {
     return msg("Project leaders");
   }
@@ -90,7 +99,7 @@ class PwProjectLeaders extends PwUsers {
         return result.entities.map(
           (value) => html`<tr>
             <td>
-              <pw-project-leader-checkbox></pw-project-leader-checkbox>
+              <pw-project-leader-checkbox projectId=${this.projectId} userId=${value.id!}></pw-project-leader-checkbox>
             </td>
             <th scope="row">
               <p>${value.id}</p>
