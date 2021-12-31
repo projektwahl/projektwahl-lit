@@ -5,7 +5,6 @@ import type { ReactiveController, ReactiveControllerHost } from "lit";
 export type HistoryState = Record<string, unknown>;
 
 export class HistoryController implements ReactiveController {
-
   host;
 
   urlPattern;
@@ -16,12 +15,12 @@ export class HistoryController implements ReactiveController {
 
   private popstateListener?: (this: Window, ev: PopStateEvent) => void;
 
-  private navigateListener?: (this: Window,event: CustomEvent<{url: URL;state: HistoryState;}>) => void;
+  private navigateListener?: (
+    this: Window,
+    event: CustomEvent<{ url: URL; state: HistoryState }>
+  ) => void;
 
-  constructor(
-    host: ReactiveControllerHost,
-    urlPattern: RegExp
-  ) {
+  constructor(host: ReactiveControllerHost, urlPattern: RegExp) {
     (this.host = host).addController(this);
 
     this.urlPattern = urlPattern;
@@ -35,7 +34,7 @@ export class HistoryController implements ReactiveController {
     this.state = window.history.state as HistoryState;
     this.popstateListener = (event: PopStateEvent) => {
       this.url = new URL(window.location.href);
-      this.state = /** @type {HistoryState} */ (event.state);
+      this.state = /** @type {HistoryState} */ event.state;
       if (this.urlPattern.test(this.url.pathname)) {
         this.host.requestUpdate();
       }

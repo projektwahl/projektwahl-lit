@@ -3,7 +3,10 @@
 
 import type { z } from "zod";
 
-export const myFetch = async <P extends import("../lib/routes").keys>(url: P, options: RequestInit | undefined): Promise<z.infer<typeof import("../lib/routes").routes[P]["response"]>> => {
+export const myFetch = async <P extends import("../lib/routes").keys>(
+  url: P,
+  options: RequestInit | undefined
+): Promise<z.infer<typeof import("../lib/routes").routes[P]["response"]>> => {
   const response = await fetch(url.toString(), options);
   if (!response.ok) {
     try {

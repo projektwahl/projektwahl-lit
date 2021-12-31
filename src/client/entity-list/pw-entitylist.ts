@@ -44,7 +44,10 @@ export class PwEntityList<P extends keyof typeof routes> extends LitElement {
     throw new Error("not implemented");
   }
 
-  protected _apiTask!: Task<[URLSearchParams], z.infer<typeof routes[P]["response"]>>;
+  protected _apiTask!: Task<
+    [URLSearchParams],
+    z.infer<typeof routes[P]["response"]>
+  >;
 
   formRef;
 
@@ -56,7 +59,9 @@ export class PwEntityList<P extends keyof typeof routes> extends LitElement {
 
   taskFunction: ([searchParams]: [URLSearchParams]) => Promise<any>;
 
-  constructor(taskFunction: ([searchParams]: [URLSearchParams]) => Promise<any>) {
+  constructor(
+    taskFunction: ([searchParams]: [URLSearchParams]) => Promise<any>
+  ) {
     super();
 
     this.taskFunction = taskFunction;
@@ -92,146 +97,141 @@ export class PwEntityList<P extends keyof typeof routes> extends LitElement {
     return html`
       ${bootstrapCss}
       <div class="container">
-      <div
-        style="position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);"
-      >
-        ${
-          /*true
+        <div
+          style="position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);"
+        >
+          ${
+            /*true
           ? ""
           : html`<div class="spinner-grow text-primary" role="status">
               <span class="visually-hidden">Loading...</span>
         </div>`*/ ""
-        }
-      </div>
-      <h1 class="text-center">${this.title}</h1>
-      <div class="row justify-content-between">
-        <div class="col-auto">
-          ${this.buttons}
+          }
         </div>
-        <div class="col-3">
-          <select
-            @change=${(event: Event) => {
-              const url = new URL(window.location.href);
-              url.searchParams.set("p_limit", (event.target as HTMLSelectElement).value);
-              HistoryController.goto(url, {});
-            }}
-            .value=${this.history.url.searchParams.get("p_limit")}
-            class="form-select"
-            aria-label="Default select example"
-          >
-            <option value="10">
-              ${((count: number) => msg(str`${count} per page`))(
-                10
-              )}
-            </option>
-            <option value="25">
-              ${((count: number) => msg(str`${count} per page`))(
-                25
-              )}
-            </option>
-            <option value="50">
-              ${((count: number) => msg(str`${count} per page`))(
-                50
-              )}
-            </option>
-            <option selected value="100">
-              ${((count: number) => msg(str`${count} per page`))(
-                100
-              )}
-            </option>
-          </select>
-        </div>
-      </div>
-
-      <form
-    ${ref(this.formRef)}
-    @input=${() => {
-      const urlSearchParams = new URLSearchParams( // @ts-expect-error probably wrong typings
-        new FormData(this.formRef.value)
-      );
-      urlSearchParams.delete("order");
-      this.history.url.searchParams
-        .getAll("order")
-        .forEach((v) => urlSearchParams.append("order", v));
-      HistoryController.goto(
-        new URL(`?${urlSearchParams}`, window.location.href), {}
-      );
-    }}
-    @submit=${(e: Event) => e.preventDefault()}
-  >
-    <table class="table">
-      <thead>
-        ${this.head}
-      </thead>
-
-      <!-- TODO FIXME add loading indicator overlay -->
-
-      <tbody>
-        ${this.body}
-      </tbody>
-    </table>
-  </form>
-
-
-      <nav aria-label="${msg("navigation of user list")}">
-        <ul class="pagination justify-content-center">
-          <li
-            class="page-item ${classMap({
-              disabled: this._apiTask.value?.previousCursor === null
-            })}"
-          >
-            <a
-              @click=${(e: Event) => {
-                e.preventDefault();
+        <h1 class="text-center">${this.title}</h1>
+        <div class="row justify-content-between">
+          <div class="col-auto">${this.buttons}</div>
+          <div class="col-3">
+            <select
+              @change=${(event: Event) => {
                 const url = new URL(window.location.href);
-                url.searchParams.set("p_cursor", JSON.stringify(this._apiTask.value?.previousCursor));
-                url.searchParams.set("p_direction", "backwards");
+                url.searchParams.set(
+                  "p_limit",
+                  (event.target as HTMLSelectElement).value
+                );
                 HistoryController.goto(url, {});
               }}
-              class="page-link"
-              href="/"
-              aria-label="${msg("previous page")}"
-              tabindex=${
-                this._apiTask.value?.previousCursor === null ? undefined : -1
-              }
-              aria-disabled=${
-                this._apiTask.value?.previousCursor === null
-              }
+              .value=${this.history.url.searchParams.get("p_limit")}
+              class="form-select"
+              aria-label="Default select example"
             >
-              <span aria-hidden="true">&laquo;</span>
-            </a>
-          </li>
-          <li
-            class="page-item ${classMap({
-              disabled: this._apiTask.value?.nextCursor === null
-            })}"
-          >
-            <a
-              @click=${(e: Event) => {
-                e.preventDefault();
-                const url = new URL(window.location.href);
-                url.searchParams.set("p_cursor", JSON.stringify(this._apiTask.value?.nextCursor));
-                url.searchParams.set("p_direction", "forwards");
-                HistoryController.goto(url, {});
-              }}
-              class="page-link"
-              href="/"
-              aria-label="${msg("next page")}"
-              tabindex=${
-                this._apiTask.value?.nextCursor === null ? undefined : -1
-              }
-              aria-disabled=${
-                this._apiTask.value?.nextCursor === null
-              }
+              <option value="10">
+                ${((count: number) => msg(str`${count} per page`))(10)}
+              </option>
+              <option value="25">
+                ${((count: number) => msg(str`${count} per page`))(25)}
+              </option>
+              <option value="50">
+                ${((count: number) => msg(str`${count} per page`))(50)}
+              </option>
+              <option selected value="100">
+                ${((count: number) => msg(str`${count} per page`))(100)}
+              </option>
+            </select>
+          </div>
+        </div>
+
+        <form
+          ${ref(this.formRef)}
+          @input=${() => {
+            const urlSearchParams = new URLSearchParams( // @ts-expect-error probably wrong typings
+              new FormData(this.formRef.value)
+            );
+            urlSearchParams.delete("order");
+            this.history.url.searchParams
+              .getAll("order")
+              .forEach((v) => urlSearchParams.append("order", v));
+            HistoryController.goto(
+              new URL(`?${urlSearchParams}`, window.location.href),
+              {}
+            );
+          }}
+          @submit=${(e: Event) => e.preventDefault()}
+        >
+          <table class="table">
+            <thead>
+              ${this.head}
+            </thead>
+
+            <!-- TODO FIXME add loading indicator overlay -->
+
+            <tbody>
+              ${this.body}
+            </tbody>
+          </table>
+        </form>
+
+        <nav aria-label="${msg("navigation of user list")}">
+          <ul class="pagination justify-content-center">
+            <li
+              class="page-item ${classMap({
+                disabled: this._apiTask.value?.previousCursor === null,
+              })}"
             >
-              <span aria-hidden="true">&raquo;</span>
-            </a>
-          </li>
-        </ul>
-      </nav>
+              <a
+                @click=${(e: Event) => {
+                  e.preventDefault();
+                  const url = new URL(window.location.href);
+                  url.searchParams.set(
+                    "p_cursor",
+                    JSON.stringify(this._apiTask.value?.previousCursor)
+                  );
+                  url.searchParams.set("p_direction", "backwards");
+                  HistoryController.goto(url, {});
+                }}
+                class="page-link"
+                href="/"
+                aria-label="${msg("previous page")}"
+                tabindex=${this._apiTask.value?.previousCursor === null
+                  ? undefined
+                  : -1}
+                aria-disabled=${this._apiTask.value?.previousCursor === null}
+              >
+                <span aria-hidden="true">&laquo;</span>
+              </a>
+            </li>
+            <li
+              class="page-item ${classMap({
+                disabled: this._apiTask.value?.nextCursor === null,
+              })}"
+            >
+              <a
+                @click=${(e: Event) => {
+                  e.preventDefault();
+                  const url = new URL(window.location.href);
+                  url.searchParams.set(
+                    "p_cursor",
+                    JSON.stringify(this._apiTask.value?.nextCursor)
+                  );
+                  url.searchParams.set("p_direction", "forwards");
+                  HistoryController.goto(url, {});
+                }}
+                class="page-link"
+                href="/"
+                aria-label="${msg("next page")}"
+                tabindex=${this._apiTask.value?.nextCursor === null
+                  ? undefined
+                  : -1}
+                aria-disabled=${this._apiTask.value?.nextCursor === null}
+              >
+                <span aria-hidden="true">&raquo;</span>
+              </a>
+            </li>
+          </ul>
+        </nav>
       </div>
     `;
   }
-};
+}
 
 customElements.define("pw-entitylist", PwEntityList);

@@ -6,41 +6,68 @@ import type { BaseQuery, FilterType } from "../lib/types.js";
 import { sql } from "./database.js";
 import { sql2, unsafe2 } from "./sql/index.js";
 
-export async function fetchData<T extends { id: number; [index: string]: null | string | string[] | boolean | number }>(
-  path: "/api/v1/users"|"/api/v1/projects",
+export async function fetchData<
+  T extends {
+    id: number;
+    [index: string]: null | string | string[] | boolean | number;
+  }
+>(
+  path: "/api/v1/users" | "/api/v1/projects",
   headers: import("http2").IncomingHttpHeaders,
   table: string,
   columns: readonly [string, ...string[]],
   filters: any,
-  orderByInfo: { [field: string]: 'nulls-first' | 'nulls-last'; },
-  customFilterQuery: (query: FilterType<T>) => [TemplateStringsArray, ...(null | string | string[] | boolean | number)[]]
-): Promise<[OutgoingHttpHeaders, z.infer<typeof routes[typeof path]["response"]>]> {
+  orderByInfo: { [field: string]: "nulls-first" | "nulls-last" },
+  customFilterQuery: (
+    query: FilterType<T>
+  ) => [
+    TemplateStringsArray,
+    ...(null | string | string[] | boolean | number)[]
+  ]
+): Promise<
+  [OutgoingHttpHeaders, z.infer<typeof routes[typeof path]["response"]>]
+> {
   const url = new URL(headers[":path"]!, "https://localhost:8443");
 
-  const pagination = z.object({
-    p_cursor: z.string().refine(s => {
-      try {
-        JSON.parse(s);
-      } catch (e) {
-        return false;
-      }
-      return true;
-    }, {
-      message: "The cursor is invalid. This is an internal error."
-    }).transform(s => JSON.parse(s)).optional(),
-    p_direction: z.enum(["forwards", "backwards"]).default("forwards"),
-    p_limit: z.string().default("100").refine(s => /^\d*$/.test(s)).transform(s => s === '' ? undefined : Number(s)),
-  }).parse(Object.fromEntries(url.searchParams as any))
+  const pagination = z
+    .object({
+      p_cursor: z
+        .string()
+        .refine(
+          (s) => {
+            try {
+              JSON.parse(s);
+            } catch (e) {
+              return false;
+            }
+            return true;
+          },
+          {
+            message: "The cursor is invalid. This is an internal error.",
+          }
+        )
+        .transform((s) => JSON.parse(s))
+        .optional(),
+      p_direction: z.enum(["forwards", "backwards"]).default("forwards"),
+      p_limit: z
+        .string()
+        .default("100")
+        .refine((s) => /^\d*$/.test(s))
+        .transform((s) => (s === "" ? undefined : Number(s))),
+    })
+    .parse(Object.fromEntries(url.searchParams as any));
 
-  const sorting = z.array(z.tuple([z.enum(columns), z.enum(["ASC", "DESC"])])).parse(url.searchParams.getAll("order").map((o) => o.split("-")))
+  const sorting = z
+    .array(z.tuple([z.enum(columns), z.enum(["ASC", "DESC"])]))
+    .parse(url.searchParams.getAll("order").map((o) => o.split("-")));
 
   let _query: BaseQuery<T> = {
     filters,
     paginationCursor: pagination.p_cursor,
     paginationDirection: pagination.p_direction,
     paginationLimit: pagination.p_limit,
-    sorting
-  }
+    sorting,
+  };
 
   const query = _query;
 
@@ -64,11 +91,11 @@ export async function fetchData<T extends { id: number; [index: string]: null | 
 
   let finalQuery;
   if (!paginationCursor) {
-    finalQuery = sql2`(SELECT ${unsafe2(columns.map(c => `"${c}"`).join(", "))} FROM ${unsafe2(
-      table
-    )} WHERE ${customFilterQuery(query.filters)} ORDER BY ${orderByQuery} LIMIT ${
-      query.paginationLimit + 1
-    })`;
+    finalQuery = sql2`(SELECT ${unsafe2(
+      columns.map((c) => `"${c}"`).join(", ")
+    )} FROM ${unsafe2(table)} WHERE ${customFilterQuery(
+      query.filters
+    )} ORDER BY ${orderByQuery} LIMIT ${query.paginationLimit + 1})`;
   } else {
     let queries = query.sorting.map((value, index) => {
       const part = query.sorting.slice(0, index + 1);
@@ -98,7 +125,7 @@ export async function fetchData<T extends { id: number; [index: string]: null | 
     });
 
     if (queries.length == 1) {
-      finalQuery = queries[0]
+      finalQuery = queries[0];
     } else {
       finalQuery = sql2`${queries
         .flatMap((v) => [sql2`\nUNION ALL\n`, v])
@@ -106,43 +133,49 @@ export async function fetchData<T extends { id: number; [index: string]: null | 
     }
   }
 
-    // [TemplateStringsArray, ...(null | string | string[] | boolean | number)[]]
-    let entities = routes[path]["response"].shape.entities.parse(await sql(...finalQuery))
+  // [TemplateStringsArray, ...(null | string | string[] | boolean | number)[]]
+  let entities = routes[path]["response"].shape.entities.parse(
+    await sql(...finalQuery)
+  );
 
-    // https://github.com/projektwahl/projektwahl-sveltekit/blob/work/src/lib/list-entities.ts#L30
+  // https://github.com/projektwahl/projektwahl-sveltekit/blob/work/src/lib/list-entities.ts#L30
 
-    let nextCursor: z.infer<typeof routes[typeof path]["response"]>["entities"][0] | null = null;
-		let previousCursor: z.infer<typeof routes[typeof path]["response"]>["entities"][0] | null = null;
-		// TODO FIXME also recalculate the other cursor because data could've been deleted in between / the filters have changed
-		if (pagination.p_direction === "forwards") {
-      if (pagination.p_cursor) {
-			  previousCursor = entities[0] ?? null;
-      }
-			if (entities.length > pagination.p_limit) {
-				entities.pop();
-				nextCursor = entities[entities.length - 1] ?? null;
-			}
-		} else if (pagination.p_direction === "backwards") {
-			entities = entities.reverse(); // fixup as we needed to switch up orders above
-			if (entities.length > pagination.p_limit) {
-				entities.shift();
-				previousCursor = entities[0] ?? null;
-			}
-      if (pagination.p_cursor) {
-			  nextCursor = entities[entities.length - 1] ?? null;
-      }
-		}
+  let nextCursor:
+    | z.infer<typeof routes[typeof path]["response"]>["entities"][0]
+    | null = null;
+  let previousCursor:
+    | z.infer<typeof routes[typeof path]["response"]>["entities"][0]
+    | null = null;
+  // TODO FIXME also recalculate the other cursor because data could've been deleted in between / the filters have changed
+  if (pagination.p_direction === "forwards") {
+    if (pagination.p_cursor) {
+      previousCursor = entities[0] ?? null;
+    }
+    if (entities.length > pagination.p_limit) {
+      entities.pop();
+      nextCursor = entities[entities.length - 1] ?? null;
+    }
+  } else if (pagination.p_direction === "backwards") {
+    entities = entities.reverse(); // fixup as we needed to switch up orders above
+    if (entities.length > pagination.p_limit) {
+      entities.shift();
+      previousCursor = entities[0] ?? null;
+    }
+    if (pagination.p_cursor) {
+      nextCursor = entities[entities.length - 1] ?? null;
+    }
+  }
 
-    return [
-      {
-        "content-type": "text/json; charset=utf-8",
-        ":status": 200,
-      },
-      // TODO FIXME
-      {
-        entities,
-        nextCursor,
-        previousCursor
-      },
-    ];
+  return [
+    {
+      "content-type": "text/json; charset=utf-8",
+      ":status": 200,
+    },
+    // TODO FIXME
+    {
+      entities,
+      nextCursor,
+      previousCursor,
+    },
+  ];
 }

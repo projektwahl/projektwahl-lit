@@ -11,13 +11,31 @@ import type { WritableTemplateStringsArray } from "../../lib/types";
 
 // https://github.com/porsager/postgres-benchmarks
 
-export function unsafe2(string: null | string | number | symbol): [TemplateStringsArray, ...any[]] {
-  let r: import("../../lib/types").WritableTemplateStringsArray = [String(string)];
-  r.raw = [String(string)]
+export function unsafe2(
+  string: null | string | number | symbol
+): [TemplateStringsArray, ...any[]] {
+  let r: import("../../lib/types").WritableTemplateStringsArray = [
+    String(string),
+  ];
+  r.raw = [String(string)];
   return [r as TemplateStringsArray];
 }
 
-export function sql2(_strings: TemplateStringsArray, ..._keys: (null | string | [TemplateStringsArray, ...(null | string | string[] | boolean | number)[]] | [TemplateStringsArray, ...(null | string | string[] | boolean | number)[]][] | string[] | boolean | number)[]): [TemplateStringsArray, ...(null | string | string[] | boolean | number)[]] {
+export function sql2(
+  _strings: TemplateStringsArray,
+  ..._keys: (
+    | null
+    | string
+    | [TemplateStringsArray, ...(null | string | string[] | boolean | number)[]]
+    | [
+        TemplateStringsArray,
+        ...(null | string | string[] | boolean | number)[]
+      ][]
+    | string[]
+    | boolean
+    | number
+  )[]
+): [TemplateStringsArray, ...(null | string | string[] | boolean | number)[]] {
   const strings = _strings;
   const keys = _keys;
   //console.log("sql", strings, keys)
@@ -32,7 +50,10 @@ export function sql2(_strings: TemplateStringsArray, ..._keys: (null | string | 
 
   // array of templates
   // @ts-expect-error
-  const flattened: [TemplateStringsArray, ...(string | string[] | boolean | number)[]][] = stringsAsTemplates.flatMap((m, i) => {
+  const flattened: [
+    TemplateStringsArray,
+    ...(string | string[] | boolean | number)[]
+  ][] = stringsAsTemplates.flatMap((m, i) => {
     if (i == keys.length) {
       return [m];
     }
@@ -55,30 +76,35 @@ export function sql2(_strings: TemplateStringsArray, ..._keys: (null | string | 
   });
   //console.log("flattened", flattened)
 
-  const result = flattened.reduce((previous, current) => {
-    const templateStrings: WritableTemplateStringsArray = [
-      ...previous[0].slice(0, -1),
-      previous[0].slice(-1)[0] + current[0][0],
-      ...current[0].slice(1),
-    ];
-    templateStrings.raw = [
-      ...previous[0].raw.slice(0, -1),
-      previous[0].raw.slice(-1)[0] + current[0].raw[0],
-      ...current[0].raw.slice(1),
-    ];
-    return [
-      templateStrings as TemplateStringsArray,
-      ...previous.slice(1),
-      ...current.slice(1),
-    ] as [TemplateStringsArray, ...any[]];
-  }, ([r]) as [TemplateStringsArray, ...any[]]);
+  const result = flattened.reduce(
+    (previous, current) => {
+      const templateStrings: WritableTemplateStringsArray = [
+        ...previous[0].slice(0, -1),
+        previous[0].slice(-1)[0] + current[0][0],
+        ...current[0].slice(1),
+      ];
+      templateStrings.raw = [
+        ...previous[0].raw.slice(0, -1),
+        previous[0].raw.slice(-1)[0] + current[0].raw[0],
+        ...current[0].raw.slice(1),
+      ];
+      return [
+        templateStrings as TemplateStringsArray,
+        ...previous.slice(1),
+        ...current.slice(1),
+      ] as [TemplateStringsArray, ...any[]];
+    },
+    [r] as [TemplateStringsArray, ...any[]]
+  );
 
   //console.log("result", result)
 
   return result;
 }
 
-export function sql2ToString(sql: [TemplateStringsArray, ...(string | string[] | boolean | number)[]]) {
+export function sql2ToString(
+  sql: [TemplateStringsArray, ...(string | string[] | boolean | number)[]]
+) {
   return sql[0]
     .map((s, i) => {
       if (i + 1 == sql.length) {

@@ -16,19 +16,18 @@ import type { rawProjectSchema } from "../../../lib/routes.js";
 
 export async function pwProject(id: number) {
   let result = await taskFunction([id]);
-  return html`<pw-project-create .initial=${result}></pw-project-create>`
+  return html`<pw-project-create .initial=${result}></pw-project-create>`;
 }
 
-const taskFunction = async ([id]: [number]
-  ) => {
-    let response = await fetch(
-      new URL(`/api/v1/projects/?f_id=${id}`, window.location.href).toString(),
-      {
-        //agent: new Agent({rejectUnauthorized: false})
-      }
-    );
-    return (await response.json()).entities[0];
-  };
+const taskFunction = async ([id]: [number]) => {
+  let response = await fetch(
+    new URL(`/api/v1/projects/?f_id=${id}`, window.location.href).toString(),
+    {
+      //agent: new Agent({rejectUnauthorized: false})
+    }
+  );
+  return (await response.json()).entities[0];
+};
 
 export class PwProjectCreate extends PwForm<"/api/v1/projects/create-or-update"> {
   static override get properties() {
@@ -66,7 +65,9 @@ export class PwProjectCreate extends PwForm<"/api/v1/projects/create-or-update">
     this._task = new Task(
       this,
       async () => {
-        const formDataEvent = new CustomEvent<Partial<z.infer<typeof rawProjectSchema>>>("myformdata", {
+        const formDataEvent = new CustomEvent<
+          Partial<z.infer<typeof rawProjectSchema>>
+        >("myformdata", {
           bubbles: true,
           composed: true,
           detail: {},

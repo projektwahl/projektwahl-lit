@@ -1,4 +1,14 @@
-import { AnyZodObject, objectUtil, z, ZodNumber, ZodObject, ZodRawShape, ZodType, ZodTypeAny, ZodTypeDef } from "zod";
+import {
+  AnyZodObject,
+  objectUtil,
+  z,
+  ZodNumber,
+  ZodObject,
+  ZodRawShape,
+  ZodType,
+  ZodTypeAny,
+  ZodTypeDef,
+} from "zod";
 import { result } from "./result.js";
 
 export const loginInputSchema = z
@@ -19,14 +29,14 @@ const rawUserCommon = {
   password_changed: z.boolean(),
   force_in_project_id: z.number(),
   computed_in_project_id: z.number(),
-}
+};
 
 export const rawUserHelperOrAdminSchema = z
   .object({
     type: z.enum(["helper", "admin"]),
     group: z.string().nullable(), // TODO FIXME add validation inside database that these are null as this depends on the type value and the previous type value
     age: z.number().nullable(),
-    ...rawUserCommon
+    ...rawUserCommon,
   })
   .strict();
 
@@ -35,52 +45,84 @@ export const rawUserVoterSchema = z
     type: z.enum(["voter"]),
     group: z.string().min(1).max(100),
     age: z.number().min(0).max(200),
-    ...rawUserCommon
+    ...rawUserCommon,
   })
   .strict();
 
-export const rawUserSchema = <O1, D1 extends ZodTypeDef = ZodTypeDef, I1 = O1, O2, D2 extends ZodTypeDef = ZodTypeDef, I2 = O2>(v1: ZodType<O1, D1, I1>, v2: ZodType<O2, D2, I2>) => z.object({
-  type: z.enum(["helper", "admin", "voter"])
-}).passthrough().superRefine((value, ctx) => {
-  // KEEP this line synchronized with the one below
-  let schema = value.type === "voter" ? v1 : v2;
-  let parsed = schema.safeParse(value)
-  if (!parsed.success) {
-    parsed.error.issues.forEach(ctx.addIssue)
-  }
-}).transform(value => {
-    // KEEP this line synchronized with the one above
-    let schema = value.type === "voter" ? v1 : v2;
-    return schema.parse(value);
-})
+export const rawUserSchema = <
+  O1,
+  D1 extends ZodTypeDef = ZodTypeDef,
+  I1 = O1,
+  O2,
+  D2 extends ZodTypeDef = ZodTypeDef,
+  I2 = O2
+>(
+  v1: ZodType<O1, D1, I1>,
+  v2: ZodType<O2, D2, I2>
+) =>
+  z
+    .object({
+      type: z.enum(["helper", "admin", "voter"]),
+    })
+    .passthrough()
+    .superRefine((value, ctx) => {
+      // KEEP this line synchronized with the one below
+      let schema = value.type === "voter" ? v1 : v2;
+      let parsed = schema.safeParse(value);
+      if (!parsed.success) {
+        parsed.error.issues.forEach(ctx.addIssue);
+      }
+    })
+    .transform((value) => {
+      // KEEP this line synchronized with the one above
+      let schema = value.type === "voter" ? v1 : v2;
+      return schema.parse(value);
+    });
 
-export const makeCreateOrUpdate = <T extends { [k: string]: ZodTypeAny;}, UnknownKeys extends UnknownKeysParam = "strip", Catchall extends ZodTypeAny = ZodTypeAny>(s: ZodObject<T, UnknownKeys, Catchall>) => z.object({
-  id: z.number().nullable()
-}).passthrough().superRefine((value, ctx) => {
-  // KEEP this line synchronized with the one below
-  let schema = value.id ? s.partial().setKey("id", z.number()) : s.setKey("id", z.null());
-  let parsed = schema.safeParse(value)
-  if (!parsed.success) {
-    parsed.error.issues.forEach(ctx.addIssue)
-  }
-}).transform(value => {
-  // KEEP this line synchronized with the one above
-  let schema = value.id ? s.partial().setKey("id", z.number()) : s.setKey("id", z.null());
-  return schema.parse(value);
-})
+export const makeCreateOrUpdate = <
+  T extends { [k: string]: ZodTypeAny },
+  UnknownKeys extends UnknownKeysParam = "strip",
+  Catchall extends ZodTypeAny = ZodTypeAny
+>(
+  s: ZodObject<T, UnknownKeys, Catchall>
+) =>
+  z
+    .object({
+      id: z.number().nullable(),
+    })
+    .passthrough()
+    .superRefine((value, ctx) => {
+      // KEEP this line synchronized with the one below
+      let schema = value.id
+        ? s.partial().setKey("id", z.number())
+        : s.setKey("id", z.null());
+      let parsed = schema.safeParse(value);
+      if (!parsed.success) {
+        parsed.error.issues.forEach(ctx.addIssue);
+      }
+    })
+    .transform((value) => {
+      // KEEP this line synchronized with the one above
+      let schema = value.id
+        ? s.partial().setKey("id", z.number())
+        : s.setKey("id", z.null());
+      return schema.parse(value);
+    });
 
-export const rawProjectSchema = z.object({
-  id: z.number().nullable(),
-  title: z.string().max(1024),
-  info: z.string().max(8192),
-  place: z.string().max(1024),
-  costs: z.number().min(0).max(100),
-  min_age: z.number().min(0).max(200),
-  max_age: z.number().min(0).max(200),
-  min_participants: z.number().min(1).max(1000),
-  max_participants: z.number().min(1).max(1000),
-  random_assignments: z.boolean(),
-}).strict();
+export const rawProjectSchema = z
+  .object({
+    id: z.number().nullable(),
+    title: z.string().max(1024),
+    info: z.string().max(8192),
+    place: z.string().max(1024),
+    costs: z.number().min(0).max(100),
+    min_age: z.number().min(0).max(200),
+    max_age: z.number().min(0).max(200),
+    min_participants: z.number().min(1).max(1000),
+    max_participants: z.number().min(1).max(1000),
+    random_assignments: z.boolean(),
+  })
+  .strict();
 
 export const rawSessionType = z.object({
   session_id: z.string(),
@@ -91,24 +133,46 @@ export const rawSessionType = z.object({
 
 export const loginOutputSchema = result(z.null(), z.record(z.string()));
 
-export type keys = "/api/v1/login"|"/api/v1/openid-login"|"/api/v1/redirect"|"/api/v1/sleep"|"/api/v1/update"|"/api/v1/users/create-or-update"|"/api/v1/projects/create-or-update"|"/api/v1/users"|"/api/v1/projects";
+export type keys =
+  | "/api/v1/login"
+  | "/api/v1/openid-login"
+  | "/api/v1/redirect"
+  | "/api/v1/sleep"
+  | "/api/v1/update"
+  | "/api/v1/users/create-or-update"
+  | "/api/v1/projects/create-or-update"
+  | "/api/v1/users"
+  | "/api/v1/projects";
 
-function identity<T extends { [r in keys]: { request: ZodType<any>, response: ZodType<any> } }>(v: T) {
+function identity<
+  T extends { [r in keys]: { request: ZodType<any>; response: ZodType<any> } }
+>(v: T) {
   return v;
 }
 
 export type UnknownKeysParam = "passthrough" | "strict" | "strip";
 
-const usersCreateOrUpdate = <T extends { [k: string]: ZodTypeAny;}, UnknownKeys extends UnknownKeysParam = "strip", Catchall extends ZodTypeAny = ZodTypeAny>(s: ZodObject<T, UnknownKeys, Catchall>) => makeCreateOrUpdate(s.pick({
-  age: true,
-  away: true,
-  group: true,
-  id: true,
-  type: true,
-  username: true
-}).extend({
-  password: z.string().optional()
-}))
+const usersCreateOrUpdate = <
+  T extends { [k: string]: ZodTypeAny },
+  UnknownKeys extends UnknownKeysParam = "strip",
+  Catchall extends ZodTypeAny = ZodTypeAny
+>(
+  s: ZodObject<T, UnknownKeys, Catchall>
+) =>
+  makeCreateOrUpdate(
+    s
+      .pick({
+        age: true,
+        away: true,
+        group: true,
+        id: true,
+        type: true,
+        username: true,
+      })
+      .extend({
+        password: z.string().optional(),
+      })
+  );
 
 /*
 const jo = usersCreateOrUpdate(rawUserVoterSchema)
@@ -122,27 +186,34 @@ let a2: z.infer<typeof jo2>;
 // TODO FIXME report upstream (picking missing keys breaks)
 //console.log(usersCreateOrUpdate(rawUserHelperOrAdminSchema).safeParse({}))
 
-const users = <T extends { [k: string]: ZodTypeAny;}, UnknownKeys extends UnknownKeysParam = "strip", Catchall extends ZodTypeAny = ZodTypeAny>(s: ZodObject<T, UnknownKeys, Catchall>) => s.pick({
-  id: true,
-  type: true,
-  username: true,
-  group: true,
-  age: true,
-  away: true
-})
+const users = <
+  T extends { [k: string]: ZodTypeAny },
+  UnknownKeys extends UnknownKeysParam = "strip",
+  Catchall extends ZodTypeAny = ZodTypeAny
+>(
+  s: ZodObject<T, UnknownKeys, Catchall>
+) =>
+  s.pick({
+    id: true,
+    type: true,
+    username: true,
+    group: true,
+    age: true,
+    away: true,
+  });
 
 const project = rawProjectSchema.pick({
-  "id": true,
-  "title": true,
-  "info": true,
-  "place": true,
-  "costs": true,
-  "min_age": true,
-  "max_age": true,
-  "min_participants": true,
-  "max_participants": true,
-  "random_assignments": true
-})
+  id: true,
+  title: true,
+  info: true,
+  place: true,
+  costs: true,
+  min_age: true,
+  max_age: true,
+  min_participants: true,
+  max_participants: true,
+  random_assignments: true,
+});
 
 export const routes = identity({
   "/api/v1/login": {
@@ -166,20 +237,40 @@ export const routes = identity({
     response: z.number(),
   },
   "/api/v1/users/create-or-update": {
-    request: rawUserSchema(usersCreateOrUpdate(rawUserVoterSchema), usersCreateOrUpdate(rawUserHelperOrAdminSchema)),
-    response: result(z.object({}).extend({ id: z.number() }), z.record(z.string())),
+    request: rawUserSchema(
+      usersCreateOrUpdate(rawUserVoterSchema),
+      usersCreateOrUpdate(rawUserHelperOrAdminSchema)
+    ),
+    response: result(
+      z.object({}).extend({ id: z.number() }),
+      z.record(z.string())
+    ),
   },
   "/api/v1/projects/create-or-update": {
     request: makeCreateOrUpdate(rawProjectSchema),
-    response: result(z.object({}).extend({ id: z.number() }), z.record(z.string())),
+    response: result(
+      z.object({}).extend({ id: z.number() }),
+      z.record(z.string())
+    ),
   },
   "/api/v1/users": {
     request: z.undefined(),
     response: z.object({
-      entities: z.array(rawUserSchema(users(rawUserVoterSchema), users(rawUserHelperOrAdminSchema))),
-      previousCursor: rawUserSchema(users(rawUserVoterSchema), users(rawUserHelperOrAdminSchema)).nullable(),
-      nextCursor: rawUserSchema(users(rawUserVoterSchema), users(rawUserHelperOrAdminSchema)).nullable(),
-    })
+      entities: z.array(
+        rawUserSchema(
+          users(rawUserVoterSchema),
+          users(rawUserHelperOrAdminSchema)
+        )
+      ),
+      previousCursor: rawUserSchema(
+        users(rawUserVoterSchema),
+        users(rawUserHelperOrAdminSchema)
+      ).nullable(),
+      nextCursor: rawUserSchema(
+        users(rawUserVoterSchema),
+        users(rawUserHelperOrAdminSchema)
+      ).nullable(),
+    }),
   },
   "/api/v1/projects": {
     request: z.undefined(),
@@ -187,7 +278,7 @@ export const routes = identity({
       entities: z.array(project),
       previousCursor: project.nullable(),
       nextCursor: project.nullable(),
-    })
+    }),
   },
 } as const);
 

@@ -21,8 +21,7 @@ export const pwUsers = async (url: URL) => {
   return html`<pw-users .initial=${result}></pw-users>`;
 };
 
-const taskFunction = async ([searchParams]: [URLSearchParams]
-) => {
+const taskFunction = async ([searchParams]: [URLSearchParams]) => {
   let response = await fetch(
     new URL(`/api/v1/users?${searchParams}`, window.location.href).toString(),
     {
@@ -33,7 +32,6 @@ const taskFunction = async ([searchParams]: [URLSearchParams]
 };
 
 class PwUsers extends PwEntityList<"/api/v1/users"> {
-
   constructor() {
     super(taskFunction);
   }
@@ -43,72 +41,69 @@ class PwUsers extends PwEntityList<"/api/v1/users"> {
   }
 
   override get buttons() {
-    return html`
-      <a
-        @click=${aClick}
-        class="btn btn-primary"
-        href="/users/create"
-        role="button"
-        >${msg("Create account")}</a
-      >`
+    return html` <a
+      @click=${aClick}
+      class="btn btn-primary"
+      href="/users/create"
+      role="button"
+      >${msg("Create account")}</a
+    >`;
   }
 
   override get head() {
     return html`<tr>
-    <!--
+        <!--
       do not support this without javascript because there is literally zero useful ways to do this useful.
       the only nice way is probably submit buttons that do things like "oder_by_id_asc" and then redirect to the new state (because you need to remove the old state)
     -->
-    <th class="table-cell-hover p-0" scope="col">
-      <pw-order name="id" title=${msg("ID")}></pw-order>
-    </th>
+        <th class="table-cell-hover p-0" scope="col">
+          <pw-order name="id" title=${msg("ID")}></pw-order>
+        </th>
 
-    <th class="table-cell-hover p-0" scope="col">
-      <pw-order name="username" title=${msg("Name")}></pw-order>
-    </th>
+        <th class="table-cell-hover p-0" scope="col">
+          <pw-order name="username" title=${msg("Name")}></pw-order>
+        </th>
 
-    <th class="table-cell-hover p-0" scope="col">
-      <pw-order name="type" title=${msg("Type")}></pw-order>
-    </th>
+        <th class="table-cell-hover p-0" scope="col">
+          <pw-order name="type" title=${msg("Type")}></pw-order>
+        </th>
 
-    <th class="table-cell-hover">${msg("Actions")}</th>
-  </tr>
+        <th class="table-cell-hover">${msg("Actions")}</th>
+      </tr>
 
-  <tr>
-    <th scope="col">
-      <input
-        name="f_id"
-        type="text"
-        class="form-control"
-        id="projects-filter-{name}"
-        value=${this.history.url.searchParams.get("f_id")}
-      />
-    </th>
+      <tr>
+        <th scope="col">
+          <input
+            name="f_id"
+            type="text"
+            class="form-control"
+            id="projects-filter-{name}"
+            value=${this.history.url.searchParams.get("f_id")}
+          />
+        </th>
 
-    <th scope="col">
-      <input
-        name="f_username"
-        type="text"
-        class="form-control"
-        id="projects-filter-{name}"
-        value=${this.history.url.searchParams.get("f_username")}
-      />
-    </th>
+        <th scope="col">
+          <input
+            name="f_username"
+            type="text"
+            class="form-control"
+            id="projects-filter-{name}"
+            value=${this.history.url.searchParams.get("f_username")}
+          />
+        </th>
 
-    <th scope="col">
-      <input
-        name="f_type"
-        type="text"
-        class="form-control"
-        id="projects-filter-{name}"
-        value=${this.history.url.searchParams.get("f_type")}
-      />
-    </th>
+        <th scope="col">
+          <input
+            name="f_type"
+            type="text"
+            class="form-control"
+            id="projects-filter-{name}"
+            value=${this.history.url.searchParams.get("f_type")}
+          />
+        </th>
 
-    <th scope="col">
-      
-    </th>
-  </tr>`
+        <th scope="col"></th>
+      </tr>`;
   }
 
   override get body() {
@@ -151,8 +146,8 @@ class PwUsers extends PwEntityList<"/api/v1/users"> {
       initial: () => {
         return html`hi`;
       },
-    })}`
+    })}`;
   }
-};
+}
 
 customElements.define("pw-users", PwUsers);

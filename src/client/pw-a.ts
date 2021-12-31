@@ -34,7 +34,14 @@ export class PwADontUse extends LitElement {
 
   role: "button" | undefined;
 
-  ariaCurrent!: "page" | "step" | "location" | "date" | "time" | "true" | "false"
+  ariaCurrent!:
+    | "page"
+    | "step"
+    | "location"
+    | "date"
+    | "time"
+    | "true"
+    | "false";
 
   constructor() {
     super();

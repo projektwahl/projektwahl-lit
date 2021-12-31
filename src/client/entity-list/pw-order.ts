@@ -77,7 +77,8 @@ export class PwOrder<T> extends LitElement {
           ].forEach((v) => urlSearchParams.append("order", v));
 
           HistoryController.goto(
-            new URL(`?${urlSearchParams}`, window.location.href), {}
+            new URL(`?${urlSearchParams}`, window.location.href),
+            {}
           );
         }}
         name="${this.name}"

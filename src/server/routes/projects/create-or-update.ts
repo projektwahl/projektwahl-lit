@@ -4,7 +4,10 @@ import { request } from "../../express.js";
 
 // TODO FIXME you can accidentialy create instead of update if you forget to pass the id. maybe force id and setting it to null means creation.
 
-export async function createOrUpdateProjectsHandler(stream: import("http2").ServerHttp2Stream, headers: import("http2").IncomingHttpHeaders) {
+export async function createOrUpdateProjectsHandler(
+  stream: import("http2").ServerHttp2Stream,
+  headers: import("http2").IncomingHttpHeaders
+) {
   // TODO FIXME create or update multiple
   return await request(
     "POST",

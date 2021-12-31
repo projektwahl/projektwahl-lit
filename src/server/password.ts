@@ -25,7 +25,10 @@ async function getKeyMaterial(password: string): Promise<CryptoKey> {
   );
 }
 
-async function hashPasswordWithSalt(password: string, salt: Buffer): Promise<Buffer> {
+async function hashPasswordWithSalt(
+  password: string,
+  salt: Buffer
+): Promise<Buffer> {
   let keyMaterial = await getKeyMaterial(password);
   return Buffer.from(
     await webcrypto.subtle.deriveBits(
@@ -41,12 +44,21 @@ async function hashPasswordWithSalt(password: string, salt: Buffer): Promise<Buf
   );
 }
 
-export async function hashPassword(password: string): Promise<[Buffer, Buffer]> {
+export async function hashPassword(
+  password: string
+): Promise<[Buffer, Buffer]> {
   const salt = webcrypto.getRandomValues(new Uint8Array(64));
-  return [await hashPasswordWithSalt(password, Buffer.from(salt)), Buffer.from(salt)];
+  return [
+    await hashPasswordWithSalt(password, Buffer.from(salt)),
+    Buffer.from(salt),
+  ];
 }
 
-export async function checkPassword(hash: Buffer, salt: Buffer, password: string): Promise<boolean> {
+export async function checkPassword(
+  hash: Buffer,
+  salt: Buffer,
+  password: string
+): Promise<boolean> {
   return crypto.timingSafeEqual(
     await hashPasswordWithSalt(password, salt),
     hash

@@ -15,23 +15,25 @@ import "../../form/pw-text-input.js";
 import { rawUserSchema } from "../../../lib/routes.js";
 import type { z } from "zod";
 
-const schema = rawUserSchema(id => id, id => id);
+const schema = rawUserSchema(
+  (id) => id,
+  (id) => id
+);
 
 export async function pwUser(id: number) {
   let result = await taskFunction([id]);
-  return html`<pw-user-create .initial=${result}></pw-user-create>`
+  return html`<pw-user-create .initial=${result}></pw-user-create>`;
 }
 
-const taskFunction = async ([id]: [number]
-  ) => {
-    let response = await fetch(
-      new URL(`/api/v1/users/?f_id=${id}`, window.location.href).toString(),
-      {
-        //agent: new Agent({rejectUnauthorized: false})
-      }
-    );
-    return (await response.json()).entities[0];
-  };
+const taskFunction = async ([id]: [number]) => {
+  let response = await fetch(
+    new URL(`/api/v1/users/?f_id=${id}`, window.location.href).toString(),
+    {
+      //agent: new Agent({rejectUnauthorized: false})
+    }
+  );
+  return (await response.json()).entities[0];
+};
 
 export class PwUserCreate extends PwForm<"/api/v1/users/create-or-update"> {
   static override get properties() {
@@ -65,11 +67,14 @@ export class PwUserCreate extends PwForm<"/api/v1/users/create-or-update"> {
     this._task = new Task(
       this,
       async () => {
-        const formDataEvent = new CustomEvent<Partial<z.infer<typeof schema>>>("myformdata", {
-          bubbles: true,
-          composed: true,
-          detail: {},
-        });
+        const formDataEvent = new CustomEvent<Partial<z.infer<typeof schema>>>(
+          "myformdata",
+          {
+            bubbles: true,
+            composed: true,
+            detail: {},
+          }
+        );
         this.form.value?.dispatchEvent(formDataEvent);
         formDataEvent.detail.id = this.initial?.id ?? null;
 
@@ -101,12 +106,15 @@ export class PwUserCreate extends PwForm<"/api/v1/users/create-or-update"> {
       ></pw-text-input>
 
       <pw-select-input
-        @change=${(event: Event) => (this.type = (event.target as HTMLSelectElement).value)}
+        @change=${(event: Event) =>
+          (this.type = (event.target as HTMLSelectElement).value)}
         label=${msg("User type")}
         name="type"
-        .options=${[ {value:"voter", text: "Schüler" },
+        .options=${[
+          { value: "voter", text: "Schüler" },
           { value: "helper", text: "Helfer" },
-          { value: "admin", text: "Admin" }]}
+          { value: "admin", text: "Admin" },
+        ]}
         .task=${this._task}
         .initial=${{ type: this.type ?? this.initial?.type ?? "voter" }}
       >
@@ -138,4 +146,3 @@ export class PwUserCreate extends PwForm<"/api/v1/users/create-or-update"> {
   };
 }
 customElements.define("pw-user-create", PwUserCreate);
-
