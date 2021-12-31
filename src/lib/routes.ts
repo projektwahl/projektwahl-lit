@@ -24,6 +24,8 @@ const rawUserCommon = {
 export const rawUserHelperOrAdminSchema = z
   .object({
     type: z.enum(["helper", "admin"]),
+    group: z.null(),
+    age: z.null(),
     ...rawUserCommon
   })
   .strict();
@@ -92,17 +94,8 @@ const usersCreateOrUpdate = <T extends { [k: string]: ZodTypeAny;}, UnknownKeys 
 })
 
 //console.log(rawUserHelperOrAdminSchema.safeParse({}))
-// TODO FIXME report upstream
+// TODO FIXME report upstream (picking missing keys breaks)
 //console.log(usersCreateOrUpdate(rawUserHelperOrAdminSchema).safeParse({}))
-
-const usersCreateOrUpdate2 = <T extends { [k: string]: ZodTypeAny;}, UnknownKeys extends UnknownKeysParam = "strip", Catchall extends ZodTypeAny = ZodTypeAny>(s: ZodObject<T, UnknownKeys, Catchall>) => s.pick({
-  away: true,
-  id: true,
-  type: true,
-  username: true
-}).extend({
-  password: z.string().optional()
-})
 
 const users = <T extends { [k: string]: ZodTypeAny;}, UnknownKeys extends UnknownKeysParam = "strip", Catchall extends ZodTypeAny = ZodTypeAny>(s: ZodObject<T, UnknownKeys, Catchall>) => s.pick({
   id: true,
@@ -111,16 +104,6 @@ const users = <T extends { [k: string]: ZodTypeAny;}, UnknownKeys extends Unknow
   group: true,
   age: true,
   away: true
-})
-
-const users2 = <T extends { [k: string]: ZodTypeAny;}, UnknownKeys extends UnknownKeysParam = "strip", Catchall extends ZodTypeAny = ZodTypeAny>(s: ZodObject<T, UnknownKeys, Catchall>) => s.pick({
-  id: true,
-  type: true,
-  username: true,
-  away: true
-}).extend({
-  group: z.null(),
-  age: z.null(),
 })
 
 const project = rawProjectSchema.pick({
@@ -158,7 +141,7 @@ export const routes = identity({
     response: z.number(),
   },
   "/api/v1/users/create-or-update": {
-    request: rawUserSchema(usersCreateOrUpdate, usersCreateOrUpdate2),
+    request: rawUserSchema(usersCreateOrUpdate, usersCreateOrUpdate),
     response: result(z.object({}).extend({ id: z.number() }), z.record(z.string())),
   },
   "/api/v1/projects/create-or-update": {
@@ -168,9 +151,9 @@ export const routes = identity({
   "/api/v1/users": {
     request: z.undefined(),
     response: z.object({
-      entities: z.array(rawUserSchema(users, users2)),
-      previousCursor: rawUserSchema(users, users2).nullable(),
-      nextCursor: rawUserSchema(users, users2).nullable(),
+      entities: z.array(rawUserSchema(users, users)),
+      previousCursor: rawUserSchema(users, users).nullable(),
+      nextCursor: rawUserSchema(users, users).nullable(),
     })
   },
   "/api/v1/projects": {
