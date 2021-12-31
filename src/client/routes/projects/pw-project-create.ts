@@ -2,17 +2,17 @@
 // SPDX-FileCopyrightText: 2021 Moritz Hedtke <Moritz.Hedtke@t-online.de>
 import { html } from "lit";
 import "../../form/pw-form.js";
-import { Task, TaskStatus } from "@lit-labs/task";
+import { Task } from "@lit-labs/task";
 import { myFetch } from "../../utils.js";
 import { PwForm } from "../../form/pw-form.js";
 import { HistoryController } from "../../history-controller.js";
-import { setupHmr } from "../../hmr.js";
 import { msg } from "@lit/localize";
 import "../../form/pw-number-input.js";
 import "../../form/pw-text-input.js";
 import "../../form/pw-checkbox-input.js";
 import type { z } from "zod";
 import type { rawProjectSchema } from "../../../lib/routes.js";
+import "./pw-project-leaders.js";
 
 export async function pwProject(id: number) {
   let result = await taskFunction([id]);
@@ -152,7 +152,7 @@ export class PwProjectCreate extends PwForm<"/api/v1/projects/create-or-update">
       ></pw-number-input>
 
       <!-- Betreuer, Projektleiter (Schüler) -->
-      <pw-users></pw-users>
+      ${this.initial ? html`<pw-project-leaders></pw-project-leaders>` : html``}
 
       <pw-checkbox-input
         label=${msg("Allow random assignments")}

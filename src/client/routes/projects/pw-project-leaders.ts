@@ -2,52 +2,25 @@
 // SPDX-FileCopyrightText: 2021 Moritz Hedtke <Moritz.Hedtke@t-online.de>
 import "../../form/pw-form.js";
 import "../../entity-list/pw-order.js";
-import { html, LitElement } from "lit";
-import { bootstrapCss } from "../../index.js";
-import { HistoryController } from "../../history-controller.js";
-import { setupHmr } from "../../hmr.js";
-import { Task, TaskStatus } from "@lit-labs/task";
-import { css } from "lit";
-import { createRef, ref } from "lit/directives/ref.js";
+import { html } from "lit";
 import { noChange } from "lit";
-import { aClick } from "../../pw-a.js";
 import { msg } from "@lit/localize";
-import type { routes } from "../../../lib/routes.js";
-import type { z } from "zod";
-import { PwEntityList } from "../../entity-list/pw-entitylist.js";
+import { PwUsers, taskFunction } from "../users/pw-users.js";
+import "./pw-project-leader-checkbox.js";
+import "../../form/pw-checkbox-input.js"; 
 
 export const pwUsers = async (url: URL) => {
   let result = await taskFunction([url.searchParams]);
   return html`<pw-users .initial=${result}></pw-users>`;
 };
 
-export const taskFunction = async ([searchParams]: [URLSearchParams]) => {
-  let response = await fetch(
-    new URL(`/api/v1/users?${searchParams}`, window.location.href).toString(),
-    {
-      //agent: new Agent({rejectUnauthorized: false})
-    }
-  );
-  return await response.json(); // TODO FIXME types with myFetch?
-};
-
-export class PwUsers extends PwEntityList<"/api/v1/users"> {
-  constructor() {
-    super(taskFunction);
-  }
-
+class PwProjectLeaders extends PwUsers {
   override get title() {
-    return msg("Users");
+    return msg("Project leaders");
   }
 
   override get buttons() {
-    return html` <a
-      @click=${aClick}
-      class="btn btn-primary"
-      href="/users/create"
-      role="button"
-      >${msg("Create account")}</a
-    >`;
+    return html``;
   }
 
   override get head() {
@@ -56,6 +29,8 @@ export class PwUsers extends PwEntityList<"/api/v1/users"> {
       do not support this without javascript because there is literally zero useful ways to do this useful.
       the only nice way is probably submit buttons that do things like "oder_by_id_asc" and then redirect to the new state (because you need to remove the old state)
     -->
+        <th class="table-cell-hover" scope="col">${msg(html`&#x2713;`)}</th>
+
         <th class="table-cell-hover p-0" scope="col">
           <pw-order name="id" title=${msg("ID")}></pw-order>
         </th>
@@ -67,11 +42,11 @@ export class PwUsers extends PwEntityList<"/api/v1/users"> {
         <th class="table-cell-hover p-0" scope="col">
           <pw-order name="type" title=${msg("Type")}></pw-order>
         </th>
-
-        <th class="table-cell-hover">${msg("Actions")}</th>
       </tr>
 
       <tr>
+        <th scope="col"></th>
+
         <th scope="col">
           <input
             name="f_id"
@@ -114,6 +89,9 @@ export class PwUsers extends PwEntityList<"/api/v1/users"> {
       complete: (result) => {
         return result.entities.map(
           (value) => html`<tr>
+            <td>
+              <pw-project-leader-checkbox></pw-project-leader-checkbox>
+            </td>
             <th scope="row">
               <p>${value.id}</p>
             </th>
@@ -122,20 +100,6 @@ export class PwUsers extends PwEntityList<"/api/v1/users"> {
             </td>
             <td>
               <p>${value.type}</p>
-            </td>
-            <td>
-              <a
-                class="btn btn-secondary"
-                href="/users/edit/${value.id}"
-                @click=${aClick}
-                role="button"
-              >
-                <i class="bi bi-pen"></i>
-              </a>
-
-              <button class="btn btn-secondary" type="button">
-                <i class="bi bi-box-arrow-in-right"></i>
-              </button>
             </td>
           </tr>`
         );
@@ -150,4 +114,4 @@ export class PwUsers extends PwEntityList<"/api/v1/users"> {
   }
 }
 
-customElements.define("pw-users", PwUsers);
+customElements.define("pw-project-leaders", PwProjectLeaders);

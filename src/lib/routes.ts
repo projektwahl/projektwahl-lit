@@ -51,10 +51,10 @@ export const rawUserVoterSchema = z
 
 export const rawUserSchema = <
   O1,
-  D1 extends ZodTypeDef = ZodTypeDef,
-  I1 = O1,
   O2,
+  D1 extends ZodTypeDef = ZodTypeDef,
   D2 extends ZodTypeDef = ZodTypeDef,
+  I1 = O1,
   I2 = O2
 >(
   v1: ZodType<O1, D1, I1>,
