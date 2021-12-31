@@ -63,7 +63,6 @@ export class PwCheckboxInput<T> extends LitElement {
 
   override connectedCallback() {
     super.connectedCallback();
-    console.log(this.closest("form"));
     this.closest("form")?.addEventListener(
       "myformdata",
       this.myformdataEventListener

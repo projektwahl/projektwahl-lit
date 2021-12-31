@@ -33,7 +33,6 @@ class PwForm<P extends keyof typeof routes> extends LitElement {
   }
 
   submit = (event: SubmitEvent) => {
-    console.log("SUBMIT")
 
     event.preventDefault();
 

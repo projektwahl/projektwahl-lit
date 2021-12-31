@@ -14,8 +14,6 @@ import "../../form/pw-checkbox-input.js";
 import type { z } from "zod";
 import type { rawProjectSchema } from "../../../lib/routes.js";
 
-// TODO FIXME implement edit
-
 export async function pwProject(id: number) {
   let result = await taskFunction([id]);
   return html`<pw-project-create .initial=${result}></pw-project-create>`
@@ -47,7 +45,7 @@ export class PwProjectCreate extends PwForm<"/api/v1/projects/create-or-update">
   }
 
   override get actionText() {
-    return msg("Create/Update project");
+    return this.initial ? msg("Update project") : msg("Create project");
   }
 
   initialRender: boolean;
