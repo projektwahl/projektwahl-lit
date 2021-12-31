@@ -17,11 +17,11 @@ export async function createOrUpdateUsersHandler(stream: import("http2").ServerH
           if (user.id) {
             const field = (name: string) => updateField(user, name);
             const finalQuery = sql2`UPDATE users SET
-            ${field("username")}
-            password_hash = CASE WHEN ${user.password !== undefined} THEN ${user.password ? await hashPassword(user.password) as any as string : null} ELSE password_hash END
-            ${field("type")}
-            ${field("\"group\"")}
-            ${field("age")}
+            ${field("username")},
+            password_hash = CASE WHEN ${user.password !== undefined} THEN ${user.password ? await hashPassword(user.password) as any as string : null} ELSE password_hash END,
+            ${field("type")},
+            ${field("\"group\"")},
+            ${field("age")},
             ${field("away")}
             WHERE id = ${user.id} RETURNING id;`
             return await sql(...finalQuery);

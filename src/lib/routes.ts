@@ -94,7 +94,20 @@ const usersCreateOrUpdate = <T extends { [k: string]: ZodTypeAny;}, UnknownKeys 
 const users = <T extends { [k: string]: ZodTypeAny;}, UnknownKeys extends UnknownKeysParam = "strip", Catchall extends ZodTypeAny = ZodTypeAny>(s: ZodObject<T, UnknownKeys, Catchall>) => s.pick({
   id: true,
   type: true,
-  username: true
+  username: true,
+  group: true,
+  age: true,
+  away: true
+})
+
+const users2 = <T extends { [k: string]: ZodTypeAny;}, UnknownKeys extends UnknownKeysParam = "strip", Catchall extends ZodTypeAny = ZodTypeAny>(s: ZodObject<T, UnknownKeys, Catchall>) => s.pick({
+  id: true,
+  type: true,
+  username: true,
+  away: true
+}).extend({
+  group: z.null(),
+  age: z.null(),
 })
 
 const project = rawProjectSchema.pick({
@@ -142,9 +155,9 @@ export const routes = identity({
   "/api/v1/users": {
     request: z.undefined(),
     response: z.object({
-      entities: z.array(rawUserSchema(users, users)),
-      previousCursor: rawUserSchema(users, users).nullable(),
-      nextCursor: rawUserSchema(users, users).nullable(),
+      entities: z.array(rawUserSchema(users, users2)),
+      previousCursor: rawUserSchema(users, users2).nullable(),
+      nextCursor: rawUserSchema(users, users2).nullable(),
     })
   },
   "/api/v1/projects": {
