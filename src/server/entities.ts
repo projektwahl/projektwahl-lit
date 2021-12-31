@@ -64,7 +64,7 @@ export async function fetchData<T extends { id: number; [index: string]: null | 
 
   let finalQuery;
   if (!paginationCursor) {
-    finalQuery = sql2`(SELECT ${unsafe2(columns.join(", "))} FROM ${unsafe2(
+    finalQuery = sql2`(SELECT ${unsafe2(columns.map(c => `"${c}"`).join(", "))} FROM ${unsafe2(
       table
     )} WHERE ${customFilterQuery(query.filters)} ORDER BY ${orderByQuery} LIMIT ${
       query.paginationLimit + 1

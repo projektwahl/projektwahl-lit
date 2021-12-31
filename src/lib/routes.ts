@@ -1,4 +1,4 @@
-import { AnyZodObject, objectUtil, z, ZodNumber, ZodObject, ZodRawShape, ZodType, ZodTypeAny } from "zod";
+import { AnyZodObject, objectUtil, z, ZodNumber, ZodObject, ZodRawShape, ZodType, ZodTypeAny, ZodTypeDef } from "zod";
 import { result } from "./result.js";
 
 export const loginInputSchema = z
@@ -9,7 +9,7 @@ export const loginInputSchema = z
   .strict();
 
 const rawUserCommon = {
-  id: z.number(),
+  id: z.number().nullable(),
   username: z.string().min(3).max(100),
   openid_id: z.string().optional(),
   password_hash: z.string(),
@@ -24,6 +24,8 @@ const rawUserCommon = {
 export const rawUserHelperOrAdminSchema = z
   .object({
     type: z.enum(["helper", "admin"]),
+    group: z.string().nullable(), // TODO FIXME add validation inside database that these are null as this depends on the type value and the previous type value
+    age: z.number().nullable(),
     ...rawUserCommon
   })
   .strict();
@@ -37,21 +39,38 @@ export const rawUserVoterSchema = z
   })
   .strict();
 
-export const rawUserSchema = <R1O, R2O>(op1: (s: typeof rawUserVoterSchema) => ZodType<R1O>, op2: (s: typeof rawUserHelperOrAdminSchema) => ZodType<R2O>) => z.object({
+export const rawUserSchema = <O1, D1 extends ZodTypeDef = ZodTypeDef, I1 = O1, O2, D2 extends ZodTypeDef = ZodTypeDef, I2 = O2>(v1: ZodType<O1, D1, I1>, v2: ZodType<O2, D2, I2>) => z.object({
   type: z.enum(["helper", "admin", "voter"])
 }).passthrough().superRefine((value, ctx) => {
-  let schema = value.type === "voter" ? op1(rawUserVoterSchema) : op2(rawUserHelperOrAdminSchema);
+  // KEEP this line synchronized with the one below
+  let schema = value.type === "voter" ? v1 : v2;
   let parsed = schema.safeParse(value)
   if (!parsed.success) {
     parsed.error.issues.forEach(ctx.addIssue)
   }
 }).transform(value => {
-  const result = value.type === "voter" ? op1(rawUserVoterSchema).parse(value) : op2(rawUserHelperOrAdminSchema).parse(value);
-  return result;
+    // KEEP this line synchronized with the one above
+    let schema = value.type === "voter" ? v1 : v2;
+    return schema.parse(value);
+})
+
+export const makeCreateOrUpdate = <T extends { [k: string]: ZodTypeAny;}, UnknownKeys extends UnknownKeysParam = "strip", Catchall extends ZodTypeAny = ZodTypeAny>(s: ZodObject<T, UnknownKeys, Catchall>) => z.object({
+  id: z.number().nullable()
+}).passthrough().superRefine((value, ctx) => {
+  // KEEP this line synchronized with the one below
+  let schema = value.id ? s.partial().setKey("id", z.number()) : s.setKey("id", z.null());
+  let parsed = schema.safeParse(value)
+  if (!parsed.success) {
+    parsed.error.issues.forEach(ctx.addIssue)
+  }
+}).transform(value => {
+  // KEEP this line synchronized with the one above
+  let schema = value.id ? s.partial().setKey("id", z.number()) : s.setKey("id", z.null());
+  return schema.parse(value);
 })
 
 export const rawProjectSchema = z.object({
-  id: z.number(),
+  id: z.number().nullable(),
   title: z.string().max(1024),
   info: z.string().max(8192),
   place: z.string().max(1024),
@@ -80,21 +99,36 @@ function identity<T extends { [r in keys]: { request: ZodType<any>, response: Zo
 
 export type UnknownKeysParam = "passthrough" | "strict" | "strip";
 
-const usersCreateOrUpdate = <T extends { [k: string]: ZodTypeAny;}, UnknownKeys extends UnknownKeysParam = "strip", Catchall extends ZodTypeAny = ZodTypeAny>(s: ZodObject<T, UnknownKeys, Catchall>) => s.pick({
+const usersCreateOrUpdate = <T extends { [k: string]: ZodTypeAny;}, UnknownKeys extends UnknownKeysParam = "strip", Catchall extends ZodTypeAny = ZodTypeAny>(s: ZodObject<T, UnknownKeys, Catchall>) => makeCreateOrUpdate(s.pick({
   age: true,
   away: true,
   group: true,
   id: true,
   type: true,
   username: true
-}).setKey("id", z.number().optional()).extend({
+}).extend({
   password: z.string().optional()
-})
+}))
+
+/*
+const jo = usersCreateOrUpdate(rawUserVoterSchema)
+let a: z.infer<typeof jo>;
+
+const jo2 = usersCreateOrUpdate(rawUserHelperOrAdminSchema)
+let a2: z.infer<typeof jo2>;
+*/
+
+//console.log(rawUserHelperOrAdminSchema.safeParse({}))
+// TODO FIXME report upstream (picking missing keys breaks)
+//console.log(usersCreateOrUpdate(rawUserHelperOrAdminSchema).safeParse({}))
 
 const users = <T extends { [k: string]: ZodTypeAny;}, UnknownKeys extends UnknownKeysParam = "strip", Catchall extends ZodTypeAny = ZodTypeAny>(s: ZodObject<T, UnknownKeys, Catchall>) => s.pick({
   id: true,
   type: true,
-  username: true
+  username: true,
+  group: true,
+  age: true,
+  away: true
 })
 
 const project = rawProjectSchema.pick({
@@ -132,19 +166,19 @@ export const routes = identity({
     response: z.number(),
   },
   "/api/v1/users/create-or-update": {
-    request: rawUserSchema(usersCreateOrUpdate, usersCreateOrUpdate),
+    request: rawUserSchema(usersCreateOrUpdate(rawUserVoterSchema), usersCreateOrUpdate(rawUserHelperOrAdminSchema)),
     response: result(z.object({}).extend({ id: z.number() }), z.record(z.string())),
   },
   "/api/v1/projects/create-or-update": {
-    request: rawProjectSchema.setKey("id", z.number().optional()),
+    request: makeCreateOrUpdate(rawProjectSchema),
     response: result(z.object({}).extend({ id: z.number() }), z.record(z.string())),
   },
   "/api/v1/users": {
     request: z.undefined(),
     response: z.object({
-      entities: z.array(rawUserSchema(users, users)),
-      previousCursor: rawUserSchema(users, users).nullable(),
-      nextCursor: rawUserSchema(users, users).nullable(),
+      entities: z.array(rawUserSchema(users(rawUserVoterSchema), users(rawUserHelperOrAdminSchema))),
+      previousCursor: rawUserSchema(users(rawUserVoterSchema), users(rawUserHelperOrAdminSchema)).nullable(),
+      nextCursor: rawUserSchema(users(rawUserVoterSchema), users(rawUserHelperOrAdminSchema)).nullable(),
     })
   },
   "/api/v1/projects": {
@@ -156,3 +190,5 @@ export const routes = identity({
     })
   },
 } as const);
+
+//const test: z.infer<typeof routes["/api/v1/projects/create-or-update"]["request"]> = 1 as any;

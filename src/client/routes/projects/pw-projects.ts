@@ -153,7 +153,8 @@ class PwProjects<T> extends PwEntityList<"/api/v1/projects"> {
                           <td>
                             <a
                               class="btn btn-secondary"
-                              href="/projects/edit/{entity.id}"
+                              @click=${aClick}
+                              href="/projects/edit/${value.id}"
                               role="button"
                             >
                               <i class="bi bi-pen"></i>

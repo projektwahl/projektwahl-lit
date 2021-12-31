@@ -19,7 +19,7 @@ export async function usersHandler(stream: import("http2").ServerHttp2Stream, he
       f_type: z.string().refine((s: string): s is "admin" | "helper" | "voter" | "" => includes(["admin", "helper", "voter", ""] as const, s)).transform(s => s === '' ? undefined : s).optional(),
     }).parse(Object.fromEntries(url.searchParams as any));
 
-    const columns = ["id", "type", "username"] as const;
+    const columns = ["id", "type", "username", "group", "age", "away"] as const;
 
     const schema = rawUserSchema(s=>s, s=>s);
 
@@ -36,7 +36,7 @@ export async function usersHandler(stream: import("http2").ServerHttp2Stream, he
         password_hash: "nulls-first",
       },
       (query) => {
-        return sql2`username LIKE ${"%" + (query.f_username ?? '') + "%"}`;
+        return sql2`(${!query.f_id} OR id = ${query.f_id ?? null}) AND username LIKE ${'%' + (query.f_username ?? '') + '%'}`;
       }
     );
   })(stream, headers);

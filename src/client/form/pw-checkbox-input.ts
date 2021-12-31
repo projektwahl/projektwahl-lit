@@ -19,7 +19,9 @@ export class PwCheckboxInput<T> extends LitElement {
           return true; // TODO FIXME bug in @lit-labs/task
         },
       },
-      value: { type: String },
+      initial: {
+        attribute: false
+      },
     };
   }
 
@@ -32,6 +34,8 @@ export class PwCheckboxInput<T> extends LitElement {
   name!: keyof T;
 
   task!: import("@lit-labs/task").Task<any, import("zod").infer<typeof import("../../lib/result.js").anyResult>>;
+
+  initial: T | undefined;
 
   value!: string;
 
@@ -59,7 +63,6 @@ export class PwCheckboxInput<T> extends LitElement {
 
   override connectedCallback() {
     super.connectedCallback();
-    console.log(this.closest("form"));
     this.closest("form")?.addEventListener(
       "myformdata",
       this.myformdataEventListener
@@ -90,6 +93,7 @@ export class PwCheckboxInput<T> extends LitElement {
         <input
           ${ref(this.input)}
           type="checkbox"
+          checked=${this.initial?.[this.name]}
           class="form-check-input ${this.task.render({
             error: () => "",
             pending: () => "",

@@ -12,8 +12,26 @@ import "../../form/pw-checkbox-input.js";
 import "../../form/pw-number-input.js";
 import "../../form/pw-select-input.js";
 import "../../form/pw-text-input.js";
+import { rawUserSchema } from "../../../lib/routes.js";
+import type { z } from "zod";
 
-// TODO FIXME implement edit
+const schema = rawUserSchema(id => id, id => id);
+
+export async function pwUser(id: number) {
+  let result = await taskFunction([id]);
+  return html`<pw-user-create .initial=${result}></pw-user-create>`
+}
+
+const taskFunction = async ([id]: [number]
+  ) => {
+    let response = await fetch(
+      new URL(`/api/v1/users/?f_id=${id}`, window.location.href).toString(),
+      {
+        //agent: new Agent({rejectUnauthorized: false})
+      }
+    );
+    return (await response.json()).entities[0];
+  };
 
 export class PwUserCreate extends PwForm<"/api/v1/users/create-or-update"> {
   static override get properties() {
@@ -23,14 +41,17 @@ export class PwUserCreate extends PwForm<"/api/v1/users/create-or-update"> {
       _task: { state: true },
       forceTask: { state: true },
       type: { state: true },
+      initial: { attribute: false },
     };
   }
 
   override get actionText() {
-    return msg("Create/Update account");
+    return this.initial ? msg("Update account") : msg("Create account");
   }
 
   type;
+
+  initial: z.infer<typeof schema> | undefined;
 
   constructor() {
     super();
@@ -38,20 +59,19 @@ export class PwUserCreate extends PwForm<"/api/v1/users/create-or-update"> {
     /** @type {number|undefined} */
     this.forceTask = undefined;
 
-    this.type = "voter";
-
     /**
      * @override
      */
     this._task = new Task(
       this,
       async () => {
-        const formDataEvent = new CustomEvent("myformdata", {
+        const formDataEvent = new CustomEvent<Partial<z.infer<typeof schema>>>("myformdata", {
           bubbles: true,
           composed: true,
           detail: {},
         });
         this.form.value?.dispatchEvent(formDataEvent);
+        formDataEvent.detail.id = this.initial?.id ?? null;
 
         let result = await myFetch("/api/v1/users/create-or-update", {
           method: "POST",
@@ -77,31 +97,34 @@ export class PwUserCreate extends PwForm<"/api/v1/users/create-or-update"> {
         label=${msg("Username")}
         name="username"
         .task=${this._task}
+        .initial=${this.initial}
       ></pw-text-input>
 
       <pw-select-input
-        .value=${this.type}
         @change=${(event: Event) => (this.type = (event.target as HTMLSelectElement).value)}
         label=${msg("User type")}
         name="type"
-        .options=${html`<option value="voter">Schüler</option>
-          <option value="helper">Helfer</option>
-          <option value="admin">Admin</option>`}
+        .options=${[ {value:"voter", text: "Schüler" },
+          { value: "helper", text: "Helfer" },
+          { value: "admin", text: "Admin" }]}
         .task=${this._task}
+        .initial=${{ type: this.type ?? this.initial?.type ?? "voter" }}
       >
       </pw-select-input>
 
-      ${this.type === "voter"
+      ${(this.type ?? this.initial?.type ?? "voter") === "voter"
         ? html`<pw-text-input
               label=${msg("Group")}
               name="group"
               .task=${this._task}
+              .initial=${this.initial}
             ></pw-text-input>
 
             <pw-number-input
               label=${msg("Age")}
               name="age"
               .task=${this._task}
+              .initial=${this.initial}
             ></pw-number-input>`
         : undefined}
 
@@ -109,6 +132,7 @@ export class PwUserCreate extends PwForm<"/api/v1/users/create-or-update"> {
         label=${msg("Away")}
         name="away"
         .task=${this._task}
+        .initial=${this.initial}
       ></pw-checkbox-input>
     `;
   };

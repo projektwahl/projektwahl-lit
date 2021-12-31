@@ -20,7 +20,9 @@ export class PwNumberInput<T> extends LitElement {
           return true; // TODO FIXME bug in @lit-labs/task
         },
       },
-      value: { type: String },
+      initial: {
+        attribute: false
+      },
     };
   }
 
@@ -33,6 +35,8 @@ export class PwNumberInput<T> extends LitElement {
   name!: keyof T;
 
   task!: import("@lit-labs/task").Task<any, import("zod").infer<typeof import("../../lib/result.js").anyResult>>
+
+  initial: T | undefined;
 
   value!: string;
 
@@ -59,7 +63,6 @@ export class PwNumberInput<T> extends LitElement {
 
   override connectedCallback() {
     super.connectedCallback();
-    console.log(this.closest("form"));
     this.closest("form")?.addEventListener(
       "myformdata",
       this.myformdataEventListener
@@ -90,6 +93,7 @@ export class PwNumberInput<T> extends LitElement {
         <input
           ${ref(this.input)}
           type="number"
+          value=${this.initial?.[this.name]}
           class="form-control ${this.task.render({
             error: () => "",
             pending: () => "",

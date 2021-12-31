@@ -22,7 +22,9 @@ export class PwTextInput<T> extends LitElement {
           return true; // TODO FIXME bug in @lit-labs/task
         },
       },
-      value: { type: String },
+      initial: {
+        attribute: false
+      },
     };
   }
 
@@ -40,9 +42,13 @@ export class PwTextInput<T> extends LitElement {
 
   task!: import("@lit-labs/task").Task<any, import("zod").infer<typeof import("../../lib/result.js").anyResult>>;
 
+  initial: T | undefined;
+
   input: import("lit/directives/ref").Ref<HTMLInputElement>;
 
   value!: string;
+
+  form: HTMLFormElement;
 
   constructor() {
     super();
@@ -66,8 +72,8 @@ export class PwTextInput<T> extends LitElement {
 
   override connectedCallback() {
     super.connectedCallback();
-    console.log(this.closest("form"));
-    this.closest("form")?.addEventListener(
+    this.form = this.closest("form")!;
+    this.form.addEventListener(
       "myformdata",
       this.myformdataEventListener
     );
@@ -75,7 +81,7 @@ export class PwTextInput<T> extends LitElement {
 
   override disconnectedCallback() {
     super.disconnectedCallback();
-    this.closest("form")?.removeEventListener(
+    this.form.removeEventListener(
       "myformdata",
       this.myformdataEventListener
     );
@@ -97,6 +103,7 @@ export class PwTextInput<T> extends LitElement {
         <input
           ${ref(this.input)}
           type=${this.type}
+          value=${this.initial?.[this.name]}
           class="form-control ${this.task.render({
             error: () => "",
             pending: () => "",

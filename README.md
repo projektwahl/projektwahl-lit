@@ -29,6 +29,12 @@ DATABASE_URL=postgres://projektwahl:projektwahl@projektwahl/projektwahl npm run 
 # https://localhost:8443/
 ```
 
+## Database access
+
+```
+psql --username=projektwahl --host=projektwahl
+```
+
 ## Firefox
 
 `about:config`: `layout.css.constructable-stylesheets.enabled = true`

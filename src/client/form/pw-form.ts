@@ -3,7 +3,6 @@
 import { html, LitElement } from "lit";
 import { createRef, ref } from "lit/directives/ref.js";
 import { bootstrapCss } from "../index.js";
-import { HistoryController } from "../history-controller.js";
 import { msg } from "@lit/localize";
 import { setupHmr } from "../hmr.js";
 import type { routes } from "../../lib/routes.js";
@@ -19,8 +18,6 @@ class PwForm<P extends keyof typeof routes> extends LitElement {
     throw new Error("not implemented");
   }
 
-  private history;
-
   _task!: import("@lit-labs/task").Task<any, import("zod").infer<typeof import("../../lib/result.js").anyResult>>;
 
   fakeSlot!: import("lit").TemplateResult;
@@ -32,13 +29,10 @@ class PwForm<P extends keyof typeof routes> extends LitElement {
   constructor() {
     super();
 
-    this.history = new HistoryController(this, /.*/);
-
     this.form = createRef();
   }
 
   submit = (event: SubmitEvent) => {
-    console.log("SUBMIT")
 
     event.preventDefault();
 

@@ -65,8 +65,6 @@ export class PwEntityList<P extends keyof typeof routes> extends LitElement {
   }
 
   override render() {
-    console.log("jo")
-
     if (!this.initialRender) {
       this.initialRender = true;
 

@@ -2,6 +2,8 @@ import postgres from "postgres";
 import { sql } from "../../database.js";
 import { request } from "../../express.js";
 
+// TODO FIXME you can accidentialy create instead of update if you forget to pass the id. maybe force id and setting it to null means creation.
+
 export async function createOrUpdateProjectsHandler(stream: import("http2").ServerHttp2Stream, headers: import("http2").IncomingHttpHeaders) {
   // TODO FIXME create or update multiple
   return await request(
@@ -10,7 +12,7 @@ export async function createOrUpdateProjectsHandler(stream: import("http2").Serv
     async function (project) {
       try {
         let [row] = await sql.begin("READ WRITE", async (sql) => {
-          if (project.id !== undefined) {
+          if (project.id) {
             return await sql`UPDATE projects SET
     title = CASE WHEN ${project.title !== undefined} THEN ${
               project.title ?? null

@@ -29,7 +29,7 @@ const taskFunction = async ([searchParams]: [URLSearchParams]
       //agent: new Agent({rejectUnauthorized: false})
     }
   );
-  return await response.json();
+  return await response.json(); // TODO FIXME types with myFetch?
 };
 
 class PwUsers extends PwEntityList<"/api/v1/users"> {
@@ -151,7 +151,8 @@ class PwUsers extends PwEntityList<"/api/v1/users"> {
                 <td>
                   <a
                     class="btn btn-secondary"
-                    href="/users/edit/{entity.id}"
+                    href="/users/edit/${value.id}"
+                    @click=${aClick}
                     role="button"
                   >
                     <i class="bi bi-pen"></i>

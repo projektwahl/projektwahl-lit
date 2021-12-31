@@ -20,6 +20,8 @@ import { configureLocalization, msg, str } from "@lit/localize";
 // Generated via output.localeCodesModule
 import { sourceLocale, targetLocales } from "./generated_locales/locales.js";
 import { pwProjects } from "./routes/projects/pw-projects.js";
+import { pwProject } from "./routes/projects/pw-project-create.js";
+import { pwUser } from "./routes/users/pw-user-create.js";
 
 /**export const { getLocale, setLocale } = configureLocalization({
   sourceLocale,
@@ -27,7 +29,6 @@ import { pwProjects } from "./routes/projects/pw-projects.js";
   loadLocale: (locale) => import(`/src/client/generated_locales/${locale}.js`),
 });*/
 
-/*
 // TODO FIXME show more details if possible (maybe error page)
 window.addEventListener("error", function (event) {
   console.error(event.error)
@@ -38,7 +39,6 @@ window.addEventListener("unhandledrejection", function (event) {
   console.error(event.promise)
   alert("unknown error: " + event.reason);
 });
-*/
 
 ReactiveElement.enableWarning?.("migration");
 ReactiveElement.enableWarning?.("change-in-update");
@@ -48,7 +48,7 @@ ReactiveElement.enableWarning?.("change-in-update");
 
 export const pwApp = async (url: URL) => {
   let page = await nextPage(url);
-  return html`<pw-app .initial=${Promise.resolve(page)}></pw-app>`;
+  return html`<pw-app .initial=${page}></pw-app>`;
 };
 
 export const nextPage = async (url: URL) => {
@@ -60,10 +60,14 @@ export const nextPage = async (url: URL) => {
       return await pwUsers(url);
     } else if (url.pathname === "/users/create") {
       return html`<pw-user-create></pw-user-create>`;
+    } else if (/users\/edit\/\d+/.test(url.pathname)) {
+      return await pwUser(Number(url.pathname.match(/users\/edit\/(\d+)/)![1]));
     } else if (url.pathname === "/projects") {
       return await pwProjects(url);
     } else if (url.pathname === "/projects/create") {
       return html`<pw-project-create></pw-project-create>`;
+    } else if (/projects\/edit\/\d+/.test(url.pathname)) {
+      return await pwProject(Number(url.pathname.match(/projects\/edit\/(\d+)/)![1]));
     } else {
       return msg(html`Not Found`);
     }
@@ -201,14 +205,14 @@ export const nextPage = async (url: URL) => {
         style="position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);"
       >
         ${until(
-          this.current.then(() => undefined),
+          this.current.then(() => undefined).catch(() => undefined),
           html`<div class="spinner-grow text-primary" role="status">
             <span class="visually-hidden">${msg("Loading...")}</span>
           </div>`
         )}
       </div>
 
-      ${until(this.current, this.last)}
+      ${until(this.current.catch((error) => error), this.last?.catch((error) => error))}
     `;
   }
 };
