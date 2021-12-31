@@ -48,6 +48,8 @@ export class PwTextInput<T> extends LitElement {
 
   value!: string;
 
+  form: HTMLFormElement;
+
   constructor() {
     super();
     this.randomId = "id" + Math.random().toString().replace(".", "");
@@ -70,7 +72,8 @@ export class PwTextInput<T> extends LitElement {
 
   override connectedCallback() {
     super.connectedCallback();
-    this.closest("form")?.addEventListener(
+    this.form = this.closest("form")!;
+    this.form.addEventListener(
       "myformdata",
       this.myformdataEventListener
     );
@@ -78,7 +81,7 @@ export class PwTextInput<T> extends LitElement {
 
   override disconnectedCallback() {
     super.disconnectedCallback();
-    this.closest("form")?.removeEventListener(
+    this.form.removeEventListener(
       "myformdata",
       this.myformdataEventListener
     );

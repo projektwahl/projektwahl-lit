@@ -91,6 +91,19 @@ const usersCreateOrUpdate = <T extends { [k: string]: ZodTypeAny;}, UnknownKeys 
   password: z.string().optional()
 })
 
+//console.log(rawUserHelperOrAdminSchema.safeParse({}))
+// TODO FIXME report upstream
+//console.log(usersCreateOrUpdate(rawUserHelperOrAdminSchema).safeParse({}))
+
+const usersCreateOrUpdate2 = <T extends { [k: string]: ZodTypeAny;}, UnknownKeys extends UnknownKeysParam = "strip", Catchall extends ZodTypeAny = ZodTypeAny>(s: ZodObject<T, UnknownKeys, Catchall>) => s.pick({
+  away: true,
+  id: true,
+  type: true,
+  username: true
+}).extend({
+  password: z.string().optional()
+})
+
 const users = <T extends { [k: string]: ZodTypeAny;}, UnknownKeys extends UnknownKeysParam = "strip", Catchall extends ZodTypeAny = ZodTypeAny>(s: ZodObject<T, UnknownKeys, Catchall>) => s.pick({
   id: true,
   type: true,
@@ -145,7 +158,7 @@ export const routes = identity({
     response: z.number(),
   },
   "/api/v1/users/create-or-update": {
-    request: rawUserSchema(usersCreateOrUpdate, usersCreateOrUpdate),
+    request: rawUserSchema(usersCreateOrUpdate, usersCreateOrUpdate2),
     response: result(z.object({}).extend({ id: z.number() }), z.record(z.string())),
   },
   "/api/v1/projects/create-or-update": {
