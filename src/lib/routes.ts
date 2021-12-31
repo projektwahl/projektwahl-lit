@@ -43,14 +43,14 @@ export const rawUserSchema = <R1O, R2O>(v1: ZodType<R1O>, v2: ZodType<R2O>) => z
   type: z.enum(["helper", "admin", "voter"])
 }).passthrough().superRefine((value, ctx) => {
   // KEEP this line synchronized with the one below
-  let schema = value.type === "voter" ? op1(rawUserVoterSchema) : op2(rawUserHelperOrAdminSchema);
+  let schema = value.type === "voter" ? v1 : v2;
   let parsed = schema.safeParse(value)
   if (!parsed.success) {
     parsed.error.issues.forEach(ctx.addIssue)
   }
 }).transform(value => {
     // KEEP this line synchronized with the one above
-    let schema = value.type === "voter" ? op1(rawUserVoterSchema) : op2(rawUserHelperOrAdminSchema);
+    let schema = value.type === "voter" ? v1 : v2;
     return schema.parse(value);
 })
 
@@ -165,7 +165,7 @@ export const routes = identity({
     response: z.number(),
   },
   "/api/v1/users/create-or-update": {
-    request: rawUserSchema(usersCreateOrUpdate, usersCreateOrUpdate),
+    request: rawUserSchema(usersCreateOrUpdate(rawUserVoterSchema), usersCreateOrUpdate(rawUserHelperOrAdminSchema)),
     response: result(z.object({}).extend({ id: z.number() }), z.record(z.string())),
   },
   "/api/v1/projects/create-or-update": {
@@ -175,9 +175,9 @@ export const routes = identity({
   "/api/v1/users": {
     request: z.undefined(),
     response: z.object({
-      entities: z.array(rawUserSchema(users, users)),
-      previousCursor: rawUserSchema(users, users).nullable(),
-      nextCursor: rawUserSchema(users, users).nullable(),
+      entities: z.array(rawUserSchema(users(rawUserVoterSchema), users(rawUserHelperOrAdminSchema))),
+      previousCursor: rawUserSchema(users(rawUserVoterSchema), users(rawUserHelperOrAdminSchema)).nullable(),
+      nextCursor: rawUserSchema(users(rawUserVoterSchema), users(rawUserHelperOrAdminSchema)).nullable(),
     })
   },
   "/api/v1/projects": {
