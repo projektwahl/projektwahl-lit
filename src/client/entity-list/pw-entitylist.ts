@@ -5,7 +5,7 @@ import { bootstrapCss } from "../index.js";
 import { HistoryController } from "../history-controller.js";
 import { setupHmr } from "../hmr.js";
 import { msg, str } from "@lit/localize";
-import { createRef } from "lit/directives/ref.js";
+import { createRef, ref } from "lit/directives/ref.js";
 import { Task, TaskStatus } from "@lit-labs/task";
 import type { routes } from "../../lib/routes.js";
 import type { z } from "zod";
@@ -36,7 +36,11 @@ export class PwEntityList<P extends keyof typeof routes> extends LitElement {
     throw new Error("not implemented");
   }
 
-  get response(): TemplateResult {
+  get head(): TemplateResult {
+    throw new Error("not implemented");
+  }
+
+  get body(): TemplateResult {
     throw new Error("not implemented");
   }
 
@@ -138,7 +142,37 @@ export class PwEntityList<P extends keyof typeof routes> extends LitElement {
           </select>
         </div>
       </div>
-      ${this.response}
+
+      <form
+    ${ref(this.formRef)}
+    @input=${() => {
+      const urlSearchParams = new URLSearchParams( // @ts-expect-error probably wrong typings
+        new FormData(this.formRef.value)
+      );
+      urlSearchParams.delete("order");
+      this.history.url.searchParams
+        .getAll("order")
+        .forEach((v) => urlSearchParams.append("order", v));
+      HistoryController.goto(
+        new URL(`?${urlSearchParams}`, window.location.href), {}
+      );
+    }}
+    @submit=${(e: Event) => e.preventDefault()}
+  >
+    <table class="table">
+      <thead>
+        ${this.head}
+      </thead>
+
+      <!-- TODO FIXME add loading indicator overlay -->
+
+      <tbody>
+        ${this.body}
+      </tbody>
+    </table>
+  </form>
+
+
       <nav aria-label="${msg("navigation of user list")}">
         <ul class="pagination justify-content-center">
           <li

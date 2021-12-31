@@ -53,128 +53,105 @@ class PwUsers extends PwEntityList<"/api/v1/users"> {
       >`
   }
 
-  override get response() {
-    return html`<form
-    ${ref(this.formRef)}
-    @input=${() => {
-      const urlSearchParams = new URLSearchParams( // @ts-expect-error probably wrong typings
-        new FormData(this.formRef.value)
-      );
-      urlSearchParams.delete("order");
-      this.history.url.searchParams
-        .getAll("order")
-        .forEach((v) => urlSearchParams.append("order", v));
-      HistoryController.goto(
-        new URL(`?${urlSearchParams}`, window.location.href), {}
-      );
-    }}
-    @submit=${(e: Event) => e.preventDefault()}
-  >
-    <table class="table">
-      <thead>
-        <tr>
-          <!--
-            do not support this without javascript because there is literally zero useful ways to do this useful.
-            the only nice way is probably submit buttons that do things like "oder_by_id_asc" and then redirect to the new state (because you need to remove the old state)
-          -->
-          <th class="table-cell-hover p-0" scope="col">
-            <pw-order name="id" title=${msg("ID")}></pw-order>
-          </th>
+  override get head() {
+    return html`<tr>
+    <!--
+      do not support this without javascript because there is literally zero useful ways to do this useful.
+      the only nice way is probably submit buttons that do things like "oder_by_id_asc" and then redirect to the new state (because you need to remove the old state)
+    -->
+    <th class="table-cell-hover p-0" scope="col">
+      <pw-order name="id" title=${msg("ID")}></pw-order>
+    </th>
 
-          <th class="table-cell-hover p-0" scope="col">
-            <pw-order name="username" title=${msg("Name")}></pw-order>
-          </th>
+    <th class="table-cell-hover p-0" scope="col">
+      <pw-order name="username" title=${msg("Name")}></pw-order>
+    </th>
 
-          <th class="table-cell-hover p-0" scope="col">
-            <pw-order name="type" title=${msg("Type")}></pw-order>
-          </th>
+    <th class="table-cell-hover p-0" scope="col">
+      <pw-order name="type" title=${msg("Type")}></pw-order>
+    </th>
 
-          <th class="table-cell-hover">${msg("Actions")}</th>
-        </tr>
+    <th class="table-cell-hover">${msg("Actions")}</th>
+  </tr>
 
-        <tr>
-          <th scope="col">
-            <input
-              name="f_id"
-              type="text"
-              class="form-control"
-              id="projects-filter-{name}"
-              value=${this.history.url.searchParams.get("f_id")}
-            />
-          </th>
+  <tr>
+    <th scope="col">
+      <input
+        name="f_id"
+        type="text"
+        class="form-control"
+        id="projects-filter-{name}"
+        value=${this.history.url.searchParams.get("f_id")}
+      />
+    </th>
 
-          <th scope="col">
-            <input
-              name="f_username"
-              type="text"
-              class="form-control"
-              id="projects-filter-{name}"
-              value=${this.history.url.searchParams.get("f_username")}
-            />
-          </th>
+    <th scope="col">
+      <input
+        name="f_username"
+        type="text"
+        class="form-control"
+        id="projects-filter-{name}"
+        value=${this.history.url.searchParams.get("f_username")}
+      />
+    </th>
 
-          <th scope="col">
-            <input
-              name="f_type"
-              type="text"
-              class="form-control"
-              id="projects-filter-{name}"
-              value=${this.history.url.searchParams.get("f_type")}
-            />
-          </th>
+    <th scope="col">
+      <input
+        name="f_type"
+        type="text"
+        class="form-control"
+        id="projects-filter-{name}"
+        value=${this.history.url.searchParams.get("f_type")}
+      />
+    </th>
 
-          <th scope="col">
-            
-          </th>
-        </tr>
-      </thead>
+    <th scope="col">
+      
+    </th>
+  </tr>`
+  }
 
-      <!-- TODO FIXME add loading indicator overlay -->
+  override get body() {
+    return html`${this._apiTask.render({
+      pending: () => {
+        return noChange;
+      },
+      complete: (result) => {
+        return result.entities.map(
+          (value) => html`<tr>
+            <th scope="row">
+              <p>${value.id}</p>
+            </th>
+            <td>
+              <p>${value.username}</p>
+            </td>
+            <td>
+              <p>${value.type}</p>
+            </td>
+            <td>
+              <a
+                class="btn btn-secondary"
+                href="/users/edit/${value.id}"
+                @click=${aClick}
+                role="button"
+              >
+                <i class="bi bi-pen"></i>
+              </a>
 
-      <tbody>
-        ${this._apiTask.render({
-          pending: () => {
-            return noChange;
-          },
-          complete: (result) => {
-            return result.entities.map(
-              (value) => html`<tr>
-                <th scope="row">
-                  <p>${value.id}</p>
-                </th>
-                <td>
-                  <p>${value.username}</p>
-                </td>
-                <td>
-                  <p>${value.type}</p>
-                </td>
-                <td>
-                  <a
-                    class="btn btn-secondary"
-                    href="/users/edit/${value.id}"
-                    @click=${aClick}
-                    role="button"
-                  >
-                    <i class="bi bi-pen"></i>
-                  </a>
-
-                  <button class="btn btn-secondary" type="button">
-                    <i class="bi bi-box-arrow-in-right"></i>
-                  </button>
-                </td>
-              </tr>`
-            );
-          },
-          error: () => {
-            return html`error`;
-          },
-          initial: () => {
-            return html`hi`;
-          },
-        })}
-      </tbody>
-    </table>
-  </form>`
+              <button class="btn btn-secondary" type="button">
+                <i class="bi bi-box-arrow-in-right"></i>
+              </button>
+            </td>
+          </tr>`
+        );
+      },
+      error: () => {
+        return html`error`;
+      },
+      initial: () => {
+        return html`hi`;
+      },
+    })}`
   }
 };
 

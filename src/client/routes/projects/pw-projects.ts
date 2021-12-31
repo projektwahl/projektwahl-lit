@@ -54,26 +54,8 @@ class PwProjects<T> extends PwEntityList<"/api/v1/projects"> {
             >`
   }
 
-  override get response() {
+  override get head() {
     return html`
-    <form
-              ${ref(this.formRef)}
-              @input=${() => {
-                const urlSearchParams = new URLSearchParams( // @ts-expect-error probably wrong typings
-                  new FormData(this.formRef.value)
-                );
-                urlSearchParams.delete("order");
-                this.history.url.searchParams
-                  .getAll("order")
-                  .forEach((v) => urlSearchParams.append("order", v));
-                HistoryController.goto(
-                  new URL(`?${urlSearchParams}`, window.location.href), {}
-                );
-              }}
-              @submit=${(e: Event) => e.preventDefault()}
-            >
-              <table class="table">
-                <thead>
                   <tr>
                     <!--
                       do not support this without javascript because there is literally zero useful ways to do this useful.
@@ -129,11 +111,10 @@ class PwProjects<T> extends PwEntityList<"/api/v1/projects"> {
                       
                     </th>
                   </tr>
-                </thead>
-
-                <!-- TODO FIXME add loading indicator overlay -->
-
-                <tbody>
+                  `
+  }
+  override get body() {
+    return html`
                   ${this._apiTask.render({
                     pending: () => {
                       return noChange;
@@ -174,9 +155,6 @@ class PwProjects<T> extends PwEntityList<"/api/v1/projects"> {
                       return html`hi`;
                     },
                   })}
-                </tbody>
-              </table>
-            </form>
     `
   }
 };
