@@ -13,24 +13,23 @@ import type { z } from "zod";
 // SPDX-FileCopyrightText: 2021 Moritz Hedtke <Moritz.Hedtke@t-online.de>
 
 class PwProjectLeaderCheckbox extends LitElement {
-    static override get properties() {
-        return {
-          _task: { state: true },
-          forceTask: { state: true },
-          disabled: { state: true },
-          user: { attribute: false },
-          projectId: { type: Number }
-        };
-      }
+  static override get properties() {
+    return {
+      _task: { state: true },
+      forceTask: { state: true },
+      disabled: { state: true },
+      user: { attribute: false },
+      projectId: { type: Number },
+    };
+  }
 
-      forceTask: number | undefined;
+  forceTask: number | undefined;
 
-      _task!: import("@lit-labs/task").Task<
-    any,
-    any
-  >;
+  _task!: import("@lit-labs/task").Task<any, any>;
 
-  user!: z.infer<typeof routes["/api/v1/users"]["response"]>["entities"][number];
+  user!: z.infer<
+    typeof routes["/api/v1/users"]["response"]
+  >["entities"][number];
 
   projectId!: number;
 
@@ -57,7 +56,7 @@ class PwProjectLeaderCheckbox extends LitElement {
           },
           body: JSON.stringify({
             id: this.user.id,
-            project_leader_id: this.projectId
+            project_leader_id: this.projectId,
           }),
         });
 
@@ -68,30 +67,27 @@ class PwProjectLeaderCheckbox extends LitElement {
   }
 
   render() {
-    return html`
-          ${bootstrapCss}
-          <form ${ref(this.form)}>
-             ${this._task.render({
-              complete: (data) => {
-                if (!data.success) {
-                  const errors = Object.entries(data.error)
-                    .map(([k, v]) => html`${k}: ${v}<br />`);
-                  if (errors.length > 0) {
-                    return html`<div class="alert alert-danger" role="alert">
-                      ${msg("Some errors occurred!")}<br />
-                      ${errors}
-                    </div>`;
-                  }
-                }
-                return html``;
-              },
-              error: (error) => html`<div
-                class="alert alert-danger"
-                role="alert"
-              >
-                ${error}
-              </div>`,
-            })}
+    return html` ${bootstrapCss}
+      <form ${ref(this.form)}>
+        ${this._task.render({
+          complete: (data) => {
+            if (!data.success) {
+              const errors = Object.entries(data.error).map(
+                ([k, v]) => html`${k}: ${v}<br />`
+              );
+              if (errors.length > 0) {
+                return html`<div class="alert alert-danger" role="alert">
+                  ${msg("Some errors occurred!")}<br />
+                  ${errors}
+                </div>`;
+              }
+            }
+            return html``;
+          },
+          error: (error) => html`<div class="alert alert-danger" role="alert">
+            ${error}
+          </div>`,
+        })}
 
         <input
           @change=${() => {
@@ -102,7 +98,7 @@ class PwProjectLeaderCheckbox extends LitElement {
           ?checked=${this.user.project_leader_id === this.projectId}
           class="form-check-input"
         />
-    </form>`;
+      </form>`;
   }
 }
 

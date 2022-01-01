@@ -152,7 +152,11 @@ export class PwProjectCreate extends PwForm<"/api/v1/projects/create-or-update">
       ></pw-number-input>
 
       <!-- Betreuer, Projektleiter (Schüler) -->
-      ${this.initial ? html`<pw-project-leaders projectId=${this.initial.id!}></pw-project-leaders>` : html``}
+      ${this.initial
+        ? html`<pw-project-leaders
+            projectId=${this.initial.id!}
+          ></pw-project-leaders>`
+        : html``}
 
       <pw-checkbox-input
         label=${msg("Allow random assignments")}

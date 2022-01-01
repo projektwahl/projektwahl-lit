@@ -34,7 +34,15 @@ export async function usersHandler(
       })
       .parse(Object.fromEntries(url.searchParams as any));
 
-    const columns = ["id", "type", "username", "group", "age", "away", "project_leader_id"] as const;
+    const columns = [
+      "id",
+      "type",
+      "username",
+      "group",
+      "age",
+      "away",
+      "project_leader_id",
+    ] as const;
 
     const schema = rawUserSchema(
       (s) => s,
