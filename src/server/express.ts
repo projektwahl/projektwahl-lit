@@ -4,7 +4,13 @@
 import { zod2result } from "../lib/result.js";
 import { json } from "node:stream/consumers";
 import { URL } from "url";
-import { rawUserHelperOrAdminSchema, rawUserSchema, rawUserVoterSchema, routes, UnknownKeysParam } from "../lib/routes.js";
+import {
+  rawUserHelperOrAdminSchema,
+  rawUserSchema,
+  rawUserVoterSchema,
+  routes,
+  UnknownKeysParam,
+} from "../lib/routes.js";
 import type {
   IncomingHttpHeaders,
   OutgoingHttpHeaders,
@@ -12,7 +18,7 @@ import type {
 } from "node:http2";
 import type { z, ZodObject, ZodTypeAny } from "zod";
 import { retryableBegin, sql } from "./database.js";
-import cookie from 'cookie'
+import cookie from "cookie";
 
 const userMapper = <
   T extends { [k: string]: ZodTypeAny },
@@ -32,7 +38,7 @@ const userMapper = <
 const userSchema = rawUserSchema(
   userMapper(rawUserVoterSchema),
   userMapper(rawUserHelperOrAdminSchema)
-).optional()
+).optional();
 
 export function request<P extends keyof typeof routes>(
   method: string,
@@ -52,11 +58,14 @@ export function request<P extends keyof typeof routes>(
   ) => {
     try {
       if (headers[":method"] !== "GET" && headers[":method"] !== "POST") {
-        throw new Error("Unsupported http method!")
+        throw new Error("Unsupported http method!");
       }
-      
-      if (headers[":method"] === "POST" && headers['x-csrf-protection'] !== 'projektwahl') {
-        throw new Error('No CSRF header!');
+
+      if (
+        headers[":method"] === "POST" &&
+        headers["x-csrf-protection"] !== "projektwahl"
+      ) {
+        throw new Error("No CSRF header!");
       }
 
       let url = new URL(headers[":path"]!, "https://localhost:8443");
@@ -68,14 +77,19 @@ export function request<P extends keyof typeof routes>(
         let session_id: string | undefined = undefined;
         if (headers.cookie) {
           var cookies = cookie.parse(headers.cookie);
-  
+
           // implementing https://datatracker.ietf.org/doc/html/draft-ietf-httpbis-rfc6265bis-02#section-8.8.2
-          session_id = headers[":method"] === "GET" ? cookies.lax_id : cookies.strict_id;
+          session_id =
+            headers[":method"] === "GET" ? cookies.lax_id : cookies.strict_id;
           if (session_id) {
-            user = userSchema.parse((await retryableBegin('READ WRITE', async (sql) => {
-              //await sql`DELETE FROM sessions WHERE CURRENT_TIMESTAMP >= updated_at + interval '24 hours' AND session_id != ${session_id} `
-              return await sql`UPDATE sessions SET updated_at = CURRENT_TIMESTAMP FROM users WHERE users.id = sessions.user_id AND session_id = ${session_id!} AND CURRENT_TIMESTAMP < updated_at + interval '24 hours' RETURNING users.id, users.type, users.username, users.group, users.age`;
-            }))[0]);
+            user = userSchema.parse(
+              (
+                await retryableBegin("READ WRITE", async (sql) => {
+                  //await sql`DELETE FROM sessions WHERE CURRENT_TIMESTAMP >= updated_at + interval '24 hours' AND session_id != ${session_id} `
+                  return await sql`UPDATE sessions SET updated_at = CURRENT_TIMESTAMP FROM users WHERE users.id = sessions.user_id AND session_id = ${session_id!} AND CURRENT_TIMESTAMP < updated_at + interval '24 hours' RETURNING users.id, users.type, users.username, users.group, users.age`;
+                })
+              )[0]
+            );
             //console.log(user)
           }
         }
@@ -84,7 +98,11 @@ export function request<P extends keyof typeof routes>(
           headers[":method"] === "POST" ? await json(stream) : undefined;
         const requestBody = zod2result(routes[path].request, body);
         if (requestBody.success) {
-          const [new_headers, responseBody] = await handler(requestBody.data, user, session_id);
+          const [new_headers, responseBody] = await handler(
+            requestBody.data,
+            user,
+            session_id
+          );
           //console.log("responseBody", responseBody);
           routes[path].response.parse(responseBody);
           stream.respond(new_headers);
@@ -103,12 +121,14 @@ export function request<P extends keyof typeof routes>(
     } catch (error) {
       console.error(error);
       stream.respond({ ":status": 200 });
-      stream.end(JSON.stringify({
-        success: false,
-        error: {
-          error: String(error)
-        }
-      }));
+      stream.end(
+        JSON.stringify({
+          success: false,
+          error: {
+            error: String(error),
+          },
+        })
+      );
       return true;
     }
     return false;

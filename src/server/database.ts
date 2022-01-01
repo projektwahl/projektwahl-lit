@@ -11,19 +11,24 @@ export const sql = postgres(process.env["DATABASE_URL"], {
   },
 });
 
-type UnwrapPromiseArray<T> = T extends any[] ? {
-  [k in keyof T]: T[k] extends Promise<infer R> ? R : T[k]
-} : T;
+type UnwrapPromiseArray<T> = T extends any[]
+  ? {
+      [k in keyof T]: T[k] extends Promise<infer R> ? R : T[k];
+    }
+  : T;
 
-export async function retryableBegin<T>(options: string, cb: (tsql: TransactionSql<{}>) => T | Promise<T>): Promise<UnwrapPromiseArray<T>> {
+export async function retryableBegin<T>(
+  options: string,
+  cb: (tsql: TransactionSql<{}>) => T | Promise<T>
+): Promise<UnwrapPromiseArray<T>> {
   while (true) {
     try {
-      return await sql.begin(options, cb)
+      return await sql.begin(options, cb);
     } catch (error) {
       if (error instanceof postgres.PostgresError && error.code === "40001") {
-        console.log("SERIALIZATION FAILURE - RETRYING")
+        console.log("SERIALIZATION FAILURE - RETRYING");
       } else {
-        throw error
+        throw error;
       }
     }
   }

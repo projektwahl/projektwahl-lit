@@ -1,6 +1,12 @@
 import { sensitiveHeaders } from "node:http2";
 import type { z, ZodObject, ZodTypeAny } from "zod";
-import { rawSessionType, rawUserHelperOrAdminSchema, rawUserSchema, rawUserVoterSchema, UnknownKeysParam } from "../../../lib/routes.js";
+import {
+  rawSessionType,
+  rawUserHelperOrAdminSchema,
+  rawUserSchema,
+  rawUserVoterSchema,
+  UnknownKeysParam,
+} from "../../../lib/routes.js";
 import { sql } from "../../database.js";
 import { request } from "../../express.js";
 import { checkPassword } from "../../password.js";
@@ -24,16 +30,17 @@ export async function loginHandler(
   headers: import("http2").IncomingHttpHeaders
 ) {
   return await request("POST", "/api/v1/login", async function (body) {
-    const r = await sql`SELECT id, username, password_hash, type FROM users WHERE username = ${body.username} LIMIT 1`;
+    const r =
+      await sql`SELECT id, username, password_hash, type FROM users WHERE username = ${body.username} LIMIT 1`;
 
-    console.log(r)
+    console.log(r);
 
     const dbUser = rawUserSchema(
       users(rawUserVoterSchema),
-      users(rawUserHelperOrAdminSchema),
-    ).optional().parse(
-      r[0]
-    );
+      users(rawUserHelperOrAdminSchema)
+    )
+      .optional()
+      .parse(r[0]);
 
     // TODO FIXME this is vulnerable to side channel attacks
     // but maybe it's fine because we want to tell the user whether the account exists
@@ -52,9 +59,7 @@ export async function loginHandler(
       ];
     }
 
-    if (
-      dbUser.password_hash == null
-    ) {
+    if (dbUser.password_hash == null) {
       return [
         {
           "content-type": "text/json; charset=utf-8",
@@ -73,10 +78,8 @@ export async function loginHandler(
       dbUser.password_hash,
       body.password
     );
-    
-    if (
-      !valid
-    ) {
+
+    if (!valid) {
       return [
         {
           "content-type": "text/json; charset=utf-8",
@@ -94,7 +97,7 @@ export async function loginHandler(
     if (needsRehash) {
       await sql.begin("READ WRITE", async (tsql) => {
         return await tsql`UPDATE users SET password_hash = ${newHash} WHERE id = ${dbUser.id}`;
-      })
+      });
     }
 
     const session = rawSessionType.pick({ session_id: true }).parse(
@@ -116,9 +119,9 @@ export async function loginHandler(
         `lax_id=${
           session.session_id
         }; Secure; Path=/; SameSite=Lax; HttpOnly; Max-Age=${48 * 60 * 60};`,
-        `username=${
-          dbUser.username
-        }; Secure; Path=/; SameSite=Lax; Max-Age=${48 * 60 * 60};`,
+        `username=${dbUser.username}; Secure; Path=/; SameSite=Lax; Max-Age=${
+          48 * 60 * 60
+        };`,
       ],
       [sensitiveHeaders]: ["set-cookie"],
     };

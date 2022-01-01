@@ -49,10 +49,9 @@ export async function openidRedirectHandler(
         s: ZodObject<T, UnknownKeys, Catchall>
       ): ZodObject<
         objectUtil.noNever<{
-          [k in
-            | "id"
-            | "username"
-            | "password_hash"]: k extends keyof T ? T[k] : never;
+          [k in "id" | "username" | "password_hash"]: k extends keyof T
+            ? T[k]
+            : never;
         }>,
         UnknownKeys,
         Catchall

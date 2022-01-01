@@ -85,153 +85,160 @@ export const PwApp = setupHmr(
   import.meta.url,
   "PwApp",
   class PwApp extends LitElement {
-  static override get properties() {
-    return {
-      last: { state: true },
-      current: { state: true },
-      initial: { attribute: false },
-      initialUsed: { state: true },
-    };
-  }
-
-  private last: Promise<import("lit").TemplateResult> | undefined;
-
-  private history;
-
-  private current: Promise<import("lit").TemplateResult> | undefined;
-
-  initialUsed: boolean;
-
-  initial: Promise<import("lit").TemplateResult> | undefined;
-
-  constructor() {
-    super();
-
-    this.history = new HistoryController(this, /.*/);
-
-    this.initialUsed = false;
-  }
-
-  override render() {
-    if (this.initial !== undefined && !this.initialUsed) {
-      this.initialUsed = true;
-      this.current = this.initial;
-    } else {
-      this.last = this.current;
-      this.current = nextPage(this.history.url);
+    static override get properties() {
+      return {
+        last: { state: true },
+        current: { state: true },
+        initial: { attribute: false },
+        initialUsed: { state: true },
+      };
     }
-    return html`
-      ${bootstrapCss}
 
-      <nav
-        class="navbar navbar-expand-lg navbar-light bg-light shadow p-3 mb-5"
-      >
-        <div class="container-fluid">
-          <a @click=${aClick} class="navbar-brand" href="/"
-            >${msg("Projektwahl")}</a
-          >
-          <button
-            class="navbar-toggler"
-            type="button"
-            data-bs-toggle="collapse"
-            data-bs-target="#navbarSupportedContent"
-            aria-controls="navbarSupportedContent"
-            aria-expanded="false"
-            aria-label=${msg("Toggle navigation")}
-          >
-            <span class="navbar-toggler-icon"></span>
-          </button>
-          <div class="collapse navbar-collapse" id="navbarSupportedContent">
-            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-              <li class="nav-item">
-                <a
-                  @click=${aClick}
-                  class="nav-link ${classMap({
-                    active: this.history.url.pathname === "/",
-                  })}"
-                  aria-current="page"
-                  href="/"
-                  >${msg("Home")}</a
-                >
-              </li>
-              <li class="nav-item">
-                <a
-                  @click=${aClick}
-                  class="nav-link ${classMap({
-                    active: this.history.url.pathname === "/users",
-                  })}"
-                  href="/users"
-                  >${msg("Accounts")}</a
-                >
-              </li>
-              <li>
-                <a
-                  @click=${aClick}
-                  class="nav-link ${classMap({
-                    active: this.history.url.pathname === "/projects",
-                  })}"
-                  href="/projects"
-                  >${msg("Projects")}</a
-                >
-              </li>
-              <li>
-                <a
-                  @click=${aClick}
-                  class="nav-link ${classMap({
-                    active: this.history.url.pathname === "/election",
-                  })}"
-                  href="/election"
-                  >${msg("Election")}</a
-                >
-              </li>
-            </ul>
-            <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
-              ${jscookie.get("username")
-                ? html`<li class="nav-item">
-                    <a @click=${async () => {
-                      await myFetch<"/api/v1/logout">("/api/v1/logout", {
-                        method: "POST",
-                        body: "{}",
-                      })
-                      HistoryController.goto(new URL("/login", window.location.href), {})
-                    }} class="nav-link" href="#"
-                      >${msg(str`Logout ${jscookie.get("username")}`)}</a
-                    >
-                  </li>`
-                : html` <li class="nav-item">
-                    <a
-                      @click=${aClick}
-                      class="nav-link ${classMap({
-                        active: this.history.url.pathname === "/login",
-                      })}"
-                      href="/login"
-                      >${msg(
-                        str`Login ${JSON.stringify(jscookie.get("username"))}`
-                      )}</a
-                    >
-                  </li>`}
-            </ul>
+    private last: Promise<import("lit").TemplateResult> | undefined;
+
+    private history;
+
+    private current: Promise<import("lit").TemplateResult> | undefined;
+
+    initialUsed: boolean;
+
+    initial: Promise<import("lit").TemplateResult> | undefined;
+
+    constructor() {
+      super();
+
+      this.history = new HistoryController(this, /.*/);
+
+      this.initialUsed = false;
+    }
+
+    override render() {
+      if (this.initial !== undefined && !this.initialUsed) {
+        this.initialUsed = true;
+        this.current = this.initial;
+      } else {
+        this.last = this.current;
+        this.current = nextPage(this.history.url);
+      }
+      return html`
+        ${bootstrapCss}
+
+        <nav
+          class="navbar navbar-expand-lg navbar-light bg-light shadow p-3 mb-5"
+        >
+          <div class="container-fluid">
+            <a @click=${aClick} class="navbar-brand" href="/"
+              >${msg("Projektwahl")}</a
+            >
+            <button
+              class="navbar-toggler"
+              type="button"
+              data-bs-toggle="collapse"
+              data-bs-target="#navbarSupportedContent"
+              aria-controls="navbarSupportedContent"
+              aria-expanded="false"
+              aria-label=${msg("Toggle navigation")}
+            >
+              <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarSupportedContent">
+              <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                <li class="nav-item">
+                  <a
+                    @click=${aClick}
+                    class="nav-link ${classMap({
+                      active: this.history.url.pathname === "/",
+                    })}"
+                    aria-current="page"
+                    href="/"
+                    >${msg("Home")}</a
+                  >
+                </li>
+                <li class="nav-item">
+                  <a
+                    @click=${aClick}
+                    class="nav-link ${classMap({
+                      active: this.history.url.pathname === "/users",
+                    })}"
+                    href="/users"
+                    >${msg("Accounts")}</a
+                  >
+                </li>
+                <li>
+                  <a
+                    @click=${aClick}
+                    class="nav-link ${classMap({
+                      active: this.history.url.pathname === "/projects",
+                    })}"
+                    href="/projects"
+                    >${msg("Projects")}</a
+                  >
+                </li>
+                <li>
+                  <a
+                    @click=${aClick}
+                    class="nav-link ${classMap({
+                      active: this.history.url.pathname === "/election",
+                    })}"
+                    href="/election"
+                    >${msg("Election")}</a
+                  >
+                </li>
+              </ul>
+              <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
+                ${jscookie.get("username")
+                  ? html`<li class="nav-item">
+                      <a
+                        @click=${async () => {
+                          await myFetch<"/api/v1/logout">("/api/v1/logout", {
+                            method: "POST",
+                            body: "{}",
+                          });
+                          HistoryController.goto(
+                            new URL("/login", window.location.href),
+                            {}
+                          );
+                        }}
+                        class="nav-link"
+                        href="#"
+                        >${msg(str`Logout ${jscookie.get("username")}`)}</a
+                      >
+                    </li>`
+                  : html` <li class="nav-item">
+                      <a
+                        @click=${aClick}
+                        class="nav-link ${classMap({
+                          active: this.history.url.pathname === "/login",
+                        })}"
+                        href="/login"
+                        >${msg(
+                          str`Login ${JSON.stringify(jscookie.get("username"))}`
+                        )}</a
+                      >
+                    </li>`}
+              </ul>
+            </div>
           </div>
+        </nav>
+
+        <div
+          style="position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);"
+        >
+          ${until(
+            this.current.then(() => undefined).catch(() => undefined),
+            html`<div class="spinner-grow text-primary" role="status">
+              <span class="visually-hidden">${msg("Loading...")}</span>
+            </div>`
+          )}
         </div>
-      </nav>
 
-      <div
-        style="position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);"
-      >
         ${until(
-          this.current.then(() => undefined).catch(() => undefined),
-          html`<div class="spinner-grow text-primary" role="status">
-            <span class="visually-hidden">${msg("Loading...")}</span>
-          </div>`
+          this.current.catch((error) => error),
+          this.last?.catch((error) => error)
         )}
-      </div>
-
-      ${until(
-        this.current.catch((error) => error),
-        this.last?.catch((error) => error)
-      )}
-    `;
+      `;
+    }
   }
-})
+);
 
 customElements.define("pw-app", PwApp);

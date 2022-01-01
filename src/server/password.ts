@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // SPDX-FileCopyrightText: 2021 Moritz Hedtke <Moritz.Hedtke@t-online.de>
-import argon2 from 'argon2';
+import argon2 from "argon2";
 
 // TODO FIXME probably switch back to argon2 it seems like we may be able to build it from source using the instructions in README
 // for now probably not too important as almost everybody should be using OpenID
@@ -12,12 +12,12 @@ import argon2 from 'argon2';
 // RAM), 128-bit salt, and 256-bit tag size.  This is the SECOND
 // RECOMMENDED option.
 const argon2Options = {
-	type: argon2.argon2id,
-	timeCost: 3,
-	memoryCost: 2 ** 16, // 2 ** 16 KB (64 MB)
-	saltLength: 128 / 8, // 16
-	hashLength: 256 / 8, // 32
-	parallelism: 4
+  type: argon2.argon2id,
+  timeCost: 3,
+  memoryCost: 2 ** 16, // 2 ** 16 KB (64 MB)
+  saltLength: 128 / 8, // 16
+  hashLength: 256 / 8, // 32
+  parallelism: 4,
 };
 
 /*
@@ -77,9 +77,7 @@ export async function checkPassword(
 }
 */
 
-export async function hashPassword(
-  password: string
-): Promise<string> {
+export async function hashPassword(password: string): Promise<string> {
   return await argon2.hash(password, argon2Options);
 }
 
@@ -88,5 +86,9 @@ export async function checkPassword(
   password: string
 ): Promise<[boolean, boolean, string]> {
   const needsRehash = await argon2.needsRehash(hash, argon2Options);
-  return [await argon2.verify(hash, password, argon2Options), needsRehash, needsRehash ? await argon2.hash(password, argon2Options) : hash]
+  return [
+    await argon2.verify(hash, password, argon2Options),
+    needsRehash,
+    needsRehash ? await argon2.hash(password, argon2Options) : hash,
+  ];
 }

@@ -26,7 +26,10 @@ export function sql2(
   ..._keys: (
     | null
     | string
-    | [TemplateStringsArray, ...(null | string | string[] | boolean | number | Buffer)[]]
+    | [
+        TemplateStringsArray,
+        ...(null | string | string[] | boolean | number | Buffer)[]
+      ]
     | [
         TemplateStringsArray,
         ...(null | string | string[] | boolean | number | Buffer)[]
@@ -36,7 +39,10 @@ export function sql2(
     | number
     | Buffer
   )[]
-): [TemplateStringsArray, ...(null | string | string[] | boolean | number | Buffer)[]] {
+): [
+  TemplateStringsArray,
+  ...(null | string | string[] | boolean | number | Buffer)[]
+] {
   const strings = _strings;
   const keys = _keys;
   //console.log("sql", strings, keys)
@@ -53,7 +59,7 @@ export function sql2(
   const flattened: [
     TemplateStringsArray,
     ...(string | string[] | boolean | number)[]
-  // @ts-expect-error
+    // @ts-expect-error
   ][] = stringsAsTemplates.flatMap((m, i) => {
     if (i == keys.length) {
       return [m];

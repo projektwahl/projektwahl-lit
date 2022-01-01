@@ -52,16 +52,19 @@ class PwProjectUserCheckbox extends LitElement {
     this._task = new Task(
       this,
       async () => {
-        let result = await myFetch<"/api/v1/users/create-or-update">("/api/v1/users/create-or-update", {
-          method: "POST",
-          headers: {
-            "content-type": "text/json",
-          },
-          body: JSON.stringify({
-            id: this.user.id,
-            [this.name]: this.projectId,
-          }),
-        });
+        let result = await myFetch<"/api/v1/users/create-or-update">(
+          "/api/v1/users/create-or-update",
+          {
+            method: "POST",
+            headers: {
+              "content-type": "text/json",
+            },
+            body: JSON.stringify({
+              id: this.user.id,
+              [this.name]: this.projectId,
+            }),
+          }
+        );
 
         return result;
       },

@@ -24,7 +24,7 @@ export const PwProjectUsers = setupHmr(
         ...super.properties,
         projectId: { type: Number },
         name: { type: String },
-        title: { type: String }
+        title: { type: String },
       };
     }
 
@@ -32,7 +32,7 @@ export const PwProjectUsers = setupHmr(
 
     projectId!: number;
 
-    title!: string
+    title!: string;
 
     override get buttons() {
       return html``;

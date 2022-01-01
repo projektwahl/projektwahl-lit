@@ -31,9 +31,9 @@ export async function createOrUpdateUsersHandler(
 
             const finalQuery = sql2`UPDATE users SET
             ${field("username")},
-            password_hash = CASE WHEN ${user.password !== undefined} THEN ${user.password
-              ? await hashPassword(user.password)
-              : null} ELSE password_hash END,
+            password_hash = CASE WHEN ${user.password !== undefined} THEN ${
+              user.password ? await hashPassword(user.password) : null
+            } ELSE password_hash END,
             ${field("type")},
             ${field("group")},
             ${field("age")},
@@ -49,9 +49,7 @@ export async function createOrUpdateUsersHandler(
               user.type ?? null
             }, ${user.type === "voter" ? user.group ?? null : null}, ${
               user.type === "voter" ? user.age ?? null : null
-            }, ${user.away ?? false}, ${
-              user.project_leader_id ?? null
-            }, ${
+            }, ${user.away ?? false}, ${user.project_leader_id ?? null}, ${
               user.force_in_project_id ?? null
             }) RETURNING id;`;
           }
