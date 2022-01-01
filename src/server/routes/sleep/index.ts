@@ -12,7 +12,10 @@ export async function sleepHandler(
             "content-type": "text/json; charset=utf-8",
             ":status": 200,
           },
-          undefined,
+          {
+            success: true,
+            data: null
+          },
         ]);
       }, 100);
     });

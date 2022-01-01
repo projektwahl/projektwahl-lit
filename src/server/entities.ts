@@ -11,9 +11,10 @@ export async function fetchData<
     id: number;
     [index: string]: null | string | string[] | boolean | number;
   },
-  Q
+  Q,
+  P extends "/api/v1/users" | "/api/v1/projects",
 >(
-  path: "/api/v1/users" | "/api/v1/projects",
+  path: P,
   headers: import("http2").IncomingHttpHeaders,
   table: string,
   columns: readonly [string, ...string[]],
@@ -23,7 +24,7 @@ export async function fetchData<
     query: Q
   ) => [
     TemplateStringsArray,
-    ...(null | string | string[] | boolean | number)[]
+    ...(null | string | string[] | boolean | number | Buffer)[]
   ]
 ): Promise<
   [OutgoingHttpHeaders, z.infer<typeof routes[typeof path]["response"]>]
@@ -135,18 +136,14 @@ export async function fetchData<
   }
 
   // [TemplateStringsArray, ...(null | string | string[] | boolean | number)[]]
-  let entities = routes[path]["response"].shape.entities.parse(
+  let entities: z.infer<typeof routes[typeof path]["response"]["options"][0]>["data"]["entities"] = routes[path]["response"]["options"][0].shape.data.shape.entities.parse(
     await sql(...finalQuery)
   );
 
   // https://github.com/projektwahl/projektwahl-sveltekit/blob/work/src/lib/list-entities.ts#L30
 
-  let nextCursor:
-    | z.infer<typeof routes[typeof path]["response"]>["entities"][0]
-    | null = null;
-  let previousCursor:
-    | z.infer<typeof routes[typeof path]["response"]>["entities"][0]
-    | null = null;
+  let nextCursor: z.infer<typeof routes[typeof path]["response"]["options"][0]>["data"]["nextCursor"] = null;
+  let previousCursor: z.infer<typeof routes[typeof path]["response"]["options"][0]>["data"]["previousCursor"] = null;
   // TODO FIXME also recalculate the other cursor because data could've been deleted in between / the filters have changed
   if (pagination.p_direction === "forwards") {
     if (pagination.p_cursor) {
@@ -167,16 +164,22 @@ export async function fetchData<
     }
   }
 
+  let d: z.infer<typeof routes[P]["response"]>;
+
+  let aff: z.infer<typeof routes[P]["response"]["options"][0]>["data"] = {
+    entities,
+    nextCursor,
+    previousCursor,
+  }
+
   return [
     {
       "content-type": "text/json; charset=utf-8",
       ":status": 200,
     },
-    // TODO FIXME
     {
-      entities,
-      nextCursor,
-      previousCursor,
+      success: true,
+      data: aff
     },
   ];
 }

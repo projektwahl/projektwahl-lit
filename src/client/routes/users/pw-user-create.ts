@@ -49,7 +49,7 @@ export class PwUserCreate extends PwForm<"/api/v1/users/create-or-update"> {
     return this.initial ? msg("Update account") : msg("Create account");
   }
 
-  type;
+  type?: "voter" | "admin" | "helper";
 
   initial: z.infer<typeof schema> | undefined;
 

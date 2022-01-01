@@ -1,6 +1,6 @@
 import { sensitiveHeaders } from "node:http2";
 import { objectUtil, z, ZodObject, ZodTypeAny } from "zod";
-import { rawUserSchema, UnknownKeysParam } from "../../../lib/routes.js";
+import { rawUserHelperOrAdminSchema, rawUserSchema, rawUserVoterSchema, UnknownKeysParam } from "../../../lib/routes.js";
 import { sql } from "../../database.js";
 import { request } from "../../express.js";
 import { client } from "./openid-client.js";
@@ -42,27 +42,19 @@ export async function openidRedirectHandler(
       //console.log(userinfo)
 
       const pickFn = <
-        T extends { [k: string]: ZodTypeAny },
-        UnknownKeys extends UnknownKeysParam = "strip",
-        Catchall extends ZodTypeAny = ZodTypeAny
-      >(
-        s: ZodObject<T, UnknownKeys, Catchall>
-      ): ZodObject<
-        objectUtil.noNever<{
-          [k in "id" | "username" | "password_hash"]: k extends keyof T
-            ? T[k]
-            : never;
-        }>,
-        UnknownKeys,
-        Catchall
-      > =>
+      T extends { [k: string]: ZodTypeAny },
+      UnknownKeys extends UnknownKeysParam = "strip",
+      Catchall extends ZodTypeAny = ZodTypeAny
+    >(
+      s: ZodObject<T, UnknownKeys, Catchall>
+    ) =>
         s.pick({
           id: true,
           username: true,
           password_hash: true,
         });
 
-      const dbUser = rawUserSchema(pickFn, pickFn).parse(
+      const dbUser = rawUserSchema(pickFn(rawUserVoterSchema), pickFn(rawUserHelperOrAdminSchema)).parse(
         (
           await sql`SELECT id, username, type FROM users WHERE openid_id = ${
             result.claims().sub

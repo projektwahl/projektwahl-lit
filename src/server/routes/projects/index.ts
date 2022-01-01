@@ -37,8 +37,10 @@ export async function projectsHandler(
     ] as const;
 
     return await fetchData<
-      z.infer<typeof rawProjectSchema>
-    >("/api/v1/projects", headers, "projects", columns, filters, {}, (query) => {
+      z.infer<typeof rawProjectSchema>,
+      typeof filters,
+      "/api/v1/projects"
+    >("/api/v1/projects" as const, headers, "projects", columns, filters, {}, (query) => {
       return sql2`(${!query.f_id} OR id = ${
         query.f_id ?? null
       }) AND title LIKE ${"%" + (query.f_title ?? "") + "%"}`;
