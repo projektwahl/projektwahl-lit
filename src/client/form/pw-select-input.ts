@@ -102,7 +102,6 @@ export class PwSelectInput<T> extends LitElement {
           ${ref(this.input)}
           aria-describedby="${this.randomId}-feedback"
           class="form-select ${this.task.render({
-            error: () => "",
             pending: () => "",
             complete: (v) =>
               !v.success && v.error[this.name] !== undefined
@@ -135,7 +134,6 @@ export class PwSelectInput<T> extends LitElement {
                   ${v.error[this.name]}
                 </div>`
               : undefined,
-          error: () => undefined,
           initial: () => undefined,
           pending: () => noChange,
         })}

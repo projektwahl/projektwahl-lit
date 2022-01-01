@@ -141,9 +141,6 @@ export class PwUsers extends PwEntityList<"/api/v1/users"> {
           </tr>`
         );
       },
-      error: () => {
-        return html`error`;
-      },
       initial: () => {
         return html`hi`;
       },

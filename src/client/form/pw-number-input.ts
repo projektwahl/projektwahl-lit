@@ -98,7 +98,6 @@ export class PwNumberInput<T> extends LitElement {
           type="number"
           value=${this.initial?.[this.name]}
           class="form-control ${this.task.render({
-            error: () => "",
             pending: () => "",
             complete: (v) =>
               !v.success && v.error[this.name] !== undefined
@@ -111,7 +110,6 @@ export class PwNumberInput<T> extends LitElement {
           aria-describedby="${this.randomId}-feedback"
           ?disabled=${this.task.render({
             complete: () => false,
-            error: () => false,
             pending: () => true,
             initial: () => false,
           })}
@@ -126,7 +124,6 @@ export class PwNumberInput<T> extends LitElement {
                   ${v.error[this.name]}
                 </div>`
               : undefined,
-          error: () => undefined,
           initial: () => undefined,
           pending: () => noChange,
         })}

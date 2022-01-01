@@ -223,6 +223,7 @@ const project = rawProjectSchema.pick({
   random_assignments: true,
 });
 
+// make every route a result?
 export const routes = identity({
   "/api/v1/logout": {
     request: z.any(),

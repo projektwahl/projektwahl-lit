@@ -90,9 +90,6 @@ class PwProjectUserCheckbox extends LitElement {
             }
             return html``;
           },
-          error: (error) => html`<div class="alert alert-danger" role="alert">
-            ${error}
-          </div>`,
         })}
 
         <input

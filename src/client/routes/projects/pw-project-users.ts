@@ -130,9 +130,6 @@ export const PwProjectUsers = setupHmr(
             </tr>`
           );
         },
-        error: () => {
-          return html`error`;
-        },
         initial: () => {
           return html`hi`;
         },

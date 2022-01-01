@@ -98,7 +98,6 @@ export class PwCheckboxInput<T> extends LitElement {
           type="checkbox"
           checked=${this.initial?.[this.name]}
           class="form-check-input ${this.task.render({
-            error: () => "",
             pending: () => "",
             complete: (v) =>
               !v.success && v.error[this.name] !== undefined
@@ -123,7 +122,6 @@ export class PwCheckboxInput<T> extends LitElement {
                   ${v.error[this.name]}
                 </div>`
               : undefined,
-          error: () => undefined,
           initial: () => undefined,
           pending: () => noChange,
         })}

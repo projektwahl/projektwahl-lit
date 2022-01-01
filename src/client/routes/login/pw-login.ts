@@ -42,6 +42,7 @@ class PwLogin extends PwForm<"/api/v1/login"> {
     this._task = new Task(
       this,
       async () => {
+        throw new Error("test")
         const formDataEvent = new CustomEvent("myformdata", {
           bubbles: true,
           composed: true,

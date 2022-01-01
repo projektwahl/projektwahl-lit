@@ -32,12 +32,12 @@ import { myFetch } from "./utils.js";
 
 // TODO FIXME show more details if possible (maybe error page)
 window.addEventListener("error", function (event) {
-  console.error(event.error);
+  console.error("window.error", event.error);
   alert("unknown error: " + event.message);
 });
 
 window.addEventListener("unhandledrejection", function (event) {
-  console.error(event.promise);
+  console.error("window.unhandledrejection", event.promise);
   alert("unknown error: " + event.reason);
 });
 

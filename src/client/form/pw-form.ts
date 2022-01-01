@@ -109,13 +109,7 @@ if ('FormDataEvent' in window) {
                   }
                 }
                 return html``;
-              },
-              error: (error) => html`<div
-                class="alert alert-danger"
-                role="alert"
-              >
-                ${error}
-              </div>`,
+              }
             })}
 
             <form
@@ -131,7 +125,6 @@ if ('FormDataEvent' in window) {
                 ?disabled=${this._task.render({
                   pending: () => true,
                   complete: () => false,
-                  error: () => false,
                   initial: () => false,
                 })}
                 class="btn btn-primary"

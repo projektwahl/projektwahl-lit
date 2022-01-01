@@ -146,9 +146,6 @@ class PwProjects<T> extends PwEntityList<"/api/v1/projects"> {
             </tr>`
           );
         },
-        error: () => {
-          return html`error`;
-        },
         initial: () => {
           return html`hi`;
         },
