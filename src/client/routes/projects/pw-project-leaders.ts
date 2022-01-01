@@ -26,7 +26,7 @@ const PwProjectLeaders = setupHmr(
       };
     }
 
-    projectId: number;
+    projectId!: number;
 
     override get title() {
       return msg("Project leaders");

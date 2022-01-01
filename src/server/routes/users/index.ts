@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { rawUserSchema, routes } from "../../../lib/routes.js";
+import { rawUserSchema, rawUserVoterSchema, rawUserHelperOrAdminSchema } from "../../../lib/routes.js";
 import { sql } from "../../database.js";
 import { fetchData } from "../../entities.js";
 import { request } from "../../express.js";
@@ -31,6 +31,11 @@ export async function usersHandler(
           )
           .transform((s) => (s === "" ? undefined : s))
           .optional(),
+          f_project_leader: z
+          .string()
+          .refine((s) => /^\d*$/.test(s))
+          .transform((s) => (s === "" ? undefined : Number(s)))
+          .optional(),
       })
       .parse(Object.fromEntries(url.searchParams as any));
 
@@ -45,11 +50,11 @@ export async function usersHandler(
     ] as const;
 
     const schema = rawUserSchema(
-      (s) => s,
-      (s) => s
+      rawUserVoterSchema,
+      rawUserHelperOrAdminSchema,
     );
 
-    return await fetchData<z.infer<typeof schema>>(
+    return await fetchData<z.infer<typeof schema>, typeof filters>(
       "/api/v1/users",
       headers,
       "users",
@@ -64,7 +69,7 @@ export async function usersHandler(
       (query) => {
         return sql2`(${!query.f_id} OR id = ${
           query.f_id ?? null
-        }) AND username LIKE ${"%" + (query.f_username ?? "") + "%"}`;
+        }) AND username LIKE ${"%" + (query.f_username ?? "") + "%"} AND (${!query.f_project_leader} OR project_leader_id = ${query.f_project_leader ?? null})`;
       }
     );
   })(stream, headers);

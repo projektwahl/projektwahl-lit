@@ -30,7 +30,6 @@ type BaseQuery<C> = {
   paginationCursor: C | null; // if this is null the start is at start/end depending on paginationDirection
   sorting: [keyof C, "ASC" | "DESC"][];
   paginationLimit: number;
-  filters: FilterType<C>;
 };
 
 export interface WritableTemplateStringsArray extends Array<string> {

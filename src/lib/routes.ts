@@ -19,7 +19,7 @@ export const loginInputSchema = z
   .strict();
 
 const rawUserCommon = {
-  id: z.number().nullable(),
+  id: z.number(),
   username: z.string().min(3).max(100),
   openid_id: z.string().optional(),
   password_hash: z.string(),
@@ -111,7 +111,7 @@ export const makeCreateOrUpdate = <
 
 export const rawProjectSchema = z
   .object({
-    id: z.number().nullable(),
+    id: z.number(),
     title: z.string().max(1024),
     info: z.string().max(8192),
     place: z.string().max(1024),

@@ -10,16 +10,16 @@ export async function fetchData<
   T extends {
     id: number;
     [index: string]: null | string | string[] | boolean | number;
-  }
->(
+  },
+Q>(
   path: "/api/v1/users" | "/api/v1/projects",
   headers: import("http2").IncomingHttpHeaders,
   table: string,
   columns: readonly [string, ...string[]],
-  filters: any,
+  filters: Q,
   orderByInfo: { [field: string]: "nulls-first" | "nulls-last" },
   customFilterQuery: (
-    query: FilterType<T>
+    query: Q
   ) => [
     TemplateStringsArray,
     ...(null | string | string[] | boolean | number)[]
@@ -51,9 +51,8 @@ export async function fetchData<
       p_direction: z.enum(["forwards", "backwards"]).default("forwards"),
       p_limit: z
         .string()
-        .default("100")
         .refine((s) => /^\d*$/.test(s))
-        .transform((s) => (s === "" ? undefined : Number(s))),
+        .transform((s) => (s === "" ? undefined : Number(s))).default("100"),
     })
     .parse(Object.fromEntries(url.searchParams as any));
 
@@ -61,8 +60,8 @@ export async function fetchData<
     .array(z.tuple([z.enum(columns), z.enum(["ASC", "DESC"])]))
     .parse(url.searchParams.getAll("order").map((o) => o.split("-")));
 
+    // TODO FIXMe remove this useless struct
   let _query: BaseQuery<T> = {
-    filters,
     paginationCursor: pagination.p_cursor,
     paginationDirection: pagination.p_direction,
     paginationLimit: pagination.p_limit,
@@ -94,7 +93,7 @@ export async function fetchData<
     finalQuery = sql2`(SELECT ${unsafe2(
       columns.map((c) => `"${c}"`).join(", ")
     )} FROM ${unsafe2(table)} WHERE ${customFilterQuery(
-      query.filters
+      filters
     )} ORDER BY ${orderByQuery} LIMIT ${query.paginationLimit + 1})`;
   } else {
     let queries = query.sorting.map((value, index) => {
@@ -118,7 +117,7 @@ export async function fetchData<
       return sql2`(SELECT ${unsafe2(columns.join(", "))} FROM ${unsafe2(
         table
       )} WHERE ${customFilterQuery(
-        query.filters
+        filters
       )} AND (${parts}) ORDER BY ${orderByQuery} LIMIT ${
         query.paginationLimit + 1
       })`;

@@ -144,6 +144,7 @@ export class PwEntityList<P extends keyof typeof routes> extends LitElement {
         <form
           ${ref(this.formRef)}
           @input=${() => {
+            // TODO FIXME convert to the better form api
             const urlSearchParams = new URLSearchParams( // @ts-expect-error probably wrong typings
               new FormData(this.formRef.value)
             );
