@@ -44,7 +44,7 @@ export async function createOrUpdateUsersHandler(
             WHERE id = ${user.id} RETURNING id;`;
             return await sql(...finalQuery);
           } else {
-            return await sql`INSERT INTO users (username, password_hash, type, "group", age, away, project_leader_id) VALUES (${
+            return await sql`INSERT INTO users (username, password_hash, type, "group", age, away, project_leader_id, force_in_project_id) VALUES (${
               user.username ?? null
             }, ${user.password ? await hashPassword(user.password) : null}, ${
               user.type ?? null
