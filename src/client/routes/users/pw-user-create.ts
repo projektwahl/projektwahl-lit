@@ -140,6 +140,15 @@ export class PwUserCreate extends PwForm<"/api/v1/users/create-or-update"> {
             ></pw-number-input>`
         : undefined}
 
+      <pw-text-input
+        label=${msg("Password")}
+        name="password"
+        type="password"
+        .task=${this._task}
+        .initial=${this.initial}
+      ></pw-text-input>
+
+
       <pw-checkbox-input
         label=${msg("Away")}
         name="away"

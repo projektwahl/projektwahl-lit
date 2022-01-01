@@ -2,6 +2,8 @@
 // SPDX-FileCopyrightText: 2021 Moritz Hedtke <Moritz.Hedtke@t-online.de>
 /*import argon2 from 'argon2';
 
+// TODO FIXME probably switch back to argon2 it seems like we may be able to build it from source using the instructions in README
+
 const argon2Options = {
 	type: argon2.argon2id,
 	timeCost: 3,
@@ -35,11 +37,11 @@ async function hashPasswordWithSalt(
       {
         name: "PBKDF2",
         salt: salt,
-        iterations: 100000,
-        hash: "SHA-256",
+        iterations: 1000000,
+        hash: "SHA-512",
       },
       keyMaterial,
-      256
+      512
     )
   );
 }
