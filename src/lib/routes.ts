@@ -203,6 +203,14 @@ let a2: z.infer<typeof jo2>;
 // TODO FIXME report upstream (picking missing keys breaks)
 //console.log(usersCreateOrUpdate(rawUserHelperOrAdminSchema).safeParse({}))
 
+export const entities = <T extends { [k: string]: ZodTypeAny },
+UnknownKeys extends UnknownKeysParam = "strip",
+Catchall extends ZodTypeAny = ZodTypeAny>(entity: ZodObject<T, UnknownKeys, Catchall>) => result(z.object({
+  entities: z.array(entity),
+  previousCursor: entity.nullable(),
+  nextCursor: entity.nullable(),
+}))
+
 const users = <
   T extends { [k: string]: ZodTypeAny },
   UnknownKeys extends UnknownKeysParam = "strip",

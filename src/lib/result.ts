@@ -31,7 +31,6 @@ export const failureResult = <E extends import("zod").ZodTypeAny>(
     })
     .strict();
 
-// TODO FIXME this creates bad error messages - switch on enum "result" value
 export const result = <
   D extends import("zod").ZodTypeAny
 >(

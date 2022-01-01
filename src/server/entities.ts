@@ -1,10 +1,19 @@
 import type { OutgoingHttpHeaders } from "node:http2";
 import type { Row } from "postgres";
-import { z } from "zod";
-import type { keys, routes } from "../lib/routes.js";
+import { z, ZodObject, ZodTypeAny } from "zod";
+import type { UnknownKeysParam } from "../lib/routes.js";
+import {entities} from "../lib/routes.js";
 import type { BaseQuery, FilterType } from "../lib/types.js";
 import { sql } from "./database.js";
 import { sql2, unsafe2 } from "./sql/index.js";
+
+class Wrapper<T extends { [k: string]: ZodTypeAny },
+UnknownKeys extends UnknownKeysParam = "strip",
+Catchall extends ZodTypeAny = ZodTypeAny> {
+  wrapped(e: ZodObject<T, UnknownKeys, Catchall>) {
+    return entities(e)
+  }
+}
 
 export async function fetchData<
   T extends {
@@ -12,9 +21,11 @@ export async function fetchData<
     [index: string]: null | string | string[] | boolean | number;
   },
   Q,
-  R extends typeof routes["/api/v1/users"|"/api/v1/projects"]["response"]
+  S extends { [k: string]: ZodTypeAny },
+  UnknownKeys extends UnknownKeysParam = "strip",
+  Catchall extends ZodTypeAny = ZodTypeAny,
 >(
-  route: R,
+  route: ReturnType<Wrapper<S, UnknownKeys, Catchall>['wrapped']>,
   headers: import("http2").IncomingHttpHeaders,
   table: string,
   columns: readonly [string, ...string[]],
@@ -136,14 +147,14 @@ export async function fetchData<
   }
 
   // [TemplateStringsArray, ...(null | string | string[] | boolean | number)[]]
-  let entities: z.infer<typeof route["options"][0]>["data"]["entities"] = route["options"][0].shape.data.shape.entities.parse(
+  let entities: z.infer<typeof route["options"][0]["shape"]["data"]["shape"]["entities"]> = route["options"][0].shape.data.shape.entities.parse(
     await sql(...finalQuery)
   );
 
   // https://github.com/projektwahl/projektwahl-sveltekit/blob/work/src/lib/list-entities.ts#L30
 
-  let nextCursor: z.infer<typeof route["options"][0]>["data"]["nextCursor"] = null;
-  let previousCursor: z.infer<typeof route["options"][0]>["data"]["previousCursor"] = null;
+  let nextCursor: z.infer<typeof route["options"][0]["shape"]["data"]["shape"]["nextCursor"]> = null;
+  let previousCursor: z.infer<typeof route["options"][0]["shape"]["data"]["shape"]["previousCursor"]> = null;
   // TODO FIXME also recalculate the other cursor because data could've been deleted in between / the filters have changed
   if (pagination.p_direction === "forwards") {
     if (pagination.p_cursor) {
@@ -170,7 +181,7 @@ export async function fetchData<
       ":status": 200,
     },
     {
-      success: true,
+      success: true as const,
       data: {
         entities,
         nextCursor,
