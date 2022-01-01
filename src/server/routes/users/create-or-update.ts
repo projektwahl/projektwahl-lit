@@ -29,14 +29,11 @@ export async function createOrUpdateUsersHandler(
           if (user.id) {
             const field = (name: string) => updateField(user, name);
 
-            const password = user.password
-            ? await hashPassword(user.password)
-            : [null, null];
-
             const finalQuery = sql2`UPDATE users SET
             ${field("username")},
-            password_hash = CASE WHEN ${user.password !== undefined} THEN ${password[0]} ELSE password_hash END,
-            password_salt = CASE WHEN ${user.password !== undefined} THEN ${password[1]} ELSE password_salt END,
+            password_hash = CASE WHEN ${user.password !== undefined} THEN ${user.password
+              ? await hashPassword(user.password)
+              : null} ELSE password_hash END,
             ${field("type")},
             ${field("group")},
             ${field("age")},

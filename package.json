@@ -31,6 +31,7 @@
     "@lit-labs/ssr": "^1.0.0",
     "@lit-labs/task": "^1.0.0",
     "@lit/localize": "^0.11.1",
+    "argon2": "^0.28.3",
     "cookie": "^0.4.1",
     "js-cookie": "^3.0.1",
     "lit": "^2.0.2",

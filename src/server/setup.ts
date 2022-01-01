@@ -17,9 +17,9 @@ await sql.begin("READ WRITE", async (sql) => {
     cache: false, // TODO FIXME doesnt seem to work properly
   });
 
-  let [hash, salt] = await hashPassword("changeme");
+  let hash = await hashPassword("changeme");
 
-  await sql`INSERT INTO users (username, password_hash, password_salt, type) VALUES ('admin', ${hash}, ${salt}, 'admin') ON CONFLICT DO NOTHING;`;
+  await sql`INSERT INTO users (username, password_hash, type) VALUES ('admin', ${hash}, 'admin') ON CONFLICT DO NOTHING;`;
 
   const projects =
     await sql`INSERT INTO projects (title, info, place, costs, min_age, max_age, min_participants, max_participants, random_assignments) (SELECT generate_series, '', '', 0, 5, 13, 5, 20, FALSE FROM generate_series(1, 10)) RETURNING *;`;

@@ -17,7 +17,6 @@ const users = <
     type: true,
     username: true,
     password_hash: true,
-    password_salt: true,
   });
 
 export async function loginHandler(
@@ -25,7 +24,7 @@ export async function loginHandler(
   headers: import("http2").IncomingHttpHeaders
 ) {
   return await request("POST", "/api/v1/login", async function (body) {
-    const r = await sql`SELECT id, username, password_hash, password_salt, type FROM users WHERE username = ${body.username} LIMIT 1`;
+    const r = await sql`SELECT id, username, password_hash, type FROM users WHERE username = ${body.username} LIMIT 1`;
 
     console.log(r)
 
@@ -54,12 +53,29 @@ export async function loginHandler(
     }
 
     if (
-      dbUser.password_hash == null ||
-      !(await checkPassword(
-        dbUser.password_hash,
-        dbUser.password_salt,
-        body.password
-      ))
+      dbUser.password_hash == null
+    ) {
+      return [
+        {
+          "content-type": "text/json; charset=utf-8",
+          ":status": "200",
+        },
+        {
+          success: false as const,
+          error: {
+            password: "Kein Password für Account gesetzt!",
+          },
+        },
+      ];
+    }
+
+    const [valid, needsRehash, newHash] = await checkPassword(
+      dbUser.password_hash,
+      body.password
+    );
+    
+    if (
+      !valid
     ) {
       return [
         {
@@ -73,6 +89,12 @@ export async function loginHandler(
           },
         },
       ];
+    }
+
+    if (needsRehash) {
+      await sql.begin("READ WRITE", async (tsql) => {
+        return await tsql`UPDATE users SET password_hash = ${newHash} WHERE id = ${dbUser.id}`;
+      })
     }
 
     const session = rawSessionType.pick({ session_id: true }).parse(
