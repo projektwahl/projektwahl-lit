@@ -20,6 +20,7 @@ Software to manage choosing projects and automatically assigning people to proje
 git clone https://github.com/projektwahl/projektwahl-lit.git
 cd projektwahl-lit/
 npm install
+npx node-pre-gyp rebuild -C ./node_modules/argon2
 npm run localize-build
 
 DATABASE_URL=postgres://projektwahl:projektwahl@projektwahl/projektwahl npm run setup

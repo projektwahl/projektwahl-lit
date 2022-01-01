@@ -32,14 +32,14 @@ const userMapper = <
 const userSchema = rawUserSchema(
   userMapper(rawUserVoterSchema),
   userMapper(rawUserHelperOrAdminSchema)
-)
+).optional()
 
 export function request<P extends keyof typeof routes>(
   method: string,
   path: P,
   handler: (
     r: z.infer<typeof routes[P]["request"]>,
-    user: z.infer<typeof userSchema> | null
+    user: z.infer<typeof userSchema>
   ) => Promise<[OutgoingHttpHeaders, z.infer<typeof routes[P]["response"]>]>
 ): (
   stream: ServerHttp2Stream,
@@ -63,7 +63,7 @@ export function request<P extends keyof typeof routes>(
         headers[":method"] === method &&
         new RegExp(path).test(/** @type {string} */ url.pathname)
       ) {
-        let user = null;
+        let user = undefined;
         if (headers.cookie) {
           var cookies = cookie.parse(headers.cookie);
   
