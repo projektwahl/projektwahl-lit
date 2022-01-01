@@ -144,7 +144,7 @@ export class PwEntityList<P extends keyof typeof routes> extends LitElement {
         <form
           ${ref(this.formRef)}
           @input=${() => {
-            // TODO FIXME convert to the better form api
+            // TODO FIXME convert to the better form api (then it needs urlsearchparams support)
             const urlSearchParams = new URLSearchParams( // @ts-expect-error probably wrong typings
               new FormData(this.formRef.value)
             );
@@ -152,6 +152,13 @@ export class PwEntityList<P extends keyof typeof routes> extends LitElement {
             this.history.url.searchParams
               .getAll("order")
               .forEach((v) => urlSearchParams.append("order", v));
+            // @ts-expect-error terrible quick hack - don't look at this
+            if (this.projectId) {
+              if (urlSearchParams.has("f_project_leader")) {
+                // @ts-expect-error you know
+                urlSearchParams.set("f_project_leader", this.projectId)
+              }
+            }
             HistoryController.goto(
               new URL(`?${urlSearchParams}`, window.location.href),
               {}
