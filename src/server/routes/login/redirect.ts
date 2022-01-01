@@ -5,14 +5,19 @@ import { sql } from "../../database.js";
 import { request } from "../../express.js";
 import { client } from "./openid-client.js";
 
-export async function openidRedirectHandler(stream: import("http2").ServerHttp2Stream, headers: import("http2").IncomingHttpHeaders) {
+export async function openidRedirectHandler(
+  stream: import("http2").ServerHttp2Stream,
+  headers: import("http2").IncomingHttpHeaders
+) {
   return await request("GET", "/api/v1/redirect", async function () {
     let url = new URL(headers[":path"]!, "https://localhost:8443");
 
-    const searchParams = z.object({
-      session_state: z.string(),
-      code: z.string()
-    }).parse(Object.fromEntries(url.searchParams as any));
+    const searchParams = z
+      .object({
+        session_state: z.string(),
+        code: z.string(),
+      })
+      .parse(Object.fromEntries(url.searchParams as any));
 
     // https://github.com/AzureAD/microsoft-authentication-library-for-js/tree/dev/lib/msal-browser
     // https://docs.microsoft.com/en-us/azure/active-directory/develop/scenario-spa-app-registration
@@ -36,13 +41,37 @@ export async function openidRedirectHandler(stream: import("http2").ServerHttp2S
 
       //console.log(userinfo)
 
-      const pickFn = <T extends { [k: string]: ZodTypeAny;}, UnknownKeys extends UnknownKeysParam = "strip", Catchall extends ZodTypeAny = ZodTypeAny>(s: ZodObject<T, UnknownKeys, Catchall>): (ZodObject<objectUtil.noNever<{
-        [k in "id" | "username" | "password_hash" | "password_salt"]: k extends keyof T ? T[k] : never;
-      }>, UnknownKeys, Catchall>) => s.pick({id: true,username: true, password_hash: true, password_salt: true})
+      const pickFn = <
+        T extends { [k: string]: ZodTypeAny },
+        UnknownKeys extends UnknownKeysParam = "strip",
+        Catchall extends ZodTypeAny = ZodTypeAny
+      >(
+        s: ZodObject<T, UnknownKeys, Catchall>
+      ): ZodObject<
+        objectUtil.noNever<{
+          [k in
+            | "id"
+            | "username"
+            | "password_hash"
+            | "password_salt"]: k extends keyof T ? T[k] : never;
+        }>,
+        UnknownKeys,
+        Catchall
+      > =>
+        s.pick({
+          id: true,
+          username: true,
+          password_hash: true,
+          password_salt: true,
+        });
 
-      const dbUser = rawUserSchema(pickFn, pickFn).parse((await sql`SELECT id, username, type FROM users WHERE openid_id = ${
-          result.claims().sub
-        } LIMIT 1`)[0])
+      const dbUser = rawUserSchema(pickFn, pickFn).parse(
+        (
+          await sql`SELECT id, username, type FROM users WHERE openid_id = ${
+            result.claims().sub
+          } LIMIT 1`
+        )[0]
+      );
 
       if (dbUser === undefined) {
         return [

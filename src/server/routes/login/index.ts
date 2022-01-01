@@ -5,9 +5,19 @@ import { sql } from "../../database.js";
 import { request } from "../../express.js";
 import { checkPassword } from "../../password.js";
 
-export async function loginHandler(stream: import("http2").ServerHttp2Stream, headers: import("http2").IncomingHttpHeaders) {
+export async function loginHandler(
+  stream: import("http2").ServerHttp2Stream,
+  headers: import("http2").IncomingHttpHeaders
+) {
   return await request("POST", "/api/v1/login", async function (body) {
-    const dbUser = rawUserSchema(s => s, s => s).parse((await sql`SELECT id, username, password_hash, password_salt, type FROM users WHERE username = ${body.username} LIMIT 1`)[0]);
+    const dbUser = rawUserSchema(
+      (s) => s,
+      (s) => s
+    ).parse(
+      (
+        await sql`SELECT id, username, password_hash, password_salt, type FROM users WHERE username = ${body.username} LIMIT 1`
+      )[0]
+    );
 
     if (dbUser === undefined) {
       return [
@@ -46,9 +56,13 @@ export async function loginHandler(stream: import("http2").ServerHttp2Stream, he
       ];
     }
 
-    const session = rawSessionType.pick({ session_id: true }).parse((await sql.begin("READ WRITE", async (tsql) => {
-      return await tsql`INSERT INTO sessions (user_id) VALUES (${dbUser.id}) RETURNING session_id`;
-    }))[0])
+    const session = rawSessionType.pick({ session_id: true }).parse(
+      (
+        await sql.begin("READ WRITE", async (tsql) => {
+          return await tsql`INSERT INTO sessions (user_id) VALUES (${dbUser.id}) RETURNING session_id`;
+        })
+      )[0]
+    );
 
     /** @type {import("node:http2").OutgoingHttpHeaders} */
     const headers: import("node:http2").OutgoingHttpHeaders = {

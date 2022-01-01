@@ -3,7 +3,13 @@
 
 import { z } from "zod";
 
-export const successResult = <D extends import("zod").ZodTypeAny>(zodObject: D): z.ZodObject<{ success: z.ZodLiteral<true>; data: D; }, "strict", z.ZodTypeAny> =>
+export const successResult = <D extends import("zod").ZodTypeAny>(
+  zodObject: D
+): z.ZodObject<
+  { success: z.ZodLiteral<true>; data: D },
+  "strict",
+  z.ZodTypeAny
+> =>
   z
     .object({
       success: z.literal(true),
@@ -11,7 +17,13 @@ export const successResult = <D extends import("zod").ZodTypeAny>(zodObject: D):
     })
     .strict();
 
-export const failureResult = <E extends import("zod").ZodTypeAny>(zodObject: E): z.ZodObject<{ success: z.ZodLiteral<false>; error: E; }, "strict", z.ZodTypeAny> =>
+export const failureResult = <E extends import("zod").ZodTypeAny>(
+  zodObject: E
+): z.ZodObject<
+  { success: z.ZodLiteral<false>; error: E },
+  "strict",
+  z.ZodTypeAny
+> =>
   z
     .object({
       success: z.literal(false),
@@ -20,27 +32,55 @@ export const failureResult = <E extends import("zod").ZodTypeAny>(zodObject: E):
     .strict();
 
 // TODO FIXME this creates bad error messages - switch on enum "result" value
-export const result = <D extends import("zod").ZodTypeAny, E extends import("zod").ZodTypeAny>(successZodObject: D, failureZodObject: E): z.ZodUnion<[z.ZodObject<{ success: z.ZodLiteral<true>; data: D; }, "strict", z.ZodTypeAny>, z.ZodObject<{ success: z.ZodLiteral<false>; error: E; }, "strict", z.ZodTypeAny>]> => z.union([successResult(successZodObject), failureResult(failureZodObject)]);
+export const result = <
+  D extends import("zod").ZodTypeAny,
+  E extends import("zod").ZodTypeAny
+>(
+  successZodObject: D,
+  failureZodObject: E
+): z.ZodUnion<
+  [
+    z.ZodObject<
+      { success: z.ZodLiteral<true>; data: D },
+      "strict",
+      z.ZodTypeAny
+    >,
+    z.ZodObject<
+      { success: z.ZodLiteral<false>; error: E },
+      "strict",
+      z.ZodTypeAny
+    >
+  ]
+> =>
+  z.union([successResult(successZodObject), failureResult(failureZodObject)]);
 
 export const anyResult = result(z.any(), z.any());
 
-export const zod2result = <T extends z.ZodTypeAny>(schema: T, input: unknown): z.infer<T> => {
+export const zod2result = <T extends z.ZodTypeAny>(
+  schema: T,
+  input: unknown
+): z.infer<T> => {
   const result = schema.safeParse(input);
   if (result.success) {
     return result;
   } else {
-    const flattenedErrors = result.error.flatten()
-    console.log(result.error)
+    const flattenedErrors = result.error.flatten();
+    console.log(result.error);
 
     /** @type {{[k: string]: string[];}} */
-    const errors: { [k: string]: string[]; } = {
-      ...(flattenedErrors.formErrors.length == 0 ? {} : {formErrors: flattenedErrors.formErrors}),
-      ...flattenedErrors.fieldErrors
-    }
-    const errors2 = /** @type {Partial<{ [key in keyof z.infer<T>]: string; }>} */ (Object.fromEntries(Object.entries(errors).map(([k, v]) => [k, v.join(". ")])))
+    const errors: { [k: string]: string[] } = {
+      ...(flattenedErrors.formErrors.length == 0
+        ? {}
+        : { formErrors: flattenedErrors.formErrors }),
+      ...flattenedErrors.fieldErrors,
+    };
+    const errors2 =
+      /** @type {Partial<{ [key in keyof z.infer<T>]: string; }>} */ Object.fromEntries(
+        Object.entries(errors).map(([k, v]) => [k, v.join(". ")])
+      );
     return {
       success: false,
-      error: errors2
+      error: errors2,
     };
   }
-}
+};

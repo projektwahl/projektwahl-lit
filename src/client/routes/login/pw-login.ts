@@ -88,7 +88,6 @@ class PwLogin extends PwForm<"/api/v1/login"> {
       >
 
       <h3 class="text-center">${msg("Login as guest")}</h3>
-      
 
       <pw-text-input
         autocomplete="username"
@@ -103,7 +102,7 @@ class PwLogin extends PwForm<"/api/v1/login"> {
         autocomplete="current-password"
         .task=${this._task}
       ></pw-text-input>`;
-  };
+  }
 
   override submit = (/** @type {SubmitEvent} */ event: SubmitEvent) => {
     event.preventDefault();
@@ -114,4 +113,4 @@ class PwLogin extends PwForm<"/api/v1/login"> {
 
 customElements.define("pw-login", PwLogin);
 
-export { PwLogin }
+export { PwLogin };

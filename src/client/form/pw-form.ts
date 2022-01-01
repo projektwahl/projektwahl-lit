@@ -18,7 +18,10 @@ class PwForm<P extends keyof typeof routes> extends LitElement {
     throw new Error("not implemented");
   }
 
-  _task!: import("@lit-labs/task").Task<any, import("zod").infer<typeof import("../../lib/result.js").anyResult>>;
+  _task!: import("@lit-labs/task").Task<
+    any,
+    import("zod").infer<typeof import("../../lib/result.js").anyResult>
+  >;
 
   fakeSlot!: import("lit").TemplateResult;
 
@@ -33,9 +36,7 @@ class PwForm<P extends keyof typeof routes> extends LitElement {
   }
 
   submit = (event: SubmitEvent) => {
-
     event.preventDefault();
-
 
     this.forceTask = (this.forceTask || 0) + 1;
   };
@@ -47,7 +48,7 @@ class PwForm<P extends keyof typeof routes> extends LitElement {
   /** @abstract @type {() => import("lit").TemplateResult} */
   getInputs(): import("lit").TemplateResult {
     throw new Error(msg("getInputs must be implemented by subclass"));
-  };
+  }
 
   /** @private */ getCurrentInputElements() {
     const formDataEvent = new CustomEvent("myformdata", {
@@ -147,4 +148,4 @@ if ('FormDataEvent' in window) {
 
 customElements.define("pw-form", PwForm);
 
-export { PwForm }
+export { PwForm };

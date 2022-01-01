@@ -5,7 +5,7 @@
 /* eslint-disable no-param-reassign, no-console */
 
 // Adapted from https://github.com/open-wc/open-wc/blob/master/packages/dev-server-hmr/src/presets/litElement.js licensed under MIT License
-import { adoptStyles, LitElement } from 'lit';
+import { adoptStyles, LitElement } from "lit";
 
 // static callback
 LitElement.hotReplacedCallback = function hotReplacedCallback() {
@@ -46,7 +46,9 @@ function trackConnectedElements(hmrClass) {
   };
 
   const originalDcb = hmrClass.prototype.disconnectedCallback;
-  hmrClass.prototype.disconnectedCallback = function disconnectedCallback(...args) {
+  hmrClass.prototype.disconnectedCallback = function disconnectedCallback(
+    ...args
+  ) {
     if (originalDcb) {
       originalDcb.call(this, ...args);
     }
@@ -56,18 +58,18 @@ function trackConnectedElements(hmrClass) {
 }
 
 const proxyMethods = [
-  'construct',
-  'defineProperty',
-  'deleteProperty',
-  'getOwnPropertyDescriptor',
-  'getPrototypeOf',
-  'setPrototypeOf',
-  'isExtensible',
-  'ownKeys',
-  'preventExtensions',
-  'has',
-  'get',
-  'set',
+  "construct",
+  "defineProperty",
+  "deleteProperty",
+  "getOwnPropertyDescriptor",
+  "getPrototypeOf",
+  "setPrototypeOf",
+  "isExtensible",
+  "ownKeys",
+  "preventExtensions",
+  "has",
+  "get",
+  "set",
 ];
 
 /**
@@ -78,7 +80,7 @@ function createProxy(originalTarget, getCurrentTarget) {
   const proxyHandler = {};
   for (const method of proxyMethods) {
     proxyHandler[method] = (_, ...args) => {
-      if (method === 'get' && args[0] === 'prototype') {
+      if (method === "get" && args[0] === "prototype") {
         // prototype must always return original target value
         return Reflect[method](_, ...args);
       }
@@ -100,7 +102,8 @@ function replacePrototypesWithProxies(instance) {
     const key = keysForClasses.get(proto.constructor);
     if (key) {
       // this is a prototype that might be hot-replaced later
-      const getCurrentProto = () => proxiesForKeys.get(key).currentClass.prototype;
+      const getCurrentProto = () =>
+        proxiesForKeys.get(key).currentClass.prototype;
       Object.setPrototypeOf(previous, createProxy(proto, getCurrentProto));
     }
 
@@ -160,7 +163,10 @@ export function register(importMetaUrl, name, clazz) {
     // this class was not yet registered,
 
     // create a proxy that will forward to the latest implementation
-    const proxy = createProxy(clazz, () => proxiesForKeys.get(key).currentClass);
+    const proxy = createProxy(
+      clazz,
+      () => proxiesForKeys.get(key).currentClass
+    );
     // inject a HMR class into the inheritance chain
     injectInheritsHmrClass(clazz);
     // keep track of all connected elements for this class
@@ -180,7 +186,10 @@ export function register(importMetaUrl, name, clazz) {
 
   // register new class, all calls will be proxied to this class
   const previousProxy = existing.currentProxy;
-  const currentProxy = createProxy(clazz, () => proxiesForKeys.get(key).currentClass);
+  const currentProxy = createProxy(
+    clazz,
+    () => proxiesForKeys.get(key).currentClass
+  );
   existing.currentClass = clazz;
   existing.currentProxy = currentProxy;
 
@@ -237,16 +246,16 @@ eventSource.addEventListener("message", async function (event) {
 
     let response = await import(`${updatedUrl.toString()}?${Date.now()}`);
 
-    const name = hmrClasses.get(updatedUrl.toString())
+    const name = hmrClasses.get(updatedUrl.toString());
 
-    console.log("update", updatedUrl.toString(), name, response[name])
+    console.log("update", updatedUrl.toString(), name, response[name]);
   }
 });
 
 export function setupHmr<T>(importMetaUrl: string, name: string, clazz: T) {
-  hmrClasses.set(importMetaUrl, name)
-  
-  console.log("register", importMetaUrl, name, clazz)
+  hmrClasses.set(importMetaUrl, name);
 
-  return register(importMetaUrl, name, clazz)
+  console.log("register", importMetaUrl, name, clazz);
+
+  return register(importMetaUrl, name, clazz);
 }

@@ -20,7 +20,7 @@ export class PwCheckboxInput<T> extends LitElement {
         },
       },
       initial: {
-        attribute: false
+        attribute: false,
       },
     };
   }
@@ -33,7 +33,10 @@ export class PwCheckboxInput<T> extends LitElement {
 
   name!: keyof T;
 
-  task!: import("@lit-labs/task").Task<any, import("zod").infer<typeof import("../../lib/result.js").anyResult>>;
+  task!: import("@lit-labs/task").Task<
+    any,
+    import("zod").infer<typeof import("../../lib/result.js").anyResult>
+  >;
 
   initial: T | undefined;
 

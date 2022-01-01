@@ -23,7 +23,7 @@ export class PwTextInput<T> extends LitElement {
         },
       },
       initial: {
-        attribute: false
+        attribute: false,
       },
     };
   }
@@ -40,7 +40,10 @@ export class PwTextInput<T> extends LitElement {
 
   autocomplete!: "username" | "current-password";
 
-  task!: import("@lit-labs/task").Task<any, import("zod").infer<typeof import("../../lib/result.js").anyResult>>;
+  task!: import("@lit-labs/task").Task<
+    any,
+    import("zod").infer<typeof import("../../lib/result.js").anyResult>
+  >;
 
   initial: T | undefined;
 
@@ -73,18 +76,12 @@ export class PwTextInput<T> extends LitElement {
   override connectedCallback() {
     super.connectedCallback();
     this.form = this.closest("form")!;
-    this.form.addEventListener(
-      "myformdata",
-      this.myformdataEventListener
-    );
+    this.form.addEventListener("myformdata", this.myformdataEventListener);
   }
 
   override disconnectedCallback() {
     super.disconnectedCallback();
-    this.form.removeEventListener(
-      "myformdata",
-      this.myformdataEventListener
-    );
+    this.form.removeEventListener("myformdata", this.myformdataEventListener);
   }
 
   override render() {
@@ -143,4 +140,3 @@ export class PwTextInput<T> extends LitElement {
   }
 }
 customElements.define("pw-text-input", PwTextInput);
-

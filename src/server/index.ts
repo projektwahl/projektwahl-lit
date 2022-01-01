@@ -11,18 +11,18 @@ import { promisify } from "node:util";
 if (cluster.isPrimary) {
   console.log(`Primary is running`);
 
-  cluster.fork(); 
+  cluster.fork();
 
   for await (const f of getDirs("./src/server")) {
     (async () => {
       for await (const event of watch(f)) {
         let oldWorkers = { ...cluster.workers };
-         
+
         cluster.fork().on("listening", (address) => {
           for (const id in oldWorkers) {
             oldWorkers[id]?.send("shutdown", () => {});
           }
-        })
+        });
       }
     })();
   }
@@ -31,68 +31,71 @@ if (cluster.isPrimary) {
     (async () => {
       for await (const event of watch(f)) {
         let oldWorkers = { ...cluster.workers };
-         
+
         cluster.fork().on("listening", (address) => {
           for (const id in oldWorkers) {
             oldWorkers[id]?.send("shutdown", () => {});
           }
-        })
+        });
       }
     })();
   }
 } else {
-
-/*
+  /*
   openssl req -x509 -newkey rsa:2048 -nodes -sha256 -subj '/CN=localhost' -keyout localhost-privkey.pem -out localhost-cert.pem
   */
 
-const server = createSecureServer({
-  key: readFileSync("localhost-privkey.pem"),
-  cert: readFileSync("localhost-cert.pem"),
-});
-server.on("error", (err) => console.error(err));
+  const server = createSecureServer({
+    key: readFileSync("localhost-privkey.pem"),
+    cert: readFileSync("localhost-cert.pem"),
+  });
+  server.on("error", (err) => console.error(err));
 
-server.on("stream", async (stream, headers) => {
-  try {
-    await (await import(`./server-handler.js`)).serverHandler(stream, headers);
-  } catch (error) {
-    // don't take down the entire server
-    // TODO FIXME try sending a 500 in a try catch
-    console.error(error);
-  }
-});
+  server.on("stream", async (stream, headers) => {
+    try {
+      await (
+        await import(`./server-handler.js`)
+      ).serverHandler(stream, headers);
+    } catch (error) {
+      // don't take down the entire server
+      // TODO FIXME try sending a 500 in a try catch
+      console.error(error);
+    }
+  });
 
-let sessions: import("node:http2").ServerHttp2Session[] = [];
+  let sessions: import("node:http2").ServerHttp2Session[] = [];
 
-server.on("session", (session) => {
-  sessions.push(session)
+  server.on("session", (session) => {
+    sessions.push(session);
 
-  session.on("close", () => {
-    // TODO FIXME this is super SLOW
-    sessions = sessions.filter(s => s === session)
-  })
-})
+    session.on("close", () => {
+      // TODO FIXME this is super SLOW
+      sessions = sessions.filter((s) => s === session);
+    });
+  });
 
-server.listen(8443, () => {
-  console.log(`[${cluster.worker?.id}] Server started at https://localhost:8443/`);
-});
+  server.listen(8443, () => {
+    console.log(
+      `[${cluster.worker?.id}] Server started at https://localhost:8443/`
+    );
+  });
 
-cluster.worker?.on("message", async (message) => {
-  //let getConnections = promisify(server.getConnections).bind(server)
-  //console.log(await getConnections())
+  cluster.worker?.on("message", async (message) => {
+    //let getConnections = promisify(server.getConnections).bind(server)
+    //console.log(await getConnections())
 
-  if (message === "shutdown") {
-    console.log(`[${cluster.worker?.id}] Shutting down`);
-    server.close()
+    if (message === "shutdown") {
+      console.log(`[${cluster.worker?.id}] Shutting down`);
+      server.close();
 
-    sessions.forEach(session => {
-      session.close()
-    })
+      sessions.forEach((session) => {
+        session.close();
+      });
 
-    cluster.worker?.removeAllListeners("message")
-    cluster.worker?.kill()
-  }
-});
+      cluster.worker?.removeAllListeners("message");
+      cluster.worker?.kill();
+    }
+  });
 }
 
 //repl.start({})

@@ -12,8 +12,8 @@ import { z } from "zod";
 import { createOrUpdateProjectsHandler } from "./routes/projects/create-or-update.js";
 import { cwd } from "node:process";
 import { projectsHandler } from "./routes/projects/index.js";
-import esbuild from 'esbuild'
-import {resolve as loaderResolve, load as loaderLoad} from '../loader.js'
+import esbuild from "esbuild";
+import { resolve as loaderResolve, load as loaderLoad } from "../loader.js";
 
 //const startTime = Date.now();
 
@@ -28,7 +28,11 @@ export async function* getDirs(dir: string): AsyncIterable<string> {
   }
 }
 
-async function replaceAsync(str: string, regex: RegExp, asyncFn: (match: string, args: any) => Promise<string>): Promise<string> {
+async function replaceAsync(
+  str: string,
+  regex: RegExp,
+  asyncFn: (match: string, args: any) => Promise<string>
+): Promise<string> {
   const promises: Promise<string>[] = [];
   str.replaceAll(regex, (match, ...args) => {
     const promise = asyncFn(match, args);
@@ -39,7 +43,10 @@ async function replaceAsync(str: string, regex: RegExp, asyncFn: (match: string,
   return str.replaceAll(regex, () => data.shift() as string);
 }
 
-export async function serverHandler(stream: import("http2").ServerHttp2Stream, headers: import("http").IncomingHttpHeaders) {
+export async function serverHandler(
+  stream: import("http2").ServerHttp2Stream,
+  headers: import("http").IncomingHttpHeaders
+) {
   const path = z.string().parse(headers[":path"]);
 
   let url = new URL(path, "https://localhost:8443");
@@ -54,7 +61,7 @@ export async function serverHandler(stream: import("http2").ServerHttp2Stream, h
       }
     );
   } else if (url.pathname === "/api/v1/hmr") {
-    console.log("got request")
+    console.log("got request");
     stream.respond({
       ":status": 200,
       "content-type": "text/event-stream",
@@ -64,8 +71,8 @@ export async function serverHandler(stream: import("http2").ServerHttp2Stream, h
       (async () => {
         for await (const event of watch(f)) {
           let baseUrl = resolve(fileURLToPath(import.meta.url), "../../..");
-          
-          let url = relative(baseUrl, join(f, event.filename))
+
+          let url = relative(baseUrl, join(f, event.filename));
 
           stream.write(`data: ${url}\n\n`);
         }
@@ -110,24 +117,32 @@ export async function serverHandler(stream: import("http2").ServerHttp2Stream, h
       try {
         //console.log(filename)
 
-        const resolved = await loaderResolve(filename, {
-          parentURL: import.meta.url
-        }, (specifier, context, defaultResolve) => {
-          const baseURL = pathToFileURL(`${cwd()}/`).href;
-          const { parentURL = baseURL } = context;
-          const targetUrl = new URL(specifier, parentURL)
-          return {
-            url: targetUrl.href
-          };
-        })
+        const resolved = await loaderResolve(
+          filename,
+          {
+            parentURL: import.meta.url,
+          },
+          (specifier, context, defaultResolve) => {
+            const baseURL = pathToFileURL(`${cwd()}/`).href;
+            const { parentURL = baseURL } = context;
+            const targetUrl = new URL(specifier, parentURL);
+            return {
+              url: targetUrl.href,
+            };
+          }
+        );
         //console.log("resolvd", resolved.url)
-        const loaded = await loaderLoad(resolved.url, undefined, async (url: string) => {
-          return {
-            source: await readFile(fileURLToPath(url), {
-              encoding: "utf-8",
-            })
-          };
-        })
+        const loaded = await loaderLoad(
+          resolved.url,
+          undefined,
+          async (url: string) => {
+            return {
+              source: await readFile(fileURLToPath(url), {
+                encoding: "utf-8",
+              }),
+            };
+          }
+        );
         let contents = loaded.source;
 
         if (extname(filename) === ".js" || extname(filename) === ".ts") {
@@ -173,7 +188,7 @@ export async function serverHandler(stream: import("http2").ServerHttp2Stream, h
         });
         stream.end(contents);
       } catch (error) {
-        console.error(error)
+        console.error(error);
         stream.respond(
           {
             ":status": 404,

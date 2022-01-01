@@ -7,7 +7,7 @@ import { ifDefined } from "lit/directives/if-defined.js";
 import { setupHmr } from "../hmr.js";
 import { msg } from "@lit/localize";
 import { createRef, ref } from "lit/directives/ref.js";
-import {repeat} from 'lit/directives/repeat.js';
+import { repeat } from "lit/directives/repeat.js";
 
 // TODO FIXME make generic over keyof T
 export class PwSelectInput<T> extends LitElement {
@@ -24,7 +24,7 @@ export class PwSelectInput<T> extends LitElement {
         },
       },
       initial: {
-        attribute: false
+        attribute: false,
       },
     };
   }
@@ -37,7 +37,10 @@ export class PwSelectInput<T> extends LitElement {
 
   name!: keyof T;
 
-  task!: import("@lit-labs/task").Task<any, import("zod").infer<typeof import("../../lib/result.js").anyResult>>;
+  task!: import("@lit-labs/task").Task<
+    any,
+    import("zod").infer<typeof import("../../lib/result.js").anyResult>
+  >;
 
   initial: T | undefined;
 
@@ -45,7 +48,7 @@ export class PwSelectInput<T> extends LitElement {
 
   input;
 
-  options!: { value: string, text: string }[];
+  options!: { value: string; text: string }[];
 
   constructor() {
     super();
@@ -110,7 +113,17 @@ export class PwSelectInput<T> extends LitElement {
           name=${this.name.toString()}
           id=${this.randomId}
         >
-          ${repeat(this.options, (o) => o.value, (o) => html`<option ?selected=${this.initial?.[this.name] === o.value} value=${o.value}>${o.text}</option>`)}
+          ${repeat(
+            this.options,
+            (o) => o.value,
+            (o) =>
+              html`<option
+                ?selected=${this.initial?.[this.name] === o.value}
+                value=${o.value}
+              >
+                ${o.text}
+              </option>`
+          )}
         </select>
         ${this.task.render({
           complete: (v) =>
@@ -131,4 +144,3 @@ export class PwSelectInput<T> extends LitElement {
   }
 }
 customElements.define("pw-select-input", PwSelectInput);
-

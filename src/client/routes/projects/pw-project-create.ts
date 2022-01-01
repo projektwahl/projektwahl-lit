@@ -2,33 +2,32 @@
 // SPDX-FileCopyrightText: 2021 Moritz Hedtke <Moritz.Hedtke@t-online.de>
 import { html } from "lit";
 import "../../form/pw-form.js";
-import { Task, TaskStatus } from "@lit-labs/task";
+import { Task } from "@lit-labs/task";
 import { myFetch } from "../../utils.js";
 import { PwForm } from "../../form/pw-form.js";
 import { HistoryController } from "../../history-controller.js";
-import { setupHmr } from "../../hmr.js";
 import { msg } from "@lit/localize";
 import "../../form/pw-number-input.js";
 import "../../form/pw-text-input.js";
 import "../../form/pw-checkbox-input.js";
 import type { z } from "zod";
 import type { rawProjectSchema } from "../../../lib/routes.js";
+import "./pw-project-users.js";
 
 export async function pwProject(id: number) {
   let result = await taskFunction([id]);
-  return html`<pw-project-create .initial=${result}></pw-project-create>`
+  return html`<pw-project-create .initial=${result}></pw-project-create>`;
 }
 
-const taskFunction = async ([id]: [number]
-  ) => {
-    let response = await fetch(
-      new URL(`/api/v1/projects/?f_id=${id}`, window.location.href).toString(),
-      {
-        //agent: new Agent({rejectUnauthorized: false})
-      }
-    );
-    return (await response.json()).entities[0];
-  };
+const taskFunction = async ([id]: [number]) => {
+  let response = await fetch(
+    new URL(`/api/v1/projects/?f_id=${id}`, window.location.href).toString(),
+    {
+      //agent: new Agent({rejectUnauthorized: false})
+    }
+  );
+  return (await response.json()).entities[0];
+};
 
 export class PwProjectCreate extends PwForm<"/api/v1/projects/create-or-update"> {
   static override get properties() {
@@ -66,7 +65,9 @@ export class PwProjectCreate extends PwForm<"/api/v1/projects/create-or-update">
     this._task = new Task(
       this,
       async () => {
-        const formDataEvent = new CustomEvent<Partial<z.infer<typeof rawProjectSchema>>>("myformdata", {
+        const formDataEvent = new CustomEvent<
+          Partial<z.infer<typeof rawProjectSchema>>
+        >("myformdata", {
           bubbles: true,
           composed: true,
           detail: {},
@@ -150,7 +151,22 @@ export class PwProjectCreate extends PwForm<"/api/v1/projects/create-or-update">
         .initial=${this.initial}
       ></pw-number-input>
 
-      <!-- Betreuer, Projektleiter (Schüler) -->
+      <!-- Projektleitende -->
+      ${this.initial
+        ? html`<pw-project-users
+            projectId=${this.initial.id!}
+            name=${"project_leader_id"}
+            title=${msg("Project leaders")}
+          ></pw-project-users>`
+        : html``}
+
+      ${this.initial
+        ? html`<pw-project-users
+            projectId=${this.initial.id!}
+            name=${"force_in_project_id"}
+            title=${msg("Guaranteed project members")}
+          ></pw-project-users>`
+        : html``}
 
       <pw-checkbox-input
         label=${msg("Allow random assignments")}

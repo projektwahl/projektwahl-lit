@@ -31,12 +31,12 @@ import { pwUser } from "./routes/users/pw-user-create.js";
 
 // TODO FIXME show more details if possible (maybe error page)
 window.addEventListener("error", function (event) {
-  console.error(event.error)
+  console.error(event.error);
   alert("unknown error: " + event.message);
 });
 
 window.addEventListener("unhandledrejection", function (event) {
-  console.error(event.promise)
+  console.error(event.promise);
   alert("unknown error: " + event.reason);
 });
 
@@ -67,7 +67,9 @@ export const nextPage = async (url: URL) => {
     } else if (url.pathname === "/projects/create") {
       return html`<pw-project-create></pw-project-create>`;
     } else if (/projects\/edit\/\d+/.test(url.pathname)) {
-      return await pwProject(Number(url.pathname.match(/projects\/edit\/(\d+)/)![1]));
+      return await pwProject(
+        Number(url.pathname.match(/projects\/edit\/(\d+)/)![1])
+      );
     } else {
       return msg(html`Not Found`);
     }
@@ -78,7 +80,7 @@ export const nextPage = async (url: URL) => {
   }
 };
 
- class PwApp extends LitElement {
+class PwApp extends LitElement {
   static override get properties() {
     return {
       last: { state: true },
@@ -116,7 +118,7 @@ export const nextPage = async (url: URL) => {
     }
     return html`
       ${bootstrapCss}
-      
+
       <nav
         class="navbar navbar-expand-lg navbar-light bg-light shadow p-3 mb-5"
       >
@@ -193,7 +195,9 @@ export const nextPage = async (url: URL) => {
                         active: this.history.url.pathname === "/login",
                       })}"
                       href="/login"
-                      >${msg(str`Login ${JSON.stringify(jscookie.get("username"))}`)}</a
+                      >${msg(
+                        str`Login ${JSON.stringify(jscookie.get("username"))}`
+                      )}</a
                     >
                   </li>`}
             </ul>
@@ -212,11 +216,14 @@ export const nextPage = async (url: URL) => {
         )}
       </div>
 
-      ${until(this.current.catch((error) => error), this.last?.catch((error) => error))}
+      ${until(
+        this.current.catch((error) => error),
+        this.last?.catch((error) => error)
+      )}
     `;
   }
-};
+}
 
 customElements.define("pw-app", PwApp);
 
-export { PwApp }
+export { PwApp };

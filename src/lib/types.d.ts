@@ -3,7 +3,6 @@
 
 // TODO FIXME remove all this and convert to zod
 
-
 type RawChoiceType = {
   user_id: number;
   project_id: number;
@@ -23,7 +22,7 @@ type EntityResponseBody<T> = {
 };
 
 type FilterType<Type> = {
-  [Property in keyof Type as `f_${string & Property}`]?: Type[Property]
+  [Property in keyof Type as `f_${string & Property}`]?: Type[Property];
 };
 
 type BaseQuery<C> = {
@@ -31,7 +30,6 @@ type BaseQuery<C> = {
   paginationCursor: C | null; // if this is null the start is at start/end depending on paginationDirection
   sorting: [keyof C, "ASC" | "DESC"][];
   paginationLimit: number;
-  filters: FilterType<C>
 };
 
 export interface WritableTemplateStringsArray extends Array<string> {
