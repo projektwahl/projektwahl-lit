@@ -26,7 +26,7 @@ export async function createOrUpdateProjectsHandler(
           {
             success: false as const,
             error: {
-              forbidden: "Forbidden!"
+              forbidden: "Insufficient permissions!"
             },
           },
         ];
@@ -82,6 +82,20 @@ export async function createOrUpdateProjectsHandler(
           }
         });
 
+        if (!row) { // insufficient permissions
+          return [
+            {
+              "content-type": "text/json; charset=utf-8",
+              ":status": 403,
+            },
+            {
+              success: false as const,
+              error: {
+                forbidden: "Insufficient permissions!"
+              },
+            },
+          ];
+        }
         return [
           {
             "content-type": "text/json; charset=utf-8",
