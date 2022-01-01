@@ -71,7 +71,7 @@ export function request<P extends keyof typeof routes>(
           const session_id = headers[":method"] === "GET" ? cookies.lax_id : cookies.strict_id;
           if (session_id) {
             user = userSchema.parse((await sql.begin('READ WRITE', async (sql) => {
-              await sql`DELETE FROM sessions WHERE CURRENT_TIMESTAMP >= updated_at + interval '24 hours'`
+              //await sql`DELETE FROM sessions WHERE CURRENT_TIMESTAMP >= updated_at + interval '24 hours' AND session_id != ${session_id} `
               return await sql`UPDATE sessions SET updated_at = CURRENT_TIMESTAMP FROM users WHERE users.id = sessions.user_id AND session_id = ${session_id} AND CURRENT_TIMESTAMP < updated_at + interval '24 hours' RETURNING users.id, users.type, users.username, users.group, users.age`;
             }))[0]);
             console.log(user)

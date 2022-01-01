@@ -2,6 +2,7 @@
 -- SPDX-FileCopyrightText: 2021 Moritz Hedtke <Moritz.Hedtke@t-online.de>
 
 -- if you remove this you get a CVE for free - so don't. (because the triggers can have race conditions then)
+-- https://www.postgresql.org/docs/current/transaction-iso.html
 ALTER DATABASE projektwahl SET default_transaction_isolation = 'serializable';
 ALTER DATABASE projektwahl SET default_transaction_read_only = true;
 
