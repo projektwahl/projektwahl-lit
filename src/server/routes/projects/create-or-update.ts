@@ -12,7 +12,26 @@ export async function createOrUpdateProjectsHandler(
   return await request(
     "POST",
     "/api/v1/projects/create-or-update",
-    async function (project) {
+    async function (project, user) {
+      // admin is allowed to do everything
+      // helper is allowed to create projects and change their own projects
+      // voter is not allowed to do anything
+
+      if (!(user?.type === "admin" || user?.type === "helper")) {
+        return [
+          {
+            "content-type": "text/json; charset=utf-8",
+            ":status": 403,
+          },
+          {
+            success: false as const,
+            error: {
+              forbidden: "Forbidden!"
+            },
+          },
+        ];
+      }
+
       try {
         let [row] = await sql.begin("READ WRITE", async (sql) => {
           if (project.id) {
@@ -44,12 +63,13 @@ export async function createOrUpdateProjectsHandler(
     random_assignments = CASE WHEN ${
       project.random_assignments !== undefined
     } THEN ${project.random_assignments ?? null} ELSE random_assignments END
-    WHERE id = ${project.id} RETURNING id;`;
+    FROM users WHERE id = ${project.id} AND users.id = ${user.id} AND (users.project_leader_id = ${project.id} AND users.type = 'helper' OR users.type = 'admin') RETURNING id;`;
           } else {
             // TODO FIXME we can use our nice query building here
             // or postgres also has builtin features for insert and update
-            return await sql`INSERT INTO projects (title, info, place, costs, min_age, max_age, min_participants, max_participants, random_assignments) VALUES
-    (${project.title ?? null},
+            return await sql`INSERT INTO projects (title, info, place, costs, min_age, max_age, min_participants, max_participants, random_assignments)
+            (SELECT 
+    ${project.title ?? null},
     ${project.info ?? null},
     ${project.place ?? null},
     ${project.costs ?? 0},
@@ -57,7 +77,7 @@ export async function createOrUpdateProjectsHandler(
     ${project.max_age ?? null},
     ${project.min_participants ?? null},
     ${project.max_participants ?? null},
-    ${project.random_assignments ?? false})
+    ${project.random_assignments ?? false} FROM users WHERE users.id = ${user.id} AND (users.type = 'helper' OR users.type = 'admin'))
     RETURNING id;`;
           }
         });
