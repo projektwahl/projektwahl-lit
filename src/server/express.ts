@@ -43,8 +43,8 @@ export function request<P extends keyof typeof routes>(
         // implementing https://datatracker.ietf.org/doc/html/draft-ietf-httpbis-rfc6265bis-02#section-8.8.2
         const session_id = headers[":method"] === "GET" ? cookies.lax_id : cookies.strict_id;
         if (session_id) {
-          await sql.begin('READ WRITE', async (sql) => {
-            const [user] = await sql`SELECT id, type FROM users, sessions WHERE users.id = sessions.user_id AND session_id = ${session_id}`;
+          const [user] = await sql.begin('READ WRITE', async (sql) => {
+            return await sql`UPDATE sessions SET updated_at = CURRENT_TIMESTAMP FROM users WHERE users.id = sessions.user_id AND session_id = ${session_id} AND CURRENT_TIMESTAMP < updated_at + interval '24 hours' RETURNING users.*`;
           });
           console.log(user)
         }
