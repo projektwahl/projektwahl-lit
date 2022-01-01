@@ -33,11 +33,9 @@ export const failureResult = <E extends import("zod").ZodTypeAny>(
 
 // TODO FIXME this creates bad error messages - switch on enum "result" value
 export const result = <
-  D extends import("zod").ZodTypeAny,
-  E extends import("zod").ZodTypeAny
+  D extends import("zod").ZodTypeAny
 >(
   successZodObject: D,
-  failureZodObject: E
 ): z.ZodUnion<
   [
     z.ZodObject<
@@ -52,9 +50,9 @@ export const result = <
     >
   ]
 > =>
-  z.union([successResult(successZodObject), failureResult(failureZodObject)]);
+  z.union([successResult(successZodObject), failureResult(z.record(z.string()))]);
 
-export const anyResult = result(z.any(), z.any());
+export const anyResult = result(z.any());
 
 export const zod2result = <T extends z.ZodTypeAny>(
   schema: T,

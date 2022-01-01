@@ -134,7 +134,7 @@ export const rawSessionType = z.object({
   user_id: z.number(),
 });
 
-export const loginOutputSchema = result(z.null(), z.record(z.string()));
+export const loginOutputSchema = result(z.null());
 
 export type keys =
   | "/api/v1/login"
@@ -148,8 +148,19 @@ export type keys =
   | "/api/v1/users"
   | "/api/v1/projects";
 
-function identity<
-  T extends { [r in keys]: { request: ZodType<any>; response: ZodType<any> } }
+function identity<T extends { [r in keys]: { request: z.ZodTypeAny; response: z.ZodUnion<
+    [
+      z.ZodObject<
+        { success: z.ZodLiteral<true>; data: z.ZodTypeAny },
+        "strict",
+        z.ZodTypeAny
+      >,
+      z.ZodObject<
+        { success: z.ZodLiteral<false>; error: z.ZodTypeAny },
+        "strict",
+        z.ZodTypeAny
+      >
+    ]> } }
 >(v: T) {
   return v;
 }
@@ -227,7 +238,7 @@ const project = rawProjectSchema.pick({
 export const routes = identity({
   "/api/v1/logout": {
     request: z.any(),
-    response: z.any(),
+    response: result(z.any()),
   },
   "/api/v1/login": {
     request: loginInputSchema,
@@ -235,19 +246,19 @@ export const routes = identity({
   },
   "/api/v1/openid-login": {
     request: z.any(),
-    response: z.any(),
+    response: result(z.any()),
   },
   "/api/v1/redirect": {
     request: z.any(),
-    response: z.any(),
+    response: result(z.any()),
   },
   "/api/v1/sleep": {
     request: z.undefined(),
-    response: z.undefined(),
+    response: result(z.any()),
   },
   "/api/v1/update": {
     request: z.undefined(),
-    response: z.number(),
+    response: result(z.number()),
   },
   "/api/v1/users/create-or-update": {
     request: rawUserSchema(
@@ -255,20 +266,18 @@ export const routes = identity({
       usersCreateOrUpdate(rawUserHelperOrAdminSchema)
     ),
     response: result(
-      z.object({}).extend({ id: z.number() }),
-      z.record(z.string())
+      z.object({}).extend({ id: z.number() })
     ),
   },
   "/api/v1/projects/create-or-update": {
     request: makeCreateOrUpdate(rawProjectSchema),
     response: result(
-      z.object({}).extend({ id: z.number() }),
-      z.record(z.string())
+      z.object({}).extend({ id: z.number() })
     ),
   },
   "/api/v1/users": {
     request: z.undefined(),
-    response: z.object({
+    response: result(z.object({
       entities: z.array(
         rawUserSchema(
           users(rawUserVoterSchema),
@@ -283,15 +292,15 @@ export const routes = identity({
         users(rawUserVoterSchema),
         users(rawUserHelperOrAdminSchema)
       ).nullable(),
-    }),
+    })),
   },
   "/api/v1/projects": {
     request: z.undefined(),
-    response: z.object({
+    response: result(z.object({
       entities: z.array(project),
       previousCursor: project.nullable(),
       nextCursor: project.nullable(),
-    }),
+    })),
   },
 } as const);
 
