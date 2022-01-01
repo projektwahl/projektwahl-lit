@@ -6,6 +6,8 @@ import { myFetch } from "../../utils.js";
 import { createRef, ref } from "lit/directives/ref.js";
 import { msg } from "@lit/localize";
 import { bootstrapCss } from "../../index.js";
+import type { routes } from "../../../lib/routes.js";
+import type { z } from "zod";
 
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // SPDX-FileCopyrightText: 2021 Moritz Hedtke <Moritz.Hedtke@t-online.de>
@@ -16,7 +18,7 @@ class PwProjectLeaderCheckbox extends LitElement {
           _task: { state: true },
           forceTask: { state: true },
           disabled: { state: true },
-          userId: { type: Number },
+          user: { attribute: false },
           projectId: { type: Number }
         };
       }
@@ -28,7 +30,7 @@ class PwProjectLeaderCheckbox extends LitElement {
     any
   >;
 
-  userId!: number;
+  user!: z.infer<typeof routes["/api/v1/users"]["response"]>["entities"][number];
 
   projectId!: number;
 
@@ -54,7 +56,7 @@ class PwProjectLeaderCheckbox extends LitElement {
             "content-type": "text/json",
           },
           body: JSON.stringify({
-            id: this.userId,
+            id: this.user.id,
             project_leader_id: this.projectId
           }),
         });
@@ -97,7 +99,7 @@ class PwProjectLeaderCheckbox extends LitElement {
           }}
           type="checkbox"
           ?disabled=${this._task.status === TaskStatus.PENDING}
-          checked=${true/* TODO FIXME */}
+          ?checked=${this.user.project_leader_id === this.projectId}
           class="form-check-input"
         />
     </form>`;

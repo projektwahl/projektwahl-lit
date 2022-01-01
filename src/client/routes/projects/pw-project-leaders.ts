@@ -99,7 +99,7 @@ class PwProjectLeaders extends PwUsers {
         return result.entities.map(
           (value) => html`<tr>
             <td>
-              <pw-project-leader-checkbox projectId=${this.projectId} userId=${value.id!}></pw-project-leader-checkbox>
+              <pw-project-leader-checkbox projectId=${this.projectId} .user=${value}></pw-project-leader-checkbox>
             </td>
             <th scope="row">
               <p>${value.id}</p>

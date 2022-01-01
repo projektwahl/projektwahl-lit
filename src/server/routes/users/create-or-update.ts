@@ -11,6 +11,9 @@ function updateField(entity: any, name: string) {
   } THEN ${entity[name] ?? null} ELSE "${unsafe2(name)}" END`;
 }
 
+// TODO FIXME somehow ensure all attributes are read here because this is an easy way to loose data
+// Also ensure create and update has the same attributes
+
 export async function createOrUpdateUsersHandler(
   stream: import("http2").ServerHttp2Stream,
   headers: import("http2").IncomingHttpHeaders
@@ -34,17 +37,18 @@ export async function createOrUpdateUsersHandler(
             ${field("type")},
             ${field("group")},
             ${field("age")},
-            ${field("away")}
+            ${field("away")},
+            ${field("project_leader_id")}
             WHERE id = ${user.id} RETURNING id;`;
             return await sql(...finalQuery);
           } else {
-            return await sql`INSERT INTO users (username, password_hash, type, "group", age, away) VALUES (${
+            return await sql`INSERT INTO users (username, password_hash, type, "group", age, away, project_leader_id) VALUES (${
               user.username ?? null
             }, ${user.password ? await hashPassword(user.password) : null}, ${
               user.type ?? null
             }, ${user.type === "voter" ? user.group ?? null : null}, ${
               user.type === "voter" ? user.age ?? null : null
-            }, ${user.away ?? false}) RETURNING id;`;
+            }, ${user.away ?? false}, ${user.project_leader_id ?? null}) RETURNING id;`;
           }
         });
 

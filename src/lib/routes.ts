@@ -25,7 +25,7 @@ const rawUserCommon = {
   password_hash: z.string(),
   password_salt: z.string(),
   away: z.boolean(),
-  project_leader_id: z.number(),
+  project_leader_id: z.number().nullable(),
   password_changed: z.boolean(),
   force_in_project_id: z.number(),
   computed_in_project_id: z.number(),
@@ -62,7 +62,7 @@ export const rawUserSchema = <
 ) =>
   z
     .object({
-      type: z.enum(["helper", "admin", "voter"]),
+      type: z.enum(["helper", "admin", "voter"]).optional(),
     })
     .passthrough()
     .superRefine((value, ctx) => {
@@ -168,6 +168,7 @@ const usersCreateOrUpdate = <
         id: true,
         type: true,
         username: true,
+        project_leader_id: true,
       })
       .extend({
         password: z.string().optional(),
@@ -200,6 +201,7 @@ const users = <
     group: true,
     age: true,
     away: true,
+    project_leader_id: true,
   });
 
 const project = rawProjectSchema.pick({
