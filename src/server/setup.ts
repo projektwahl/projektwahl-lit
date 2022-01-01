@@ -44,7 +44,7 @@ await sql.begin("READ WRITE", async (sql) => {
     // TODO we could use that admin URL
     // Remove all user sessions associated with the user Also send notification to all clients that have an admin URL to invalidate the sessions for the particular user.
     /*
-		const response = await fetch(process.env['OPENID_ADMIN_URL']!, {
+		const response = await myFetch(process.env['OPENID_ADMIN_URL']!, {
 			method: 'POST',
 			headers: {
 				Accept: 'application/json',
@@ -61,7 +61,7 @@ await sql.begin("READ WRITE", async (sql) => {
 		console.log(await response.text());
 		console.log(response.headers);
 		console.log(response.headers.get('location'));
-		const userResponse = await fetch(response.headers.get('location')!, {
+		const userResponse = await myFetch(response.headers.get('location')!, {
 			method: 'GET',
 			headers: {
 				Accept: 'application/json',

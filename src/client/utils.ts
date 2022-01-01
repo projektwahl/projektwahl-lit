@@ -4,10 +4,16 @@
 import type { z } from "zod";
 
 export const myFetch = async <P extends import("../lib/routes").keys>(
-  url: P,
+  url: `${P}${string}`,
   options: RequestInit | undefined
 ): Promise<z.infer<typeof import("../lib/routes").routes[P]["response"]>> => {
-  const response = await fetch(url.toString(), options);
+  const response = await fetch(url.toString(), {
+    ...options,
+    headers: {
+      ...options?.headers,
+      "x-csrf-protection": "projektwahl",
+    },
+  });
   if (!response.ok) {
     try {
       const additionalInfo = await response.text();

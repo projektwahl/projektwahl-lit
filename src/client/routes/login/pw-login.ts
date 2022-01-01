@@ -11,7 +11,7 @@ import "../../form/pw-text-input.js";
 import { setupHmr } from "../../hmr.js";
 
 export const pwLogin = async (): Promise<import("lit").TemplateResult> => {
-  const content = 0; //await fetch("/api/v1/sleep").then((r) => r.text());
+  const content = 0; //await myFetch<"/api/v1/sleep">("/api/v1/sleep").then((r) => r.text());
   return html`<pw-login .data=${content}></pw-login>`;
 };
 
@@ -49,7 +49,7 @@ class PwLogin extends PwForm<"/api/v1/login"> {
         });
         this.form.value?.dispatchEvent(formDataEvent);
 
-        let result = await myFetch("/api/v1/login", {
+        let result = await myFetch<"/api/v1/login">("/api/v1/login", {
           method: "POST",
           headers: {
             "content-type": "text/json",
