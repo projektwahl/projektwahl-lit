@@ -32,7 +32,7 @@ export async function loginHandler(
     const dbUser = rawUserSchema(
       users(rawUserVoterSchema),
       users(rawUserHelperOrAdminSchema),
-    ).parse(
+    ).optional().parse(
       r[0]
     );
 
