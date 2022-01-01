@@ -15,7 +15,7 @@ export const pwProjectUsers = async (url: URL) => {
   return html`<pw-project-users .initial=${result}></pw-project-users>`;
 };
 
-const PwProjectUsers = setupHmr(
+export const PwProjectUsers = setupHmr(
   import.meta.url,
   "PwProjectUsers",
   class PwProjectUsers extends PwUsers {

@@ -39,7 +39,8 @@ export function request<P extends keyof typeof routes>(
   path: P,
   handler: (
     r: z.infer<typeof routes[P]["request"]>,
-    user: z.infer<typeof userSchema>
+    user: z.infer<typeof userSchema>,
+    session_id: string | undefined
   ) => Promise<[OutgoingHttpHeaders, z.infer<typeof routes[P]["response"]>]>
 ): (
   stream: ServerHttp2Stream,
@@ -64,15 +65,16 @@ export function request<P extends keyof typeof routes>(
         new RegExp(path).test(/** @type {string} */ url.pathname)
       ) {
         let user = undefined;
+        let session_id: string | undefined = undefined;
         if (headers.cookie) {
           var cookies = cookie.parse(headers.cookie);
   
           // implementing https://datatracker.ietf.org/doc/html/draft-ietf-httpbis-rfc6265bis-02#section-8.8.2
-          const session_id = headers[":method"] === "GET" ? cookies.lax_id : cookies.strict_id;
+          session_id = headers[":method"] === "GET" ? cookies.lax_id : cookies.strict_id;
           if (session_id) {
             user = userSchema.parse((await retryableBegin('READ WRITE', async (sql) => {
               //await sql`DELETE FROM sessions WHERE CURRENT_TIMESTAMP >= updated_at + interval '24 hours' AND session_id != ${session_id} `
-              return await sql`UPDATE sessions SET updated_at = CURRENT_TIMESTAMP FROM users WHERE users.id = sessions.user_id AND session_id = ${session_id} AND CURRENT_TIMESTAMP < updated_at + interval '24 hours' RETURNING users.id, users.type, users.username, users.group, users.age`;
+              return await sql`UPDATE sessions SET updated_at = CURRENT_TIMESTAMP FROM users WHERE users.id = sessions.user_id AND session_id = ${session_id!} AND CURRENT_TIMESTAMP < updated_at + interval '24 hours' RETURNING users.id, users.type, users.username, users.group, users.age`;
             }))[0]);
             //console.log(user)
           }
@@ -82,7 +84,7 @@ export function request<P extends keyof typeof routes>(
           headers[":method"] === "POST" ? await json(stream) : undefined;
         const requestBody = zod2result(routes[path].request, body);
         if (requestBody.success) {
-          const [new_headers, responseBody] = await handler(requestBody.data, user);
+          const [new_headers, responseBody] = await handler(requestBody.data, user, session_id);
           //console.log("responseBody", responseBody);
           routes[path].response.parse(responseBody);
           stream.respond(new_headers);

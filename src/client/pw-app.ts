@@ -22,6 +22,7 @@ import { sourceLocale, targetLocales } from "./generated_locales/locales.js";
 import { pwProjects } from "./routes/projects/pw-projects.js";
 import { pwProject } from "./routes/projects/pw-project-create.js";
 import { pwUser } from "./routes/users/pw-user-create.js";
+import { myFetch } from "./utils.js";
 
 /**export const { getLocale, setLocale } = configureLocalization({
   sourceLocale,
@@ -80,7 +81,10 @@ export const nextPage = async (url: URL) => {
   }
 };
 
-class PwApp extends LitElement {
+export const PwApp = setupHmr(
+  import.meta.url,
+  "PwApp",
+  class PwApp extends LitElement {
   static override get properties() {
     return {
       last: { state: true },
@@ -184,7 +188,13 @@ class PwApp extends LitElement {
             <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
               ${jscookie.get("username")
                 ? html`<li class="nav-item">
-                    <a @click=${aClick} class="nav-link" href="#"
+                    <a @click=${async () => {
+                      await myFetch<"/api/v1/logout">("/api/v1/logout", {
+                        method: "POST",
+                        body: "{}",
+                      })
+                      HistoryController.goto(new URL("/login", window.location.href), {})
+                    }} class="nav-link" href="#"
                       >${msg(str`Logout ${jscookie.get("username")}`)}</a
                     >
                   </li>`
@@ -222,8 +232,6 @@ class PwApp extends LitElement {
       )}
     `;
   }
-}
+})
 
 customElements.define("pw-app", PwApp);
-
-export { PwApp };

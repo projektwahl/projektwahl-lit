@@ -14,6 +14,7 @@ import { cwd } from "node:process";
 import { projectsHandler } from "./routes/projects/index.js";
 import esbuild from "esbuild";
 import { resolve as loaderResolve, load as loaderLoad } from "../loader.js";
+import { logoutHandler } from "./routes/login/logout.js";
 
 //const startTime = Date.now();
 
@@ -82,6 +83,7 @@ export async function serverHandler(
     // TODO FIXME store this in a routing table and automatically extract types from that
     let executed =
       (await loginHandler(stream, headers)) ||
+      (await logoutHandler(stream, headers)) ||
       (await openidLoginHandler(stream, headers)) ||
       (await openidRedirectHandler(stream, headers)) ||
       (await sleepHandler(stream, headers)) ||

@@ -112,13 +112,13 @@ export async function loginHandler(
       "set-cookie": [
         `strict_id=${
           session.session_id
-        }; Secure; SameSite=Strict; HttpOnly; Max-Age=${48 * 60 * 60};`,
+        }; Secure; Path=/; SameSite=Strict; HttpOnly; Max-Age=${48 * 60 * 60};`,
         `lax_id=${
           session.session_id
-        }; Secure; SameSite=Lax; HttpOnly; Max-Age=${48 * 60 * 60};`,
+        }; Secure; Path=/; SameSite=Lax; HttpOnly; Max-Age=${48 * 60 * 60};`,
         `username=${
           dbUser.username
-        }; Secure; SameSite=Strict; Path=/; Max-Age=${48 * 60 * 60};`,
+        }; Secure; Path=/; SameSite=Lax; Max-Age=${48 * 60 * 60};`,
       ],
       [sensitiveHeaders]: ["set-cookie"],
     };
