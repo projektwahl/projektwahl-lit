@@ -13,6 +13,7 @@ function updateField(entity: any, name: string) {
 
 // TODO FIXME somehow ensure all attributes are read here because this is an easy way to loose data
 // Also ensure create and update has the same attributes
+// TO IMPROVE this maybe return the full column and also read back that data at all places
 
 export async function createOrUpdateUsersHandler(
   stream: import("http2").ServerHttp2Stream,
@@ -38,7 +39,8 @@ export async function createOrUpdateUsersHandler(
             ${field("group")},
             ${field("age")},
             ${field("away")},
-            ${field("project_leader_id")}
+            ${field("project_leader_id")},
+            ${field("force_in_project_id")}
             WHERE id = ${user.id} RETURNING id;`;
             return await sql(...finalQuery);
           } else {
@@ -50,6 +52,8 @@ export async function createOrUpdateUsersHandler(
               user.type === "voter" ? user.age ?? null : null
             }, ${user.away ?? false}, ${
               user.project_leader_id ?? null
+            }, ${
+              user.force_in_project_id ?? null
             }) RETURNING id;`;
           }
         });

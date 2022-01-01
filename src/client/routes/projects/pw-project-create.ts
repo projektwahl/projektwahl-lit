@@ -160,6 +160,14 @@ export class PwProjectCreate extends PwForm<"/api/v1/projects/create-or-update">
           ></pw-project-users>`
         : html``}
 
+      ${this.initial
+        ? html`<pw-project-users
+            projectId=${this.initial.id!}
+            name=${"force_in_project_id"}
+            title=${msg("Guaranteed project members")}
+          ></pw-project-users>`
+        : html``}
+
       <pw-checkbox-input
         label=${msg("Allow random assignments")}
         name="random_assignments"

@@ -158,6 +158,10 @@ export class PwEntityList<P extends keyof typeof routes> extends LitElement {
                 // @ts-expect-error you know
                 urlSearchParams.set("f_project_leader_id", this.projectId)
               }
+              if (urlSearchParams.has("f_force_in_project_id")) {
+                // @ts-expect-error you know
+                urlSearchParams.set("f_force_in_project_id", this.projectId)
+              }
             }
             HistoryController.goto(
               new URL(`?${urlSearchParams}`, window.location.href),

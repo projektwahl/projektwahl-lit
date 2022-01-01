@@ -27,8 +27,8 @@ const rawUserCommon = {
   away: z.boolean(),
   project_leader_id: z.number().nullable(),
   password_changed: z.boolean(),
-  force_in_project_id: z.number(),
-  computed_in_project_id: z.number(),
+  force_in_project_id: z.number().nullable(),
+  computed_in_project_id: z.number().nullable(),
 };
 
 export const rawUserHelperOrAdminSchema = z
@@ -169,6 +169,7 @@ const usersCreateOrUpdate = <
         type: true,
         username: true,
         project_leader_id: true,
+        force_in_project_id: true,
       })
       .extend({
         password: z.string().optional(),
@@ -202,6 +203,7 @@ const users = <
     age: true,
     away: true,
     project_leader_id: true,
+    force_in_project_id: true,
   });
 
 const project = rawProjectSchema.pick({

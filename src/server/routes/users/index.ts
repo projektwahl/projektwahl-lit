@@ -36,6 +36,11 @@ export async function usersHandler(
           .refine((s) => /^\d*$/.test(s))
           .transform((s) => (s === "" ? undefined : Number(s)))
           .optional(),
+          f_force_in_project_id: z
+          .string()
+          .refine((s) => /^\d*$/.test(s))
+          .transform((s) => (s === "" ? undefined : Number(s)))
+          .optional(),
       })
       .parse(Object.fromEntries(url.searchParams as any));
 
@@ -47,6 +52,7 @@ export async function usersHandler(
       "age",
       "away",
       "project_leader_id",
+      "force_in_project_id",
     ] as const;
 
     const schema = rawUserSchema(
@@ -69,7 +75,9 @@ export async function usersHandler(
       (query) => {
         return sql2`(${!query.f_id} OR id = ${
           query.f_id ?? null
-        }) AND username LIKE ${"%" + (query.f_username ?? "") + "%"} AND (${!query.f_project_leader_id} OR project_leader_id = ${query.f_project_leader_id ?? null})`;
+        }) AND username LIKE ${"%" + (query.f_username ?? "") + "%"}
+           AND (${!query.f_project_leader_id} OR project_leader_id = ${query.f_project_leader_id ?? null})
+           AND (${!query.f_force_in_project_id} OR force_in_project_id = ${query.f_force_in_project_id ?? null})`;
       }
     );
   })(stream, headers);
