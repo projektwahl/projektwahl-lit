@@ -11,6 +11,8 @@ import type {
   ServerHttp2Stream,
 } from "node:http2";
 import type { z } from "zod";
+import { sql } from "./database.js";
+import cookie from 'cookie'
 
 export function request<P extends keyof typeof routes>(
   method: string,
@@ -27,6 +29,24 @@ export function request<P extends keyof typeof routes>(
     headers: import("http2").IncomingHttpHeaders
   ) => {
     try {
+      if (headers[":method"] !== "GET" && headers[":method"] !== "POST") {
+        throw new Error("Unsupported http method!")
+      }
+      
+      if (headers[":method"] === "POST" && headers['x-csrf-protection'] !== 'projektwahl') {
+        throw new Error('No CSRF header!');
+      }
+
+      if (headers.cookie) {
+        var cookies = cookie.parse(headers.cookie);
+
+        const session_id = headers[":method"] === "GET" ? cookies.lax_id : cookies.strict_id;
+        if (session_id) {
+          const [user] = await sql`SELECT id, type FROM users, sessions WHERE users.id = sessions.user_id AND session_id = ${session_id}`;
+          console.log(user)
+        }
+      }
+
       let url = new URL(headers[":path"]!, "https://localhost:8443");
       if (
         headers[":method"] === method &&
@@ -54,7 +74,13 @@ export function request<P extends keyof typeof routes>(
       }
     } catch (error) {
       console.error(error);
-      stream.respond({ ":status": "500" }, { endStream: true });
+      stream.respond({ ":status": 200 });
+      stream.end(JSON.stringify({
+        success: false,
+        error: {
+          error: String(error)
+        }
+      }));
       return true;
     }
     return false;

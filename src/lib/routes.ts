@@ -18,12 +18,16 @@ export const loginInputSchema = z
   })
   .strict();
 
+if (!globalThis.Buffer) {
+  globalThis.Buffer = ArrayBuffer; // hack for client
+}
+
 const rawUserCommon = {
   id: z.number(),
   username: z.string().min(3).max(100),
   openid_id: z.string().optional(),
-  password_hash: z.string(),
-  password_salt: z.string(),
+  password_hash: z.instanceof(Buffer),
+  password_salt: z.instanceof(Buffer),
   away: z.boolean(),
   project_leader_id: z.number().nullable(),
   password_changed: z.boolean(),

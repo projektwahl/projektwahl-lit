@@ -12,12 +12,12 @@ import "../../form/pw-checkbox-input.js";
 import "../../form/pw-number-input.js";
 import "../../form/pw-select-input.js";
 import "../../form/pw-text-input.js";
-import { rawUserSchema } from "../../../lib/routes.js";
+import { rawUserSchema, rawUserVoterSchema, rawUserHelperOrAdminSchema } from "../../../lib/routes.js";
 import type { z } from "zod";
 
 const schema = rawUserSchema(
-  (id) => id,
-  (id) => id
+  rawUserVoterSchema,
+  rawUserHelperOrAdminSchema,
 );
 
 export async function pwUser(id: number) {

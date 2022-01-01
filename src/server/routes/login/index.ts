@@ -1,24 +1,43 @@
 import { sensitiveHeaders } from "node:http2";
-import { z } from "zod";
-import { rawSessionType, rawUserSchema } from "../../../lib/routes.js";
+import type { z, ZodObject, ZodTypeAny } from "zod";
+import { rawSessionType, rawUserHelperOrAdminSchema, rawUserSchema, rawUserVoterSchema, UnknownKeysParam } from "../../../lib/routes.js";
 import { sql } from "../../database.js";
 import { request } from "../../express.js";
 import { checkPassword } from "../../password.js";
+
+const users = <
+  T extends { [k: string]: ZodTypeAny },
+  UnknownKeys extends UnknownKeysParam = "strip",
+  Catchall extends ZodTypeAny = ZodTypeAny
+>(
+  s: ZodObject<T, UnknownKeys, Catchall>
+) =>
+  s.pick({
+    id: true,
+    type: true,
+    username: true,
+    password_hash: true,
+    password_salt: true,
+  });
 
 export async function loginHandler(
   stream: import("http2").ServerHttp2Stream,
   headers: import("http2").IncomingHttpHeaders
 ) {
   return await request("POST", "/api/v1/login", async function (body) {
+    const r = await sql`SELECT id, username, password_hash, password_salt, type FROM users WHERE username = ${body.username} LIMIT 1`;
+
+    console.log(r)
+
     const dbUser = rawUserSchema(
-      (s) => s,
-      (s) => s
+      users(rawUserVoterSchema),
+      users(rawUserHelperOrAdminSchema),
     ).parse(
-      (
-        await sql`SELECT id, username, password_hash, password_salt, type FROM users WHERE username = ${body.username} LIMIT 1`
-      )[0]
+      r[0]
     );
 
+    // TODO FIXME this is vulnerable to side channel attacks
+    // but maybe it's fine because we want to tell the user whether the account exists
     if (dbUser === undefined) {
       return [
         {
