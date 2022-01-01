@@ -2,6 +2,7 @@
 -- SPDX-FileCopyrightText: 2021 Moritz Hedtke <Moritz.Hedtke@t-online.de>
 
 -- if you remove this you get a CVE for free - so don't. (because the triggers can have race conditions then)
+-- https://www.postgresql.org/docs/current/transaction-iso.html
 ALTER DATABASE projektwahl SET default_transaction_isolation = 'serializable';
 ALTER DATABASE projektwahl SET default_transaction_read_only = true;
 
@@ -30,8 +31,7 @@ CREATE TABLE IF NOT EXISTS users (
   id SERIAL PRIMARY KEY NOT NULL,
   username VARCHAR(64) UNIQUE NOT NULL,
   openid_id VARCHAR(256) UNIQUE,
-  password_hash BYTEA,
-  password_salt BYTEA,
+  password_hash VARCHAR(256),
   type user_type NOT NULL,
   project_leader_id INTEGER, -- TODO FIXME maybe m:n as somebody could theoretically be leader in multiple projects?
   "group" VARCHAR(16),

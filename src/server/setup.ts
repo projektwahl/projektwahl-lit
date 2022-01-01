@@ -17,9 +17,9 @@ await sql.begin("READ WRITE", async (sql) => {
     cache: false, // TODO FIXME doesnt seem to work properly
   });
 
-  let [hash, salt] = await hashPassword("changeme");
+  let hash = await hashPassword("changeme");
 
-  await sql`INSERT INTO users (username, password_hash, password_salt, type) VALUES ('admin', ${hash}, ${salt}, 'admin') ON CONFLICT DO NOTHING;`;
+  await sql`INSERT INTO users (username, password_hash, type) VALUES ('admin', ${hash}, 'admin') ON CONFLICT DO NOTHING;`;
 
   const projects =
     await sql`INSERT INTO projects (title, info, place, costs, min_age, max_age, min_participants, max_participants, random_assignments) (SELECT generate_series, '', '', 0, 5, 13, 5, 20, FALSE FROM generate_series(1, 10)) RETURNING *;`;
@@ -44,7 +44,7 @@ await sql.begin("READ WRITE", async (sql) => {
     // TODO we could use that admin URL
     // Remove all user sessions associated with the user Also send notification to all clients that have an admin URL to invalidate the sessions for the particular user.
     /*
-		const response = await fetch(process.env['OPENID_ADMIN_URL']!, {
+		const response = await myFetch(process.env['OPENID_ADMIN_URL']!, {
 			method: 'POST',
 			headers: {
 				Accept: 'application/json',
@@ -61,7 +61,7 @@ await sql.begin("READ WRITE", async (sql) => {
 		console.log(await response.text());
 		console.log(response.headers);
 		console.log(response.headers.get('location'));
-		const userResponse = await fetch(response.headers.get('location')!, {
+		const userResponse = await myFetch(response.headers.get('location')!, {
 			method: 'GET',
 			headers: {
 				Accept: 'application/json',

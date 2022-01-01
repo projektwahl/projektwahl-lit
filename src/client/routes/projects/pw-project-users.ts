@@ -15,7 +15,7 @@ export const pwProjectUsers = async (url: URL) => {
   return html`<pw-project-users .initial=${result}></pw-project-users>`;
 };
 
-const PwProjectUsers = setupHmr(
+export const PwProjectUsers = setupHmr(
   import.meta.url,
   "PwProjectUsers",
   class PwProjectUsers extends PwUsers {
@@ -24,7 +24,7 @@ const PwProjectUsers = setupHmr(
         ...super.properties,
         projectId: { type: Number },
         name: { type: String },
-        title: { type: String }
+        title: { type: String },
       };
     }
 
@@ -32,7 +32,7 @@ const PwProjectUsers = setupHmr(
 
     projectId!: number;
 
-    title!: string
+    title!: string;
 
     override get buttons() {
       return html``;

@@ -20,13 +20,13 @@ export async function pwProject(id: number) {
 }
 
 const taskFunction = async ([id]: [number]) => {
-  let response = await fetch(
-    new URL(`/api/v1/projects/?f_id=${id}`, window.location.href).toString(),
+  let response = await myFetch<"/api/v1/projects">(
+    `/api/v1/projects/?f_id=${id}`,
     {
       //agent: new Agent({rejectUnauthorized: false})
     }
   );
-  return (await response.json()).entities[0];
+  return response.entities[0];
 };
 
 export class PwProjectCreate extends PwForm<"/api/v1/projects/create-or-update"> {
@@ -75,13 +75,16 @@ export class PwProjectCreate extends PwForm<"/api/v1/projects/create-or-update">
         this.form.value?.dispatchEvent(formDataEvent);
         formDataEvent.detail.id = this.initial?.id ?? null;
 
-        let result = await myFetch("/api/v1/projects/create-or-update", {
-          method: "POST",
-          headers: {
-            "content-type": "text/json",
-          },
-          body: JSON.stringify(formDataEvent.detail),
-        });
+        let result = await myFetch<"/api/v1/projects/create-or-update">(
+          "/api/v1/projects/create-or-update",
+          {
+            method: "POST",
+            headers: {
+              "content-type": "text/json",
+            },
+            body: JSON.stringify(formDataEvent.detail),
+          }
+        );
 
         if (result.success) {
           HistoryController.goto(new URL("/", window.location.href), {});
@@ -159,7 +162,6 @@ export class PwProjectCreate extends PwForm<"/api/v1/projects/create-or-update">
             title=${msg("Project leaders")}
           ></pw-project-users>`
         : html``}
-
       ${this.initial
         ? html`<pw-project-users
             projectId=${this.initial.id!}

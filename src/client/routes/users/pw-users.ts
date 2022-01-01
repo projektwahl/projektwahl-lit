@@ -15,6 +15,7 @@ import { msg } from "@lit/localize";
 import type { routes } from "../../../lib/routes.js";
 import type { z } from "zod";
 import { PwEntityList } from "../../entity-list/pw-entitylist.js";
+import { myFetch } from "../../utils.js";
 
 export const pwUsers = async (url: URL) => {
   let result = await taskFunction([url.searchParams]);
@@ -22,13 +23,13 @@ export const pwUsers = async (url: URL) => {
 };
 
 export const taskFunction = async ([searchParams]: [URLSearchParams]) => {
-  let response = await fetch(
-    new URL(`/api/v1/users?${searchParams}`, window.location.href).toString(),
+  let response = await myFetch<"/api/v1/users">(
+    `/api/v1/users?${searchParams}`,
     {
       //agent: new Agent({rejectUnauthorized: false})
     }
   );
-  return await response.json(); // TODO FIXME types with myFetch?
+  return response;
 };
 
 export class PwUsers extends PwEntityList<"/api/v1/users"> {

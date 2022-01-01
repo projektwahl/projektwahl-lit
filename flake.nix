@@ -24,6 +24,7 @@
               pkgs.glpk
               #pkgs.lp_solve
               #pkgs.diffoscope
+              pkgs.python3 # argon2
             ];
           };
 

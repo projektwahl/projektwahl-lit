@@ -12,13 +12,14 @@ import "../../form/pw-checkbox-input.js";
 import "../../form/pw-number-input.js";
 import "../../form/pw-select-input.js";
 import "../../form/pw-text-input.js";
-import { rawUserSchema } from "../../../lib/routes.js";
+import {
+  rawUserSchema,
+  rawUserVoterSchema,
+  rawUserHelperOrAdminSchema,
+} from "../../../lib/routes.js";
 import type { z } from "zod";
 
-const schema = rawUserSchema(
-  (id) => id,
-  (id) => id
-);
+const schema = rawUserSchema(rawUserVoterSchema, rawUserHelperOrAdminSchema);
 
 export async function pwUser(id: number) {
   let result = await taskFunction([id]);
@@ -26,13 +27,10 @@ export async function pwUser(id: number) {
 }
 
 const taskFunction = async ([id]: [number]) => {
-  let response = await fetch(
-    new URL(`/api/v1/users/?f_id=${id}`, window.location.href).toString(),
-    {
-      //agent: new Agent({rejectUnauthorized: false})
-    }
-  );
-  return (await response.json()).entities[0];
+  let response = await myFetch<"/api/v1/users">(`/api/v1/users/?f_id=${id}`, {
+    //agent: new Agent({rejectUnauthorized: false})
+  });
+  return response.entities[0];
 };
 
 export class PwUserCreate extends PwForm<"/api/v1/users/create-or-update"> {
@@ -77,14 +75,21 @@ export class PwUserCreate extends PwForm<"/api/v1/users/create-or-update"> {
         );
         this.form.value?.dispatchEvent(formDataEvent);
         formDataEvent.detail.id = this.initial?.id ?? null;
+        if (!this.initial?.id) {
+          formDataEvent.detail.project_leader_id = null;
+          formDataEvent.detail.force_in_project_id = null;
+        }
 
-        let result = await myFetch("/api/v1/users/create-or-update", {
-          method: "POST",
-          headers: {
-            "content-type": "text/json",
-          },
-          body: JSON.stringify(formDataEvent.detail),
-        });
+        let result = await myFetch<"/api/v1/users/create-or-update">(
+          "/api/v1/users/create-or-update",
+          {
+            method: "POST",
+            headers: {
+              "content-type": "text/json",
+            },
+            body: JSON.stringify(formDataEvent.detail),
+          }
+        );
 
         if (result.success) {
           HistoryController.goto(new URL("/", window.location.href), {});
@@ -135,6 +140,14 @@ export class PwUserCreate extends PwForm<"/api/v1/users/create-or-update"> {
               .initial=${this.initial}
             ></pw-number-input>`
         : undefined}
+
+      <pw-text-input
+        label=${msg("Password")}
+        name="password"
+        type="password"
+        .task=${this._task}
+        .initial=${this.initial}
+      ></pw-text-input>
 
       <pw-checkbox-input
         label=${msg("Away")}

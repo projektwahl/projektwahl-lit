@@ -1,15 +1,26 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // SPDX-FileCopyrightText: 2021 Moritz Hedtke <Moritz.Hedtke@t-online.de>
-/*import argon2 from 'argon2';
+import argon2 from "argon2";
 
+// TODO FIXME probably switch back to argon2 it seems like we may be able to build it from source using the instructions in README
+// for now probably not too important as almost everybody should be using OpenID
+// we could also additionally do the PBKDF2 client side so no log leaks etc would be possible.
+
+// https://datatracker.ietf.org/doc/html/rfc9106#section-4
+// If much less memory is available, a uniformly safe option is
+// Argon2id with t=3 iterations, p=4 lanes, m=2^(16) (64 MiB of
+// RAM), 128-bit salt, and 256-bit tag size.  This is the SECOND
+// RECOMMENDED option.
 const argon2Options = {
-	type: argon2.argon2id,
-	timeCost: 3,
-	memoryCost: 64 * 1024, // 64 MiB
-	saltLength: 128 / 8, // 16
-	hashLength: 256 / 8, // 32
-	parallelism: 4
-};*/
+  type: argon2.argon2id,
+  timeCost: 3,
+  memoryCost: 2 ** 16, // 2 ** 16 KB (64 MB)
+  saltLength: 128 / 8, // 16
+  hashLength: 256 / 8, // 32
+  parallelism: 4,
+};
+
+/*
 import crypto from "node:crypto";
 
 const webcrypto = crypto.webcrypto as unknown as Crypto;
@@ -35,11 +46,11 @@ async function hashPasswordWithSalt(
       {
         name: "PBKDF2",
         salt: salt,
-        iterations: 100000,
-        hash: "SHA-256",
+        iterations: 1200000,
+        hash: "SHA-512",
       },
       keyMaterial,
-      256
+      512
     )
   );
 }
@@ -63,4 +74,21 @@ export async function checkPassword(
     await hashPasswordWithSalt(password, salt),
     hash
   );
+}
+*/
+
+export async function hashPassword(password: string): Promise<string> {
+  return await argon2.hash(password, argon2Options);
+}
+
+export async function checkPassword(
+  hash: string,
+  password: string
+): Promise<[boolean, boolean, string]> {
+  const needsRehash = await argon2.needsRehash(hash, argon2Options);
+  return [
+    await argon2.verify(hash, password, argon2Options),
+    needsRehash,
+    needsRehash ? await argon2.hash(password, argon2Options) : hash,
+  ];
 }

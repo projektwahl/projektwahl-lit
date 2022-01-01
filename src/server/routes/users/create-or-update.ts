@@ -28,12 +28,11 @@ export async function createOrUpdateUsersHandler(
         const [row] = await sql.begin("READ WRITE", async (sql) => {
           if (user.id) {
             const field = (name: string) => updateField(user, name);
+
             const finalQuery = sql2`UPDATE users SET
             ${field("username")},
             password_hash = CASE WHEN ${user.password !== undefined} THEN ${
-              user.password
-                ? ((await hashPassword(user.password)) as any as string)
-                : null
+              user.password ? await hashPassword(user.password) : null
             } ELSE password_hash END,
             ${field("type")},
             ${field("group")},
@@ -44,15 +43,13 @@ export async function createOrUpdateUsersHandler(
             WHERE id = ${user.id} RETURNING id;`;
             return await sql(...finalQuery);
           } else {
-            return await sql`INSERT INTO users (username, password_hash, type, "group", age, away, project_leader_id) VALUES (${
+            return await sql`INSERT INTO users (username, password_hash, type, "group", age, away, project_leader_id, force_in_project_id) VALUES (${
               user.username ?? null
             }, ${user.password ? await hashPassword(user.password) : null}, ${
               user.type ?? null
             }, ${user.type === "voter" ? user.group ?? null : null}, ${
               user.type === "voter" ? user.age ?? null : null
-            }, ${user.away ?? false}, ${
-              user.project_leader_id ?? null
-            }, ${
+            }, ${user.away ?? false}, ${user.project_leader_id ?? null}, ${
               user.force_in_project_id ?? null
             }) RETURNING id;`;
           }

@@ -1,24 +1,49 @@
 import { sensitiveHeaders } from "node:http2";
-import { z } from "zod";
-import { rawSessionType, rawUserSchema } from "../../../lib/routes.js";
+import type { z, ZodObject, ZodTypeAny } from "zod";
+import {
+  rawSessionType,
+  rawUserHelperOrAdminSchema,
+  rawUserSchema,
+  rawUserVoterSchema,
+  UnknownKeysParam,
+} from "../../../lib/routes.js";
 import { sql } from "../../database.js";
 import { request } from "../../express.js";
 import { checkPassword } from "../../password.js";
+
+const users = <
+  T extends { [k: string]: ZodTypeAny },
+  UnknownKeys extends UnknownKeysParam = "strip",
+  Catchall extends ZodTypeAny = ZodTypeAny
+>(
+  s: ZodObject<T, UnknownKeys, Catchall>
+) =>
+  s.pick({
+    id: true,
+    type: true,
+    username: true,
+    password_hash: true,
+  });
 
 export async function loginHandler(
   stream: import("http2").ServerHttp2Stream,
   headers: import("http2").IncomingHttpHeaders
 ) {
   return await request("POST", "/api/v1/login", async function (body) {
-    const dbUser = rawUserSchema(
-      (s) => s,
-      (s) => s
-    ).parse(
-      (
-        await sql`SELECT id, username, password_hash, password_salt, type FROM users WHERE username = ${body.username} LIMIT 1`
-      )[0]
-    );
+    const r =
+      await sql`SELECT id, username, password_hash, type FROM users WHERE username = ${body.username} LIMIT 1`;
 
+    console.log(r);
+
+    const dbUser = rawUserSchema(
+      users(rawUserVoterSchema),
+      users(rawUserHelperOrAdminSchema)
+    )
+      .optional()
+      .parse(r[0]);
+
+    // TODO FIXME this is vulnerable to side channel attacks
+    // but maybe it's fine because we want to tell the user whether the account exists
     if (dbUser === undefined) {
       return [
         {
@@ -34,14 +59,27 @@ export async function loginHandler(
       ];
     }
 
-    if (
-      dbUser.password_hash == null ||
-      !(await checkPassword(
-        dbUser.password_hash,
-        dbUser.password_salt,
-        body.password
-      ))
-    ) {
+    if (dbUser.password_hash == null) {
+      return [
+        {
+          "content-type": "text/json; charset=utf-8",
+          ":status": "200",
+        },
+        {
+          success: false as const,
+          error: {
+            password: "Kein Password für Account gesetzt!",
+          },
+        },
+      ];
+    }
+
+    const [valid, needsRehash, newHash] = await checkPassword(
+      dbUser.password_hash,
+      body.password
+    );
+
+    if (!valid) {
       return [
         {
           "content-type": "text/json; charset=utf-8",
@@ -54,6 +92,12 @@ export async function loginHandler(
           },
         },
       ];
+    }
+
+    if (needsRehash) {
+      await sql.begin("READ WRITE", async (tsql) => {
+        return await tsql`UPDATE users SET password_hash = ${newHash} WHERE id = ${dbUser.id}`;
+      });
     }
 
     const session = rawSessionType.pick({ session_id: true }).parse(
@@ -71,13 +115,13 @@ export async function loginHandler(
       "set-cookie": [
         `strict_id=${
           session.session_id
-        }; Secure; SameSite=Strict; HttpOnly; Max-Age=${48 * 60 * 60};`,
+        }; Secure; Path=/; SameSite=Strict; HttpOnly; Max-Age=${48 * 60 * 60};`,
         `lax_id=${
           session.session_id
-        }; Secure; SameSite=Lax; HttpOnly; Max-Age=${48 * 60 * 60};`,
-        `username=${
-          dbUser.username
-        }; Secure; SameSite=Strict; Path=/; Max-Age=${48 * 60 * 60};`,
+        }; Secure; Path=/; SameSite=Lax; HttpOnly; Max-Age=${48 * 60 * 60};`,
+        `username=${dbUser.username}; Secure; Path=/; SameSite=Lax; Max-Age=${
+          48 * 60 * 60
+        };`,
       ],
       [sensitiveHeaders]: ["set-cookie"],
     };

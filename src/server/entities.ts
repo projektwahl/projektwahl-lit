@@ -11,7 +11,8 @@ export async function fetchData<
     id: number;
     [index: string]: null | string | string[] | boolean | number;
   },
-Q>(
+  Q
+>(
   path: "/api/v1/users" | "/api/v1/projects",
   headers: import("http2").IncomingHttpHeaders,
   table: string,
@@ -52,7 +53,8 @@ Q>(
       p_limit: z
         .string()
         .refine((s) => /^\d*$/.test(s))
-        .transform((s) => (s === "" ? undefined : Number(s))).default("100"),
+        .transform((s) => (s === "" ? undefined : Number(s)))
+        .default("100"),
     })
     .parse(Object.fromEntries(url.searchParams as any));
 
@@ -60,7 +62,7 @@ Q>(
     .array(z.tuple([z.enum(columns), z.enum(["ASC", "DESC"])]))
     .parse(url.searchParams.getAll("order").map((o) => o.split("-")));
 
-    // TODO FIXMe remove this useless struct
+  // TODO FIXMe remove this useless struct
   let _query: BaseQuery<T> = {
     paginationCursor: pagination.p_cursor,
     paginationDirection: pagination.p_direction,

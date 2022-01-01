@@ -18,12 +18,15 @@ export const loginInputSchema = z
   })
   .strict();
 
+if (!globalThis.Buffer) {
+  globalThis.Buffer = ArrayBuffer; // hack for client
+}
+
 const rawUserCommon = {
   id: z.number(),
   username: z.string().min(3).max(100),
   openid_id: z.string().optional(),
   password_hash: z.string(),
-  password_salt: z.string(),
   away: z.boolean(),
   project_leader_id: z.number().nullable(),
   password_changed: z.boolean(),
@@ -135,6 +138,7 @@ export const loginOutputSchema = result(z.null(), z.record(z.string()));
 
 export type keys =
   | "/api/v1/login"
+  | "/api/v1/logout"
   | "/api/v1/openid-login"
   | "/api/v1/redirect"
   | "/api/v1/sleep"
@@ -220,6 +224,10 @@ const project = rawProjectSchema.pick({
 });
 
 export const routes = identity({
+  "/api/v1/logout": {
+    request: z.any(),
+    response: z.any(),
+  },
   "/api/v1/login": {
     request: loginInputSchema,
     response: loginOutputSchema,

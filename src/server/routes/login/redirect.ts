@@ -49,11 +49,9 @@ export async function openidRedirectHandler(
         s: ZodObject<T, UnknownKeys, Catchall>
       ): ZodObject<
         objectUtil.noNever<{
-          [k in
-            | "id"
-            | "username"
-            | "password_hash"
-            | "password_salt"]: k extends keyof T ? T[k] : never;
+          [k in "id" | "username" | "password_hash"]: k extends keyof T
+            ? T[k]
+            : never;
         }>,
         UnknownKeys,
         Catchall
@@ -62,7 +60,6 @@ export async function openidRedirectHandler(
           id: true,
           username: true,
           password_hash: true,
-          password_salt: true,
         });
 
       const dbUser = rawUserSchema(pickFn, pickFn).parse(
