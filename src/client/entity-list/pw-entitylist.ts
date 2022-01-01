@@ -154,9 +154,9 @@ export class PwEntityList<P extends keyof typeof routes> extends LitElement {
               .forEach((v) => urlSearchParams.append("order", v));
             // @ts-expect-error terrible quick hack - don't look at this
             if (this.projectId) {
-              if (urlSearchParams.has("f_project_leader")) {
+              if (urlSearchParams.has("f_project_leader_id")) {
                 // @ts-expect-error you know
-                urlSearchParams.set("f_project_leader", this.projectId)
+                urlSearchParams.set("f_project_leader_id", this.projectId)
               }
             }
             HistoryController.goto(

@@ -12,7 +12,7 @@ import type { z } from "zod";
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // SPDX-FileCopyrightText: 2021 Moritz Hedtke <Moritz.Hedtke@t-online.de>
 
-class PwProjectLeaderCheckbox extends LitElement {
+class PwProjectUserCheckbox extends LitElement {
   static override get properties() {
     return {
       _task: { state: true },
@@ -20,8 +20,11 @@ class PwProjectLeaderCheckbox extends LitElement {
       disabled: { state: true },
       user: { attribute: false },
       projectId: { type: Number },
+      name: { type: String },
     };
   }
+
+  name!: string; // TODO FIXME project_leader_id
 
   forceTask: number | undefined;
 
@@ -56,7 +59,7 @@ class PwProjectLeaderCheckbox extends LitElement {
           },
           body: JSON.stringify({
             id: this.user.id,
-            project_leader_id: this.projectId,
+            [this.name]: this.projectId,
           }),
         });
 
@@ -95,11 +98,11 @@ class PwProjectLeaderCheckbox extends LitElement {
           }}
           type="checkbox"
           ?disabled=${this._task.status === TaskStatus.PENDING}
-          ?checked=${this.user.project_leader_id === this.projectId}
+          ?checked=${this.user[this.name] === this.projectId}
           class="form-check-input"
         />
       </form>`;
   }
 }
 
-customElements.define("pw-project-leader-checkbox", PwProjectLeaderCheckbox);
+customElements.define("pw-project-user-checkbox", PwProjectUserCheckbox);

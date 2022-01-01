@@ -31,7 +31,7 @@ export async function usersHandler(
           )
           .transform((s) => (s === "" ? undefined : s))
           .optional(),
-          f_project_leader: z
+          f_project_leader_id: z
           .string()
           .refine((s) => /^\d*$/.test(s))
           .transform((s) => (s === "" ? undefined : Number(s)))
@@ -69,7 +69,7 @@ export async function usersHandler(
       (query) => {
         return sql2`(${!query.f_id} OR id = ${
           query.f_id ?? null
-        }) AND username LIKE ${"%" + (query.f_username ?? "") + "%"} AND (${!query.f_project_leader} OR project_leader_id = ${query.f_project_leader ?? null})`;
+        }) AND username LIKE ${"%" + (query.f_username ?? "") + "%"} AND (${!query.f_project_leader_id} OR project_leader_id = ${query.f_project_leader_id ?? null})`;
       }
     );
   })(stream, headers);

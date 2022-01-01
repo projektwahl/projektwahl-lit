@@ -12,7 +12,7 @@ import "../../form/pw-text-input.js";
 import "../../form/pw-checkbox-input.js";
 import type { z } from "zod";
 import type { rawProjectSchema } from "../../../lib/routes.js";
-import "./pw-project-leaders.js";
+import "./pw-project-users.js";
 
 export async function pwProject(id: number) {
   let result = await taskFunction([id]);
@@ -151,11 +151,13 @@ export class PwProjectCreate extends PwForm<"/api/v1/projects/create-or-update">
         .initial=${this.initial}
       ></pw-number-input>
 
-      <!-- Betreuer, Projektleiter (Schüler) -->
+      <!-- Projektleitende -->
       ${this.initial
-        ? html`<pw-project-leaders
+        ? html`<pw-project-users
             projectId=${this.initial.id!}
-          ></pw-project-leaders>`
+            name=${"project_leader_id"}
+            title=${msg("Project leaders")}
+          ></pw-project-users>`
         : html``}
 
       <pw-checkbox-input

@@ -6,31 +6,33 @@ import { html } from "lit";
 import { noChange } from "lit";
 import { msg } from "@lit/localize";
 import { PwUsers, taskFunction } from "../users/pw-users.js";
-import "./pw-project-leader-checkbox.js";
+import "./pw-project-user-checkbox.js";
 import "../../form/pw-checkbox-input.js";
 import { setupHmr } from "../../hmr.js";
 
-export const pwProjectLeaders = async (url: URL) => {
+export const pwProjectUsers = async (url: URL) => {
   let result = await taskFunction([url.searchParams]);
-  return html`<pw-project-leaders .initial=${result}></pw-project-leaders>`;
+  return html`<pw-project-users .initial=${result}></pw-project-users>`;
 };
 
-const PwProjectLeaders = setupHmr(
+const PwProjectUsers = setupHmr(
   import.meta.url,
-  "PwProjectLeaders",
-  class PwProjectLeaders extends PwUsers {
+  "PwProjectUsers",
+  class PwProjectUsers extends PwUsers {
     static override get properties() {
       return {
         ...super.properties,
         projectId: { type: Number },
+        name: { type: String },
+        title: { type: String }
       };
     }
 
+    name!: string; // f_project_leader
+
     projectId!: number;
 
-    override get title() {
-      return msg("Project leaders");
-    }
+    title!: string
 
     override get buttons() {
       return html``;
@@ -60,10 +62,10 @@ const PwProjectLeaders = setupHmr(
         <tr>
           <th scope="col">
             <input
-              name="f_project_leader"
+              name=${`f_${this.name}`}
               type="checkbox"
               class="form-check-input"
-              value=${this.history.url.searchParams.get("f_project_leader")}
+              value=${this.history.url.searchParams.get(`f_${this.name}`)}
             />
           </th>
 
@@ -110,10 +112,11 @@ const PwProjectLeaders = setupHmr(
           return result.entities.map(
             (value) => html`<tr>
               <td>
-                <pw-project-leader-checkbox
+                <pw-project-user-checkbox
                   projectId=${this.projectId}
                   .user=${value}
-                ></pw-project-leader-checkbox>
+                  name=${this.name}
+                ></pw-project-user-checkbox>
               </td>
               <th scope="row">
                 <p>${value.id}</p>
@@ -138,4 +141,4 @@ const PwProjectLeaders = setupHmr(
   }
 );
 
-customElements.define("pw-project-leaders", PwProjectLeaders);
+customElements.define("pw-project-users", PwProjectUsers);
