@@ -9,8 +9,7 @@ import { msg } from "@lit/localize";
 import { createRef, ref } from "lit/directives/ref.js";
 import { repeat } from "lit/directives/repeat.js";
 
-// TODO FIXME make generic over keyof T
-export class PwSelectInput<T> extends LitElement {
+export class PwSelectInput<T, Q extends keyof T> extends LitElement {
   static override get properties() {
     return {
       label: { type: String },
@@ -35,7 +34,7 @@ export class PwSelectInput<T> extends LitElement {
 
   label!: string;
 
-  name!: keyof T;
+  name!: Q;
 
   task!: import("@lit-labs/task").Task<
     any,
@@ -48,7 +47,7 @@ export class PwSelectInput<T> extends LitElement {
 
   input;
 
-  options!: { value: string; text: string }[];
+  options!: { value: T[Q]; text: string }[];
 
   constructor() {
     super();
@@ -104,7 +103,7 @@ export class PwSelectInput<T> extends LitElement {
           class="form-select ${this.task.render({
             pending: () => "",
             complete: (v) =>
-              !v.success && v.error[this.name] !== undefined
+              !v.success && v.error[this.name as string] !== undefined
                 ? "is-invalid"
                 : "is-valid",
             initial: () => "",
@@ -126,12 +125,12 @@ export class PwSelectInput<T> extends LitElement {
         </select>
         ${this.task.render({
           complete: (v) =>
-            !v.success && v.error[this.name] !== undefined
+            !v.success && v.error[this.name as string] !== undefined
               ? html` <div
                   id="${this.randomId}-feedback"
                   class="invalid-feedback"
                 >
-                  ${v.error[this.name]}
+                  ${v.error[this.name as string]}
                 </div>`
               : undefined,
           initial: () => undefined,

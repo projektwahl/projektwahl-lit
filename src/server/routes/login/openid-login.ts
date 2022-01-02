@@ -29,7 +29,7 @@ export async function openidLoginHandler(
       headers,
       {
         success: true,
-        data: undefined,
+        data: {},
       },
     ];
   })(stream, headers);

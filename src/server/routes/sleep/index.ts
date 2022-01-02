@@ -14,7 +14,7 @@ export async function sleepHandler(
           },
           {
             success: true,
-            data: null
+            data: {}
           },
         ]);
       }, 100);

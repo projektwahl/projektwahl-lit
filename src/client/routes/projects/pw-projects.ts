@@ -118,7 +118,7 @@ class PwProjects<T> extends PwEntityList<"/api/v1/projects"> {
           return noChange;
         },
         complete: (result) => {
-          return result.entities.map(
+          return result.success ? result.data.entities.map(
             (value) => html`<tr>
               <th scope="row">
                 <p>${value.id}</p>
@@ -144,7 +144,7 @@ class PwProjects<T> extends PwEntityList<"/api/v1/projects"> {
                 </button>
               </td>
             </tr>`
-          );
+          ) : result.error;
         },
         initial: () => {
           return html`hi`;

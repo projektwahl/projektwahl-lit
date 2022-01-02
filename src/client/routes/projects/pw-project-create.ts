@@ -26,7 +26,7 @@ const taskFunction = async ([id]: [number]) => {
       //agent: new Agent({rejectUnauthorized: false})
     }
   );
-  return response.entities[0];
+  return response.success ? response.data.entities[0] : null; // TODO FIXME error handling, PwForm already has some form of error handling
 };
 
 export class PwProjectCreate extends PwForm<"/api/v1/projects/create-or-update"> {

@@ -30,7 +30,7 @@ const taskFunction = async ([id]: [number]) => {
   let response = await myFetch<"/api/v1/users">(`/api/v1/users/?f_id=${id}`, {
     //agent: new Agent({rejectUnauthorized: false})
   });
-  return response.entities[0];
+  return response.success ? response.data.entities[0] : null; // TODO FIXME error handling, PwForm already has some form of error handling
 };
 
 export class PwUserCreate extends PwForm<"/api/v1/users/create-or-update"> {
@@ -112,7 +112,7 @@ export class PwUserCreate extends PwForm<"/api/v1/users/create-or-update"> {
 
       <pw-select-input
         @change=${(event: Event) =>
-          (this.type = (event.target as HTMLSelectElement).value)}
+          (this.type = (event.target as HTMLSelectElement).value as "helper" | "admin" | "voter")}
         label=${msg("User type")}
         name="type"
         .options=${[

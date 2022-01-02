@@ -96,11 +96,11 @@ export class PwNumberInput<T> extends LitElement {
         <input
           ${ref(this.input)}
           type="number"
-          value=${this.initial?.[this.name]}
+          value=${ifDefined(this.initial?.[this.name])}
           class="form-control ${this.task.render({
             pending: () => "",
             complete: (v) =>
-              !v.success && v.error[this.name] !== undefined
+              !v.success && v.error[this.name as string] !== undefined
                 ? "is-invalid"
                 : "is-valid",
             initial: () => "",
@@ -116,12 +116,12 @@ export class PwNumberInput<T> extends LitElement {
         />
         ${this.task.render({
           complete: (v) =>
-            !v.success && v.error[this.name] !== undefined
+            !v.success && v.error[this.name as string] !== undefined
               ? html` <div
                   id="${this.randomId}-feedback"
                   class="invalid-feedback"
                 >
-                  ${v.error[this.name]}
+                  ${v.error[this.name as string]}
                 </div>`
               : undefined,
           initial: () => undefined,

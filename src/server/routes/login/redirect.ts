@@ -104,7 +104,7 @@ export async function openidRedirectHandler(
         responseHeaders,
         {
           success: true,
-          data: undefined,
+          data: {},
         },
       ];
     } catch (error) {
@@ -116,7 +116,7 @@ export async function openidRedirectHandler(
         {
           success: false,
           error: {
-            login: error,
+            login: `${error}`,
           },
         },
       ];

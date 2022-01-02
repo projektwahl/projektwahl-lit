@@ -19,7 +19,7 @@ import { myFetch } from "../../utils.js";
 
 export const pwUsers = async (url: URL) => {
   let result = await taskFunction([url.searchParams]);
-  return html`<pw-users .initial=${result}></pw-users>`;
+  return html`<pw-users title=${msg("Users")} .initial=${result}></pw-users>`;
 };
 
 export const taskFunction = async ([searchParams]: [URLSearchParams]) => {
@@ -33,12 +33,15 @@ export const taskFunction = async ([searchParams]: [URLSearchParams]) => {
 };
 
 export class PwUsers extends PwEntityList<"/api/v1/users"> {
-  constructor() {
-    super(taskFunction);
+  static override get properties() {
+    return {
+      ...super.properties,
+      title: { type: String },
+    };
   }
 
-  override get title() {
-    return msg("Users");
+  constructor() {
+    super(taskFunction);
   }
 
   override get buttons() {
@@ -113,7 +116,7 @@ export class PwUsers extends PwEntityList<"/api/v1/users"> {
         return noChange;
       },
       complete: (result) => {
-        return result.entities.map(
+        return result.success ? result.data.entities.map(
           (value) => html`<tr>
             <th scope="row">
               <p>${value.id}</p>
@@ -139,7 +142,7 @@ export class PwUsers extends PwEntityList<"/api/v1/users"> {
               </button>
             </td>
           </tr>`
-        );
+        ) : result.error;
       },
       initial: () => {
         return html`hi`;

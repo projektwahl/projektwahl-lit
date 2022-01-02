@@ -7,6 +7,7 @@ import { ifDefined } from "lit/directives/if-defined.js";
 import { setupHmr } from "../hmr.js";
 import { msg } from "@lit/localize";
 import { createRef, ref } from "lit/directives/ref.js";
+import type { StatusRenderer } from "@lit-labs/task";
 
 export class PwTextInput<T> extends LitElement {
   static override get properties() {
@@ -51,7 +52,7 @@ export class PwTextInput<T> extends LitElement {
 
   value!: string;
 
-  form: HTMLFormElement;
+  form!: HTMLFormElement;
 
   constructor() {
     super();
@@ -100,11 +101,11 @@ export class PwTextInput<T> extends LitElement {
         <input
           ${ref(this.input)}
           type=${this.type}
-          value=${this.initial?.[this.name]}
+          value=${ifDefined(this.initial?.[this.name])}
           class="form-control ${this.task.render({
             pending: () => "",
             complete: (v) =>
-              !v.success && v.error[this.name] !== undefined
+              !v.success && v.error[this.name as string] !== undefined
                 ? "is-invalid"
                 : "is-valid",
             initial: () => "",
@@ -121,12 +122,12 @@ export class PwTextInput<T> extends LitElement {
         />
         ${this.task.render({
           complete: (v) =>
-            !v.success && v.error[this.name] !== undefined
+            !v.success && v.error[this.name as string] !== undefined
               ? html` <div
                   id="${this.randomId}-feedback"
                   class="invalid-feedback"
                 >
-                  ${v.error[this.name]}
+                  ${v.error[this.name as string]}
                 </div>`
               : undefined,
           initial: () => undefined,

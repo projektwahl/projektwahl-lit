@@ -39,7 +39,7 @@ export async function logoutHandler(
         headers,
         {
           success: true as const,
-          data: null,
+          data: {},
         },
       ];
     }

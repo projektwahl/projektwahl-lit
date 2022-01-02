@@ -6,6 +6,7 @@ import { HistoryController } from "../history-controller.js";
 import { setupHmr } from "../hmr.js";
 import { msg } from "@lit/localize";
 import { createRef, ref } from "lit/directives/ref.js";
+import { ifDefined } from "lit/directives/if-defined";
 
 export class PwCheckboxInput<T> extends LitElement {
   static override get properties() {
@@ -96,11 +97,11 @@ export class PwCheckboxInput<T> extends LitElement {
         <input
           ${ref(this.input)}
           type="checkbox"
-          checked=${this.initial?.[this.name]}
+          ?checked=${this.initial?.[this.name]}
           class="form-check-input ${this.task.render({
             pending: () => "",
             complete: (v) =>
-              !v.success && v.error[this.name] !== undefined
+              !v.success && v.error[this.name as string] !== undefined
                 ? "is-invalid"
                 : "is-valid",
             initial: () => "",
@@ -114,12 +115,12 @@ export class PwCheckboxInput<T> extends LitElement {
         >
         ${this.task.render({
           complete: (v) =>
-            !v.success && v.error[this.name] !== undefined
+            !v.success && v.error[this.name as string] !== undefined
               ? html` <div
                   id="${this.randomId}-feedback"
                   class="invalid-feedback"
                 >
-                  ${v.error[this.name]}
+                  ${v.error[this.name as string]}
                 </div>`
               : undefined,
           initial: () => undefined,

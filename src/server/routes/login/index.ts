@@ -129,7 +129,7 @@ export async function loginHandler(
       headers,
       {
         success: true as const,
-        data: null,
+        data: {},
       },
     ];
   })(stream, headers);

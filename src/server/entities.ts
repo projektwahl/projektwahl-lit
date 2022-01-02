@@ -5,6 +5,9 @@ import type { BaseQuery } from "../lib/types.js";
 import { sql } from "./database.js";
 import { sql2, unsafe2 } from "./sql/index.js";
 
+// Mapped Types
+// https://www.typescriptlang.org/docs/handbook/2/mapped-types.html
+
 type entitesType = {
   [K in keyof typeof entityRoutes]: typeof entityRoutes[K]
 };

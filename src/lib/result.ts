@@ -20,6 +20,8 @@ export const failureResult = <Output, Def extends ZodTypeDef = ZodTypeDef, Input
 
 export const result = <T extends { [k: string]: ZodTypeAny }, UnknownKeys extends UnknownKeysParam = "strip", Catchall extends ZodTypeAny = ZodTypeAny>(s: ZodObject<T, UnknownKeys, Catchall>) => z.union([successResult(s), failureResult(z.record(z.string()))]);
 
+export const anyResult = result(z.object({}));
+
 export const zod2result = <T extends z.ZodTypeAny>(
   schema: T,
   input: unknown

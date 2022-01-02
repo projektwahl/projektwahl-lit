@@ -24,15 +24,15 @@ class PwProjectUserCheckbox extends LitElement {
     };
   }
 
-  name!: string; // TODO FIXME project_leader_id
+  name!: "project_leader_id" | "force_in_project_id";
 
   forceTask: number | undefined;
 
   _task!: import("@lit-labs/task").Task<any, any>;
 
   user!: z.infer<
-    typeof routes["/api/v1/users"]["response"]
-  >["entities"][number];
+    typeof routes["/api/v1/users"]["response"]["options"][0]
+  >["data"]["entities"][number];
 
   projectId!: number;
 

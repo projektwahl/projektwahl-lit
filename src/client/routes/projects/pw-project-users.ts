@@ -24,15 +24,12 @@ export const PwProjectUsers = setupHmr(
         ...super.properties,
         projectId: { type: Number },
         name: { type: String },
-        title: { type: String },
       };
     }
 
     name!: string; // f_project_leader
 
     projectId!: number;
-
-    title!: string;
 
     override get buttons() {
       return html``;
@@ -109,7 +106,7 @@ export const PwProjectUsers = setupHmr(
           return noChange;
         },
         complete: (result) => {
-          return result.entities.map(
+          return result.success ? result.data.entities.map(
             (value) => html`<tr>
               <td>
                 <pw-project-user-checkbox
@@ -128,7 +125,7 @@ export const PwProjectUsers = setupHmr(
                 <p>${value.type}</p>
               </td>
             </tr>`
-          );
+          ) : result.error;
         },
         initial: () => {
           return html`hi`;
