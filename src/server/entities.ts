@@ -9,18 +9,6 @@ type entitesType = {
   [K in keyof typeof entityRoutes]: typeof entityRoutes[K]
 };
 
-/*
-let z: z.infer<entitesType[R]["response"]["options"][0]["shape"]["data"]> = {
-    entities: entities as z.infer<entitesType[R]["response"]["options"][0]["shape"]["data"]>["entities"],
-    nextCursor: nextCursor as z.infer<entitesType[R]["response"]["options"][0]["shape"]["data"]>["nextCursor"],
-    previousCursor: previousCursor as z.infer<entitesType[R]["response"]["options"][0]["shape"]["data"]>["previousCursor"],
-  };
-  */
-
-type test<T> = {
-  [K in keyof T]: T[K]
-};
-
 // { entities: z.TypeOf<entitesType[R]["response"]["options"][0]["shape"]["data"]>["entities"]; nextCursor: z.TypeOf<entitesType[R]["response"]["options"][0]["shape"]["data"]>["nextCursor"]; previousCursor: z.TypeOf<entitesType[R]["response"]["options"][0]["shape"]["data"]>["previousCursor"]; }
 type mappedInfer1<R extends keyof typeof entityRoutes> = {
   [K in keyof z.infer<entitesType[R]["response"]["options"][0]["shape"]["data"]>]: z.infer<entitesType[R]["response"]["options"][0]["shape"]["data"]>[K]
@@ -188,16 +176,16 @@ export async function fetchData<
     }
   }
 
-  let y: mappedInfer1<R> = {
+  let y = {
     entities: entities as z.infer<entitesType[R]["response"]["options"][0]["shape"]["data"]>["entities"],
     nextCursor: nextCursor as z.infer<entitesType[R]["response"]["options"][0]["shape"]["data"]>["nextCursor"],
     previousCursor: previousCursor as z.infer<entitesType[R]["response"]["options"][0]["shape"]["data"]>["previousCursor"],
-  };
+  } as mappedInfer1<R>;
 
-  let a: z.infer<entitesType[R]["response"]> = {
+  let a = {
     success: true as const,
     data: y
-  };
+  } as z.infer<entitesType[R]["response"]>;
 
   return [
     {
