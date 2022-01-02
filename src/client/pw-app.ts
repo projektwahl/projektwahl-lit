@@ -16,6 +16,7 @@ import { setupHmr } from "./hmr.js";
 import { pwUsers } from "./routes/users/pw-users.js";
 import jscookie from "js-cookie";
 import { configureLocalization, msg, str } from "@lit/localize";
+import "./routes/pw-welcome.js";
 
 // Generated via output.localeCodesModule
 import { sourceLocale, targetLocales } from "./generated_locales/locales.js";
@@ -54,7 +55,9 @@ export const pwApp = async (url: URL) => {
 
 export const nextPage = async (url: URL) => {
   try {
-    if (url.pathname === "/login") {
+    if (url.pathname === "/") {
+      return html`<pw-welcome></pw-welcome>`
+    } else if (url.pathname === "/login") {
       //setLocale("de");
       return await pwLogin();
     } else if (url.pathname === "/users") {
