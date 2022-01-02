@@ -11,7 +11,7 @@ import "../../form/pw-number-input.js";
 import "../../form/pw-text-input.js";
 import "../../form/pw-checkbox-input.js";
 import type { z } from "zod";
-import type { rawProjectSchema } from "../../../lib/routes.js";
+import type { routes } from "../../../lib/routes.js";
 import "./pw-project-users.js";
 
 export async function pwProject(id: number) {
@@ -49,7 +49,7 @@ export class PwProjectCreate extends PwForm<"/api/v1/projects/create-or-update">
 
   initialRender: boolean;
 
-  initial: z.infer<typeof rawProjectSchema> | undefined;
+  initial: z.infer<typeof routes["/api/v1/projects/create-or-update"]["request"]> | undefined;
 
   constructor() {
     super();
@@ -66,11 +66,13 @@ export class PwProjectCreate extends PwForm<"/api/v1/projects/create-or-update">
       this,
       async () => {
         const formDataEvent = new CustomEvent<
-          Partial<z.infer<typeof rawProjectSchema>>
+        z.infer<typeof routes["/api/v1/projects/create-or-update"]["request"]>
         >("myformdata", {
           bubbles: true,
           composed: true,
-          detail: {},
+          detail: {
+            id: -1
+          },
         });
         this.form.value?.dispatchEvent(formDataEvent);
         formDataEvent.detail.id = this.initial?.id ?? null;

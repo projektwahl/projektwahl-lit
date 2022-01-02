@@ -19,7 +19,8 @@ export const loginInputSchema = z
   .strict();
 
 if (!globalThis.Buffer) {
-  globalThis.Buffer = ArrayBuffer; // hack for client
+  // @ts-expect-error hack for client
+  globalThis.Buffer = ArrayBuffer;
 }
 
 const rawUserCommon = {
@@ -98,7 +99,9 @@ export const makeCreateOrUpdate = <
       // KEEP this line synchronized with the one below
       let schema = value.id
         ? s.partial().setKey("id", z.number())
-        : s.setKey("id", z.null());
+        : s.extend({
+          "id": z.null()
+        });
       let parsed = schema.safeParse(value);
       if (!parsed.success) {
         parsed.error.issues.forEach(ctx.addIssue);
@@ -108,7 +111,9 @@ export const makeCreateOrUpdate = <
       // KEEP this line synchronized with the one above
       let schema = value.id
         ? s.partial().setKey("id", z.number())
-        : s.setKey("id", z.null());
+        : s.extend({
+          "id": z.null()
+        });
       return schema.parse(value);
     });
 
