@@ -1,39 +1,24 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // SPDX-FileCopyrightText: 2021 Moritz Hedtke <Moritz.Hedtke@t-online.de>
 
-import { z, ZodObject, ZodType, ZodTypeAny, ZodTypeDef } from "zod";
+import { SomeZodObject, z, ZodObject, ZodType, ZodTypeAny, ZodTypeDef } from "zod";
 import type { UnknownKeysParam } from "./routes.js";
 
-export const successResult = <
-Output, Def extends ZodTypeDef = ZodTypeDef, Input = Output
->(
-s: ZodType<Output, Def, Input>
-) =>
-  z
+export const successResult = <T extends SomeZodObject>(s: T) => z
     .object({
       success: z.literal(true),
       data: s,
     })
     .strict();
 
-export const failureResult = <
-Output, Def extends ZodTypeDef = ZodTypeDef, Input = Output
->(
-s: ZodType<Output, Def, Input>
-) =>
-  z
+export const failureResult = <Output, Def extends ZodTypeDef = ZodTypeDef, Input = Output>(s: ZodType<Output, Def, Input>) => z
     .object({
       success: z.literal(false),
       error: s,
     })
     .strict();
 
-export const result =<
-Output, Def extends ZodTypeDef = ZodTypeDef, Input = Output
->(
-s: ZodType<Output, Def, Input>
-) =>
-  z.union([successResult(s), failureResult(z.record(z.string()))]);
+export const result = <T extends { [k: string]: ZodTypeAny }, UnknownKeys extends UnknownKeysParam = "strip", Catchall extends ZodTypeAny = ZodTypeAny>(s: ZodObject<T, UnknownKeys, Catchall>) => z.union([successResult(s), failureResult(z.record(z.string()))]);
 
 export const zod2result = <T extends z.ZodTypeAny>(
   schema: T,

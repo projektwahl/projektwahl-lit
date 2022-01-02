@@ -38,7 +38,7 @@ export async function fetchData<
     ...(null | string | string[] | boolean | number | Buffer)[]
   ]
 ): Promise<
-  [OutgoingHttpHeaders, z.infer<typeof route>]
+  [OutgoingHttpHeaders, z.infer<ReturnType<Wrapper<S, UnknownKeys, Catchall>['wrapped']>>]
 > {
   const url = new URL(headers[":path"]!, "https://localhost:8443");
 
@@ -174,6 +174,8 @@ export async function fetchData<
       nextCursor = entities[entities.length - 1] ?? null;
     }
   }
+
+  let a: ReturnType<Wrapper<S, UnknownKeys, Catchall>['wrapped']>;
 
   return [
     {
