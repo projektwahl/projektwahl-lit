@@ -16,6 +16,7 @@ export class PwTextInput<T> extends LitElement {
       name: { type: String },
       type: { type: String },
       autocomplete: { type: String },
+      disabled: { type: Boolean },
       randomId: { state: true },
       task: {
         attribute: false,
@@ -28,6 +29,8 @@ export class PwTextInput<T> extends LitElement {
       },
     };
   }
+
+  disabled: boolean = false;
 
   randomId;
 
@@ -114,7 +117,7 @@ export class PwTextInput<T> extends LitElement {
           id=${this.randomId}
           aria-describedby="${this.randomId}-feedback"
           autocomplete=${ifDefined(this.autocomplete)}
-          ?disabled=${this.task.render({
+          ?disabled=${this.disabled || this.task.render({
             complete: () => false,
             pending: () => true,
             initial: () => false,

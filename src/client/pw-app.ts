@@ -16,6 +16,7 @@ import { setupHmr } from "./hmr.js";
 import { pwUsers } from "./routes/users/pw-users.js";
 import jscookie from "js-cookie";
 import { configureLocalization, msg, str } from "@lit/localize";
+import "./routes/pw-welcome.js";
 
 // Generated via output.localeCodesModule
 import { sourceLocale, targetLocales } from "./generated_locales/locales.js";
@@ -54,7 +55,9 @@ export const pwApp = async (url: URL) => {
 
 export const nextPage = async (url: URL) => {
   try {
-    if (url.pathname === "/login") {
+    if (url.pathname === "/") {
+      return html`<pw-welcome></pw-welcome>`
+    } else if (url.pathname === "/login") {
       //setLocale("de");
       return await pwLogin();
     } else if (url.pathname === "/users") {
@@ -63,6 +66,8 @@ export const nextPage = async (url: URL) => {
       return html`<pw-user-create></pw-user-create>`;
     } else if (/users\/edit\/\d+/.test(url.pathname)) {
       return await pwUser(Number(url.pathname.match(/users\/edit\/(\d+)/)![1]));
+    } else if (/users\/view\/\d+/.test(url.pathname)) {
+      return await pwUser(Number(url.pathname.match(/users\/view\/(\d+)/)![1]), true);
     } else if (url.pathname === "/projects") {
       return await pwProjects(url);
     } else if (url.pathname === "/projects/create") {
@@ -70,6 +75,10 @@ export const nextPage = async (url: URL) => {
     } else if (/projects\/edit\/\d+/.test(url.pathname)) {
       return await pwProject(
         Number(url.pathname.match(/projects\/edit\/(\d+)/)![1])
+      );
+    } else if (/projects\/view\/\d+/.test(url.pathname)) {
+      return await pwProject(
+        Number(url.pathname.match(/projects\/view\/(\d+)/)![1]), true
       );
     } else {
       return msg(html`Not Found`);
@@ -211,9 +220,7 @@ export const PwApp = setupHmr(
                           active: this.history.url.pathname === "/login",
                         })}"
                         href="/login"
-                        >${msg(
-                          str`Login ${JSON.stringify(jscookie.get("username"))}`
-                        )}</a
+                        >${msg("Login")}</a
                       >
                     </li>`}
               </ul>

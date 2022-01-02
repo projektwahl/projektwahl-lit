@@ -17,9 +17,12 @@ export async function usersHandler(
   stream: import("http2").ServerHttp2Stream,
   headers: import("http2").IncomingHttpHeaders
 ) {
-  return await request("GET", "/api/v1/users", async function (_, loggedInUser) {
+  return await request("GET", "/api/v1/users", async function (_, loggedInUser, session_id) {
       // helper is allowed to read the normal data
       // voter is not allowed to do anything
+
+      console.log(loggedInUser)
+      console.log(session_id)
 
     if (!(loggedInUser?.type === "admin" || loggedInUser?.type === "helper")) {
       return [

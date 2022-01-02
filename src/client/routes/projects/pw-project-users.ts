@@ -9,6 +9,7 @@ import { PwUsers, taskFunction } from "../users/pw-users.js";
 import "./pw-project-user-checkbox.js";
 import "../../form/pw-checkbox-input.js";
 import { setupHmr } from "../../hmr.js";
+import { aClick } from "../../pw-a.js";
 
 export const pwProjectUsers = async (url: URL) => {
   let result = await taskFunction([url.searchParams]);
@@ -117,10 +118,10 @@ export const PwProjectUsers = setupHmr(
                     ></pw-project-user-checkbox>
                   </td>
                   <th scope="row">
-                    <p>${value.id}</p>
+                    <p><a @click=${aClick} href="/users/view/${value.id}">${value.id}</a></p>
                   </th>
                   <td>
-                    <p>${value.username}</p>
+                  <p><a @click=${aClick} href="/users/view/${value.id}">${value.username}</a></p>
                   </td>
                   <td>
                     <p>${value.type}</p>

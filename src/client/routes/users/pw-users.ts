@@ -120,10 +120,10 @@ export class PwUsers extends PwEntityList<"/api/v1/users"> {
           ? result.data.entities.map(
               (value) => html`<tr>
                 <th scope="row">
-                  <p>${value.id}</p>
+                <p><a @click=${aClick} href="/users/view/${value.id}">${value.id}</a></p>
                 </th>
                 <td>
-                  <p>${value.username}</p>
+                <p><a @click=${aClick} href="/users/view/${value.id}">${value.username}</a></p>
                 </td>
                 <td>
                   <p>${value.type}</p>
