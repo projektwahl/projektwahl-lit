@@ -1,57 +1,39 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // SPDX-FileCopyrightText: 2021 Moritz Hedtke <Moritz.Hedtke@t-online.de>
 
-import { z } from "zod";
+import { z, ZodObject, ZodType, ZodTypeAny, ZodTypeDef } from "zod";
+import type { UnknownKeysParam } from "./routes.js";
 
-export const successResult = <D extends import("zod").ZodTypeAny>(
-  zodObject: D
-): z.ZodObject<
-  { success: z.ZodLiteral<true>; data: D },
-  "strict",
-  z.ZodTypeAny
-> =>
+export const successResult = <
+Output, Def extends ZodTypeDef = ZodTypeDef, Input = Output
+>(
+s: ZodType<Output, Def, Input>
+) =>
   z
     .object({
       success: z.literal(true),
-      data: zodObject,
+      data: s,
     })
     .strict();
 
-export const failureResult = <E extends import("zod").ZodTypeAny>(
-  zodObject: E
-): z.ZodObject<
-  { success: z.ZodLiteral<false>; error: E },
-  "strict",
-  z.ZodTypeAny
-> =>
+export const failureResult = <
+Output, Def extends ZodTypeDef = ZodTypeDef, Input = Output
+>(
+s: ZodType<Output, Def, Input>
+) =>
   z
     .object({
       success: z.literal(false),
-      error: zodObject,
+      error: s,
     })
     .strict();
 
-export const result = <
-  D extends import("zod").ZodTypeAny
+export const result =<
+Output, Def extends ZodTypeDef = ZodTypeDef, Input = Output
 >(
-  successZodObject: D,
-): z.ZodUnion<
-  [
-    z.ZodObject<
-      { success: z.ZodLiteral<true>; data: D },
-      "strict",
-      z.ZodTypeAny
-    >,
-    z.ZodObject<
-      { success: z.ZodLiteral<false>; error: E },
-      "strict",
-      z.ZodTypeAny
-    >
-  ]
-> =>
-  z.union([successResult(successZodObject), failureResult(z.record(z.string()))]);
-
-export const anyResult = result(z.any());
+s: ZodType<Output, Def, Input>
+) =>
+  z.union([successResult(s), failureResult(z.record(z.string()))]);
 
 export const zod2result = <T extends z.ZodTypeAny>(
   schema: T,

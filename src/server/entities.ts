@@ -147,14 +147,14 @@ export async function fetchData<
   }
 
   // [TemplateStringsArray, ...(null | string | string[] | boolean | number)[]]
-  let entities: z.infer<typeof route["options"][0]["shape"]["data"]["shape"]["entities"]> = route["options"][0].shape.data.shape.entities.parse(
+  let entities: z.infer<ReturnType<typeof route["options"][0]["shape"]["data"]["_def"]["shape"]>["entities"]> = route["options"][0].shape.data._def.shape().entities.parse(
     await sql(...finalQuery)
   );
 
   // https://github.com/projektwahl/projektwahl-sveltekit/blob/work/src/lib/list-entities.ts#L30
 
-  let nextCursor: z.infer<typeof route["options"][0]["shape"]["data"]["shape"]["nextCursor"]> = null;
-  let previousCursor: z.infer<typeof route["options"][0]["shape"]["data"]["shape"]["previousCursor"]> = null;
+  let nextCursor: z.infer<ReturnType<typeof route["options"][0]["shape"]["data"]["_def"]["shape"]>["nextCursor"]> = null;
+  let previousCursor: z.infer<ReturnType<typeof route["options"][0]["shape"]["data"]["_def"]["shape"]>["previousCursor"]> = null;
   // TODO FIXME also recalculate the other cursor because data could've been deleted in between / the filters have changed
   if (pagination.p_direction === "forwards") {
     if (pagination.p_cursor) {
