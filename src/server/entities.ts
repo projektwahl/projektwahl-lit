@@ -68,7 +68,7 @@ export async function fetchData<
         .string()
         .refine((s) => /^\d*$/.test(s))
         .transform((s) => (s === "" ? undefined : Number(s)))
-        .default("100"),
+        .default("10"),
     })
     .parse(Object.fromEntries(url.searchParams as any));
 
