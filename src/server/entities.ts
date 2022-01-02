@@ -1,7 +1,7 @@
 import type { OutgoingHttpHeaders } from "node:http2";
 import type { Row } from "postgres";
 import { z, ZodObject, ZodTypeAny } from "zod";
-import type { UnknownKeysParam } from "../lib/routes.js";
+import { routes, UnknownKeysParam } from "../lib/routes.js";
 import {entities} from "../lib/routes.js";
 import type { BaseQuery, FilterType } from "../lib/types.js";
 import { sql } from "./database.js";
@@ -21,11 +21,9 @@ export async function fetchData<
     [index: string]: null | string | string[] | boolean | number;
   },
   Q,
-  S extends { [k: string]: ZodTypeAny },
-  UnknownKeys extends UnknownKeysParam = "strip",
-  Catchall extends ZodTypeAny = ZodTypeAny,
+  R extends "/api/v1/users"|"/api/v1/projects"
 >(
-  route: ReturnType<Wrapper<S, UnknownKeys, Catchall>['wrapped']>,
+  path: R,
   headers: import("http2").IncomingHttpHeaders,
   table: string,
   columns: readonly [string, ...string[]],
@@ -38,7 +36,7 @@ export async function fetchData<
     ...(null | string | string[] | boolean | number | Buffer)[]
   ]
 ): Promise<
-  [OutgoingHttpHeaders, z.infer<ReturnType<Wrapper<S, UnknownKeys, Catchall>['wrapped']>>]
+  [OutgoingHttpHeaders, z.infer<typeof routes["/api/v1/users"]["response"]> | z.infer<typeof routes["/api/v1/projects"]["response"]>]
 > {
   const url = new URL(headers[":path"]!, "https://localhost:8443");
 
@@ -147,7 +145,7 @@ export async function fetchData<
   }
 
   // [TemplateStringsArray, ...(null | string | string[] | boolean | number)[]]
-  let entities: z.infer<ReturnType<typeof route["options"][0]["shape"]["data"]["_def"]["shape"]>["entities"]> = route["options"][0].shape.data._def.shape().entities.parse(
+  let entities: z.infer<typeof routes["/api/v1/users"]["response"]["options"][0]>["data"]["entities"] | z.infer<typeof routes["/api/v1/projects"]["response"]["options"][0]>["data"]["entities"] = routes["/api/v1/users"]["response"]["options"][0].shape.data.shape.entities.parse(
     await sql(...finalQuery)
   );
 
@@ -175,20 +173,21 @@ export async function fetchData<
     }
   }
 
-  let a: ReturnType<Wrapper<S, UnknownKeys, Catchall>['wrapped']>;
+  let a: z.infer<ReturnType<Wrapper<S, UnknownKeys, Catchall>['wrapped']>> = {
+    success: true as const,
+    data: {
+      entities,
+      nextCursor,
+      previousCursor,
+    }
+  };
+
 
   return [
     {
       "content-type": "text/json; charset=utf-8",
       ":status": 200,
     },
-    {
-      success: true as const,
-      data: {
-        entities,
-        nextCursor,
-        previousCursor,
-      }
-    },
+    a
   ];
 }

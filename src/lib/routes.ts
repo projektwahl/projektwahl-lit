@@ -213,11 +213,6 @@ let a = entities(z.object({}));
 
 let b: z.infer<typeof a>;
 
-if (b.success) {
-  
-}
-
-
 const users = <
   T extends { [k: string]: ZodTypeAny },
   UnknownKeys extends UnknownKeysParam = "strip",
