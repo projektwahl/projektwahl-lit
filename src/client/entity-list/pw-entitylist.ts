@@ -12,7 +12,9 @@ import type { z } from "zod";
 import { classMap } from "lit/directives/class-map.js";
 import { ifDefined } from "lit/directives/if-defined.js";
 
-export class PwEntityList<P extends keyof typeof entityRoutes> extends LitElement {
+export class PwEntityList<
+  P extends keyof typeof entityRoutes
+> extends LitElement {
   static override get properties() {
     return {
       task: { attribute: false },
@@ -184,71 +186,81 @@ export class PwEntityList<P extends keyof typeof entityRoutes> extends LitElemen
           </table>
         </form>
 
-        ${this._apiTask.value?.success ? html`
-
-        <nav aria-label="${msg("navigation of user list")}">
-          <ul class="pagination justify-content-center">
-            <li
-              class="page-item ${classMap({
-                disabled: this._apiTask.value?.data.previousCursor === null,
-              })}"
-            >
-              <a
-                @click=${(e: Event) => {
-                  e.preventDefault();
-                  const url = new URL(window.location.href);
-                  if (this._apiTask.value?.success) {
-                    url.searchParams.set(
-                      "p_cursor",
-                      JSON.stringify(this._apiTask.value?.data.previousCursor)
-                    );
-                  }
-                  url.searchParams.set("p_direction", "backwards");
-                  HistoryController.goto(url, {});
-                }}
-                class="page-link"
-                href="/"
-                aria-label="${msg("previous page")}"
-                tabindex=${ifDefined(this._apiTask.value?.data.previousCursor === null
-                  ? undefined
-                  : -1)}
-                aria-disabled=${this._apiTask.value?.data.previousCursor === null}
-              >
-                <span aria-hidden="true">&laquo;</span>
-              </a>
-            </li>
-            <li
-              class="page-item ${classMap({
-                disabled: this._apiTask.value?.data.nextCursor === null,
-              })}"
-            >
-              <a
-                @click=${(e: Event) => {
-                  e.preventDefault();
-                  const url = new URL(window.location.href);
-                  if (this._apiTask.value?.success) {
-                    url.searchParams.set(
-                      "p_cursor",
-                      JSON.stringify(this._apiTask.value?.data.nextCursor)
-                    );
-                  }
-                  url.searchParams.set("p_direction", "forwards");
-                  HistoryController.goto(url, {});
-                }}
-                class="page-link"
-                href="/"
-                aria-label="${msg("next page")}"
-                tabindex=${ifDefined(this._apiTask.value?.data.nextCursor === null
-                  ? undefined
-                  : -1)}
-                aria-disabled=${this._apiTask.value?.data.nextCursor === null}
-              >
-                <span aria-hidden="true">&raquo;</span>
-              </a>
-            </li>
-          </ul>
-        </nav>
-        ` : undefined}
+        ${this._apiTask.value?.success
+          ? html`
+              <nav aria-label="${msg("navigation of user list")}">
+                <ul class="pagination justify-content-center">
+                  <li
+                    class="page-item ${classMap({
+                      disabled:
+                        this._apiTask.value?.data.previousCursor === null,
+                    })}"
+                  >
+                    <a
+                      @click=${(e: Event) => {
+                        e.preventDefault();
+                        const url = new URL(window.location.href);
+                        if (this._apiTask.value?.success) {
+                          url.searchParams.set(
+                            "p_cursor",
+                            JSON.stringify(
+                              this._apiTask.value?.data.previousCursor
+                            )
+                          );
+                        }
+                        url.searchParams.set("p_direction", "backwards");
+                        HistoryController.goto(url, {});
+                      }}
+                      class="page-link"
+                      href="/"
+                      aria-label="${msg("previous page")}"
+                      tabindex=${ifDefined(
+                        this._apiTask.value?.data.previousCursor === null
+                          ? undefined
+                          : -1
+                      )}
+                      aria-disabled=${this._apiTask.value?.data
+                        .previousCursor === null}
+                    >
+                      <span aria-hidden="true">&laquo;</span>
+                    </a>
+                  </li>
+                  <li
+                    class="page-item ${classMap({
+                      disabled: this._apiTask.value?.data.nextCursor === null,
+                    })}"
+                  >
+                    <a
+                      @click=${(e: Event) => {
+                        e.preventDefault();
+                        const url = new URL(window.location.href);
+                        if (this._apiTask.value?.success) {
+                          url.searchParams.set(
+                            "p_cursor",
+                            JSON.stringify(this._apiTask.value?.data.nextCursor)
+                          );
+                        }
+                        url.searchParams.set("p_direction", "forwards");
+                        HistoryController.goto(url, {});
+                      }}
+                      class="page-link"
+                      href="/"
+                      aria-label="${msg("next page")}"
+                      tabindex=${ifDefined(
+                        this._apiTask.value?.data.nextCursor === null
+                          ? undefined
+                          : -1
+                      )}
+                      aria-disabled=${this._apiTask.value?.data.nextCursor ===
+                      null}
+                    >
+                      <span aria-hidden="true">&raquo;</span>
+                    </a>
+                  </li>
+                </ul>
+              </nav>
+            `
+          : undefined}
       </div>
     `;
   }

@@ -49,7 +49,9 @@ export class PwProjectCreate extends PwForm<"/api/v1/projects/create-or-update">
 
   initialRender: boolean;
 
-  initial: z.infer<typeof routes["/api/v1/projects/create-or-update"]["request"]> | undefined;
+  initial:
+    | z.infer<typeof routes["/api/v1/projects/create-or-update"]["request"]>
+    | undefined;
 
   constructor() {
     super();
@@ -66,12 +68,12 @@ export class PwProjectCreate extends PwForm<"/api/v1/projects/create-or-update">
       this,
       async () => {
         const formDataEvent = new CustomEvent<
-        z.infer<typeof routes["/api/v1/projects/create-or-update"]["request"]>
+          z.infer<typeof routes["/api/v1/projects/create-or-update"]["request"]>
         >("myformdata", {
           bubbles: true,
           composed: true,
           detail: {
-            id: -1
+            id: -1,
           },
         });
         this.form.value?.dispatchEvent(formDataEvent);

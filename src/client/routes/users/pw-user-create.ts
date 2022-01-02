@@ -50,7 +50,9 @@ export class PwUserCreate extends PwForm<"/api/v1/users/create-or-update"> {
 
   type?: "voter" | "admin" | "helper";
 
-  initial: z.infer<typeof routes["/api/v1/users/create-or-update"]["request"]> | undefined;
+  initial:
+    | z.infer<typeof routes["/api/v1/users/create-or-update"]["request"]>
+    | undefined;
 
   constructor() {
     super();
@@ -64,16 +66,15 @@ export class PwUserCreate extends PwForm<"/api/v1/users/create-or-update"> {
     this._task = new Task(
       this,
       async () => {
-        const formDataEvent = new CustomEvent<z.infer<typeof routes["/api/v1/users/create-or-update"]["request"]>>(
-          "myformdata",
-          {
-            bubbles: true,
-            composed: true,
-            detail: {
-              id: -1,
-            },
-          }
-        );
+        const formDataEvent = new CustomEvent<
+          z.infer<typeof routes["/api/v1/users/create-or-update"]["request"]>
+        >("myformdata", {
+          bubbles: true,
+          composed: true,
+          detail: {
+            id: -1,
+          },
+        });
         this.form.value?.dispatchEvent(formDataEvent);
         formDataEvent.detail.id = this.initial?.id ?? null;
         if (!this.initial?.id) {
@@ -113,7 +114,10 @@ export class PwUserCreate extends PwForm<"/api/v1/users/create-or-update"> {
 
       <pw-select-input
         @change=${(event: Event) =>
-          (this.type = (event.target as HTMLSelectElement).value as "helper" | "admin" | "voter")}
+          (this.type = (event.target as HTMLSelectElement).value as
+            | "helper"
+            | "admin"
+            | "voter")}
         label=${msg("User type")}
         name="type"
         .options=${[

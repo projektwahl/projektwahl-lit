@@ -9,13 +9,15 @@ import { sql2, unsafe2 } from "./sql/index.js";
 // https://www.typescriptlang.org/docs/handbook/2/mapped-types.html
 
 type entitesType = {
-  [K in keyof typeof entityRoutes]: typeof entityRoutes[K]
+  [K in keyof typeof entityRoutes]: typeof entityRoutes[K];
 };
 
 // { entities: z.TypeOf<entitesType[R]["response"]["options"][0]["shape"]["data"]>["entities"]; nextCursor: z.TypeOf<entitesType[R]["response"]["options"][0]["shape"]["data"]>["nextCursor"]; previousCursor: z.TypeOf<entitesType[R]["response"]["options"][0]["shape"]["data"]>["previousCursor"]; }
 type mappedInfer1<R extends keyof typeof entityRoutes> = {
-  [K in keyof z.infer<entitesType[R]["response"]["options"][0]["shape"]["data"]>]: z.infer<entitesType[R]["response"]["options"][0]["shape"]["data"]>[K]
-}
+  [K in keyof z.infer<
+    entitesType[R]["response"]["options"][0]["shape"]["data"]
+  >]: z.infer<entitesType[R]["response"]["options"][0]["shape"]["data"]>[K];
+};
 
 export async function fetchData<
   T extends {
@@ -37,9 +39,7 @@ export async function fetchData<
     TemplateStringsArray,
     ...(null | string | string[] | boolean | number | Buffer)[]
   ]
-): Promise<
-  [OutgoingHttpHeaders, z.infer<typeof entityRoutes[R]["response"]>]
-> {
+): Promise<[OutgoingHttpHeaders, z.infer<typeof entityRoutes[R]["response"]>]> {
   let entitySchema: entitesType[R] = entityRoutes[path];
 
   const url = new URL(headers[":path"]!, "https://localhost:8443");
@@ -149,16 +149,23 @@ export async function fetchData<
   }
 
   // [TemplateStringsArray, ...(null | string | string[] | boolean | number)[]]
-  let entitiesSchema: entitesType[R]["response"]["options"][0]["shape"]["data"]["shape"]["entities"] = entitySchema["response"]["options"][0]["shape"]["data"]["shape"]["entities"];
-  
-  let entities: z.infer<entitesType[R]["response"]["options"][0]["shape"]["data"]>["entities"] = entitiesSchema.parse(
-    await sql(...finalQuery)
-  );
+  let entitiesSchema: entitesType[R]["response"]["options"][0]["shape"]["data"]["shape"]["entities"] =
+    entitySchema["response"]["options"][0]["shape"]["data"]["shape"][
+      "entities"
+    ];
+
+  let entities: z.infer<
+    entitesType[R]["response"]["options"][0]["shape"]["data"]
+  >["entities"] = entitiesSchema.parse(await sql(...finalQuery));
 
   // https://github.com/projektwahl/projektwahl-sveltekit/blob/work/src/lib/list-entities.ts#L30
 
-  let nextCursor: z.infer<entitesType[R]["response"]["options"][0]["shape"]["data"]>["nextCursor"] = null;
-  let previousCursor: z.infer<entitesType[R]["response"]["options"][0]["shape"]["data"]>["previousCursor"] = null;
+  let nextCursor: z.infer<
+    entitesType[R]["response"]["options"][0]["shape"]["data"]
+  >["nextCursor"] = null;
+  let previousCursor: z.infer<
+    entitesType[R]["response"]["options"][0]["shape"]["data"]
+  >["previousCursor"] = null;
   // TODO FIXME also recalculate the other cursor because data could've been deleted in between / the filters have changed
   if (pagination.p_direction === "forwards") {
     if (pagination.p_cursor) {
@@ -180,14 +187,20 @@ export async function fetchData<
   }
 
   let y = {
-    entities: entities as z.infer<entitesType[R]["response"]["options"][0]["shape"]["data"]>["entities"],
-    nextCursor: nextCursor as z.infer<entitesType[R]["response"]["options"][0]["shape"]["data"]>["nextCursor"],
-    previousCursor: previousCursor as z.infer<entitesType[R]["response"]["options"][0]["shape"]["data"]>["previousCursor"],
+    entities: entities as z.infer<
+      entitesType[R]["response"]["options"][0]["shape"]["data"]
+    >["entities"],
+    nextCursor: nextCursor as z.infer<
+      entitesType[R]["response"]["options"][0]["shape"]["data"]
+    >["nextCursor"],
+    previousCursor: previousCursor as z.infer<
+      entitesType[R]["response"]["options"][0]["shape"]["data"]
+    >["previousCursor"],
   } as mappedInfer1<R>;
 
   let a = {
     success: true as const,
-    data: y
+    data: y,
   } as z.infer<entitesType[R]["response"]>;
 
   return [
@@ -195,6 +208,6 @@ export async function fetchData<
       "content-type": "text/json; charset=utf-8",
       ":status": 200,
     },
-    a
+    a,
   ];
 }

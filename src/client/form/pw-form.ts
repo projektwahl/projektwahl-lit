@@ -109,7 +109,7 @@ if ('FormDataEvent' in window) {
                   }
                 }
                 return html``;
-              }
+              },
             })}
 
             <form

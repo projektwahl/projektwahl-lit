@@ -100,8 +100,8 @@ export const makeCreateOrUpdate = <
       let schema = value.id
         ? s.partial().setKey("id", z.number())
         : s.extend({
-          "id": z.null()
-        });
+            id: z.null(),
+          });
       let parsed = schema.safeParse(value);
       if (!parsed.success) {
         parsed.error.issues.forEach(ctx.addIssue);
@@ -112,8 +112,8 @@ export const makeCreateOrUpdate = <
       let schema = value.id
         ? s.partial().setKey("id", z.number())
         : s.extend({
-          "id": z.null()
-        });
+            id: z.null(),
+          });
       return schema.parse(value);
     });
 
@@ -153,19 +153,26 @@ export type keys =
   | "/api/v1/users"
   | "/api/v1/projects";
 
-function identity<T extends { [r in keys]: { request: z.ZodTypeAny; response: z.ZodUnion<
-    [
-      z.ZodObject<
-        { success: z.ZodLiteral<true>; data: z.ZodTypeAny },
-        "strict",
-        z.ZodTypeAny
-      >,
-      z.ZodObject<
-        { success: z.ZodLiteral<false>; error: z.ZodTypeAny },
-        "strict",
-        z.ZodTypeAny
-      >
-    ]> } }
+function identity<
+  T extends {
+    [r in keys]: {
+      request: z.ZodTypeAny;
+      response: z.ZodUnion<
+        [
+          z.ZodObject<
+            { success: z.ZodLiteral<true>; data: z.ZodTypeAny },
+            "strict",
+            z.ZodTypeAny
+          >,
+          z.ZodObject<
+            { success: z.ZodLiteral<false>; error: z.ZodTypeAny },
+            "strict",
+            z.ZodTypeAny
+          >
+        ]
+      >;
+    };
+  }
 >(v: T) {
   return v;
 }
@@ -208,11 +215,20 @@ let a2: z.infer<typeof jo2>;
 // TODO FIXME report upstream (picking missing keys breaks)
 //console.log(usersCreateOrUpdate(rawUserHelperOrAdminSchema).safeParse({}))
 
-export const entities = <T extends { [k: string]: ZodTypeAny }, UnknownKeys extends UnknownKeysParam = "strip", Catchall extends ZodTypeAny = ZodTypeAny>(entity: ZodObject<T, UnknownKeys, Catchall>) => result(z.object({
-  entities: z.array(entity),
-  previousCursor: entity.nullable(),
-  nextCursor: entity.nullable(),
-}))
+export const entities = <
+  T extends { [k: string]: ZodTypeAny },
+  UnknownKeys extends UnknownKeysParam = "strip",
+  Catchall extends ZodTypeAny = ZodTypeAny
+>(
+  entity: ZodObject<T, UnknownKeys, Catchall>
+) =>
+  result(
+    z.object({
+      entities: z.array(entity),
+      previousCursor: entity.nullable(),
+      nextCursor: entity.nullable(),
+    })
+  );
 
 let a = entities(z.object({}));
 
@@ -280,48 +296,48 @@ export const routes = identity({
       usersCreateOrUpdate(rawUserVoterSchema),
       usersCreateOrUpdate(rawUserHelperOrAdminSchema)
     ),
-    response: result(
-      z.object({}).extend({ id: z.number() })
-    ),
+    response: result(z.object({}).extend({ id: z.number() })),
   },
   "/api/v1/projects/create-or-update": {
     request: makeCreateOrUpdate(rawProjectSchema),
-    response: result(
-      z.object({}).extend({ id: z.number() })
-    ),
+    response: result(z.object({}).extend({ id: z.number() })),
   },
   "/api/v1/users": {
     request: z.undefined(),
-    response: result(z.object({
-      entities: z.array(
-        rawUserSchema(
+    response: result(
+      z.object({
+        entities: z.array(
+          rawUserSchema(
+            users(rawUserVoterSchema),
+            users(rawUserHelperOrAdminSchema)
+          )
+        ),
+        previousCursor: rawUserSchema(
           users(rawUserVoterSchema),
           users(rawUserHelperOrAdminSchema)
-        )
-      ),
-      previousCursor: rawUserSchema(
-        users(rawUserVoterSchema),
-        users(rawUserHelperOrAdminSchema)
-      ).nullable(),
-      nextCursor: rawUserSchema(
-        users(rawUserVoterSchema),
-        users(rawUserHelperOrAdminSchema)
-      ).nullable(),
-    })),
+        ).nullable(),
+        nextCursor: rawUserSchema(
+          users(rawUserVoterSchema),
+          users(rawUserHelperOrAdminSchema)
+        ).nullable(),
+      })
+    ),
   },
   "/api/v1/projects": {
     request: z.undefined(),
-    response: result(z.object({
-      entities: z.array(project),
-      previousCursor: project.nullable(),
-      nextCursor: project.nullable(),
-    })),
+    response: result(
+      z.object({
+        entities: z.array(project),
+        previousCursor: project.nullable(),
+        nextCursor: project.nullable(),
+      })
+    ),
   },
 } as const);
 
 export const entityRoutes = {
   "/api/v1/users": routes["/api/v1/users"],
-  "/api/v1/projects": routes["/api/v1/projects"]
-}
+  "/api/v1/projects": routes["/api/v1/projects"],
+};
 
 //const test: z.infer<typeof routes["/api/v1/projects/create-or-update"]["request"]> = 1 as any;

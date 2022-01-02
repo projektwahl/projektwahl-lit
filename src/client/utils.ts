@@ -21,39 +21,39 @@ export const myFetch = async <P extends import("../lib/routes").keys>(
         return {
           success: false,
           error: {
-            network: `Failed to request ${url}: ${response.status} ${response.statusText}\nAdditional information: ${additionalInfo}`
-          }
-        }
+            network: `Failed to request ${url}: ${response.status} ${response.statusText}\nAdditional information: ${additionalInfo}`,
+          },
+        };
       } catch (error) {
         return {
           success: false,
           error: {
-            network: `Failed to request ${url}: ${response.status} ${response.statusText}\n`
-          }
-        }
+            network: `Failed to request ${url}: ${response.status} ${response.statusText}\n`,
+          },
+        };
       }
     }
     const result = await response.json();
     return result;
   } catch (error) {
     console.error(error);
-		if (error instanceof TypeError) {
-			return {
-				success: false,
-				error: {
-					network: `Failed to request ${url}: ${error.message}\nAdditional information: ${
-						error.stack ?? 'none'
-					}`
-				}
-			};
-		} else {
-			return {
-				success: false,
-				error: {
-					network: `Failed to request ${url}: Unknown error see console.`
-				}
-			};
-		}
+    if (error instanceof TypeError) {
+      return {
+        success: false,
+        error: {
+          network: `Failed to request ${url}: ${
+            error.message
+          }\nAdditional information: ${error.stack ?? "none"}`,
+        },
+      };
+    } else {
+      return {
+        success: false,
+        error: {
+          network: `Failed to request ${url}: Unknown error see console.`,
+        },
+      };
+    }
   }
   // TODO FIXME this doubles the bundle size
   //return routes[url].response.parse(result)

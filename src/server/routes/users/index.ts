@@ -64,7 +64,11 @@ export async function usersHandler(
       rawUserHelperOrAdminSchema
     );
 
-    return await fetchData<z.infer<typeof schema>, typeof filters, "/api/v1/users">(
+    return await fetchData<
+      z.infer<typeof schema>,
+      typeof filters,
+      "/api/v1/users"
+    >(
       "/api/v1/users" as const,
       headers,
       "users",

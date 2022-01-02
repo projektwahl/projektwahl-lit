@@ -106,26 +106,28 @@ export const PwProjectUsers = setupHmr(
           return noChange;
         },
         complete: (result) => {
-          return result.success ? result.data.entities.map(
-            (value) => html`<tr>
-              <td>
-                <pw-project-user-checkbox
-                  projectId=${this.projectId}
-                  .user=${value}
-                  name=${this.name}
-                ></pw-project-user-checkbox>
-              </td>
-              <th scope="row">
-                <p>${value.id}</p>
-              </th>
-              <td>
-                <p>${value.username}</p>
-              </td>
-              <td>
-                <p>${value.type}</p>
-              </td>
-            </tr>`
-          ) : result.error;
+          return result.success
+            ? result.data.entities.map(
+                (value) => html`<tr>
+                  <td>
+                    <pw-project-user-checkbox
+                      projectId=${this.projectId}
+                      .user=${value}
+                      name=${this.name}
+                    ></pw-project-user-checkbox>
+                  </td>
+                  <th scope="row">
+                    <p>${value.id}</p>
+                  </th>
+                  <td>
+                    <p>${value.username}</p>
+                  </td>
+                  <td>
+                    <p>${value.type}</p>
+                  </td>
+                </tr>`
+              )
+            : result.error;
         },
         initial: () => {
           return html`hi`;

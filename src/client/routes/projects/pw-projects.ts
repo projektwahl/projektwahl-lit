@@ -118,33 +118,44 @@ class PwProjects<T> extends PwEntityList<"/api/v1/projects"> {
           return noChange;
         },
         complete: (result) => {
-          return result.success ? result.data.entities.map(
-            (value) => html`<tr>
-              <th scope="row">
-                <p>${value.id}</p>
-              </th>
-              <td>
-                <p>${value.title}</p>
-              </td>
-              <td>
-                <p>${value.info}</p>
-              </td>
-              <td>
-                <a
-                  class="btn btn-secondary"
-                  @click=${aClick}
-                  href="/projects/edit/${value.id}"
-                  role="button"
-                >
-                  <i class="bi bi-pen"></i>
-                </a>
+          return result.success
+            ? result.data.entities.map(
+                (value) => html`<tr>
+                  <th scope="row">
+                    <p>${value.id}</p>
+                  </th>
+                  <td>
+                    <p>${value.title}</p>
+                  </td>
+                  <td>
+                    <p>${value.info}</p>
+                  </td>
+                  <td>
+                    <a
+                      class="btn btn-secondary"
+                      @click=${aClick}
+                      href="/projects/edit/${value.id}"
+                      role="button"
+                    >
+                      <i class="bi bi-pen"></i>
+                    </a>
 
-                <button class="btn btn-secondary" type="button">
-                  <i class="bi bi-box-arrow-in-right"></i>
-                </button>
-              </td>
-            </tr>`
-          ) : result.error;
+                    <button class="btn btn-secondary" type="button">
+                      <i class="bi bi-box-arrow-in-right"></i>
+                    </button>
+                  </td>
+                </tr>`
+              )
+            : html`<tr>
+                <td colspan="4">
+                  <div class="alert alert-danger" role="alert">
+                    ${msg("Some errors occurred!")}<br />
+                    ${Object.entries(result.error).map(
+                      ([k, v]) => html`${k}: ${v}<br />`
+                    )}
+                  </div>
+                </td>
+              </tr>`;
         },
         initial: () => {
           return html`hi`;
