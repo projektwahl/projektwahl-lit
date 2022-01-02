@@ -214,9 +214,7 @@ export const PwApp = setupHmr(
                           active: this.history.url.pathname === "/login",
                         })}"
                         href="/login"
-                        >${msg(
-                          str`Login ${JSON.stringify(jscookie.get("username"))}`
-                        )}</a
+                        >${msg("Login")}</a
                       >
                     </li>`}
               </ul>

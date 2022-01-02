@@ -98,10 +98,10 @@ export async function openidRedirectHandler(
         "set-cookie": [
           `strict_id=${
             session.session_id
-          }; Secure; SameSite=Strict; HttpOnly; Max-Age=${48 * 60 * 60};`,
+          }; Secure; SameSite=Strict; Path=/; HttpOnly; Max-Age=${48 * 60 * 60};`,
           `lax_id=${
             session.session_id
-          }; Secure; SameSite=Lax; HttpOnly; Max-Age=${48 * 60 * 60};`,
+          }; Secure; SameSite=Lax;  Path=/; HttpOnly; Max-Age=${48 * 60 * 60};`,
           `username=${
             dbUser.username
           }; Secure; SameSite=Strict; Path=/; Max-Age=${48 * 60 * 60};`,
