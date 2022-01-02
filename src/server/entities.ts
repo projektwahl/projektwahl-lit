@@ -21,8 +21,9 @@ type test<T> = {
   [K in keyof T]: T[K]
 };
 
+// { entities: z.TypeOf<entitesType[R]["response"]["options"][0]["shape"]["data"]>["entities"]; nextCursor: z.TypeOf<entitesType[R]["response"]["options"][0]["shape"]["data"]>["nextCursor"]; previousCursor: z.TypeOf<entitesType[R]["response"]["options"][0]["shape"]["data"]>["previousCursor"]; }
 type mappedInfer1<R extends keyof typeof entityRoutes> = {
-  [K in keyof z.infer<typeof entityRoutes[R]["response"]["options"][0]["shape"]["data"]>]: z.infer<typeof entityRoutes[R]["response"]["options"][0]["shape"]["data"]>[K]
+  [K in keyof z.infer<entitesType[R]["response"]["options"][0]["shape"]["data"]>]: z.infer<entitesType[R]["response"]["options"][0]["shape"]["data"]>[K]
 }
 
 export async function fetchData<
