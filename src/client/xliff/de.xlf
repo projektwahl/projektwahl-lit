@@ -1,191 +1,221 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<xliff xmlns="urn:oasis:names:tc:xliff:document:1.2" version="1.2">
-  <file target-language="de" source-language="en" original="lit-localize-inputs" datatype="plaintext">
-    <body>
-      <trans-unit id="s6c2062b9249e8c19">
-        <source>getInputs must be implemented by subclass</source>
-        <target>getInputs muss von Unterklasse implementiert werden</target>
-      </trans-unit>
-      <trans-unit id="s01dc5a60edf9e053">
-        <source>component not fully initialized</source>
-        <target>Komponente nicht vollständig initialisiert</target>
-      </trans-unit>
-      <trans-unit id="s494268b948a317a2">
-        <source>Some errors occurred!</source>
-        <target>Einige Fehler sind aufgetreten!</target>
-      </trans-unit>
-      <trans-unit id="s7dc552fda8bc803d">
-        <source><x id="0" equiv-text="${count}"/> per page</source>
-        <target><x id="0" equiv-text="${count}"/> pro Seite</target>
-      </trans-unit>
-      <trans-unit id="s724828a10b3dd581">
-        <source>navigation of user list</source>
-        <target>Navigation der Accountliste</target>
-      </trans-unit>
-      <trans-unit id="s5aab4b7939a81663">
-        <source>previous page</source>
-        <target>Vorherige Seite</target>
-      </trans-unit>
-      <trans-unit id="s530b5e503198f143">
-        <source>next page</source>
-        <target>Nächste Seite</target>
-      </trans-unit>
-      <trans-unit id="s416ccf81fded518c">
-        <source>sort by <x id="0" equiv-text="${this.title}"/></source>
-        <target>Nach <x id="0" equiv-text="${this.title}"/> sortieren</target>
-      </trans-unit>
-      <trans-unit id="s586d6bd2eca2da93">
-        <source>Users</source>
-        <target>Accounts</target>
-      </trans-unit>
-      <trans-unit id="s0c97387dc725a9e2">
-        <source>Create account</source>
-        <target>Account erstellen</target>
-      </trans-unit>
-      <trans-unit id="s09240e07b5b8d640">
-        <source>ID</source>
-        <target>ID</target>
-      </trans-unit>
-      <trans-unit id="sef49aec68fd1dc66">
-        <source>Name</source>
-        <target>Name</target>
-      </trans-unit>
-      <trans-unit id="sd2223afb7d6b100d">
-        <source>Type</source>
-        <target>Typ</target>
-      </trans-unit>
-      <trans-unit id="s8af61807443f32a4">
-        <source>Actions</source>
-        <target>Aktionen</target>
-      </trans-unit>
-      <trans-unit id="s73aacc310b7d8714">
-        <source>Create/Update account</source>
-        <target>Account erstellen/aktualisieren</target>
-      </trans-unit>
-      <trans-unit id="s03f42eea72154959">
-        <source>Username</source>
-        <target>Accountname</target>
-      </trans-unit>
-      <trans-unit id="s9f9492d30a96b9c6">
-        <source>User type</source>
-        <target>Accounttyp</target>
-      </trans-unit>
-      <trans-unit id="s98b1cb8fb62909ec">
-        <source>Group</source>
-        <target>Klasse</target>
-      </trans-unit>
-      <trans-unit id="sf9b8d419a00f04bc">
-        <source>Age</source>
-        <target>Jahrgang</target>
-      </trans-unit>
-      <trans-unit id="sececb48b4688a29b">
-        <source>Away</source>
-        <target>Abwesend</target>
-      </trans-unit>
-      <trans-unit id="s9d678a001aaa0736">
-        <source>Create/Update project</source>
-        <target>Projekt erstellen/aktualisieren</target>
-      </trans-unit>
-      <trans-unit id="s99f110d27e30b289">
-        <source>Title</source>
-        <target>Titel</target>
-      </trans-unit>
-      <trans-unit id="s2063a9d17c280fe5">
-        <source>Info</source>
-        <target>Info</target>
-      </trans-unit>
-      <trans-unit id="s13b3f5afa0862d1c">
-        <source>Place</source>
-        <target>Ort/Raum</target>
-      </trans-unit>
-      <trans-unit id="s83871af4c0d79211">
-        <source>Costs</source>
-        <target>Kosten</target>
-      </trans-unit>
-      <trans-unit id="see65a67b4c57946c">
-        <source>Minimum age</source>
-        <target>minimale Jahrgangsstufe</target>
-      </trans-unit>
-      <trans-unit id="s59417c8662ddc5f2">
-        <source>Maximum age</source>
-        <target>maximale Jahrgangsstufe</target>
-      </trans-unit>
-      <trans-unit id="sa2b8f32796bda377">
-        <source>Minimum participants</source>
-        <target>minimale Teilnehmer</target>
-      </trans-unit>
-      <trans-unit id="s63fd8c3d71e20415">
-        <source>Maximum participants</source>
-        <target>maximale Teilnehmer</target>
-      </trans-unit>
-      <trans-unit id="s840d9c93fd926ecb">
-        <source>Allow random assignments</source>
-        <target>Zufällige Projektzuweisungen erlaubt</target>
-      </trans-unit>
-      <trans-unit id="sc8da3cc71de63832">
-        <source>Login</source>
-        <target>Anmelden</target>
-      </trans-unit>
-      <trans-unit id="s0561a43eeaf34c64">
-        <source>Login with third party account</source>
-        <target>Mit Schulaccount anmelden</target>
-      </trans-unit>
-      <trans-unit id="s8bfdcea2687691c2">
-        <source>Login as guest</source>
-        <target>Als Gast anmelden</target>
-      </trans-unit>
-      <trans-unit id="sf6e1665c7022a1f8">
-        <source>Password</source>
-        <target>Passwort</target>
-      </trans-unit>
-      <trans-unit id="s199f5853f4e718f7">
-        <source>Projects</source>
-        <target>Projekte</target>
-      </trans-unit>
-      <trans-unit id="sfb43be2359ccab14">
-        <source>Create project</source>
-        <target>Projekt erstellen</target>
-      </trans-unit>
-      <trans-unit id="hc66aaa662761137a">
-        <source>Not Found</source>
-        <target>Nicht gefunden</target>
-      </trans-unit>
-      <trans-unit id="s879f3dab73cde287">
-        <source>Error: <x id="0" equiv-text="${error}"/></source>
-        <target>Fehler: <x id="0" equiv-text="${error}"/></target>
-      </trans-unit>
-      <trans-unit id="sb57e557f2fef10c2">
-        <source>Projektwahl</source>
-        <target>Projektwahl</target>
-      </trans-unit>
-      <trans-unit id="s9fd5683fdd21fe41">
-        <source>Toggle navigation</source>
-        <target>Navigation umschalten</target>
-      </trans-unit>
-      <trans-unit id="s6abb1cd87fe0114e">
-        <source>Home</source>
-        <target>Start</target>
-      </trans-unit>
-      <trans-unit id="se48bd9e6c2a3109d">
-        <source>Accounts</source>
-        <target>Accounts</target>
-      </trans-unit>
-      <trans-unit id="s4fbcfb0cae19e35a">
-        <source>Election</source>
-        <target>Wahl</target>
-      </trans-unit>
-      <trans-unit id="s2667d13ee670a19d">
-        <source>Logout <x id="0" equiv-text="${jscookie.get(&quot;username&quot;)}"/></source>
-        <target><x id="0" equiv-text="${jscookie.get(&quot;username&quot;)}"/> abmelden</target>
-      </trans-unit>
-      <trans-unit id="s8af3a5335dbad918">
-        <source>Login <x id="0" equiv-text="${JSON.stringify(jscookie.get(&quot;username&quot;))}"/></source>
-        <target><x id="0" equiv-text="${JSON.stringify(jscookie.get(&quot;username&quot;))}"/> anmelden</target>
-      </trans-unit>
-      <trans-unit id="s49730f3d5751a433">
-        <source>Loading...</source>
-        <target>Wird geladen...</target>
-      </trans-unit>
-    </body>
-  </file>
+<xliff version="1.2" xmlns="urn:oasis:names:tc:xliff:document:1.2">
+<file target-language="de" source-language="en" original="lit-localize-inputs" datatype="plaintext">
+<body>
+<trans-unit id="s6c2062b9249e8c19">
+  <source>getInputs must be implemented by subclass</source>
+  <target>getInputs muss von Unterklasse implementiert werden</target>
+</trans-unit>
+<trans-unit id="s01dc5a60edf9e053">
+  <source>component not fully initialized</source>
+  <target>Komponente nicht vollständig initialisiert</target>
+</trans-unit>
+<trans-unit id="s494268b948a317a2">
+  <source>Some errors occurred!</source>
+  <target>Einige Fehler sind aufgetreten!</target>
+</trans-unit>
+<trans-unit id="s416ccf81fded518c">
+  <source>sort by <x id="0" equiv-text="${this.title}"/></source>
+  <target>Nach <x id="0" equiv-text="${this.title}"/> sortieren</target>
+</trans-unit>
+<trans-unit id="s7dc552fda8bc803d">
+  <source><x id="0" equiv-text="${count}"/> per page</source>
+  <target><x id="0" equiv-text="${count}"/> pro Seite</target>
+</trans-unit>
+<trans-unit id="s724828a10b3dd581">
+  <source>navigation of user list</source>
+  <target>Navigation der Accountliste</target>
+</trans-unit>
+<trans-unit id="s5aab4b7939a81663">
+  <source>previous page</source>
+  <target>Vorherige Seite</target>
+</trans-unit>
+<trans-unit id="s530b5e503198f143">
+  <source>next page</source>
+  <target>Nächste Seite</target>
+</trans-unit>
+<trans-unit id="s586d6bd2eca2da93">
+  <source>Users</source>
+  <target>Accounts</target>
+</trans-unit>
+<trans-unit id="s0c97387dc725a9e2">
+  <source>Create account</source>
+  <target>Account erstellen</target>
+</trans-unit>
+<trans-unit id="s09240e07b5b8d640">
+  <source>ID</source>
+  <target>ID</target>
+</trans-unit>
+<trans-unit id="sef49aec68fd1dc66">
+  <source>Name</source>
+  <target>Name</target>
+</trans-unit>
+<trans-unit id="sd2223afb7d6b100d">
+  <source>Type</source>
+  <target>Typ</target>
+</trans-unit>
+<trans-unit id="s8af61807443f32a4">
+  <source>Actions</source>
+  <target>Aktionen</target>
+</trans-unit>
+<trans-unit id="s88608c78750c1b37">
+  <source>View account</source>
+</trans-unit>
+<trans-unit id="sa86d79c867c8f453">
+  <source>Update account</source>
+</trans-unit>
+<trans-unit id="s03f42eea72154959">
+  <source>Username</source>
+  <target>Accountname</target>
+</trans-unit>
+<trans-unit id="s9f9492d30a96b9c6">
+  <source>User type</source>
+  <target>Accounttyp</target>
+</trans-unit>
+<trans-unit id="s98b1cb8fb62909ec">
+  <source>Group</source>
+  <target>Klasse</target>
+</trans-unit>
+<trans-unit id="sf9b8d419a00f04bc">
+  <source>Age</source>
+  <target>Jahrgang</target>
+</trans-unit>
+<trans-unit id="sf6e1665c7022a1f8">
+  <source>Password</source>
+  <target>Passwort</target>
+</trans-unit>
+<trans-unit id="sececb48b4688a29b">
+  <source>Away</source>
+  <target>Abwesend</target>
+</trans-unit>
+<trans-unit id="hd684a0e714c0d252">
+  <source>✓</source>
+</trans-unit>
+<trans-unit id="s3e9c025477abb23d">
+  <source>View project</source>
+</trans-unit>
+<trans-unit id="s7bef03c295945331">
+  <source>Update project</source>
+</trans-unit>
+<trans-unit id="sfb43be2359ccab14">
+  <source>Create project</source>
+  <target>Projekt erstellen</target>
+</trans-unit>
+<trans-unit id="s99f110d27e30b289">
+  <source>Title</source>
+  <target>Titel</target>
+</trans-unit>
+<trans-unit id="s2063a9d17c280fe5">
+  <source>Info</source>
+  <target>Info</target>
+</trans-unit>
+<trans-unit id="s13b3f5afa0862d1c">
+  <source>Place</source>
+  <target>Ort/Raum</target>
+</trans-unit>
+<trans-unit id="s83871af4c0d79211">
+  <source>Costs</source>
+  <target>Kosten</target>
+</trans-unit>
+<trans-unit id="see65a67b4c57946c">
+  <source>Minimum age</source>
+  <target>minimale Jahrgangsstufe</target>
+</trans-unit>
+<trans-unit id="s59417c8662ddc5f2">
+  <source>Maximum age</source>
+  <target>maximale Jahrgangsstufe</target>
+</trans-unit>
+<trans-unit id="sa2b8f32796bda377">
+  <source>Minimum participants</source>
+  <target>minimale Teilnehmer</target>
+</trans-unit>
+<trans-unit id="s63fd8c3d71e20415">
+  <source>Maximum participants</source>
+  <target>maximale Teilnehmer</target>
+</trans-unit>
+<trans-unit id="s7e3a936c4f113dd4">
+  <source>Project leaders</source>
+</trans-unit>
+<trans-unit id="sea8d39886fdb9cf5">
+  <source>Guaranteed project members</source>
+</trans-unit>
+<trans-unit id="s840d9c93fd926ecb">
+  <source>Allow random assignments</source>
+  <target>Zufällige Projektzuweisungen erlaubt</target>
+</trans-unit>
+<trans-unit id="sc8da3cc71de63832">
+  <source>Login</source>
+  <target>Anmelden</target>
+</trans-unit>
+<trans-unit id="s0561a43eeaf34c64">
+  <source>Login with third party account</source>
+  <target>Mit Schulaccount anmelden</target>
+</trans-unit>
+<trans-unit id="s8bfdcea2687691c2">
+  <source>Login as guest</source>
+  <target>Als Gast anmelden</target>
+</trans-unit>
+<trans-unit id="scdb1bac161852c73">
+  <source>Welcome</source>
+</trans-unit>
+<trans-unit id="se478d5906376d65e">
+  <source>This is some boilerplate welcome text that can be adapted by changing the translation.</source>
+</trans-unit>
+<trans-unit id="s7a391ae3182a86b5">
+  <source>Credits</source>
+</trans-unit>
+<trans-unit id="s1d7b0c0421a2c3bb">
+  <source>Copyright (C) 2021 Moritz Hedtke</source>
+</trans-unit>
+<trans-unit id="s002eca353a21fdbe">
+  <source>projektwahl-lit</source>
+</trans-unit>
+<trans-unit id="sd492e73c3bfe5cf7">
+  <source> is licensed under the </source>
+</trans-unit>
+<trans-unit id="sb998e2a6393b7b37">
+  <source>GNU Affero General Public License v3.0</source>
+</trans-unit>
+<trans-unit id="s199f5853f4e718f7">
+  <source>Projects</source>
+  <target>Projekte</target>
+</trans-unit>
+<trans-unit id="hc66aaa662761137a">
+  <source>Not Found</source>
+  <target>Nicht gefunden</target>
+</trans-unit>
+<trans-unit id="s879f3dab73cde287">
+  <source>Error: <x id="0" equiv-text="${error}"/></source>
+  <target>Fehler: <x id="0" equiv-text="${error}"/></target>
+</trans-unit>
+<trans-unit id="sb57e557f2fef10c2">
+  <source>Projektwahl</source>
+  <target>Projektwahl</target>
+</trans-unit>
+<trans-unit id="s9fd5683fdd21fe41">
+  <source>Toggle navigation</source>
+  <target>Navigation umschalten</target>
+</trans-unit>
+<trans-unit id="s6abb1cd87fe0114e">
+  <source>Home</source>
+  <target>Start</target>
+</trans-unit>
+<trans-unit id="se48bd9e6c2a3109d">
+  <source>Accounts</source>
+  <target>Accounts</target>
+</trans-unit>
+<trans-unit id="s4fbcfb0cae19e35a">
+  <source>Election</source>
+  <target>Wahl</target>
+</trans-unit>
+<trans-unit id="s2667d13ee670a19d">
+  <source>Logout <x id="0" equiv-text="${jscookie.get(&quot;username&quot;)}"/></source>
+  <target><x id="0" equiv-text="${jscookie.get(&quot;username&quot;)}"/> abmelden</target>
+</trans-unit>
+<trans-unit id="s49730f3d5751a433">
+  <source>Loading...</source>
+  <target>Wird geladen...</target>
+</trans-unit>
+</body>
+</file>
 </xliff>
