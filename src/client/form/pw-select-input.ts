@@ -15,6 +15,7 @@ export class PwSelectInput<T, Q extends keyof T> extends LitElement {
       label: { type: String },
       name: { type: String },
       options: { attribute: false },
+      disabled: { type: Boolean },
       randomId: { state: true },
       task: {
         attribute: false,
@@ -27,6 +28,8 @@ export class PwSelectInput<T, Q extends keyof T> extends LitElement {
       },
     };
   }
+
+  disabled: boolean = false;
 
   randomId;
 
@@ -99,6 +102,11 @@ export class PwSelectInput<T, Q extends keyof T> extends LitElement {
         <label for=${this.randomId} class="form-label">${this.label}:</label>
         <select
           ${ref(this.input)}
+          ?disabled=${this.disabled || this.task.render({
+            complete: () => false,
+            pending: () => true,
+            initial: () => false,
+          })}
           aria-describedby="${this.randomId}-feedback"
           class="form-select ${this.task.render({
             pending: () => "",

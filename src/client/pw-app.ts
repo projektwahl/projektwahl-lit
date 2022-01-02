@@ -66,6 +66,8 @@ export const nextPage = async (url: URL) => {
       return html`<pw-user-create></pw-user-create>`;
     } else if (/users\/edit\/\d+/.test(url.pathname)) {
       return await pwUser(Number(url.pathname.match(/users\/edit\/(\d+)/)![1]));
+    } else if (/users\/view\/\d+/.test(url.pathname)) {
+      return await pwUser(Number(url.pathname.match(/users\/view\/(\d+)/)![1]), true);
     } else if (url.pathname === "/projects") {
       return await pwProjects(url);
     } else if (url.pathname === "/projects/create") {
@@ -73,6 +75,10 @@ export const nextPage = async (url: URL) => {
     } else if (/projects\/edit\/\d+/.test(url.pathname)) {
       return await pwProject(
         Number(url.pathname.match(/projects\/edit\/(\d+)/)![1])
+      );
+    } else if (/projects\/view\/\d+/.test(url.pathname)) {
+      return await pwProject(
+        Number(url.pathname.match(/projects\/view\/(\d+)/)![1]), true
       );
     } else {
       return msg(html`Not Found`);

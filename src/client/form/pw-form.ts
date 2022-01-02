@@ -11,8 +11,11 @@ class PwForm<P extends keyof typeof routes> extends LitElement {
   static override get properties() {
     return {
       forceTask: { state: true },
+      disabled: { type: Boolean },
     };
   }
+
+  disabled: boolean = false;
 
   get actionText(): string {
     throw new Error("not implemented");
@@ -120,6 +123,7 @@ if ('FormDataEvent' in window) {
             >
               ${this.getInputs()}
 
+              ${!this.disabled ? html`
               <button
                 type="submit"
                 ?disabled=${this._task.render({
@@ -131,6 +135,7 @@ if ('FormDataEvent' in window) {
               >
                 ${this.actionText} ${this._task.status}
               </button>
+              ` : undefined}
             </form>
           </div>
         </div>

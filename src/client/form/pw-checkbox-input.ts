@@ -13,6 +13,7 @@ export class PwCheckboxInput<T> extends LitElement {
     return {
       label: { type: String },
       name: { type: String },
+      disabled: { type: Boolean },
       randomId: { state: true },
       task: {
         attribute: false,
@@ -25,6 +26,8 @@ export class PwCheckboxInput<T> extends LitElement {
       },
     };
   }
+
+  disabled: boolean = false;
 
   randomId;
 
@@ -96,6 +99,11 @@ export class PwCheckboxInput<T> extends LitElement {
         <input type="hidden" name=${this.name.toString()} value="off" />
         <input
           ${ref(this.input)}
+          ?disabled=${this.disabled || this.task.render({
+            complete: () => false,
+            pending: () => true,
+            initial: () => false,
+          })}
           type="checkbox"
           ?checked=${this.initial?.[this.name]}
           class="form-check-input ${this.task.render({

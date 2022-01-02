@@ -14,6 +14,7 @@ export class PwNumberInput<T> extends LitElement {
       label: { type: String },
       name: { type: String },
       randomId: { state: true },
+      disabled: { type: Boolean },
       task: {
         attribute: false,
         hasChanged: () => {
@@ -25,6 +26,8 @@ export class PwNumberInput<T> extends LitElement {
       },
     };
   }
+
+  disabled: boolean = false;
 
   randomId;
 
@@ -108,7 +111,7 @@ export class PwNumberInput<T> extends LitElement {
           name=${this.name.toString()}
           id=${this.randomId}
           aria-describedby="${this.randomId}-feedback"
-          ?disabled=${this.task.render({
+          ?disabled=${this.disabled || this.task.render({
             complete: () => false,
             pending: () => true,
             initial: () => false,

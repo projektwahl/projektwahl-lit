@@ -13,10 +13,11 @@ import "../../form/pw-checkbox-input.js";
 import type { z } from "zod";
 import type { routes } from "../../../lib/routes.js";
 import "./pw-project-users.js";
+import { setupHmr } from "../../hmr.js";
 
-export async function pwProject(id: number) {
+export async function pwProject(id: number, viewOnly: boolean = false) {
   let result = await taskFunction([id]);
-  return html`<pw-project-create .initial=${result}></pw-project-create>`;
+  return html`<pw-project-create ?disabled=${viewOnly} .initial=${result}></pw-project-create>`;
 }
 
 const taskFunction = async ([id]: [number]) => {
@@ -29,22 +30,25 @@ const taskFunction = async ([id]: [number]) => {
   return response.success ? response.data.entities[0] : null; // TODO FIXME error handling, PwForm already has some form of error handling
 };
 
-export class PwProjectCreate extends PwForm<"/api/v1/projects/create-or-update"> {
+export const PwProjectCreate = setupHmr(
+  import.meta.url,
+  "PwProjectCreate",
+class PwProjectCreate extends PwForm<"/api/v1/projects/create-or-update"> {
   static override get properties() {
     return {
+      ...super.properties,
       url: { attribute: false },
       actionText: { type: String },
       _task: { state: true },
       _initialTask: { state: true },
-      forceTask: { state: true },
       type: { state: true },
       initial: { attribute: false },
       initialRender: { state: true },
     };
   }
-
+  
   override get actionText() {
-    return this.initial ? msg("Update project") : msg("Create project");
+    return this.disabled ? msg("View project") : (this.initial ? msg("Update project") : msg("Create project"));
   }
 
   initialRender: boolean;
@@ -100,9 +104,10 @@ export class PwProjectCreate extends PwForm<"/api/v1/projects/create-or-update">
     );
   }
 
-  override getInputs = () => {
+  override getInputs() {
     return html`
       <pw-text-input
+        ?disabled=${this.disabled}
         label=${msg("Title")}
         name="title"
         .task=${this._task}
@@ -110,6 +115,7 @@ export class PwProjectCreate extends PwForm<"/api/v1/projects/create-or-update">
       ></pw-text-input>
 
       <pw-text-input
+        ?disabled=${this.disabled}
         label=${msg("Info")}
         name="info"
         .task=${this._task}
@@ -117,6 +123,7 @@ export class PwProjectCreate extends PwForm<"/api/v1/projects/create-or-update">
       ></pw-text-input>
 
       <pw-text-input
+        ?disabled=${this.disabled}
         label=${msg("Place")}
         name="place"
         .task=${this._task}
@@ -124,6 +131,7 @@ export class PwProjectCreate extends PwForm<"/api/v1/projects/create-or-update">
       ></pw-text-input>
 
       <pw-number-input
+      ?disabled=${this.disabled}
         label=${msg("Costs")}
         name="costs"
         .task=${this._task}
@@ -131,6 +139,7 @@ export class PwProjectCreate extends PwForm<"/api/v1/projects/create-or-update">
       ></pw-number-input>
 
       <pw-number-input
+      ?disabled=${this.disabled}
         label=${msg("Minimum age")}
         name="min_age"
         .task=${this._task}
@@ -138,6 +147,7 @@ export class PwProjectCreate extends PwForm<"/api/v1/projects/create-or-update">
       ></pw-number-input>
 
       <pw-number-input
+      ?disabled=${this.disabled}
         label=${msg("Maximum age")}
         name="max_age"
         .task=${this._task}
@@ -145,6 +155,7 @@ export class PwProjectCreate extends PwForm<"/api/v1/projects/create-or-update">
       ></pw-number-input>
 
       <pw-number-input
+      ?disabled=${this.disabled}
         label=${msg("Minimum participants")}
         name="min_participants"
         .task=${this._task}
@@ -152,6 +163,7 @@ export class PwProjectCreate extends PwForm<"/api/v1/projects/create-or-update">
       ></pw-number-input>
 
       <pw-number-input
+      ?disabled=${this.disabled}
         label=${msg("Maximum participants")}
         name="max_participants"
         .task=${this._task}
@@ -159,6 +171,7 @@ export class PwProjectCreate extends PwForm<"/api/v1/projects/create-or-update">
       ></pw-number-input>
 
       <!-- Projektleitende -->
+      <!-- TODO FIXME view only -->
       ${this.initial
         ? html`<pw-project-users
             projectId=${this.initial.id!}
@@ -175,6 +188,7 @@ export class PwProjectCreate extends PwForm<"/api/v1/projects/create-or-update">
         : html``}
 
       <pw-checkbox-input
+      ?disabled=${this.disabled}
         label=${msg("Allow random assignments")}
         name="random_assignments"
         .task=${this._task}
@@ -182,5 +196,6 @@ export class PwProjectCreate extends PwForm<"/api/v1/projects/create-or-update">
       ></pw-checkbox-input>
     `;
   };
-}
+})
+
 customElements.define("pw-project-create", PwProjectCreate);

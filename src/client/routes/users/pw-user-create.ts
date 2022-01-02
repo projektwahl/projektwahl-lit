@@ -20,9 +20,9 @@ import type {
 } from "../../../lib/routes.js";
 import type { z } from "zod";
 
-export async function pwUser(id: number) {
+export async function pwUser(id: number, viewOnly: boolean = false) {
   let result = await taskFunction([id]);
-  return html`<pw-user-create .initial=${result}></pw-user-create>`;
+  return html`<pw-user-create ?disabled=${viewOnly} .initial=${result}></pw-user-create>`;
 }
 
 const taskFunction = async ([id]: [number]) => {
@@ -32,20 +32,23 @@ const taskFunction = async ([id]: [number]) => {
   return response.success ? response.data.entities[0] : null; // TODO FIXME error handling, PwForm already has some form of error handling
 };
 
-export class PwUserCreate extends PwForm<"/api/v1/users/create-or-update"> {
+export const PwUserCreate = setupHmr(
+  import.meta.url,
+  "PwUserCreate",
+class PwUserCreate extends PwForm<"/api/v1/users/create-or-update"> {
   static override get properties() {
     return {
+      ...super.properties,
       url: { attribute: false },
       actionText: { type: String },
       _task: { state: true },
-      forceTask: { state: true },
       type: { state: true },
       initial: { attribute: false },
     };
   }
 
   override get actionText() {
-    return this.initial ? msg("Update account") : msg("Create account");
+    return this.disabled ? msg("View account") : (this.initial ? msg("Update account") : msg("Create account"));
   }
 
   type?: "voter" | "admin" | "helper";
@@ -103,9 +106,10 @@ export class PwUserCreate extends PwForm<"/api/v1/users/create-or-update"> {
     );
   }
 
-  override getInputs = () => {
+  override getInputs() {
     return html`
       <pw-text-input
+        ?disabled=${this.disabled}
         label=${msg("Username")}
         name="username"
         .task=${this._task}
@@ -113,6 +117,7 @@ export class PwUserCreate extends PwForm<"/api/v1/users/create-or-update"> {
       ></pw-text-input>
 
       <pw-select-input
+        ?disabled=${this.disabled}
         @change=${(event: Event) =>
           (this.type = (event.target as HTMLSelectElement).value as
             | "helper"
@@ -132,6 +137,7 @@ export class PwUserCreate extends PwForm<"/api/v1/users/create-or-update"> {
 
       ${(this.type ?? this.initial?.type ?? "voter") === "voter"
         ? html`<pw-text-input
+              ?disabled=${this.disabled}
               label=${msg("Group")}
               name="group"
               .task=${this._task}
@@ -139,6 +145,7 @@ export class PwUserCreate extends PwForm<"/api/v1/users/create-or-update"> {
             ></pw-text-input>
 
             <pw-number-input
+              ?disabled=${this.disabled}
               label=${msg("Age")}
               name="age"
               .task=${this._task}
@@ -146,15 +153,19 @@ export class PwUserCreate extends PwForm<"/api/v1/users/create-or-update"> {
             ></pw-number-input>`
         : undefined}
 
+        ${!this.disabled ? html`
       <pw-text-input
+        ?disabled=${this.disabled}
         label=${msg("Password")}
         name="password"
         type="password"
         .task=${this._task}
         .initial=${this.initial}
       ></pw-text-input>
+      ` : undefined}
 
       <pw-checkbox-input
+        ?disabled=${this.disabled}
         label=${msg("Away")}
         name="away"
         .task=${this._task}
@@ -162,5 +173,6 @@ export class PwUserCreate extends PwForm<"/api/v1/users/create-or-update"> {
       ></pw-checkbox-input>
     `;
   };
-}
+})
+
 customElements.define("pw-user-create", PwUserCreate);
