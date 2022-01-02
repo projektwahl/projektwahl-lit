@@ -145,7 +145,13 @@ export async function fetchData<
   }
 
   // [TemplateStringsArray, ...(null | string | string[] | boolean | number)[]]
-  let entities: z.infer<typeof routes[R]["response"]["options"][0]>["data"]["entities"] = routes[path]["response"]["options"][0].shape.data.shape.entities.parse(
+  let entities: {
+    "/api/v1/users": z.infer<typeof routes["/api/v1/users"]["response"]["options"][0]["shape"]["data"]["shape"]["entities"]>;
+    "/api/v1/projects": z.infer<typeof routes["/api/v1/projects"]["response"]["options"][0]["shape"]["data"]["shape"]["entities"]>;
+   }[typeof path] = {
+     "/api/v1/users": routes["/api/v1/users"]["response"]["options"][0].shape.data.shape.entities,
+     "/api/v1/projects": routes["/api/v1/projects"]["response"]["options"][0].shape.data.shape.entities,
+   }[path].parse(
     await sql(...finalQuery)
   );
 

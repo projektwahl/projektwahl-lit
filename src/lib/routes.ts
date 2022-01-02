@@ -134,7 +134,7 @@ export const rawSessionType = z.object({
   user_id: z.number(),
 });
 
-export const loginOutputSchema = result(z.null());
+export const loginOutputSchema = result(z.object({}));
 
 export type keys =
   | "/api/v1/login"
@@ -248,7 +248,7 @@ const project = rawProjectSchema.pick({
 export const routes = identity({
   "/api/v1/logout": {
     request: z.any(),
-    response: result(z.any()),
+    response: result(z.object({})),
   },
   "/api/v1/login": {
     request: loginInputSchema,
@@ -256,19 +256,19 @@ export const routes = identity({
   },
   "/api/v1/openid-login": {
     request: z.any(),
-    response: result(z.any()),
+    response: result(z.object({})),
   },
   "/api/v1/redirect": {
     request: z.any(),
-    response: result(z.any()),
+    response: result(z.object({})),
   },
   "/api/v1/sleep": {
     request: z.undefined(),
-    response: result(z.any()),
+    response: result(z.object({})),
   },
   "/api/v1/update": {
     request: z.undefined(),
-    response: result(z.number()),
+    response: result(z.object({})),
   },
   "/api/v1/users/create-or-update": {
     request: rawUserSchema(
@@ -313,5 +313,10 @@ export const routes = identity({
     })),
   },
 } as const);
+
+export const entityRoutes = {
+  "/api/v1/users": routes["/api/v1/users"],
+  "/api/v1/projects": routes["/api/v1/projects"]
+}
 
 //const test: z.infer<typeof routes["/api/v1/projects/create-or-update"]["request"]> = 1 as any;
