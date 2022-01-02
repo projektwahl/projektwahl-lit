@@ -1,19 +1,15 @@
 import type { OutgoingHttpHeaders } from "node:http2";
 import type { Row } from "postgres";
 import { z, ZodObject, ZodTypeAny } from "zod";
-import { routes, UnknownKeysParam } from "../lib/routes.js";
+import { routes, entityRoutes } from "../lib/routes.js";
 import {entities} from "../lib/routes.js";
 import type { BaseQuery, FilterType } from "../lib/types.js";
 import { sql } from "./database.js";
 import { sql2, unsafe2 } from "./sql/index.js";
 
-class Wrapper<T extends { [k: string]: ZodTypeAny },
-UnknownKeys extends UnknownKeysParam = "strip",
-Catchall extends ZodTypeAny = ZodTypeAny> {
-  wrapped(e: ZodObject<T, UnknownKeys, Catchall>) {
-    return entities(e)
-  }
-}
+type entitesType = {
+  [K in keyof typeof entityRoutes]: typeof entityRoutes[K]
+};
 
 export async function fetchData<
   T extends {
@@ -21,7 +17,7 @@ export async function fetchData<
     [index: string]: null | string | string[] | boolean | number;
   },
   Q,
-  R extends "/api/v1/users"|"/api/v1/projects"
+  R extends keyof typeof entityRoutes
 >(
   path: R,
   headers: import("http2").IncomingHttpHeaders,
@@ -36,8 +32,10 @@ export async function fetchData<
     ...(null | string | string[] | boolean | number | Buffer)[]
   ]
 ): Promise<
-  [OutgoingHttpHeaders, z.infer<typeof routes["/api/v1/users"]["response"]> | z.infer<typeof routes["/api/v1/projects"]["response"]>]
+  [OutgoingHttpHeaders, z.infer<typeof entityRoutes[R]["response"]>]
 > {
+  let entitySchema: entitesType[R] = entityRoutes[path];
+
   const url = new URL(headers[":path"]!, "https://localhost:8443");
 
   const pagination = z
@@ -145,20 +143,16 @@ export async function fetchData<
   }
 
   // [TemplateStringsArray, ...(null | string | string[] | boolean | number)[]]
-  let entities: {
-    "/api/v1/users": z.infer<typeof routes["/api/v1/users"]["response"]["options"][0]["shape"]["data"]["shape"]["entities"]>;
-    "/api/v1/projects": z.infer<typeof routes["/api/v1/projects"]["response"]["options"][0]["shape"]["data"]["shape"]["entities"]>;
-   }[typeof path] = {
-     "/api/v1/users": routes["/api/v1/users"]["response"]["options"][0].shape.data.shape.entities,
-     "/api/v1/projects": routes["/api/v1/projects"]["response"]["options"][0].shape.data.shape.entities,
-   }[path].parse(
+  let entitiesSchema: entitesType[R]["response"]["options"][0]["shape"]["data"]["shape"]["entities"] = entitySchema["response"]["options"][0]["shape"]["data"]["shape"]["entities"];
+  
+  let entities: z.infer<entitesType[R]["response"]["options"][0]["shape"]["data"]["shape"]["entities"]> = entitiesSchema.parse(
     await sql(...finalQuery)
   );
 
   // https://github.com/projektwahl/projektwahl-sveltekit/blob/work/src/lib/list-entities.ts#L30
 
-  let nextCursor: z.infer<typeof routes[R]["response"]["options"][0]>["data"]["nextCursor"] = null;
-  let previousCursor: z.infer<typeof routes[R]["response"]["options"][0]>["data"]["previousCursor"] = null;
+  let nextCursor: z.infer<entitesType[R]["response"]["options"][0]["shape"]["data"]["shape"]["nextCursor"]> = null;
+  let previousCursor: z.infer<entitesType[R]["response"]["options"][0]["shape"]["data"]["shape"]["previousCursor"]> = null;
   // TODO FIXME also recalculate the other cursor because data could've been deleted in between / the filters have changed
   if (pagination.p_direction === "forwards") {
     if (pagination.p_cursor) {
@@ -179,15 +173,16 @@ export async function fetchData<
     }
   }
 
-  let a: z.infer<typeof routes[R]["response"]["options"][0]> = {
-    success: true as const,
-    data: {
-      entities,
-      nextCursor,
-      previousCursor,
-    }
+  let z: z.infer<entitesType[R]["response"]["options"][0]["shape"]["data"]> = {
+    entities: entities as z.infer<entitesType[R]["response"]["options"][0]["shape"]["data"]["shape"]["entities"]>,
+    nextCursor: nextCursor,
+    previousCursor: previousCursor,
   };
 
+  let a: z.infer<entitesType[R]["response"]> = {
+    success: true as const,
+    data: z
+  };
 
   return [
     {
