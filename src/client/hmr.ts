@@ -156,7 +156,7 @@ function injectInheritsHmrClass(clazz) {
  * Registers a web component class. Triggers a hot replacement if the
  * class was already registered before.
  */
-export function register(importMetaUrl, name, clazz) {
+export function register<T>(importMetaUrl, name, clazz: T): T {
   const key = `${new URL(importMetaUrl).pathname}:${name}`;
   const existing = proxiesForKeys.get(key);
   if (!existing) {

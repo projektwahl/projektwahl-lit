@@ -122,10 +122,10 @@ class PwProjects<T> extends PwEntityList<"/api/v1/projects"> {
             ? result.data.entities.map(
                 (value) => html`<tr>
                   <th scope="row">
-                    <p>${value.id}</p>
+                    <p><a @click=${aClick} href="/projects/view/${value.id}">${value.id}</a></p>
                   </th>
                   <td>
-                    <p>${value.title}</p>
+                  <p><a @click=${aClick} href="/projects/view/${value.id}">${value.title}</a></p>
                   </td>
                   <td>
                     <p>${value.info}</p>
