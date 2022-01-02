@@ -111,7 +111,8 @@ export class PwNumberInput<T> extends LitElement {
           name=${this.name.toString()}
           id=${this.randomId}
           aria-describedby="${this.randomId}-feedback"
-          ?disabled=${this.disabled || this.task.render({
+          ?disabled=${this.disabled ||
+          this.task.render({
             complete: () => false,
             pending: () => true,
             initial: () => false,

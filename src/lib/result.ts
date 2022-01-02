@@ -12,12 +12,13 @@ import {
 import type { UnknownKeysParam } from "./routes.js";
 
 export const successResult = <
-Output,
-Def extends ZodTypeDef = ZodTypeDef,
-Input = Output
+  Output,
+  Def extends ZodTypeDef = ZodTypeDef,
+  Input = Output
 >(
-s: ZodType<Output, Def, Input>
-) => z
+  s: ZodType<Output, Def, Input>
+) =>
+  z
     .object({
       success: z.literal(true),
       data: s,
@@ -25,24 +26,25 @@ s: ZodType<Output, Def, Input>
     .strict();
 
 export const failureResult = <
-Output,
-Def extends ZodTypeDef = ZodTypeDef,
-Input = Output
+  Output,
+  Def extends ZodTypeDef = ZodTypeDef,
+  Input = Output
 >(
-s: ZodType<Output, Def, Input>
-) => z
+  s: ZodType<Output, Def, Input>
+) =>
+  z
     .object({
       success: z.literal(false),
       error: s,
     })
     .strict();
 
-export const result =  <
-Output,
-Def extends ZodTypeDef = ZodTypeDef,
-Input = Output
+export const result = <
+  Output,
+  Def extends ZodTypeDef = ZodTypeDef,
+  Input = Output
 >(
-s: ZodType<Output, Def, Input>
+  s: ZodType<Output, Def, Input>
 ) => z.union([successResult(s), failureResult(z.record(z.string()))]);
 
 export const anyResult = result(z.object({}));

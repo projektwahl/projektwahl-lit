@@ -122,20 +122,21 @@ if ('FormDataEvent' in window) {
               @submit=${this.submit}
             >
               ${this.getInputs()}
-
-              ${!this.disabled ? html`
-              <button
-                type="submit"
-                ?disabled=${this._task.render({
-                  pending: () => true,
-                  complete: () => false,
-                  initial: () => false,
-                })}
-                class="btn btn-primary"
-              >
-                ${this.actionText} ${this._task.status}
-              </button>
-              ` : undefined}
+              ${!this.disabled
+                ? html`
+                    <button
+                      type="submit"
+                      ?disabled=${this._task.render({
+                        pending: () => true,
+                        complete: () => false,
+                        initial: () => false,
+                      })}
+                      class="btn btn-primary"
+                    >
+                      ${this.actionText} ${this._task.status}
+                    </button>
+                  `
+                : undefined}
             </form>
           </div>
         </div>

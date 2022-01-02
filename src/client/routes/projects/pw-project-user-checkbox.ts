@@ -8,7 +8,7 @@ import { msg } from "@lit/localize";
 import { bootstrapCss } from "../../index.js";
 import type { routes } from "../../../lib/routes.js";
 import type { z } from "zod";
-import {live} from 'lit/directives/live.js';
+import { live } from "lit/directives/live.js";
 
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // SPDX-FileCopyrightText: 2021 Moritz Hedtke <Moritz.Hedtke@t-online.de>
@@ -62,7 +62,8 @@ class PwProjectUserCheckbox extends LitElement {
             },
             body: JSON.stringify({
               id: this.user.id,
-              [this.name]: this.user[this.name] === this.projectId ? null : this.projectId,
+              [this.name]:
+                this.user[this.name] === this.projectId ? null : this.projectId,
             }),
           }
         );

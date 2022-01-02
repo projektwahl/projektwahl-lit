@@ -16,7 +16,9 @@ export async function createOrUpdateProjectsHandler(
       // helper is allowed to create projects and change their own projects
       // voter is not allowed to do anything
 
-      if (!(loggedInUser?.type === "admin" || loggedInUser?.type === "helper")) {
+      if (
+        !(loggedInUser?.type === "admin" || loggedInUser?.type === "helper")
+      ) {
         return [
           {
             "content-type": "text/json; charset=utf-8",
@@ -70,7 +72,8 @@ export async function createOrUpdateProjectsHandler(
           } else {
             // TODO FIXME we can use our nice query building here
             // or postgres also has builtin features for insert and update
-            let res = await sql`INSERT INTO projects (title, info, place, costs, min_age, max_age, min_participants, max_participants, random_assignments)
+            let res =
+              await sql`INSERT INTO projects (title, info, place, costs, min_age, max_age, min_participants, max_participants, random_assignments)
             (SELECT 
     ${project.title ?? null},
     ${project.info ?? null},
@@ -81,13 +84,15 @@ export async function createOrUpdateProjectsHandler(
     ${project.min_participants ?? null},
     ${project.max_participants ?? null},
     ${project.random_assignments ?? false} FROM users WHERE users.id = ${
-              loggedInUser.id
-            } AND (users.type = 'helper' OR users.type = 'admin'))
+                loggedInUser.id
+              } AND (users.type = 'helper' OR users.type = 'admin'))
     RETURNING id;`;
 
             // TODO FIXME make this in sql directly
             if (loggedInUser.type === "helper") {
-              await sql`UPDATE users SET project_leader_id = ${res[0].id as number} WHERE project_leader_id IS NULL AND id = ${loggedInUser.id}`
+              await sql`UPDATE users SET project_leader_id = ${
+                res[0].id as number
+              } WHERE project_leader_id IS NULL AND id = ${loggedInUser.id}`;
             }
 
             return res;

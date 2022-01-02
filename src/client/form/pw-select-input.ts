@@ -102,7 +102,8 @@ export class PwSelectInput<T, Q extends keyof T> extends LitElement {
         <label for=${this.randomId} class="form-label">${this.label}:</label>
         <select
           ${ref(this.input)}
-          ?disabled=${this.disabled || this.task.render({
+          ?disabled=${this.disabled ||
+          this.task.render({
             complete: () => false,
             pending: () => true,
             initial: () => false,

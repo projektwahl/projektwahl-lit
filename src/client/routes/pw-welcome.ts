@@ -3,26 +3,26 @@ import { html, LitElement } from "lit";
 import { setupHmr } from "../hmr.js";
 import { bootstrapCss } from "../index.js";
 
-
 export const PwWelcome = setupHmr(
-    import.meta.url,
-    "PwWelcome",
-    class PwWelcome extends LitElement {
+  import.meta.url,
+  "PwWelcome",
+  class PwWelcome extends LitElement {
+    protected render() {
+      return html`
+        ${bootstrapCss}
 
-        protected render() {
-            return html`
-            ${bootstrapCss}
+        <div class="container">
+          <h1 class="text-center">${msg("Welcome")}</h1>
 
-            <div class="container">
-            <h1 class="text-center">${msg("Welcome")}</h1>
+          <p>
+            ${msg(
+              "This is some boilerplate welcome text that can be adapted by changing the translation."
+            )}
+          </p>
 
-            <p>
-            ${msg("This is some boilerplate welcome text that can be adapted by changing the translation.")}
-            </p>
-
-            <br>
-            <h2 class="text-center">${msg("Credits")}</h2>
-            <!--
+          <br />
+          <h2 class="text-center">${msg("Credits")}</h2>
+          <!--
             <pre>
 projektwahl-lit is a software to manage choosing projects and automatically assigning people to projects.
 Copyright (C) 2021 Moritz Hedtke
@@ -42,13 +42,25 @@ along with this program. If not, see https://www.gnu.org/licenses/.
             </pre>
         -->
 
-            <p class="text-center">${msg("Copyright (C) 2021 Moritz Hedtke")}</p>
-            <p class="text-center"><a href="https://github.com/projektwahl/projektwahl-lit" target="_blank" rel="noopener noreferrer">${msg("projektwahl-lit")}</a>${msg(" is licensed under the ")}
-<a href="https://github.com/projektwahl/projektwahl-lit/blob/main/LICENSE" target="_blank" rel="noopener noreferrer">${msg("GNU Affero General Public License v3.0")}</a>.</p>
+          <p class="text-center">${msg("Copyright (C) 2021 Moritz Hedtke")}</p>
+          <p class="text-center">
+            <a
+              href="https://github.com/projektwahl/projektwahl-lit"
+              target="_blank"
+              rel="noopener noreferrer"
+              >${msg("projektwahl-lit")}</a
+            >${msg(" is licensed under the ")}
+            <a
+              href="https://github.com/projektwahl/projektwahl-lit/blob/main/LICENSE"
+              target="_blank"
+              rel="noopener noreferrer"
+              >${msg("GNU Affero General Public License v3.0")}</a
+            >.
+          </p>
         </div>
-            `
-        }
-
-})
+      `;
+    }
+  }
+);
 
 customElements.define("pw-welcome", PwWelcome);

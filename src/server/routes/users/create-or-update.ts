@@ -25,7 +25,7 @@ export async function createOrUpdateUsersHandler(
     "POST",
     "/api/v1/users/create-or-update",
     async function (user, loggedInUser) {
-      // helper is allowed to set voters as away (TODO implement) 
+      // helper is allowed to set voters as away (TODO implement)
       // voter is not allowed to do anything
 
       if (!(loggedInUser?.type === "admin")) {
@@ -59,7 +59,9 @@ export async function createOrUpdateUsersHandler(
             ${field("away")},
             ${field("project_leader_id")},
             ${field("force_in_project_id")}
-            WHERE id = ${user.id} RETURNING id, project_leader_id, force_in_project_id;`;
+            WHERE id = ${
+              user.id
+            } RETURNING id, project_leader_id, force_in_project_id;`;
             return await sql(...finalQuery);
           } else {
             return await sql`INSERT INTO users (username, password_hash, type, "group", age, away, project_leader_id, force_in_project_id) VALUES (${
@@ -74,7 +76,7 @@ export async function createOrUpdateUsersHandler(
           }
         });
 
-        console.log(row)
+        console.log(row);
 
         return [
           {
@@ -83,7 +85,9 @@ export async function createOrUpdateUsersHandler(
           },
           {
             success: true as const,
-            data: routes["/api/v1/users/create-or-update"]["response"]["options"][0]["shape"]["data"].parse(row),
+            data: routes["/api/v1/users/create-or-update"]["response"][
+              "options"
+            ][0]["shape"]["data"].parse(row),
           },
         ];
       } catch (error: unknown) {

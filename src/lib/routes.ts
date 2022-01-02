@@ -309,10 +309,12 @@ export const routes = identity({
       usersCreateOrUpdate(rawUserVoterSchema),
       usersCreateOrUpdate(rawUserHelperOrAdminSchema)
     ),
-    response: result(rawUserSchema(
-      createOrUpdateUserResponse(rawUserVoterSchema),
-      createOrUpdateUserResponse(rawUserHelperOrAdminSchema)
-    )),
+    response: result(
+      rawUserSchema(
+        createOrUpdateUserResponse(rawUserVoterSchema),
+        createOrUpdateUserResponse(rawUserHelperOrAdminSchema)
+      )
+    ),
   },
   "/api/v1/projects/create-or-update": {
     request: makeCreateOrUpdate(rawProjectSchema),

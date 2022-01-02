@@ -118,10 +118,18 @@ export const PwProjectUsers = setupHmr(
                     ></pw-project-user-checkbox>
                   </td>
                   <th scope="row">
-                    <p><a @click=${aClick} href="/users/view/${value.id}">${value.id}</a></p>
+                    <p>
+                      <a @click=${aClick} href="/users/view/${value.id}"
+                        >${value.id}</a
+                      >
+                    </p>
                   </th>
                   <td>
-                  <p><a @click=${aClick} href="/users/view/${value.id}">${value.username}</a></p>
+                    <p>
+                      <a @click=${aClick} href="/users/view/${value.id}"
+                        >${value.username}</a
+                      >
+                    </p>
                   </td>
                   <td>
                     <p>${value.type}</p>

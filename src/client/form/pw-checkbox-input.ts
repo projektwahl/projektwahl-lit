@@ -99,7 +99,8 @@ export class PwCheckboxInput<T> extends LitElement {
         <input type="hidden" name=${this.name.toString()} value="off" />
         <input
           ${ref(this.input)}
-          ?disabled=${this.disabled || this.task.render({
+          ?disabled=${this.disabled ||
+          this.task.render({
             complete: () => false,
             pending: () => true,
             initial: () => false,
