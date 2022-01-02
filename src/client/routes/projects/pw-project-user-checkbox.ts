@@ -8,6 +8,7 @@ import { msg } from "@lit/localize";
 import { bootstrapCss } from "../../index.js";
 import type { routes } from "../../../lib/routes.js";
 import type { z } from "zod";
+import {live} from 'lit/directives/live.js';
 
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // SPDX-FileCopyrightText: 2021 Moritz Hedtke <Moritz.Hedtke@t-online.de>
@@ -28,7 +29,7 @@ class PwProjectUserCheckbox extends LitElement {
 
   forceTask: number | undefined;
 
-  _task!: import("@lit-labs/task").Task<any, any>;
+  _task;
 
   user!: z.infer<
     typeof routes["/api/v1/users"]["response"]["options"][0]
@@ -61,10 +62,12 @@ class PwProjectUserCheckbox extends LitElement {
             },
             body: JSON.stringify({
               id: this.user.id,
-              [this.name]: this.projectId,
+              [this.name]: this.user[this.name] === this.projectId ? null : this.projectId,
             }),
           }
         );
+
+        HistoryController.goto(new URL(window.location.href), {});
 
         return result;
       },
@@ -93,12 +96,12 @@ class PwProjectUserCheckbox extends LitElement {
         })}
 
         <input
-          @change=${() => {
+          @change=${(e: Event) => {
             this.forceTask = (this.forceTask || 0) + 1;
           }}
           type="checkbox"
           ?disabled=${this._task.status === TaskStatus.PENDING}
-          ?checked=${this.user[this.name] === this.projectId}
+          .checked=${live(this.user[this.name] === this.projectId)}
           class="form-check-input"
         />
       </form>`;

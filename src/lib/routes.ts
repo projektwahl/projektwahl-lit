@@ -252,6 +252,19 @@ const users = <
     force_in_project_id: true,
   });
 
+const createOrUpdateUserResponse = <
+  T extends { [k: string]: ZodTypeAny },
+  UnknownKeys extends UnknownKeysParam = "strip",
+  Catchall extends ZodTypeAny = ZodTypeAny
+>(
+  s: ZodObject<T, UnknownKeys, Catchall>
+) =>
+  s.pick({
+    id: true,
+    project_leader_id: true,
+    force_in_project_id: true,
+  });
+
 const project = rawProjectSchema.pick({
   id: true,
   title: true,
@@ -296,7 +309,10 @@ export const routes = identity({
       usersCreateOrUpdate(rawUserVoterSchema),
       usersCreateOrUpdate(rawUserHelperOrAdminSchema)
     ),
-    response: result(z.object({}).extend({ id: z.number() })),
+    response: result(rawUserSchema(
+      createOrUpdateUserResponse(rawUserVoterSchema),
+      createOrUpdateUserResponse(rawUserHelperOrAdminSchema)
+    )),
   },
   "/api/v1/projects/create-or-update": {
     request: makeCreateOrUpdate(rawProjectSchema),
