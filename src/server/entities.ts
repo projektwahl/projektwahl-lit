@@ -145,14 +145,14 @@ export async function fetchData<
   // [TemplateStringsArray, ...(null | string | string[] | boolean | number)[]]
   let entitiesSchema: entitesType[R]["response"]["options"][0]["shape"]["data"]["shape"]["entities"] = entitySchema["response"]["options"][0]["shape"]["data"]["shape"]["entities"];
   
-  let entities: z.infer<entitesType[R]["response"]["options"][0]["shape"]["data"]["shape"]["entities"]> = entitiesSchema.parse(
+  let entities: z.infer<entitesType[R]["response"]["options"][0]["shape"]["data"]>["entities"] = entitiesSchema.parse(
     await sql(...finalQuery)
   );
 
   // https://github.com/projektwahl/projektwahl-sveltekit/blob/work/src/lib/list-entities.ts#L30
 
-  let nextCursor: z.infer<entitesType[R]["response"]["options"][0]["shape"]["data"]["shape"]["nextCursor"]> = null;
-  let previousCursor: z.infer<entitesType[R]["response"]["options"][0]["shape"]["data"]["shape"]["previousCursor"]> = null;
+  let nextCursor: z.infer<entitesType[R]["response"]["options"][0]["shape"]["data"]>["nextCursor"] = null;
+  let previousCursor: z.infer<entitesType[R]["response"]["options"][0]["shape"]["data"]>["previousCursor"] = null;
   // TODO FIXME also recalculate the other cursor because data could've been deleted in between / the filters have changed
   if (pagination.p_direction === "forwards") {
     if (pagination.p_cursor) {
@@ -174,9 +174,9 @@ export async function fetchData<
   }
 
   let z: z.infer<entitesType[R]["response"]["options"][0]["shape"]["data"]> = {
-    entities: entities as z.infer<entitesType[R]["response"]["options"][0]["shape"]["data"]["shape"]["entities"]>,
-    nextCursor: nextCursor,
-    previousCursor: previousCursor,
+    entities: entities as z.infer<entitesType[R]["response"]["options"][0]["shape"]["data"]>["entities"],
+    nextCursor: nextCursor as z.infer<entitesType[R]["response"]["options"][0]["shape"]["data"]>["nextCursor"],
+    previousCursor: previousCursor as z.infer<entitesType[R]["response"]["options"][0]["shape"]["data"]>["previousCursor"],
   };
 
   let a: z.infer<entitesType[R]["response"]> = {
