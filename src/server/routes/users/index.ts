@@ -17,7 +17,25 @@ export async function usersHandler(
   stream: import("http2").ServerHttp2Stream,
   headers: import("http2").IncomingHttpHeaders
 ) {
-  return await request("GET", "/api/v1/users", async function () {
+  return await request("GET", "/api/v1/users", async function (_, loggedInUser) {
+      // helper is allowed to read the normal data
+      // voter is not allowed to do anything
+
+    if (!(loggedInUser?.type === "admin" || loggedInUser?.type === "helper")) {
+      return [
+        {
+          "content-type": "text/json; charset=utf-8",
+          ":status": 403,
+        },
+        {
+          success: false as const,
+          error: {
+            forbidden: "Insufficient permissions!",
+          },
+        },
+      ];
+    }
+
     const url = new URL(headers[":path"]!, "https://localhost:8443");
 
     const filters = z

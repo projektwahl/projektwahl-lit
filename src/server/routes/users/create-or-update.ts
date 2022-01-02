@@ -24,7 +24,25 @@ export async function createOrUpdateUsersHandler(
   return await request(
     "POST",
     "/api/v1/users/create-or-update",
-    async function (user) {
+    async function (user, loggedInUser) {
+      // helper is allowed to set voters as away (TODO implement) 
+      // voter is not allowed to do anything
+
+      if (!(loggedInUser?.type === "admin")) {
+        return [
+          {
+            "content-type": "text/json; charset=utf-8",
+            ":status": 403,
+          },
+          {
+            success: false as const,
+            error: {
+              forbidden: "Insufficient permissions!",
+            },
+          },
+        ];
+      }
+
       try {
         const [row] = await sql.begin("READ WRITE", async (sql) => {
           if (user.id) {

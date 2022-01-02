@@ -9,7 +9,25 @@ export async function projectsHandler(
   stream: import("http2").ServerHttp2Stream,
   headers: import("http2").IncomingHttpHeaders
 ) {
-  return await request("GET", "/api/v1/projects", async function () {
+  return await request("GET", "/api/v1/projects", async function (_, loggedInUser) {
+    // helper is allowed to read the normal data
+    // voter is allowed to read the normal data
+
+    if (!(loggedInUser?.type === "admin" || loggedInUser?.type === "helper" || loggedInUser?.type === "voter")) {
+      return [
+        {
+          "content-type": "text/json; charset=utf-8",
+          ":status": 403,
+        },
+        {
+          success: false as const,
+          error: {
+            forbidden: "Insufficient permissions!",
+          },
+        },
+      ];
+    }
+
     const url = new URL(headers[":path"]!, "https://localhost:8443");
 
     const filters = z

@@ -13,7 +13,6 @@ export async function createOrUpdateProjectsHandler(
     "POST",
     "/api/v1/projects/create-or-update",
     async function (project, user) {
-      // admin is allowed to do everything
       // helper is allowed to create projects and change their own projects
       // voter is not allowed to do anything
 
