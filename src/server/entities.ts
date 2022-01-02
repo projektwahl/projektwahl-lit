@@ -1,15 +1,29 @@
 import type { OutgoingHttpHeaders } from "node:http2";
-import type { Row } from "postgres";
-import { z, ZodObject, ZodTypeAny } from "zod";
-import { routes, entityRoutes } from "../lib/routes.js";
-import {entities} from "../lib/routes.js";
-import type { BaseQuery, FilterType } from "../lib/types.js";
+import { z, ZodTypeAny } from "zod";
+import { entityRoutes } from "../lib/routes.js";
+import type { BaseQuery } from "../lib/types.js";
 import { sql } from "./database.js";
 import { sql2, unsafe2 } from "./sql/index.js";
 
 type entitesType = {
   [K in keyof typeof entityRoutes]: typeof entityRoutes[K]
 };
+
+/*
+let z: z.infer<entitesType[R]["response"]["options"][0]["shape"]["data"]> = {
+    entities: entities as z.infer<entitesType[R]["response"]["options"][0]["shape"]["data"]>["entities"],
+    nextCursor: nextCursor as z.infer<entitesType[R]["response"]["options"][0]["shape"]["data"]>["nextCursor"],
+    previousCursor: previousCursor as z.infer<entitesType[R]["response"]["options"][0]["shape"]["data"]>["previousCursor"],
+  };
+  */
+
+type test<T> = {
+  [K in keyof T]: T[K]
+};
+
+type mappedInfer1<R extends keyof typeof entityRoutes> = {
+  [K in keyof z.infer<typeof entityRoutes[R]["response"]["options"][0]["shape"]["data"]>]: z.infer<typeof entityRoutes[R]["response"]["options"][0]["shape"]["data"]>[K]
+}
 
 export async function fetchData<
   T extends {
@@ -173,7 +187,7 @@ export async function fetchData<
     }
   }
 
-  let z: z.infer<entitesType[R]["response"]["options"][0]["shape"]["data"]> = {
+  let y: mappedInfer1<R> = {
     entities: entities as z.infer<entitesType[R]["response"]["options"][0]["shape"]["data"]>["entities"],
     nextCursor: nextCursor as z.infer<entitesType[R]["response"]["options"][0]["shape"]["data"]>["nextCursor"],
     previousCursor: previousCursor as z.infer<entitesType[R]["response"]["options"][0]["shape"]["data"]>["previousCursor"],
@@ -181,7 +195,7 @@ export async function fetchData<
 
   let a: z.infer<entitesType[R]["response"]> = {
     success: true as const,
-    data: z
+    data: y
   };
 
   return [
