@@ -37,7 +37,6 @@ export const pwProjectUsers = async (url: URL) => {
 };
 
 export const PwProjectUsers = setupHmr(
-  import.meta.url,
   "PwProjectUsers",
   class PwProjectUsers extends PwUsers {
     static override get properties() {

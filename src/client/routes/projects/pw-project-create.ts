@@ -54,7 +54,6 @@ const taskFunction = async ([id]: [number]) => {
 };
 
 export const PwProjectCreate = setupHmr(
-  import.meta.url,
   "PwProjectCreate",
   class PwProjectCreate extends PwForm<"/api/v1/projects/create-or-update"> {
     static override get properties() {

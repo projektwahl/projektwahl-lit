@@ -179,8 +179,7 @@ function injectInheritsHmrClass(clazz) {
  * Registers a web component class. Triggers a hot replacement if the
  * class was already registered before.
  */
-export function register<T>(importMetaUrl, name, clazz: T): T {
-  const key = `${new URL(importMetaUrl).pathname}:${name}`;
+export function register<T>(key, clazz: T): T {
   const existing = proxiesForKeys.get(key);
   if (!existing) {
     // this class was not yet registered,
@@ -251,9 +250,7 @@ export function register<T>(importMetaUrl, name, clazz: T): T {
   return currentProxy;
 }
 
-if (!PRODUCTION) {
-  const hmrClasses = new Map();
-
+if (!window.PRODUCTION) {
   let eventSource = new EventSource("/api/v1/hmr");
   eventSource.addEventListener("error", function (error) {
     console.error(error);
@@ -264,27 +261,22 @@ if (!PRODUCTION) {
   });
   eventSource.addEventListener("message", async function (event) {
     let updatedUrl = new URL(event.data, document.location.origin);
+      
+    console.log("hmr updating");
 
-    if (hmrClasses.has(updatedUrl.toString())) {
-      console.log("hmr updating");
+    let response = await import(`${updatedUrl.toString()}?${Date.now()}`);
 
-      let response = await import(`${updatedUrl.toString()}?${Date.now()}`);
-
-      const name = hmrClasses.get(updatedUrl.toString());
-
-      console.log("update", updatedUrl.toString(), name, response[name]);
-    }
+    console.log("update", updatedUrl.toString());
   });
 }
 
-  export function setupHmr<T>(importMetaUrl: string, name: string, clazz: T) {
-    if (!PRODUCTION) {
-      return clazz;
+  export function setupHmr<T>(name: string, clazz: T) {
+    if (!window.PRODUCTION) {
+      console.log("register", name, clazz);
+
+      return register(name, clazz);
     }
-    hmrClasses.set(importMetaUrl, name);
 
-    console.log("register", importMetaUrl, name, clazz);
-
-    return register(importMetaUrl, name, clazz);
+    return clazz;
   }
 

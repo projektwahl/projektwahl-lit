@@ -26,7 +26,6 @@ import { setupHmr } from "../hmr.js";
 import { bootstrapCss } from "../index.js";
 
 export const PwWelcome = setupHmr(
-  import.meta.url,
   "PwWelcome",
   class PwWelcome extends LitElement {
     protected render() {

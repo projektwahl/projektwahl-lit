@@ -56,7 +56,6 @@ const taskFunction = async ([id]: [number]) => {
 };
 
 export const PwUserCreate = setupHmr(
-  import.meta.url,
   "PwUserCreate",
   class PwUserCreate extends PwForm<"/api/v1/users/create-or-update"> {
     static override get properties() {

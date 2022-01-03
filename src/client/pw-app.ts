@@ -115,7 +115,6 @@ export const nextPage = async (url: URL) => {
 };
 
 export const PwApp = setupHmr(
-  import.meta.url,
   "PwApp",
   class PwApp extends LitElement {
     static override get properties() {
@@ -155,7 +154,6 @@ export const PwApp = setupHmr(
       }
       return html`
         ${bootstrapCss}
-
         <nav
           class="navbar navbar-expand-lg navbar-light bg-light shadow p-3 mb-5"
         >
