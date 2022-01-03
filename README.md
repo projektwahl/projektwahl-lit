@@ -7,6 +7,8 @@ SPDX-FileCopyrightText: 2021 Moritz Hedtke <Moritz.Hedtke@t-online.de>
 
 Software to manage choosing projects and automatically assigning people to projects.
 
+This software is licensed under the GNU Affero General Public License v3.0 or any later version.
+
 ## Requirements
 
 - Node 16/17
