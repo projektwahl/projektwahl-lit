@@ -45,6 +45,7 @@ SPDX-FileCopyrightText: 2021 Moritz Hedtke <Moritz.Hedtke@t-online.de>
               #pkgs.lp_solve
               #pkgs.diffoscope
               pkgs.python3 # argon2
+              pkgs.brotli
             ];
           };
 
