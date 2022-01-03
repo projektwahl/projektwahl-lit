@@ -56,10 +56,8 @@ const taskFunction = async ([id]: [number]) => {
 };
 
 // maybe extending actually breaks shit
-export const PwUserCreate = setupHmr(
-  "PwUserCreate",
-  class PwUserCreate extends PwForm<"/api/v1/users/create-or-update"> {
-    static override get properties() {
+class PwUserCreate extends PwForm<"/api/v1/users/create-or-update"> {
+    static get properties() {
       return {
         ...super.properties,
         forceTask: { state: true },
@@ -85,13 +83,8 @@ export const PwUserCreate = setupHmr(
       | z.infer<typeof routes["/api/v1/users/create-or-update"]["request"]>
       | undefined;
 
-    forceTask: number | undefined;
-
     constructor() {
       super();
-
-      /** @type {number|undefined} */
-      this.forceTask = undefined;
 
       /**
        * @override
@@ -99,6 +92,12 @@ export const PwUserCreate = setupHmr(
       this._task = new Task(
         this,
         async () => {
+          if (this.forceTask === 0) { // TODO FIXME REMOVE
+            return {
+              success: false,
+              error: {}
+            };
+          }
           const formDataEvent = new CustomEvent<
             z.infer<typeof routes["/api/v1/users/create-or-update"]["request"]>
           >("myformdata", {
@@ -205,6 +204,6 @@ export const PwUserCreate = setupHmr(
       `;
     }
   }
-);
+
 
 customElements.define("pw-user-create", PwUserCreate);

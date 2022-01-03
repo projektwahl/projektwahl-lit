@@ -28,7 +28,7 @@ import { setupHmr } from "../hmr.js";
 import type { routes } from "../../lib/routes.js";
 
 class PwForm<P extends keyof typeof routes> extends LitElement {
-  static override get properties() {
+  static get properties() {
     return {
       forceTask: { state: true },
       disabled: { type: Boolean },
@@ -55,6 +55,9 @@ class PwForm<P extends keyof typeof routes> extends LitElement {
   constructor() {
     super();
 
+    /** @type {number|undefined} */
+    this.forceTask = undefined;
+
     this.form = createRef();
   }
 
@@ -63,7 +66,13 @@ class PwForm<P extends keyof typeof routes> extends LitElement {
 
     this.forceTask = (this.forceTask || 0) + 1;
 
-    this.requestUpdate()
+    //this.requestUpdate()
+    // I understand it the following way:
+    // the components render method doesnt use this
+    // therefore the update is not needed
+    // and therefore the task which is the only user of this
+    // doesnt get run.
+    // alternatively undefined means for the task to not run or something (likely not true)
   };
 
   // TODO FIXME really important
@@ -116,6 +125,8 @@ if ('FormDataEvent' in window) {
       <main class="container">
         <h1 class="text-center">${this.actionText}</h1>
 
+        ${this.forceTask}
+        
         <div class="row justify-content-center">
           <div class="col-md-7 col-lg-8">
             ${this._task.render({
