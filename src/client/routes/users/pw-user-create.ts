@@ -55,12 +55,14 @@ const taskFunction = async ([id]: [number]) => {
   return response.success ? response.data.entities[0] : null; // TODO FIXME error handling, PwForm already has some form of error handling
 };
 
+// maybe extending actually breaks shit
 export const PwUserCreate = setupHmr(
   "PwUserCreate",
   class PwUserCreate extends PwForm<"/api/v1/users/create-or-update"> {
     static override get properties() {
       return {
         ...super.properties,
+        forceTask: { state: true },
         url: { attribute: false },
         actionText: { type: String },
         _task: { state: true },
@@ -82,6 +84,8 @@ export const PwUserCreate = setupHmr(
     initial:
       | z.infer<typeof routes["/api/v1/users/create-or-update"]["request"]>
       | undefined;
+
+    forceTask: number | undefined;
 
     constructor() {
       super();

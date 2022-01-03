@@ -58,10 +58,12 @@ class PwForm<P extends keyof typeof routes> extends LitElement {
     this.form = createRef();
   }
 
-  submit = (event: SubmitEvent) => {
+  protected submit(event: SubmitEvent) {
     event.preventDefault();
 
     this.forceTask = (this.forceTask || 0) + 1;
+
+    this.requestUpdate()
   };
 
   // TODO FIXME really important
