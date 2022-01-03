@@ -6,13 +6,9 @@
     "module": "ESNext",
     "moduleResolution": "Node",
     "lib": ["ESNext", "DOM"],
-    "declaration": true,
-    "declarationMap": true,
     "sourceMap": true,
     "strict": true,
     "noEmit": true,
-    "allowJs": true,
-    "checkJs": true,
     "importsNotUsedAsValues": "error",
     "allowSyntheticDefaultImports": true,
     "noErrorTruncation": true

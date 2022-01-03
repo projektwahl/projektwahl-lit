@@ -24,8 +24,8 @@
     "server": "node --experimental-loader ./src/loader.js --enable-source-maps --experimental-import-meta-resolve ./src/server/index.js",
     "localize-extract": "lit-localize extract",
     "localize-build": "lit-localize build",
-    "build": "esbuild --format=esm --bundle src/client/pw-app.ts --entry-names=[dir]/[name]-[hash] --charset=utf8 --define:PRODUCTION=true --sourcemap --splitting --analyze --outdir=dist --minify-whitespace --minify-identifiers --minify-syntax --tree-shaking=true --minify",
-    "terser": "npx terser --compress passes=2,unsafe --mangle --module --toplevel --mangle-props --output dist/pw-app-MIQETEFA-terser.js -- dist/pw-app-MIQETEFA.js",
+    "build": "esbuild --format=esm --bundle src/client/pw-app.ts --charset=utf8 --define:window.PRODUCTION=true --sourcemap --splitting --analyze --outdir=dist --minify-whitespace --minify-identifiers --minify-syntax --tree-shaking=true --minify",
+    "terser": "npx terser --compress passes=2,unsafe --mangle --module --toplevel --mangle-props --output dist/pw-app-terser.js -- dist/pw-app.js",
     "rollup": "rollup -c"
   },
   "dependencies": {
