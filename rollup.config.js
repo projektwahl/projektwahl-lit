@@ -26,12 +26,12 @@ export default {
       transforms: ['typescript']
     }),*/
     minifyHTML(),
-    /*terser({
+    terser({
       ecma: 2020,
       module: true,
       warnings: true,
-    }),*/
-    compiler(), // currently crashes in acorn dependency that's not updated
+    }),
+    //compiler(), // currently crashes in acorn dependency that's not updated
   ],
   output: {
     dir: 'dist',
