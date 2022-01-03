@@ -41,6 +41,7 @@ This software is licensed under the GNU Affero General Public License v3.0 or an
 ```bash
 git clone https://github.com/projektwahl/projektwahl-lit.git
 cd projektwahl-lit/
+openssl req -x509 -newkey rsa:2048 -nodes -sha256 -subj '/CN=localhost' -keyout localhost-privkey.pem -out localhost-cert.pem # or use actual certificates
 npm install
 npx node-pre-gyp rebuild -C ./node_modules/argon2
 npm run localize-build
@@ -75,3 +76,9 @@ See [SECURITY.md](SECURITY.md)
 ## Browser support
 
 This application will probably never work without JavaScript as this would require bad API design because forms are just terrible.
+
+## Licenses of dependencies
+
+```
+npx license-checker --production --summary
+```

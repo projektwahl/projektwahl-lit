@@ -7,3 +7,4 @@ src/client/generated_locales/
 !src/loader.js
 dist
 *.map
+*.pem
