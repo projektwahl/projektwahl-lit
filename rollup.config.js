@@ -30,6 +30,35 @@ export default {
       ecma: 2020,
       module: true,
       warnings: true,
+      mangle: {
+        toplevel: true,
+        //eval: true,
+        module: true,
+      },
+      compress: {
+        global_defs: {
+          "window.PRODUCTION": true
+        },
+        //passes: 3,
+        //arguments: true,
+        //hoist_funs: true,
+        toplevel: true,
+        //keep_fargs: false,
+        module: true,
+        //pure_getters: true,
+        /*unsafe: true,
+        unsafe_comps: true,
+        unsafe_Function: true,
+        unsafe_math: true,
+        unsafe_symbols: true,
+        unsafe_methods: true,
+        unsafe_proto: true,
+        unsafe_regexp: true,
+        unsafe_undefined: true,*/
+      },
+      toplevel: true,
+      //keep_classnames: false,
+      //keep_fnames: false,
     }),
     //compiler(), // currently crashes in acorn dependency that's not updated
   ],
