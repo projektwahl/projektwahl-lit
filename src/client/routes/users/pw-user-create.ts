@@ -92,12 +92,6 @@ class PwUserCreate extends PwForm<"/api/v1/users/create-or-update"> {
       this._task = new Task(
         this,
         async () => {
-          if (this.forceTask === 0) { // TODO FIXME REMOVE
-            return {
-              success: false,
-              error: {}
-            };
-          }
           const formDataEvent = new CustomEvent<
             z.infer<typeof routes["/api/v1/users/create-or-update"]["request"]>
           >("myformdata", {

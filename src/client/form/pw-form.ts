@@ -65,14 +65,6 @@ class PwForm<P extends keyof typeof routes> extends LitElement {
     event.preventDefault();
 
     this.forceTask = (this.forceTask || 0) + 1;
-
-    //this.requestUpdate()
-    // I understand it the following way:
-    // the components render method doesnt use this
-    // therefore the update is not needed
-    // and therefore the task which is the only user of this
-    // doesnt get run.
-    // alternatively undefined means for the task to not run or something (likely not true)
   };
 
   // TODO FIXME really important
