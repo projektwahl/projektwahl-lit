@@ -251,34 +251,40 @@ export function register<T>(importMetaUrl, name, clazz: T): T {
   return currentProxy;
 }
 
-const hmrClasses = new Map();
+if (!PRODUCTION) {
+  const hmrClasses = new Map();
 
-let eventSource = new EventSource("/api/v1/hmr");
-eventSource.addEventListener("error", function (error) {
-  console.error(error);
-  // eventSource = new EventSource("/api/v1/hmr");
-});
-eventSource.addEventListener("open", function (event) {
-  console.log(event);
-});
-eventSource.addEventListener("message", async function (event) {
-  let updatedUrl = new URL(event.data, document.location.origin);
+  let eventSource = new EventSource("/api/v1/hmr");
+  eventSource.addEventListener("error", function (error) {
+    console.error(error);
+    // eventSource = new EventSource("/api/v1/hmr");
+  });
+  eventSource.addEventListener("open", function (event) {
+    console.log(event);
+  });
+  eventSource.addEventListener("message", async function (event) {
+    let updatedUrl = new URL(event.data, document.location.origin);
 
-  if (hmrClasses.has(updatedUrl.toString())) {
-    console.log("hmr updating");
+    if (hmrClasses.has(updatedUrl.toString())) {
+      console.log("hmr updating");
 
-    let response = await import(`${updatedUrl.toString()}?${Date.now()}`);
+      let response = await import(`${updatedUrl.toString()}?${Date.now()}`);
 
-    const name = hmrClasses.get(updatedUrl.toString());
+      const name = hmrClasses.get(updatedUrl.toString());
 
-    console.log("update", updatedUrl.toString(), name, response[name]);
-  }
-});
-
-export function setupHmr<T>(importMetaUrl: string, name: string, clazz: T) {
-  hmrClasses.set(importMetaUrl, name);
-
-  console.log("register", importMetaUrl, name, clazz);
-
-  return register(importMetaUrl, name, clazz);
+      console.log("update", updatedUrl.toString(), name, response[name]);
+    }
+  });
 }
+
+  export function setupHmr<T>(importMetaUrl: string, name: string, clazz: T) {
+    if (!PRODUCTION) {
+      return clazz;
+    }
+    hmrClasses.set(importMetaUrl, name);
+
+    console.log("register", importMetaUrl, name, clazz);
+
+    return register(importMetaUrl, name, clazz);
+  }
+

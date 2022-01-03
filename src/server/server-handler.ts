@@ -251,7 +251,7 @@ export async function serverHandler(
     <body>
       <script
         type="module"
-        src="/src/client/pw-app.js"
+        src="/dist/pw-app.js"
       ></script>
       <noscript>Bitte aktiviere JavaScript!</noscript>
   

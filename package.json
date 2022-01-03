@@ -24,7 +24,7 @@
     "server": "node --experimental-loader ./src/loader.js --enable-source-maps --experimental-import-meta-resolve ./src/server/index.js",
     "localize-extract": "lit-localize extract",
     "localize-build": "lit-localize build",
-    "build": "esbuild --format=esm --bundle src/client/pw-app.ts --sourcemap --splitting --analyze --outdir=dist --minify-whitespace --minify-identifiers --minify-syntax --tree-shaking=true --minify"
+    "build": "esbuild --format=esm --bundle src/client/pw-app.ts --define:PRODUCTION=true --sourcemap --splitting --analyze --outdir=dist --minify-whitespace --minify-identifiers --minify-syntax --tree-shaking=true --minify"
   },
   "dependencies": {
     "@lit-labs/motion": "^1.0.1",
