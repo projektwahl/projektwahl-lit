@@ -206,6 +206,8 @@ export async function serverHandler(
           );
         }
 
+        const contentType = filename.endsWith(".css") ? "text/css" : "application/javascript";
+
         const raw = new Readable()
         raw.push(contents)    // the string you want
         raw.push(null)      // indicates end-of-file basically - the end of the stream
@@ -231,7 +233,7 @@ export async function serverHandler(
         // See https://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.3
         if (/\bbr\b/.test(acceptEncoding)) {
           stream.respond({
-            "content-type": "application/javascript; charset=utf-8",
+            "content-type": `${contentType}; charset=utf-8`,
             "vary": "accept-encoding",
             'content-encoding': 'br',
             ":status": 200,
@@ -239,7 +241,7 @@ export async function serverHandler(
           pipeline(raw, zlib.createBrotliCompress(), stream, onError);
         } else {
           stream.respond({
-            "content-type": "application/javascript; charset=utf-8",
+            "content-type": `${contentType}; charset=utf-8`,
             "vary": "accept-encoding",
             ":status": 200,
           });
@@ -272,10 +274,8 @@ export async function serverHandler(
         }
       </style>
       <link
-        href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css"
+        href="/dist/bootstrap.min.css"
         rel="stylesheet"
-        integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3"
-        crossorigin="anonymous"
       />
   
       <title>Hello, world!</title>
