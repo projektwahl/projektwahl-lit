@@ -1,5 +1,25 @@
-// SPDX-License-Identifier: AGPL-3.0-or-later
-// SPDX-FileCopyrightText: 2021 Moritz Hedtke <Moritz.Hedtke@t-online.de>
+/*
+projektwahl-lit is a software to manage choosing projects and automatically assigning people to projects.
+Copyright (C) 2021 Moritz Hedtke
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU Affero General Public License as published
+by the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+GNU Affero General Public License for more details.
+
+You should have received a copy of the GNU Affero General Public License
+along with this program. If not, see https://www.gnu.org/licenses/.
+*/
+/*!
+https://github.com/projektwahl/projektwahl-lit
+SPDX-License-Identifier: AGPL-3.0-or-later
+SPDX-FileCopyrightText: 2021 Moritz Hedtke <Moritz.Hedtke@t-online.de>
+*/
 import { html } from "lit";
 import "../../form/pw-form.js";
 import { Task } from "@lit-labs/task";
@@ -17,7 +37,10 @@ import { setupHmr } from "../../hmr.js";
 
 export async function pwProject(id: number, viewOnly: boolean = false) {
   let result = await taskFunction([id]);
-  return html`<pw-project-create ?disabled=${viewOnly} .initial=${result}></pw-project-create>`;
+  return html`<pw-project-create
+    ?disabled=${viewOnly}
+    .initial=${result}
+  ></pw-project-create>`;
 }
 
 const taskFunction = async ([id]: [number]) => {
@@ -33,169 +56,176 @@ const taskFunction = async ([id]: [number]) => {
 export const PwProjectCreate = setupHmr(
   import.meta.url,
   "PwProjectCreate",
-class PwProjectCreate extends PwForm<"/api/v1/projects/create-or-update"> {
-  static override get properties() {
-    return {
-      ...super.properties,
-      url: { attribute: false },
-      actionText: { type: String },
-      _task: { state: true },
-      _initialTask: { state: true },
-      type: { state: true },
-      initial: { attribute: false },
-      initialRender: { state: true },
-    };
-  }
-  
-  override get actionText() {
-    return this.disabled ? msg("View project") : (this.initial ? msg("Update project") : msg("Create project"));
-  }
+  class PwProjectCreate extends PwForm<"/api/v1/projects/create-or-update"> {
+    static override get properties() {
+      return {
+        ...super.properties,
+        url: { attribute: false },
+        actionText: { type: String },
+        _task: { state: true },
+        _initialTask: { state: true },
+        type: { state: true },
+        initial: { attribute: false },
+        initialRender: { state: true },
+      };
+    }
 
-  initialRender: boolean;
+    override get actionText() {
+      return this.disabled
+        ? msg("View project")
+        : this.initial
+        ? msg("Update project")
+        : msg("Create project");
+    }
 
-  initial:
-    | z.infer<typeof routes["/api/v1/projects/create-or-update"]["request"]>
-    | undefined;
+    initialRender: boolean;
 
-  constructor() {
-    super();
+    initial:
+      | z.infer<typeof routes["/api/v1/projects/create-or-update"]["request"]>
+      | undefined;
 
-    this.initialRender = false;
+    constructor() {
+      super();
 
-    /** @type {number|undefined} */
-    this.forceTask = undefined;
+      this.initialRender = false;
 
-    /**
-     * @override
-     */
-    this._task = new Task(
-      this,
-      async () => {
-        const formDataEvent = new CustomEvent<
-          z.infer<typeof routes["/api/v1/projects/create-or-update"]["request"]>
-        >("myformdata", {
-          bubbles: true,
-          composed: true,
-          detail: {
-            id: -1,
-          },
-        });
-        this.form.value?.dispatchEvent(formDataEvent);
-        formDataEvent.detail.id = this.initial?.id ?? null;
+      /** @type {number|undefined} */
+      this.forceTask = undefined;
 
-        let result = await myFetch<"/api/v1/projects/create-or-update">(
-          "/api/v1/projects/create-or-update",
-          {
-            method: "POST",
-            headers: {
-              "content-type": "text/json",
+      /**
+       * @override
+       */
+      this._task = new Task(
+        this,
+        async () => {
+          const formDataEvent = new CustomEvent<
+            z.infer<
+              typeof routes["/api/v1/projects/create-or-update"]["request"]
+            >
+          >("myformdata", {
+            bubbles: true,
+            composed: true,
+            detail: {
+              id: -1,
             },
-            body: JSON.stringify(formDataEvent.detail),
+          });
+          this.form.value?.dispatchEvent(formDataEvent);
+          formDataEvent.detail.id = this.initial?.id ?? null;
+
+          let result = await myFetch<"/api/v1/projects/create-or-update">(
+            "/api/v1/projects/create-or-update",
+            {
+              method: "POST",
+              headers: {
+                "content-type": "text/json",
+              },
+              body: JSON.stringify(formDataEvent.detail),
+            }
+          );
+
+          if (result.success) {
+            HistoryController.goto(new URL("/", window.location.href), {});
           }
-        );
 
-        if (result.success) {
-          HistoryController.goto(new URL("/", window.location.href), {});
-        }
+          return result;
+        },
+        () => [this.forceTask]
+      );
+    }
 
-        return result;
-      },
-      () => [this.forceTask]
-    );
+    override getInputs() {
+      return html`
+        <pw-text-input
+          ?disabled=${this.disabled}
+          label=${msg("Title")}
+          name="title"
+          .task=${this._task}
+          .initial=${this.initial}
+        ></pw-text-input>
+
+        <pw-text-input
+          ?disabled=${this.disabled}
+          label=${msg("Info")}
+          name="info"
+          .task=${this._task}
+          .initial=${this.initial}
+        ></pw-text-input>
+
+        <pw-text-input
+          ?disabled=${this.disabled}
+          label=${msg("Place")}
+          name="place"
+          .task=${this._task}
+          .initial=${this.initial}
+        ></pw-text-input>
+
+        <pw-number-input
+          ?disabled=${this.disabled}
+          label=${msg("Costs")}
+          name="costs"
+          .task=${this._task}
+          .initial=${this.initial}
+        ></pw-number-input>
+
+        <pw-number-input
+          ?disabled=${this.disabled}
+          label=${msg("Minimum age")}
+          name="min_age"
+          .task=${this._task}
+          .initial=${this.initial}
+        ></pw-number-input>
+
+        <pw-number-input
+          ?disabled=${this.disabled}
+          label=${msg("Maximum age")}
+          name="max_age"
+          .task=${this._task}
+          .initial=${this.initial}
+        ></pw-number-input>
+
+        <pw-number-input
+          ?disabled=${this.disabled}
+          label=${msg("Minimum participants")}
+          name="min_participants"
+          .task=${this._task}
+          .initial=${this.initial}
+        ></pw-number-input>
+
+        <pw-number-input
+          ?disabled=${this.disabled}
+          label=${msg("Maximum participants")}
+          name="max_participants"
+          .task=${this._task}
+          .initial=${this.initial}
+        ></pw-number-input>
+
+        <!-- Projektleitende -->
+        <!-- TODO FIXME view only -->
+        ${this.initial
+          ? html`<pw-project-users
+              projectId=${this.initial.id!}
+              name=${"project_leader_id"}
+              title=${msg("Project leaders")}
+            ></pw-project-users>`
+          : html``}
+        ${this.initial
+          ? html`<pw-project-users
+              projectId=${this.initial.id!}
+              name=${"force_in_project_id"}
+              title=${msg("Guaranteed project members")}
+            ></pw-project-users>`
+          : html``}
+
+        <pw-checkbox-input
+          ?disabled=${this.disabled}
+          label=${msg("Allow random assignments")}
+          name="random_assignments"
+          .task=${this._task}
+          .initial=${this.initial}
+        ></pw-checkbox-input>
+      `;
+    }
   }
-
-  override getInputs() {
-    return html`
-      <pw-text-input
-        ?disabled=${this.disabled}
-        label=${msg("Title")}
-        name="title"
-        .task=${this._task}
-        .initial=${this.initial}
-      ></pw-text-input>
-
-      <pw-text-input
-        ?disabled=${this.disabled}
-        label=${msg("Info")}
-        name="info"
-        .task=${this._task}
-        .initial=${this.initial}
-      ></pw-text-input>
-
-      <pw-text-input
-        ?disabled=${this.disabled}
-        label=${msg("Place")}
-        name="place"
-        .task=${this._task}
-        .initial=${this.initial}
-      ></pw-text-input>
-
-      <pw-number-input
-      ?disabled=${this.disabled}
-        label=${msg("Costs")}
-        name="costs"
-        .task=${this._task}
-        .initial=${this.initial}
-      ></pw-number-input>
-
-      <pw-number-input
-      ?disabled=${this.disabled}
-        label=${msg("Minimum age")}
-        name="min_age"
-        .task=${this._task}
-        .initial=${this.initial}
-      ></pw-number-input>
-
-      <pw-number-input
-      ?disabled=${this.disabled}
-        label=${msg("Maximum age")}
-        name="max_age"
-        .task=${this._task}
-        .initial=${this.initial}
-      ></pw-number-input>
-
-      <pw-number-input
-      ?disabled=${this.disabled}
-        label=${msg("Minimum participants")}
-        name="min_participants"
-        .task=${this._task}
-        .initial=${this.initial}
-      ></pw-number-input>
-
-      <pw-number-input
-      ?disabled=${this.disabled}
-        label=${msg("Maximum participants")}
-        name="max_participants"
-        .task=${this._task}
-        .initial=${this.initial}
-      ></pw-number-input>
-
-      <!-- Projektleitende -->
-      <!-- TODO FIXME view only -->
-      ${this.initial
-        ? html`<pw-project-users
-            projectId=${this.initial.id!}
-            name=${"project_leader_id"}
-            title=${msg("Project leaders")}
-          ></pw-project-users>`
-        : html``}
-      ${this.initial
-        ? html`<pw-project-users
-            projectId=${this.initial.id!}
-            name=${"force_in_project_id"}
-            title=${msg("Guaranteed project members")}
-          ></pw-project-users>`
-        : html``}
-
-      <pw-checkbox-input
-      ?disabled=${this.disabled}
-        label=${msg("Allow random assignments")}
-        name="random_assignments"
-        .task=${this._task}
-        .initial=${this.initial}
-      ></pw-checkbox-input>
-    `;
-  };
-})
+);
 
 customElements.define("pw-project-create", PwProjectCreate);

@@ -1,3 +1,25 @@
+/*
+projektwahl-lit is a software to manage choosing projects and automatically assigning people to projects.
+Copyright (C) 2021 Moritz Hedtke
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU Affero General Public License as published
+by the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+GNU Affero General Public License for more details.
+
+You should have received a copy of the GNU Affero General Public License
+along with this program. If not, see https://www.gnu.org/licenses/.
+*/
+/*!
+https://github.com/projektwahl/projektwahl-lit
+SPDX-License-Identifier: AGPL-3.0-or-later
+SPDX-FileCopyrightText: 2021 Moritz Hedtke <Moritz.Hedtke@t-online.de>
+*/
 import postgres from "postgres";
 import { sql } from "../../database.js";
 import { request } from "../../express.js";
@@ -16,7 +38,9 @@ export async function createOrUpdateProjectsHandler(
       // helper is allowed to create projects and change their own projects
       // voter is not allowed to do anything
 
-      if (!(loggedInUser?.type === "admin" || loggedInUser?.type === "helper")) {
+      if (
+        !(loggedInUser?.type === "admin" || loggedInUser?.type === "helper")
+      ) {
         return [
           {
             "content-type": "text/json; charset=utf-8",
@@ -70,7 +94,8 @@ export async function createOrUpdateProjectsHandler(
           } else {
             // TODO FIXME we can use our nice query building here
             // or postgres also has builtin features for insert and update
-            let res = await sql`INSERT INTO projects (title, info, place, costs, min_age, max_age, min_participants, max_participants, random_assignments)
+            let res =
+              await sql`INSERT INTO projects (title, info, place, costs, min_age, max_age, min_participants, max_participants, random_assignments)
             (SELECT 
     ${project.title ?? null},
     ${project.info ?? null},
@@ -81,13 +106,15 @@ export async function createOrUpdateProjectsHandler(
     ${project.min_participants ?? null},
     ${project.max_participants ?? null},
     ${project.random_assignments ?? false} FROM users WHERE users.id = ${
-              loggedInUser.id
-            } AND (users.type = 'helper' OR users.type = 'admin'))
+                loggedInUser.id
+              } AND (users.type = 'helper' OR users.type = 'admin'))
     RETURNING id;`;
 
             // TODO FIXME make this in sql directly
             if (loggedInUser.type === "helper") {
-              await sql`UPDATE users SET project_leader_id = ${res[0].id as number} WHERE project_leader_id IS NULL AND id = ${loggedInUser.id}`
+              await sql`UPDATE users SET project_leader_id = ${
+                res[0].id as number
+              } WHERE project_leader_id IS NULL AND id = ${loggedInUser.id}`;
             }
 
             return res;

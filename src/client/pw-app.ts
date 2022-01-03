@@ -1,5 +1,25 @@
-// SPDX-License-Identifier: AGPL-3.0-or-later
-// SPDX-FileCopyrightText: 2021 Moritz Hedtke <Moritz.Hedtke@t-online.de>
+/*
+projektwahl-lit is a software to manage choosing projects and automatically assigning people to projects.
+Copyright (C) 2021 Moritz Hedtke
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU Affero General Public License as published
+by the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+GNU Affero General Public License for more details.
+
+You should have received a copy of the GNU Affero General Public License
+along with this program. If not, see https://www.gnu.org/licenses/.
+*/
+/*!
+https://github.com/projektwahl/projektwahl-lit
+SPDX-License-Identifier: AGPL-3.0-or-later
+SPDX-FileCopyrightText: 2021 Moritz Hedtke <Moritz.Hedtke@t-online.de>
+*/
 import "./routes/users/pw-users.js";
 import "./form/pw-form.js";
 import "./entity-list/pw-entitylist.js";
@@ -56,7 +76,7 @@ export const pwApp = async (url: URL) => {
 export const nextPage = async (url: URL) => {
   try {
     if (url.pathname === "/") {
-      return html`<pw-welcome></pw-welcome>`
+      return html`<pw-welcome></pw-welcome>`;
     } else if (url.pathname === "/login") {
       //setLocale("de");
       return await pwLogin();
@@ -67,7 +87,10 @@ export const nextPage = async (url: URL) => {
     } else if (/users\/edit\/\d+/.test(url.pathname)) {
       return await pwUser(Number(url.pathname.match(/users\/edit\/(\d+)/)![1]));
     } else if (/users\/view\/\d+/.test(url.pathname)) {
-      return await pwUser(Number(url.pathname.match(/users\/view\/(\d+)/)![1]), true);
+      return await pwUser(
+        Number(url.pathname.match(/users\/view\/(\d+)/)![1]),
+        true
+      );
     } else if (url.pathname === "/projects") {
       return await pwProjects(url);
     } else if (url.pathname === "/projects/create") {
@@ -78,7 +101,8 @@ export const nextPage = async (url: URL) => {
       );
     } else if (/projects\/view\/\d+/.test(url.pathname)) {
       return await pwProject(
-        Number(url.pathname.match(/projects\/view\/(\d+)/)![1]), true
+        Number(url.pathname.match(/projects\/view\/(\d+)/)![1]),
+        true
       );
     } else {
       return msg(html`Not Found`);

@@ -1,3 +1,25 @@
+/*
+projektwahl-lit is a software to manage choosing projects and automatically assigning people to projects.
+Copyright (C) 2021 Moritz Hedtke
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU Affero General Public License as published
+by the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+GNU Affero General Public License for more details.
+
+You should have received a copy of the GNU Affero General Public License
+along with this program. If not, see https://www.gnu.org/licenses/.
+*/
+/*!
+https://github.com/projektwahl/projektwahl-lit
+SPDX-License-Identifier: AGPL-3.0-or-later
+SPDX-FileCopyrightText: 2021 Moritz Hedtke <Moritz.Hedtke@t-online.de>
+*/
 import postgres from "postgres";
 import { z } from "zod";
 import { routes } from "../../../lib/routes.js";
@@ -25,7 +47,7 @@ export async function createOrUpdateUsersHandler(
     "POST",
     "/api/v1/users/create-or-update",
     async function (user, loggedInUser) {
-      // helper is allowed to set voters as away (TODO implement) 
+      // helper is allowed to set voters as away (TODO implement)
       // voter is not allowed to do anything
 
       if (!(loggedInUser?.type === "admin")) {
@@ -59,7 +81,9 @@ export async function createOrUpdateUsersHandler(
             ${field("away")},
             ${field("project_leader_id")},
             ${field("force_in_project_id")}
-            WHERE id = ${user.id} RETURNING id, project_leader_id, force_in_project_id;`;
+            WHERE id = ${
+              user.id
+            } RETURNING id, project_leader_id, force_in_project_id;`;
             return await sql(...finalQuery);
           } else {
             return await sql`INSERT INTO users (username, password_hash, type, "group", age, away, project_leader_id, force_in_project_id) VALUES (${
@@ -74,7 +98,7 @@ export async function createOrUpdateUsersHandler(
           }
         });
 
-        console.log(row)
+        console.log(row);
 
         return [
           {
@@ -83,7 +107,9 @@ export async function createOrUpdateUsersHandler(
           },
           {
             success: true as const,
-            data: routes["/api/v1/users/create-or-update"]["response"]["options"][0]["shape"]["data"].parse(row),
+            data: routes["/api/v1/users/create-or-update"]["response"][
+              "options"
+            ][0]["shape"]["data"].parse(row),
           },
         ];
       } catch (error: unknown) {
