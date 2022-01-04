@@ -59,6 +59,23 @@ CREATE TABLE IF NOT EXISTS projects_history (
     ON DELETE RESTRICT
 );
 
+-- TODO FIXME If you want this audit log to be trustworthy, your app should run with a role that has at most USAGE to the audit schema and SELECT rights to audit.logged_actions. Most importantly, your app must not connect with a superuser role and must not own the tables it uses. Create your app's schema with a different user to the one your app runs as, and GRANT your app the minimum rights it needs.
+CREATE OR REPLACE FUNCTION log_history_projects() RETURNS TRIGGER AS $test1$
+BEGIN
+  -- TODO FIXME log delete / log what type of operation it was
+  INSERT INTO projects_history SELECT nextval('projects_history_history_id_seq'), NEW.*;
+  RETURN NEW;
+END;
+$test1$ LANGUAGE plpgsql;
+
+CREATE TRIGGER projects_audit_insert_delete
+AFTER INSERT OR DELETE ON projects FOR EACH ROW
+EXECUTE PROCEDURE log_history_projects();
+
+CREATE TRIGGER projects_audit_update_selective
+AFTER UPDATE ON projects FOR EACH ROW
+EXECUTE PROCEDURE log_history_projects();
+
 DO $$ BEGIN
   CREATE TYPE user_type AS ENUM ('admin', 'helper', 'voter');
 EXCEPTION
