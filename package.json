@@ -25,7 +25,7 @@
     "localize-extract": "lit-localize extract",
     "localize-build": "lit-localize build",
     "build": "esbuild --format=esm --bundle src/client/pw-app.ts --charset=utf8 --define:window.PRODUCTION=true --sourcemap --splitting --analyze --outdir=dist --minify-whitespace --minify-identifiers --minify-syntax --tree-shaking=true --minify",
-    "purgecss": "npx purgecss --css bootstrap.min.css --content src/**/**.ts --output dist/bootstrap.min.css --font-face --keyframes --variables"
+    "purgecss": "purgecss --css node_modules/bootstrap/dist/css/bootstrap.css --content dist/pw-app.js --output dist/bootstrap.min.css --font-face --keyframes --variables"
   },
   "dependencies": {
     "@lit-labs/motion": "^1.0.1",
@@ -33,6 +33,7 @@
     "@lit-labs/task": "^1.0.0",
     "@lit/localize": "^0.11.1",
     "argon2": "^0.28.3",
+    "bootstrap": "^5.1.3",
     "cookie": "^0.4.1",
     "js-cookie": "^3.0.1",
     "lit": "^2.0.2",
