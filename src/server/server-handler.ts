@@ -279,7 +279,7 @@ export async function serverHandler(
         href="/dist/bootstrap.min.css"
         rel="stylesheet"
       />
-      <link rel="preload" href="/dist/chunk-O27XPTNE.js" as="script" crossorigin="anonymous">
+      <!--<link rel="preload" href="/dist/chunk-O27XPTNE.js" as="script" crossorigin="anonymous">-->
   
       <title>Projektwahl</title>
     </head>
