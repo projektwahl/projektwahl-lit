@@ -24,10 +24,16 @@ import { msg } from "@lit/localize";
 import { html, LitElement } from "lit";
 import { setupHmr } from "../hmr.js";
 import { bootstrapCss } from "../index.js";
+import { aClick } from "../pw-a.js";
+import { myFetch } from "../utils.js";
 
 export const PwWelcome = setupHmr(
   "PwWelcome",
   class PwWelcome extends LitElement {
+
+    bruh: any = aClick;
+    bruh2: any = myFetch;
+
     protected render() {
       return html`
         ${bootstrapCss}

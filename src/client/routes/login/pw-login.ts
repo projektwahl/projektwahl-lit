@@ -29,6 +29,7 @@ import { HistoryController } from "../../history-controller.js";
 import { msg } from "@lit/localize";
 import "../../form/pw-text-input.js";
 import { setupHmr } from "../../hmr.js";
+import { aClick } from "../../pw-a.js";
 
 export const pwLogin = async (): Promise<import("lit").TemplateResult> => {
   const content = 0; //await myFetch<"/api/v1/sleep">("/api/v1/sleep").then((r) => r.text());
@@ -49,6 +50,9 @@ class PwLogin extends PwForm<"/api/v1/login"> {
   override get actionText() {
     return msg("Login");
   }
+
+  bruh: any = aClick;
+  bruh2: any = myFetch;
 
   constructor() {
     super();

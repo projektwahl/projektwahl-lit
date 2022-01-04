@@ -24,7 +24,7 @@
     "server": "node --experimental-loader ./src/loader.js --enable-source-maps --experimental-import-meta-resolve ./src/server/index.js",
     "localize-extract": "lit-localize extract",
     "localize-build": "lit-localize build",
-    "build": "rm -R dist && esbuild --format=esm --bundle src/client/pw-app.ts --charset=utf8 --define:window.PRODUCTION=true --sourcemap --splitting --analyze --outdir=dist --minify-whitespace --minify-identifiers --minify-syntax --tree-shaking=true --minify",
+    "build": "rm -Rf dist && esbuild --format=esm --bundle src/client/pw-app.ts --charset=utf8 --define:window.PRODUCTION=true --sourcemap --splitting --analyze --outdir=dist --minify-whitespace --minify-identifiers --minify-syntax --tree-shaking=true --minify",
     "purgecss": "purgecss --css node_modules/bootstrap/dist/css/bootstrap.css --content dist/pw-app.js --output dist/bootstrap.min.css --font-face --keyframes --variables"
   },
   "dependencies": {

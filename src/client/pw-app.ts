@@ -24,7 +24,6 @@ import { html, LitElement, ReactiveElement } from "lit";
 import { bootstrapCss } from "./index.js";
 import { HistoryController } from "./history-controller.js";
 import { aClick } from "./pw-a.js";
-import { classMap } from "lit/directives/class-map.js";
 import { until } from "lit/directives/until.js";
 import { setupHmr } from "./hmr.js";
 import jscookie from "js-cookie";
@@ -174,9 +173,7 @@ export const PwApp = setupHmr(
                 <li class="nav-item">
                   <a
                     @click=${aClick}
-                    class="nav-link ${classMap({
-                      active: this.history.url.pathname === "/",
-                    })}"
+                    class="nav-link ${this.history.url.pathname === "/" ? "active" : ""}"
                     aria-current="page"
                     href="/"
                     >${msg("Home")}</a
@@ -185,9 +182,7 @@ export const PwApp = setupHmr(
                 <li class="nav-item">
                   <a
                     @click=${aClick}
-                    class="nav-link ${classMap({
-                      active: this.history.url.pathname === "/users",
-                    })}"
+                    class="nav-link ${this.history.url.pathname === "/users" ? "active" : ""}"
                     href="/users"
                     >${msg("Accounts")}</a
                   >
@@ -195,9 +190,7 @@ export const PwApp = setupHmr(
                 <li>
                   <a
                     @click=${aClick}
-                    class="nav-link ${classMap({
-                      active: this.history.url.pathname === "/projects",
-                    })}"
+                    class="nav-link ${this.history.url.pathname === "/projects" ? "active" : ""}"
                     href="/projects"
                     >${msg("Projects")}</a
                   >
@@ -205,9 +198,7 @@ export const PwApp = setupHmr(
                 <li>
                   <a
                     @click=${aClick}
-                    class="nav-link ${classMap({
-                      active: this.history.url.pathname === "/election",
-                    })}"
+                    class="nav-link ${this.history.url.pathname === "/election" ? "active" : ""}"
                     href="/election"
                     >${msg("Election")}</a
                   >
@@ -235,9 +226,7 @@ export const PwApp = setupHmr(
                   : html` <li class="nav-item">
                       <a
                         @click=${aClick}
-                        class="nav-link ${classMap({
-                          active: this.history.url.pathname === "/login",
-                        })}"
+                        class="nav-link ${this.history.url.pathname === "/login" ? "active" : ""}"
                         href="/login"
                         >${msg("Login")}</a
                       >
