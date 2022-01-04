@@ -41,8 +41,6 @@ import { pipeline, Readable } from "node:stream";
 import {render} from '@lit-labs/ssr/lib/render-with-global-dom-shim.js';
 import { unsafeHTML } from "lit/directives/unsafe-html.js";
 import '../client/pw-app.js'
-import { pwApp } from "../client/pw-app.js";
-import { html } from "lit";
 
 //const startTime = Date.now();
 
@@ -262,17 +260,7 @@ export async function serverHandler(
         );
       }
     } else {
-      // current issue: https://github.com/lit/lit/issues/2329
-
-      // TODO FIXME IMPORTANT this doesn't work for parallel rendering
-      // TODO FIXME SECURITY THE DOMAIN NEEDS TO BE FORCED TO OUR VALUE OTHERWISE THIS IS PRONE TO ATTACKS
-      Object.assign(window, {
-        location: url,
-      });
-
-      // ${await pwApp(url)}
-
-      let rawContents = html`<!DOCTYPE html>
+      let rawContents = `<!DOCTYPE html>
   <html lang="en">
     <head>
       <!-- Required meta tags -->
@@ -317,7 +305,16 @@ export async function serverHandler(
     </body>
   </html>
   `;
-      const ssrResult = render(rawContents);
+      // ${await pwApp(url)}
+
+      // current issue: https://github.com/lit/lit/issues/2329
+
+      // TODO FIXME IMPORTANT this doesn't work for parallel rendering
+      // TODO FIXME SECURITY THE DOMAIN NEEDS TO BE FORCED TO OUR VALUE OTHERWISE THIS IS PRONE TO ATTACKS
+      Object.assign(window, {
+        location: url,
+      });
+      const ssrResult = render(unsafeHTML(rawContents));
 
       stream.respond({
         "content-type": "text/html; charset=utf-8",
