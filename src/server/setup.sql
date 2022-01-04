@@ -142,6 +142,23 @@ CREATE TABLE IF NOT EXISTS users_history (
     ON DELETE RESTRICT
 );
 
+-- TODO FIXME don't log old password hashes
+CREATE OR REPLACE FUNCTION log_history_users() RETURNS TRIGGER AS $test1$
+BEGIN
+  -- TODO FIXME log delete / log what type of operation it was
+  INSERT INTO users_history SELECT nextval('users_history_history_id_seq'), NEW.*;
+  RETURN NEW;
+END;
+$test1$ LANGUAGE plpgsql;
+
+CREATE TRIGGER users_audit_insert_delete
+AFTER INSERT OR DELETE ON users FOR EACH ROW
+EXECUTE PROCEDURE log_history_users();
+
+CREATE TRIGGER users_audit_update_selective
+AFTER UPDATE ON users FOR EACH ROW
+EXECUTE PROCEDURE log_history_users();
+
 -- EXPLAIN ANALYZE VERBOSE SELECT id,name,type FROM users ORDER BY type ASC,name DESC;
 -- maybe add an index on name and maybe on type (or replace by enum?)
 
