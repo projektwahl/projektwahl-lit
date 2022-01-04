@@ -70,7 +70,7 @@ export const nextPage = async (url: URL) => {
       const { pwLogin } = await import("./routes/login/pw-login.js");
       return await pwLogin();
     } else if (url.pathname === "/users") {
-      const { pwUsers } = await import("./routes/users/pw-users.js");
+      const { pwUsers } = await import("./routes/chunk1.js");
       return await pwUsers(url);
     } else if (url.pathname === "/users/create") {
       await import("./routes/users/pw-user-create.js");
@@ -88,15 +88,15 @@ export const nextPage = async (url: URL) => {
       const { pwProjects } = await import("./routes/projects/pw-projects.js");
       return await pwProjects(url);
     } else if (url.pathname === "/projects/create") {
-      await import("./routes/projects/pw-project-create.js");
+      await import("./routes/chunk1.js");
       return html`<pw-project-create></pw-project-create>`;
     } else if (/projects\/edit\/\d+/.test(url.pathname)) {
-      const { pwProject } = await import("./routes/projects/pw-project-create.js");
+      const { pwProject } = await import("./routes/chunk1.js");
       return await pwProject(
         Number(url.pathname.match(/projects\/edit\/(\d+)/)![1])
       );
     } else if (/projects\/view\/\d+/.test(url.pathname)) {
-      const { pwProject } = await import("./routes/projects/pw-project-create.js");
+      const { pwProject } = await import("./routes/chunk1.js");
       return await pwProject(
         Number(url.pathname.match(/projects\/view\/(\d+)/)![1]),
         true

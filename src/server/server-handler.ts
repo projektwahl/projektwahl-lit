@@ -278,7 +278,7 @@ export async function serverHandler(
         rel="stylesheet"
       />
   
-      <title>Hello, world!</title>
+      <title>Projektwahl</title>
     </head>
     <body>
       <script
