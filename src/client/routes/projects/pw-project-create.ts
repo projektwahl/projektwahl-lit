@@ -32,7 +32,6 @@ import "../../form/pw-text-input.js";
 import "../../form/pw-checkbox-input.js";
 import type { z } from "zod";
 import type { routes } from "../../../lib/routes.js";
-import "./pw-project-users.js";
 import { setupHmr } from "../../hmr.js";
 
 export async function pwProject(id: number, viewOnly: boolean = false) {
@@ -44,12 +43,13 @@ export async function pwProject(id: number, viewOnly: boolean = false) {
 }
 
 const taskFunction = async ([id]: [number]) => {
-  let response = await myFetch<"/api/v1/projects">(
+  const [_, response] = await Promise.all([import("../chunk-entities.js"),
+  await myFetch<"/api/v1/projects">(
     `/api/v1/projects/?f_id=${id}`,
     {
       //agent: new Agent({rejectUnauthorized: false})
     }
-  );
+  )]);
   return response.success ? response.data.entities[0] : null; // TODO FIXME error handling, PwForm already has some form of error handling
 };
 

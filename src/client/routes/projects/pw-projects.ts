@@ -32,7 +32,6 @@ import { createRef, ref } from "lit/directives/ref.js";
 import { noChange } from "lit";
 import { aClick } from "../../pw-a.js";
 import { msg } from "@lit/localize";
-import "./pw-projects.js";
 import type { routes } from "../../../lib/routes.js";
 import type { z } from "zod";
 import { PwEntityList } from "../../entity-list/pw-entitylist.js";

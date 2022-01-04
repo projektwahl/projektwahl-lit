@@ -67,36 +67,36 @@ export const nextPage = async (url: URL) => {
       return html`<pw-welcome></pw-welcome>`;
     } else if (url.pathname === "/login") {
       //setLocale("de");
-      const { pwLogin } = await import("./routes/login/pw-login.js");
+      const { pwLogin } = await import("./routes/chunk-forms.js");
       return await pwLogin();
     } else if (url.pathname === "/users") {
-      const { pwUsers } = await import("./routes/chunk1.js");
+      const { pwUsers } = await import("./routes/chunk-entities.js");
       return await pwUsers(url);
     } else if (url.pathname === "/users/create") {
-      await import("./routes/users/pw-user-create.js");
+      await import("./routes/chunk-forms.js");
       return html`<pw-user-create></pw-user-create>`;
     } else if (/users\/edit\/\d+/.test(url.pathname)) {
-      const { pwUser } = await import("./routes/users/pw-user-create.js");
+      const { pwUser } = await import("./routes/chunk-forms.js");
       return await pwUser(Number(url.pathname.match(/users\/edit\/(\d+)/)![1]));
     } else if (/users\/view\/\d+/.test(url.pathname)) {
-      const { pwUser } = await import("./routes/users/pw-user-create.js");
+      const { pwUser } = await import("./routes/chunk-forms.js");
       return await pwUser(
         Number(url.pathname.match(/users\/view\/(\d+)/)![1]),
         true
       );
     } else if (url.pathname === "/projects") {
-      const { pwProjects } = await import("./routes/projects/pw-projects.js");
+      const { pwProjects } = await import("./routes/chunk-entities.js");
       return await pwProjects(url);
     } else if (url.pathname === "/projects/create") {
-      await import("./routes/chunk1.js");
+      await import("./routes/chunk-forms.js");
       return html`<pw-project-create></pw-project-create>`;
     } else if (/projects\/edit\/\d+/.test(url.pathname)) {
-      const { pwProject } = await import("./routes/chunk1.js");
+      const { pwProject } = await import("./routes/chunk-forms.js");
       return await pwProject(
         Number(url.pathname.match(/projects\/edit\/(\d+)/)![1])
       );
     } else if (/projects\/view\/\d+/.test(url.pathname)) {
-      const { pwProject } = await import("./routes/chunk1.js");
+      const { pwProject } = await import("./routes/chunk-forms.js");
       return await pwProject(
         Number(url.pathname.match(/projects\/view\/(\d+)/)![1]),
         true
