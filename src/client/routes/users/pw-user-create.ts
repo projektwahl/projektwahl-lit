@@ -55,13 +55,12 @@ const taskFunction = async ([id]: [number]) => {
   return response.success ? response.data.entities[0] : null; // TODO FIXME error handling, PwForm already has some form of error handling
 };
 
-export const PwUserCreate = setupHmr(
-  import.meta.url,
-  "PwUserCreate",
-  class PwUserCreate extends PwForm<"/api/v1/users/create-or-update"> {
-    static override get properties() {
+// maybe extending actually breaks shit
+class PwUserCreate extends PwForm<"/api/v1/users/create-or-update"> {
+    static get properties() {
       return {
         ...super.properties,
+        forceTask: { state: true },
         url: { attribute: false },
         actionText: { type: String },
         _task: { state: true },
@@ -86,9 +85,6 @@ export const PwUserCreate = setupHmr(
 
     constructor() {
       super();
-
-      /** @type {number|undefined} */
-      this.forceTask = undefined;
 
       /**
        * @override
@@ -202,6 +198,6 @@ export const PwUserCreate = setupHmr(
       `;
     }
   }
-);
+
 
 customElements.define("pw-user-create", PwUserCreate);

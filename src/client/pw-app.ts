@@ -20,29 +20,15 @@ https://github.com/projektwahl/projektwahl-lit
 SPDX-License-Identifier: AGPL-3.0-or-later
 SPDX-FileCopyrightText: 2021 Moritz Hedtke <Moritz.Hedtke@t-online.de>
 */
-import "./routes/users/pw-users.js";
-import "./form/pw-form.js";
-import "./entity-list/pw-entitylist.js";
-import "./routes/users/pw-user-create.js";
-import "./routes/projects/pw-project-create.js";
 import { html, LitElement, ReactiveElement } from "lit";
 import { bootstrapCss } from "./index.js";
 import { HistoryController } from "./history-controller.js";
 import { aClick } from "./pw-a.js";
-import { classMap } from "lit/directives/class-map.js";
 import { until } from "lit/directives/until.js";
-import { pwLogin } from "./routes/login/pw-login.js";
 import { setupHmr } from "./hmr.js";
-import { pwUsers } from "./routes/users/pw-users.js";
 import jscookie from "js-cookie";
-import { configureLocalization, msg, str } from "@lit/localize";
-import "./routes/pw-welcome.js";
-
-// Generated via output.localeCodesModule
+import { msg, str } from "@lit/localize";
 import { sourceLocale, targetLocales } from "./generated_locales/locales.js";
-import { pwProjects } from "./routes/projects/pw-projects.js";
-import { pwProject } from "./routes/projects/pw-project-create.js";
-import { pwUser } from "./routes/users/pw-user-create.js";
 import { myFetch } from "./utils.js";
 
 /**export const { getLocale, setLocale } = configureLocalization({
@@ -76,30 +62,40 @@ export const pwApp = async (url: URL) => {
 export const nextPage = async (url: URL) => {
   try {
     if (url.pathname === "/") {
+      await import("./routes/pw-welcome.js");
       return html`<pw-welcome></pw-welcome>`;
     } else if (url.pathname === "/login") {
       //setLocale("de");
+      const { pwLogin } = await import("./routes/chunk-forms.js");
       return await pwLogin();
     } else if (url.pathname === "/users") {
+      const { pwUsers } = await import("./routes/chunk-entities.js");
       return await pwUsers(url);
     } else if (url.pathname === "/users/create") {
+      await import("./routes/chunk-forms.js");
       return html`<pw-user-create></pw-user-create>`;
     } else if (/users\/edit\/\d+/.test(url.pathname)) {
+      const { pwUser } = await import("./routes/chunk-forms.js");
       return await pwUser(Number(url.pathname.match(/users\/edit\/(\d+)/)![1]));
     } else if (/users\/view\/\d+/.test(url.pathname)) {
+      const { pwUser } = await import("./routes/chunk-forms.js");
       return await pwUser(
         Number(url.pathname.match(/users\/view\/(\d+)/)![1]),
         true
       );
     } else if (url.pathname === "/projects") {
+      const { pwProjects } = await import("./routes/chunk-entities.js");
       return await pwProjects(url);
     } else if (url.pathname === "/projects/create") {
+      await import("./routes/chunk-forms.js");
       return html`<pw-project-create></pw-project-create>`;
     } else if (/projects\/edit\/\d+/.test(url.pathname)) {
+      const { pwProject } = await import("./routes/chunk-forms.js");
       return await pwProject(
         Number(url.pathname.match(/projects\/edit\/(\d+)/)![1])
       );
     } else if (/projects\/view\/\d+/.test(url.pathname)) {
+      const { pwProject } = await import("./routes/chunk-forms.js");
       return await pwProject(
         Number(url.pathname.match(/projects\/view\/(\d+)/)![1]),
         true
@@ -115,7 +111,6 @@ export const nextPage = async (url: URL) => {
 };
 
 export const PwApp = setupHmr(
-  import.meta.url,
   "PwApp",
   class PwApp extends LitElement {
     static override get properties() {
@@ -155,7 +150,6 @@ export const PwApp = setupHmr(
       }
       return html`
         ${bootstrapCss}
-
         <nav
           class="navbar navbar-expand-lg navbar-light bg-light shadow p-3 mb-5"
         >
@@ -179,9 +173,7 @@ export const PwApp = setupHmr(
                 <li class="nav-item">
                   <a
                     @click=${aClick}
-                    class="nav-link ${classMap({
-                      active: this.history.url.pathname === "/",
-                    })}"
+                    class="nav-link ${this.history.url.pathname === "/" ? "active" : ""}"
                     aria-current="page"
                     href="/"
                     >${msg("Home")}</a
@@ -190,9 +182,7 @@ export const PwApp = setupHmr(
                 <li class="nav-item">
                   <a
                     @click=${aClick}
-                    class="nav-link ${classMap({
-                      active: this.history.url.pathname === "/users",
-                    })}"
+                    class="nav-link ${this.history.url.pathname === "/users" ? "active" : ""}"
                     href="/users"
                     >${msg("Accounts")}</a
                   >
@@ -200,9 +190,7 @@ export const PwApp = setupHmr(
                 <li>
                   <a
                     @click=${aClick}
-                    class="nav-link ${classMap({
-                      active: this.history.url.pathname === "/projects",
-                    })}"
+                    class="nav-link ${this.history.url.pathname === "/projects" ? "active" : ""}"
                     href="/projects"
                     >${msg("Projects")}</a
                   >
@@ -210,9 +198,7 @@ export const PwApp = setupHmr(
                 <li>
                   <a
                     @click=${aClick}
-                    class="nav-link ${classMap({
-                      active: this.history.url.pathname === "/election",
-                    })}"
+                    class="nav-link ${this.history.url.pathname === "/election" ? "active" : ""}"
                     href="/election"
                     >${msg("Election")}</a
                   >
@@ -240,9 +226,7 @@ export const PwApp = setupHmr(
                   : html` <li class="nav-item">
                       <a
                         @click=${aClick}
-                        class="nav-link ${classMap({
-                          active: this.history.url.pathname === "/login",
-                        })}"
+                        class="nav-link ${this.history.url.pathname === "/login" ? "active" : ""}"
                         href="/login"
                         >${msg("Login")}</a
                       >

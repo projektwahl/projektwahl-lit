@@ -36,6 +36,8 @@ import { projectsHandler } from "./routes/projects/index.js";
 import esbuild from "esbuild";
 import { resolve as loaderResolve, load as loaderLoad } from "../loader.js";
 import { logoutHandler } from "./routes/login/logout.js";
+import zlib from 'node:zlib';
+import { pipeline, Readable } from "node:stream";
 
 //const startTime = Date.now();
 
@@ -73,7 +75,7 @@ export async function serverHandler(
 
   let url = new URL(path, "https://localhost:8443");
 
-  if (url.pathname === "/favicon.ico") {
+  if (url.pathname === "/favicon.ico" || url.pathname === "/robots.txt") {
     stream.respond(
       {
         ":status": 404,
@@ -204,11 +206,49 @@ export async function serverHandler(
           );
         }
 
-        stream.respond({
-          "content-type": "application/javascript; charset=utf-8",
-          ":status": 200,
-        });
-        stream.end(contents);
+        const contentType = filename.endsWith(".css") ? "text/css" : "application/javascript";
+
+        const raw = new Readable()
+        raw.push(contents)    // the string you want
+        raw.push(null)      // indicates end-of-file basically - the end of the stream
+
+        let acceptEncoding = headers['accept-encoding'] as string;
+        if (!acceptEncoding) {
+          acceptEncoding = '';
+        }
+
+        const onError = (err: any) => {
+          if (err) {
+            // If an error occurs, there's not much we can do because
+            // the server has already sent the 200 response code and
+            // some amount of data has already been sent to the client.
+            // The best we can do is terminate the response immediately
+            // and log the error.
+            stream.end();
+            console.error('An error occurred:', err);
+          }
+        };
+
+        // Note: This is not a conformant accept-encoding parser.
+        // See https://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.3
+        if (/\bbr\b/.test(acceptEncoding)) {
+          stream.respond({
+            "content-type": `${contentType}; charset=utf-8`,
+            "cache-control": "public, max-age=604800, immutable",
+            "vary": "accept-encoding",
+            'content-encoding': 'br',
+            ":status": 200,
+          });
+          pipeline(raw, zlib.createBrotliCompress(), stream, onError);
+        } else {
+          stream.respond({
+            "content-type": `${contentType}; charset=utf-8`,
+            "cache-control": "public, max-age=604800, immutable",
+            "vary": "accept-encoding",
+            ":status": 200,
+          });
+          pipeline(raw, stream, onError);
+        }
       } catch (error) {
         console.error(error);
         stream.respond(
@@ -236,22 +276,17 @@ export async function serverHandler(
         }
       </style>
       <link
-        href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css"
+        href="/dist/bootstrap.min.css"
         rel="stylesheet"
-        integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3"
-        crossorigin="anonymous"
       />
-      <link
-        rel="stylesheet"
-        href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.0/font/bootstrap-icons.css"
-      />
+      <!--<link rel="preload" href="/dist/chunk-O27XPTNE.js" as="script" crossorigin="anonymous">-->
   
-      <title>Hello, world!</title>
+      <title>Projektwahl</title>
     </head>
     <body>
       <script
         type="module"
-        src="/src/client/pw-app.js"
+        src="/dist/pw-app.js"
       ></script>
       <noscript>Bitte aktiviere JavaScript!</noscript>
   

@@ -26,9 +26,11 @@ import { bootstrapCss } from "../index.js";
 import { msg } from "@lit/localize";
 import { setupHmr } from "../hmr.js";
 import type { routes } from "../../lib/routes.js";
+import {isPrimitive} from "lit-html/directive-helpers.js";
+import { AsyncDirective } from "lit/async-directive.js";
 
 class PwForm<P extends keyof typeof routes> extends LitElement {
-  static override get properties() {
+  static get properties() {
     return {
       forceTask: { state: true },
       disabled: { type: Boolean },
@@ -52,13 +54,19 @@ class PwForm<P extends keyof typeof routes> extends LitElement {
 
   forceTask: number | undefined;
 
+  b1 = isPrimitive;
+  b2 = AsyncDirective;
+
   constructor() {
     super();
+
+    /** @type {number|undefined} */
+    this.forceTask = undefined;
 
     this.form = createRef();
   }
 
-  submit = (event: SubmitEvent) => {
+  protected submit(event: SubmitEvent) {
     event.preventDefault();
 
     this.forceTask = (this.forceTask || 0) + 1;
@@ -113,7 +121,7 @@ if ('FormDataEvent' in window) {
       ${bootstrapCss}
       <main class="container">
         <h1 class="text-center">${this.actionText}</h1>
-
+        
         <div class="row justify-content-center">
           <div class="col-md-7 col-lg-8">
             ${this._task.render({

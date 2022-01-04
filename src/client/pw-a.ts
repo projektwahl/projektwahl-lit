@@ -83,4 +83,4 @@ export class PwADontUse extends LitElement {
       ></a>`;
   }
 }
-customElements.define("pw-a-dontuse", PwADontUse);
+//customElements.define("pw-a-dontuse", PwADontUse);

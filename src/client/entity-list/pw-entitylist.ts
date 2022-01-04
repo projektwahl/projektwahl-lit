@@ -29,7 +29,6 @@ import { createRef, ref } from "lit/directives/ref.js";
 import { Task, TaskStatus } from "@lit-labs/task";
 import type { entityRoutes } from "../../lib/routes.js";
 import type { z } from "zod";
-import { classMap } from "lit/directives/class-map.js";
 import { ifDefined } from "lit/directives/if-defined.js";
 
 export class PwEntityList<
@@ -211,10 +210,7 @@ export class PwEntityList<
               <nav aria-label="${msg("navigation of user list")}">
                 <ul class="pagination justify-content-center">
                   <li
-                    class="page-item ${classMap({
-                      disabled:
-                        this._apiTask.value?.data.previousCursor === null,
-                    })}"
+                    class="page-item ${this._apiTask.value?.data.previousCursor === null ? "disabled" : ""}"
                   >
                     <a
                       @click=${(e: Event) => {
@@ -246,9 +242,7 @@ export class PwEntityList<
                     </a>
                   </li>
                   <li
-                    class="page-item ${classMap({
-                      disabled: this._apiTask.value?.data.nextCursor === null,
-                    })}"
+                    class="page-item ${this._apiTask.value?.data.nextCursor === null ? "disabled" : ""}"
                   >
                     <a
                       @click=${(e: Event) => {
