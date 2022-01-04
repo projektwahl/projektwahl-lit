@@ -38,9 +38,6 @@ import { resolve as loaderResolve, load as loaderLoad } from "../loader.js";
 import { logoutHandler } from "./routes/login/logout.js";
 import zlib from 'node:zlib';
 import { pipeline, Readable } from "node:stream";
-import {render} from '@lit-labs/ssr/lib/render-with-global-dom-shim.js';
-import { unsafeHTML } from "lit/directives/unsafe-html.js";
-import '../client/pw-app.js'
 
 //const startTime = Date.now();
 
@@ -284,24 +281,13 @@ export async function serverHandler(
       <title>Hello, world!</title>
     </head>
     <body>
-      <pw-app></pw-app>
-
-      <script type="module">
-        import '/node_modules/lit/experimental-hydrate-support.js';
-        // Hydrate template-shadowroots eagerly after rendering (for browsers without
-        // native declarative shadow roots)
-        import {
-          hasNativeDeclarativeShadowRoots,
-          hydrateShadowRoots
-        } from '/node_modules/@webcomponents/template-shadowroot/template-shadowroot.js';
-        if (!hasNativeDeclarativeShadowRoots) {
-          hydrateShadowRoots(document.body);
-        }
-        // ...
-        // Load and hydrate components lazily
-        import('/dist/pw-app.js');
-      </script>
+      <script
+        type="module"
+        src="/dist/pw-app.js"
+      ></script>
       <noscript>Bitte aktiviere JavaScript!</noscript>
+  
+      <pw-app></pw-app>
     </body>
   </html>
   `;
@@ -311,18 +297,17 @@ export async function serverHandler(
 
       // TODO FIXME IMPORTANT this doesn't work for parallel rendering
       // TODO FIXME SECURITY THE DOMAIN NEEDS TO BE FORCED TO OUR VALUE OTHERWISE THIS IS PRONE TO ATTACKS
-      Object.assign(window, {
-        location: url,
-      });
-      const ssrResult = render(unsafeHTML(rawContents));
+      //window.location.href = url;
+      //const ssrResult = render(contents);
 
       stream.respond({
         "content-type": "text/html; charset=utf-8",
         ":status": 200,
       });
-      Readable.from(ssrResult).pipe(stream)
+      //Readable.from(ssrResult).pipe(stream)
+      //stream.end()
 
-      //stream.end(rawContents);
+      stream.end(rawContents);
     }
   }
 }
