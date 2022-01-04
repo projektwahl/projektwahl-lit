@@ -75,7 +75,7 @@ export async function serverHandler(
 
   let url = new URL(path, "https://localhost:8443");
 
-  if (url.pathname === "/favicon.ico") {
+  if (url.pathname === "/favicon.ico" || url.pathname === "/robots.txt") {
     stream.respond(
       {
         ":status": 404,
@@ -234,6 +234,7 @@ export async function serverHandler(
         if (/\bbr\b/.test(acceptEncoding)) {
           stream.respond({
             "content-type": `${contentType}; charset=utf-8`,
+            "cache-control": "public, max-age=604800, immutable",
             "vary": "accept-encoding",
             'content-encoding': 'br',
             ":status": 200,
@@ -242,6 +243,7 @@ export async function serverHandler(
         } else {
           stream.respond({
             "content-type": `${contentType}; charset=utf-8`,
+            "cache-control": "public, max-age=604800, immutable",
             "vary": "accept-encoding",
             ":status": 200,
           });
@@ -277,6 +279,7 @@ export async function serverHandler(
         href="/dist/bootstrap.min.css"
         rel="stylesheet"
       />
+      <link rel="preload" href="/dist/chunk-O27XPTNE.js" as="script" crossorigin="anonymous">
   
       <title>Projektwahl</title>
     </head>
