@@ -21,6 +21,7 @@ SPDX-License-Identifier: AGPL-3.0-or-later
 SPDX-FileCopyrightText: 2021 Moritz Hedtke <Moritz.Hedtke@t-online.de>
 */
 import type { ReactiveController, ReactiveControllerHost } from "lit";
+import { PwForm } from "./form/pw-form.js";
 
 export type HistoryState = Record<string, unknown>;
 
@@ -34,6 +35,8 @@ export class HistoryController implements ReactiveController {
   state: HistoryState;
 
   private popstateListener?: (this: Window, ev: PopStateEvent) => void;
+
+  b1 = PwForm;
 
   private navigateListener?: (
     this: Window,
