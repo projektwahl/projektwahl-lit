@@ -52,6 +52,7 @@ import { myFetch } from "./utils.js";
 });*/
 
 // TODO FIXME show more details if possible (maybe error page)
+if (window.addEventListener) {
 window.addEventListener("error", function (event) {
   console.error("window.error", event.error);
   alert("unknown error: " + event.message);
@@ -61,6 +62,7 @@ window.addEventListener("unhandledrejection", function (event) {
   console.error("window.unhandledrejection", event.promise);
   alert("unknown error: " + event.reason);
 });
+}
 
 ReactiveElement.enableWarning?.("migration");
 ReactiveElement.enableWarning?.("change-in-update");

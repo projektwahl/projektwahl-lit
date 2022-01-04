@@ -250,7 +250,7 @@ export function register<T>(key, clazz: T): T {
   return currentProxy;
 }
 
-if (!window.PRODUCTION) {
+if (!window.PRODUCTION && window.EventSource) {
   let eventSource = new EventSource("/api/v1/hmr");
   eventSource.addEventListener("error", function (error) {
     console.error(error);
@@ -271,7 +271,7 @@ if (!window.PRODUCTION) {
 }
 
   export function setupHmr<T>(name: string, clazz: T) {
-    if (!window.PRODUCTION) {
+    if (!window.PRODUCTION && window.EventSource) {
       console.log("register", name, clazz);
 
       return register(name, clazz);
