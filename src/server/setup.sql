@@ -38,6 +38,25 @@ CREATE TABLE IF NOT EXISTS projects (
   min_participants INTEGER NOT NULL,
   max_participants INTEGER NOT NULL,
   random_assignments BOOLEAN NOT NULL DEFAULT FALSE
+  -- maybe add last_updated_by which can then automatically be used in the trigger in projects_history
+);
+
+CREATE TABLE IF NOT EXISTS projects_history (
+  history_id SERIAL PRIMARY KEY NOT NULL,
+  id INTEGER NOT NULL,
+  title VARCHAR(255) NOT NULL,
+  info VARCHAR(4096) NOT NULL,
+  place VARCHAR(256) NOT NULL,
+  costs FLOAT NOT NULL,
+  min_age INTEGER NOT NULL,
+  max_age INTEGER NOT NULL,
+  min_participants INTEGER NOT NULL,
+  max_participants INTEGER NOT NULL,
+  random_assignments BOOLEAN NOT NULL DEFAULT FALSE,
+  FOREIGN KEY (id)
+    REFERENCES projects(id)
+    ON UPDATE RESTRICT
+    ON DELETE RESTRICT
 );
 
 DO $$ BEGIN
@@ -74,6 +93,38 @@ CREATE TABLE IF NOT EXISTS users (
     ON DELETE RESTRICT
 );
 
+CREATE TABLE IF NOT EXISTS users_history (
+  history_id SERIAL PRIMARY KEY NOT NULL,
+  id INTEGER NOT NULL,
+  username VARCHAR(64) UNIQUE NOT NULL,
+  openid_id VARCHAR(256) UNIQUE,
+  password_hash VARCHAR(256),
+  type user_type NOT NULL,
+  project_leader_id INTEGER, -- TODO FIXME maybe m:n as somebody could theoretically be leader in multiple projects?
+  "group" VARCHAR(16),
+  age INTEGER,
+  away BOOLEAN NOT NULL DEFAULT FALSE,
+  password_changed BOOLEAN NOT NULL DEFAULT FALSE,
+  force_in_project_id INTEGER, -- this should still be stored here even with openid as we can't join on it otherwise
+  computed_in_project_id INTEGER, -- this should still be stored here even with openid as we can't join on it otherwise
+  FOREIGN KEY (project_leader_id)
+    REFERENCES projects(id)
+    ON UPDATE RESTRICT
+    ON DELETE RESTRICT,
+  FOREIGN KEY (force_in_project_id)
+    REFERENCES projects(id)
+    ON UPDATE RESTRICT
+    ON DELETE RESTRICT,
+  FOREIGN KEY (computed_in_project_id)
+    REFERENCES projects(id)
+    ON UPDATE RESTRICT
+    ON DELETE RESTRICT,
+  FOREIGN KEY (id)
+    REFERENCES users(id)
+    ON UPDATE RESTRICT
+    ON DELETE RESTRICT
+);
+
 -- EXPLAIN ANALYZE VERBOSE SELECT id,name,type FROM users ORDER BY type ASC,name DESC;
 -- maybe add an index on name and maybe on type (or replace by enum?)
 
@@ -82,6 +133,21 @@ CREATE TABLE IF NOT EXISTS choices (
   project_id INTEGER NOT NULL,
   user_id INTEGER NOT NULL,
   PRIMARY KEY(user_id,project_id),
+  FOREIGN KEY (project_id)
+    REFERENCES projects(id)
+    ON UPDATE RESTRICT
+    ON DELETE RESTRICT,
+  FOREIGN KEY (user_id)
+    REFERENCES users(id)
+    ON UPDATE RESTRICT
+    ON DELETE RESTRICT
+);
+
+CREATE TABLE IF NOT EXISTS choices_history (
+  history_id SERIAL PRIMARY KEY NOT NULL,
+  rank INTEGER NOT NULL, -- TODO FIXME add checks here and on other places e.g. that this is from 1 - 5
+  project_id INTEGER NOT NULL,
+  user_id INTEGER NOT NULL,
   FOREIGN KEY (project_id)
     REFERENCES projects(id)
     ON UPDATE RESTRICT
