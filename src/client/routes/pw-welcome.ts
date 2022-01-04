@@ -26,6 +26,8 @@ import { setupHmr } from "../hmr.js";
 import { bootstrapCss } from "../index.js";
 import { aClick } from "../pw-a.js";
 import { myFetch } from "../utils.js";
+import {isPrimitive} from "lit-html/directive-helpers.js";
+import { AsyncDirective } from "lit/async-directive.js";
 
 export const PwWelcome = setupHmr(
   "PwWelcome",
@@ -33,6 +35,8 @@ export const PwWelcome = setupHmr(
 
     bruh: any = aClick;
     bruh2: any = myFetch;
+    b1 = isPrimitive;
+    b2 = AsyncDirective;
 
     protected render() {
       return html`

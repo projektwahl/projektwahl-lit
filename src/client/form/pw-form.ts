@@ -26,6 +26,8 @@ import { bootstrapCss } from "../index.js";
 import { msg } from "@lit/localize";
 import { setupHmr } from "../hmr.js";
 import type { routes } from "../../lib/routes.js";
+import {isPrimitive} from "lit-html/directive-helpers.js";
+import { AsyncDirective } from "lit/async-directive.js";
 
 class PwForm<P extends keyof typeof routes> extends LitElement {
   static get properties() {
@@ -51,6 +53,9 @@ class PwForm<P extends keyof typeof routes> extends LitElement {
   form: import("lit/directives/ref").Ref<HTMLFormElement>;
 
   forceTask: number | undefined;
+
+  b1 = isPrimitive;
+  b2 = AsyncDirective;
 
   constructor() {
     super();
