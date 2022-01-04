@@ -116,8 +116,6 @@ if ('FormDataEvent' in window) {
       ${bootstrapCss}
       <main class="container">
         <h1 class="text-center">${this.actionText}</h1>
-
-        ${this.forceTask}
         
         <div class="row justify-content-center">
           <div class="col-md-7 col-lg-8">
