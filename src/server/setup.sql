@@ -26,12 +26,8 @@ SPDX-FileCopyrightText: 2021 Moritz Hedtke <Moritz.Hedtke@t-online.de>
 ALTER DATABASE projektwahl SET default_transaction_isolation = 'serializable';
 ALTER DATABASE projektwahl SET default_transaction_read_only = true;
 
--- possibly add a boolean deleted column to prevent breaking foreign keys with the log table?
--- then the triggers that check validity would need to be updated though
--- this would also allow repeated deletion and recovery and making implementation like search by id simple as it still exists.
-
 -- TODO FIXME at some point create the tables based on the zod definitions? so min/max etc. are checked correctly?
-CREATE TABLE IF NOT EXISTS projects (
+CREATE TABLE IF NOT EXISTS projects_with_deleted (
   id SERIAL PRIMARY KEY NOT NULL,
   title VARCHAR(255) NOT NULL,
   info VARCHAR(4096) NOT NULL,
@@ -41,8 +37,13 @@ CREATE TABLE IF NOT EXISTS projects (
   max_age INTEGER NOT NULL,
   min_participants INTEGER NOT NULL,
   max_participants INTEGER NOT NULL,
-  random_assignments BOOLEAN NOT NULL DEFAULT FALSE
-  -- maybe add last_updated_by which can then automatically be used in the trigger in projects_history
+  random_assignments BOOLEAN NOT NULL DEFAULT FALSE,
+  deleted BOOLEAN NOT NULL DEFAULT FALSE,
+  last_updated_by INTEGER NOT NULL,
+  FOREIGN KEY (last_updated_by)
+    REFERENCES users_with_deleted(id)
+    ON UPDATE RESTRICT
+    ON DELETE RESTRICT
 );
 
 CREATE TABLE IF NOT EXISTS projects_history (
@@ -59,8 +60,14 @@ CREATE TABLE IF NOT EXISTS projects_history (
   min_participants INTEGER NOT NULL,
   max_participants INTEGER NOT NULL,
   random_assignments BOOLEAN NOT NULL DEFAULT FALSE,
+  deleted BOOLEAN NOT NULL DEFAULT FALSE,
+  last_updated_by INTEGER NOT NULL,
+  FOREIGN KEY (last_updated_by)
+    REFERENCES users_with_deleted(id)
+    ON UPDATE RESTRICT
+    ON DELETE RESTRICT,
   FOREIGN KEY (id)
-    REFERENCES projects(id)
+    REFERENCES projects_with_deleted(id)
     ON UPDATE RESTRICT
     ON DELETE RESTRICT
 );
@@ -71,22 +78,22 @@ CREATE OR REPLACE FUNCTION log_history_projects() RETURNS TRIGGER AS $body$
 DECLARE
   d RECORD;
 BEGIN
-  if (TG_OP = 'DELETE') then
-    d := OLD;
-  else
+  --if (TG_OP = 'DELETE') then
+  --  d := OLD;
+  --else
     d := NEW;
-  end if;
-  INSERT INTO projects_history (operation, id, title, info, place, costs, min_age, max_age, min_participants, max_participants, random_assignments) VALUES (TG_OP, d.id, d.title, d.info, d.place, d.costs, d.min_age, d.max_age, d.min_participants, d.max_participants, d.random_assignments);
+  --end if;
+  INSERT INTO projects_history (operation, id, title, info, place, costs, min_age, max_age, min_participants, max_participants, random_assignments, deleted, last_updated_by) VALUES (TG_OP, d.id, d.title, d.info, d.place, d.costs, d.min_age, d.max_age, d.min_participants, d.max_participants, d.random_assignments, d.deleted, d.last_updated_by);
   RETURN NULL;
 END;
 $body$ LANGUAGE plpgsql;
 
 CREATE TRIGGER projects_audit_insert_delete
-AFTER INSERT OR DELETE ON projects FOR EACH ROW
+AFTER INSERT OR DELETE ON projects_with_deleted FOR EACH ROW
 EXECUTE PROCEDURE log_history_projects();
 
 CREATE TRIGGER projects_audit_update_selective
-AFTER UPDATE ON projects FOR EACH ROW
+AFTER UPDATE ON projects_with_deleted FOR EACH ROW
 EXECUTE PROCEDURE log_history_projects();
 
 DO $$ BEGIN
@@ -109,16 +116,22 @@ CREATE TABLE IF NOT EXISTS users (
   password_changed BOOLEAN NOT NULL DEFAULT FALSE,
   force_in_project_id INTEGER, -- this should still be stored here even with openid as we can't join on it otherwise
   computed_in_project_id INTEGER, -- this should still be stored here even with openid as we can't join on it otherwise
+  deleted BOOLEAN NOT NULL DEFAULT FALSE,
+  last_updated_by INTEGER NOT NULL,
+  FOREIGN KEY (last_updated_by)
+    REFERENCES users_with_deleted(id)
+    ON UPDATE RESTRICT
+    ON DELETE RESTRICT,
   FOREIGN KEY (project_leader_id)
-    REFERENCES projects(id)
+    REFERENCES projects_with_deleted(id)
     ON UPDATE RESTRICT
     ON DELETE RESTRICT,
   FOREIGN KEY (force_in_project_id)
-    REFERENCES projects(id)
+    REFERENCES projects_with_deleted(id)
     ON UPDATE RESTRICT
     ON DELETE RESTRICT,
   FOREIGN KEY (computed_in_project_id)
-    REFERENCES projects(id)
+    REFERENCES projects_with_deleted(id)
     ON UPDATE RESTRICT
     ON DELETE RESTRICT
 );
@@ -138,20 +151,26 @@ CREATE TABLE IF NOT EXISTS users_history (
   password_changed BOOLEAN NOT NULL DEFAULT FALSE,
   force_in_project_id INTEGER, -- this should still be stored here even with openid as we can't join on it otherwise
   computed_in_project_id INTEGER, -- this should still be stored here even with openid as we can't join on it otherwise
+  deleted BOOLEAN NOT NULL DEFAULT FALSE,
+  last_updated_by INTEGER NOT NULL,
+  FOREIGN KEY (last_updated_by)
+    REFERENCES users_with_deleted(id)
+    ON UPDATE RESTRICT
+    ON DELETE RESTRICT,
   FOREIGN KEY (project_leader_id)
-    REFERENCES projects(id)
+    REFERENCES projects_with_deleted(id)
     ON UPDATE RESTRICT
     ON DELETE RESTRICT,
   FOREIGN KEY (force_in_project_id)
-    REFERENCES projects(id)
+    REFERENCES projects_with_deleted(id)
     ON UPDATE RESTRICT
     ON DELETE RESTRICT,
   FOREIGN KEY (computed_in_project_id)
-    REFERENCES projects(id)
+    REFERENCES projects_with_deleted(id)
     ON UPDATE RESTRICT
     ON DELETE RESTRICT,
   FOREIGN KEY (id)
-    REFERENCES users(id)
+    REFERENCES users_with_deleted(id)
     ON UPDATE RESTRICT
     ON DELETE RESTRICT
 );
@@ -160,26 +179,23 @@ CREATE OR REPLACE FUNCTION log_history_users() RETURNS TRIGGER AS $body$
 DECLARE
   d RECORD;
 BEGIN
-  if (TG_OP = 'DELETE') then
-    d := OLD;
-  else
+  --if (TG_OP = 'DELETE') then
+  --  d := OLD;
+  --else
     d := NEW;
-  end if;
-  INSERT INTO users_history (operation, id, username, openid_id, type, project_leader_id, "group", age, away, password_changed, force_in_project_id, computed_in_project_id) VALUES (TG_OP, d.id, d.username, d.openid_id, d.type, d.project_leader_id, d."group", d.age, d.away, d.password_changed, d.force_in_project_id, d.computed_in_project_id);
+  --end if;
+  INSERT INTO users_history (operation, id, username, openid_id, type, project_leader_id, "group", age, away, password_changed, force_in_project_id, computed_in_project_id, deleted, last_updated_by) VALUES (TG_OP, d.id, d.username, d.openid_id, d.type, d.project_leader_id, d."group", d.age, d.away, d.password_changed, d.force_in_project_id, d.computed_in_project_id, d.deleted, d.last_updated_by);
   RETURN NULL;
 END;
 $body$ LANGUAGE plpgsql;
 
 CREATE TRIGGER users_audit_insert_delete
-AFTER INSERT OR DELETE ON users FOR EACH ROW
+AFTER INSERT OR DELETE ON users_with_deleted FOR EACH ROW
 EXECUTE PROCEDURE log_history_users();
 
 CREATE TRIGGER users_audit_update_selective
-AFTER UPDATE ON users FOR EACH ROW
+AFTER UPDATE ON users_with_deleted FOR EACH ROW
 EXECUTE PROCEDURE log_history_users();
-
--- EXPLAIN ANALYZE VERBOSE SELECT id,name,type FROM users ORDER BY type ASC,name DESC;
--- maybe add an index on name and maybe on type (or replace by enum?)
 
 CREATE TABLE IF NOT EXISTS choices (
   rank INTEGER NOT NULL, -- TODO FIXME add checks here and on other places e.g. that this is from 1 - 5
@@ -187,29 +203,53 @@ CREATE TABLE IF NOT EXISTS choices (
   user_id INTEGER NOT NULL,
   PRIMARY KEY(user_id,project_id),
   FOREIGN KEY (project_id)
-    REFERENCES projects(id)
+    REFERENCES projects_with_deleted(id)
     ON UPDATE RESTRICT
     ON DELETE RESTRICT,
   FOREIGN KEY (user_id)
-    REFERENCES users(id)
+    REFERENCES users_with_deleted(id)
     ON UPDATE RESTRICT
     ON DELETE RESTRICT
 );
 
 CREATE TABLE IF NOT EXISTS choices_history (
   history_id SERIAL PRIMARY KEY NOT NULL,
+  operation TEXT NOT NULL,
+
   rank INTEGER NOT NULL, -- TODO FIXME add checks here and on other places e.g. that this is from 1 - 5
   project_id INTEGER NOT NULL,
   user_id INTEGER NOT NULL,
   FOREIGN KEY (project_id)
-    REFERENCES projects(id)
+    REFERENCES projects_with_deleted(id)
     ON UPDATE RESTRICT
     ON DELETE RESTRICT,
   FOREIGN KEY (user_id)
-    REFERENCES users(id)
+    REFERENCES users_with_deleted(id)
     ON UPDATE RESTRICT
     ON DELETE RESTRICT
 );
+
+CREATE OR REPLACE FUNCTION log_history_choices() RETURNS TRIGGER AS $body$
+DECLARE
+  d RECORD;
+BEGIN
+  if (TG_OP = 'DELETE') then
+    d := OLD;
+  else
+    d := NEW;
+  end if;
+  INSERT INTO choices_history (operation, rank, project_id, user_id) VALUES (TG_OP, d.rank, d.project_id, d.user_id);
+  RETURN NULL;
+END;
+$body$ LANGUAGE plpgsql;
+
+CREATE TRIGGER choices_audit_insert_delete
+AFTER INSERT OR DELETE ON choices FOR EACH ROW
+EXECUTE PROCEDURE log_history_choices();
+
+CREATE TRIGGER choices_audit_update_selective
+AFTER UPDATE ON choices FOR EACH ROW
+EXECUTE PROCEDURE log_history_choices();
 
 CREATE TABLE IF NOT EXISTS sessions (
   session_id UUID PRIMARY KEY NOT NULL DEFAULT gen_random_uuid(),
