@@ -39,11 +39,7 @@ CREATE TABLE IF NOT EXISTS projects_with_deleted (
   max_participants INTEGER NOT NULL,
   random_assignments BOOLEAN NOT NULL DEFAULT FALSE,
   deleted BOOLEAN NOT NULL DEFAULT FALSE,
-  last_updated_by INTEGER NOT NULL,
-  FOREIGN KEY (last_updated_by)
-    REFERENCES users_with_deleted(id)
-    ON UPDATE RESTRICT
-    ON DELETE RESTRICT
+  last_updated_by INTEGER NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS projects_history (
@@ -61,15 +57,7 @@ CREATE TABLE IF NOT EXISTS projects_history (
   max_participants INTEGER NOT NULL,
   random_assignments BOOLEAN NOT NULL DEFAULT FALSE,
   deleted BOOLEAN NOT NULL DEFAULT FALSE,
-  last_updated_by INTEGER NOT NULL,
-  FOREIGN KEY (last_updated_by)
-    REFERENCES users_with_deleted(id)
-    ON UPDATE RESTRICT
-    ON DELETE RESTRICT,
-  FOREIGN KEY (id)
-    REFERENCES projects_with_deleted(id)
-    ON UPDATE RESTRICT
-    ON DELETE RESTRICT
+  last_updated_by INTEGER NOT NULL
 );
 
 -- https://wiki.postgresql.org/wiki/Audit_trigger
@@ -103,7 +91,7 @@ EXCEPTION
 END $$;
 
 -- TODO ADd check that group and age is NULL if type is not voter
-CREATE TABLE IF NOT EXISTS users (
+CREATE TABLE IF NOT EXISTS users_with_deleted (
   id SERIAL PRIMARY KEY NOT NULL,
   username VARCHAR(64) UNIQUE NOT NULL,
   openid_id VARCHAR(256) UNIQUE,
@@ -117,23 +105,7 @@ CREATE TABLE IF NOT EXISTS users (
   force_in_project_id INTEGER, -- this should still be stored here even with openid as we can't join on it otherwise
   computed_in_project_id INTEGER, -- this should still be stored here even with openid as we can't join on it otherwise
   deleted BOOLEAN NOT NULL DEFAULT FALSE,
-  last_updated_by INTEGER NOT NULL,
-  FOREIGN KEY (last_updated_by)
-    REFERENCES users_with_deleted(id)
-    ON UPDATE RESTRICT
-    ON DELETE RESTRICT,
-  FOREIGN KEY (project_leader_id)
-    REFERENCES projects_with_deleted(id)
-    ON UPDATE RESTRICT
-    ON DELETE RESTRICT,
-  FOREIGN KEY (force_in_project_id)
-    REFERENCES projects_with_deleted(id)
-    ON UPDATE RESTRICT
-    ON DELETE RESTRICT,
-  FOREIGN KEY (computed_in_project_id)
-    REFERENCES projects_with_deleted(id)
-    ON UPDATE RESTRICT
-    ON DELETE RESTRICT
+  last_updated_by INTEGER NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS users_history (
@@ -152,28 +124,68 @@ CREATE TABLE IF NOT EXISTS users_history (
   force_in_project_id INTEGER, -- this should still be stored here even with openid as we can't join on it otherwise
   computed_in_project_id INTEGER, -- this should still be stored here even with openid as we can't join on it otherwise
   deleted BOOLEAN NOT NULL DEFAULT FALSE,
-  last_updated_by INTEGER NOT NULL,
-  FOREIGN KEY (last_updated_by)
-    REFERENCES users_with_deleted(id)
-    ON UPDATE RESTRICT
-    ON DELETE RESTRICT,
-  FOREIGN KEY (project_leader_id)
-    REFERENCES projects_with_deleted(id)
-    ON UPDATE RESTRICT
-    ON DELETE RESTRICT,
-  FOREIGN KEY (force_in_project_id)
-    REFERENCES projects_with_deleted(id)
-    ON UPDATE RESTRICT
-    ON DELETE RESTRICT,
-  FOREIGN KEY (computed_in_project_id)
-    REFERENCES projects_with_deleted(id)
-    ON UPDATE RESTRICT
-    ON DELETE RESTRICT,
-  FOREIGN KEY (id)
-    REFERENCES users_with_deleted(id)
-    ON UPDATE RESTRICT
-    ON DELETE RESTRICT
+  last_updated_by INTEGER NOT NULL
 );
+
+ALTER TABLE projects_with_deleted ADD FOREIGN KEY (last_updated_by)
+    REFERENCES users_with_deleted(id)
+    ON UPDATE RESTRICT
+    ON DELETE RESTRICT;
+
+ALTER TABLE projects_history ADD FOREIGN KEY (last_updated_by)
+    REFERENCES users_with_deleted(id)
+    ON UPDATE RESTRICT
+    ON DELETE RESTRICT;
+
+ALTER TABLE projects_history ADD FOREIGN KEY (id)
+    REFERENCES projects_with_deleted(id)
+    ON UPDATE RESTRICT
+    ON DELETE RESTRICT;
+
+ALTER TABLE users_with_deleted ADD FOREIGN KEY (last_updated_by)
+    REFERENCES users_with_deleted(id)
+    ON UPDATE RESTRICT
+    ON DELETE RESTRICT;
+
+ALTER TABLE users_with_deleted ADD FOREIGN KEY (project_leader_id)
+    REFERENCES projects_with_deleted(id)
+    ON UPDATE RESTRICT
+    ON DELETE RESTRICT;
+
+ALTER TABLE users_with_deleted ADD FOREIGN KEY (force_in_project_id)
+    REFERENCES projects_with_deleted(id)
+    ON UPDATE RESTRICT
+    ON DELETE RESTRICT;
+
+ALTER TABLE users_with_deleted ADD FOREIGN KEY (computed_in_project_id)
+    REFERENCES projects_with_deleted(id)
+    ON UPDATE RESTRICT
+    ON DELETE RESTRICT;
+
+ALTER TABLE users_history ADD FOREIGN KEY (last_updated_by)
+    REFERENCES users_with_deleted(id)
+    ON UPDATE RESTRICT
+    ON DELETE RESTRICT;
+
+ALTER TABLE users_history ADD FOREIGN KEY (project_leader_id)
+    REFERENCES projects_with_deleted(id)
+    ON UPDATE RESTRICT
+    ON DELETE RESTRICT;
+
+ALTER TABLE users_history ADD FOREIGN KEY (force_in_project_id)
+    REFERENCES projects_with_deleted(id)
+    ON UPDATE RESTRICT
+    ON DELETE RESTRICT;
+
+ALTER TABLE users_history ADD FOREIGN KEY (computed_in_project_id)
+    REFERENCES projects_with_deleted(id)
+    ON UPDATE RESTRICT
+    ON DELETE RESTRICT;
+
+ALTER TABLE users_history ADD FOREIGN KEY (id)
+    REFERENCES users_with_deleted(id)
+    ON UPDATE RESTRICT
+    ON DELETE RESTRICT;
 
 CREATE OR REPLACE FUNCTION log_history_users() RETURNS TRIGGER AS $body$
 DECLARE
@@ -257,7 +269,7 @@ CREATE TABLE IF NOT EXISTS sessions (
   updated_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
   user_id INTEGER NOT NULL,
   FOREIGN KEY (user_id)
-    REFERENCES users(id)
+    REFERENCES users_with_deleted(id)
     ON UPDATE RESTRICT
     ON DELETE RESTRICT
 );
@@ -267,11 +279,11 @@ CREATE TABLE IF NOT EXISTS settings (
   election_running BOOLEAN NOT NULL
 );
 
-CREATE OR REPLACE VIEW present_voters AS SELECT * FROM users WHERE type = 'voter' AND NOT away;
-
 CREATE OR REPLACE VIEW users AS SELECT * FROM users_with_deleted WHERE NOT deleted;
 
 CREATE OR REPLACE VIEW projects AS SELECT * FROM projects_with_deleted WHERE NOT deleted;
+
+CREATE OR REPLACE VIEW present_voters AS SELECT * FROM users WHERE type = 'voter' AND NOT away;
 
 -- https://www.cybertec-postgresql.com/en/triggers-to-enforce-constraints/
 -- https://www.bizety.com/2018/09/24/acidrain-concurrency-attacks-on-database-backed-applications/
@@ -284,8 +296,8 @@ CREATE OR REPLACE VIEW projects AS SELECT * FROM projects_with_deleted WHERE NOT
 
 CREATE OR REPLACE FUNCTION check_choices_age() RETURNS TRIGGER AS $body$
 BEGIN
-  IF (SELECT min_age FROM projects WHERE id = NEW.project_id) > (SELECT age FROM users WHERE id = NEW.user_id) OR
-     (SELECT max_age FROM projects WHERE id = NEW.project_id) < (SELECT age FROM users WHERE id = NEW.user_id) THEN
+  IF (SELECT min_age FROM projects_with_deleted WHERE id = NEW.project_id) > (SELECT age FROM users_with_deleted WHERE id = NEW.user_id) OR
+     (SELECT max_age FROM projects_with_deleted WHERE id = NEW.project_id) < (SELECT age FROM users_with_deleted WHERE id = NEW.user_id) THEN
       RAISE EXCEPTION 'Der Nutzer passt nicht in die Altersbegrenzung des Projekts!';
   END IF;
   RETURN NEW;
@@ -304,17 +316,17 @@ EXECUTE FUNCTION check_choices_age();
 
 CREATE OR REPLACE FUNCTION update_project_check_choices_age() RETURNS TRIGGER AS $test2$
 BEGIN
-  IF (SELECT COUNT(*) FROM choices, users WHERE choices.project_id = NEW.id AND users.id = choices.user_id AND (users.age < NEW.min_age OR users.age > NEW.max_age)) > 0 THEN
+  IF (SELECT COUNT(*) FROM choices, users_with_deleted WHERE choices.project_id = NEW.id AND users_with_deleted.id = choices.user_id AND (users_with_deleted.age < NEW.min_age OR users_with_deleted.age > NEW.max_age)) > 0 THEN
       RAISE EXCEPTION 'Geänderte Altersbegrenzung wuerde Wahlen ungültig machen!';
   END IF;
   RETURN NEW;
 END;
 $test2$ LANGUAGE plpgsql;
 
-DROP TRIGGER IF EXISTS trigger_update_project_check_choices_age ON projects;
+DROP TRIGGER IF EXISTS trigger_update_project_check_choices_age ON projects_with_deleted;
 
 CREATE TRIGGER trigger_update_project_check_choices_age
-BEFORE UPDATE ON projects
+BEFORE UPDATE ON projects_with_deleted
 FOR EACH ROW
 EXECUTE FUNCTION update_project_check_choices_age();
 
@@ -328,9 +340,9 @@ BEGIN
 END;
 $test3$ LANGUAGE plpgsql;
 
-DROP TRIGGER IF EXISTS trigger_check_project_leader_voted_own_project ON users;
+DROP TRIGGER IF EXISTS trigger_check_project_leader_voted_own_project ON users_with_deleted;
 
-CREATE TRIGGER trigger_check_project_leader_voted_own_project BEFORE UPDATE ON users
+CREATE TRIGGER trigger_check_project_leader_voted_own_project BEFORE UPDATE ON users_with_deleted
 FOR EACH ROW
 EXECUTE FUNCTION check_project_leader_voted_own_project();
 
@@ -338,7 +350,7 @@ EXECUTE FUNCTION check_project_leader_voted_own_project();
 
 CREATE OR REPLACE FUNCTION check_project_leader_choices() RETURNS TRIGGER AS $test4$
 BEGIN
-  IF (SELECT COUNT(*) FROM users WHERE users.project_leader_id = NEW.project_id AND users.id = NEW.user_id) > 0 THEN
+  IF (SELECT COUNT(*) FROM users_with_deleted WHERE users_with_deleted.project_leader_id = NEW.project_id AND users_with_deleted.id = NEW.user_id) > 0 THEN
       RAISE EXCEPTION 'Nutzer kann Projekt nicht wählen, in dem er Projektleiter ist!';
   END IF;
   RETURN NEW;
