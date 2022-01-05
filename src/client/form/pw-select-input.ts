@@ -29,6 +29,29 @@ import { msg } from "@lit/localize";
 import { createRef, ref } from "lit/directives/ref.js";
 import { repeat } from "lit/directives/repeat.js";
 
+export function pwSelectInput<T, Q extends keyof T>(props: {
+    disabled: boolean,
+    label: string,
+    name: Q,
+    options: { value: T[Q]; text: string }[],
+    task: import("@lit-labs/task").Task<
+    any,
+    import("zod").infer<typeof import("../../lib/result.js").anyResult>
+  >,
+  initial: T,
+   "@change": any
+  }) {
+  return html`<pw-select-input
+    ?disabled=${props.disabled}
+    @change=${props["@change"]}
+    label=${props.label}
+    .name=${props.name}
+    .options=${props.options}
+    .task=${props.task}
+    .initial=${props.initial}
+    ></pw-select-input>`
+}
+
 export class PwSelectInput<T, Q extends keyof T> extends LitElement {
   static override get properties() {
     return {

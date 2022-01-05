@@ -39,6 +39,7 @@ import type {
   routes,
 } from "../../../lib/routes.js";
 import type { z } from "zod";
+import { PwSelectInput, pwSelectInput } from "../../form/pw-select-input.js";
 
 export async function pwUser(id: number, viewOnly: boolean = false) {
   let result = await taskFunction([id]);
@@ -139,6 +140,23 @@ class PwUserCreate extends PwForm<"/api/v1/users/create-or-update"> {
           .initial=${this.initial}
         ></pw-text-input>
 
+        ${pwSelectInput({
+          disabled: this.disabled,
+          "@change": (event: Event) =>
+          (this.type = (event.target as HTMLSelectElement).value as
+            | "helper"
+            | "admin"
+            | "voter"),
+          label: msg("User type"),
+          name: "type",
+          options: [
+            { value: "voter", text: "Schüler" },
+            { value: "helper", text: "Helfer" },
+            { value: "admin", text: "Admin" },
+          ],
+          task: this._task,
+          initial: { type: this.type ?? this.initial?.type ?? "voter" }
+        })}
         <pw-select-input
           ?disabled=${this.disabled}
           @change=${(event: Event) =>
