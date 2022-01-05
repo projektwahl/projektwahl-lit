@@ -83,6 +83,7 @@ export async function projectsHandler(
         "min_participants",
         "max_participants",
         "random_assignments",
+        "deleted"
       ] as const;
 
       return await fetchData<
@@ -92,7 +93,7 @@ export async function projectsHandler(
       >(
         "/api/v1/projects" as const,
         headers,
-        "projects",
+        "projects_with_deleted",
         columns,
         filters,
         {},

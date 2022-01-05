@@ -105,6 +105,7 @@ export async function usersHandler(
         "away",
         "project_leader_id",
         "force_in_project_id",
+        "deleted"
       ] as const;
 
       const schema = rawUserSchema(
@@ -119,7 +120,7 @@ export async function usersHandler(
       >(
         "/api/v1/users" as const,
         headers,
-        "users",
+        "users_with_deleted",
         columns,
         filters,
         {

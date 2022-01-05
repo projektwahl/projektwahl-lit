@@ -80,7 +80,7 @@ class PwUserCreate extends PwForm<"/api/v1/users/create-or-update"> {
     type?: "voter" | "admin" | "helper";
 
     initial:
-      | z.infer<typeof routes["/api/v1/users/create-or-update"]["request"]>
+      | z.infer<typeof routes["/api/v1/users"]["response"]["options"]["0"]["shape"]["data"]>["entities"][number]
       | undefined;
 
     constructor() {

@@ -62,7 +62,7 @@ export async function createOrUpdateProjectsHandler(
           if (project.id) {
             const field = (name: string) => updateField(project, name);
 
-            const finalQuery = sql2`UPDATE projects SET
+            const finalQuery = sql2`UPDATE projects_with_deleted SET
             ${field("title")},
             ${field("info")},
             ${field("place")},
@@ -72,19 +72,20 @@ export async function createOrUpdateProjectsHandler(
             ${field("min_participants")},
             ${field("max_participants")},
             ${field("random_assignments")},
-            ${field("deleted")}
-            FROM users WHERE projects.id = ${project.id} AND users.id = ${
+            ${field("deleted")},
+            last_updated_by = ${loggedInUser.id}
+            FROM users_with_deleted WHERE projects_with_deleted.id = ${project.id} AND users_with_deleted.id = ${
               loggedInUser.id
-            } AND (users.project_leader_id = ${
+            } AND (users_with_deleted.project_leader_id = ${
               project.id
-            } AND users.type = 'helper' OR users.type = 'admin') RETURNING projects.id;`;
+            } AND users_with_deleted.type = 'helper' OR users_with_deleted.type = 'admin') RETURNING projects_with_deleted.id;`;
 
             return await sql(...finalQuery);
           } else {
             // TODO FIXME we can use our nice query building here
             // or postgres also has builtin features for insert and update
             let res =
-              await sql`INSERT INTO projects (title, info, place, costs, min_age, max_age, min_participants, max_participants, random_assignments, deleted)
+              await sql`INSERT INTO projects_with_deleted (title, info, place, costs, min_age, max_age, min_participants, max_participants, random_assignments, deleted, last_updated_by)
             (SELECT 
     ${project.title ?? null},
     ${project.info ?? null},
@@ -94,14 +95,14 @@ export async function createOrUpdateProjectsHandler(
     ${project.max_age ?? null},
     ${project.min_participants ?? null},
     ${project.max_participants ?? null},
-    ${project.random_assignments ?? false}, ${project.deleted ?? false} FROM users WHERE users.id = ${
+    ${project.random_assignments ?? false}, ${project.deleted ?? false}, ${loggedInUser.id} FROM users_with_deleted WHERE users_with_deleted.id = ${
                 loggedInUser.id
-              } AND (users.type = 'helper' OR users.type = 'admin'))
+              } AND (users_with_deleted.type = 'helper' OR users_with_deleted.type = 'admin'))
     RETURNING id;`;
 
             // TODO FIXME make this in sql directly
             if (loggedInUser.type === "helper") {
-              await sql`UPDATE users SET project_leader_id = ${
+              await sql`UPDATE users_with_deleted SET project_leader_id = ${
                 res[0].id as number
               } WHERE project_leader_id IS NULL AND id = ${loggedInUser.id}`;
             }
