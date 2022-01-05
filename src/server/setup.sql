@@ -113,8 +113,8 @@ CREATE TABLE IF NOT EXISTS users_history (
   operation TEXT NOT NULL,
 
   id INTEGER NOT NULL,
-  username VARCHAR(64) UNIQUE NOT NULL,
-  openid_id VARCHAR(256) UNIQUE,
+  username VARCHAR(64) NOT NULL,
+  openid_id VARCHAR(256),
   type user_type NOT NULL,
   project_leader_id INTEGER, -- TODO FIXME maybe m:n as somebody could theoretically be leader in multiple projects?
   "group" VARCHAR(16),

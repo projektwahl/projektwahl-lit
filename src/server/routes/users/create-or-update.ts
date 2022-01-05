@@ -72,7 +72,7 @@ export async function createOrUpdateUsersHandler(
 
             const finalQuery = sql2`UPDATE users SET
             ${field("username")},
-            password_hash = CASE WHEN ${user.password !== undefined} THEN ${
+            password_hash = CASE WHEN ${!!user.password} THEN ${
               user.password ? await hashPassword(user.password) : null
             } ELSE password_hash END,
             ${field("type")},
@@ -116,7 +116,7 @@ export async function createOrUpdateUsersHandler(
         if (error instanceof postgres.PostgresError) {
           if (
             error.code === "23505" &&
-            error.constraint_name === "users_username_key"
+            error.constraint_name === "users_with_deleted_username_key"
           ) {
             // unique violation
             return [
