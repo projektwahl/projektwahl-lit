@@ -74,7 +74,9 @@ export async function createOrUpdateProjectsHandler(
             ${field("random_assignments")},
             ${field("deleted")},
             last_updated_by = ${loggedInUser.id}
-            FROM users_with_deleted WHERE projects_with_deleted.id = ${project.id} AND users_with_deleted.id = ${
+            FROM users_with_deleted WHERE projects_with_deleted.id = ${
+              project.id
+            } AND users_with_deleted.id = ${
               loggedInUser.id
             } AND (users_with_deleted.project_leader_id = ${
               project.id
@@ -95,7 +97,9 @@ export async function createOrUpdateProjectsHandler(
     ${project.max_age ?? null},
     ${project.min_participants ?? null},
     ${project.max_participants ?? null},
-    ${project.random_assignments ?? false}, ${project.deleted ?? false}, ${loggedInUser.id} FROM users_with_deleted WHERE users_with_deleted.id = ${
+    ${project.random_assignments ?? false}, ${project.deleted ?? false}, ${
+                loggedInUser.id
+              } FROM users_with_deleted WHERE users_with_deleted.id = ${
                 loggedInUser.id
               } AND (users_with_deleted.type = 'helper' OR users_with_deleted.type = 'admin'))
     RETURNING id;`;

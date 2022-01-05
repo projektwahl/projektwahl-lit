@@ -120,11 +120,11 @@ export class PwCheckboxInput<T> extends LitElement {
         <input
           ${ref(this.input)}
           ?disabled=${this.disabled ||
-          this.task.render({
+          (this.task.render({
             complete: () => false,
             pending: () => true,
             initial: () => false,
-          }) as boolean}
+          }) as boolean)}
           type="checkbox"
           ?checked=${this.initial?.[this.name]}
           class="form-check-input ${this.task.render({

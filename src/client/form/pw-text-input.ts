@@ -138,11 +138,11 @@ export class PwTextInput<T> extends LitElement {
           aria-describedby="${this.randomId}-feedback"
           autocomplete=${ifDefined(this.autocomplete)}
           ?disabled=${this.disabled ||
-          this.task.render({
+          (this.task.render({
             complete: () => false,
             pending: () => true,
             initial: () => false,
-          }) as boolean}
+          }) as boolean)}
         />
         ${this.task.render({
           complete: (v) =>

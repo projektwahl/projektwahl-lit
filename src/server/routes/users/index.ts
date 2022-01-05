@@ -105,7 +105,7 @@ export async function usersHandler(
         "away",
         "project_leader_id",
         "force_in_project_id",
-        "deleted"
+        "deleted",
       ] as const;
 
       const schema = rawUserSchema(

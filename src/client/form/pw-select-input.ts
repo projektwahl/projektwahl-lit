@@ -28,35 +28,48 @@ import { setupHmr } from "../hmr.js";
 import { msg } from "@lit/localize";
 import { createRef, ref } from "lit/directives/ref.js";
 import { repeat } from "lit/directives/repeat.js";
+import type { Task } from "@lit-labs/task";
+import type { z } from "zod";
 
 export function pwSelectInput<T, Q extends keyof T>(props: {
-    disabled: boolean,
-    label: string,
-    name: Q,
-    options: { value: T[Q]; text: string }[],
-    task: import("@lit-labs/task").Task<
+  disabled: boolean;
+  label: string;
+  name: Q;
+  options: { value: T[Q]; text: string }[];
+  task: Task<
     any,
-    import("zod").infer<typeof import("../../lib/result.js").anyResult>
-  >,
-  initial: T,
-   "@change": any
-  }) {
+    z.infer<typeof import("../../lib/result.js").anyResult>
+  >;
+  initial: T;
+  onchange: any;
+}) {
+  const {
+    onchange,
+    disabled,
+    initial,
+    label,
+    name,
+    options,
+    task,
+    ...rest
+  } = props;
+  const _: never = rest;
   return html`<pw-select-input
-    ?disabled=${props.disabled}
-    @change=${props["@change"]}
-    label=${props.label}
-    .name=${props.name}
-    .options=${props.options}
-    .task=${props.task}
-    .initial=${props.initial}
-    ></pw-select-input>`
+    ?disabled=${disabled}
+    @change=${onchange}
+    label=${label}
+    .name=${name}
+    .options=${options}
+    .task=${task}
+    .initial=${initial}
+  ></pw-select-input>`;
 }
 
 export class PwSelectInput<T, Q extends keyof T> extends LitElement {
   static override get properties() {
     return {
       label: { type: String },
-      name: { attribute: false, },
+      name: { attribute: false },
       options: { attribute: false },
       disabled: { type: Boolean },
       randomId: { state: true },
@@ -146,11 +159,11 @@ export class PwSelectInput<T, Q extends keyof T> extends LitElement {
         <select
           ${ref(this.input)}
           ?disabled=${this.disabled ||
-          this.task.render({
+          (this.task.render({
             complete: () => false,
             pending: () => true,
             initial: () => false,
-          }) as boolean}
+          }) as boolean)}
           aria-describedby="${this.randomId}-feedback"
           class="form-select ${this.task.render({
             pending: () => "",

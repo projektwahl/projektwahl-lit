@@ -83,7 +83,7 @@ export async function projectsHandler(
         "min_participants",
         "max_participants",
         "random_assignments",
-        "deleted"
+        "deleted",
       ] as const;
 
       return await fetchData<

@@ -43,13 +43,12 @@ export async function pwProject(id: number, viewOnly: boolean = false) {
 }
 
 const taskFunction = async ([id]: [number]) => {
-  const [_, response] = await Promise.all([import("../chunk-entities.js"),
-  await myFetch<"/api/v1/projects">(
-    `/api/v1/projects/?f_id=${id}`,
-    {
+  const [_, response] = await Promise.all([
+    import("../chunk-entities.js"),
+    await myFetch<"/api/v1/projects">(`/api/v1/projects/?f_id=${id}`, {
       //agent: new Agent({rejectUnauthorized: false})
-    }
-  )]);
+    }),
+  ]);
   return response.success ? response.data.entities[0] : null; // TODO FIXME error handling, PwForm already has some form of error handling
 };
 

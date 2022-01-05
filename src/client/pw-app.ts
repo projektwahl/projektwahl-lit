@@ -173,7 +173,9 @@ export const PwApp = setupHmr(
                 <li class="nav-item">
                   <a
                     @click=${aClick}
-                    class="nav-link ${this.history.url.pathname === "/" ? "active" : ""}"
+                    class="nav-link ${this.history.url.pathname === "/"
+                      ? "active"
+                      : ""}"
                     aria-current="page"
                     href="/"
                     >${msg("Home")}</a
@@ -182,7 +184,9 @@ export const PwApp = setupHmr(
                 <li class="nav-item">
                   <a
                     @click=${aClick}
-                    class="nav-link ${this.history.url.pathname === "/users" ? "active" : ""}"
+                    class="nav-link ${this.history.url.pathname === "/users"
+                      ? "active"
+                      : ""}"
                     href="/users"
                     >${msg("Accounts")}</a
                   >
@@ -190,7 +194,9 @@ export const PwApp = setupHmr(
                 <li>
                   <a
                     @click=${aClick}
-                    class="nav-link ${this.history.url.pathname === "/projects" ? "active" : ""}"
+                    class="nav-link ${this.history.url.pathname === "/projects"
+                      ? "active"
+                      : ""}"
                     href="/projects"
                     >${msg("Projects")}</a
                   >
@@ -198,7 +204,9 @@ export const PwApp = setupHmr(
                 <li>
                   <a
                     @click=${aClick}
-                    class="nav-link ${this.history.url.pathname === "/election" ? "active" : ""}"
+                    class="nav-link ${this.history.url.pathname === "/election"
+                      ? "active"
+                      : ""}"
                     href="/election"
                     >${msg("Election")}</a
                   >
@@ -226,7 +234,9 @@ export const PwApp = setupHmr(
                   : html` <li class="nav-item">
                       <a
                         @click=${aClick}
-                        class="nav-link ${this.history.url.pathname === "/login" ? "active" : ""}"
+                        class="nav-link ${this.history.url.pathname === "/login"
+                          ? "active"
+                          : ""}"
                         href="/login"
                         >${msg("Login")}</a
                       >

@@ -39,7 +39,8 @@ await sql.begin("READ WRITE", async (sql) => {
 
   let hash = await hashPassword("changeme");
 
-  let [admin] = await sql`INSERT INTO users (username, password_hash, type) VALUES ('admin', ${hash}, 'admin') ON CONFLICT DO NOTHING RETURNING id;`;
+  let [admin] =
+    await sql`INSERT INTO users (username, password_hash, type) VALUES ('admin', ${hash}, 'admin') ON CONFLICT DO NOTHING RETURNING id;`;
 
   const projects =
     await sql`INSERT INTO projects (title, info, place, costs, min_age, max_age, min_participants, max_participants, random_assignments, last_updated_by) (SELECT generate_series, '', '', 0, 5, 13, 5, 20, FALSE, ${admin.id} FROM generate_series(1, 10)) RETURNING *;`;
@@ -95,7 +96,9 @@ await sql.begin("READ WRITE", async (sql) => {
 
     /** @type {[import("../lib/routes.js").withId(import("../lib/routes.js").rawUserSchema>)]} */
     const [user] =
-      await sql`INSERT INTO users (username, type, "group", age, last_updated_by) VALUES (${`user${Math.random()}`}, 'voter', 'a', 10, ${admin.id}) ON CONFLICT DO NOTHING RETURNING *;`;
+      await sql`INSERT INTO users (username, type, "group", age, last_updated_by) VALUES (${`user${Math.random()}`}, 'voter', 'a', 10, ${
+        admin.id
+      }) ON CONFLICT DO NOTHING RETURNING *;`;
     shuffleArray(projects);
     for (let j = 0; j < 5; j++) {
       // TODO FIXME generate users who voted incorrectly (maybe increase/decrease iterations)

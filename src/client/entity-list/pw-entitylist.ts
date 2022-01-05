@@ -210,7 +210,10 @@ export class PwEntityList<
               <nav aria-label="${msg("navigation of user list")}">
                 <ul class="pagination justify-content-center">
                   <li
-                    class="page-item ${this._apiTask.value?.data.previousCursor === null ? "disabled" : ""}"
+                    class="page-item ${this._apiTask.value?.data
+                      .previousCursor === null
+                      ? "disabled"
+                      : ""}"
                   >
                     <a
                       @click=${(e: Event) => {
@@ -242,7 +245,10 @@ export class PwEntityList<
                     </a>
                   </li>
                   <li
-                    class="page-item ${this._apiTask.value?.data.nextCursor === null ? "disabled" : ""}"
+                    class="page-item ${this._apiTask.value?.data.nextCursor ===
+                    null
+                      ? "disabled"
+                      : ""}"
                   >
                     <a
                       @click=${(e: Event) => {

@@ -26,7 +26,7 @@ import { bootstrapCss } from "../index.js";
 import { msg } from "@lit/localize";
 import { setupHmr } from "../hmr.js";
 import type { routes } from "../../lib/routes.js";
-import {isPrimitive} from "lit-html/directive-helpers.js";
+import { isPrimitive } from "lit-html/directive-helpers.js";
 import { AsyncDirective } from "lit/async-directive.js";
 
 class PwForm<P extends keyof typeof routes> extends LitElement {
@@ -70,7 +70,7 @@ class PwForm<P extends keyof typeof routes> extends LitElement {
     event.preventDefault();
 
     this.forceTask = (this.forceTask || 0) + 1;
-  };
+  }
 
   // TODO FIXME really important
   // get the inputs from there and check that the errors returned from the server don't contain additional
@@ -121,7 +121,7 @@ if ('FormDataEvent' in window) {
       ${bootstrapCss}
       <main class="container">
         <h1 class="text-center">${this.actionText}</h1>
-        
+
         <div class="row justify-content-center">
           <div class="col-md-7 col-lg-8">
             ${this._task.render({

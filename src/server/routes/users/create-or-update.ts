@@ -91,7 +91,9 @@ export async function createOrUpdateUsersHandler(
               user.type === "voter" ? user.age ?? null : null
             }, ${user.away ?? false}, ${user.project_leader_id ?? null}, ${
               user.force_in_project_id ?? null
-            }, ${user.deleted ?? false}, ${loggedInUser.id}) RETURNING id, project_leader_id, force_in_project_id;`;
+            }, ${user.deleted ?? false}, ${
+              loggedInUser.id
+            }) RETURNING id, project_leader_id, force_in_project_id;`;
           }
         });
 
