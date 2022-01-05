@@ -35,8 +35,8 @@ import { result } from "./result.js";
 
 export const loginInputSchema = z
   .object({
-    username: z.string().min(4).max(100),
-    password: z.string().min(6).max(1024),
+    username: z.string().min(3).max(100),
+    password: z.string(),
   })
   .strict();
 
@@ -221,7 +221,7 @@ const usersCreateOrUpdate = <
         force_in_project_id: true,
       })
       .extend({
-        password: z.string().optional(),
+        password: z.string(),
       })
   );
 

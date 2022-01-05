@@ -150,7 +150,7 @@ export async function createOrUpdateProjectsHandler(
         if (error instanceof postgres.PostgresError) {
           if (
             error.code === "23505" &&
-            error.constraint_name === "users_username_key"
+            error.constraint_name === "users_with_deleted_username_key"
           ) {
             // unique violation
             return [

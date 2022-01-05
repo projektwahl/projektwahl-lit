@@ -38,7 +38,7 @@ SPDX-FileCopyrightText: 2021 Moritz Hedtke <Moritz.Hedtke@t-online.de>
               #(pkgs.yarn.override { nodejs = pkgs.nodejs-17_x; })
               pkgs.postgresql_14
               pkgs.reuse
-              #pkgs.nixpkgs-fmt
+              pkgs.nixpkgs-fmt
               #pkgs.nodePackages.npm-check-updates
               #pkgs.cbc
               pkgs.glpk
@@ -66,7 +66,7 @@ SPDX-FileCopyrightText: 2021 Moritz Hedtke <Moritz.Hedtke@t-online.de>
                   enable = true;
                   package = pkgs.postgresql_14;
                   enableTCPIP = true;
-                  authentication = "hostnossl all all 10.233.3.1 255.255.0.0 scram-sha-256";
+                  authentication = "hostnossl all all 169.254.1.1 255.255.0.0 scram-sha-256";
                 };
 
                 systemd.services.projektwahl-init = {
