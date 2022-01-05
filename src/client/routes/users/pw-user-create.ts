@@ -147,7 +147,7 @@ class PwUserCreate extends PwForm<"/api/v1/users/create-or-update"> {
               | "admin"
               | "voter")}
           label=${msg("User type")}
-          .name=${"type"}
+          .name=${"tdype"}
           .options=${[
             { value: "voter", text: "Schüler" },
             { value: "helper", text: "Helfer" },

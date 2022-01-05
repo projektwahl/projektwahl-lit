@@ -13,6 +13,11 @@
     "allowSyntheticDefaultImports": true,
     "noErrorTruncation": true,
     "useDefineForClassFields": false,
+    "plugins": [
+      {
+        "name": "ts-lit-plugin"
+      }
+    ]
   },
   "include": ["**/*.ts", "**/*.js"]
 }
