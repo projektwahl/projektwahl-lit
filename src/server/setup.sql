@@ -39,7 +39,7 @@ CREATE TABLE IF NOT EXISTS projects_with_deleted (
   max_participants INTEGER NOT NULL,
   random_assignments BOOLEAN NOT NULL DEFAULT FALSE,
   deleted BOOLEAN NOT NULL DEFAULT FALSE,
-  last_updated_by INTEGER NOT NULL
+  last_updated_by INTEGER
 );
 
 CREATE TABLE IF NOT EXISTS projects_history (
@@ -57,7 +57,7 @@ CREATE TABLE IF NOT EXISTS projects_history (
   max_participants INTEGER NOT NULL,
   random_assignments BOOLEAN NOT NULL DEFAULT FALSE,
   deleted BOOLEAN NOT NULL DEFAULT FALSE,
-  last_updated_by INTEGER NOT NULL
+  last_updated_by INTEGER
 );
 
 -- https://wiki.postgresql.org/wiki/Audit_trigger
@@ -105,7 +105,7 @@ CREATE TABLE IF NOT EXISTS users_with_deleted (
   force_in_project_id INTEGER, -- this should still be stored here even with openid as we can't join on it otherwise
   computed_in_project_id INTEGER, -- this should still be stored here even with openid as we can't join on it otherwise
   deleted BOOLEAN NOT NULL DEFAULT FALSE,
-  last_updated_by INTEGER NOT NULL
+  last_updated_by INTEGER
 );
 
 CREATE TABLE IF NOT EXISTS users_history (
@@ -124,7 +124,7 @@ CREATE TABLE IF NOT EXISTS users_history (
   force_in_project_id INTEGER, -- this should still be stored here even with openid as we can't join on it otherwise
   computed_in_project_id INTEGER, -- this should still be stored here even with openid as we can't join on it otherwise
   deleted BOOLEAN NOT NULL DEFAULT FALSE,
-  last_updated_by INTEGER NOT NULL
+  last_updated_by INTEGER
 );
 
 ALTER TABLE projects_with_deleted ADD FOREIGN KEY (last_updated_by)

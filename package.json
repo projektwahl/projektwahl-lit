@@ -20,7 +20,7 @@
     "format": "prettier --write .",
     "lint": "eslint .",
     "fix:lint": "eslint --fix .",
-    "setup": "node --experimental-loader ./src/loader.js ./src/server/setup.js",
+    "setup": "node --experimental-loader ./src/loader.js --enable-source-maps ./src/server/setup.js",
     "server": "node --experimental-loader ./src/loader.js --enable-source-maps --experimental-import-meta-resolve ./src/server/index.js",
     "localize-extract": "lit-localize extract",
     "localize-build": "lit-localize build",
