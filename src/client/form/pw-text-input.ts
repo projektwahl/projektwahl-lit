@@ -69,7 +69,7 @@ export class PwTextInput<T> extends LitElement {
     import("zod").infer<typeof import("../../lib/result.js").anyResult>
   >;
 
-  initial: T | undefined;
+  initial: T;
 
   input: import("lit/directives/ref").Ref<HTMLInputElement>;
 

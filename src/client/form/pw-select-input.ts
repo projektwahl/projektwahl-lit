@@ -64,7 +64,7 @@ export class PwSelectInput<T, Q extends keyof T> extends LitElement {
     import("zod").infer<typeof import("../../lib/result.js").anyResult>
   >;
 
-  initial: T | undefined;
+  initial: T;
 
   value!: string;
 
