@@ -33,7 +33,7 @@ export class PwSelectInput<T, Q extends keyof T> extends LitElement {
   static override get properties() {
     return {
       label: { type: String },
-      name: { type: String },
+      name: { attribute: false, },
       options: { attribute: false },
       disabled: { type: Boolean },
       randomId: { state: true },
@@ -127,7 +127,7 @@ export class PwSelectInput<T, Q extends keyof T> extends LitElement {
             complete: () => false,
             pending: () => true,
             initial: () => false,
-          })}
+          }) as boolean}
           aria-describedby="${this.randomId}-feedback"
           class="form-select ${this.task.render({
             pending: () => "",

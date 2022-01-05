@@ -158,7 +158,7 @@ if ('FormDataEvent' in window) {
                         pending: () => true,
                         complete: () => false,
                         initial: () => false,
-                      })}
+                      }) as boolean}
                       class="btn btn-primary"
                     >
                       ${this.actionText} ${this._task.status}

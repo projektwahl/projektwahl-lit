@@ -124,7 +124,7 @@ export class PwCheckboxInput<T> extends LitElement {
             complete: () => false,
             pending: () => true,
             initial: () => false,
-          })}
+          }) as boolean}
           type="checkbox"
           ?checked=${this.initial?.[this.name]}
           class="form-check-input ${this.task.render({

@@ -28,7 +28,7 @@ import { until } from "lit/directives/until.js";
 import { setupHmr } from "./hmr.js";
 import jscookie from "js-cookie";
 import { msg, str } from "@lit/localize";
-import { sourceLocale, targetLocales } from "./generated_locales/locales.js";
+//import { sourceLocale, targetLocales } from "./generated_locales/locales.js";
 import { myFetch } from "./utils.js";
 
 /**export const { getLocale, setLocale } = configureLocalization({
@@ -56,7 +56,7 @@ ReactiveElement.enableWarning?.("change-in-update");
 
 export const pwApp = async (url: URL) => {
   let page = await nextPage(url);
-  return html`<pw-app .initial=${page}></pw-app>`;
+  return html`<pw-app .initial=${Promise.resolve(page)}></pw-app>`;
 };
 
 export const nextPage = async (url: URL) => {

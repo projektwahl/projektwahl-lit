@@ -142,7 +142,7 @@ export class PwTextInput<T> extends LitElement {
             complete: () => false,
             pending: () => true,
             initial: () => false,
-          })}
+          }) as boolean}
         />
         ${this.task.render({
           complete: (v) =>
