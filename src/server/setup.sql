@@ -43,6 +43,8 @@ CREATE TABLE IF NOT EXISTS projects (
 
 CREATE TABLE IF NOT EXISTS projects_history (
   history_id SERIAL PRIMARY KEY NOT NULL,
+  operation TEXT NOT NULL,
+
   id INTEGER NOT NULL,
   title VARCHAR(255) NOT NULL,
   info VARCHAR(4096) NOT NULL,
@@ -59,14 +61,21 @@ CREATE TABLE IF NOT EXISTS projects_history (
     ON DELETE RESTRICT
 );
 
+-- https://wiki.postgresql.org/wiki/Audit_trigger
 -- TODO FIXME If you want this audit log to be trustworthy, your app should run with a role that has at most USAGE to the audit schema and SELECT rights to audit.logged_actions. Most importantly, your app must not connect with a superuser role and must not own the tables it uses. Create your app's schema with a different user to the one your app runs as, and GRANT your app the minimum rights it needs.
-CREATE OR REPLACE FUNCTION log_history_projects() RETURNS TRIGGER AS $test1$
+CREATE OR REPLACE FUNCTION log_history_projects() RETURNS TRIGGER AS $body$
+DECLARE
+  d RECORD;
 BEGIN
-  -- TODO FIXME log delete / log what type of operation it was
-  INSERT INTO projects_history SELECT nextval('projects_history_history_id_seq'), NEW.*;
-  RETURN NEW;
+  if (TG_OP = 'DELETE') then
+    d := OLD;
+  else
+    d := NEW;
+  end if;
+  INSERT INTO projects_history (operation, id, title, info, place, costs, min_age, max_age, min_participants, max_participants, random_assignments) VALUES (TG_OP, d.id, d.title, d.info, d.place, d.costs, d.min_age, d.max_age, d.min_participants, d.max_participants, d.random_assignments);
+  RETURN NULL;
 END;
-$test1$ LANGUAGE plpgsql;
+$body$ LANGUAGE plpgsql;
 
 CREATE TRIGGER projects_audit_insert_delete
 AFTER INSERT OR DELETE ON projects FOR EACH ROW
@@ -112,10 +121,11 @@ CREATE TABLE IF NOT EXISTS users (
 
 CREATE TABLE IF NOT EXISTS users_history (
   history_id SERIAL PRIMARY KEY NOT NULL,
+  operation TEXT NOT NULL,
+
   id INTEGER NOT NULL,
   username VARCHAR(64) UNIQUE NOT NULL,
   openid_id VARCHAR(256) UNIQUE,
-  password_hash VARCHAR(256),
   type user_type NOT NULL,
   project_leader_id INTEGER, -- TODO FIXME maybe m:n as somebody could theoretically be leader in multiple projects?
   "group" VARCHAR(16),
@@ -142,14 +152,19 @@ CREATE TABLE IF NOT EXISTS users_history (
     ON DELETE RESTRICT
 );
 
--- TODO FIXME don't log old password hashes
-CREATE OR REPLACE FUNCTION log_history_users() RETURNS TRIGGER AS $test1$
+CREATE OR REPLACE FUNCTION log_history_users() RETURNS TRIGGER AS $body$
+DECLARE
+  d RECORD;
 BEGIN
-  -- TODO FIXME log delete / log what type of operation it was
-  INSERT INTO users_history SELECT nextval('users_history_history_id_seq'), NEW.*;
-  RETURN NEW;
+  if (TG_OP = 'DELETE') then
+    d := OLD;
+  else
+    d := NEW;
+  end if;
+  INSERT INTO users_history (operation, id, username, openid_id, type, project_leader_id, "group", age, away, password_changed, force_in_project_id, computed_in_project_id) VALUES (TG_OP, d.id, d.username, d.openid_id, d.type, d.project_leader_id, d."group", d.age, d.away, d.password_changed, d.force_in_project_id, d.computed_in_project_id);
+  RETURN NULL;
 END;
-$test1$ LANGUAGE plpgsql;
+$body$ LANGUAGE plpgsql;
 
 CREATE TRIGGER users_audit_insert_delete
 AFTER INSERT OR DELETE ON users FOR EACH ROW
@@ -221,7 +236,7 @@ CREATE OR REPLACE VIEW present_voters AS SELECT * FROM users WHERE type = 'voter
 
 -- TODO LOOK AT https://www.postgresql.org/docs/current/plpgsql-trigger.html
 
-CREATE OR REPLACE FUNCTION check_choices_age() RETURNS TRIGGER AS $test1$
+CREATE OR REPLACE FUNCTION check_choices_age() RETURNS TRIGGER AS $body$
 BEGIN
   IF (SELECT min_age FROM projects WHERE id = NEW.project_id) > (SELECT age FROM users WHERE id = NEW.user_id) OR
      (SELECT max_age FROM projects WHERE id = NEW.project_id) < (SELECT age FROM users WHERE id = NEW.user_id) THEN
@@ -229,7 +244,7 @@ BEGIN
   END IF;
   RETURN NEW;
 END;
-$test1$ LANGUAGE plpgsql;
+$body$ LANGUAGE plpgsql;
 
 DROP TRIGGER IF EXISTS trigger_check_choices_age ON choices;
 
