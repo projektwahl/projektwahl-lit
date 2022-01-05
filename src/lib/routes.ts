@@ -55,6 +55,7 @@ const rawUserCommon = {
   password_changed: z.boolean(),
   force_in_project_id: z.number().nullable(),
   computed_in_project_id: z.number().nullable(),
+  deleted: z.boolean(),
 };
 
 export const rawUserHelperOrAdminSchema = z
@@ -151,6 +152,7 @@ export const rawProjectSchema = z
     min_participants: z.number().min(1).max(1000),
     max_participants: z.number().min(1).max(1000),
     random_assignments: z.boolean(),
+    deleted: z.boolean(),
   })
   .strict();
 
@@ -219,6 +221,7 @@ const usersCreateOrUpdate = <
         username: true,
         project_leader_id: true,
         force_in_project_id: true,
+        deleted: true,
       })
       .extend({
         password: z.string(),

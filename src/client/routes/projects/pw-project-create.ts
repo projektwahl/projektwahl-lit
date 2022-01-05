@@ -222,6 +222,14 @@ export const PwProjectCreate = setupHmr(
           .task=${this._task}
           .initial=${this.initial}
         ></pw-checkbox-input>
+
+        <pw-checkbox-input
+          ?disabled=${this.disabled}
+          label=${msg("Mark this project as deleted")}
+          name="deleted"
+          .task=${this._task}
+          .initial=${this.initial}
+        ></pw-checkbox-input>
       `;
     }
   }

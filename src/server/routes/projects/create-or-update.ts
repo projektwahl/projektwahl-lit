@@ -22,7 +22,9 @@ SPDX-FileCopyrightText: 2021 Moritz Hedtke <Moritz.Hedtke@t-online.de>
 */
 import postgres from "postgres";
 import { sql } from "../../database.js";
+import { updateField } from "../../entities.js";
 import { request } from "../../express.js";
+import { sql2 } from "../../sql/index.js";
 
 // TODO FIXME you can accidentialy create instead of update if you forget to pass the id. maybe force id and setting it to null means creation.
 
@@ -58,44 +60,31 @@ export async function createOrUpdateProjectsHandler(
       try {
         let [row] = await sql.begin("READ WRITE", async (sql) => {
           if (project.id) {
-            return await sql`UPDATE projects SET
-    title = CASE WHEN ${project.title !== undefined} THEN ${
-              project.title ?? null
-            } ELSE title END,
-    info = CASE WHEN ${project.info !== undefined} THEN ${
-              project.info ?? null
-            } ELSE info END,
-    place = CASE WHEN ${project.place !== undefined} THEN ${
-              project.place ?? null
-            } ELSE place END,
-    costs = CASE WHEN ${project.costs !== undefined} THEN ${
-              project.costs ?? null
-            } ELSE costs END,
-    min_age = CASE WHEN ${project.min_age !== undefined} THEN ${
-              project.min_age ?? null
-            } ELSE min_age END,
-    max_age = CASE WHEN ${project.max_age !== undefined} THEN ${
-              project.max_age ?? null
-            } ELSE max_age END,
-    min_participants = CASE WHEN ${
-      project.min_participants !== undefined
-    } THEN ${project.min_participants ?? null} ELSE max_participants END,
-    max_participants = CASE WHEN ${
-      project.max_participants !== undefined
-    } THEN ${project.max_participants ?? null} ELSE max_participants END,
-    random_assignments = CASE WHEN ${
-      project.random_assignments !== undefined
-    } THEN ${project.random_assignments ?? null} ELSE random_assignments END
-    FROM users WHERE projects.id = ${project.id} AND users.id = ${
+            const field = (name: string) => updateField(project, name);
+
+            const finalQuery = sql2`UPDATE projects SET
+            ${field("title")},
+            ${field("info")},
+            ${field("place")},
+            ${field("costs")},
+            ${field("min_age")},
+            ${field("max_age")},
+            ${field("min_participants")},
+            ${field("max_participants")},
+            ${field("random_assignments")},
+            ${field("deleted")}
+            FROM users WHERE projects.id = ${project.id} AND users.id = ${
               loggedInUser.id
             } AND (users.project_leader_id = ${
               project.id
             } AND users.type = 'helper' OR users.type = 'admin') RETURNING projects.id;`;
+
+            return await sql(...finalQuery);
           } else {
             // TODO FIXME we can use our nice query building here
             // or postgres also has builtin features for insert and update
             let res =
-              await sql`INSERT INTO projects (title, info, place, costs, min_age, max_age, min_participants, max_participants, random_assignments)
+              await sql`INSERT INTO projects (title, info, place, costs, min_age, max_age, min_participants, max_participants, random_assignments, deleted)
             (SELECT 
     ${project.title ?? null},
     ${project.info ?? null},
@@ -105,7 +94,7 @@ export async function createOrUpdateProjectsHandler(
     ${project.max_age ?? null},
     ${project.min_participants ?? null},
     ${project.max_participants ?? null},
-    ${project.random_assignments ?? false} FROM users WHERE users.id = ${
+    ${project.random_assignments ?? false}, ${project.deleted ?? false} FROM users WHERE users.id = ${
                 loggedInUser.id
               } AND (users.type = 'helper' OR users.type = 'admin'))
     RETURNING id;`;

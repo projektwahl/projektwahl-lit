@@ -41,6 +41,12 @@ type mappedInfer1<R extends keyof typeof entityRoutes> = {
   >]: z.infer<entitesType[R]["response"]["options"][0]["shape"]["data"]>[K];
 };
 
+export function updateField(entity: any, name: string) {
+  return sql2`"${unsafe2(name)}" = CASE WHEN ${
+    entity[name] !== undefined
+  } THEN ${entity[name] ?? null} ELSE "${unsafe2(name)}" END`;
+}
+
 export async function fetchData<
   T extends {
     id: number;

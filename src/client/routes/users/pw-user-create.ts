@@ -195,6 +195,14 @@ class PwUserCreate extends PwForm<"/api/v1/users/create-or-update"> {
           .task=${this._task}
           .initial=${this.initial}
         ></pw-checkbox-input>
+
+        <pw-checkbox-input
+          ?disabled=${this.disabled}
+          label=${msg("Mark this user as deleted")}
+          name="deleted"
+          .task=${this._task}
+          .initial=${this.initial}
+        ></pw-checkbox-input>
       `;
     }
   }

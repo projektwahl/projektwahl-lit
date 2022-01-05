@@ -234,7 +234,7 @@ export async function serverHandler(
         if (/\bbr\b/.test(acceptEncoding)) {
           stream.respond({
             "content-type": `${contentType}; charset=utf-8`,
-            "cache-control": "public, max-age=604800, immutable",
+            //"cache-control": "public, max-age=604800, immutable",
             "vary": "accept-encoding",
             'content-encoding': 'br',
             ":status": 200,
@@ -243,7 +243,7 @@ export async function serverHandler(
         } else {
           stream.respond({
             "content-type": `${contentType}; charset=utf-8`,
-            "cache-control": "public, max-age=604800, immutable",
+            //"cache-control": "public, max-age=604800, immutable",
             "vary": "accept-encoding",
             ":status": 200,
           });
