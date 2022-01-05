@@ -26,6 +26,10 @@ SPDX-FileCopyrightText: 2021 Moritz Hedtke <Moritz.Hedtke@t-online.de>
 ALTER DATABASE projektwahl SET default_transaction_isolation = 'serializable';
 ALTER DATABASE projektwahl SET default_transaction_read_only = true;
 
+-- possibly add a boolean deleted column to prevent breaking foreign keys with the log table?
+-- then the triggers that check validity would need to be updated though
+-- this would also allow repeated deletion and recovery and making implementation like search by id simple as it still exists.
+
 -- TODO FIXME at some point create the tables based on the zod definitions? so min/max etc. are checked correctly?
 CREATE TABLE IF NOT EXISTS projects (
   id SERIAL PRIMARY KEY NOT NULL,
