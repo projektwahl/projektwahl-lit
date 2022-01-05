@@ -218,7 +218,7 @@ export const PwProjectCreate = setupHmr(
         <pw-checkbox-input
           ?disabled=${this.disabled}
           label=${msg("Allow random assignments")}
-          name="random_assignments"
+          .name=${"random_assignments"}
           .task=${this._task}
           .initial=${this.initial}
         ></pw-checkbox-input>
@@ -226,7 +226,7 @@ export const PwProjectCreate = setupHmr(
         <pw-checkbox-input
           ?disabled=${this.disabled}
           label=${msg("Mark this project as deleted")}
-          name="deleted"
+          .name=${"deleted"}
           .task=${this._task}
           .initial=${this.initial}
         ></pw-checkbox-input>

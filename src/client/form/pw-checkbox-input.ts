@@ -32,7 +32,7 @@ export class PwCheckboxInput<T> extends LitElement {
   static override get properties() {
     return {
       label: { type: String },
-      name: { type: String },
+      name: { attribute: false },
       disabled: { type: Boolean },
       randomId: { state: true },
       task: {
