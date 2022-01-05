@@ -38,7 +38,7 @@ SPDX-FileCopyrightText: 2021 Moritz Hedtke <Moritz.Hedtke@t-online.de>
               #(pkgs.yarn.override { nodejs = pkgs.nodejs-17_x; })
               pkgs.postgresql_14
               pkgs.reuse
-              #pkgs.nixpkgs-fmt
+              pkgs.nixpkgs-fmt
               #pkgs.nodePackages.npm-check-updates
               #pkgs.cbc
               pkgs.glpk

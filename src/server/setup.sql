@@ -267,9 +267,11 @@ CREATE TABLE IF NOT EXISTS settings (
   election_running BOOLEAN NOT NULL
 );
 
-
 CREATE OR REPLACE VIEW present_voters AS SELECT * FROM users WHERE type = 'voter' AND NOT away;
 
+CREATE OR REPLACE VIEW users AS SELECT * FROM users_with_deleted WHERE NOT deleted;
+
+CREATE OR REPLACE VIEW projects AS SELECT * FROM projects_with_deleted WHERE NOT deleted;
 
 -- https://www.cybertec-postgresql.com/en/triggers-to-enforce-constraints/
 -- https://www.bizety.com/2018/09/24/acidrain-concurrency-attacks-on-database-backed-applications/
@@ -293,7 +295,7 @@ $body$ LANGUAGE plpgsql;
 DROP TRIGGER IF EXISTS trigger_check_choices_age ON choices;
 
 CREATE TRIGGER trigger_check_choices_age
-BEFORE INSERT ON choices -- probably also update?
+BEFORE INSERT OR UPDATE ON choices
 FOR EACH ROW
 EXECUTE FUNCTION check_choices_age();
 
