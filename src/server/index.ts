@@ -25,41 +25,8 @@ import { readFileSync } from "node:fs";
 import "./routes/login/openid-client.js";
 import cluster from "cluster";
 import { watch } from "node:fs/promises";
-import { getDirs } from "./server-handler.js";
+import { getDirs, serverHandler } from "./server-handler.js";
 
-if (cluster.isPrimary) {
-  console.log(`Primary is running`);
-
-  cluster.fork();
-
-  for await (const f of getDirs("./src/server")) {
-    (async () => {
-      for await (const event of watch(f)) {
-        let oldWorkers = { ...cluster.workers };
-
-        cluster.fork().on("listening", (address) => {
-          for (const id in oldWorkers) {
-            oldWorkers[id]?.send("shutdown", () => {});
-          }
-        });
-      }
-    })();
-  }
-
-  for await (const f of getDirs("./src/lib")) {
-    (async () => {
-      for await (const event of watch(f)) {
-        let oldWorkers = { ...cluster.workers };
-
-        cluster.fork().on("listening", (address) => {
-          for (const id in oldWorkers) {
-            oldWorkers[id]?.send("shutdown", () => {});
-          }
-        });
-      }
-    })();
-  }
-} else {
   /*
   openssl req -x509 -newkey rsa:2048 -nodes -sha256 -subj '/CN=localhost' -keyout localhost-privkey.pem -out localhost-cert.pem
   */
@@ -67,14 +34,12 @@ if (cluster.isPrimary) {
   const server = createSecureServer({
     key: readFileSync("localhost-privkey.pem"),
     cert: readFileSync("localhost-cert.pem"),
-  });
-  server.on("error", (err) => console.error(err));
-
-  server.on("stream", async (stream, headers) => {
+    allowHTTP1: true,
+  }, (request, response) => {
+    console.log("request")
+    
     try {
-      await (
-        await import(`./server-handler.js`)
-      ).serverHandler(stream, headers);
+      serverHandler(request, request.headers, response)
     } catch (error) {
       // don't take down the entire server
       // TODO FIXME try sending a 500 in a try catch
@@ -82,40 +47,11 @@ if (cluster.isPrimary) {
     }
   });
 
-  let sessions: import("node:http2").ServerHttp2Session[] = [];
-
-  server.on("session", (session) => {
-    sessions.push(session);
-
-    session.on("close", () => {
-      // TODO FIXME this is super SLOW
-      sessions = sessions.filter((s) => s === session);
-    });
-  });
-
   server.listen(8443, () => {
     console.log(
       `[${cluster.worker?.id}] Server started at https://localhost:8443/`
     );
   });
-
-  cluster.worker?.on("message", async (message) => {
-    //let getConnections = promisify(server.getConnections).bind(server)
-    //console.log(await getConnections())
-
-    if (message === "shutdown") {
-      console.log(`[${cluster.worker?.id}] Shutting down`);
-      server.close();
-
-      sessions.forEach((session) => {
-        session.close();
-      });
-
-      cluster.worker?.removeAllListeners("message");
-      cluster.worker?.kill();
-    }
-  });
-}
 
 //repl.start({})
 

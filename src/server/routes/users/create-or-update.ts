@@ -24,21 +24,22 @@ import postgres from "postgres";
 import { z } from "zod";
 import { routes } from "../../../lib/routes.js";
 import { sql } from "../../database.js";
-import { request } from "../../express.js";
+import { requestHandler } from "../../express.js";
 import { hashPassword } from "../../password.js";
 import { sql2, unsafe2 } from "../../sql/index.js";
 import { updateField } from "../../entities.js";
+import type { IncomingMessage, ServerResponse } from "node:http";
 
 // TODO FIXME somehow ensure all attributes are read here because this is an easy way to loose data
 // Also ensure create and update has the same attributes
 // TO IMPROVE this maybe return the full column and also read back that data at all places
 
 export async function createOrUpdateUsersHandler(
-  stream: import("http2").ServerHttp2Stream,
-  headers: import("http2").IncomingHttpHeaders
+  request: IncomingMessage,
+  response: ServerResponse
 ) {
   // TODO FIXME create or update multiple
-  return await request(
+  return await requestHandler(
     "POST",
     "/api/v1/users/create-or-update",
     async function (user, loggedInUser) {
@@ -161,5 +162,5 @@ export async function createOrUpdateUsersHandler(
         ];
       }
     }
-  )(stream, headers);
+  )(request, response);
 }

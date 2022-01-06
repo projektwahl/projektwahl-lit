@@ -29,14 +29,15 @@ import {
   UnknownKeysParam,
 } from "../../../lib/routes.js";
 import { sql } from "../../database.js";
-import { request } from "../../express.js";
+import { requestHandler } from "../../express.js";
 import { client } from "./openid-client.js";
+import type { IncomingMessage, ServerResponse } from "node:http";
 
 export async function openidRedirectHandler(
-  stream: import("http2").ServerHttp2Stream,
-  headers: import("http2").IncomingHttpHeaders
+  request: IncomingMessage,
+  response: ServerResponse
 ) {
-  return await request("GET", "/api/v1/redirect", async function () {
+  return await requestHandler("GET", "/api/v1/redirect", async function () {
     let url = new URL(headers[":path"]!, "https://localhost:8443");
 
     const searchParams = z
@@ -153,5 +154,5 @@ export async function openidRedirectHandler(
         },
       ];
     }
-  })(stream, headers);
+  })(request, response);
 }

@@ -30,8 +30,9 @@ import {
   UnknownKeysParam,
 } from "../../../lib/routes.js";
 import { sql } from "../../database.js";
-import { request } from "../../express.js";
+import { requestHandler } from "../../express.js";
 import { checkPassword } from "../../password.js";
+import type { IncomingMessage, ServerResponse } from "node:http";
 
 const users = <
   T extends { [k: string]: ZodTypeAny },
@@ -48,10 +49,10 @@ const users = <
   });
 
 export async function loginHandler(
-  stream: import("http2").ServerHttp2Stream,
-  headers: import("http2").IncomingHttpHeaders
+  request: IncomingMessage,
+  response: ServerResponse
 ) {
-  return await request("POST", "/api/v1/login", async function (body) {
+  return await requestHandler("POST", "/api/v1/login", async function (body) {
     const r =
       await sql`SELECT id, username, password_hash, type FROM users WHERE username = ${body.username} LIMIT 1`;
 
@@ -154,5 +155,5 @@ export async function loginHandler(
         data: {},
       },
     ];
-  })(stream, headers);
+  })(request, response);
 }

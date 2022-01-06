@@ -23,17 +23,18 @@ SPDX-FileCopyrightText: 2021 Moritz Hedtke <Moritz.Hedtke@t-online.de>
 import postgres from "postgres";
 import { sql } from "../../database.js";
 import { updateField } from "../../entities.js";
-import { request } from "../../express.js";
+import { requestHandler } from "../../express.js";
 import { sql2 } from "../../sql/index.js";
+import type { IncomingMessage, ServerResponse } from "node:http";
 
 // TODO FIXME you can accidentialy create instead of update if you forget to pass the id. maybe force id and setting it to null means creation.
 
 export async function createOrUpdateProjectsHandler(
-  stream: import("http2").ServerHttp2Stream,
-  headers: import("http2").IncomingHttpHeaders
+  request: IncomingMessage,
+  response: ServerResponse
 ) {
   // TODO FIXME create or update multiple
-  return await request(
+  return await requestHandler(
     "POST",
     "/api/v1/projects/create-or-update",
     async function (project, loggedInUser) {
@@ -176,5 +177,5 @@ export async function createOrUpdateProjectsHandler(
         ];
       }
     }
-  )(stream, headers);
+  )(request, response);
 }

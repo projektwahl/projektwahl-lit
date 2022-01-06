@@ -39,7 +39,7 @@ SPDX-FileCopyrightText: 2021 Moritz Hedtke <Moritz.Hedtke@t-online.de>
               pkgs.postgresql_14
               pkgs.reuse
               pkgs.nixpkgs-fmt
-              #pkgs.nodePackages.npm-check-updates
+              pkgs.nodePackages.npm-check-updates
               #pkgs.cbc
               pkgs.glpk
               #pkgs.lp_solve
@@ -47,6 +47,9 @@ SPDX-FileCopyrightText: 2021 Moritz Hedtke <Moritz.Hedtke@t-online.de>
               pkgs.python3 # argon2
               pkgs.brotli
               pkgs.openssl
+
+              pkgs.zap
+              #pkgs.burpsuite
             ];
           };
 

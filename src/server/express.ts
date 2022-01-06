@@ -31,14 +31,10 @@ import {
   routes,
   UnknownKeysParam,
 } from "../lib/routes.js";
-import type {
-  IncomingHttpHeaders,
-  OutgoingHttpHeaders,
-  ServerHttp2Stream,
-} from "node:http2";
 import type { z, ZodObject, ZodTypeAny } from "zod";
 import { retryableBegin, sql } from "./database.js";
 import cookie from "cookie";
+import type { IncomingMessage, ServerResponse } from "node:http";
 
 const userMapper = <
   T extends { [k: string]: ZodTypeAny },
@@ -60,7 +56,7 @@ const userSchema = rawUserSchema(
   userMapper(rawUserHelperOrAdminSchema)
 ).optional();
 
-export function request<P extends keyof typeof routes>(
+export function requestHandler<P extends keyof typeof routes>(
   method: string,
   path: P,
   handler: (
@@ -69,38 +65,38 @@ export function request<P extends keyof typeof routes>(
     session_id: string | undefined
   ) => Promise<[OutgoingHttpHeaders, z.infer<typeof routes[P]["response"]>]>
 ): (
-  stream: ServerHttp2Stream,
-  headers: IncomingHttpHeaders
+  request: IncomingMessage,
+  response: ServerResponse
 ) => Promise<boolean> {
   let fn = async (
-    stream: import("http2").ServerHttp2Stream,
-    headers: import("http2").IncomingHttpHeaders
+    request: IncomingMessage,
+  response: ServerResponse
   ) => {
     try {
-      if (headers[":method"] !== "GET" && headers[":method"] !== "POST") {
+      if (request.headers[":method"] !== "GET" && request.headers[":method"] !== "POST") {
         throw new Error("Unsupported http method!");
       }
 
       if (
-        headers[":method"] === "POST" &&
-        headers["x-csrf-protection"] !== "projektwahl"
+        request.headers[":method"] === "POST" &&
+        request.headers["x-csrf-protection"] !== "projektwahl"
       ) {
         throw new Error("No CSRF header!");
       }
 
-      let url = new URL(headers[":path"]!, "https://localhost:8443");
+      let url = new URL(request.headers[":path"]!, "https://localhost:8443");
       if (
-        headers[":method"] === method &&
+        request.headers[":method"] === method &&
         new RegExp(path).test(/** @type {string} */ url.pathname)
       ) {
         let user = undefined;
         let session_id: string | undefined = undefined;
-        if (headers.cookie) {
-          var cookies = cookie.parse(headers.cookie);
+        if (request.headers.cookie) {
+          var cookies = cookie.parse(request.headers.cookie);
 
           // implementing https://datatracker.ietf.org/doc/html/draft-ietf-httpbis-rfc6265bis-02#section-8.8.2
           session_id =
-            headers[":method"] === "GET" ? cookies.lax_id : cookies.strict_id;
+          request.headers[":method"] === "GET" ? cookies.lax_id : cookies.strict_id;
           if (session_id) {
             user = userSchema.parse(
               (
@@ -115,7 +111,7 @@ export function request<P extends keyof typeof routes>(
         }
 
         const body =
-          headers[":method"] === "POST" ? await json(stream) : undefined;
+          request.headers[":method"] === "POST" ? await json(request) : undefined;
         const requestBody = zod2result(routes[path].request, body);
         if (requestBody.success) {
           const [new_headers, responseBody] = await handler(
@@ -125,23 +121,22 @@ export function request<P extends keyof typeof routes>(
           );
           //console.log("responseBody", responseBody);
           routes[path].response.parse(responseBody);
-          stream.respond(new_headers);
-          stream.end(JSON.stringify(responseBody));
+          response.writeHead(new_headers[":status"], new_headers);
+          response.end(JSON.stringify(responseBody));
         } else {
           //console.log(requestBody);
-          stream.respond({
+          response.writeHead(200, {
             "content-type": "text/json; charset=utf-8",
-            ":status": 200,
           });
-          stream.end(JSON.stringify(requestBody));
+          response.end(JSON.stringify(requestBody));
         }
 
         return true;
       }
     } catch (error) {
       console.error(error);
-      stream.respond({ ":status": 200 });
-      stream.end(
+      response.writeHead(200);
+      response.end(
         JSON.stringify({
           success: false,
           error: {

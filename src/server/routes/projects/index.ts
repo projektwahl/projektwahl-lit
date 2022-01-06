@@ -24,14 +24,15 @@ import { z } from "zod";
 import type { rawProjectSchema } from "../../../lib/routes.js";
 import { sql } from "../../database.js";
 import { fetchData } from "../../entities.js";
-import { request } from "../../express.js";
+import { requestHandler } from "../../express.js";
 import { sql2 } from "../../sql/index.js";
+import type { IncomingMessage, ServerResponse } from "node:http";
 
 export async function projectsHandler(
-  stream: import("http2").ServerHttp2Stream,
-  headers: import("http2").IncomingHttpHeaders
+  request: IncomingMessage,
+  response: ServerResponse
 ) {
-  return await request(
+  return await requestHandler(
     "GET",
     "/api/v1/projects",
     async function (_, loggedInUser) {
@@ -104,5 +105,5 @@ export async function projectsHandler(
         }
       );
     }
-  )(stream, headers);
+  )(request, response);
 }

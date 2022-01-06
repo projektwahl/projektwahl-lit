@@ -37,6 +37,7 @@ import { resolve as loaderResolve, load as loaderLoad } from "../loader.js";
 import { logoutHandler } from "./routes/login/logout.js";
 import zlib from "node:zlib";
 import { pipeline, Readable } from "node:stream";
+import type { IncomingMessage, ServerResponse } from "node:http";
 
 //const startTime = Date.now();
 
@@ -67,26 +68,19 @@ async function replaceAsync(
 }
 
 export async function serverHandler(
-  stream: import("http2").ServerHttp2Stream,
-  headers: import("http").IncomingHttpHeaders
+  request: IncomingMessage,
+  response: ServerResponse
 ) {
-  const path = z.string().parse(headers[":path"]);
+  const path = z.string().parse(request.url);
 
   let url = new URL(path, "https://localhost:8443");
 
   if (url.pathname === "/favicon.ico" || url.pathname === "/robots.txt") {
-    stream.respond(
-      {
-        ":status": 404,
-      },
-      {
-        endStream: true,
-      }
-    );
+    response.writeHead(404)
+    response.end()
   } else if (url.pathname === "/api/v1/hmr") {
     console.log("got request");
-    stream.respond({
-      ":status": 200,
+    response.writeHead(200, {
       "content-type": "text/event-stream",
     });
 
@@ -97,29 +91,25 @@ export async function serverHandler(
 
           let url = relative(baseUrl, join(f, event.filename));
 
-          stream.write(`data: ${url}\n\n`);
+          response.write(`data: ${url}\n\n`);
         }
       })();
     }
   } else if (url.pathname.startsWith("/api")) {
     // TODO FIXME store this in a routing table and automatically extract types from that
     let executed =
-      (await loginHandler(stream, headers)) ||
-      (await logoutHandler(stream, headers)) ||
-      (await openidLoginHandler(stream, headers)) ||
-      (await openidRedirectHandler(stream, headers)) ||
-      (await createOrUpdateUsersHandler(stream, headers)) ||
-      (await createOrUpdateProjectsHandler(stream, headers)) ||
-      (await projectsHandler(stream, headers)) ||
-      (await usersHandler(stream, headers));
+      (await loginHandler(request, response)) ||
+      (await logoutHandler(request, response)) ||
+      (await openidLoginHandler(request, response)) ||
+      (await openidRedirectHandler(request, response)) ||
+      (await createOrUpdateUsersHandler(request, response)) ||
+      (await createOrUpdateProjectsHandler(request, response)) ||
+      (await projectsHandler(request, response)) ||
+      (await usersHandler(request, response));
 
     if (!executed) {
-      stream.respond(
-        {
-          ":status": 404,
-        },
-        { endStream: true }
-      );
+      response.writeHead(404)
+      response.end()
     }
   } else {
     // TODO FIXME AUDIT
@@ -213,7 +203,7 @@ export async function serverHandler(
         raw.push(contents); // the string you want
         raw.push(null); // indicates end-of-file basically - the end of the stream
 
-        let acceptEncoding = headers["accept-encoding"] as string;
+        let acceptEncoding = request.headers["accept-encoding"] as string;
         if (!acceptEncoding) {
           acceptEncoding = "";
         }
@@ -225,7 +215,7 @@ export async function serverHandler(
             // some amount of data has already been sent to the client.
             // The best we can do is terminate the response immediately
             // and log the error.
-            stream.end();
+            response.end();
             console.error("An error occurred:", err);
           }
         };
@@ -233,31 +223,25 @@ export async function serverHandler(
         // Note: This is not a conformant accept-encoding parser.
         // See https://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.3
         if (/\bbr\b/.test(acceptEncoding)) {
-          stream.respond({
+          response.writeHead(200, {
             "content-type": `${contentType}; charset=utf-8`,
             //"cache-control": "public, max-age=604800, immutable",
             vary: "accept-encoding",
             "content-encoding": "br",
-            ":status": 200,
           });
-          pipeline(raw, zlib.createBrotliCompress(), stream, onError);
+          pipeline(raw, zlib.createBrotliCompress(), response, onError);
         } else {
-          stream.respond({
+          response.writeHead(200, {
             "content-type": `${contentType}; charset=utf-8`,
             //"cache-control": "public, max-age=604800, immutable",
             vary: "accept-encoding",
-            ":status": 200,
           });
-          pipeline(raw, stream, onError);
+          pipeline(raw, response, onError);
         }
       } catch (error) {
         console.error(error);
-        stream.respond(
-          {
-            ":status": 404,
-          },
-          { endStream: true }
-        );
+        response.writeHead(404)
+        response.end()
       }
     } else {
       let rawContents = `<!DOCTYPE html>
@@ -304,14 +288,13 @@ export async function serverHandler(
       //window.location.href = url;
       //const ssrResult = render(contents);
 
-      stream.respond({
+      response.writeHead(200, {
         "content-type": "text/html; charset=utf-8",
-        ":status": 200,
       });
       //Readable.from(ssrResult).pipe(stream)
       //stream.end()
 
-      stream.end(rawContents);
+      response.end(rawContents);
     }
   }
 }
