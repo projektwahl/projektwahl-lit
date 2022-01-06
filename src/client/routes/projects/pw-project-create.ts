@@ -85,9 +85,6 @@ export const PwProjectCreate = setupHmr(
 
       this.initialRender = false;
 
-      /** @type {number|undefined} */
-      this.forceTask = undefined;
-
       /**
        * @override
        */
@@ -124,8 +121,7 @@ export const PwProjectCreate = setupHmr(
           }
 
           return result;
-        },
-        () => [this.forceTask]
+        }
       );
     }
 

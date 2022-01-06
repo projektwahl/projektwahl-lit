@@ -36,7 +36,6 @@ class PwProjectUserCheckbox extends LitElement {
   static override get properties() {
     return {
       _task: { state: true },
-      forceTask: { state: true },
       disabled: { state: true },
       user: { attribute: false },
       projectId: { type: Number },
@@ -45,8 +44,6 @@ class PwProjectUserCheckbox extends LitElement {
   }
 
   name!: "project_leader_id" | "force_in_project_id";
-
-  forceTask: number | undefined;
 
   _task;
 
@@ -66,8 +63,6 @@ class PwProjectUserCheckbox extends LitElement {
     this.disabled = false;
 
     this.form = createRef();
-
-    this.forceTask = undefined;
 
     this._task = new Task(
       this,
@@ -90,8 +85,7 @@ class PwProjectUserCheckbox extends LitElement {
         HistoryController.goto(new URL(window.location.href), {});
 
         return result;
-      },
-      () => [this.forceTask] // TODO FIXME ensure this is working and update to the new method
+      }
     );
   }
 
@@ -117,7 +111,7 @@ class PwProjectUserCheckbox extends LitElement {
 
         <input
           @change=${(e: Event) => {
-            this.forceTask = (this.forceTask || 0) + 1;
+            this._task.run()
           }}
           type="checkbox"
           ?disabled=${this._task.status === TaskStatus.PENDING}

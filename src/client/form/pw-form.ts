@@ -24,15 +24,11 @@ import { html, LitElement } from "lit";
 import { createRef, ref } from "lit/directives/ref.js";
 import { bootstrapCss } from "../index.js";
 import { msg } from "@lit/localize";
-import { setupHmr } from "../hmr.js";
 import type { routes } from "../../lib/routes.js";
-import { isPrimitive } from "lit-html/directive-helpers.js";
-import { AsyncDirective } from "lit/async-directive.js";
 
 class PwForm<P extends keyof typeof routes> extends LitElement {
   static get properties() {
     return {
-      forceTask: { state: true },
       disabled: { type: Boolean },
     };
   }
@@ -52,16 +48,8 @@ class PwForm<P extends keyof typeof routes> extends LitElement {
 
   form: import("lit/directives/ref").Ref<HTMLFormElement>;
 
-  forceTask: number | undefined;
-
-  b1 = isPrimitive;
-  b2 = AsyncDirective;
-
   constructor() {
     super();
-
-    /** @type {number|undefined} */
-    this.forceTask = undefined;
 
     this.form = createRef();
   }
@@ -69,7 +57,7 @@ class PwForm<P extends keyof typeof routes> extends LitElement {
   protected submit(event: SubmitEvent) {
     event.preventDefault();
 
-    this.forceTask = (this.forceTask || 0) + 1;
+    this._task.run();
   }
 
   // TODO FIXME really important

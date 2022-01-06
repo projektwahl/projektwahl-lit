@@ -54,7 +54,6 @@ class PwUserCreate extends PwForm<"/api/v1/users/create-or-update"> {
   static get properties() {
     return {
       ...super.properties,
-      forceTask: { state: true },
       url: { attribute: false },
       actionText: { type: String },
       _task: { state: true },
@@ -120,8 +119,7 @@ class PwUserCreate extends PwForm<"/api/v1/users/create-or-update"> {
         }
 
         return result;
-      },
-      () => [this.forceTask]
+      }
     );
   }
 

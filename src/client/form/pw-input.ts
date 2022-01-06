@@ -114,11 +114,16 @@ export class PwInput<T, Q extends keyof T> extends LitElement {
   }
 
   myformdataEventListener = (event: CustomEvent) => {
+    console.log(this)
+    console.log(this.input)
     if (this.type === "number") {
       event.detail[this.name] =
       this.input.value?.value === "" ? null : this.input.value?.valueAsNumber;
     } else if (this.type === "checkbox") {
       event.detail[this.name] = this.input.value?.checked;
+    } else if (this.type === "select") {
+      event.detail[this.name] =
+      this.input.value!.selectedIndex == -1 ? null : this.input.value!.value;
     } else {
       event.detail[this.name] = this.input.value!.value;
     }
@@ -147,7 +152,7 @@ export class PwInput<T, Q extends keyof T> extends LitElement {
     return html`
       ${bootstrapCss}
       <div class="mb-3">
-        <label for=${this.randomId} class="${this.type === "checkbox" ? "form-check-label" : "form-label"}">${this.label}:</label>
+        ${this.type !== "checkbox" ? html`<label for=${this.randomId} class="form-label">${this.label}:</label>` : undefined}
         <${this.type === "select" ? literal`select` : literal`input`}
           ${ref(this.input)}
           type=${this.type}
@@ -184,6 +189,7 @@ export class PwInput<T, Q extends keyof T> extends LitElement {
               </option>`
           ) : undefined}
         </${this.type === "select" ? literal`select` : literal`input`}>
+        ${this.type === "checkbox" ? html`<label for=${this.randomId} class="form-check-label">${this.label}</label>` : undefined}
         ${this.task.render({
           complete: (v) =>
             !v.success && v.error[this.name as string] !== undefined

@@ -37,7 +37,6 @@ class PwLogin extends PwForm<"/api/v1/login"> {
       actionText: { type: String },
       data: { attribute: false },
       _task: { state: true },
-      forceTask: { state: true },
     };
   }
 
@@ -47,9 +46,6 @@ class PwLogin extends PwForm<"/api/v1/login"> {
 
   constructor() {
     super();
-
-    /** @type {number|undefined} */
-    this.forceTask = undefined;
 
     /**
      * @override
@@ -85,8 +81,7 @@ class PwLogin extends PwForm<"/api/v1/login"> {
         });
         this.dispatchEvent(resultEvent);
         */
-      },
-      () => [this.forceTask]
+      }
     );
   }
 
@@ -124,7 +119,7 @@ class PwLogin extends PwForm<"/api/v1/login"> {
   override submit = (/** @type {SubmitEvent} */ event: SubmitEvent) => {
     event.preventDefault();
 
-    this.forceTask = (this.forceTask || 0) + 1;
+    this._task.run()
   };
 }
 
