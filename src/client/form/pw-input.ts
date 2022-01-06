@@ -30,7 +30,7 @@ import { createRef, ref } from "lit/directives/ref.js";
 import { repeat } from 'lit/directives/repeat.js';
 
 // workaround see https://github.com/runem/lit-analyzer/issues/149#issuecomment-1006162839
-export function pwInput<T, Q extends keyof T>(props: Pick<PwInput<T, Q>, "type" | "autocomplete" | "onchange" | "disabled" | "initial" | "label" | "name" | "options" | "task">) {
+export function pwInput<T, Q extends keyof T>(props: Pick<PwInput<T, Q>, "type" | "autocomplete" | "disabled" | "initial" | "label" | "name" | "options" | "task"> & Partial<Pick<PwInput<T, Q>, "onchange">>) {
   let { onchange, disabled, initial, label, name, options, task, type, autocomplete, ...rest } = props;
   rest = {}; // ensure no property is missed
   return html`<pw-input
@@ -87,7 +87,7 @@ export class PwInput<T, Q extends keyof T> extends LitElement {
     import("zod").infer<typeof import("../../lib/result.js").anyResult>
   >;
 
-  initial: T;
+  initial: T | undefined;
 
   value!: string;
 
@@ -95,7 +95,7 @@ export class PwInput<T, Q extends keyof T> extends LitElement {
 
   form!: HTMLFormElement;
 
-  options!: { value: T[Q]; text: string }[];
+  options?: { value: T[Q]; text: string }[];
 
   constructor() {
     super();

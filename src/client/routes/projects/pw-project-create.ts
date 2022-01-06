@@ -27,10 +27,10 @@ import { myFetch } from "../../utils.js";
 import { PwForm } from "../../form/pw-form.js";
 import { HistoryController } from "../../history-controller.js";
 import { msg } from "@lit/localize";
-import "../../form/pw-input.js";
 import type { z } from "zod";
 import type { routes } from "../../../lib/routes.js";
 import { setupHmr } from "../../hmr.js";
+import { pwInput } from "../../form/pw-input.js";
 
 export async function pwProject(id: number, viewOnly: boolean = false) {
   let result = await taskFunction([id]);
@@ -127,95 +127,95 @@ export const PwProjectCreate = setupHmr(
 
     override getInputs() {
       return html`
-        <pw-input
-          type="text"
-          ?disabled=${this.disabled}
-          label=${msg("Title")}
-          .name="title"
-          .task=${this._task}
-          .initial=${this.initial}
-        ></pw-input>
+        ${pwInput({
+          type:"text",
+          disabled:this.disabled,
+          label:msg("Title"),
+          name:"title",
+          task:this._task,
+          initial:this.initial,
+        })}
 
-        <pw-input
-          type="text"
-          ?disabled=${this.disabled}
-          label=${msg("Info")}
-          .name="info"
-          .task=${this._task}
-          .initial=${this.initial}
-        ></pw-input>
+        ${pwInput({
+          type:"text",
+          disabled:this.disabled,
+          label:msg("Info"),
+          name:"info",
+          task:this._task,
+          initial:this.initial,
+        })}
 
-        <pw-input
-          type="text"
-          ?disabled=${this.disabled}
-          label=${msg("Place")}
-          .name="place"
-          .task=${this._task}
-          .initial=${this.initial}
-        ></pw-input>
+        ${pwInput({
+          type:"text",
+          disabled:this.disabled,
+          label:msg("Place"),
+          name:"place",
+          task:this._task,
+          initial:this.initial,
+        })}
 
-        <pw-input
-          type="number"
-          ?disabled=${this.disabled}
-          label=${msg("Costs")}
-          .name="costs"
-          .task=${this._task}
-          .initial=${this.initial}
-        ></pw-input>
+        ${pwInput({
+          type:"number",
+          disabled:this.disabled,
+          label:msg("Costs"),
+          name:"costs",
+          task:this._task,
+          initial:this.initial
+        })}
 
-        <pw-input
-          type="number"
-          ?disabled=${this.disabled}
-          label=${msg("Minimum age")}
-          .name="min_age"
-          .task=${this._task}
-          .initial=${this.initial}
-        ></pw-input>
+        ${pwInput({
+          type:"number",
+          disabled:this.disabled,
+          label:msg("Minimum age"),
+          name:"min_age",
+          task:this._task,
+          initial:this.initial,
+        })}
 
-        <pw-input
-          type="number"
-          ?disabled=${this.disabled}
-          label=${msg("Maximum age")}
-          .name="max_age"
-          .task=${this._task}
-          .initial=${this.initial}
-        ></pw-input>
+        ${pwInput({
+          type:"number",
+          disabled:this.disabled,
+          label:msg("Maximum age"),
+          name:"max_age",
+          task:this._task,
+          initial:this.initial,
+        })}
 
-        <pw-input
-          type="number"
-          ?disabled=${this.disabled}
-          label=${msg("Minimum participants")}
-          .name="min_participants"
-          .task=${this._task}
-          .initial=${this.initial}
-        ></pw-input>
+        ${pwInput({
+          type:"number",
+          disabled:this.disabled,
+          label:msg("Minimum participants"),
+          name:"min_participants",
+          task:this._task,
+          initial:this.initial,
+        })}
 
-        <pw-input
-          type="number"
-          ?disabled=${this.disabled}
-          label=${msg("Maximum participants")}
-          .name="max_participants"
-          .task=${this._task}
-          .initial=${this.initial}
-        ></pw-input>
+${pwInput({
+          type:"number",
+          disabled:this.disabled,
+          label:msg("Maximum participants"),
+          name:"max_participants",
+          task:this._task,
+          initial:this.initial,
+})}
 
-        <pw-input
-          type="checkbox"
-          ?disabled=${this.disabled}
-          label=${msg("Allow random assignments")}
-          .name=${"random_assignments"}
-          .task=${this._task}
-          .initial=${this.initial}
-        ></pw-input>
+${pwInput({
+          type:"checkbox",
+          disabled:this.disabled,
+          label:msg("Allow random assignments"),
+          name:"random_assignments",
+          task:this._task,
+          initial:this.initial,
+})}
 
-        <pw-input
-          type="checkbox"
-          ?disabled=${this.disabled}
-          label=${msg("Mark this project as deleted")}
-          .name=${"deleted"}
-          .task=${this._task}
-          .initial=${this.initial}
-        ></pw-input>
+${pwInput({
+          type:"checkbox",
+          disabled:this.disabled,
+          label:msg("Mark this project as deleted"),
+          name:"deleted",
+          task:this._task,
+          initial:this.initial,
+})}
 
         <!-- Projektleitende -->
         <!-- TODO FIXME view only -->
