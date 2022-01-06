@@ -24,17 +24,18 @@ import { html, LitElement, noChange } from "lit";
 import { bootstrapCss } from "../index.js";
 import { HistoryController } from "../history-controller.js";
 import { ifDefined } from "lit/directives/if-defined.js";
-import { setupHmr } from "../hmr.js";
 import { msg } from "@lit/localize";
 import { createRef, ref } from "lit/directives/ref.js";
 
-export class PwNumberInput<T> extends LitElement {
+export class PwInput<T> extends LitElement {
   static override get properties() {
     return {
       label: { type: String },
       name: { type: String },
-      randomId: { state: true },
+      type: { type: String },
+      autocomplete: { type: String },
       disabled: { type: Boolean },
+      randomId: { state: true },
       task: {
         attribute: false,
         hasChanged: () => {
@@ -57,6 +58,10 @@ export class PwNumberInput<T> extends LitElement {
 
   name!: keyof T;
 
+  type: "text" | "password" | "number";
+
+  autocomplete!: "username" | "current-password";
+
   task!: import("@lit-labs/task").Task<
     any,
     import("zod").infer<typeof import("../../lib/result.js").anyResult>
@@ -68,11 +73,15 @@ export class PwNumberInput<T> extends LitElement {
 
   input: import("lit/directives/ref").Ref<HTMLInputElement>;
 
+  form!: HTMLFormElement;
+
   constructor() {
     super();
     this.randomId = "id" + Math.random().toString().replace(".", "");
 
     this.history = new HistoryController(this, /.*/);
+
+    this.type = "text";
 
     this.input = createRef();
   }
@@ -83,24 +92,23 @@ export class PwNumberInput<T> extends LitElement {
   }
 
   myformdataEventListener = (event: CustomEvent) => {
-    event.detail[this.name] =
+    if (this.type === "number") {
+      event.detail[this.name] =
       this.input.value?.value === "" ? null : this.input.value?.valueAsNumber;
+    } else {
+      event.detail[this.name] = this.input.value!.value;
+    }
   };
 
   override connectedCallback() {
     super.connectedCallback();
-    this.closest("form")?.addEventListener(
-      "myformdata",
-      this.myformdataEventListener
-    );
+    this.form = this.closest("form")!;
+    this.form.addEventListener("myformdata", this.myformdataEventListener);
   }
 
   override disconnectedCallback() {
     super.disconnectedCallback();
-    this.closest("form")?.removeEventListener(
-      "myformdata",
-      this.myformdataEventListener
-    );
+    this.form.removeEventListener("myformdata", this.myformdataEventListener);
   }
 
   override render() {
@@ -118,7 +126,7 @@ export class PwNumberInput<T> extends LitElement {
         <label for=${this.randomId} class="form-label">${this.label}:</label>
         <input
           ${ref(this.input)}
-          type="number"
+          type=${this.type}
           value=${ifDefined(this.initial?.[this.name])}
           class="form-control ${this.task.render({
             pending: () => "",
@@ -131,6 +139,7 @@ export class PwNumberInput<T> extends LitElement {
           name=${this.name.toString()}
           id=${this.randomId}
           aria-describedby="${this.randomId}-feedback"
+          autocomplete=${ifDefined(this.autocomplete)}
           ?disabled=${this.disabled ||
           (this.task.render({
             complete: () => false,
@@ -155,4 +164,4 @@ export class PwNumberInput<T> extends LitElement {
     `;
   }
 }
-customElements.define("pw-number-input", PwNumberInput);
+customElements.define("pw-input", PwInput);
