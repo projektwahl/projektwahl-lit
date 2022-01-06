@@ -31,29 +31,9 @@ import { repeat } from "lit/directives/repeat.js";
 import type { Task } from "@lit-labs/task";
 import type { z } from "zod";
 
-export function pwSelectInput<T, Q extends keyof T>(props: {
-  disabled: boolean;
-  label: string;
-  name: Q;
-  options: { value: T[Q]; text: string }[];
-  task: Task<
-    any,
-    z.infer<typeof import("../../lib/result.js").anyResult>
-  >;
-  initial: T;
-  onchange: any;
-}) {
-  const {
-    onchange,
-    disabled,
-    initial,
-    label,
-    name,
-    options,
-    task,
-    ...rest
-  } = props;
-  const _: never = rest;
+export function pwSelectInput<T, Q extends keyof T>(props: Pick<PwSelectInput<T, Q>, "onchange" | "disabled" | "initial" | "label" | "name" | "options" | "task">) {
+  const { onchange, disabled, initial, label, name, options, task, ...rest } = props;
+  const _: {} = rest;
   return html`<pw-select-input
     ?disabled=${disabled}
     @change=${onchange}

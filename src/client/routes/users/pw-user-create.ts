@@ -159,24 +159,6 @@ class PwUserCreate extends PwForm<"/api/v1/users/create-or-update"> {
         task: this._task,
         initial: { type: this.type ?? this.initial?.type ?? "voter" },
       })}
-      <pw-select-input
-        ?disabled=${this.disabled}
-        @change=${(event: Event) =>
-          (this.type = (event.target as HTMLSelectElement).value as
-            | "helper"
-            | "admin"
-            | "voter")}
-        label=${msg("User type")}
-        .name=${"tdype"}
-        .options=${[
-          { value: "voter", text: "Schüler" },
-          { value: "helper", text: "Helfer" },
-          { value: "admin", text: "Admin" },
-        ]}
-        .task=${this._task}
-        .initial=${{ type: this.type ?? this.initial?.type ?? "voter" }}
-      >
-      </pw-select-input>
 
       ${(this.type ?? this.initial?.type ?? "voter") === "voter"
         ? html`<pw-text-input

@@ -275,7 +275,7 @@ const users = <
     away: true,
     project_leader_id: true,
     force_in_project_id: true,
-    // deleted: true
+    deleted: true
   });
 
 const createOrUpdateUserResponse = <
