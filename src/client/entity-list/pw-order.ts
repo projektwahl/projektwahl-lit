@@ -22,15 +22,33 @@ SPDX-FileCopyrightText: 2021 Moritz Hedtke <Moritz.Hedtke@t-online.de>
 */
 import { html, LitElement } from "lit";
 import { bootstrapCss } from "../index.js";
-import { setupHmr } from "../hmr.js";
 import { HistoryController } from "../history-controller.js";
 import { msg, str } from "@lit/localize";
 
-export class PwOrder<T> extends LitElement {
+// workaround see https://github.com/runem/lit-analyzer/issues/149#issuecomment-1006162839
+export function pwOrder<T, Q extends keyof T>(
+  props: Pick<
+    PwOrder<T, Q>,
+    "name" | "title"
+  >
+) {
+  let {
+    name,
+    title,
+    ...rest
+  } = props;
+  rest = {}; // ensure no property is missed
+  return html`<pw-order
+    .name=${name}
+    title=${title}
+  ></pw-order>`;
+}
+
+export class PwOrder<T, Q extends keyof T> extends LitElement {
   static override get properties() {
     return {
       title: { type: String },
-      name: { type: String },
+      name: { attribute: false },
     };
   }
 
@@ -39,7 +57,7 @@ export class PwOrder<T> extends LitElement {
     return this;
   }
 
-  name!: string;
+  name!: Q;
 
   title!: string;
 
@@ -101,7 +119,7 @@ export class PwOrder<T> extends LitElement {
             {}
           );
         }}
-        name="${this.name}"
+        name="${this.name.toString()}"
         type="button"
         class="btn w-100 text-start"
         id=${this.randomId}

@@ -21,13 +21,13 @@ SPDX-License-Identifier: AGPL-3.0-or-later
 SPDX-FileCopyrightText: 2021 Moritz Hedtke <Moritz.Hedtke@t-online.de>
 */
 import "../../form/pw-form.js";
-import "../../entity-list/pw-order.js";
 import { html } from "lit";
 import { noChange } from "lit";
 import { aClick } from "../../pw-a.js";
 import { msg } from "@lit/localize";
 import { PwEntityList } from "../../entity-list/pw-entitylist.js";
 import { myFetch } from "../../utils.js";
+import { pwOrder } from "../../entity-list/pw-order.js";
 
 export const pwUsers = async (url: URL) => {
   let result = await taskFunction([url.searchParams]);
@@ -73,15 +73,15 @@ export class PwUsers extends PwEntityList<"/api/v1/users"> {
       the only nice way is probably submit buttons that do things like "oder_by_id_asc" and then redirect to the new state (because you need to remove the old state)
     -->
         <th class="table-cell-hover p-0" scope="col">
-          <pw-order name="id" title=${msg("ID")}></pw-order>
+        ${pwOrder({name:"id", title:msg("ID")})}
         </th>
 
         <th class="table-cell-hover p-0" scope="col">
-          <pw-order name="username" title=${msg("Name")}></pw-order>
+        ${pwOrder({name:"username", title:msg("Name")})}
         </th>
 
         <th class="table-cell-hover p-0" scope="col">
-          <pw-order name="type" title=${msg("Type")}></pw-order>
+        ${pwOrder({name:"type", title:msg("Type")})}
         </th>
 
         <th class="table-cell-hover">${msg("Actions")}</th>

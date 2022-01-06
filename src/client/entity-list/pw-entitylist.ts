@@ -91,12 +91,12 @@ export class PwEntityList<
 
     this.formRef = createRef();
 
-    this.initialRender = false;
+    this.initialRender = true;
   }
 
   override render() {
-    if (!this.initialRender) {
-      this.initialRender = true;
+    if (this.initialRender) {
+      this.initialRender = false;
 
       // TODO FIXME because of page navigation this currently loads twice
       // TODO FIXME somehow debounce (as we currently do a full navigation this probably has to be done somewhere else)
@@ -110,8 +110,9 @@ export class PwEntityList<
       if (this.initial !== undefined) {
         // TODO FIXME goddammit the private attributes get minified
         this._apiTask.status = TaskStatus.COMPLETE;
+        console.log(this._apiTask)
         // @ts-expect-error See https://github.com/lit/lit/issues/2367
-        this._apiTask.P = this.initial;
+        this._apiTask.p = this.initial;
       }
     }
 
@@ -284,5 +285,3 @@ export class PwEntityList<
     `;
   }
 }
-
-customElements.define("pw-entitylist", PwEntityList);
