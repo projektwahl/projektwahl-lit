@@ -20,7 +20,7 @@ https://github.com/projektwahl/projektwahl-lit
 SPDX-License-Identifier: AGPL-3.0-or-later
 SPDX-FileCopyrightText: 2021 Moritz Hedtke <Moritz.Hedtke@t-online.de>
 */
-import { css, html } from "lit";
+import { html } from "lit";
 import "../../form/pw-form.js";
 import { Task } from "@lit-labs/task";
 import { myFetch } from "../../utils.js";
@@ -28,8 +28,6 @@ import { PwForm } from "../../form/pw-form.js";
 import { HistoryController } from "../../history-controller.js";
 import { msg } from "@lit/localize";
 import "../../form/pw-text-input.js";
-import { setupHmr } from "../../hmr.js";
-import { aClick } from "../../pw-a.js";
 
 class PwLogin extends PwForm<"/api/v1/login"> {
   static override get properties() {
@@ -46,9 +44,6 @@ class PwLogin extends PwForm<"/api/v1/login"> {
   override get actionText() {
     return msg("Login");
   }
-
-  bruh: any = aClick;
-  bruh2: any = myFetch;
 
   constructor() {
     super();

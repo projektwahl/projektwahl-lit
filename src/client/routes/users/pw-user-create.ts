@@ -26,20 +26,16 @@ import { Task } from "@lit-labs/task";
 import { myFetch } from "../../utils.js";
 import { PwForm } from "../../form/pw-form.js";
 import { HistoryController } from "../../history-controller.js";
-import { setupHmr } from "../../hmr.js";
 import { msg } from "@lit/localize";
 import "../../form/pw-checkbox-input.js";
 import "../../form/pw-number-input.js";
 import "../../form/pw-select-input.js";
 import "../../form/pw-text-input.js";
 import type {
-  rawUserSchema,
-  rawUserVoterSchema,
-  rawUserHelperOrAdminSchema,
   routes,
 } from "../../../lib/routes.js";
 import type { z } from "zod";
-import { PwSelectInput, pwSelectInput } from "../../form/pw-select-input.js";
+import { pwSelectInput } from "../../form/pw-select-input.js";
 
 export async function pwUser(id: number, viewOnly: boolean = false) {
   let result = await taskFunction([id]);

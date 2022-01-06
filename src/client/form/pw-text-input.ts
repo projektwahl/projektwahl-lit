@@ -24,10 +24,8 @@ import { html, LitElement, noChange } from "lit";
 import { bootstrapCss } from "../index.js";
 import { HistoryController } from "../history-controller.js";
 import { ifDefined } from "lit/directives/if-defined.js";
-import { setupHmr } from "../hmr.js";
 import { msg } from "@lit/localize";
 import { createRef, ref } from "lit/directives/ref.js";
-import type { StatusRenderer } from "@lit-labs/task";
 
 export class PwTextInput<T> extends LitElement {
   static override get properties() {

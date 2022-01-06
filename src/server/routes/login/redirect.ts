@@ -21,7 +21,7 @@ SPDX-License-Identifier: AGPL-3.0-or-later
 SPDX-FileCopyrightText: 2021 Moritz Hedtke <Moritz.Hedtke@t-online.de>
 */
 import { sensitiveHeaders } from "node:http2";
-import { objectUtil, z, ZodObject, ZodTypeAny } from "zod";
+import { z, ZodObject, ZodTypeAny } from "zod";
 import {
   rawUserHelperOrAdminSchema,
   rawUserSchema,

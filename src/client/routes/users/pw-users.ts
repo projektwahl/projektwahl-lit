@@ -22,18 +22,10 @@ SPDX-FileCopyrightText: 2021 Moritz Hedtke <Moritz.Hedtke@t-online.de>
 */
 import "../../form/pw-form.js";
 import "../../entity-list/pw-order.js";
-import { html, LitElement } from "lit";
-import { bootstrapCss } from "../../index.js";
-import { HistoryController } from "../../history-controller.js";
-import { setupHmr } from "../../hmr.js";
-import { Task, TaskStatus } from "@lit-labs/task";
-import { css } from "lit";
-import { createRef, ref } from "lit/directives/ref.js";
+import { html } from "lit";
 import { noChange } from "lit";
 import { aClick } from "../../pw-a.js";
 import { msg } from "@lit/localize";
-import type { routes } from "../../../lib/routes.js";
-import type { z } from "zod";
 import { PwEntityList } from "../../entity-list/pw-entitylist.js";
 import { myFetch } from "../../utils.js";
 

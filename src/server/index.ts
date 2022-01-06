@@ -26,7 +26,6 @@ import "./routes/login/openid-client.js";
 import cluster from "cluster";
 import { watch } from "node:fs/promises";
 import { getDirs } from "./server-handler.js";
-import { promisify } from "node:util";
 
 if (cluster.isPrimary) {
   console.log(`Primary is running`);

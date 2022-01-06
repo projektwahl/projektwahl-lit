@@ -22,14 +22,10 @@ SPDX-FileCopyrightText: 2021 Moritz Hedtke <Moritz.Hedtke@t-online.de>
 */
 
 import {
-  SomeZodObject,
   z,
-  ZodObject,
   ZodType,
-  ZodTypeAny,
   ZodTypeDef,
 } from "zod";
-import type { UnknownKeysParam } from "./routes.js";
 
 export const successResult = <
   Output,

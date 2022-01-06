@@ -26,7 +26,6 @@ import {
   rawUserVoterSchema,
   rawUserHelperOrAdminSchema,
 } from "../../../lib/routes.js";
-import { sql } from "../../database.js";
 import { fetchData } from "../../entities.js";
 import { request } from "../../express.js";
 import { sql2 } from "../../sql/index.js";

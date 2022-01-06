@@ -23,13 +23,9 @@ SPDX-FileCopyrightText: 2021 Moritz Hedtke <Moritz.Hedtke@t-online.de>
 import { html, LitElement, noChange } from "lit";
 import { bootstrapCss } from "../index.js";
 import { HistoryController } from "../history-controller.js";
-import { ifDefined } from "lit/directives/if-defined.js";
-import { setupHmr } from "../hmr.js";
 import { msg } from "@lit/localize";
 import { createRef, ref } from "lit/directives/ref.js";
 import { repeat } from "lit/directives/repeat.js";
-import type { Task } from "@lit-labs/task";
-import type { z } from "zod";
 
 export function pwSelectInput<T, Q extends keyof T>(props: Pick<PwSelectInput<T, Q>, "onchange" | "disabled" | "initial" | "label" | "name" | "options" | "task">) {
   const { onchange, disabled, initial, label, name, options, task, ...rest } = props;

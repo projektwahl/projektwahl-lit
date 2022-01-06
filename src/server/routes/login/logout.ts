@@ -20,18 +20,8 @@ https://github.com/projektwahl/projektwahl-lit
 SPDX-License-Identifier: AGPL-3.0-or-later
 SPDX-FileCopyrightText: 2021 Moritz Hedtke <Moritz.Hedtke@t-online.de>
 */
-import { sensitiveHeaders } from "node:http2";
-import type { z, ZodObject, ZodTypeAny } from "zod";
-import {
-  rawSessionType,
-  rawUserHelperOrAdminSchema,
-  rawUserSchema,
-  rawUserVoterSchema,
-  UnknownKeysParam,
-} from "../../../lib/routes.js";
 import { sql } from "../../database.js";
 import { request } from "../../express.js";
-import { checkPassword } from "../../password.js";
 
 export async function logoutHandler(
   stream: import("http2").ServerHttp2Stream,
