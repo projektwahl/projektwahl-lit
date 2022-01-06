@@ -30,7 +30,7 @@ import { msg } from "@lit/localize";
 import "../../form/pw-checkbox-input.js";
 import "../../form/pw-number-input.js";
 import "../../form/pw-select-input.js";
-import "../../form/pw-text-input.js";
+import "../../form/pw-input.js";
 import type {
   routes,
 } from "../../../lib/routes.js";

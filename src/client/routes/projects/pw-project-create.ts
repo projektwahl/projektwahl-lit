@@ -28,7 +28,7 @@ import { PwForm } from "../../form/pw-form.js";
 import { HistoryController } from "../../history-controller.js";
 import { msg } from "@lit/localize";
 import "../../form/pw-number-input.js";
-import "../../form/pw-text-input.js";
+import "../../form/pw-input.js";
 import "../../form/pw-checkbox-input.js";
 import type { z } from "zod";
 import type { routes } from "../../../lib/routes.js";

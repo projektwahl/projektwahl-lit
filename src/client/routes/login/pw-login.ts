@@ -27,7 +27,7 @@ import { myFetch } from "../../utils.js";
 import { PwForm } from "../../form/pw-form.js";
 import { HistoryController } from "../../history-controller.js";
 import { msg } from "@lit/localize";
-import "../../form/pw-text-input.js";
+import "../../form/pw-input.js";
 
 class PwLogin extends PwForm<"/api/v1/login"> {
   static override get properties() {

@@ -58,7 +58,7 @@ export class PwInput<T> extends LitElement {
 
   name!: keyof T;
 
-  type: "text" | "password" | "number";
+  type: "text" | "password" | "number" | "checkbox";
 
   autocomplete!: "username" | "current-password";
 
@@ -95,6 +95,8 @@ export class PwInput<T> extends LitElement {
     if (this.type === "number") {
       event.detail[this.name] =
       this.input.value?.value === "" ? null : this.input.value?.valueAsNumber;
+    } else if (this.type === "checkbox") {
+      event.detail[this.name] = this.input.value?.checked;
     } else {
       event.detail[this.name] = this.input.value!.value;
     }
@@ -123,12 +125,13 @@ export class PwInput<T> extends LitElement {
     return html`
       ${bootstrapCss}
       <div class="mb-3">
-        <label for=${this.randomId} class="form-label">${this.label}:</label>
+        <label for=${this.randomId} class="${this.type === "checkbox" ? "form-check-label" : "form-label"}">${this.label}:</label>
         <input
           ${ref(this.input)}
           type=${this.type}
           value=${ifDefined(this.initial?.[this.name])}
-          class="form-control ${this.task.render({
+          ?checked=${this.initial?.[this.name]}
+          class="${this.type === "checkbox" ?  "form-check-input" : "form-control"} ${this.task.render({
             pending: () => "",
             complete: (v) =>
               !v.success && v.error[this.name as string] !== undefined
