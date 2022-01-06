@@ -88,134 +88,120 @@ export const PwProjectCreate = setupHmr(
       /**
        * @override
        */
-      this._task = new Task(
-        this,
-        async () => {
-          const formDataEvent = new CustomEvent<
-            z.infer<
-              typeof routes["/api/v1/projects/create-or-update"]["request"]
-            >
-          >("myformdata", {
-            bubbles: true,
-            composed: true,
-            detail: {
-              id: -1,
+      this._task = new Task(this, async () => {
+        const formDataEvent = new CustomEvent<
+          z.infer<typeof routes["/api/v1/projects/create-or-update"]["request"]>
+        >("myformdata", {
+          bubbles: true,
+          composed: true,
+          detail: {
+            id: -1,
+          },
+        });
+        this.form.value?.dispatchEvent(formDataEvent);
+        formDataEvent.detail.id = this.initial?.id ?? null;
+
+        let result = await myFetch<"/api/v1/projects/create-or-update">(
+          "/api/v1/projects/create-or-update",
+          {
+            method: "POST",
+            headers: {
+              "content-type": "text/json",
             },
-          });
-          this.form.value?.dispatchEvent(formDataEvent);
-          formDataEvent.detail.id = this.initial?.id ?? null;
-
-          let result = await myFetch<"/api/v1/projects/create-or-update">(
-            "/api/v1/projects/create-or-update",
-            {
-              method: "POST",
-              headers: {
-                "content-type": "text/json",
-              },
-              body: JSON.stringify(formDataEvent.detail),
-            }
-          );
-
-          if (result.success) {
-            HistoryController.goto(new URL("/", window.location.href), {});
+            body: JSON.stringify(formDataEvent.detail),
           }
+        );
 
-          return result;
+        if (result.success) {
+          HistoryController.goto(new URL("/", window.location.href), {});
         }
-      );
+
+        return result;
+      });
     }
 
     override getInputs() {
       return html`
         ${pwInput({
-          type:"text",
-          disabled:this.disabled,
-          label:msg("Title"),
-          name:"title",
-          task:this._task,
-          initial:this.initial,
+          type: "text",
+          disabled: this.disabled,
+          label: msg("Title"),
+          name: "title",
+          task: this._task,
+          initial: this.initial,
         })}
-
         ${pwInput({
-          type:"text",
-          disabled:this.disabled,
-          label:msg("Info"),
-          name:"info",
-          task:this._task,
-          initial:this.initial,
+          type: "text",
+          disabled: this.disabled,
+          label: msg("Info"),
+          name: "info",
+          task: this._task,
+          initial: this.initial,
         })}
-
         ${pwInput({
-          type:"text",
-          disabled:this.disabled,
-          label:msg("Place"),
-          name:"place",
-          task:this._task,
-          initial:this.initial,
+          type: "text",
+          disabled: this.disabled,
+          label: msg("Place"),
+          name: "place",
+          task: this._task,
+          initial: this.initial,
         })}
-
         ${pwInput({
-          type:"number",
-          disabled:this.disabled,
-          label:msg("Costs"),
-          name:"costs",
-          task:this._task,
-          initial:this.initial
+          type: "number",
+          disabled: this.disabled,
+          label: msg("Costs"),
+          name: "costs",
+          task: this._task,
+          initial: this.initial,
         })}
-
         ${pwInput({
-          type:"number",
-          disabled:this.disabled,
-          label:msg("Minimum age"),
-          name:"min_age",
-          task:this._task,
-          initial:this.initial,
+          type: "number",
+          disabled: this.disabled,
+          label: msg("Minimum age"),
+          name: "min_age",
+          task: this._task,
+          initial: this.initial,
         })}
-
         ${pwInput({
-          type:"number",
-          disabled:this.disabled,
-          label:msg("Maximum age"),
-          name:"max_age",
-          task:this._task,
-          initial:this.initial,
+          type: "number",
+          disabled: this.disabled,
+          label: msg("Maximum age"),
+          name: "max_age",
+          task: this._task,
+          initial: this.initial,
         })}
-
         ${pwInput({
-          type:"number",
-          disabled:this.disabled,
-          label:msg("Minimum participants"),
-          name:"min_participants",
-          task:this._task,
-          initial:this.initial,
+          type: "number",
+          disabled: this.disabled,
+          label: msg("Minimum participants"),
+          name: "min_participants",
+          task: this._task,
+          initial: this.initial,
         })}
-
-${pwInput({
-          type:"number",
-          disabled:this.disabled,
-          label:msg("Maximum participants"),
-          name:"max_participants",
-          task:this._task,
-          initial:this.initial,
-})}
-
-${pwInput({
-          type:"checkbox",
-          disabled:this.disabled,
-          label:msg("Allow random assignments"),
-          name:"random_assignments",
-          task:this._task,
-          initial:this.initial,
-})}
-
-${pwInput({
-          type:"checkbox",
-          disabled:this.disabled,
-          label:msg("Mark this project as deleted"),
-          name:"deleted",
-          task:this._task,
-          initial:this.initial,
-})}
+        ${pwInput({
+          type: "number",
+          disabled: this.disabled,
+          label: msg("Maximum participants"),
+          name: "max_participants",
+          task: this._task,
+          initial: this.initial,
+        })}
+        ${pwInput({
+          type: "checkbox",
+          disabled: this.disabled,
+          label: msg("Allow random assignments"),
+          name: "random_assignments",
+          task: this._task,
+          initial: this.initial,
+        })}
+        ${pwInput({
+          type: "checkbox",
+          disabled: this.disabled,
+          label: msg("Mark this project as deleted"),
+          name: "deleted",
+          task: this._task,
+          initial: this.initial,
+        })}
 
         <!-- Projektleitende -->
         <!-- TODO FIXME view only -->

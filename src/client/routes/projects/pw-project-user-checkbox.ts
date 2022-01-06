@@ -64,29 +64,26 @@ class PwProjectUserCheckbox extends LitElement {
 
     this.form = createRef();
 
-    this._task = new Task(
-      this,
-      async () => {
-        let result = await myFetch<"/api/v1/users/create-or-update">(
-          "/api/v1/users/create-or-update",
-          {
-            method: "POST",
-            headers: {
-              "content-type": "text/json",
-            },
-            body: JSON.stringify({
-              id: this.user.id,
-              [this.name]:
-                this.user[this.name] === this.projectId ? null : this.projectId,
-            }),
-          }
-        );
+    this._task = new Task(this, async () => {
+      let result = await myFetch<"/api/v1/users/create-or-update">(
+        "/api/v1/users/create-or-update",
+        {
+          method: "POST",
+          headers: {
+            "content-type": "text/json",
+          },
+          body: JSON.stringify({
+            id: this.user.id,
+            [this.name]:
+              this.user[this.name] === this.projectId ? null : this.projectId,
+          }),
+        }
+      );
 
-        HistoryController.goto(new URL(window.location.href), {});
+      HistoryController.goto(new URL(window.location.href), {});
 
-        return result;
-      }
-    );
+      return result;
+    });
   }
 
   render() {
@@ -111,7 +108,7 @@ class PwProjectUserCheckbox extends LitElement {
 
         <input
           @change=${(e: Event) => {
-            this._task.run()
+            this._task.run();
           }}
           type="checkbox"
           ?disabled=${this._task.status === TaskStatus.PENDING}

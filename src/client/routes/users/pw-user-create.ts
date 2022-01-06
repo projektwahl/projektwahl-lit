@@ -28,9 +28,7 @@ import { PwForm } from "../../form/pw-form.js";
 import { HistoryController } from "../../history-controller.js";
 import { msg } from "@lit/localize";
 import "../../form/pw-input.js";
-import type {
-  routes,
-} from "../../../lib/routes.js";
+import type { routes } from "../../../lib/routes.js";
 import type { z } from "zod";
 import { pwInput } from "../../form/pw-input.js";
 
@@ -84,56 +82,52 @@ class PwUserCreate extends PwForm<"/api/v1/users/create-or-update"> {
     /**
      * @override
      */
-    this._task = new Task(
-      this,
-      async () => {
-        const formDataEvent = new CustomEvent<
-          z.infer<typeof routes["/api/v1/users/create-or-update"]["request"]>
-        >("myformdata", {
-          bubbles: true,
-          composed: true,
-          detail: {
-            id: -1,
-          },
-        });
-        this.form.value?.dispatchEvent(formDataEvent);
-        formDataEvent.detail.id = this.initial?.id ?? null;
-        if (!this.initial?.id) {
-          formDataEvent.detail.project_leader_id = null;
-          formDataEvent.detail.force_in_project_id = null;
-        }
-
-        let result = await myFetch<"/api/v1/users/create-or-update">(
-          "/api/v1/users/create-or-update",
-          {
-            method: "POST",
-            headers: {
-              "content-type": "text/json",
-            },
-            body: JSON.stringify(formDataEvent.detail),
-          }
-        );
-
-        if (result.success) {
-          HistoryController.goto(new URL("/", window.location.href), {});
-        }
-
-        return result;
+    this._task = new Task(this, async () => {
+      const formDataEvent = new CustomEvent<
+        z.infer<typeof routes["/api/v1/users/create-or-update"]["request"]>
+      >("myformdata", {
+        bubbles: true,
+        composed: true,
+        detail: {
+          id: -1,
+        },
+      });
+      this.form.value?.dispatchEvent(formDataEvent);
+      formDataEvent.detail.id = this.initial?.id ?? null;
+      if (!this.initial?.id) {
+        formDataEvent.detail.project_leader_id = null;
+        formDataEvent.detail.force_in_project_id = null;
       }
-    );
+
+      let result = await myFetch<"/api/v1/users/create-or-update">(
+        "/api/v1/users/create-or-update",
+        {
+          method: "POST",
+          headers: {
+            "content-type": "text/json",
+          },
+          body: JSON.stringify(formDataEvent.detail),
+        }
+      );
+
+      if (result.success) {
+        HistoryController.goto(new URL("/", window.location.href), {});
+      }
+
+      return result;
+    });
   }
 
   override getInputs() {
     return html`
       ${pwInput({
-        type:"text",
-        disabled:this.disabled,
-        label:msg("Username"),
-        name:"username",
-        task:this._task,
-        initial:this.initial
+        type: "text",
+        disabled: this.disabled,
+        label: msg("Username"),
+        name: "username",
+        task: this._task,
+        initial: this.initial,
       })}
-
       ${pwInput({
         type: "select",
         disabled: this.disabled,
@@ -152,55 +146,51 @@ class PwUserCreate extends PwForm<"/api/v1/users/create-or-update"> {
         task: this._task,
         initial: { type: this.type ?? this.initial?.type ?? "voter" },
       })}
-
       ${(this.type ?? this.initial?.type ?? "voter") === "voter"
         ? html`${pwInput({
-              type:"text",
-              disabled:this.disabled,
-              label:msg("Group"),
-              name:"group",
-              task:this._task,
-              initial:this.initial,
-            })}
-
-            ${pwInput({
-              type:"number",
-              disabled:this.disabled,
-              label:msg("Age"),
-              name:"age",
-              task:this._task,
-              initial:this.initial
-            })}`
+            type: "text",
+            disabled: this.disabled,
+            label: msg("Group"),
+            name: "group",
+            task: this._task,
+            initial: this.initial,
+          })}
+          ${pwInput({
+            type: "number",
+            disabled: this.disabled,
+            label: msg("Age"),
+            name: "age",
+            task: this._task,
+            initial: this.initial,
+          })}`
         : undefined}
       ${!this.disabled
         ? html`
             ${pwInput({
-              type:"password",
-              disabled:this.disabled,
-              label:msg("Password"),
-              name:"password",
-              task:this._task,
-              initial:this.initial,
+              type: "password",
+              disabled: this.disabled,
+              label: msg("Password"),
+              name: "password",
+              task: this._task,
+              initial: this.initial,
             })}
           `
         : undefined}
-
       ${pwInput({
-        type:"checkbox",
-        disabled:this.disabled,
-        label:msg("Away"),
-        name:"away",
-        task:this._task,
-        initial:this.initial,
+        type: "checkbox",
+        disabled: this.disabled,
+        label: msg("Away"),
+        name: "away",
+        task: this._task,
+        initial: this.initial,
       })}
-
       ${pwInput({
-        type:"checkbox",
-        disabled:this.disabled,
-        label:msg("Mark this user as deleted"),
-        name:"deleted",
-        task:this._task,
-        initial:this.initial
+        type: "checkbox",
+        disabled: this.disabled,
+        label: msg("Mark this user as deleted"),
+        name: "deleted",
+        task: this._task,
+        initial: this.initial,
       })}
     `;
   }

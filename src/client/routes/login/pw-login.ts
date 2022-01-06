@@ -51,30 +51,28 @@ class PwLogin extends PwForm<"/api/v1/login"> {
     /**
      * @override
      */
-    this._task = new Task(
-      this,
-      async () => {
-        const formDataEvent = new CustomEvent("myformdata", {
-          bubbles: true,
-          composed: true,
-          detail: {},
-        });
-        this.form.value?.dispatchEvent(formDataEvent);
+    this._task = new Task(this, async () => {
+      const formDataEvent = new CustomEvent("myformdata", {
+        bubbles: true,
+        composed: true,
+        detail: {},
+      });
+      this.form.value?.dispatchEvent(formDataEvent);
 
-        let result = await myFetch<"/api/v1/login">("/api/v1/login", {
-          method: "POST",
-          headers: {
-            "content-type": "text/json",
-          },
-          body: JSON.stringify(formDataEvent.detail),
-        });
+      let result = await myFetch<"/api/v1/login">("/api/v1/login", {
+        method: "POST",
+        headers: {
+          "content-type": "text/json",
+        },
+        body: JSON.stringify(formDataEvent.detail),
+      });
 
-        if (result.success) {
-          HistoryController.goto(new URL("/", window.location.href), {});
-        }
+      if (result.success) {
+        HistoryController.goto(new URL("/", window.location.href), {});
+      }
 
-        return result;
-        /*// https://lit.dev/docs/components/events/#dispatching-events
+      return result;
+      /*// https://lit.dev/docs/components/events/#dispatching-events
         const resultEvent = new CustomEvent("form-result", {
           detail: this.result,
           bubbles: true,
@@ -82,8 +80,7 @@ class PwLogin extends PwForm<"/api/v1/login"> {
         });
         this.dispatchEvent(resultEvent);
         */
-      }
-    );
+    });
   }
 
   /** @override static styles = css`h3 {
@@ -105,22 +102,22 @@ class PwLogin extends PwForm<"/api/v1/login"> {
         autocomplete: "username",
         label: msg("Username"),
         name: "username",
-        task: this._task
+        task: this._task,
       })}
       ${pwInput({
-        type:"text",
-        label:msg("Password"),
-        name:"password",
-        type:"password",
-        autocomplete:"current-password",
-        task:this._task
+        type: "text",
+        label: msg("Password"),
+        name: "password",
+        type: "password",
+        autocomplete: "current-password",
+        task: this._task,
       })}`;
   }
 
   override submit = (/** @type {SubmitEvent} */ event: SubmitEvent) => {
     event.preventDefault();
 
-    this._task.run()
+    this._task.run();
   };
 }
 

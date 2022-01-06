@@ -20,18 +20,42 @@ https://github.com/projektwahl/projektwahl-lit
 SPDX-License-Identifier: AGPL-3.0-or-later
 SPDX-FileCopyrightText: 2021 Moritz Hedtke <Moritz.Hedtke@t-online.de>
 */
-import { html, literal} from 'lit/static-html.js';
+import { html, literal } from "lit/static-html.js";
 import { LitElement, noChange } from "lit";
 import { bootstrapCss } from "../index.js";
 import { HistoryController } from "../history-controller.js";
 import { ifDefined } from "lit/directives/if-defined.js";
 import { msg } from "@lit/localize";
 import { createRef, ref } from "lit/directives/ref.js";
-import { repeat } from 'lit/directives/repeat.js';
+import { repeat } from "lit/directives/repeat.js";
 
 // workaround see https://github.com/runem/lit-analyzer/issues/149#issuecomment-1006162839
-export function pwInput<T, Q extends keyof T>(props: Pick<PwInput<T, Q>, "type" | "autocomplete" | "disabled" | "initial" | "label" | "name" | "options" | "task"> & Partial<Pick<PwInput<T, Q>, "onchange">>) {
-  let { onchange, disabled, initial, label, name, options, task, type, autocomplete, ...rest } = props;
+export function pwInput<T, Q extends keyof T>(
+  props: Pick<
+    PwInput<T, Q>,
+    | "type"
+    | "autocomplete"
+    | "disabled"
+    | "initial"
+    | "label"
+    | "name"
+    | "options"
+    | "task"
+  > &
+    Partial<Pick<PwInput<T, Q>, "onchange">>
+) {
+  let {
+    onchange,
+    disabled,
+    initial,
+    label,
+    name,
+    options,
+    task,
+    type,
+    autocomplete,
+    ...rest
+  } = props;
   rest = {}; // ensure no property is missed
   return html`<pw-input
     type=${type}
@@ -114,16 +138,16 @@ export class PwInput<T, Q extends keyof T> extends LitElement {
   }
 
   myformdataEventListener = (event: CustomEvent) => {
-    console.log(this)
-    console.log(this.input)
+    console.log(this);
+    console.log(this.input);
     if (this.type === "number") {
       event.detail[this.name] =
-      this.input.value?.value === "" ? null : this.input.value?.valueAsNumber;
+        this.input.value?.value === "" ? null : this.input.value?.valueAsNumber;
     } else if (this.type === "checkbox") {
       event.detail[this.name] = this.input.value?.checked;
     } else if (this.type === "select") {
       event.detail[this.name] =
-      this.input.value!.selectedIndex == -1 ? null : this.input.value!.value;
+        this.input.value!.selectedIndex == -1 ? null : this.input.value!.value;
     } else {
       event.detail[this.name] = this.input.value!.value;
     }
@@ -152,44 +176,64 @@ export class PwInput<T, Q extends keyof T> extends LitElement {
     return html`
       ${bootstrapCss}
       <div class="mb-3">
-        ${this.type !== "checkbox" ? html`<label for=${this.randomId} class="form-label">${this.label}:</label>` : undefined}
+        ${
+          this.type !== "checkbox"
+            ? html`<label for=${this.randomId} class="form-label"
+                >${this.label}:</label
+              >`
+            : undefined
+        }
         <${this.type === "select" ? literal`select` : literal`input`}
           ${ref(this.input)}
           type=${this.type}
           value=${ifDefined(this.initial?.[this.name])}
           ?checked=${this.initial?.[this.name]}
-          class="${this.type === "checkbox" ?  "form-check-input" : "form-control"} ${this.task.render({
-            pending: () => "",
-            complete: (v) =>
-              !v.success && v.error[this.name as string] !== undefined
-                ? "is-invalid"
-                : "is-valid",
-            initial: () => "",
-          })}"
+          class="${
+            this.type === "checkbox" ? "form-check-input" : "form-control"
+          } ${this.task.render({
+      pending: () => "",
+      complete: (v) =>
+        !v.success && v.error[this.name as string] !== undefined
+          ? "is-invalid"
+          : "is-valid",
+      initial: () => "",
+    })}"
           name=${this.name.toString()}
           id=${this.randomId}
           aria-describedby="${this.randomId}-feedback"
           autocomplete=${ifDefined(this.autocomplete)}
-          ?disabled=${this.disabled ||
-          (this.task.render({
-            complete: () => false,
-            pending: () => true,
-            initial: () => false,
-          }) as boolean)}
+          ?disabled=${
+            this.disabled ||
+            (this.task.render({
+              complete: () => false,
+              pending: () => true,
+              initial: () => false,
+            }) as boolean)
+          }
         >
-          ${this.type === "select" ? repeat(
-            this.options,
-            (o) => o.value,
-            (o) =>
-              html`<option
-                ?selected=${this.initial?.[this.name] === o.value}
-                value=${o.value}
-              >
-                ${o.text}
-              </option>`
-          ) : undefined}
+          ${
+            this.type === "select"
+              ? repeat(
+                  this.options,
+                  (o) => o.value,
+                  (o) =>
+                    html`<option
+                      ?selected=${this.initial?.[this.name] === o.value}
+                      value=${o.value}
+                    >
+                      ${o.text}
+                    </option>`
+                )
+              : undefined
+          }
         </${this.type === "select" ? literal`select` : literal`input`}>
-        ${this.type === "checkbox" ? html`<label for=${this.randomId} class="form-check-label">${this.label}</label>` : undefined}
+        ${
+          this.type === "checkbox"
+            ? html`<label for=${this.randomId} class="form-check-label"
+                >${this.label}</label
+              >`
+            : undefined
+        }
         ${this.task.render({
           complete: (v) =>
             !v.success && v.error[this.name as string] !== undefined
