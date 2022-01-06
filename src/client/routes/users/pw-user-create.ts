@@ -125,14 +125,14 @@ class PwUserCreate extends PwForm<"/api/v1/users/create-or-update"> {
 
   override getInputs() {
     return html`
-      <pw-input
-        type="text"
-        ?disabled=${this.disabled}
-        label=${msg("Username")}
-        .name=${"username"}
-        .task=${this._task}
-        .initial=${this.initial}
-      ></pw-input>
+      ${pwInput({
+        type:"text",
+        disabled:this.disabled,
+        label:msg("Username"),
+        name:"username",
+        task:this._task,
+        initial:this.initial
+      })}
 
       ${pwInput({
         type: "select",
@@ -154,54 +154,54 @@ class PwUserCreate extends PwForm<"/api/v1/users/create-or-update"> {
       })}
 
       ${(this.type ?? this.initial?.type ?? "voter") === "voter"
-        ? html`<pw-input
-              type="text"
-              ?disabled=${this.disabled}
-              label=${msg("Group")}
-              .name=${"group"}
-              .task=${this._task}
-              .initial=${this.initial}
-            ></pw-input>
+        ? html`${pwInput({
+              type:"text",
+              disabled:this.disabled,
+              label:msg("Group"),
+              name:"group",
+              task:this._task,
+              initial:this.initial,
+            })}
 
-            <pw-input
-              type="number"
-              ?disabled=${this.disabled}
-              label=${msg("Age")}
-              .name=${"age"}
-              .task=${this._task}
-              .initial=${this.initial}
-            ></pw-input>`
+            ${pwInput({
+              type:"number",
+              disabled:this.disabled,
+              label:msg("Age"),
+              name:"age",
+              task:this._task,
+              initial:this.initial
+            })}`
         : undefined}
       ${!this.disabled
         ? html`
-            <pw-input
-              type="password"
-              ?disabled=${this.disabled}
-              label=${msg("Password")}
-              .name=${"password"}
-              .task=${this._task}
-              .initial=${this.initial}
-            ></pw-input>
+            ${pwInput({
+              type:"password",
+              disabled:this.disabled,
+              label:msg("Password"),
+              name:"password",
+              task:this._task,
+              initial:this.initial,
+            })}
           `
         : undefined}
 
-      <pw-input
-        type="checkbox"
-        ?disabled=${this.disabled}
-        label=${msg("Away")}
-        .name=${"away"}
-        .task=${this._task}
-        .initial=${this.initial}
-      ></pw-input>
+      ${pwInput({
+        type:"checkbox",
+        disabled:this.disabled,
+        label:msg("Away"),
+        name:"away",
+        task:this._task,
+        initial:this.initial,
+      })}
 
-      <pw-input
-        type="checkbox"
-        ?disabled=${this.disabled}
-        label=${msg("Mark this user as deleted")}
-        .name=${"deleted"}
-        .task=${this._task}
-        .initial=${this.initial}
-      ></pw-input>
+      ${pwInput({
+        type:"checkbox",
+        disabled:this.disabled,
+        label:msg("Mark this user as deleted"),
+        name:"deleted",
+        task:this._task,
+        initial:this.initial
+      })}
     `;
   }
 }
