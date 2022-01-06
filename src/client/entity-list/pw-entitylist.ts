@@ -23,7 +23,6 @@ SPDX-FileCopyrightText: 2021 Moritz Hedtke <Moritz.Hedtke@t-online.de>
 import { css, html, LitElement, TemplateResult } from "lit";
 import { bootstrapCss } from "../index.js";
 import { HistoryController } from "../history-controller.js";
-import { setupHmr } from "../hmr.js";
 import { msg, str } from "@lit/localize";
 import { createRef, ref } from "lit/directives/ref.js";
 import { Task, TaskStatus } from "@lit-labs/task";
@@ -210,7 +209,10 @@ export class PwEntityList<
               <nav aria-label="${msg("navigation of user list")}">
                 <ul class="pagination justify-content-center">
                   <li
-                    class="page-item ${this._apiTask.value?.data.previousCursor === null ? "disabled" : ""}"
+                    class="page-item ${this._apiTask.value?.data
+                      .previousCursor === null
+                      ? "disabled"
+                      : ""}"
                   >
                     <a
                       @click=${(e: Event) => {
@@ -242,7 +244,10 @@ export class PwEntityList<
                     </a>
                   </li>
                   <li
-                    class="page-item ${this._apiTask.value?.data.nextCursor === null ? "disabled" : ""}"
+                    class="page-item ${this._apiTask.value?.data.nextCursor ===
+                    null
+                      ? "disabled"
+                      : ""}"
                   >
                     <a
                       @click=${(e: Event) => {

@@ -24,15 +24,11 @@ import { html, LitElement } from "lit";
 import { createRef, ref } from "lit/directives/ref.js";
 import { bootstrapCss } from "../index.js";
 import { msg } from "@lit/localize";
-import { setupHmr } from "../hmr.js";
 import type { routes } from "../../lib/routes.js";
-import {isPrimitive} from "lit-html/directive-helpers.js";
-import { AsyncDirective } from "lit/async-directive.js";
 
 class PwForm<P extends keyof typeof routes> extends LitElement {
   static get properties() {
     return {
-      forceTask: { state: true },
       disabled: { type: Boolean },
     };
   }
@@ -52,16 +48,8 @@ class PwForm<P extends keyof typeof routes> extends LitElement {
 
   form: import("lit/directives/ref").Ref<HTMLFormElement>;
 
-  forceTask: number | undefined;
-
-  b1 = isPrimitive;
-  b2 = AsyncDirective;
-
   constructor() {
     super();
-
-    /** @type {number|undefined} */
-    this.forceTask = undefined;
 
     this.form = createRef();
   }
@@ -69,8 +57,8 @@ class PwForm<P extends keyof typeof routes> extends LitElement {
   protected submit(event: SubmitEvent) {
     event.preventDefault();
 
-    this.forceTask = (this.forceTask || 0) + 1;
-  };
+    this._task.run();
+  }
 
   // TODO FIXME really important
   // get the inputs from there and check that the errors returned from the server don't contain additional
@@ -121,7 +109,7 @@ if ('FormDataEvent' in window) {
       ${bootstrapCss}
       <main class="container">
         <h1 class="text-center">${this.actionText}</h1>
-        
+
         <div class="row justify-content-center">
           <div class="col-md-7 col-lg-8">
             ${this._task.render({
@@ -158,7 +146,7 @@ if ('FormDataEvent' in window) {
                         pending: () => true,
                         complete: () => false,
                         initial: () => false,
-                      })}
+                      }) as boolean}
                       class="btn btn-primary"
                     >
                       ${this.actionText} ${this._task.status}

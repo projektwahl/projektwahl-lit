@@ -28,7 +28,7 @@ import { until } from "lit/directives/until.js";
 import { setupHmr } from "./hmr.js";
 import jscookie from "js-cookie";
 import { msg, str } from "@lit/localize";
-import { sourceLocale, targetLocales } from "./generated_locales/locales.js";
+//import { sourceLocale, targetLocales } from "./generated_locales/locales.js";
 import { myFetch } from "./utils.js";
 
 /**export const { getLocale, setLocale } = configureLocalization({
@@ -56,7 +56,7 @@ ReactiveElement.enableWarning?.("change-in-update");
 
 export const pwApp = async (url: URL) => {
   let page = await nextPage(url);
-  return html`<pw-app .initial=${page}></pw-app>`;
+  return html`<pw-app .initial=${Promise.resolve(page)}></pw-app>`;
 };
 
 export const nextPage = async (url: URL) => {
@@ -173,7 +173,9 @@ export const PwApp = setupHmr(
                 <li class="nav-item">
                   <a
                     @click=${aClick}
-                    class="nav-link ${this.history.url.pathname === "/" ? "active" : ""}"
+                    class="nav-link ${this.history.url.pathname === "/"
+                      ? "active"
+                      : ""}"
                     aria-current="page"
                     href="/"
                     >${msg("Home")}</a
@@ -182,7 +184,9 @@ export const PwApp = setupHmr(
                 <li class="nav-item">
                   <a
                     @click=${aClick}
-                    class="nav-link ${this.history.url.pathname === "/users" ? "active" : ""}"
+                    class="nav-link ${this.history.url.pathname === "/users"
+                      ? "active"
+                      : ""}"
                     href="/users"
                     >${msg("Accounts")}</a
                   >
@@ -190,7 +194,9 @@ export const PwApp = setupHmr(
                 <li>
                   <a
                     @click=${aClick}
-                    class="nav-link ${this.history.url.pathname === "/projects" ? "active" : ""}"
+                    class="nav-link ${this.history.url.pathname === "/projects"
+                      ? "active"
+                      : ""}"
                     href="/projects"
                     >${msg("Projects")}</a
                   >
@@ -198,7 +204,9 @@ export const PwApp = setupHmr(
                 <li>
                   <a
                     @click=${aClick}
-                    class="nav-link ${this.history.url.pathname === "/election" ? "active" : ""}"
+                    class="nav-link ${this.history.url.pathname === "/election"
+                      ? "active"
+                      : ""}"
                     href="/election"
                     >${msg("Election")}</a
                   >
@@ -226,7 +234,9 @@ export const PwApp = setupHmr(
                   : html` <li class="nav-item">
                       <a
                         @click=${aClick}
-                        class="nav-link ${this.history.url.pathname === "/login" ? "active" : ""}"
+                        class="nav-link ${this.history.url.pathname === "/login"
+                          ? "active"
+                          : ""}"
                         href="/login"
                         >${msg("Login")}</a
                       >

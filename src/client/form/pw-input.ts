@@ -20,21 +20,63 @@ https://github.com/projektwahl/projektwahl-lit
 SPDX-License-Identifier: AGPL-3.0-or-later
 SPDX-FileCopyrightText: 2021 Moritz Hedtke <Moritz.Hedtke@t-online.de>
 */
-import { html, LitElement, noChange } from "lit";
+import { html, literal } from "lit/static-html.js";
+import { LitElement, noChange } from "lit";
 import { bootstrapCss } from "../index.js";
 import { HistoryController } from "../history-controller.js";
 import { ifDefined } from "lit/directives/if-defined.js";
-import { setupHmr } from "../hmr.js";
 import { msg } from "@lit/localize";
 import { createRef, ref } from "lit/directives/ref.js";
-import type { StatusRenderer } from "@lit-labs/task";
+import { repeat } from "lit/directives/repeat.js";
 
-export class PwTextInput<T> extends LitElement {
+// workaround see https://github.com/runem/lit-analyzer/issues/149#issuecomment-1006162839
+export function pwInput<T, Q extends keyof T>(
+  props: Pick<
+    PwInput<T, Q>,
+    | "type"
+    | "autocomplete"
+    | "disabled"
+    | "initial"
+    | "label"
+    | "name"
+    | "options"
+    | "task"
+  > &
+    Partial<Pick<PwInput<T, Q>, "onchange">>
+) {
+  let {
+    onchange,
+    disabled,
+    initial,
+    label,
+    name,
+    options,
+    task,
+    type,
+    autocomplete,
+    ...rest
+  } = props;
+  rest = {}; // ensure no property is missed
+  return html`<pw-input
+    type=${type}
+    ?disabled=${disabled}
+    @change=${onchange}
+    label=${label}
+    .name=${name}
+    .options=${options}
+    autocomplete=${ifDefined(autocomplete)}
+    .task=${task}
+    .initial=${initial}
+  ></pw-input>`;
+}
+
+export class PwInput<T, Q extends keyof T> extends LitElement {
   static override get properties() {
     return {
       label: { type: String },
-      name: { type: String },
+      name: { attribute: false },
       type: { type: String },
+      options: { attribute: false },
       autocomplete: { type: String },
       disabled: { type: Boolean },
       randomId: { state: true },
@@ -58,11 +100,11 @@ export class PwTextInput<T> extends LitElement {
 
   label!: string;
 
-  name!: keyof T;
+  name!: Q;
 
-  type: "text" | "password";
+  type: "text" | "password" | "number" | "checkbox" | "select";
 
-  autocomplete!: "username" | "current-password";
+  autocomplete?: "username" | "current-password";
 
   task!: import("@lit-labs/task").Task<
     any,
@@ -71,11 +113,13 @@ export class PwTextInput<T> extends LitElement {
 
   initial: T | undefined;
 
-  input: import("lit/directives/ref").Ref<HTMLInputElement>;
-
   value!: string;
 
+  input: import("lit/directives/ref").Ref<HTMLInputElement>;
+
   form!: HTMLFormElement;
+
+  options?: { value: T[Q]; text: string }[];
 
   constructor() {
     super();
@@ -89,12 +133,24 @@ export class PwTextInput<T> extends LitElement {
   }
 
   // because forms in shadow root are garbage
-  /** @protected @override */ createRenderRoot() {
+  protected override createRenderRoot() {
     return this;
   }
 
   myformdataEventListener = (event: CustomEvent) => {
-    event.detail[this.name] = this.input.value!.value;
+    console.log(this);
+    console.log(this.input);
+    if (this.type === "number") {
+      event.detail[this.name] =
+        this.input.value?.value === "" ? null : this.input.value?.valueAsNumber;
+    } else if (this.type === "checkbox") {
+      event.detail[this.name] = this.input.value?.checked;
+    } else if (this.type === "select") {
+      event.detail[this.name] =
+        this.input.value!.selectedIndex == -1 ? null : this.input.value!.value;
+    } else {
+      event.detail[this.name] = this.input.value!.value;
+    }
   };
 
   override connectedCallback() {
@@ -120,30 +176,64 @@ export class PwTextInput<T> extends LitElement {
     return html`
       ${bootstrapCss}
       <div class="mb-3">
-        <label for=${this.randomId} class="form-label">${this.label}:</label>
-        <input
+        ${
+          this.type !== "checkbox"
+            ? html`<label for=${this.randomId} class="form-label"
+                >${this.label}:</label
+              >`
+            : undefined
+        }
+        <${this.type === "select" ? literal`select` : literal`input`}
           ${ref(this.input)}
           type=${this.type}
           value=${ifDefined(this.initial?.[this.name])}
-          class="form-control ${this.task.render({
-            pending: () => "",
-            complete: (v) =>
-              !v.success && v.error[this.name as string] !== undefined
-                ? "is-invalid"
-                : "is-valid",
-            initial: () => "",
-          })}"
+          ?checked=${this.initial?.[this.name]}
+          class="${
+            this.type === "checkbox" ? "form-check-input" : "form-control"
+          } ${this.task.render({
+      pending: () => "",
+      complete: (v) =>
+        !v.success && v.error[this.name as string] !== undefined
+          ? "is-invalid"
+          : "is-valid",
+      initial: () => "",
+    })}"
           name=${this.name.toString()}
           id=${this.randomId}
           aria-describedby="${this.randomId}-feedback"
           autocomplete=${ifDefined(this.autocomplete)}
-          ?disabled=${this.disabled ||
-          this.task.render({
-            complete: () => false,
-            pending: () => true,
-            initial: () => false,
-          })}
-        />
+          ?disabled=${
+            this.disabled ||
+            (this.task.render({
+              complete: () => false,
+              pending: () => true,
+              initial: () => false,
+            }) as boolean)
+          }
+        >
+          ${
+            this.type === "select"
+              ? repeat(
+                  this.options,
+                  (o) => o.value,
+                  (o) =>
+                    html`<option
+                      ?selected=${this.initial?.[this.name] === o.value}
+                      value=${o.value}
+                    >
+                      ${o.text}
+                    </option>`
+                )
+              : undefined
+          }
+        </${this.type === "select" ? literal`select` : literal`input`}>
+        ${
+          this.type === "checkbox"
+            ? html`<label for=${this.randomId} class="form-check-label"
+                >${this.label}</label
+              >`
+            : undefined
+        }
         ${this.task.render({
           complete: (v) =>
             !v.success && v.error[this.name as string] !== undefined
@@ -161,4 +251,4 @@ export class PwTextInput<T> extends LitElement {
     `;
   }
 }
-customElements.define("pw-text-input", PwTextInput);
+customElements.define("pw-input", PwInput);

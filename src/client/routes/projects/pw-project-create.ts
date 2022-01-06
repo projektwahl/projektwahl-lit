@@ -27,12 +27,10 @@ import { myFetch } from "../../utils.js";
 import { PwForm } from "../../form/pw-form.js";
 import { HistoryController } from "../../history-controller.js";
 import { msg } from "@lit/localize";
-import "../../form/pw-number-input.js";
-import "../../form/pw-text-input.js";
-import "../../form/pw-checkbox-input.js";
 import type { z } from "zod";
 import type { routes } from "../../../lib/routes.js";
 import { setupHmr } from "../../hmr.js";
+import { pwInput } from "../../form/pw-input.js";
 
 export async function pwProject(id: number, viewOnly: boolean = false) {
   let result = await taskFunction([id]);
@@ -43,13 +41,12 @@ export async function pwProject(id: number, viewOnly: boolean = false) {
 }
 
 const taskFunction = async ([id]: [number]) => {
-  const [_, response] = await Promise.all([import("../chunk-entities.js"),
-  await myFetch<"/api/v1/projects">(
-    `/api/v1/projects/?f_id=${id}`,
-    {
+  const [_, response] = await Promise.all([
+    import("../chunk-entities.js"),
+    await myFetch<"/api/v1/projects">(`/api/v1/projects/?f_id=${id}`, {
       //agent: new Agent({rejectUnauthorized: false})
-    }
-  )]);
+    }),
+  ]);
   return response.success ? response.data.entities[0] : null; // TODO FIXME error handling, PwForm already has some form of error handling
 };
 
@@ -88,115 +85,123 @@ export const PwProjectCreate = setupHmr(
 
       this.initialRender = false;
 
-      /** @type {number|undefined} */
-      this.forceTask = undefined;
-
       /**
        * @override
        */
-      this._task = new Task(
-        this,
-        async () => {
-          const formDataEvent = new CustomEvent<
-            z.infer<
-              typeof routes["/api/v1/projects/create-or-update"]["request"]
-            >
-          >("myformdata", {
-            bubbles: true,
-            composed: true,
-            detail: {
-              id: -1,
+      this._task = new Task(this, async () => {
+        const formDataEvent = new CustomEvent<
+          z.infer<typeof routes["/api/v1/projects/create-or-update"]["request"]>
+        >("myformdata", {
+          bubbles: true,
+          composed: true,
+          detail: {
+            id: -1,
+          },
+        });
+        this.form.value?.dispatchEvent(formDataEvent);
+        formDataEvent.detail.id = this.initial?.id ?? null;
+
+        let result = await myFetch<"/api/v1/projects/create-or-update">(
+          "/api/v1/projects/create-or-update",
+          {
+            method: "POST",
+            headers: {
+              "content-type": "text/json",
             },
-          });
-          this.form.value?.dispatchEvent(formDataEvent);
-          formDataEvent.detail.id = this.initial?.id ?? null;
-
-          let result = await myFetch<"/api/v1/projects/create-or-update">(
-            "/api/v1/projects/create-or-update",
-            {
-              method: "POST",
-              headers: {
-                "content-type": "text/json",
-              },
-              body: JSON.stringify(formDataEvent.detail),
-            }
-          );
-
-          if (result.success) {
-            HistoryController.goto(new URL("/", window.location.href), {});
+            body: JSON.stringify(formDataEvent.detail),
           }
+        );
 
-          return result;
-        },
-        () => [this.forceTask]
-      );
+        if (result.success) {
+          HistoryController.goto(new URL("/", window.location.href), {});
+        }
+
+        return result;
+      });
     }
 
     override getInputs() {
       return html`
-        <pw-text-input
-          ?disabled=${this.disabled}
-          label=${msg("Title")}
-          name="title"
-          .task=${this._task}
-          .initial=${this.initial}
-        ></pw-text-input>
-
-        <pw-text-input
-          ?disabled=${this.disabled}
-          label=${msg("Info")}
-          name="info"
-          .task=${this._task}
-          .initial=${this.initial}
-        ></pw-text-input>
-
-        <pw-text-input
-          ?disabled=${this.disabled}
-          label=${msg("Place")}
-          name="place"
-          .task=${this._task}
-          .initial=${this.initial}
-        ></pw-text-input>
-
-        <pw-number-input
-          ?disabled=${this.disabled}
-          label=${msg("Costs")}
-          name="costs"
-          .task=${this._task}
-          .initial=${this.initial}
-        ></pw-number-input>
-
-        <pw-number-input
-          ?disabled=${this.disabled}
-          label=${msg("Minimum age")}
-          name="min_age"
-          .task=${this._task}
-          .initial=${this.initial}
-        ></pw-number-input>
-
-        <pw-number-input
-          ?disabled=${this.disabled}
-          label=${msg("Maximum age")}
-          name="max_age"
-          .task=${this._task}
-          .initial=${this.initial}
-        ></pw-number-input>
-
-        <pw-number-input
-          ?disabled=${this.disabled}
-          label=${msg("Minimum participants")}
-          name="min_participants"
-          .task=${this._task}
-          .initial=${this.initial}
-        ></pw-number-input>
-
-        <pw-number-input
-          ?disabled=${this.disabled}
-          label=${msg("Maximum participants")}
-          name="max_participants"
-          .task=${this._task}
-          .initial=${this.initial}
-        ></pw-number-input>
+        ${pwInput({
+          type: "text",
+          disabled: this.disabled,
+          label: msg("Title"),
+          name: "title",
+          task: this._task,
+          initial: this.initial,
+        })}
+        ${pwInput({
+          type: "text",
+          disabled: this.disabled,
+          label: msg("Info"),
+          name: "info",
+          task: this._task,
+          initial: this.initial,
+        })}
+        ${pwInput({
+          type: "text",
+          disabled: this.disabled,
+          label: msg("Place"),
+          name: "place",
+          task: this._task,
+          initial: this.initial,
+        })}
+        ${pwInput({
+          type: "number",
+          disabled: this.disabled,
+          label: msg("Costs"),
+          name: "costs",
+          task: this._task,
+          initial: this.initial,
+        })}
+        ${pwInput({
+          type: "number",
+          disabled: this.disabled,
+          label: msg("Minimum age"),
+          name: "min_age",
+          task: this._task,
+          initial: this.initial,
+        })}
+        ${pwInput({
+          type: "number",
+          disabled: this.disabled,
+          label: msg("Maximum age"),
+          name: "max_age",
+          task: this._task,
+          initial: this.initial,
+        })}
+        ${pwInput({
+          type: "number",
+          disabled: this.disabled,
+          label: msg("Minimum participants"),
+          name: "min_participants",
+          task: this._task,
+          initial: this.initial,
+        })}
+        ${pwInput({
+          type: "number",
+          disabled: this.disabled,
+          label: msg("Maximum participants"),
+          name: "max_participants",
+          task: this._task,
+          initial: this.initial,
+        })}
+        ${pwInput({
+          type: "checkbox",
+          disabled: this.disabled,
+          label: msg("Allow random assignments"),
+          name: "random_assignments",
+          task: this._task,
+          initial: this.initial,
+        })}
+        ${pwInput({
+          type: "checkbox",
+          disabled: this.disabled,
+          label: msg("Mark this project as deleted"),
+          name: "deleted",
+          task: this._task,
+          initial: this.initial,
+        })}
 
         <!-- Projektleitende -->
         <!-- TODO FIXME view only -->
@@ -214,14 +219,6 @@ export const PwProjectCreate = setupHmr(
               title=${msg("Guaranteed project members")}
             ></pw-project-users>`
           : html``}
-
-        <pw-checkbox-input
-          ?disabled=${this.disabled}
-          label=${msg("Allow random assignments")}
-          name="random_assignments"
-          .task=${this._task}
-          .initial=${this.initial}
-        ></pw-checkbox-input>
       `;
     }
   }

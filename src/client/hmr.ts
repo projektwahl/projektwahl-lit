@@ -261,7 +261,7 @@ if (!window.PRODUCTION) {
   });
   eventSource.addEventListener("message", async function (event) {
     let updatedUrl = new URL(event.data, document.location.origin);
-      
+
     console.log("hmr updating");
 
     let response = await import(`${updatedUrl.toString()}?${Date.now()}`);
@@ -270,13 +270,12 @@ if (!window.PRODUCTION) {
   });
 }
 
-  export function setupHmr<T>(name: string, clazz: T) {
-    if (!window.PRODUCTION) {
-      console.log("register", name, clazz);
+export function setupHmr<T>(name: string, clazz: T) {
+  if (!window.PRODUCTION) {
+    console.log("register", name, clazz);
 
-      return register(name, clazz);
-    }
-
-    return clazz;
+    return register(name, clazz);
   }
 
+  return clazz;
+}

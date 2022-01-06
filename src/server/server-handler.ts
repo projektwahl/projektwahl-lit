@@ -28,15 +28,14 @@ import { createOrUpdateUsersHandler } from "./routes/users/create-or-update.js";
 import { usersHandler } from "./routes/users/index.js";
 import { openidLoginHandler } from "./routes/login/openid-login.js";
 import { openidRedirectHandler } from "./routes/login/redirect.js";
-import path, { extname, relative } from "path/posix";
+import { extname, relative } from "path/posix";
 import { z } from "zod";
 import { createOrUpdateProjectsHandler } from "./routes/projects/create-or-update.js";
 import { cwd } from "node:process";
 import { projectsHandler } from "./routes/projects/index.js";
-import esbuild from "esbuild";
 import { resolve as loaderResolve, load as loaderLoad } from "../loader.js";
 import { logoutHandler } from "./routes/login/logout.js";
-import zlib from 'node:zlib';
+import zlib from "node:zlib";
 import { pipeline, Readable } from "node:stream";
 
 //const startTime = Date.now();
@@ -206,15 +205,17 @@ export async function serverHandler(
           );
         }
 
-        const contentType = filename.endsWith(".css") ? "text/css" : "application/javascript";
+        const contentType = filename.endsWith(".css")
+          ? "text/css"
+          : "application/javascript";
 
-        const raw = new Readable()
-        raw.push(contents)    // the string you want
-        raw.push(null)      // indicates end-of-file basically - the end of the stream
+        const raw = new Readable();
+        raw.push(contents); // the string you want
+        raw.push(null); // indicates end-of-file basically - the end of the stream
 
-        let acceptEncoding = headers['accept-encoding'] as string;
+        let acceptEncoding = headers["accept-encoding"] as string;
         if (!acceptEncoding) {
-          acceptEncoding = '';
+          acceptEncoding = "";
         }
 
         const onError = (err: any) => {
@@ -225,7 +226,7 @@ export async function serverHandler(
             // The best we can do is terminate the response immediately
             // and log the error.
             stream.end();
-            console.error('An error occurred:', err);
+            console.error("An error occurred:", err);
           }
         };
 
@@ -234,17 +235,17 @@ export async function serverHandler(
         if (/\bbr\b/.test(acceptEncoding)) {
           stream.respond({
             "content-type": `${contentType}; charset=utf-8`,
-            "cache-control": "public, max-age=604800, immutable",
-            "vary": "accept-encoding",
-            'content-encoding': 'br',
+            //"cache-control": "public, max-age=604800, immutable",
+            vary: "accept-encoding",
+            "content-encoding": "br",
             ":status": 200,
           });
           pipeline(raw, zlib.createBrotliCompress(), stream, onError);
         } else {
           stream.respond({
             "content-type": `${contentType}; charset=utf-8`,
-            "cache-control": "public, max-age=604800, immutable",
-            "vary": "accept-encoding",
+            //"cache-control": "public, max-age=604800, immutable",
+            vary: "accept-encoding",
             ":status": 200,
           });
           pipeline(raw, stream, onError);

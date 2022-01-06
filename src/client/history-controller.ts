@@ -20,9 +20,7 @@ https://github.com/projektwahl/projektwahl-lit
 SPDX-License-Identifier: AGPL-3.0-or-later
 SPDX-FileCopyrightText: 2021 Moritz Hedtke <Moritz.Hedtke@t-online.de>
 */
-import { Task } from "@lit-labs/task";
 import type { ReactiveController, ReactiveControllerHost } from "lit";
-import { PwForm } from "./form/pw-form.js";
 
 export type HistoryState = Record<string, unknown>;
 
@@ -36,9 +34,6 @@ export class HistoryController implements ReactiveController {
   state: HistoryState;
 
   private popstateListener?: (this: Window, ev: PopStateEvent) => void;
-
-  b1 = PwForm;
-  b2 = Task;
 
   private navigateListener?: (
     this: Window,

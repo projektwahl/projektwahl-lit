@@ -27,7 +27,7 @@ import { noChange } from "lit";
 import { msg } from "@lit/localize";
 import { PwUsers, taskFunction } from "../users/pw-users.js";
 import "./pw-project-user-checkbox.js";
-import "../../form/pw-checkbox-input.js";
+import "../../form/pw-input.js";
 import { setupHmr } from "../../hmr.js";
 import { aClick } from "../../pw-a.js";
 

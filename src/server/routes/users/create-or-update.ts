@@ -27,12 +27,7 @@ import { sql } from "../../database.js";
 import { request } from "../../express.js";
 import { hashPassword } from "../../password.js";
 import { sql2, unsafe2 } from "../../sql/index.js";
-
-function updateField(entity: any, name: string) {
-  return sql2`"${unsafe2(name)}" = CASE WHEN ${
-    entity[name] !== undefined
-  } THEN ${entity[name] ?? null} ELSE "${unsafe2(name)}" END`;
-}
+import { updateField } from "../../entities.js";
 
 // TODO FIXME somehow ensure all attributes are read here because this is an easy way to loose data
 // Also ensure create and update has the same attributes
@@ -70,7 +65,7 @@ export async function createOrUpdateUsersHandler(
           if (user.id) {
             const field = (name: string) => updateField(user, name);
 
-            const finalQuery = sql2`UPDATE users SET
+            const finalQuery = sql2`UPDATE users_with_deleted SET
             ${field("username")},
             password_hash = CASE WHEN ${!!user.password} THEN ${
               user.password ? await hashPassword(user.password) : null
@@ -80,13 +75,15 @@ export async function createOrUpdateUsersHandler(
             ${field("age")},
             ${field("away")},
             ${field("project_leader_id")},
-            ${field("force_in_project_id")}
+            ${field("force_in_project_id")},
+            ${field("deleted")},
+            last_updated_by = ${loggedInUser.id}
             WHERE id = ${
               user.id
             } RETURNING id, project_leader_id, force_in_project_id;`;
             return await sql(...finalQuery);
           } else {
-            return await sql`INSERT INTO users (username, password_hash, type, "group", age, away, project_leader_id, force_in_project_id) VALUES (${
+            return await sql`INSERT INTO users_with_deleted (username, password_hash, type, "group", age, away, project_leader_id, force_in_project_id, deleted, last_updated_by) VALUES (${
               user.username ?? null
             }, ${user.password ? await hashPassword(user.password) : null}, ${
               user.type ?? null
@@ -94,6 +91,8 @@ export async function createOrUpdateUsersHandler(
               user.type === "voter" ? user.age ?? null : null
             }, ${user.away ?? false}, ${user.project_leader_id ?? null}, ${
               user.force_in_project_id ?? null
+            }, ${user.deleted ?? false}, ${
+              loggedInUser.id
             }) RETURNING id, project_leader_id, force_in_project_id;`;
           }
         });

@@ -26,7 +26,6 @@ import {
   rawUserVoterSchema,
   rawUserHelperOrAdminSchema,
 } from "../../../lib/routes.js";
-import { sql } from "../../database.js";
 import { fetchData } from "../../entities.js";
 import { request } from "../../express.js";
 import { sql2 } from "../../sql/index.js";
@@ -105,6 +104,7 @@ export async function usersHandler(
         "away",
         "project_leader_id",
         "force_in_project_id",
+        "deleted",
       ] as const;
 
       const schema = rawUserSchema(
@@ -119,7 +119,7 @@ export async function usersHandler(
       >(
         "/api/v1/users" as const,
         headers,
-        "users",
+        "users_with_deleted",
         columns,
         filters,
         {

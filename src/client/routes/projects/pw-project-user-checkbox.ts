@@ -36,7 +36,6 @@ class PwProjectUserCheckbox extends LitElement {
   static override get properties() {
     return {
       _task: { state: true },
-      forceTask: { state: true },
       disabled: { state: true },
       user: { attribute: false },
       projectId: { type: Number },
@@ -45,8 +44,6 @@ class PwProjectUserCheckbox extends LitElement {
   }
 
   name!: "project_leader_id" | "force_in_project_id";
-
-  forceTask: number | undefined;
 
   _task;
 
@@ -67,32 +64,26 @@ class PwProjectUserCheckbox extends LitElement {
 
     this.form = createRef();
 
-    this.forceTask = undefined;
+    this._task = new Task(this, async () => {
+      let result = await myFetch<"/api/v1/users/create-or-update">(
+        "/api/v1/users/create-or-update",
+        {
+          method: "POST",
+          headers: {
+            "content-type": "text/json",
+          },
+          body: JSON.stringify({
+            id: this.user.id,
+            [this.name]:
+              this.user[this.name] === this.projectId ? null : this.projectId,
+          }),
+        }
+      );
 
-    this._task = new Task(
-      this,
-      async () => {
-        let result = await myFetch<"/api/v1/users/create-or-update">(
-          "/api/v1/users/create-or-update",
-          {
-            method: "POST",
-            headers: {
-              "content-type": "text/json",
-            },
-            body: JSON.stringify({
-              id: this.user.id,
-              [this.name]:
-                this.user[this.name] === this.projectId ? null : this.projectId,
-            }),
-          }
-        );
+      HistoryController.goto(new URL(window.location.href), {});
 
-        HistoryController.goto(new URL(window.location.href), {});
-
-        return result;
-      },
-      () => [this.forceTask] // TODO FIXME ensure this is working and update to the new method
-    );
+      return result;
+    });
   }
 
   render() {
@@ -117,7 +108,7 @@ class PwProjectUserCheckbox extends LitElement {
 
         <input
           @change=${(e: Event) => {
-            this.forceTask = (this.forceTask || 0) + 1;
+            this._task.run();
           }}
           type="checkbox"
           ?disabled=${this._task.status === TaskStatus.PENDING}
