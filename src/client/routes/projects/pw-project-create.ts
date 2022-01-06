@@ -42,7 +42,7 @@ export async function pwProject(id: number, viewOnly: boolean = false) {
 
 const taskFunction = async ([id]: [number]) => {
   const [_, response] = await Promise.all([
-    import("../chunk-entities.js"),
+    import("../projects/pw-project-users.js"),
     await myFetch<"/api/v1/projects">(`/api/v1/projects/?f_id=${id}`, {
       //agent: new Agent({rejectUnauthorized: false})
     }),
