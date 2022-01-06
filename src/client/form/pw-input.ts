@@ -30,15 +30,17 @@ import { createRef, ref } from "lit/directives/ref.js";
 import { repeat } from 'lit/directives/repeat.js';
 
 // workaround see https://github.com/runem/lit-analyzer/issues/149#issuecomment-1006162839
-export function pwInput<T, Q extends keyof T>(props: Pick<PwInput<T, Q>, "onchange" | "disabled" | "initial" | "label" | "name" | "options" | "task">) {
-  const { onchange, disabled, initial, label, name, options, task, ...rest } = props;
-  const _: {} = rest;
+export function pwInput<T, Q extends keyof T>(props: Pick<PwInput<T, Q>, "type" | "autocomplete" | "onchange" | "disabled" | "initial" | "label" | "name" | "options" | "task">) {
+  let { onchange, disabled, initial, label, name, options, task, type, autocomplete, ...rest } = props;
+  rest = {}; // ensure no property is missed
   return html`<pw-input
+    type=${type}
     ?disabled=${disabled}
     @change=${onchange}
     label=${label}
     .name=${name}
     .options=${options}
+    autocomplete=${ifDefined(autocomplete)}
     .task=${task}
     .initial=${initial}
   ></pw-input>`;
@@ -78,7 +80,7 @@ export class PwInput<T, Q extends keyof T> extends LitElement {
 
   type: "text" | "password" | "number" | "checkbox" | "select";
 
-  autocomplete!: "username" | "current-password";
+  autocomplete?: "username" | "current-password";
 
   task!: import("@lit-labs/task").Task<
     any,

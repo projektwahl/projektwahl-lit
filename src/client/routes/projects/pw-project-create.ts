@@ -27,9 +27,7 @@ import { myFetch } from "../../utils.js";
 import { PwForm } from "../../form/pw-form.js";
 import { HistoryController } from "../../history-controller.js";
 import { msg } from "@lit/localize";
-import "../../form/pw-number-input.js";
 import "../../form/pw-input.js";
-import "../../form/pw-checkbox-input.js";
 import type { z } from "zod";
 import type { routes } from "../../../lib/routes.js";
 import { setupHmr } from "../../hmr.js";
@@ -133,69 +131,95 @@ export const PwProjectCreate = setupHmr(
 
     override getInputs() {
       return html`
-        <pw-text-input
+        <pw-input
+          type="text"
           ?disabled=${this.disabled}
           label=${msg("Title")}
-          name="title"
+          .name="title"
           .task=${this._task}
           .initial=${this.initial}
-        ></pw-text-input>
+        ></pw-input>
 
-        <pw-text-input
+        <pw-input
+          type="text"
           ?disabled=${this.disabled}
           label=${msg("Info")}
-          name="info"
+          .name="info"
           .task=${this._task}
           .initial=${this.initial}
-        ></pw-text-input>
+        ></pw-input>
 
-        <pw-text-input
+        <pw-input
+          type="text"
           ?disabled=${this.disabled}
           label=${msg("Place")}
-          name="place"
+          .name="place"
           .task=${this._task}
           .initial=${this.initial}
-        ></pw-text-input>
+        ></pw-input>
 
-        <pw-number-input
+        <pw-input
+          type="number"
           ?disabled=${this.disabled}
           label=${msg("Costs")}
-          name="costs"
+          .name="costs"
           .task=${this._task}
           .initial=${this.initial}
-        ></pw-number-input>
+        ></pw-input>
 
-        <pw-number-input
+        <pw-input
+          type="number"
           ?disabled=${this.disabled}
           label=${msg("Minimum age")}
-          name="min_age"
+          .name="min_age"
           .task=${this._task}
           .initial=${this.initial}
-        ></pw-number-input>
+        ></pw-input>
 
-        <pw-number-input
+        <pw-input
+          type="number"
           ?disabled=${this.disabled}
           label=${msg("Maximum age")}
-          name="max_age"
+          .name="max_age"
           .task=${this._task}
           .initial=${this.initial}
-        ></pw-number-input>
+        ></pw-input>
 
-        <pw-number-input
+        <pw-input
+          type="number"
           ?disabled=${this.disabled}
           label=${msg("Minimum participants")}
-          name="min_participants"
+          .name="min_participants"
           .task=${this._task}
           .initial=${this.initial}
-        ></pw-number-input>
+        ></pw-input>
 
-        <pw-number-input
+        <pw-input
+          type="number"
           ?disabled=${this.disabled}
           label=${msg("Maximum participants")}
-          name="max_participants"
+          .name="max_participants"
           .task=${this._task}
           .initial=${this.initial}
-        ></pw-number-input>
+        ></pw-input>
+
+        <pw-input
+          type="checkbox"
+          ?disabled=${this.disabled}
+          label=${msg("Allow random assignments")}
+          .name=${"random_assignments"}
+          .task=${this._task}
+          .initial=${this.initial}
+        ></pw-input>
+
+        <pw-input
+          type="checkbox"
+          ?disabled=${this.disabled}
+          label=${msg("Mark this project as deleted")}
+          .name=${"deleted"}
+          .task=${this._task}
+          .initial=${this.initial}
+        ></pw-input>
 
         <!-- Projektleitende -->
         <!-- TODO FIXME view only -->
@@ -213,22 +237,6 @@ export const PwProjectCreate = setupHmr(
               title=${msg("Guaranteed project members")}
             ></pw-project-users>`
           : html``}
-
-        <pw-checkbox-input
-          ?disabled=${this.disabled}
-          label=${msg("Allow random assignments")}
-          .name=${"random_assignments"}
-          .task=${this._task}
-          .initial=${this.initial}
-        ></pw-checkbox-input>
-
-        <pw-checkbox-input
-          ?disabled=${this.disabled}
-          label=${msg("Mark this project as deleted")}
-          .name=${"deleted"}
-          .task=${this._task}
-          .initial=${this.initial}
-        ></pw-checkbox-input>
       `;
     }
   }

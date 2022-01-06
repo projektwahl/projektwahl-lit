@@ -104,19 +104,21 @@ class PwLogin extends PwForm<"/api/v1/login"> {
 
       <h3 class="text-center">${msg("Login as guest")}</h3>
 
-      <pw-text-input
+      <pw-input
+        type="text"
         autocomplete="username"
         label="${msg("Username")}"
         name="username"
         .task=${this._task}
-      ></pw-text-input>
-      <pw-text-input
+      ></pw-input>
+      <pw-input
+        type="text"
         label="${msg("Password")}"
         name="password"
         type="password"
         autocomplete="current-password"
         .task=${this._task}
-      ></pw-text-input>`;
+      ></pw-input>`;
   }
 
   override submit = (/** @type {SubmitEvent} */ event: SubmitEvent) => {

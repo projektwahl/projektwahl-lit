@@ -27,15 +27,12 @@ import { myFetch } from "../../utils.js";
 import { PwForm } from "../../form/pw-form.js";
 import { HistoryController } from "../../history-controller.js";
 import { msg } from "@lit/localize";
-import "../../form/pw-checkbox-input.js";
-import "../../form/pw-number-input.js";
-import "../../form/pw-select-input.js";
 import "../../form/pw-input.js";
 import type {
   routes,
 } from "../../../lib/routes.js";
 import type { z } from "zod";
-import { pwSelectInput } from "../../form/pw-select-input.js";
+import { pwInput } from "../../form/pw-input.js";
 
 export async function pwUser(id: number, viewOnly: boolean = false) {
   let result = await taskFunction([id]);
@@ -130,15 +127,17 @@ class PwUserCreate extends PwForm<"/api/v1/users/create-or-update"> {
 
   override getInputs() {
     return html`
-      <pw-text-input
+      <pw-input
+        type="text"
         ?disabled=${this.disabled}
         label=${msg("Username")}
-        name="username"
+        .name=${"username"}
         .task=${this._task}
         .initial=${this.initial}
-      ></pw-text-input>
+      ></pw-input>
 
-      ${pwSelectInput({
+      ${pwInput({
+        type: "select",
         disabled: this.disabled,
         onchange: (event: Event) =>
           (this.type = (event.target as HTMLSelectElement).value as
@@ -157,50 +156,54 @@ class PwUserCreate extends PwForm<"/api/v1/users/create-or-update"> {
       })}
 
       ${(this.type ?? this.initial?.type ?? "voter") === "voter"
-        ? html`<pw-text-input
+        ? html`<pw-input
+              type="text"
               ?disabled=${this.disabled}
               label=${msg("Group")}
-              name="group"
+              .name=${"group"}
               .task=${this._task}
               .initial=${this.initial}
-            ></pw-text-input>
+            ></pw-input>
 
-            <pw-number-input
+            <pw-input
+              type="number"
               ?disabled=${this.disabled}
               label=${msg("Age")}
-              name="age"
+              .name=${"age"}
               .task=${this._task}
               .initial=${this.initial}
-            ></pw-number-input>`
+            ></pw-input>`
         : undefined}
       ${!this.disabled
         ? html`
-            <pw-text-input
+            <pw-input
+              type="password"
               ?disabled=${this.disabled}
               label=${msg("Password")}
-              name="password"
-              type="password"
+              .name=${"password"}
               .task=${this._task}
               .initial=${this.initial}
-            ></pw-text-input>
+            ></pw-input>
           `
         : undefined}
 
-      <pw-checkbox-input
+      <pw-input
+        type="checkbox"
         ?disabled=${this.disabled}
         label=${msg("Away")}
         .name=${"away"}
         .task=${this._task}
         .initial=${this.initial}
-      ></pw-checkbox-input>
+      ></pw-input>
 
-      <pw-checkbox-input
+      <pw-input
+        type="checkbox"
         ?disabled=${this.disabled}
         label=${msg("Mark this user as deleted")}
         .name=${"deleted"}
         .task=${this._task}
         .initial=${this.initial}
-      ></pw-checkbox-input>
+      ></pw-input>
     `;
   }
 }
