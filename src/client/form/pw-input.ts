@@ -20,19 +20,37 @@ https://github.com/projektwahl/projektwahl-lit
 SPDX-License-Identifier: AGPL-3.0-or-later
 SPDX-FileCopyrightText: 2021 Moritz Hedtke <Moritz.Hedtke@t-online.de>
 */
-import { html, LitElement, noChange } from "lit";
+import { html, literal} from 'lit/static-html.js';
+import { LitElement, noChange } from "lit";
 import { bootstrapCss } from "../index.js";
 import { HistoryController } from "../history-controller.js";
 import { ifDefined } from "lit/directives/if-defined.js";
 import { msg } from "@lit/localize";
 import { createRef, ref } from "lit/directives/ref.js";
+import { repeat } from 'lit/directives/repeat.js';
 
-export class PwInput<T> extends LitElement {
+// workaround see https://github.com/runem/lit-analyzer/issues/149#issuecomment-1006162839
+export function pwInput<T, Q extends keyof T>(props: Pick<PwInput<T, Q>, "onchange" | "disabled" | "initial" | "label" | "name" | "options" | "task">) {
+  const { onchange, disabled, initial, label, name, options, task, ...rest } = props;
+  const _: {} = rest;
+  return html`<pw-input
+    ?disabled=${disabled}
+    @change=${onchange}
+    label=${label}
+    .name=${name}
+    .options=${options}
+    .task=${task}
+    .initial=${initial}
+  ></pw-input>`;
+}
+
+export class PwInput<T, Q extends keyof T> extends LitElement {
   static override get properties() {
     return {
       label: { type: String },
-      name: { type: String },
+      name: { attribute: false },
       type: { type: String },
+      options: { attribute: false },
       autocomplete: { type: String },
       disabled: { type: Boolean },
       randomId: { state: true },
@@ -56,9 +74,9 @@ export class PwInput<T> extends LitElement {
 
   label!: string;
 
-  name!: keyof T;
+  name!: Q;
 
-  type: "text" | "password" | "number" | "checkbox";
+  type: "text" | "password" | "number" | "checkbox" | "select";
 
   autocomplete!: "username" | "current-password";
 
@@ -74,6 +92,8 @@ export class PwInput<T> extends LitElement {
   input: import("lit/directives/ref").Ref<HTMLInputElement>;
 
   form!: HTMLFormElement;
+
+  options!: { value: T[Q]; text: string }[];
 
   constructor() {
     super();
@@ -126,7 +146,7 @@ export class PwInput<T> extends LitElement {
       ${bootstrapCss}
       <div class="mb-3">
         <label for=${this.randomId} class="${this.type === "checkbox" ? "form-check-label" : "form-label"}">${this.label}:</label>
-        <input
+        <${this.type === "select" ? literal`select` : literal`input`}
           ${ref(this.input)}
           type=${this.type}
           value=${ifDefined(this.initial?.[this.name])}
@@ -149,7 +169,19 @@ export class PwInput<T> extends LitElement {
             pending: () => true,
             initial: () => false,
           }) as boolean)}
-        />
+        >
+          ${this.type === "select" ? repeat(
+            this.options,
+            (o) => o.value,
+            (o) =>
+              html`<option
+                ?selected=${this.initial?.[this.name] === o.value}
+                value=${o.value}
+              >
+                ${o.text}
+              </option>`
+          ) : undefined}
+        </${this.type === "select" ? literal`select` : literal`input`}>
         ${this.task.render({
           complete: (v) =>
             !v.success && v.error[this.name as string] !== undefined
