@@ -35,16 +35,13 @@ export const pwProjects = async (url: URL) => {
 };
 
 const taskFunction = async ([searchParams]: [URLSearchParams]) => {
-  let response = await myFetch<"/api/v1/users">(
-    new URL(
+  let response = await myFetch<"/api/v1/projects">(
       `/api/v1/projects?${searchParams}`,
-      window.location.href
-    ).toString(),
     {
       //agent: new Agent({rejectUnauthorized: false})
     }
   );
-  return await response.json();
+  return response;
 };
 
 class PwProjects extends PwEntityList<"/api/v1/projects"> {
