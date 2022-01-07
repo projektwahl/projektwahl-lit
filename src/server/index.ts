@@ -36,9 +36,6 @@ import { getDirs, serverHandler } from "./server-handler.js";
     cert: readFileSync("localhost-cert.pem"),
     allowHTTP1: true,
   }, (request, response) => {
-    console.log("request", request)
-    console.log("response", response)
-    
     try {
       serverHandler(request, response)
     } catch (error) {

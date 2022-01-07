@@ -6,3 +6,4 @@ src/client/generated_locales/
 dist
 *.pem
 bootstrap.min.css
+zap*

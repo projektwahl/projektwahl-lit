@@ -20,6 +20,7 @@ https://github.com/projektwahl/projektwahl-lit
 SPDX-License-Identifier: AGPL-3.0-or-later
 SPDX-FileCopyrightText: 2021 Moritz Hedtke <Moritz.Hedtke@t-online.de>
 */
+import type { IncomingMessage } from "node:http";
 import type { OutgoingHttpHeaders } from "node:http2";
 import { z, ZodTypeAny } from "zod";
 import { entityRoutes } from "../lib/routes.js";
@@ -56,7 +57,7 @@ export async function fetchData<
   R extends keyof typeof entityRoutes
 >(
   path: R,
-  headers: import("http2").IncomingHttpHeaders,
+  request: IncomingMessage,
   table: string,
   columns: readonly [string, ...string[]],
   filters: Q,

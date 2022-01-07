@@ -67,6 +67,12 @@ async function replaceAsync(
   return str.replaceAll(regex, () => data.shift() as string);
 }
 
+export const defaultHeaders = {
+  "x-content-type-options": "nosniff",
+  "x-frame-options": "DENY",
+  "cache-control": "private",
+}
+
 export async function serverHandler(
   request: IncomingMessage,
   response: ServerResponse
@@ -76,11 +82,14 @@ export async function serverHandler(
   let url = new URL(path, "https://localhost:8443");
 
   if (url.pathname === "/favicon.ico" || url.pathname === "/robots.txt") {
-    response.writeHead(404)
+    response.writeHead(404, {
+      ...defaultHeaders,
+    })
     response.end()
   } else if (url.pathname === "/api/v1/hmr") {
     console.log("got request");
     response.writeHead(200, {
+      ...defaultHeaders,
       "content-type": "text/event-stream",
     });
 
@@ -108,7 +117,9 @@ export async function serverHandler(
       (await usersHandler(request, response));
 
     if (!executed) {
-      response.writeHead(404)
+      response.writeHead(404, {
+        ...defaultHeaders,
+      })
       response.end()
     }
   } else {
@@ -224,6 +235,7 @@ export async function serverHandler(
         // See https://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.3
         if (/\bbr\b/.test(acceptEncoding)) {
           response.writeHead(200, {
+            ...defaultHeaders,
             "content-type": `${contentType}; charset=utf-8`,
             //"cache-control": "public, max-age=604800, immutable",
             vary: "accept-encoding",
@@ -232,6 +244,7 @@ export async function serverHandler(
           pipeline(raw, zlib.createBrotliCompress(), response, onError);
         } else {
           response.writeHead(200, {
+            ...defaultHeaders,
             "content-type": `${contentType}; charset=utf-8`,
             //"cache-control": "public, max-age=604800, immutable",
             vary: "accept-encoding",
@@ -240,7 +253,9 @@ export async function serverHandler(
         }
       } catch (error) {
         console.error(error);
-        response.writeHead(404)
+        response.writeHead(404, {
+          ...defaultHeaders,
+        })
         response.end()
       }
     } else {
@@ -289,6 +304,7 @@ export async function serverHandler(
       //const ssrResult = render(contents);
 
       response.writeHead(200, {
+        ...defaultHeaders,
         "content-type": "text/html; charset=utf-8",
       });
       //Readable.from(ssrResult).pipe(stream)

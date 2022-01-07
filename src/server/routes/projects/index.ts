@@ -60,7 +60,7 @@ export async function projectsHandler(
         ];
       }
 
-      const url = new URL(headers[":path"]!, "https://localhost:8443");
+      const url = new URL(request.url, "https://localhost:8443");
 
       const filters = z
         .object({
@@ -93,7 +93,7 @@ export async function projectsHandler(
         "/api/v1/projects"
       >(
         "/api/v1/projects" as const,
-        headers,
+        request,
         "projects_with_deleted",
         columns,
         filters,

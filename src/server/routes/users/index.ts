@@ -66,7 +66,7 @@ export async function usersHandler(
         ];
       }
 
-      const url = new URL(headers[":path"]!, "https://localhost:8443");
+      const url = new URL(request.url!, "https://localhost:8443");
 
       const filters = z
         .object({
@@ -119,7 +119,7 @@ export async function usersHandler(
         "/api/v1/users"
       >(
         "/api/v1/users" as const,
-        headers,
+        request,
         "users_with_deleted",
         columns,
         filters,

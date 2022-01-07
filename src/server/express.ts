@@ -35,6 +35,7 @@ import type { z, ZodObject, ZodTypeAny } from "zod";
 import { retryableBegin, sql } from "./database.js";
 import cookie from "cookie";
 import type { IncomingMessage, ServerResponse } from "node:http";
+import { defaultHeaders } from "./server-handler.js";
 
 const userMapper = <
   T extends { [k: string]: ZodTypeAny },
@@ -73,20 +74,20 @@ export function requestHandler<P extends keyof typeof routes>(
   response: ServerResponse
   ) => {
     try {
-      if (request.headers[":method"] !== "GET" && request.headers[":method"] !== "POST") {
+      if (request.method !== "GET" && request.method !== "POST") {
         throw new Error("Unsupported http method!");
       }
 
       if (
-        request.headers[":method"] === "POST" &&
+        request.method === "POST" &&
         request.headers["x-csrf-protection"] !== "projektwahl"
       ) {
         throw new Error("No CSRF header!");
       }
 
-      let url = new URL(request.headers[":path"]!, "https://localhost:8443");
+      let url = new URL(request.url, "https://localhost:8443");
       if (
-        request.headers[":method"] === method &&
+        request.method === method &&
         new RegExp(path).test(/** @type {string} */ url.pathname)
       ) {
         let user = undefined;
@@ -96,7 +97,7 @@ export function requestHandler<P extends keyof typeof routes>(
 
           // implementing https://datatracker.ietf.org/doc/html/draft-ietf-httpbis-rfc6265bis-02#section-8.8.2
           session_id =
-          request.headers[":method"] === "GET" ? cookies.lax_id : cookies.strict_id;
+          request.method === "GET" ? cookies.lax_id : cookies.strict_id;
           if (session_id) {
             user = userSchema.parse(
               (
@@ -111,7 +112,7 @@ export function requestHandler<P extends keyof typeof routes>(
         }
 
         const body =
-          request.headers[":method"] === "POST" ? await json(request) : undefined;
+          request.method === "POST" ? await json(request) : undefined;
         const requestBody = zod2result(routes[path].request, body);
         if (requestBody.success) {
           const [new_headers, responseBody] = await handler(
@@ -121,11 +122,16 @@ export function requestHandler<P extends keyof typeof routes>(
           );
           //console.log("responseBody", responseBody);
           routes[path].response.parse(responseBody);
-          response.writeHead(new_headers[":status"], new_headers);
+          const { finalHeaders, ":status": test } = new_headers;
+          response.writeHead(new_headers[":status"], {
+            ...defaultHeaders,
+            ...finalHeaders
+          });
           response.end(JSON.stringify(responseBody));
         } else {
           //console.log(requestBody);
           response.writeHead(200, {
+            ...defaultHeaders,
             "content-type": "text/json; charset=utf-8",
           });
           response.end(JSON.stringify(requestBody));
@@ -135,7 +141,9 @@ export function requestHandler<P extends keyof typeof routes>(
       }
     } catch (error) {
       console.error(error);
-      response.writeHead(200);
+      response.writeHead(200, {
+        ...defaultHeaders,
+      });
       response.end(
         JSON.stringify({
           success: false,
