@@ -87,6 +87,7 @@ export const nextPage = async (url: URL) => {
       const { pwProjects } = await import("./routes/projects/pw-projects.js");
       return await pwProjects(url);
     } else if (url.pathname === "/projects/create") {
+      const { pwProject } = await import("./routes/projects/pw-project-create.js");
       await import("./routes/projects/pw-project-users.js");
       return html`<pw-project-create></pw-project-create>`;
     } else if (/projects\/edit\/\d+/.test(url.pathname)) {
