@@ -24,21 +24,22 @@ import postgres from "postgres";
 import { z } from "zod";
 import { routes } from "../../../lib/routes.js";
 import { sql } from "../../database.js";
-import { request } from "../../express.js";
+import { requestHandler } from "../../express.js";
 import { hashPassword } from "../../password.js";
 import { sql2, unsafe2 } from "../../sql/index.js";
 import { updateField } from "../../entities.js";
+import type { IncomingMessage, ServerResponse } from "node:http";
 
 // TODO FIXME somehow ensure all attributes are read here because this is an easy way to loose data
 // Also ensure create and update has the same attributes
 // TO IMPROVE this maybe return the full column and also read back that data at all places
 
 export async function createOrUpdateUsersHandler(
-  stream: import("http2").ServerHttp2Stream,
-  headers: import("http2").IncomingHttpHeaders
+  request: IncomingMessage,
+  response: ServerResponse
 ) {
   // TODO FIXME create or update multiple
-  return await request(
+  return await requestHandler(
     "POST",
     "/api/v1/users/create-or-update",
     async function (user, loggedInUser) {
@@ -63,7 +64,7 @@ export async function createOrUpdateUsersHandler(
       try {
         const [row] = await sql.begin("READ WRITE", async (sql) => {
           if (user.id) {
-            const field = (name: string) => updateField(user, name);
+            const field = (name: string) => updateField("users_with_deleted", user, name);
 
             const finalQuery = sql2`UPDATE users_with_deleted SET
             ${field("username")},
@@ -81,6 +82,7 @@ export async function createOrUpdateUsersHandler(
             WHERE id = ${
               user.id
             } RETURNING id, project_leader_id, force_in_project_id;`;
+            // TODO FIXME (found using fuzzer) if this tries to update a nonexisting user we should return an error
             return await sql(...finalQuery);
           } else {
             return await sql`INSERT INTO users_with_deleted (username, password_hash, type, "group", age, away, project_leader_id, force_in_project_id, deleted, last_updated_by) VALUES (${
@@ -161,5 +163,5 @@ export async function createOrUpdateUsersHandler(
         ];
       }
     }
-  )(stream, headers);
+  )(request, response);
 }

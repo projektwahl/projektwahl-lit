@@ -20,6 +20,7 @@ https://github.com/projektwahl/projektwahl-lit
 SPDX-License-Identifier: AGPL-3.0-or-later
 SPDX-FileCopyrightText: 2021 Moritz Hedtke <Moritz.Hedtke@t-online.de>
 */
+import type { IncomingMessage, ServerResponse } from "node:http";
 import { z } from "zod";
 import {
   rawUserSchema,
@@ -27,7 +28,7 @@ import {
   rawUserHelperOrAdminSchema,
 } from "../../../lib/routes.js";
 import { fetchData } from "../../entities.js";
-import { request } from "../../express.js";
+import { requestHandler } from "../../express.js";
 import { sql2 } from "../../sql/index.js";
 
 function includes<T, U extends T>(arr: readonly U[], elem: T): elem is U {
@@ -35,10 +36,10 @@ function includes<T, U extends T>(arr: readonly U[], elem: T): elem is U {
 }
 
 export async function usersHandler(
-  stream: import("http2").ServerHttp2Stream,
-  headers: import("http2").IncomingHttpHeaders
+  request: IncomingMessage,
+  response: ServerResponse
 ) {
-  return await request(
+  return await requestHandler(
     "GET",
     "/api/v1/users",
     async function (_, loggedInUser, session_id) {
@@ -65,7 +66,7 @@ export async function usersHandler(
         ];
       }
 
-      const url = new URL(headers[":path"]!, "https://localhost:8443");
+      const url = new URL(request.url!, "https://localhost:8443");
 
       const filters = z
         .object({
@@ -118,7 +119,7 @@ export async function usersHandler(
         "/api/v1/users"
       >(
         "/api/v1/users" as const,
-        headers,
+        request,
         "users_with_deleted",
         columns,
         filters,
@@ -141,5 +142,5 @@ export async function usersHandler(
         }
       );
     }
-  )(stream, headers);
+  )(request, response);
 }

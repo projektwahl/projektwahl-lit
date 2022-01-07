@@ -161,6 +161,4 @@ if ('FormDataEvent' in window) {
   }
 }
 
-customElements.define("pw-form", PwForm);
-
 export { PwForm };

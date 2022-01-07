@@ -25,7 +25,7 @@ import { readFileSync } from "node:fs";
 import "./routes/login/openid-client.js";
 import cluster from "cluster";
 import { watch } from "node:fs/promises";
-import { getDirs } from "./server-handler.js";
+import { getDirs, serverHandler } from "./server-handler.js";
 
 if (cluster.isPrimary) {
   console.log(`Primary is running`);
@@ -60,6 +60,7 @@ if (cluster.isPrimary) {
     })();
   }
 } else {
+
   /*
   openssl req -x509 -newkey rsa:2048 -nodes -sha256 -subj '/CN=localhost' -keyout localhost-privkey.pem -out localhost-cert.pem
   */
@@ -67,30 +68,15 @@ if (cluster.isPrimary) {
   const server = createSecureServer({
     key: readFileSync("localhost-privkey.pem"),
     cert: readFileSync("localhost-cert.pem"),
-  });
-  server.on("error", (err) => console.error(err));
-
-  server.on("stream", async (stream, headers) => {
+    allowHTTP1: true,
+  }, (request, response) => {
     try {
-      await (
-        await import(`./server-handler.js`)
-      ).serverHandler(stream, headers);
+      serverHandler(request, response)
     } catch (error) {
       // don't take down the entire server
       // TODO FIXME try sending a 500 in a try catch
       console.error(error);
     }
-  });
-
-  let sessions: import("node:http2").ServerHttp2Session[] = [];
-
-  server.on("session", (session) => {
-    sessions.push(session);
-
-    session.on("close", () => {
-      // TODO FIXME this is super SLOW
-      sessions = sessions.filter((s) => s === session);
-    });
   });
 
   server.listen(8443, () => {
@@ -106,10 +92,6 @@ if (cluster.isPrimary) {
     if (message === "shutdown") {
       console.log(`[${cluster.worker?.id}] Shutting down`);
       server.close();
-
-      sessions.forEach((session) => {
-        session.close();
-      });
 
       cluster.worker?.removeAllListeners("message");
       cluster.worker?.kill();

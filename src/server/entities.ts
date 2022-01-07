@@ -20,6 +20,7 @@ https://github.com/projektwahl/projektwahl-lit
 SPDX-License-Identifier: AGPL-3.0-or-later
 SPDX-FileCopyrightText: 2021 Moritz Hedtke <Moritz.Hedtke@t-online.de>
 */
+import type { IncomingMessage } from "node:http";
 import type { OutgoingHttpHeaders } from "node:http2";
 import { z, ZodTypeAny } from "zod";
 import { entityRoutes } from "../lib/routes.js";
@@ -41,10 +42,11 @@ type mappedInfer1<R extends keyof typeof entityRoutes> = {
   >]: z.infer<entitesType[R]["response"]["options"][0]["shape"]["data"]>[K];
 };
 
-export function updateField(entity: any, name: string) {
+// TODO FIXME make this function generic over name and entity
+export function updateField(table: string, entity: any, name: string) {
   return sql2`"${unsafe2(name)}" = CASE WHEN ${
     entity[name] !== undefined
-  } THEN ${entity[name] ?? null} ELSE "${unsafe2(name)}" END`;
+  } THEN ${entity[name] ?? null} ELSE "${unsafe2(table)}"."${unsafe2(name)}" END`;
 }
 
 export async function fetchData<
@@ -56,7 +58,7 @@ export async function fetchData<
   R extends keyof typeof entityRoutes
 >(
   path: R,
-  headers: import("http2").IncomingHttpHeaders,
+  request: IncomingMessage,
   table: string,
   columns: readonly [string, ...string[]],
   filters: Q,
@@ -70,7 +72,7 @@ export async function fetchData<
 ): Promise<[OutgoingHttpHeaders, z.infer<typeof entityRoutes[R]["response"]>]> {
   let entitySchema: entitesType[R] = entityRoutes[path];
 
-  const url = new URL(headers[":path"]!, "https://localhost:8443");
+  const url = new URL(request.headers.url, "https://localhost:8443");
 
   const pagination = z
     .object({

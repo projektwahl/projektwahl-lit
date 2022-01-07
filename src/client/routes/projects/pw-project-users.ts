@@ -30,6 +30,7 @@ import "./pw-project-user-checkbox.js";
 import "../../form/pw-input.js";
 import { setupHmr } from "../../hmr.js";
 import { aClick } from "../../pw-a.js";
+import { pwOrder } from "../../entity-list/pw-order.js";
 
 export const pwProjectUsers = async (url: URL) => {
   let result = await taskFunction([url.searchParams]);
@@ -64,15 +65,15 @@ export const PwProjectUsers = setupHmr(
           <th class="table-cell-hover" scope="col">${msg(html`&#x2713;`)}</th>
 
           <th class="table-cell-hover p-0" scope="col">
-            <pw-order name="id" title=${msg("ID")}></pw-order>
+            ${pwOrder({name:"id", title:msg("ID")})}
           </th>
 
           <th class="table-cell-hover p-0" scope="col">
-            <pw-order name="username" title=${msg("Name")}></pw-order>
+            ${pwOrder({name:"username", title:msg("Name")})}
           </th>
 
           <th class="table-cell-hover p-0" scope="col">
-            <pw-order name="type" title=${msg("Type")}></pw-order>
+            ${pwOrder({name:"type", title:msg("Type")})}
           </th>
         </tr>
 

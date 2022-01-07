@@ -21,12 +21,13 @@ SPDX-License-Identifier: AGPL-3.0-or-later
 SPDX-FileCopyrightText: 2021 Moritz Hedtke <Moritz.Hedtke@t-online.de>
 */
 import "../../form/pw-form.js";
-import "../../entity-list/pw-order.js";
 import { html } from "lit";
 import { noChange } from "lit";
 import { aClick } from "../../pw-a.js";
 import { msg } from "@lit/localize";
 import { PwEntityList } from "../../entity-list/pw-entitylist.js";
+import { pwOrder } from "../../entity-list/pw-order.js";
+import { myFetch } from "../../utils.js";
 
 export const pwProjects = async (url: URL) => {
   let result = await taskFunction([url.searchParams]);
@@ -34,19 +35,16 @@ export const pwProjects = async (url: URL) => {
 };
 
 const taskFunction = async ([searchParams]: [URLSearchParams]) => {
-  let response = await fetch(
-    new URL(
+  let response = await myFetch<"/api/v1/projects">(
       `/api/v1/projects?${searchParams}`,
-      window.location.href
-    ).toString(),
     {
       //agent: new Agent({rejectUnauthorized: false})
     }
   );
-  return await response.json();
+  return response;
 };
 
-class PwProjects<T> extends PwEntityList<"/api/v1/projects"> {
+class PwProjects extends PwEntityList<"/api/v1/projects"> {
   constructor() {
     super(taskFunction);
   }
@@ -73,15 +71,15 @@ class PwProjects<T> extends PwEntityList<"/api/v1/projects"> {
                       the only nice way is probably submit buttons that do things like "oder_by_id_asc" and then redirect to the new state (because you need to remove the old state)
                     -->
         <th class="table-cell-hover p-0" scope="col">
-          <pw-order name="id" title=${msg("ID")}></pw-order>
+        ${pwOrder({name:"id", title:msg("ID")})}
         </th>
 
         <th class="table-cell-hover p-0" scope="col">
-          <pw-order name="title" title=${msg("Title")}></pw-order>
+        ${pwOrder({name:"title", title:msg("Title")})}
         </th>
 
         <th class="table-cell-hover p-0" scope="col">
-          <pw-order name="info" title=${msg("Info")}></pw-order>
+        ${pwOrder({name:"info", title:msg("Info")})}
         </th>
 
         <th class="table-cell-hover">${msg("Actions")}</th>

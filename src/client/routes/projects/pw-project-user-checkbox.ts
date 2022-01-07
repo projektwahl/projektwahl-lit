@@ -20,7 +20,7 @@ https://github.com/projektwahl/projektwahl-lit
 SPDX-License-Identifier: AGPL-3.0-or-later
 SPDX-FileCopyrightText: 2021 Moritz Hedtke <Moritz.Hedtke@t-online.de>
 */
-import "../../form/pw-checkbox-input.js";
+import "../../form/pw-input.js";
 import { Task, TaskStatus } from "@lit-labs/task";
 import { html, LitElement } from "lit";
 import { HistoryController } from "../../history-controller.js";
