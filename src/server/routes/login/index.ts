@@ -146,7 +146,6 @@ export async function loginHandler(
           48 * 60 * 60
         };`,
       ],
-      [sensitiveHeaders]: ["set-cookie"],
     };
     return [
       headers,

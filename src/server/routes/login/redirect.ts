@@ -117,7 +117,7 @@ export async function openidRedirectHandler(
       const responseHeaders: import("node:http2").OutgoingHttpHeaders = {
         "content-type": "text/json; charset=utf-8",
         ":status": 302,
-        location: "https://localhost:8443/",
+        location: "/",
         "set-cookie": [
           `strict_id=${
             session.session_id

@@ -122,7 +122,7 @@ export function requestHandler<P extends keyof typeof routes>(
           );
           //console.log("responseBody", responseBody);
           routes[path].response.parse(responseBody);
-          const { finalHeaders, ":status": test } = new_headers;
+          const { ":status": test, ...finalHeaders } = new_headers;
           response.writeHead(new_headers[":status"], {
             ...defaultHeaders,
             ...finalHeaders
