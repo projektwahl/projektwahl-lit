@@ -29,7 +29,15 @@ SPDX-FileCopyrightText: 2021 Moritz Hedtke <Moritz.Hedtke@t-online.de>
   outputs = { self, nixpkgs, flake-utils }:
     flake-utils.lib.eachDefaultSystem
       (system:
-        let pkgs = nixpkgs.legacyPackages.${system}; in
+        let pkgs = import nixpkgs {
+          inherit system;
+          config.permittedInsecurePackages = [
+            "openssl-1.0.2u"
+            "openssl-1.0.2e"
+            "openssl-1.1.1h"
+          ];
+        };
+        in
         {
           devShell = pkgs.mkShell {
             nativeBuildInputs = [
@@ -49,6 +57,7 @@ SPDX-FileCopyrightText: 2021 Moritz Hedtke <Moritz.Hedtke@t-online.de>
               pkgs.openssl
 
               pkgs.zap
+              pkgs.wapiti
               #pkgs.burpsuite
             ];
           };

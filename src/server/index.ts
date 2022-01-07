@@ -27,6 +27,40 @@ import cluster from "cluster";
 import { watch } from "node:fs/promises";
 import { getDirs, serverHandler } from "./server-handler.js";
 
+if (cluster.isPrimary) {
+  console.log(`Primary is running`);
+
+  cluster.fork();
+
+  for await (const f of getDirs("./src/server")) {
+    (async () => {
+      for await (const event of watch(f)) {
+        let oldWorkers = { ...cluster.workers };
+
+        cluster.fork().on("listening", (address) => {
+          for (const id in oldWorkers) {
+            oldWorkers[id]?.send("shutdown", () => {});
+          }
+        });
+      }
+    })();
+  }
+
+  for await (const f of getDirs("./src/lib")) {
+    (async () => {
+      for await (const event of watch(f)) {
+        let oldWorkers = { ...cluster.workers };
+
+        cluster.fork().on("listening", (address) => {
+          for (const id in oldWorkers) {
+            oldWorkers[id]?.send("shutdown", () => {});
+          }
+        });
+      }
+    })();
+  }
+} else {
+
   /*
   openssl req -x509 -newkey rsa:2048 -nodes -sha256 -subj '/CN=localhost' -keyout localhost-privkey.pem -out localhost-cert.pem
   */
@@ -50,6 +84,20 @@ import { getDirs, serverHandler } from "./server-handler.js";
       `[${cluster.worker?.id}] Server started at https://localhost:8443/`
     );
   });
+
+  cluster.worker?.on("message", async (message) => {
+    //let getConnections = promisify(server.getConnections).bind(server)
+    //console.log(await getConnections())
+
+    if (message === "shutdown") {
+      console.log(`[${cluster.worker?.id}] Shutting down`);
+      server.close();
+
+      cluster.worker?.removeAllListeners("message");
+      cluster.worker?.kill();
+    }
+  });
+}
 
 //repl.start({})
 

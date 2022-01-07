@@ -70,9 +70,8 @@ async function replaceAsync(
 export const defaultHeaders = {
   "x-content-type-options": "nosniff",
   "x-frame-options": "DENY",
-  "cache-control": "private",
+  "cache-control": "private, no-cache=\"Set-Cookie\"",
 }
-
 export async function serverHandler(
   request: IncomingMessage,
   response: ServerResponse
