@@ -292,6 +292,7 @@ const project = rawProjectSchema.pick({
   min_participants: true,
   max_participants: true,
   random_assignments: true,
+  deleted: true,
 });
 
 // make every route a result?
