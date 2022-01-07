@@ -27,6 +27,7 @@ import { aClick } from "../../pw-a.js";
 import { msg } from "@lit/localize";
 import { PwEntityList } from "../../entity-list/pw-entitylist.js";
 import { pwOrder } from "../../entity-list/pw-order.js";
+import { myFetch } from "../../utils.js";
 
 export const pwProjects = async (url: URL) => {
   let result = await taskFunction([url.searchParams]);
@@ -34,7 +35,7 @@ export const pwProjects = async (url: URL) => {
 };
 
 const taskFunction = async ([searchParams]: [URLSearchParams]) => {
-  let response = await fetch(
+  let response = await myFetch<"/api/v1/users">(
     new URL(
       `/api/v1/projects?${searchParams}`,
       window.location.href
