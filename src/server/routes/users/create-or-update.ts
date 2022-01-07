@@ -82,6 +82,7 @@ export async function createOrUpdateUsersHandler(
             WHERE id = ${
               user.id
             } RETURNING id, project_leader_id, force_in_project_id;`;
+            // TODO FIXME (found using fuzzer) if this tries to update a nonexisting user we should return an error
             return await sql(...finalQuery);
           } else {
             return await sql`INSERT INTO users_with_deleted (username, password_hash, type, "group", age, away, project_leader_id, force_in_project_id, deleted, last_updated_by) VALUES (${
