@@ -64,7 +64,7 @@ export async function createOrUpdateUsersHandler(
       try {
         const [row] = await sql.begin("READ WRITE", async (sql) => {
           if (user.id) {
-            const field = (name: string) => updateField(user, name);
+            const field = (name: string) => updateField("users_with_deleted", user, name);
 
             const finalQuery = sql2`UPDATE users_with_deleted SET
             ${field("username")},
