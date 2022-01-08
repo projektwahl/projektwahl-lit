@@ -20,7 +20,13 @@ https://github.com/projektwahl/projektwahl-lit
 SPDX-License-Identifier: AGPL-3.0-or-later
 SPDX-FileCopyrightText: 2021 Moritz Hedtke <Moritz.Hedtke@t-online.de>
 */
-import { html, LitElement, noChange, ReactiveElement, TemplateResult } from "lit";
+import {
+  html,
+  LitElement,
+  noChange,
+  ReactiveElement,
+  TemplateResult,
+} from "lit";
 import { bootstrapCss } from "./index.js";
 import { HistoryController } from "./history-controller.js";
 import { aClick } from "./pw-a.js";
@@ -83,11 +89,11 @@ const pages = {
     await import("./routes/users/pw-user-create.js");
     return html`<pw-user-create></pw-user-create>`;
   },
-  "^/users\/edit\/\d+/$": async (url: URL) => {
+  "^/users/edit/d+/$": async (url: URL) => {
     const { pwUser } = await import("./routes/users/pw-user-create.js");
     return await pwUser(Number(url.pathname.match(/^users\/edit\/(\d+)$/)![1]));
   },
-  "^/users\/view\/\d+/$": async (url: URL) => {
+  "^/users/view/d+/$": async (url: URL) => {
     const { pwUser } = await import("./routes/users/pw-user-create.js");
     return await pwUser(
       Number(url.pathname.match(/^users\/view\/(\d+)$/)![1]),
@@ -105,7 +111,7 @@ const pages = {
     await import("./routes/projects/pw-project-users.js");
     return html`<pw-project-create></pw-project-create>`;
   },
-  "^/projects\/edit\/\d+/$": async (url: URL) => {
+  "^/projects/edit/d+/$": async (url: URL) => {
     const { pwProject } = await import(
       "./routes/projects/pw-project-create.js"
     );
@@ -113,7 +119,7 @@ const pages = {
       Number(url.pathname.match(/^projects\/edit\/(\d+)$/)![1])
     );
   },
-  "^/projects\/view\/\d+/$": async (url: URL) => {
+  "^/projects/view/d+/$": async (url: URL) => {
     const { pwProject } = await import(
       "./routes/projects/pw-project-create.js"
     );
@@ -122,7 +128,7 @@ const pages = {
       true
     );
   },
-}
+};
 
 class PwApp extends LitElement {
   static override get properties() {
@@ -168,13 +174,13 @@ class PwApp extends LitElement {
     super();
 
     this.nextPage = async ([key]: [keyof typeof pages | undefined]) => {
-      console.log("newPage")
+      console.log("newPage");
       try {
         if (key) {
           return await pages[key](this.history.url);
         } else {
-          console.log(this.history.url)
-          return msg(html`Not Found`)
+          console.log(this.history.url);
+          return msg(html`Not Found`);
         }
       } catch (error) {
         return html`<div class="alert alert-danger" role="alert">
@@ -199,11 +205,11 @@ class PwApp extends LitElement {
     // if the url changes but not the page I think this should be the responsibility of that page
     // I think this makes sense as otherwise the page would potentially be unloaded and could not react to keyboard input
     // this is especially a problem for the entity lists
-    this._apiTask = new Task(
-      this,
-      this.nextPage,
-      () => [Object.keys(pages).find(k => new RegExp(k).test(this.history.url.pathname))]
-    );
+    this._apiTask = new Task(this, this.nextPage, () => [
+      Object.keys(pages).find((k) =>
+        new RegExp(k).test(this.history.url.pathname)
+      ),
+    ]);
   }
 
   override render() {
