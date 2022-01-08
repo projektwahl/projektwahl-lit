@@ -28,6 +28,7 @@ import { msg } from "@lit/localize";
 import { PwEntityList } from "../../entity-list/pw-entitylist.js";
 import { myFetch } from "../../utils.js";
 import { pwOrder } from "../../entity-list/pw-order.js";
+import { ifDefined } from "lit/directives/if-defined";
 
 export const pwUsers = async (url: URL) => {
   let result = await taskFunction([url.searchParams]);
@@ -38,7 +39,6 @@ export const taskFunction = async ([searchParams]: [URLSearchParams]) => {
   let response = await myFetch<"/api/v1/users">(
     `/api/v1/users?${searchParams}`,
     {
-      //agent: new Agent({rejectUnauthorized: false})
     }
   );
   return response;
@@ -67,6 +67,9 @@ export class PwUsers extends PwEntityList<"/api/v1/users"> {
   }
 
   override get head() {
+    const f_id = this.history.url.searchParams.get("f_id")
+    const f_username = this.history.url.searchParams.get("f_username")
+    const f_type = this.history.url.searchParams.get("f_type");
     return html`<tr>
         <!--
       do not support this without javascript because there is literally zero useful ways to do this useful.
@@ -94,7 +97,7 @@ export class PwUsers extends PwEntityList<"/api/v1/users"> {
             type="text"
             class="form-control"
             id="projects-filter-{name}"
-            value=${this.history.url.searchParams.get("f_id")}
+            value=${ifDefined(f_id === null ? undefined : f_id)}
           />
         </th>
 
@@ -104,7 +107,7 @@ export class PwUsers extends PwEntityList<"/api/v1/users"> {
             type="text"
             class="form-control"
             id="projects-filter-{name}"
-            value=${this.history.url.searchParams.get("f_username")}
+            value=${ifDefined(f_username === null ? undefined : f_username)}
           />
         </th>
 
@@ -114,7 +117,7 @@ export class PwUsers extends PwEntityList<"/api/v1/users"> {
             type="text"
             class="form-control"
             id="projects-filter-{name}"
-            value=${this.history.url.searchParams.get("f_type")}
+            value=${ifDefined(f_type === null ? undefined : f_type)}
           />
         </th>
 

@@ -56,8 +56,6 @@ export async function loginHandler(
     const r =
       await sql`SELECT id, username, password_hash, type FROM users WHERE username = ${body.username} LIMIT 1`;
 
-    console.log(r);
-
     const dbUser = rawUserSchema(
       users(rawUserVoterSchema),
       users(rawUserHelperOrAdminSchema)

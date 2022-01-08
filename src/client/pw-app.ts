@@ -58,12 +58,12 @@ ReactiveElement.enableWarning?.("change-in-update");
 
 // TODO FIXME create a pw-app directive that can be awaited on the server side.
 // so we actually get server side rendering with datae
-
+/*
 export const pwApp = async (url: URL) => {
   let page = await nextPage(url);
   return html`<pw-app .initial=${Promise.resolve(page)}></pw-app>`;
 };
-
+*/
 function identity<
   T extends {
     [r: string]: (url: URL) => Promise<TemplateResult<any>>;
@@ -149,25 +149,18 @@ class PwApp extends LitElement {
 
   private popstateListener: (this: Window, ev: PopStateEvent) => void;
 
-  private navigateListener: (
-    this: Window,
-    event: CustomEvent<{ url: URL; state: HistoryState }>
-  ) => void;
-
-  protected _apiTask!: Task<[URLSearchParams], TemplateResult>;
+  protected _apiTask!: Task<[keyof typeof pages | undefined], TemplateResult>;
 
   nextPage: any;
 
   override connectedCallback(): void {
     super.connectedCallback();
     window.addEventListener("popstate", this.popstateListener);
-    window.addEventListener("navigate", this.navigateListener);
   }
 
   override disconnectedCallback(): void {
     super.disconnectedCallback();
     window.removeEventListener("popstate", this.popstateListener!);
-    window.removeEventListener("navigate", this.navigateListener!);
   }
 
   constructor() {

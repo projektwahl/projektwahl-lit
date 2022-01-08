@@ -22,7 +22,7 @@ SPDX-FileCopyrightText: 2021 Moritz Hedtke <Moritz.Hedtke@t-online.de>
 */
 import type { IncomingMessage } from "node:http";
 import type { OutgoingHttpHeaders } from "node:http2";
-import { z, ZodTypeAny } from "zod";
+import { z } from "zod";
 import { entityRoutes } from "../lib/routes.js";
 import type { BaseQuery } from "../lib/types.js";
 import { sql } from "./database.js";
@@ -35,14 +35,13 @@ type entitesType = {
   [K in keyof typeof entityRoutes]: typeof entityRoutes[K];
 };
 
-// { entities: z.TypeOf<entitesType[R]["response"]["options"][0]["shape"]["data"]>["entities"]; nextCursor: z.TypeOf<entitesType[R]["response"]["options"][0]["shape"]["data"]>["nextCursor"]; previousCursor: z.TypeOf<entitesType[R]["response"]["options"][0]["shape"]["data"]>["previousCursor"]; }
 type mappedInfer1<R extends keyof typeof entityRoutes> = {
   [K in keyof z.infer<
     entitesType[R]["response"]["options"][0]["shape"]["data"]
   >]: z.infer<entitesType[R]["response"]["options"][0]["shape"]["data"]>[K];
 };
 
-// TODO FIXME make this function generic over name and entity
+// TODO FIXME make this function generic over name and entity here
 export function updateField(table: string, entity: any, name: string) {
   return sql2`"${unsafe2(name)}" = CASE WHEN ${
     entity[name] !== undefined
@@ -108,7 +107,7 @@ export async function fetchData<
     .array(z.tuple([z.enum(columns), z.enum(["ASC", "DESC"])]))
     .parse(url.searchParams.getAll("order").map((o) => o.split("-")));
 
-  // TODO FIXMe remove this useless struct
+  // TODO FIXME remove this useless struct
   let _query: BaseQuery<T> = {
     paginationCursor: pagination.p_cursor,
     paginationDirection: pagination.p_direction,

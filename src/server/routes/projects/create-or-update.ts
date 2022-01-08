@@ -27,8 +27,6 @@ import { requestHandler } from "../../express.js";
 import { sql2 } from "../../sql/index.js";
 import type { IncomingMessage, ServerResponse } from "node:http";
 
-// TODO FIXME you can accidentialy create instead of update if you forget to pass the id. maybe force id and setting it to null means creation.
-
 export async function createOrUpdateProjectsHandler(
   request: IncomingMessage,
   response: ServerResponse

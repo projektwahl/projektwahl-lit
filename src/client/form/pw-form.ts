@@ -41,10 +41,8 @@ class PwForm<P extends keyof typeof routes> extends LitElement {
 
   _task!: import("@lit-labs/task").Task<
     any,
-    import("zod").infer<typeof import("../../lib/result.js").anyResult>
+    import("zod").infer<typeof import("../../lib/result.js").anyResult> // TODO FIXME
   >;
-
-  fakeSlot!: import("lit").TemplateResult;
 
   form: import("lit/directives/ref").Ref<HTMLFormElement>;
 

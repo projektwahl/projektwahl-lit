@@ -197,9 +197,6 @@ export class PwEntityList<
             <thead>
               ${this.head}
             </thead>
-
-            <!-- TODO FIXME add loading indicator overlay -->
-
             <tbody>
               ${this.body}
             </tbody>

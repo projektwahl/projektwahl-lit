@@ -23,7 +23,6 @@ SPDX-FileCopyrightText: 2021 Moritz Hedtke <Moritz.Hedtke@t-online.de>
 import { html, literal } from "lit/static-html.js";
 import { LitElement, noChange } from "lit";
 import { bootstrapCss } from "../index.js";
-import { HistoryController } from "../history-controller.js";
 import { ifDefined } from "lit/directives/if-defined.js";
 import { msg } from "@lit/localize";
 import { createRef, ref } from "lit/directives/ref.js";
@@ -96,8 +95,6 @@ export class PwInput<T, Q extends keyof T> extends LitElement {
 
   randomId;
 
-  private history;
-
   label!: string;
 
   name!: Q;
@@ -108,7 +105,7 @@ export class PwInput<T, Q extends keyof T> extends LitElement {
 
   task!: import("@lit-labs/task").Task<
     any,
-    import("zod").infer<typeof import("../../lib/result.js").anyResult>
+    import("zod").infer<typeof import("../../lib/result.js").anyResult> // TODO FIXME
   >;
 
   initial: T | undefined;
@@ -125,8 +122,6 @@ export class PwInput<T, Q extends keyof T> extends LitElement {
     super();
     this.randomId = "id" + Math.random().toString().replace(".", "");
 
-    this.history = new HistoryController(this, /.*/);
-
     this.type = "text";
 
     this.input = createRef();
@@ -138,8 +133,6 @@ export class PwInput<T, Q extends keyof T> extends LitElement {
   }
 
   myformdataEventListener = (event: CustomEvent) => {
-    console.log(this);
-    console.log(this.input);
     if (this.type === "number") {
       event.detail[this.name] =
         this.input.value?.value === "" ? null : this.input.value?.valueAsNumber;
@@ -214,7 +207,7 @@ export class PwInput<T, Q extends keyof T> extends LitElement {
           ${
             this.type === "select"
               ? repeat(
-                  this.options,
+                  this.options!,
                   (o) => o.value,
                   (o) =>
                     html`<option

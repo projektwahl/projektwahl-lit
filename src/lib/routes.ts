@@ -295,7 +295,6 @@ const project = rawProjectSchema.pick({
   deleted: true,
 });
 
-// make every route a result?
 export const routes = identity({
   "/api/v1/logout": {
     request: z.any(),

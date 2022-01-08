@@ -72,6 +72,7 @@ export const defaultHeaders = {
   "x-frame-options": "DENY",
   "cache-control": "private, no-cache",
 };
+
 export async function serverHandler(
   request: IncomingMessage,
   response: ServerResponse

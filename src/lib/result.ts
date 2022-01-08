@@ -59,8 +59,6 @@ export const result = <
   s: ZodType<Output, Def, Input>
 ) => z.union([successResult(s), failureResult(z.record(z.string()))]);
 
-export const anyResult = result(z.object({}));
-
 export const zod2result = <T extends z.ZodTypeAny>(
   schema: T,
   input: unknown

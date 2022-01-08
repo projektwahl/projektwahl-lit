@@ -46,9 +46,6 @@ export async function usersHandler(
       // helper is allowed to read the normal data
       // voter is not allowed to do anything
 
-      console.log(loggedInUser);
-      console.log(session_id);
-
       if (
         !(loggedInUser?.type === "admin" || loggedInUser?.type === "helper")
       ) {

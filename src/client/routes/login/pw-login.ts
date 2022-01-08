@@ -36,7 +36,6 @@ class PwLogin extends PwForm<"/api/v1/login"> {
       ...super.properties,
       url: { attribute: false },
       actionText: { type: String },
-      data: { attribute: false },
       _task: { state: true },
     };
   }
@@ -48,9 +47,6 @@ class PwLogin extends PwForm<"/api/v1/login"> {
   constructor() {
     super();
 
-    /**
-     * @override
-     */
     this._task = new Task(this, async () => {
       const formDataEvent = new CustomEvent("myformdata", {
         bubbles: true,
@@ -72,20 +68,8 @@ class PwLogin extends PwForm<"/api/v1/login"> {
       }
 
       return result;
-      /*// https://lit.dev/docs/components/events/#dispatching-events
-        const resultEvent = new CustomEvent("form-result", {
-          detail: this.result,
-          bubbles: true,
-          composed: true,
-        });
-        this.dispatchEvent(resultEvent);
-        */
     });
   }
-
-  /** @override static styles = css`h3 {
-    color: blue;
-  }`*/
 
   override getInputs() {
     return html` <a
@@ -105,16 +89,15 @@ class PwLogin extends PwForm<"/api/v1/login"> {
         task: this._task,
       })}
       ${pwInput({
-        type: "text",
+        type: "password",
         label: msg("Password"),
         name: "password",
-        type: "password",
         autocomplete: "current-password",
         task: this._task,
       })}`;
   }
 
-  override submit = (/** @type {SubmitEvent} */ event: SubmitEvent) => {
+  override submit = (event: SubmitEvent) => {
     event.preventDefault();
 
     this._task.run();
@@ -124,8 +107,7 @@ class PwLogin extends PwForm<"/api/v1/login"> {
 customElements.define("pw-login", PwLogin);
 
 export const pwLogin = async (): Promise<import("lit").TemplateResult> => {
-  const content = 0; //await myFetch<"/api/v1/sleep">("/api/v1/sleep").then((r) => r.text());
-  return html`<pw-login .data=${content}></pw-login>`;
+  return html`<pw-login></pw-login>`;
 };
 
 export { PwLogin };

@@ -57,10 +57,6 @@ const userSchema = rawUserSchema(
   userMapper(rawUserHelperOrAdminSchema)
 ).optional();
 
-const sleep = (milliseconds) => {
-  return new Promise((resolve) => setTimeout(resolve, milliseconds));
-};
-
 export function requestHandler<P extends keyof typeof routes>(
   method: string,
   path: P,
@@ -72,8 +68,6 @@ export function requestHandler<P extends keyof typeof routes>(
 ): (request: IncomingMessage, response: ServerResponse) => Promise<boolean> {
   let fn = async (request: IncomingMessage, response: ServerResponse) => {
     try {
-      await sleep(Math.random() * 1000);
-
       if (request.method !== "GET" && request.method !== "POST") {
         throw new Error("Unsupported http method!");
       }
@@ -85,7 +79,7 @@ export function requestHandler<P extends keyof typeof routes>(
         throw new Error("No CSRF header!");
       }
 
-      let url = new URL(request.url, "https://localhost:8443");
+      let url = new URL(request.url!, "https://localhost:8443");
       if (
         request.method === method &&
         new RegExp(path).test(/** @type {string} */ url.pathname)

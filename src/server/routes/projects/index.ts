@@ -22,7 +22,6 @@ SPDX-FileCopyrightText: 2021 Moritz Hedtke <Moritz.Hedtke@t-online.de>
 */
 import { z } from "zod";
 import type { rawProjectSchema } from "../../../lib/routes.js";
-import { sql } from "../../database.js";
 import { fetchData } from "../../entities.js";
 import { requestHandler } from "../../express.js";
 import { sql2 } from "../../sql/index.js";
@@ -60,7 +59,7 @@ export async function projectsHandler(
         ];
       }
 
-      const url = new URL(request.url, "https://localhost:8443");
+      const url = new URL(request.url!, "https://localhost:8443");
 
       const filters = z
         .object({

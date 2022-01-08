@@ -28,6 +28,7 @@ import { msg } from "@lit/localize";
 import { PwEntityList } from "../../entity-list/pw-entitylist.js";
 import { pwOrder } from "../../entity-list/pw-order.js";
 import { myFetch } from "../../utils.js";
+import { ifDefined } from "lit/directives/if-defined";
 
 export const pwProjects = async (url: URL) => {
   let result = await taskFunction([url.searchParams]);
@@ -38,7 +39,6 @@ const taskFunction = async ([searchParams]: [URLSearchParams]) => {
   let response = await myFetch<"/api/v1/projects">(
     `/api/v1/projects?${searchParams}`,
     {
-      //agent: new Agent({rejectUnauthorized: false})
     }
   );
   return response;
@@ -64,6 +64,9 @@ class PwProjects extends PwEntityList<"/api/v1/projects"> {
   }
 
   override get head() {
+    const f_id = this.history.url.searchParams.get("f_id");
+    const f_title = this.history.url.searchParams.get("f_title");
+    const f_info = this.history.url.searchParams.get("f_info");
     return html`
       <tr>
         <!--
@@ -92,7 +95,7 @@ class PwProjects extends PwEntityList<"/api/v1/projects"> {
             type="text"
             class="form-control"
             id="projects-filter-{name}"
-            value=${this.history.url.searchParams.get("f_id")}
+            value=${ifDefined(f_id === null ? undefined : f_id)}
           />
         </th>
 
@@ -102,7 +105,7 @@ class PwProjects extends PwEntityList<"/api/v1/projects"> {
             type="text"
             class="form-control"
             id="projects-filter-{name}"
-            value=${this.history.url.searchParams.get("f_title")}
+            value=${ifDefined(f_title === null ? undefined : f_title)}
           />
         </th>
 
@@ -112,7 +115,7 @@ class PwProjects extends PwEntityList<"/api/v1/projects"> {
             type="text"
             class="form-control"
             id="projects-filter-{name}"
-            value=${this.history.url.searchParams.get("f_info")}
+            value=${ifDefined(f_info === null ? undefined : f_info)}
           />
         </th>
 
