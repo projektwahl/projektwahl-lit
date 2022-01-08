@@ -27,21 +27,11 @@ import { msg, str } from "@lit/localize";
 
 // workaround see https://github.com/runem/lit-analyzer/issues/149#issuecomment-1006162839
 export function pwOrder<T, Q extends keyof T>(
-  props: Pick<
-    PwOrder<T, Q>,
-    "name" | "title"
-  >
+  props: Pick<PwOrder<T, Q>, "name" | "title">
 ) {
-  let {
-    name,
-    title,
-    ...rest
-  } = props;
+  let { name, title, ...rest } = props;
   rest = {}; // ensure no property is missed
-  return html`<pw-order
-    .name=${name}
-    title=${title}
-  ></pw-order>`;
+  return html`<pw-order .name=${name} title=${title}></pw-order>`;
 }
 
 export class PwOrder<T, Q extends keyof T> extends LitElement {

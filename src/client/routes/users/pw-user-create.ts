@@ -172,6 +172,7 @@ class PwUserCreate extends PwForm<"/api/v1/users/create-or-update"> {
               label: msg("Password"),
               name: "password",
               task: this._task,
+              autocomplete: "new-password",
               initial: this.initial,
             })}
           `

@@ -36,7 +36,7 @@ export const pwProjects = async (url: URL) => {
 
 const taskFunction = async ([searchParams]: [URLSearchParams]) => {
   let response = await myFetch<"/api/v1/projects">(
-      `/api/v1/projects?${searchParams}`,
+    `/api/v1/projects?${searchParams}`,
     {
       //agent: new Agent({rejectUnauthorized: false})
     }
@@ -71,15 +71,15 @@ class PwProjects extends PwEntityList<"/api/v1/projects"> {
                       the only nice way is probably submit buttons that do things like "oder_by_id_asc" and then redirect to the new state (because you need to remove the old state)
                     -->
         <th class="table-cell-hover p-0" scope="col">
-        ${pwOrder({name:"id", title:msg("ID")})}
+          ${pwOrder({ name: "id", title: msg("ID") })}
         </th>
 
         <th class="table-cell-hover p-0" scope="col">
-        ${pwOrder({name:"title", title:msg("Title")})}
+          ${pwOrder({ name: "title", title: msg("Title") })}
         </th>
 
         <th class="table-cell-hover p-0" scope="col">
-        ${pwOrder({name:"info", title:msg("Info")})}
+          ${pwOrder({ name: "info", title: msg("Info") })}
         </th>
 
         <th class="table-cell-hover">${msg("Actions")}</th>

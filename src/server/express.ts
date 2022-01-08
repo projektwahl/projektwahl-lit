@@ -57,6 +57,10 @@ const userSchema = rawUserSchema(
   userMapper(rawUserHelperOrAdminSchema)
 ).optional();
 
+const sleep = (milliseconds) => {
+  return new Promise((resolve) => setTimeout(resolve, milliseconds));
+};
+
 export function requestHandler<P extends keyof typeof routes>(
   method: string,
   path: P,
@@ -65,15 +69,11 @@ export function requestHandler<P extends keyof typeof routes>(
     user: z.infer<typeof userSchema>,
     session_id: string | undefined
   ) => Promise<[OutgoingHttpHeaders, z.infer<typeof routes[P]["response"]>]>
-): (
-  request: IncomingMessage,
-  response: ServerResponse
-) => Promise<boolean> {
-  let fn = async (
-    request: IncomingMessage,
-  response: ServerResponse
-  ) => {
+): (request: IncomingMessage, response: ServerResponse) => Promise<boolean> {
+  let fn = async (request: IncomingMessage, response: ServerResponse) => {
     try {
+      await sleep(Math.random() * 1000);
+
       if (request.method !== "GET" && request.method !== "POST") {
         throw new Error("Unsupported http method!");
       }
@@ -97,7 +97,7 @@ export function requestHandler<P extends keyof typeof routes>(
 
           // implementing https://datatracker.ietf.org/doc/html/draft-ietf-httpbis-rfc6265bis-02#section-8.8.2
           session_id =
-          request.method === "GET" ? cookies.lax_id : cookies.strict_id;
+            request.method === "GET" ? cookies.lax_id : cookies.strict_id;
           if (session_id) {
             user = userSchema.parse(
               (
@@ -125,7 +125,7 @@ export function requestHandler<P extends keyof typeof routes>(
           const { ":status": test, ...finalHeaders } = new_headers;
           response.writeHead(new_headers[":status"], {
             ...defaultHeaders,
-            ...finalHeaders
+            ...finalHeaders,
           });
           response.end(JSON.stringify(responseBody));
         } else {

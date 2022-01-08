@@ -98,21 +98,18 @@ export class PwEntityList<
     if (this.initialRender) {
       this.initialRender = false;
 
-      // TODO FIXME because of page navigation this currently loads twice
-      // TODO FIXME somehow debounce (as we currently do a full navigation this probably has to be done somewhere else)
-      // TODO FIXME probably just completely remove and let page navigation do this
-      this._apiTask = new Task(
-        this,
-        this.taskFunction,
-        () => [this.history.url.searchParams] as [URLSearchParams]
-      );
+      this._apiTask = new Task(this, {
+        task: this.taskFunction,
+        args: () => [this.history.url.searchParams] as [URLSearchParams],
+        autoRun: false, // TODO FIXME this would be way simpler if there would be a no first run or so
+      });
 
       if (this.initial !== undefined) {
         // TODO FIXME goddammit the private attributes get minified
         this._apiTask.status = TaskStatus.COMPLETE;
-        console.log(this._apiTask)
         // @ts-expect-error See https://github.com/lit/lit/issues/2367
         this._apiTask.p = this.initial;
+        // TODO FIXMe if we set the currentArgs here somehow I think this may work
       }
     }
 
@@ -120,16 +117,18 @@ export class PwEntityList<
       ${bootstrapCss}
       <div class="container">
         <div
-          style="position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);"
+          style="position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 1337;"
         >
-          ${
-            /*true
-          ? ""
-          : html`<div class="spinner-grow text-primary" role="status">
-              <span class="visually-hidden">Loading...</span>
-        </div>`*/ ""
-          }
+          ${this._apiTask.render({
+            pending: () => html`<div
+              class="spinner-grow text-primary"
+              role="status"
+            >
+              <span class="visually-hidden">${msg("Loading...")}</span>
+            </div>`,
+          })}
         </div>
+
         <h1 class="text-center">${this.title}</h1>
         <div class="row justify-content-between">
           <div class="col-auto">${this.buttons}</div>
@@ -142,6 +141,7 @@ export class PwEntityList<
                   (event.target as HTMLSelectElement).value
                 );
                 HistoryController.goto(url, {});
+                this._apiTask.run();
               }}
               .value=${this.history.url.searchParams.get("p_limit") ?? "10"}
               class="form-select"
@@ -189,6 +189,7 @@ export class PwEntityList<
               new URL(`?${urlSearchParams}`, window.location.href),
               {}
             );
+            this._apiTask.run();
           }}
           @submit=${(e: Event) => e.preventDefault()}
         >
@@ -229,6 +230,7 @@ export class PwEntityList<
                         }
                         url.searchParams.set("p_direction", "backwards");
                         HistoryController.goto(url, {});
+                        this._apiTask.run();
                       }}
                       class="page-link"
                       href="/"
@@ -262,6 +264,7 @@ export class PwEntityList<
                         }
                         url.searchParams.set("p_direction", "forwards");
                         HistoryController.goto(url, {});
+                        this._apiTask.run();
                       }}
                       class="page-link"
                       href="/"

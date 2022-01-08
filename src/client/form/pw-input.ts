@@ -104,7 +104,7 @@ export class PwInput<T, Q extends keyof T> extends LitElement {
 
   type: "text" | "password" | "number" | "checkbox" | "select";
 
-  autocomplete?: "username" | "current-password";
+  autocomplete?: "username" | "current-password" | "new-password";
 
   task!: import("@lit-labs/task").Task<
     any,
@@ -227,6 +227,29 @@ export class PwInput<T, Q extends keyof T> extends LitElement {
               : undefined
           }
         </${this.type === "select" ? literal`select` : literal`input`}>
+        ${
+          this.autocomplete === "new-password"
+            ? html`<div id="passwordHelp" class="form-text">
+                <a
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  href="https://imgs.xkcd.com/comics/password_strength.png"
+                  >${msg(
+                    "Denk dran: Lange Passwörter sind viel sicherer als welche mit vielen Sonderzeichen."
+                  )}</a
+                ><br />
+                ${msg(html` Also lieber "Ich mag fliegende Autos." anstatt
+                  "Moritz1234!".<br />Du kannst auch einen Passwort-Manager
+                  verwenden, z.B.`)}
+                <a
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  href="https://bitwarden.com/download/"
+                  >${msg("Bitwarden")}</a
+                >
+              </div>`
+            : undefined
+        }
         ${
           this.type === "checkbox"
             ? html`<label for=${this.randomId} class="form-check-label"
