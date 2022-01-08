@@ -24,7 +24,6 @@ import { html, LitElement, noChange, ReactiveElement, TemplateResult } from "lit
 import { bootstrapCss } from "./index.js";
 import { HistoryController } from "./history-controller.js";
 import { aClick } from "./pw-a.js";
-import { setupHmr } from "./hmr.js";
 import jscookie from "js-cookie";
 import { msg, str } from "@lit/localize";
 //import { sourceLocale, targetLocales } from "./generated_locales/locales.js";
@@ -59,63 +58,71 @@ export const pwApp = async (url: URL) => {
   return html`<pw-app .initial=${Promise.resolve(page)}></pw-app>`;
 };
 
-export const nextPage = async (url: URL) => {
-  try {
-    if (url.pathname === "/") {
-      await import("./routes/pw-welcome.js");
-      return html`<pw-welcome></pw-welcome>`;
-    } else if (url.pathname === "/login") {
-      //setLocale("de");
-      const { pwLogin } = await import("./routes/login/pw-login.js");
-      return await pwLogin();
-    } else if (url.pathname === "/users") {
-      const { pwUsers } = await import("./routes/users/pw-users.js");
-      return await pwUsers(url);
-    } else if (url.pathname === "/users/create") {
-      await import("./routes/users/pw-user-create.js");
-      return html`<pw-user-create></pw-user-create>`;
-    } else if (/users\/edit\/\d+/.test(url.pathname)) {
-      const { pwUser } = await import("./routes/users/pw-user-create.js");
-      return await pwUser(Number(url.pathname.match(/users\/edit\/(\d+)/)![1]));
-    } else if (/users\/view\/\d+/.test(url.pathname)) {
-      const { pwUser } = await import("./routes/users/pw-user-create.js");
-      return await pwUser(
-        Number(url.pathname.match(/users\/view\/(\d+)/)![1]),
-        true
-      );
-    } else if (url.pathname === "/projects") {
-      const { pwProjects } = await import("./routes/projects/pw-projects.js");
-      return await pwProjects(url);
-    } else if (url.pathname === "/projects/create") {
-      const { pwProject } = await import(
-        "./routes/projects/pw-project-create.js"
-      );
-      await import("./routes/projects/pw-project-users.js");
-      return html`<pw-project-create></pw-project-create>`;
-    } else if (/projects\/edit\/\d+/.test(url.pathname)) {
-      const { pwProject } = await import(
-        "./routes/projects/pw-project-create.js"
-      );
-      return await pwProject(
-        Number(url.pathname.match(/projects\/edit\/(\d+)/)![1])
-      );
-    } else if (/projects\/view\/\d+/.test(url.pathname)) {
-      const { pwProject } = await import(
-        "./routes/projects/pw-project-create.js"
-      );
-      return await pwProject(
-        Number(url.pathname.match(/projects\/view\/(\d+)/)![1]),
-        true
-      );
-    } else {
-      return msg(html`Not Found`);
-    }
-  } catch (error) {
-    return html`<div class="alert alert-danger" role="alert">
-      ${msg(str`Error: ${error}`)}
-    </div>`;
+function identity<
+  T extends {
+    [r: string]: (url: URL) => Promise<TemplateResult<any>>;
   }
-};
+>(v: T) {
+  return v;
+}
+
+const pages = {
+  "^/$": async () => {
+    await import("./routes/pw-welcome.js");
+    return html`<pw-welcome></pw-welcome>`;
+  },
+  "^/login$": async () => {
+    const { pwLogin } = await import("./routes/login/pw-login.js");
+    return await pwLogin();
+  },
+  "^/users$": async (url: URL) => {
+    const { pwUsers } = await import("./routes/users/pw-users.js");
+    return await pwUsers(url);
+  },
+  "^/users/create$": async () => {
+    await import("./routes/users/pw-user-create.js");
+    return html`<pw-user-create></pw-user-create>`;
+  },
+  "^/users\/edit\/\d+/$": async (url: URL) => {
+    const { pwUser } = await import("./routes/users/pw-user-create.js");
+    return await pwUser(Number(url.pathname.match(/^users\/edit\/(\d+)$/)![1]));
+  },
+  "^/users\/view\/\d+/$": async (url: URL) => {
+    const { pwUser } = await import("./routes/users/pw-user-create.js");
+    return await pwUser(
+      Number(url.pathname.match(/^users\/view\/(\d+)$/)![1]),
+      true
+    );
+  },
+  "^/projects$": async (url: URL) => {
+    const { pwProjects } = await import("./routes/projects/pw-projects.js");
+    return await pwProjects(url);
+  },
+  "^/projects/create$": async () => {
+    const { pwProject } = await import(
+      "./routes/projects/pw-project-create.js"
+    );
+    await import("./routes/projects/pw-project-users.js");
+    return html`<pw-project-create></pw-project-create>`;
+  },
+  "^/projects\/edit\/\d+/$": async (url: URL) => {
+    const { pwProject } = await import(
+      "./routes/projects/pw-project-create.js"
+    );
+    return await pwProject(
+      Number(url.pathname.match(/^projects\/edit\/(\d+)$/)![1])
+    );
+  },
+  "^/projects\/view\/\d+/$": async (url: URL) => {
+    const { pwProject } = await import(
+      "./routes/projects/pw-project-create.js"
+    );
+    return await pwProject(
+      Number(url.pathname.match(/^projects\/view\/(\d+)$/)![1]),
+      true
+    );
+  },
+}
 
 class PwApp extends LitElement {
   static override get properties() {
@@ -143,6 +150,8 @@ class PwApp extends LitElement {
 
   protected _apiTask!: Task<[URLSearchParams], TemplateResult>;
 
+  nextPage: any;
+
   override connectedCallback(): void {
     super.connectedCallback();
     window.addEventListener("popstate", this.popstateListener);
@@ -157,6 +166,22 @@ class PwApp extends LitElement {
 
   constructor() {
     super();
+
+    this.nextPage = async ([key]: [keyof typeof pages | undefined]) => {
+      console.log("newPage")
+      try {
+        if (key) {
+          return await pages[key](this.history.url);
+        } else {
+          console.log(this.history.url)
+          return msg(html`Not Found`)
+        }
+      } catch (error) {
+        return html`<div class="alert alert-danger" role="alert">
+          ${msg(str`Error: ${error}`)}
+        </div>`;
+      }
+    };
 
     this.popstateListener = (event: PopStateEvent) => {
       const url = new URL(window.location.href);
@@ -176,8 +201,8 @@ class PwApp extends LitElement {
     // this is especially a problem for the entity lists
     this._apiTask = new Task(
       this,
-      ([url]) => nextPage(url),
-      () => [this.history.url] as [URL]
+      this.nextPage,
+      () => [Object.keys(pages).find(k => new RegExp(k).test(this.history.url.pathname))]
     );
   }
 
