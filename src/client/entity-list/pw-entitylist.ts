@@ -103,8 +103,11 @@ export class PwEntityList<
       // TODO FIXME probably just completely remove and let page navigation do this
       this._apiTask = new Task(
         this,
-        this.taskFunction,
-        () => [this.history.url.searchParams] as [URLSearchParams]
+        {
+          task: this.taskFunction,
+          args: () => [this.history.url.searchParams] as [URLSearchParams],
+          autoRun: false
+        }
       );
 
       if (this.initial !== undefined) {
