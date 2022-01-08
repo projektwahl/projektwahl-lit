@@ -72,7 +72,7 @@ export async function fetchData<
 ): Promise<[OutgoingHttpHeaders, z.infer<typeof entityRoutes[R]["response"]>]> {
   let entitySchema: entitesType[R] = entityRoutes[path];
 
-  const url = new URL(request.headers.url, "https://localhost:8443");
+  const url = new URL(request.url!, "https://localhost:8443");
 
   const pagination = z
     .object({
