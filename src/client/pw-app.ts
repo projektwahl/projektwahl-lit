@@ -20,16 +20,16 @@ https://github.com/projektwahl/projektwahl-lit
 SPDX-License-Identifier: AGPL-3.0-or-later
 SPDX-FileCopyrightText: 2021 Moritz Hedtke <Moritz.Hedtke@t-online.de>
 */
-import { html, LitElement, ReactiveElement } from "lit";
+import { html, LitElement, noChange, ReactiveElement, TemplateResult } from "lit";
 import { bootstrapCss } from "./index.js";
 import { HistoryController } from "./history-controller.js";
 import { aClick } from "./pw-a.js";
-import { until } from "lit/directives/until.js";
 import { setupHmr } from "./hmr.js";
 import jscookie from "js-cookie";
 import { msg, str } from "@lit/localize";
 //import { sourceLocale, targetLocales } from "./generated_locales/locales.js";
 import { myFetch } from "./utils.js";
+import { Task, TaskStatus } from "@lit-labs/task";
 
 /**export const { getLocale, setLocale } = configureLocalization({
   sourceLocale,
@@ -118,186 +118,197 @@ export const nextPage = async (url: URL) => {
 };
 
 class PwApp extends LitElement {
-    static override get properties() {
-      return {
-        last: { state: true },
-        current: { state: true },
-        initial: { attribute: false },
-        initialUsed: { state: true },
-        navbarOpen: { state: true }
-      };
-    }
-
-    private last: Promise<import("lit").TemplateResult> | undefined;
-
-    private history;
-
-    private current: Promise<import("lit").TemplateResult> | undefined;
-
-    initialUsed: boolean;
-
-    initial: Promise<import("lit").TemplateResult> | undefined;
-
-    navbarOpen: boolean;
-
-    private popstateListener: (this: Window, ev: PopStateEvent) => void;
-
-    private navigateListener: (
-      this: Window,
-      event: CustomEvent<{ url: URL; state: HistoryState }>
-    ) => void;
-
-    override connectedCallback(): void {
-      super.connectedCallback()
-      window.addEventListener("popstate", this.popstateListener);
-      window.addEventListener("navigate", this.navigateListener);
-    }
-
-    override disconnectedCallback(): void {
-      super.disconnectedCallback()
-      window.removeEventListener("popstate", this.popstateListener!);
-      window.removeEventListener("navigate", this.navigateListener!);
-    }
-
-    constructor() {
-      super();
-
-      this.popstateListener = (event: PopStateEvent) => {
-        const url = new URL(window.location.href);
-        const state = /** @type {HistoryState} */ event.state;
-        HistoryController.goto(url, state);
-      };
-
-      this.navbarOpen = false;
-
-      this.history = new HistoryController(this, /.*/);
-
-      this.initialUsed = false;
-    }
-
-    override render() {
-      if (this.initial !== undefined && !this.initialUsed) {
-        this.initialUsed = true;
-        this.current = this.initial;
-      } else {
-        this.current = nextPage(this.history.url);
-      }
-      return html`
-        ${bootstrapCss}
-        <nav
-          class="navbar navbar-expand-lg navbar-light bg-light shadow p-3 mb-5"
-        >
-          <div class="container-fluid">
-            <a @click=${aClick} class="navbar-brand" href="/"
-              >${msg("Projektwahl")}</a
-            >
-            <button
-              class="navbar-toggler"
-              type="button"
-              data-bs-toggle="collapse"
-              data-bs-target="#navbarSupportedContent"
-              aria-controls="navbarSupportedContent"
-              aria-expanded="false"
-              aria-label=${msg("Toggle navigation")}
-              @click=${() => this.navbarOpen = !this.navbarOpen}
-            >
-              <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse ${this.navbarOpen ? "show" : ""}" id="navbarSupportedContent">
-              <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-                <li class="nav-item">
-                  <a
-                    @click=${aClick}
-                    class="nav-link ${this.history.url.pathname === "/"
-                      ? "active"
-                      : ""}"
-                    aria-current="page"
-                    href="/"
-                    >${msg("Home")}</a
-                  >
-                </li>
-                <li class="nav-item">
-                  <a
-                    @click=${aClick}
-                    class="nav-link ${this.history.url.pathname === "/users"
-                      ? "active"
-                      : ""}"
-                    href="/users"
-                    >${msg("Accounts")}</a
-                  >
-                </li>
-                <li>
-                  <a
-                    @click=${aClick}
-                    class="nav-link ${this.history.url.pathname === "/projects"
-                      ? "active"
-                      : ""}"
-                    href="/projects"
-                    >${msg("Projects")}</a
-                  >
-                </li>
-                <li>
-                  <a
-                    @click=${aClick}
-                    class="nav-link ${this.history.url.pathname === "/election"
-                      ? "active"
-                      : ""}"
-                    href="/election"
-                    >${msg("Election")}</a
-                  >
-                </li>
-              </ul>
-              <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
-                ${jscookie.get("username")
-                  ? html`<li class="nav-item">
-                      <a
-                        @click=${async () => {
-                          await myFetch<"/api/v1/logout">("/api/v1/logout", {
-                            method: "POST",
-                            body: "{}",
-                          });
-                          HistoryController.goto(
-                            new URL("/login", window.location.href),
-                            {}
-                          );
-                        }}
-                        class="nav-link"
-                        href="#"
-                        >${msg(str`Logout ${jscookie.get("username")}`)}</a
-                      >
-                    </li>`
-                  : html` <li class="nav-item">
-                      <a
-                        @click=${aClick}
-                        class="nav-link ${this.history.url.pathname === "/login"
-                          ? "active"
-                          : ""}"
-                        href="/login"
-                        >${msg("Login")}</a
-                      >
-                    </li>`}
-              </ul>
-            </div>
-          </div>
-        </nav>
-
-        <div
-          style="position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 1337;"
-        >
-          ${until(
-            this.current.then(() => undefined).catch(() => undefined),
-            html`<div class="spinner-grow text-primary" role="status">
-              <span class="visually-hidden">${msg("Loading...")}</span>
-            </div>`
-          )}
-        </div>
-
-        ${until(
-          this.current.catch((error) => error),
-        )}
-      `;
-    }
+  static override get properties() {
+    return {
+      initial: { attribute: false },
+      initialUsed: { state: true },
+      navbarOpen: { state: true },
+    };
   }
 
+  private history;
+
+  initialUsed: boolean;
+
+  initial: Promise<import("lit").TemplateResult> | undefined;
+
+  navbarOpen: boolean;
+
+  private popstateListener: (this: Window, ev: PopStateEvent) => void;
+
+  private navigateListener: (
+    this: Window,
+    event: CustomEvent<{ url: URL; state: HistoryState }>
+  ) => void;
+
+  protected _apiTask!: Task<[URLSearchParams], TemplateResult>;
+
+  override connectedCallback(): void {
+    super.connectedCallback();
+    window.addEventListener("popstate", this.popstateListener);
+    window.addEventListener("navigate", this.navigateListener);
+  }
+
+  override disconnectedCallback(): void {
+    super.disconnectedCallback();
+    window.removeEventListener("popstate", this.popstateListener!);
+    window.removeEventListener("navigate", this.navigateListener!);
+  }
+
+  constructor() {
+    super();
+
+    this.popstateListener = (event: PopStateEvent) => {
+      const url = new URL(window.location.href);
+      const state = /** @type {HistoryState} */ event.state;
+      HistoryController.goto(url, state);
+    };
+
+    this.navbarOpen = false;
+
+    this.history = new HistoryController(this, /.*/);
+
+    this.initialUsed = false;
+
+    this._apiTask = new Task(
+      this,
+      ([url]) => nextPage(url),
+      () => [this.history.url] as [URL]
+    );
+  }
+
+  override render() {
+    if (this.initial !== undefined && !this.initialUsed) {
+      this.initialUsed = true;
+
+      // TODO FIXME goddammit the private attributes get minified
+      this._apiTask.status = TaskStatus.COMPLETE;
+      // @ts-expect-error See https://github.com/lit/lit/issues/2367
+      this._apiTask.p = this.initial;
+    }
+
+    return html`
+      ${bootstrapCss}
+      <nav
+        class="navbar navbar-expand-lg navbar-light bg-light shadow p-3 mb-5"
+      >
+        <div class="container-fluid">
+          <a @click=${aClick} class="navbar-brand" href="/"
+            >${msg("Projektwahl")}</a
+          >
+          <button
+            class="navbar-toggler"
+            type="button"
+            data-bs-toggle="collapse"
+            data-bs-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent"
+            aria-expanded="false"
+            aria-label=${msg("Toggle navigation")}
+            @click=${() => (this.navbarOpen = !this.navbarOpen)}
+          >
+            <span class="navbar-toggler-icon"></span>
+          </button>
+          <div
+            class="collapse navbar-collapse ${this.navbarOpen ? "show" : ""}"
+            id="navbarSupportedContent"
+          >
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+              <li class="nav-item">
+                <a
+                  @click=${aClick}
+                  class="nav-link ${this.history.url.pathname === "/"
+                    ? "active"
+                    : ""}"
+                  aria-current="page"
+                  href="/"
+                  >${msg("Home")}</a
+                >
+              </li>
+              <li class="nav-item">
+                <a
+                  @click=${aClick}
+                  class="nav-link ${this.history.url.pathname === "/users"
+                    ? "active"
+                    : ""}"
+                  href="/users"
+                  >${msg("Accounts")}</a
+                >
+              </li>
+              <li>
+                <a
+                  @click=${aClick}
+                  class="nav-link ${this.history.url.pathname === "/projects"
+                    ? "active"
+                    : ""}"
+                  href="/projects"
+                  >${msg("Projects")}</a
+                >
+              </li>
+              <li>
+                <a
+                  @click=${aClick}
+                  class="nav-link ${this.history.url.pathname === "/election"
+                    ? "active"
+                    : ""}"
+                  href="/election"
+                  >${msg("Election")}</a
+                >
+              </li>
+            </ul>
+            <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
+              ${jscookie.get("username")
+                ? html`<li class="nav-item">
+                    <a
+                      @click=${async () => {
+                        await myFetch<"/api/v1/logout">("/api/v1/logout", {
+                          method: "POST",
+                          body: "{}",
+                        });
+                        HistoryController.goto(
+                          new URL("/login", window.location.href),
+                          {}
+                        );
+                      }}
+                      class="nav-link"
+                      href="#"
+                      >${msg(str`Logout ${jscookie.get("username")}`)}</a
+                    >
+                  </li>`
+                : html` <li class="nav-item">
+                    <a
+                      @click=${aClick}
+                      class="nav-link ${this.history.url.pathname === "/login"
+                        ? "active"
+                        : ""}"
+                      href="/login"
+                      >${msg("Login")}</a
+                    >
+                  </li>`}
+            </ul>
+          </div>
+        </div>
+      </nav>
+
+      <div
+        style="position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 1337;"
+      >
+        ${this._apiTask.render({
+          pending: () => html`<div
+            class="spinner-grow text-primary"
+            role="status"
+          >
+            <span class="visually-hidden">${msg("Loading...")}</span>
+          </div>`,
+        })}
+      </div>
+
+      ${this._apiTask.render({
+        complete: (v) => v,
+        error: (e) => e,
+        pending: () => noChange,
+      })}
+    `;
+  }
+}
 
 customElements.define("pw-app", PwApp);

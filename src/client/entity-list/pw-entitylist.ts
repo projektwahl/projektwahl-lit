@@ -110,7 +110,6 @@ export class PwEntityList<
       if (this.initial !== undefined) {
         // TODO FIXME goddammit the private attributes get minified
         this._apiTask.status = TaskStatus.COMPLETE;
-        console.log(this._apiTask);
         // @ts-expect-error See https://github.com/lit/lit/issues/2367
         this._apiTask.p = this.initial;
       }

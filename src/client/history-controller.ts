@@ -58,7 +58,7 @@ export class HistoryController implements ReactiveController {
   hostConnected() {
     this.url = new URL(window.location.href);
     this.state = window.history.state as HistoryState;
-   
+
     window.addEventListener("navigate", this.navigateListener);
   }
   hostDisconnected() {
