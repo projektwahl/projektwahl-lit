@@ -170,6 +170,10 @@ class PwApp extends LitElement {
 
     this.initialUsed = false;
 
+    // TODO FIXME I think we should only update here if the PAGE changes.
+    // if the url changes but not the page I think this should be the responsibility of that page
+    // I think this makes sense as otherwise the page would potentially be unloaded and could not react to keyboard input
+    // this is especially a problem for the entity lists
     this._apiTask = new Task(
       this,
       ([url]) => nextPage(url),
