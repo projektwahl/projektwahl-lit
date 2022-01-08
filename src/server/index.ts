@@ -60,24 +60,26 @@ if (cluster.isPrimary) {
     })();
   }
 } else {
-
   /*
   openssl req -x509 -newkey rsa:2048 -nodes -sha256 -subj '/CN=localhost' -keyout localhost-privkey.pem -out localhost-cert.pem
   */
 
-  const server = createSecureServer({
-    key: readFileSync("localhost-privkey.pem"),
-    cert: readFileSync("localhost-cert.pem"),
-    allowHTTP1: true,
-  }, (request, response) => {
-    try {
-      serverHandler(request, response)
-    } catch (error) {
-      // don't take down the entire server
-      // TODO FIXME try sending a 500 in a try catch
-      console.error(error);
+  const server = createSecureServer(
+    {
+      key: readFileSync("localhost-privkey.pem"),
+      cert: readFileSync("localhost-cert.pem"),
+      allowHTTP1: true,
+    },
+    (request, response) => {
+      try {
+        serverHandler(request, response);
+      } catch (error) {
+        // don't take down the entire server
+        // TODO FIXME try sending a 500 in a try catch
+        console.error(error);
+      }
     }
-  });
+  );
 
   server.listen(8443, () => {
     console.log(

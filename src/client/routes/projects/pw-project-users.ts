@@ -65,15 +65,15 @@ export const PwProjectUsers = setupHmr(
           <th class="table-cell-hover" scope="col">${msg(html`&#x2713;`)}</th>
 
           <th class="table-cell-hover p-0" scope="col">
-            ${pwOrder({name:"id", title:msg("ID")})}
+            ${pwOrder({ name: "id", title: msg("ID") })}
           </th>
 
           <th class="table-cell-hover p-0" scope="col">
-            ${pwOrder({name:"username", title:msg("Name")})}
+            ${pwOrder({ name: "username", title: msg("Name") })}
           </th>
 
           <th class="table-cell-hover p-0" scope="col">
-            ${pwOrder({name:"type", title:msg("Type")})}
+            ${pwOrder({ name: "type", title: msg("Type") })}
           </th>
         </tr>
 

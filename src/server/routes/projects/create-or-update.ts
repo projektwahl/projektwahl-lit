@@ -61,7 +61,8 @@ export async function createOrUpdateProjectsHandler(
       try {
         let [row] = await sql.begin("READ WRITE", async (sql) => {
           if (project.id) {
-            const field = (name: string) => updateField("projects_with_deleted", project, name);
+            const field = (name: string) =>
+              updateField("projects_with_deleted", project, name);
 
             const finalQuery = sql2`UPDATE projects_with_deleted SET
             ${field("title")},

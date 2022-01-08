@@ -46,7 +46,9 @@ type mappedInfer1<R extends keyof typeof entityRoutes> = {
 export function updateField(table: string, entity: any, name: string) {
   return sql2`"${unsafe2(name)}" = CASE WHEN ${
     entity[name] !== undefined
-  } THEN ${entity[name] ?? null} ELSE "${unsafe2(table)}"."${unsafe2(name)}" END`;
+  } THEN ${entity[name] ?? null} ELSE "${unsafe2(table)}"."${unsafe2(
+    name
+  )}" END`;
 }
 
 export async function fetchData<

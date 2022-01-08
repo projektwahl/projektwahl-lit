@@ -71,7 +71,7 @@ export const defaultHeaders = {
   "x-content-type-options": "nosniff",
   "x-frame-options": "DENY",
   "cache-control": "private, no-cache",
-}
+};
 export async function serverHandler(
   request: IncomingMessage,
   response: ServerResponse
@@ -83,8 +83,8 @@ export async function serverHandler(
   if (url.pathname === "/favicon.ico" || url.pathname === "/robots.txt") {
     response.writeHead(404, {
       ...defaultHeaders,
-    })
-    response.end()
+    });
+    response.end();
   } else if (url.pathname === "/api/v1/hmr") {
     console.log("got request");
     response.writeHead(200, {
@@ -118,8 +118,8 @@ export async function serverHandler(
     if (!executed) {
       response.writeHead(404, {
         ...defaultHeaders,
-      })
-      response.end()
+      });
+      response.end();
     }
   } else {
     // TODO FIXME AUDIT
@@ -254,8 +254,8 @@ export async function serverHandler(
         console.error(error);
         response.writeHead(404, {
           ...defaultHeaders,
-        })
-        response.end()
+        });
+        response.end();
       }
     } else {
       let rawContents = `<!DOCTYPE html>
