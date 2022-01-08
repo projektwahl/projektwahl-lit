@@ -117,15 +117,14 @@ export const nextPage = async (url: URL) => {
   }
 };
 
-export const PwApp = setupHmr(
-  "PwApp",
-  class PwApp extends LitElement {
+class PwApp extends LitElement {
     static override get properties() {
       return {
         last: { state: true },
         current: { state: true },
         initial: { attribute: false },
         initialUsed: { state: true },
+        navbarOpen: { state: true }
       };
     }
 
@@ -139,8 +138,37 @@ export const PwApp = setupHmr(
 
     initial: Promise<import("lit").TemplateResult> | undefined;
 
+    navbarOpen: boolean;
+
+    private popstateListener: (this: Window, ev: PopStateEvent) => void;
+
+    private navigateListener: (
+      this: Window,
+      event: CustomEvent<{ url: URL; state: HistoryState }>
+    ) => void;
+
+    override connectedCallback(): void {
+      super.connectedCallback()
+      window.addEventListener("popstate", this.popstateListener);
+      window.addEventListener("navigate", this.navigateListener);
+    }
+
+    override disconnectedCallback(): void {
+      super.disconnectedCallback()
+      window.removeEventListener("popstate", this.popstateListener!);
+      window.removeEventListener("navigate", this.navigateListener!);
+    }
+
     constructor() {
       super();
+
+      this.popstateListener = (event: PopStateEvent) => {
+        const url = new URL(window.location.href);
+        const state = /** @type {HistoryState} */ event.state;
+        HistoryController.goto(url, state);
+      };
+
+      this.navbarOpen = false;
 
       this.history = new HistoryController(this, /.*/);
 
@@ -172,10 +200,11 @@ export const PwApp = setupHmr(
               aria-controls="navbarSupportedContent"
               aria-expanded="false"
               aria-label=${msg("Toggle navigation")}
+              @click=${() => this.navbarOpen = !this.navbarOpen}
             >
               <span class="navbar-toggler-icon"></span>
             </button>
-            <div class="collapse navbar-collapse" id="navbarSupportedContent">
+            <div class="collapse navbar-collapse ${this.navbarOpen ? "show" : ""}" id="navbarSupportedContent">
               <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                 <li class="nav-item">
                   <a
@@ -271,6 +300,6 @@ export const PwApp = setupHmr(
       `;
     }
   }
-);
+
 
 customElements.define("pw-app", PwApp);
