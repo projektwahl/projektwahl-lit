@@ -180,7 +180,6 @@ class PwApp extends LitElement {
         this.initialUsed = true;
         this.current = this.initial;
       } else {
-        this.last = this.current;
         this.current = nextPage(this.history.url);
       }
       return html`
@@ -283,7 +282,7 @@ class PwApp extends LitElement {
         </nav>
 
         <div
-          style="position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);"
+          style="position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 1337;"
         >
           ${until(
             this.current.then(() => undefined).catch(() => undefined),
@@ -295,7 +294,6 @@ class PwApp extends LitElement {
 
         ${until(
           this.current.catch((error) => error),
-          this.last?.catch((error) => error)
         )}
       `;
     }
