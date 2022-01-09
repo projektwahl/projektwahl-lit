@@ -63,7 +63,7 @@ s: ZodObject<T, UnknownKeys, Catchall>
 export const zod2result = <T extends z.ZodTypeAny>(
   schema: T,
   input: unknown
-): z.infer<T> => {
+): z.infer<T> => { // TODO FIXME wrong
   const result = schema.safeParse(input);
   if (result.success) {
     return result;

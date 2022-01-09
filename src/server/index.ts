@@ -71,28 +71,25 @@ if (cluster.isPrimary) {
       allowHTTP1: true,
     },
     (request, response) => {
-      try {
-        serverHandler(request, response);
-      } catch (error) {
-        // don't take down the entire server
+      serverHandler(request, response).catch(error => {
         // TODO FIXME try sending a 500 in a try catch
         console.error(error);
-      }
+      })
     }
   );
 
   server.listen(8443, () => {
     console.log(
-      `[${cluster.worker?.id}] Server started at https://localhost:8443/`
+      `[${cluster.worker?.id ?? "unknown"}] Server started at https://localhost:8443/`
     );
   });
 
-  cluster.worker?.on("message", async (message) => {
+  cluster.worker?.on("message", (message) => {
     //let getConnections = promisify(server.getConnections).bind(server)
     //console.log(await getConnections())
 
     if (message === "shutdown") {
-      console.log(`[${cluster.worker?.id}] Shutting down`);
+      console.log(`[${cluster.worker?.id ?? "unknown"}] Shutting down`);
       server.close();
 
       cluster.worker?.removeAllListeners("message");
