@@ -27,6 +27,7 @@ import { MyRequest, requestHandler } from "../../express.js";
 import { sql2 } from "../../sql/index.js";
 import type { ServerResponse } from "node:http";
 import type { Http2ServerResponse } from "node:http2";
+import { rawProjectSchema } from "../../../lib/routes.js";
 
 export async function createOrUpdateProjectsHandler(
   request: MyRequest,
@@ -58,7 +59,7 @@ export async function createOrUpdateProjectsHandler(
       }
 
       try {
-        const [row] = await sql.begin("READ WRITE", async (sql) => {
+        const row = rawProjectSchema.parse((await sql.begin("READ WRITE", async (sql) => {
           if (project.id) {
             const field = (name: string) =>
               updateField("projects_with_deleted", project, name);
@@ -114,7 +115,7 @@ export async function createOrUpdateProjectsHandler(
 
             return res;
           }
-        });
+        }))[0]);
 
         if (!row) {
           // insufficient permissions

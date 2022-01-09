@@ -90,7 +90,7 @@ export async function usersHandler(
             .transform((s) => (s === "" ? undefined : Number(s)))
             .optional(),
         })
-        .parse(Object.fromEntries(url.searchParams as any));
+        .parse(Object.fromEntries(url.searchParams as unknown as Iterable<readonly [string, string]>));
 
       const columns = [
         "id",

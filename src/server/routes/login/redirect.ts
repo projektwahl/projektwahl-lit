@@ -23,6 +23,7 @@ SPDX-FileCopyrightText: 2021 Moritz Hedtke <Moritz.Hedtke@t-online.de>
 import { sensitiveHeaders } from "node:http2";
 import { z, ZodObject, ZodTypeAny } from "zod";
 import {
+  rawSessionType,
   rawUserSchema,
   UnknownKeysParam,
 } from "../../../lib/routes.js";
@@ -44,7 +45,7 @@ export async function openidRedirectHandler(
         session_state: z.string(),
         code: z.string(),
       })
-      .parse(Object.fromEntries(url.searchParams as any));
+      .parse(Object.fromEntries(url.searchParams as unknown as Iterable<readonly [string, string]>));
 
     // https://github.com/AzureAD/microsoft-authentication-library-for-js/tree/dev/lib/msal-browser
     // https://docs.microsoft.com/en-us/azure/active-directory/develop/scenario-spa-app-registration
@@ -54,8 +55,12 @@ export async function openidRedirectHandler(
     // https://github.com/projektwahl/projektwahl-sveltekit/blob/work/src/routes/login/index.json.ts
     // https://github.com/projektwahl/projektwahl-sveltekit/blob/work/src/routes/redirect/index.ts_old
 
+    if (!client) {
+      throw new Error("OpenID not configured!")
+    }
+
     try {
-      const result = await client!.callback(
+      const result = await client.callback(
         `${"https://localhost:8443"}/api/v1/redirect`,
         searchParams
       );
@@ -105,9 +110,9 @@ export async function openidRedirectHandler(
       }
 
       /** @type {[Pick<import("../../../lib/types").RawSessionType, "session_id">]} */
-      const [session] = await sql.begin("READ WRITE", async (sql) => {
+      const session = rawSessionType.parse((await sql.begin("READ WRITE", async (sql) => {
         return await sql`INSERT INTO sessions (user_id) VALUES (${dbUser.id}) RETURNING session_id`;
-      });
+      }))[0]);
 
       /** @type {import("node:http2").OutgoingHttpHeaders} */
       const responseHeaders: import("node:http2").OutgoingHttpHeaders = {
@@ -145,7 +150,7 @@ export async function openidRedirectHandler(
         {
           success: false,
           error: {
-            login: `${error}`,
+            login: String(error),
           },
         },
       ];

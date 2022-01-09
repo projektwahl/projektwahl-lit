@@ -71,7 +71,7 @@ export async function projectsHandler(
             .optional(),
           f_title: z.string().optional(),
         })
-        .parse(Object.fromEntries(url.searchParams as any));
+        .parse(Object.fromEntries(url.searchParams as unknown as Iterable<readonly [string, string]>));
 
       const columns = [
         "id",

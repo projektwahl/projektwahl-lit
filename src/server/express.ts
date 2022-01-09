@@ -62,7 +62,7 @@ export function requestHandler<P extends keyof typeof routes>(
     r: z.infer<typeof routes[P]["request"]>,
     user: z.infer<typeof userSchema>,
     session_id: string | undefined
-  ) => Promise<[OutgoingHttpHeaders, z.infer<typeof routes[P]["response"]>]>
+  ) => PromiseLike<[OutgoingHttpHeaders, z.infer<typeof routes[P]["response"]>]>
 ): (request: MyRequest, response: ServerResponse | Http2ServerResponse) => Promise<boolean> {
   const fn = async (request: MyRequest, response: ServerResponse | Http2ServerResponse) => {
     try {

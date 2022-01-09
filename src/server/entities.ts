@@ -101,7 +101,7 @@ export async function fetchData<
         .transform((s) => (s === "" ? undefined : Number(s)))
         .default("10"),
     })
-    .parse(Object.fromEntries(url.searchParams as any));
+    .parse(Object.fromEntries(url.searchParams as unknown as Iterable<readonly [string, string]>));
 
   const sorting = z
     .array(z.tuple([z.enum(columns), z.enum(["ASC", "DESC"])]))

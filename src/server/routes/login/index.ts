@@ -30,7 +30,7 @@ import {
 import { sql } from "../../database.js";
 import { MyRequest, requestHandler } from "../../express.js";
 import { checkPassword } from "../../password.js";
-import type { IncomingMessage, ServerResponse } from "node:http";
+import type { ServerResponse } from "node:http";
 
 const users = <
   T extends { [k: string]: ZodTypeAny },
