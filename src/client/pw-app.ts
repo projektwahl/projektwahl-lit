@@ -28,7 +28,7 @@ import {
   TemplateResult,
 } from "lit";
 import { bootstrapCss } from "./index.js";
-import { HistoryController } from "./history-controller.js";
+import { HistoryController, HistoryState } from "./history-controller.js";
 import { aClick } from "./pw-a.js";
 import jscookie from "js-cookie";
 import { msg, str } from "@lit/localize";
@@ -48,9 +48,9 @@ window.addEventListener("error", function (event) {
   alert("unknown error: " + event.message);
 });
 
-window.addEventListener("unhandledrejection", function (event) {
+window.addEventListener("unhandledrejection", function (event: PromiseRejectionEvent) {
   console.error("window.unhandledrejection", event.promise);
-  alert("unknown error: " + event.reason);
+  alert("unknown error: " + String(event.reason));
 });
 
 ReactiveElement.enableWarning?.("migration");
@@ -64,13 +64,14 @@ export const pwApp = async (url: URL) => {
   return html`<pw-app .initial=${Promise.resolve(page)}></pw-app>`;
 };
 */
+/*
 function identity<
   T extends {
     [r: string]: (url: URL) => Promise<TemplateResult<any>>;
   }
 >(v: T) {
   return v;
-}
+}*/
 
 const pages = {
   "^/$": async () => {
@@ -91,12 +92,12 @@ const pages = {
   },
   "^/users/edit/d+/$": async (url: URL) => {
     const { pwUser } = await import("./routes/users/pw-user-create.js");
-    return await pwUser(Number(url.pathname.match(/^users\/edit\/(\d+)$/)![1]));
+    return await pwUser(Number(url.pathname.match(/^users\/edit\/(\d+)$/)[1]));
   },
   "^/users/view/d+/$": async (url: URL) => {
     const { pwUser } = await import("./routes/users/pw-user-create.js");
     return await pwUser(
-      Number(url.pathname.match(/^users\/view\/(\d+)$/)![1]),
+      Number(url.pathname.match(/^users\/view\/(\d+)$/)?.[1]),
       true
     );
   },
@@ -105,7 +106,7 @@ const pages = {
     return await pwProjects(url);
   },
   "^/projects/create$": async () => {
-    const { pwProject } = await import(
+    await import(
       "./routes/projects/pw-project-create.js"
     );
     await import("./routes/projects/pw-project-users.js");
@@ -116,7 +117,7 @@ const pages = {
       "./routes/projects/pw-project-create.js"
     );
     return await pwProject(
-      Number(url.pathname.match(/^projects\/edit\/(\d+)$/)![1])
+      Number(url.pathname.match(/^projects\/edit\/(\d+)$/)?.[1])
     );
   },
   "^/projects/view/d+/$": async (url: URL) => {
@@ -124,7 +125,7 @@ const pages = {
       "./routes/projects/pw-project-create.js"
     );
     return await pwProject(
-      Number(url.pathname.match(/^projects\/view\/(\d+)$/)![1]),
+      Number(url.pathname.match(/^projects\/view\/(\d+)$/)?.[1]),
       true
     );
   },
@@ -151,7 +152,7 @@ class PwApp extends LitElement {
 
   protected _apiTask!: Task<[keyof typeof pages | undefined], TemplateResult>;
 
-  nextPage: any;
+  nextPage: ([key]: [keyof typeof pages | undefined]) => Promise<TemplateResult>;
 
   override connectedCallback(): void {
     super.connectedCallback();
@@ -184,7 +185,7 @@ class PwApp extends LitElement {
 
     this.popstateListener = (event: PopStateEvent) => {
       const url = new URL(window.location.href);
-      const state = /** @type {HistoryState} */ event.state;
+      const state = event.state as HistoryState;
       HistoryController.goto(url, state);
     };
 
@@ -201,7 +202,7 @@ class PwApp extends LitElement {
     this._apiTask = new Task(this, this.nextPage, () => [
       Object.keys(pages).find((k) =>
         new RegExp(k).test(this.history.url.pathname)
-      ),
+      ) as keyof typeof pages,
     ]);
   }
 
