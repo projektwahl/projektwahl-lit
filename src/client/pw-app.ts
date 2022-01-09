@@ -95,7 +95,9 @@ const pages = {
   },
   "^/users/edit/d+/$": async (url: URL) => {
     const { pwUser } = await import("./routes/users/pw-user-create.js");
-    return await pwUser(Number(url.pathname.match(/^users\/edit\/(\d+)$/)?.[1]));
+    return await pwUser(
+      Number(url.pathname.match(/^users\/edit\/(\d+)$/)?.[1])
+    );
   },
   "^/users/view/d+/$": async (url: URL) => {
     const { pwUser } = await import("./routes/users/pw-user-create.js");
