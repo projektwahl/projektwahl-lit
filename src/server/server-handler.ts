@@ -146,7 +146,7 @@ export async function serverHandler(
           {
             parentURL: import.meta.url,
           },
-          (specifier, context, defaultResolve) => {
+          (specifier: string, context: { parentURL: string | undefined }, defaultResolve: Function) => {
             const baseURL = pathToFileURL(`${cwd()}/`).href;
             const { parentURL = baseURL } = context;
             const targetUrl = new URL(specifier, parentURL);

@@ -48,6 +48,7 @@ const rawUserCommon = {
   deleted: z.boolean(),
 };
 
+// TODO FIXME just combine these two and do this otherwise as this here just creates too many problems
 export const rawUserHelperOrAdminSchema = z
   .object({
     type: z.enum(["helper", "admin"]),

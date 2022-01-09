@@ -120,7 +120,7 @@ export class PwInput<
 
   value!: string;
 
-  input: import("lit/directives/ref").Ref<HTMLInputElement>;
+  input: import("lit/directives/ref").Ref<HTMLElement>;
 
   form!: HTMLFormElement;
 
@@ -143,14 +143,14 @@ export class PwInput<
   myformdataEventListener = (event: CustomEvent) => {
     if (this.type === "number") {
       event.detail[this.name] =
-        this.input.value?.value === "" ? null : this.input.value?.valueAsNumber;
+        (this.input.value! as HTMLInputElement).value === "" ? null : (this.input.value! as HTMLInputElement).valueAsNumber;
     } else if (this.type === "checkbox") {
-      event.detail[this.name] = this.input.value?.checked;
+      event.detail[this.name] = (this.input.value! as HTMLInputElement).checked;
     } else if (this.type === "select") {
       event.detail[this.name] =
-        this.input.value!.selectedIndex == -1 ? null : this.input.value!.value;
+        (this.input.value! as HTMLSelectElement).selectedIndex == -1 ? null : (this.input.value! as HTMLInputElement).value;
     } else {
-      event.detail[this.name] = this.input.value!.value;
+      event.detail[this.name] = (this.input.value! as HTMLInputElement).value;
     }
   };
 

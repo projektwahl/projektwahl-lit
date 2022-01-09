@@ -20,6 +20,8 @@ https://github.com/projektwahl/projektwahl-lit
 SPDX-License-Identifier: AGPL-3.0-or-later
 SPDX-FileCopyrightText: 2021 Moritz Hedtke <Moritz.Hedtke@t-online.de>
 */
+import { z } from "zod";
+import { rawProjectSchema, rawUserHelperOrAdminSchema } from "../lib/routes.js";
 import { sql } from "./database.js";
 import { hashPassword } from "./password.js";
 
@@ -39,11 +41,11 @@ await sql.begin("READ WRITE", async (sql) => {
 
   let hash = await hashPassword("changeme");
 
-  let [admin] =
-    await sql`INSERT INTO users (username, password_hash, type) VALUES ('admin', ${hash}, 'admin') ON CONFLICT DO NOTHING RETURNING id;`;
+  let admin = rawUserHelperOrAdminSchema.parse(
+    (await sql`INSERT INTO users (username, password_hash, type) VALUES ('admin', ${hash}, 'admin') ON CONFLICT DO NOTHING RETURNING id;`)[0]);
 
-  const projects =
-    await sql`INSERT INTO projects (title, info, place, costs, min_age, max_age, min_participants, max_participants, random_assignments, last_updated_by) (SELECT generate_series, '', '', 0, 5, 13, 5, 20, FALSE, ${admin.id} FROM generate_series(1, 10)) RETURNING *;`;
+  const projects = z.array(rawProjectSchema).parse(
+    (await sql`INSERT INTO projects (title, info, place, costs, min_age, max_age, min_participants, max_participants, random_assignments, last_updated_by) (SELECT generate_series, '', '', 0, 5, 13, 5, 20, FALSE, ${admin.id} FROM generate_series(1, 10)) RETURNING *;`)[0]);
 
   console.log(projects);
 
@@ -94,11 +96,10 @@ await sql.begin("READ WRITE", async (sql) => {
 		console.log(keycloakUser)^;
 		*/
 
-    /** @type {[import("../lib/routes.js").withId(import("../lib/routes.js").rawUserSchema>)]} */
-    const [user] =
-      await sql`INSERT INTO users (username, type, "group", age, last_updated_by) VALUES (${`user${Math.random()}`}, 'voter', 'a', 10, ${
+    const user =rawUserHelperOrAdminSchema.parse(
+      (await sql`INSERT INTO users (username, type, "group", age, last_updated_by) VALUES (${`user${Math.random()}`}, 'voter', 'a', 10, ${
         admin.id
-      }) ON CONFLICT DO NOTHING RETURNING *;`;
+      }) ON CONFLICT DO NOTHING RETURNING *;`)[0]);
     shuffleArray(projects);
     for (let j = 0; j < 5; j++) {
       // TODO FIXME generate users who voted incorrectly (maybe increase/decrease iterations)

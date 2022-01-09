@@ -36,6 +36,7 @@ import { retryableBegin, sql } from "./database.js";
 import cookie from "cookie";
 import type { IncomingMessage, ServerResponse } from "node:http";
 import { defaultHeaders } from "./server-handler.js";
+import type { OutgoingHttpHeaders } from "http2";
 
 const userMapper = <
   T extends { [k: string]: ZodTypeAny },
@@ -117,7 +118,7 @@ export function requestHandler<P extends keyof typeof routes>(
           //console.log("responseBody", responseBody);
           routes[path].response.parse(responseBody);
           const { ":status": test, ...finalHeaders } = new_headers;
-          response.writeHead(new_headers[":status"], {
+          response.writeHead(Number(new_headers[":status"]!), {
             ...defaultHeaders,
             ...finalHeaders,
           });
