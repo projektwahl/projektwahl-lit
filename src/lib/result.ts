@@ -25,11 +25,11 @@ import { z, ZodObject, ZodType, ZodTypeAny, ZodTypeDef } from "zod";
 import type { UnknownKeysParam } from "./routes.js";
 
 export const successResult = <
-T extends { [k: string]: ZodTypeAny },
-UnknownKeys extends UnknownKeysParam = "strip",
-Catchall extends ZodTypeAny = ZodTypeAny
+  T extends { [k: string]: ZodTypeAny },
+  UnknownKeys extends UnknownKeysParam = "strip",
+  Catchall extends ZodTypeAny = ZodTypeAny
 >(
-s: ZodObject<T, UnknownKeys, Catchall>
+  s: ZodObject<T, UnknownKeys, Catchall>
 ) =>
   z
     .object({
@@ -53,22 +53,23 @@ export const failureResult = <
     .strict();
 
 export const result = <
-T extends { [k: string]: ZodTypeAny },
-UnknownKeys extends UnknownKeysParam = "strip",
-Catchall extends ZodTypeAny = ZodTypeAny
+  T extends { [k: string]: ZodTypeAny },
+  UnknownKeys extends UnknownKeysParam = "strip",
+  Catchall extends ZodTypeAny = ZodTypeAny
 >(
-s: ZodObject<T, UnknownKeys, Catchall>
+  s: ZodObject<T, UnknownKeys, Catchall>
 ) => z.union([successResult(s), failureResult(z.record(z.string()))]);
 
 export const zod2result = <
-Z extends ZodType<Output, Def, Input>,
-Output,
-Def extends ZodTypeDef = ZodTypeDef,
-Input = Output,
+  Z extends ZodType<Output, Def, Input>,
+  Output,
+  Def extends ZodTypeDef = ZodTypeDef,
+  Input = Output
 >(
   schema: Z,
   input: unknown
-) => { // TODO FIXME wrong
+) => {
+  // TODO FIXME wrong
   const result = schema.safeParse(input);
   if (result.success) {
     return result;

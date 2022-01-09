@@ -28,7 +28,9 @@ import { ifDefined } from "lit/directives/if-defined.js";
 // TODO FIXME https://lit.dev/docs/components/events/#shadowdom-retargeting just use the approach shown there
 export const aClick = (event: MouseEvent) => {
   event.preventDefault();
-  const target = (event.target as HTMLElement).closest("a") as HTMLAnchorElement;
+  const target = (event.target as HTMLElement).closest(
+    "a"
+  ) as HTMLAnchorElement;
   HistoryController.goto(new URL(target.href, window.location.href), {});
 };
 

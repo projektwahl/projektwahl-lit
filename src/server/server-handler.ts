@@ -102,7 +102,12 @@ export async function serverHandler(
 
           const url = relative(baseUrl, join(f, event.filename));
 
-          (response.write as (chunk: string | Uint8Array, callback?: ((err: Error) => void) | undefined) => boolean)(`data: ${url}\n\n`);
+          (
+            response.write as (
+              chunk: string | Uint8Array,
+              callback?: ((err: Error) => void) | undefined
+            ) => boolean
+          )(`data: ${url}\n\n`);
         }
       })();
     }
@@ -177,7 +182,9 @@ export async function serverHandler(
             /import( )?["']([^"']+)["']/g,
             async (match, args) => {
               if (!import.meta.resolve) {
-                throw new Error("need to run with --experimental-import-meta-resolve")
+                throw new Error(
+                  "need to run with --experimental-import-meta-resolve"
+                );
               }
               let url = await import.meta.resolve(
                 args[1],
@@ -197,7 +204,9 @@ export async function serverHandler(
             /([*} ])from ?["']([^"']+)["']/g,
             async (match, args) => {
               if (!import.meta.resolve) {
-                throw new Error("need to run with --experimental-import-meta-resolve")
+                throw new Error(
+                  "need to run with --experimental-import-meta-resolve"
+                );
               }
               let url = await import.meta.resolve(
                 args[1],

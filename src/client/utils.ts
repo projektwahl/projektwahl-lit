@@ -53,7 +53,9 @@ export const myFetch = async <P extends import("../lib/routes").keys>(
         };
       }
     }
-    const result = await response.json() as z.infer<typeof import("../lib/routes").routes[P]["response"]>;
+    const result = (await response.json()) as z.infer<
+      typeof import("../lib/routes").routes[P]["response"]
+    >;
     return result;
   } catch (error) {
     console.error(error);

@@ -49,13 +49,13 @@ const rawUserCommon = {
 };
 
 export const rawUserSchema = z
-.object({
-  type: z.enum(["voter", "helper", "admin"]),
-  group: z.string().min(1).max(100).nullable(),
-  age: z.number().min(0).max(200).nullable(),
-  ...rawUserCommon,
-})
-.strict();
+  .object({
+    type: z.enum(["voter", "helper", "admin"]),
+    group: z.string().min(1).max(100).nullable(),
+    age: z.number().min(0).max(200).nullable(),
+    ...rawUserCommon,
+  })
+  .strict();
 
 // setKey("id", z.number().nullable())
 
@@ -129,22 +129,22 @@ const usersCreateOrUpdate = <
 >(
   s: ZodObject<T, UnknownKeys, Catchall>
 ) =>
-    s
-      .pick({
-        age: true,
-        away: true,
-        group: true,
-        id: true,
-        type: true,
-        username: true,
-        project_leader_id: true,
-        force_in_project_id: true,
-        deleted: true,
-      })
-      .extend({
-        password: z.string(),
-      }).partial()
-  
+  s
+    .pick({
+      age: true,
+      away: true,
+      group: true,
+      id: true,
+      type: true,
+      username: true,
+      project_leader_id: true,
+      force_in_project_id: true,
+      deleted: true,
+    })
+    .extend({
+      password: z.string(),
+    })
+    .partial();
 
 /*
 const jo = usersCreateOrUpdate(rawUserVoterSchema)

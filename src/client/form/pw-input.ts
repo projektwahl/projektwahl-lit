@@ -141,15 +141,21 @@ export class PwInput<
     return this;
   }
 
-  myformdataEventListener = (event: CustomEvent<z.infer<typeof routes[P]["request"]>>) => {
+  myformdataEventListener = (
+    event: CustomEvent<z.infer<typeof routes[P]["request"]>>
+  ) => {
     if (this.type === "number") {
       event.detail[this.name] =
-        (this.input.value as HTMLInputElement).value === "" ? null : (this.input.value as HTMLInputElement).valueAsNumber;
+        (this.input.value as HTMLInputElement).value === ""
+          ? null
+          : (this.input.value as HTMLInputElement).valueAsNumber;
     } else if (this.type === "checkbox") {
       event.detail[this.name] = (this.input.value as HTMLInputElement).checked;
     } else if (this.type === "select") {
       event.detail[this.name] =
-        (this.input.value as HTMLSelectElement).selectedIndex == -1 ? null : (this.input.value as HTMLInputElement).value;
+        (this.input.value as HTMLSelectElement).selectedIndex == -1
+          ? null
+          : (this.input.value as HTMLInputElement).value;
     } else {
       event.detail[this.name] = (this.input.value as HTMLInputElement).value;
     }
@@ -216,7 +222,10 @@ export class PwInput<
           ${
             this.type === "select"
               ? repeat(
-                  this.options as { value: z.infer<typeof routes[P]["request"]>[Q]; text: string }[],
+                  this.options as {
+                    value: z.infer<typeof routes[P]["request"]>[Q];
+                    text: string;
+                  }[],
                   (o) => o.value,
                   (o) =>
                     html`<option
@@ -268,9 +277,9 @@ export class PwInput<
                   class="invalid-feedback"
                 >
                   ${v.error[this.name as string]}
-                </div>`
+                </div>`;
               }
-              return undefined
+              return undefined;
             }
           },
           initial: () => undefined,

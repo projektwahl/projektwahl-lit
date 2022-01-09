@@ -96,17 +96,12 @@ class PwLogin extends PwForm<"/api/v1/login"> {
         task: this._task,
       })}`;
   }
-
-  override submit = async (event: SubmitEvent) => {
-    event.preventDefault();
-
-    await this._task.run();
-  };
 }
 
 customElements.define("pw-login", PwLogin);
 
-export const pwLogin = async (): Promise<import("lit").TemplateResult> => { // eslint-disable-line @typescript-eslint/require-await
+export const pwLogin = async (): Promise<import("lit").TemplateResult> => {
+  // eslint-disable-line @typescript-eslint/require-await
   return html`<pw-login></pw-login>`;
 };
 

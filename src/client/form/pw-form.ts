@@ -129,9 +129,9 @@ if ('FormDataEvent' in window) {
               method="POST"
               action="/no-javascript"
               @submit=${async (event: Event) => {
-                 event.preventDefault();
+                event.preventDefault();
 
-                 await this._task.run();
+                await this._task.run();
               }}
             >
               ${this.getInputs()}

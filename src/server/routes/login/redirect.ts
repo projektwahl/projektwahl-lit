@@ -45,7 +45,11 @@ export async function openidRedirectHandler(
         session_state: z.string(),
         code: z.string(),
       })
-      .parse(Object.fromEntries(url.searchParams as unknown as Iterable<readonly [string, string]>));
+      .parse(
+        Object.fromEntries(
+          url.searchParams as unknown as Iterable<readonly [string, string]>
+        )
+      );
 
     // https://github.com/AzureAD/microsoft-authentication-library-for-js/tree/dev/lib/msal-browser
     // https://docs.microsoft.com/en-us/azure/active-directory/develop/scenario-spa-app-registration
@@ -56,7 +60,7 @@ export async function openidRedirectHandler(
     // https://github.com/projektwahl/projektwahl-sveltekit/blob/work/src/routes/redirect/index.ts_old
 
     if (!client) {
-      throw new Error("OpenID not configured!")
+      throw new Error("OpenID not configured!");
     }
 
     try {
@@ -110,9 +114,13 @@ export async function openidRedirectHandler(
       }
 
       /** @type {[Pick<import("../../../lib/types").RawSessionType, "session_id">]} */
-      const session = rawSessionType.parse((await sql.begin("READ WRITE", async (sql) => {
-        return await sql`INSERT INTO sessions (user_id) VALUES (${dbUser.id}) RETURNING session_id`;
-      }))[0]);
+      const session = rawSessionType.parse(
+        (
+          await sql.begin("READ WRITE", async (sql) => {
+            return await sql`INSERT INTO sessions (user_id) VALUES (${dbUser.id}) RETURNING session_id`;
+          })
+        )[0]
+      );
 
       /** @type {import("node:http2").OutgoingHttpHeaders} */
       const responseHeaders: import("node:http2").OutgoingHttpHeaders = {

@@ -76,7 +76,9 @@ export const PwProjectCreate = setupHmr(
     initialRender: boolean;
 
     initial:
-      | z.infer<typeof routes["/api/v1/projects"]["response"]["options"][0]["shape"]["data"]["shape"]["entities"]>[number]
+      | z.infer<
+          typeof routes["/api/v1/projects"]["response"]["options"][0]["shape"]["data"]["shape"]["entities"]
+        >[number]
       | undefined;
 
     constructor() {
@@ -98,7 +100,7 @@ export const PwProjectCreate = setupHmr(
           },
         });
         this.form.value?.dispatchEvent(formDataEvent);
-        formDataEvent.detail.id = this.initial?.id ?? null;
+        formDataEvent.detail.id = this.initial?.id;
 
         const result = await myFetch<"/api/v1/projects/create-or-update">(
           "/api/v1/projects/create-or-update",

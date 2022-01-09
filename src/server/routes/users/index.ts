@@ -22,9 +22,7 @@ SPDX-FileCopyrightText: 2021 Moritz Hedtke <Moritz.Hedtke@t-online.de>
 */
 import type { ServerResponse } from "node:http";
 import { z } from "zod";
-import {
-  rawUserSchema,
-} from "../../../lib/routes.js";
+import { rawUserSchema } from "../../../lib/routes.js";
 import { fetchData } from "../../entities.js";
 import { MyRequest, requestHandler } from "../../express.js";
 import { sql2 } from "../../sql/index.js";
@@ -90,7 +88,11 @@ export async function usersHandler(
             .transform((s) => (s === "" ? undefined : Number(s)))
             .optional(),
         })
-        .parse(Object.fromEntries(url.searchParams as unknown as Iterable<readonly [string, string]>));
+        .parse(
+          Object.fromEntries(
+            url.searchParams as unknown as Iterable<readonly [string, string]>
+          )
+        );
 
       const columns = [
         "id",

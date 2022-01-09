@@ -48,10 +48,13 @@ window.addEventListener("error", function (event) {
   alert("unknown error: " + event.message);
 });
 
-window.addEventListener("unhandledrejection", function (event: PromiseRejectionEvent) {
-  console.error("window.unhandledrejection", event.promise);
-  alert("unknown error: " + String(event.reason));
-});
+window.addEventListener(
+  "unhandledrejection",
+  function (event: PromiseRejectionEvent) {
+    console.error("window.unhandledrejection", event.promise);
+    alert("unknown error: " + String(event.reason));
+  }
+);
 
 ReactiveElement.enableWarning?.("migration");
 ReactiveElement.enableWarning?.("change-in-update");
@@ -92,7 +95,7 @@ const pages = {
   },
   "^/users/edit/d+/$": async (url: URL) => {
     const { pwUser } = await import("./routes/users/pw-user-create.js");
-    return await pwUser(Number(url.pathname.match(/^users\/edit\/(\d+)$/)[1]));
+    return await pwUser(Number(url.pathname.match(/^users\/edit\/(\d+)$/)?.[1]));
   },
   "^/users/view/d+/$": async (url: URL) => {
     const { pwUser } = await import("./routes/users/pw-user-create.js");
@@ -106,9 +109,7 @@ const pages = {
     return await pwProjects(url);
   },
   "^/projects/create$": async () => {
-    await import(
-      "./routes/projects/pw-project-create.js"
-    );
+    await import("./routes/projects/pw-project-create.js");
     await import("./routes/projects/pw-project-users.js");
     return html`<pw-project-create></pw-project-create>`;
   },
@@ -152,7 +153,9 @@ class PwApp extends LitElement {
 
   protected _apiTask!: Task<[keyof typeof pages | undefined], TemplateResult>;
 
-  nextPage: ([key]: [keyof typeof pages | undefined]) => Promise<TemplateResult>;
+  nextPage: ([key]: [
+    keyof typeof pages | undefined
+  ]) => Promise<TemplateResult>;
 
   override connectedCallback(): void {
     super.connectedCallback();

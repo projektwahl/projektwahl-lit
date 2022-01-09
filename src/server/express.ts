@@ -24,17 +24,17 @@ SPDX-FileCopyrightText: 2021 Moritz Hedtke <Moritz.Hedtke@t-online.de>
 import { zod2result } from "../lib/result.js";
 import { json } from "node:stream/consumers";
 import { URL } from "url";
-import {
-  rawUserSchema,
-  routes,
-  UnknownKeysParam,
-} from "../lib/routes.js";
+import { rawUserSchema, routes, UnknownKeysParam } from "../lib/routes.js";
 import type { z, ZodObject, ZodTypeAny } from "zod";
 import { retryableBegin } from "./database.js";
 import cookie from "cookie";
 import type { IncomingMessage, ServerResponse } from "node:http";
 import { defaultHeaders } from "./server-handler.js";
-import type { Http2ServerRequest, Http2ServerResponse, OutgoingHttpHeaders } from "http2";
+import type {
+  Http2ServerRequest,
+  Http2ServerResponse,
+  OutgoingHttpHeaders,
+} from "http2";
 
 const userMapper = <
   T extends { [k: string]: ZodTypeAny },
@@ -53,7 +53,8 @@ const userMapper = <
 
 const userSchema = userMapper(rawUserSchema).optional();
 
-export type MyRequest = (IncomingMessage | Http2ServerRequest) & Required<Pick<IncomingMessage | Http2ServerRequest, "url" | "method">>;
+export type MyRequest = (IncomingMessage | Http2ServerRequest) &
+  Required<Pick<IncomingMessage | Http2ServerRequest, "url" | "method">>;
 
 export function requestHandler<P extends keyof typeof routes>(
   method: string,
@@ -63,8 +64,14 @@ export function requestHandler<P extends keyof typeof routes>(
     user: z.infer<typeof userSchema>,
     session_id: string | undefined
   ) => PromiseLike<[OutgoingHttpHeaders, z.infer<typeof routes[P]["response"]>]>
-): (request: MyRequest, response: ServerResponse | Http2ServerResponse) => Promise<boolean> {
-  const fn = async (request: MyRequest, response: ServerResponse | Http2ServerResponse) => {
+): (
+  request: MyRequest,
+  response: ServerResponse | Http2ServerResponse
+) => Promise<boolean> {
+  const fn = async (
+    request: MyRequest,
+    response: ServerResponse | Http2ServerResponse
+  ) => {
     try {
       if (request.method !== "GET" && request.method !== "POST") {
         throw new Error("Unsupported http method!");
@@ -83,8 +90,11 @@ export function requestHandler<P extends keyof typeof routes>(
         new RegExp(path).test(/** @type {string} */ url.pathname)
       ) {
         let user: z.infer<typeof userSchema> | undefined = undefined;
-        const cookies = request.headers.cookie ? cookie.parse(request.headers.cookie) : {};
-        const session_id: string | undefined = request.method === "GET" ? cookies.lax_id : cookies.strict_id;
+        const cookies = request.headers.cookie
+          ? cookie.parse(request.headers.cookie)
+          : {};
+        const session_id: string | undefined =
+          request.method === "GET" ? cookies.lax_id : cookies.strict_id;
 
         // implementing https://datatracker.ietf.org/doc/html/draft-ietf-httpbis-rfc6265bis-02#section-8.8.2
         if (session_id) {

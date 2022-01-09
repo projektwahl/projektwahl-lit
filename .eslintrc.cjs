@@ -35,7 +35,7 @@ module.exports = {
     node: true,
   },
   rules: {
-    "@typescript-eslint/no-unused-vars": ["error", { "varsIgnorePattern": "^_" }]
+    "@typescript-eslint/no-unused-vars": ["error", { varsIgnorePattern: "^_" }],
   },
   extends: [
     "eslint:recommended",
@@ -44,5 +44,5 @@ module.exports = {
     "plugin:@typescript-eslint/recommended-requiring-type-checking",
     "prettier",
   ],
-  "ignorePatterns": ["dist/", "src/client/hmr.ts", "rollup.config.js"],
+  ignorePatterns: ["dist/", "src/client/hmr.ts", "rollup.config.js"],
 };

@@ -90,7 +90,7 @@ class PwUserCreate extends PwForm<"/api/v1/users/create-or-update"> {
         },
       });
       this.form.value?.dispatchEvent(formDataEvent);
-      formDataEvent.detail.id = this.initial?.id ?? null;
+      formDataEvent.detail.id = this.initial?.id;
       if (!this.initial?.id) {
         formDataEvent.detail.project_leader_id = null;
         formDataEvent.detail.force_in_project_id = null;

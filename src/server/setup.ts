@@ -36,17 +36,29 @@ const shuffleArray = <T>(array: T[]) => {
 };
 
 await sql.begin("READ WRITE", async (sql) => {
-  await sql.file("./src/server/setup.sql", undefined as unknown as SerializableParameter[], {
-    cache: false, // TODO FIXME doesnt seem to work properly
-  });
+  await sql.file(
+    "./src/server/setup.sql",
+    undefined as unknown as SerializableParameter[],
+    {
+      cache: false, // TODO FIXME doesnt seem to work properly
+    }
+  );
 
   const hash = await hashPassword("changeme");
 
   const admin = rawUserSchema.parse(
-    (await sql`INSERT INTO users (username, password_hash, type) VALUES ('admin', ${hash}, 'admin') ON CONFLICT DO NOTHING RETURNING id;`)[0]);
+    (
+      await sql`INSERT INTO users (username, password_hash, type) VALUES ('admin', ${hash}, 'admin') ON CONFLICT DO NOTHING RETURNING id;`
+    )[0]
+  );
 
-  const projects = z.array(rawProjectSchema).parse(
-    (await sql`INSERT INTO projects (title, info, place, costs, min_age, max_age, min_participants, max_participants, random_assignments, last_updated_by) (SELECT generate_series, '', '', 0, 5, 13, 5, 20, FALSE, ${admin.id} FROM generate_series(1, 10)) RETURNING *;`)[0]);
+  const projects = z
+    .array(rawProjectSchema)
+    .parse(
+      (
+        await sql`INSERT INTO projects (title, info, place, costs, min_age, max_age, min_participants, max_participants, random_assignments, last_updated_by) (SELECT generate_series, '', '', 0, 5, 13, 5, 20, FALSE, ${admin.id} FROM generate_series(1, 10)) RETURNING *;`
+      )[0]
+    );
 
   console.log(projects);
 
@@ -98,9 +110,12 @@ await sql.begin("READ WRITE", async (sql) => {
 		*/
 
     const user = rawUserSchema.parse(
-      (await sql`INSERT INTO users (username, type, "group", age, last_updated_by) VALUES (${`user${Math.random()}`}, 'voter', 'a', 10, ${
-        admin.id
-      }) ON CONFLICT DO NOTHING RETURNING *;`)[0]);
+      (
+        await sql`INSERT INTO users (username, type, "group", age, last_updated_by) VALUES (${`user${Math.random()}`}, 'voter', 'a', 10, ${
+          admin.id
+        }) ON CONFLICT DO NOTHING RETURNING *;`
+      )[0]
+    );
     shuffleArray(projects);
     for (let j = 0; j < 5; j++) {
       // TODO FIXME generate users who voted incorrectly (maybe increase/decrease iterations)

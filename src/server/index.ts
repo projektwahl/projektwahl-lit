@@ -71,16 +71,18 @@ if (cluster.isPrimary) {
       allowHTTP1: true,
     },
     (request, response) => {
-      serverHandler(request, response).catch(error => {
+      serverHandler(request, response).catch((error) => {
         // TODO FIXME try sending a 500 in a try catch
         console.error(error);
-      })
+      });
     }
   );
 
   server.listen(8443, () => {
     console.log(
-      `[${cluster.worker?.id ?? "unknown"}] Server started at https://localhost:8443/`
+      `[${
+        cluster.worker?.id ?? "unknown"
+      }] Server started at https://localhost:8443/`
     );
   });
 

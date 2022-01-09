@@ -41,7 +41,10 @@ type mappedInfer1<R extends keyof typeof entityRoutes> = {
   >]: z.infer<entitesType[R]["response"]["options"][0]["shape"]["data"]>[K];
 };
 
-export function updateField<E extends { [name: string]: string | number | null }, K extends keyof E>(table: string, entity: E, name: K) {
+export function updateField<
+  E extends { [name: string]: boolean | string | number | null },
+  K extends keyof E
+>(table: string, entity: E, name: K) {
   return sql2`"${unsafe2(name)}" = CASE WHEN ${
     entity[name] !== undefined
   } THEN ${entity[name] ?? null} ELSE "${unsafe2(table)}"."${unsafe2(
@@ -102,7 +105,11 @@ export async function fetchData<
         .transform((s) => (s === "" ? undefined : Number(s)))
         .default("10"),
     })
-    .parse(Object.fromEntries(url.searchParams as unknown as Iterable<readonly [string, string]>));
+    .parse(
+      Object.fromEntries(
+        url.searchParams as unknown as Iterable<readonly [string, string]>
+      )
+    );
 
   const sorting = z
     .array(z.tuple([z.enum(columns), z.enum(["ASC", "DESC"])]))
@@ -181,7 +188,9 @@ export async function fetchData<
   }
 
   const entitiesSchema =
-    entitySchema["response"]["options"][0]["shape"]["data"]["shape"]["entities"]
+    entitySchema["response"]["options"][0]["shape"]["data"]["shape"][
+      "entities"
+    ];
 
   let entities: z.infer<
     entitesType[R]["response"]["options"][0]["shape"]["data"]
@@ -216,9 +225,9 @@ export async function fetchData<
   }
 
   const y = {
-    entities: entities ,
-    nextCursor: nextCursor ,
-    previousCursor: previousCursor ,
+    entities: entities,
+    nextCursor: nextCursor,
+    previousCursor: previousCursor,
   } as mappedInfer1<R>;
 
   const a = {
