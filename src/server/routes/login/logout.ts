@@ -22,8 +22,8 @@ SPDX-FileCopyrightText: 2021 Moritz Hedtke <Moritz.Hedtke@t-online.de>
 */
 import { sql } from "../../database.js";
 import { MyRequest, requestHandler } from "../../express.js";
-import type { IncomingMessage, ServerResponse } from "node:http";
-import type { Http2ServerRequest, Http2ServerResponse } from "node:http2";
+import type { ServerResponse } from "node:http";
+import type { Http2ServerResponse } from "node:http2";
 
 export async function logoutHandler(
   request: MyRequest,

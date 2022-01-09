@@ -30,7 +30,7 @@ import {
   UnknownKeysParam,
 } from "../lib/routes.js";
 import type { z, ZodObject, ZodTypeAny } from "zod";
-import { retryableBegin, sql } from "./database.js";
+import { retryableBegin } from "./database.js";
 import cookie from "cookie";
 import type { IncomingMessage, ServerResponse } from "node:http";
 import { defaultHeaders } from "./server-handler.js";
@@ -77,7 +77,7 @@ export function requestHandler<P extends keyof typeof routes>(
         throw new Error("No CSRF header!");
       }
 
-      const url = new URL(request.url!, "https://localhost:8443");
+      const url = new URL(request.url, "https://localhost:8443");
       if (
         request.method === method &&
         new RegExp(path).test(/** @type {string} */ url.pathname)

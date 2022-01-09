@@ -29,15 +29,15 @@ import {
 import { sql } from "../../database.js";
 import { MyRequest, requestHandler } from "../../express.js";
 import { client } from "./openid-client.js";
-import type { IncomingMessage, ServerResponse } from "node:http";
-import type { Http2ServerRequest, Http2ServerResponse } from "node:http2";
+import type { ServerResponse } from "node:http";
+import type { Http2ServerResponse } from "node:http2";
 
 export async function openidRedirectHandler(
   request: MyRequest,
   response: ServerResponse | Http2ServerResponse
 ) {
   return await requestHandler("GET", "/api/v1/redirect", async function () {
-    const url = new URL(request.url!, "https://localhost:8443");
+    const url = new URL(request.url, "https://localhost:8443");
 
     const searchParams = z
       .object({

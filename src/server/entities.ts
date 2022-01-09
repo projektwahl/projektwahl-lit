@@ -20,8 +20,7 @@ https://github.com/projektwahl/projektwahl-lit
 SPDX-License-Identifier: AGPL-3.0-or-later
 SPDX-FileCopyrightText: 2021 Moritz Hedtke <Moritz.Hedtke@t-online.de>
 */
-import type { IncomingMessage } from "node:http";
-import type { Http2ServerRequest, OutgoingHttpHeaders } from "node:http2";
+import type { OutgoingHttpHeaders } from "node:http2";
 import { z } from "zod";
 import { entityRoutes } from "../lib/routes.js";
 import type { BaseQuery } from "../lib/types.js";
@@ -74,7 +73,7 @@ export async function fetchData<
 ): Promise<[OutgoingHttpHeaders, z.infer<typeof entityRoutes[R]["response"]>]> {
   const entitySchema: entitesType[R] = entityRoutes[path];
 
-  const url = new URL(request.url!, "https://localhost:8443");
+  const url = new URL(request.url, "https://localhost:8443");
 
   const pagination = z
     .object({

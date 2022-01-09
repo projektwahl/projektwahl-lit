@@ -25,8 +25,8 @@ import type { rawProjectSchema } from "../../../lib/routes.js";
 import { fetchData } from "../../entities.js";
 import { MyRequest, requestHandler } from "../../express.js";
 import { sql2 } from "../../sql/index.js";
-import type { IncomingMessage, ServerResponse } from "node:http";
-import type { Http2ServerRequest, Http2ServerResponse } from "node:http2";
+import type { ServerResponse } from "node:http";
+import type { Http2ServerResponse } from "node:http2";
 
 export async function projectsHandler(
   request: MyRequest,
@@ -60,7 +60,7 @@ export async function projectsHandler(
         ];
       }
 
-      const url = new URL(request.url!, "https://localhost:8443");
+      const url = new URL(request.url, "https://localhost:8443");
 
       const filters = z
         .object({

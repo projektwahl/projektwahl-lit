@@ -20,7 +20,7 @@ https://github.com/projektwahl/projektwahl-lit
 SPDX-License-Identifier: AGPL-3.0-or-later
 SPDX-FileCopyrightText: 2021 Moritz Hedtke <Moritz.Hedtke@t-online.de>
 */
-import type { IncomingMessage, ServerResponse } from "node:http";
+import type { ServerResponse } from "node:http";
 import { z } from "zod";
 import {
   rawUserSchema,
@@ -28,7 +28,7 @@ import {
 import { fetchData } from "../../entities.js";
 import { MyRequest, requestHandler } from "../../express.js";
 import { sql2 } from "../../sql/index.js";
-import type { Http2ServerRequest, Http2ServerResponse } from "node:http2";
+import type { Http2ServerResponse } from "node:http2";
 
 function includes<T, U extends T>(arr: readonly U[], elem: T): elem is U {
   return arr.includes(elem as U);
@@ -62,7 +62,7 @@ export async function usersHandler(
         ];
       }
 
-      const url = new URL(request.url!, "https://localhost:8443");
+      const url = new URL(request.url, "https://localhost:8443");
 
       const filters = z
         .object({

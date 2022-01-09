@@ -20,8 +20,8 @@ https://github.com/projektwahl/projektwahl-lit
 SPDX-License-Identifier: AGPL-3.0-or-later
 SPDX-FileCopyrightText: 2021 Moritz Hedtke <Moritz.Hedtke@t-online.de>
 */
-import type { Http2ServerRequest, Http2ServerResponse } from "node:http2";
-import type { z, ZodObject, ZodTypeAny } from "zod";
+import type { Http2ServerResponse } from "node:http2";
+import type { ZodObject, ZodTypeAny } from "zod";
 import {
   rawSessionType,
   rawUserSchema,
