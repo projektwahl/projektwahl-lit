@@ -100,8 +100,8 @@ class PwLogin extends PwForm<"/api/v1/login"> {
 
 customElements.define("pw-login", PwLogin);
 
+// eslint-disable-next-line @typescript-eslint/require-await
 export const pwLogin = async (): Promise<import("lit").TemplateResult> => {
-  // eslint-disable-line @typescript-eslint/require-await
   return html`<pw-login></pw-login>`;
 };
 

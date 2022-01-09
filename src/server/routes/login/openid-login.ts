@@ -29,8 +29,8 @@ export async function openidLoginHandler(
   request: MyRequest,
   response: ServerResponse | Http2ServerResponse
 ) {
+  // eslint-disable-next-line @typescript-eslint/require-await
   return await requestHandler("GET", "/api/v1/openid-login", async function () {
-    // eslint-disable-line @typescript-eslint/require-await
 
     // https://github.com/AzureAD/microsoft-authentication-library-for-js/tree/dev/lib/msal-browser
     // https://docs.microsoft.com/en-us/azure/active-directory/develop/scenario-spa-app-registration

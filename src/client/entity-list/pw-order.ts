@@ -82,11 +82,11 @@ export class PwOrder<P extends keyof typeof entityRoutes> extends LitElement {
           const order = [...urlSearchParams.getAll("order")];
 
           const oldElementIndex = order.findIndex((e) =>
-            e.startsWith(`${this.name}-`)
+            e.startsWith(`${this.name as string}-`)
           );
           let oldElement;
           if (oldElementIndex == -1) {
-            oldElement = `${this.name}-downup`;
+            oldElement = `${this.name as string}-downup`;
           } else {
             oldElement = order.splice(oldElementIndex, 1)[0];
           }
@@ -122,7 +122,7 @@ export class PwOrder<P extends keyof typeof entityRoutes> extends LitElement {
         ${(() => {
           const value = this.history.url.searchParams
             .getAll("order")
-            .find((e) => e.startsWith(this.name + "-"))
+            .find((e) => e.startsWith(`${this.name as string}-`))
             ?.split("-")[1];
           return value === "ASC"
             ? html`<svg
