@@ -179,11 +179,8 @@ export async function fetchData<
     }
   }
 
-  // [TemplateStringsArray, ...(null | string | string[] | boolean | number)[]]
-  let entitiesSchema: entitesType[R]["response"]["options"][0]["shape"]["data"]["shape"]["entities"] =
-    entitySchema["response"]["options"][0]["shape"]["data"]["shape"][
-      "entities"
-    ];
+  let entitiesSchema =
+    entitySchema["response"]["options"][0]["shape"]["data"]["shape"]["entities"]
 
   let entities: z.infer<
     entitesType[R]["response"]["options"][0]["shape"]["data"]

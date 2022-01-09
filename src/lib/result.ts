@@ -21,14 +21,15 @@ SPDX-License-Identifier: AGPL-3.0-or-later
 SPDX-FileCopyrightText: 2021 Moritz Hedtke <Moritz.Hedtke@t-online.de>
 */
 
-import { z, ZodType, ZodTypeDef } from "zod";
+import { z, ZodObject, ZodType, ZodTypeAny, ZodTypeDef } from "zod";
+import type { UnknownKeysParam } from "./routes.js";
 
 export const successResult = <
-  Output,
-  Def extends ZodTypeDef = ZodTypeDef,
-  Input = Output
+T extends { [k: string]: ZodTypeAny },
+UnknownKeys extends UnknownKeysParam = "strip",
+Catchall extends ZodTypeAny = ZodTypeAny
 >(
-  s: ZodType<Output, Def, Input>
+s: ZodObject<T, UnknownKeys, Catchall>
 ) =>
   z
     .object({
@@ -52,11 +53,11 @@ export const failureResult = <
     .strict();
 
 export const result = <
-  Output,
-  Def extends ZodTypeDef = ZodTypeDef,
-  Input = Output
+T extends { [k: string]: ZodTypeAny },
+UnknownKeys extends UnknownKeysParam = "strip",
+Catchall extends ZodTypeAny = ZodTypeAny
 >(
-  s: ZodType<Output, Def, Input>
+s: ZodObject<T, UnknownKeys, Catchall>
 ) => z.union([successResult(s), failureResult(z.record(z.string()))]);
 
 export const zod2result = <T extends z.ZodTypeAny>(
