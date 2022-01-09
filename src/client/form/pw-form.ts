@@ -41,7 +41,7 @@ class PwForm<P extends keyof typeof routes> extends LitElement {
   }
 
   _task!: import("@lit-labs/task").Task<
-    any,
+    unknown[],
     z.infer<typeof routes[P]["response"]>
   >;
 

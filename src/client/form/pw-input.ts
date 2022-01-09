@@ -48,7 +48,7 @@ export function pwInput<
   > &
     Partial<Pick<PwInput<P, Q>, "onchange">>
 ) {
-  let {
+  const {
     onchange,
     disabled,
     initial,
@@ -60,7 +60,8 @@ export function pwInput<
     autocomplete,
     ...rest
   } = props;
-  rest = {}; // ensure no property is missed
+  let _ = rest;
+  _ = 1; // ensure no property is missed - Don't use `{}` as a type. `{}` actually means "any non-nullish value".
   return html`<pw-input
     type=${type}
     ?disabled=${disabled}
@@ -112,7 +113,7 @@ export class PwInput<
   autocomplete?: "username" | "current-password" | "new-password";
 
   task!: import("@lit-labs/task").Task<
-    any,
+    unknown[],
     z.infer<typeof routes[P]["request"]>
   >;
 
@@ -140,7 +141,7 @@ export class PwInput<
     return this;
   }
 
-  myformdataEventListener = (event: CustomEvent) => {
+  myformdataEventListener = (event: CustomEvent<z.infer<typeof routes[P]["request"]>>) => {
     if (this.type === "number") {
       event.detail[this.name] =
         (this.input.value! as HTMLInputElement).value === "" ? null : (this.input.value! as HTMLInputElement).valueAsNumber;

@@ -31,8 +31,9 @@ import type { z } from "zod";
 export function pwOrder<P extends keyof typeof entityRoutes>(
   props: Pick<PwOrder<P>, "name" | "title">
 ) {
-  let { name, title, ...rest } = props;
-  rest = {}; // ensure no property is missed
+  const { name, title, ...rest } = props;
+  let _ = rest;
+  _ = 1; // ensure no property is missed - Don't use `{}` as a type. `{}` actually means "any non-nullish value".
   return html`<pw-order .name=${name} title=${title}></pw-order>`;
 }
 
