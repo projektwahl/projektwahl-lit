@@ -59,8 +59,8 @@ export const PwProjectUsers = setupHmr(
 
     override get head() {
       const f_name = this.history.url.searchParams.get(`f_${this.name}`);
-      const f_id = this.history.url.searchParams.get("f_id")
-      const f_username = this.history.url.searchParams.get("f_username")
+      const f_id = this.history.url.searchParams.get("f_id");
+      const f_username = this.history.url.searchParams.get("f_username");
       const f_type = this.history.url.searchParams.get("f_type");
       return html`<tr>
           <!--
@@ -74,7 +74,10 @@ export const PwProjectUsers = setupHmr(
           </th>
 
           <th class="table-cell-hover p-0" scope="col">
-            ${pwOrder<"/api/v1/users">({ name: "username", title: msg("Name") })}
+            ${pwOrder<"/api/v1/users">({
+              name: "username",
+              title: msg("Name"),
+            })}
           </th>
 
           <th class="table-cell-hover p-0" scope="col">

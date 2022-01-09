@@ -31,7 +31,10 @@ import type { routes } from "../../lib/routes.js";
 import type { z } from "zod";
 
 // workaround see https://github.com/runem/lit-analyzer/issues/149#issuecomment-1006162839
-export function pwInput<P extends keyof typeof routes, Q extends keyof z.infer<typeof routes[P]["request"]>>(
+export function pwInput<
+  P extends keyof typeof routes,
+  Q extends keyof z.infer<typeof routes[P]["request"]>
+>(
   props: Pick<
     PwInput<P, Q>,
     | "type"
@@ -71,7 +74,10 @@ export function pwInput<P extends keyof typeof routes, Q extends keyof z.infer<t
   ></pw-input>`;
 }
 
-export class PwInput<P extends keyof typeof routes, Q extends keyof z.infer<typeof routes[P]["request"]>> extends LitElement {
+export class PwInput<
+  P extends keyof typeof routes,
+  Q extends keyof z.infer<typeof routes[P]["request"]>
+> extends LitElement {
   static override get properties() {
     return {
       label: { type: String },

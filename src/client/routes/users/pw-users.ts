@@ -38,8 +38,7 @@ export const pwUsers = async (url: URL) => {
 export const taskFunction = async ([searchParams]: [URLSearchParams]) => {
   let response = await myFetch<"/api/v1/users">(
     `/api/v1/users?${searchParams}`,
-    {
-    }
+    {}
   );
   return response;
 };
@@ -67,8 +66,8 @@ export class PwUsers extends PwEntityList<"/api/v1/users"> {
   }
 
   override get head() {
-    const f_id = this.history.url.searchParams.get("f_id")
-    const f_username = this.history.url.searchParams.get("f_username")
+    const f_id = this.history.url.searchParams.get("f_id");
+    const f_username = this.history.url.searchParams.get("f_username");
     const f_type = this.history.url.searchParams.get("f_type");
     return html`<tr>
         <!--

@@ -49,7 +49,9 @@ export class PwOrder<P extends keyof typeof entityRoutes> extends LitElement {
     return this;
   }
 
-  name!: keyof z.infer<typeof entityRoutes[P]["response"]["options"][0]>["data"]["entities"][number]; // TODO FIXME pass order using json and then use that schema here
+  name!: keyof z.infer<
+    typeof entityRoutes[P]["response"]["options"][0]
+  >["data"]["entities"][number]; // TODO FIXME pass order using json and then use that schema here
 
   title!: string;
 

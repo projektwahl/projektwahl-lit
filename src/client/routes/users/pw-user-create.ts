@@ -41,8 +41,10 @@ export async function pwUser(id: number, viewOnly: boolean = false) {
 }
 
 const taskFunction = async ([id]: [number]) => {
-  let response = await myFetch<"/api/v1/users">(`/api/v1/users/?f_id=${id}`, {
-  });
+  let response = await myFetch<"/api/v1/users">(
+    `/api/v1/users/?f_id=${id}`,
+    {}
+  );
   return response.success ? response.data.entities[0] : null; // TODO FIXME error handling, PwForm already has some form of error handling
 };
 

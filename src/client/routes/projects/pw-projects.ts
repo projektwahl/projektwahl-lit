@@ -38,8 +38,7 @@ export const pwProjects = async (url: URL) => {
 const taskFunction = async ([searchParams]: [URLSearchParams]) => {
   let response = await myFetch<"/api/v1/projects">(
     `/api/v1/projects?${searchParams}`,
-    {
-    }
+    {}
   );
   return response;
 };
