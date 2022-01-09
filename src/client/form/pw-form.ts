@@ -25,6 +25,7 @@ import { createRef, ref } from "lit/directives/ref.js";
 import { bootstrapCss } from "../index.js";
 import { msg } from "@lit/localize";
 import type { routes } from "../../lib/routes.js";
+import type { z } from "zod";
 
 class PwForm<P extends keyof typeof routes> extends LitElement {
   static get properties() {
@@ -41,7 +42,7 @@ class PwForm<P extends keyof typeof routes> extends LitElement {
 
   _task!: import("@lit-labs/task").Task<
     any,
-    import("zod").infer<typeof import("../../lib/result.js").anyResult> // TODO FIXME
+    z.infer<typeof routes[P]["response"]>
   >;
 
   form: import("lit/directives/ref").Ref<HTMLFormElement>;
@@ -147,7 +148,7 @@ if ('FormDataEvent' in window) {
                       }) as boolean}
                       class="btn btn-primary"
                     >
-                      ${this.actionText} ${this._task.status}
+                      ${this.actionText}
                     </button>
                   `
                 : undefined}

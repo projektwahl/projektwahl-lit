@@ -27,6 +27,8 @@ import { ifDefined } from "lit/directives/if-defined.js";
 import { msg } from "@lit/localize";
 import { createRef, ref } from "lit/directives/ref.js";
 import { repeat } from "lit/directives/repeat.js";
+import type { routes } from "../../lib/routes.js";
+import type { z } from "zod";
 
 // workaround see https://github.com/runem/lit-analyzer/issues/149#issuecomment-1006162839
 export function pwInput<T, Q extends keyof T>(
@@ -69,7 +71,7 @@ export function pwInput<T, Q extends keyof T>(
   ></pw-input>`;
 }
 
-export class PwInput<T, Q extends keyof T> extends LitElement {
+export class PwInput<P extends keyof typeof routes, Q extends keyof z.infer<typeof routes[P]["request"]>> extends LitElement {
   static override get properties() {
     return {
       label: { type: String },
@@ -105,10 +107,10 @@ export class PwInput<T, Q extends keyof T> extends LitElement {
 
   task!: import("@lit-labs/task").Task<
     any,
-    import("zod").infer<typeof import("../../lib/result.js").anyResult> // TODO FIXME
+    z.infer<typeof routes[P]["request"]>
   >;
 
-  initial: T | undefined;
+  initial: z.infer<typeof routes[P]["request"]> | undefined;
 
   value!: string;
 
@@ -116,7 +118,7 @@ export class PwInput<T, Q extends keyof T> extends LitElement {
 
   form!: HTMLFormElement;
 
-  options?: { value: T[Q]; text: string }[];
+  options?: { value: z.infer<typeof routes[P]["request"]>[Q]; text: string }[];
 
   constructor() {
     super();
