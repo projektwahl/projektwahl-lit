@@ -80,7 +80,7 @@ export async function serverHandler(
 ) {
   const path = z.string().parse(request.url);
 
-  let url = new URL(path, "https://localhost:8443");
+  const url = new URL(path, "https://localhost:8443");
 
   if (url.pathname === "/favicon.ico" || url.pathname === "/robots.txt") {
     response.writeHead(404, {
@@ -97,9 +97,9 @@ export async function serverHandler(
     for await (const f of getDirs("./src/client")) {
       (async () => {
         for await (const event of watch(f)) {
-          let baseUrl = resolve(fileURLToPath(import.meta.url), "../../..");
+          const baseUrl = resolve(fileURLToPath(import.meta.url), "../../..");
 
-          let url = relative(baseUrl, join(f, event.filename));
+          const url = relative(baseUrl, join(f, event.filename));
 
           (response.write as (chunk: string | Uint8Array, callback?: ((err: Error) => void) | undefined) => boolean)(`data: ${url}\n\n`);
         }
@@ -107,7 +107,7 @@ export async function serverHandler(
     }
   } else if (url.pathname.startsWith("/api")) {
     // TODO FIXME store this in a routing table and automatically extract types from that
-    let executed =
+    const executed =
       (await loginHandler(request, response)) ||
       (await logoutHandler(request, response)) ||
       (await openidLoginHandler(request, response)) ||
@@ -127,9 +127,9 @@ export async function serverHandler(
     // TODO FIXME AUDIT
     // curl --insecure --path-as-is -v https://localhost:8443/../src/index.js
 
-    let filename = resolve("." + url.pathname);
+    const filename = resolve("." + url.pathname);
 
-    let baseUrl = resolve(fileURLToPath(import.meta.url), "../../..");
+    const baseUrl = resolve(fileURLToPath(import.meta.url), "../../..");
 
     if (
       filename.startsWith(join(baseUrl, "/src/")) ||
@@ -260,7 +260,7 @@ export async function serverHandler(
         response.end();
       }
     } else {
-      let rawContents = `<!DOCTYPE html>
+      const rawContents = `<!DOCTYPE html>
   <html lang="en">
     <head>
       <!-- Required meta tags -->

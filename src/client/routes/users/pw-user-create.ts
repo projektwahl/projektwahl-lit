@@ -32,8 +32,8 @@ import type { routes } from "../../../lib/routes.js";
 import type { z } from "zod";
 import { pwInput } from "../../form/pw-input.js";
 
-export async function pwUser(id: number, viewOnly: boolean = false) {
-  let result = await taskFunction([id]);
+export async function pwUser(id: number, viewOnly = false) {
+  const result = await taskFunction([id]);
   return html`<pw-user-create
     ?disabled=${viewOnly}
     .initial=${result}
@@ -41,7 +41,7 @@ export async function pwUser(id: number, viewOnly: boolean = false) {
 }
 
 const taskFunction = async ([id]: [number]) => {
-  let response = await myFetch<"/api/v1/users">(
+  const response = await myFetch<"/api/v1/users">(
     `/api/v1/users/?f_id=${id}`,
     {}
   );
@@ -96,7 +96,7 @@ class PwUserCreate extends PwForm<"/api/v1/users/create-or-update"> {
         formDataEvent.detail.force_in_project_id = null;
       }
 
-      let result = await myFetch<"/api/v1/users/create-or-update">(
+      const result = await myFetch<"/api/v1/users/create-or-update">(
         "/api/v1/users/create-or-update",
         {
           method: "POST",

@@ -31,12 +31,12 @@ import { myFetch } from "../../utils.js";
 import { ifDefined } from "lit/directives/if-defined";
 
 export const pwProjects = async (url: URL) => {
-  let result = await taskFunction([url.searchParams]);
+  const result = await taskFunction([url.searchParams]);
   return html`<pw-projects .initial=${result}></pw-projects>`;
 };
 
 const taskFunction = async ([searchParams]: [URLSearchParams]) => {
-  let response = await myFetch<"/api/v1/projects">(
+  const response = await myFetch<"/api/v1/projects">(
     `/api/v1/projects?${searchParams}`,
     {}
   );

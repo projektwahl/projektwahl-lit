@@ -62,7 +62,7 @@ export class HistoryController implements ReactiveController {
     window.addEventListener("navigate", this.navigateListener);
   }
   hostDisconnected() {
-    window.removeEventListener("navigate", this.navigateListener!);
+    window.removeEventListener("navigate", this.navigateListener);
   }
 
   static goto(url: URL, state: HistoryState) {

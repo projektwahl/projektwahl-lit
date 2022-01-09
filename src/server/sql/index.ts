@@ -36,7 +36,7 @@ import type { WritableTemplateStringsArray } from "../../lib/types";
 export function unsafe2(
   string: null | string | number | symbol
 ): [TemplateStringsArray, ...any[]] {
-  let r: import("../../lib/types").WritableTemplateStringsArray = [
+  const r: import("../../lib/types").WritableTemplateStringsArray = [
     String(string),
   ];
   r.raw = [String(string)];

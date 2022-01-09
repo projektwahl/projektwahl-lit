@@ -71,19 +71,19 @@ export const makeCreateOrUpdate = <
     .passthrough()
     .superRefine((value, ctx) => {
       // KEEP this line synchronized with the one below
-      let schema = value.id
+      const schema = value.id
         ? s.partial().setKey("id", z.number())
         : s.extend({
             id: z.null(),
           });
-      let parsed = schema.safeParse(value);
+      const parsed = schema.safeParse(value);
       if (!parsed.success) {
         parsed.error.issues.forEach(ctx.addIssue);
       }
     })
     .transform((value) => {
       // KEEP this line synchronized with the one above
-      let schema = value.id
+      const schema = value.id
         ? s.partial().setKey("id", z.number())
         : s.extend({
             id: z.null(),
@@ -206,7 +206,7 @@ export const entities = <
     })
   );
 
-let a = entities(z.object({}));
+const a = entities(z.object({}));
 
 let b: z.infer<typeof a>;
 

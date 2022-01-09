@@ -71,7 +71,7 @@ export async function fetchData<
     ...(null | string | string[] | boolean | number | Buffer)[]
   ]
 ): Promise<[OutgoingHttpHeaders, z.infer<typeof entityRoutes[R]["response"]>]> {
-  let entitySchema: entitesType[R] = entityRoutes[path];
+  const entitySchema: entitesType[R] = entityRoutes[path];
 
   const url = new URL(request.url!, "https://localhost:8443");
 
@@ -108,7 +108,7 @@ export async function fetchData<
     .parse(url.searchParams.getAll("order").map((o) => o.split("-")));
 
   // TODO FIXME remove this useless struct
-  let _query: BaseQuery<T> = {
+  const _query: BaseQuery<T> = {
     paginationCursor: pagination.p_cursor,
     paginationDirection: pagination.p_direction,
     paginationLimit: pagination.p_limit,
@@ -143,10 +143,10 @@ export async function fetchData<
       filters
     )} ORDER BY ${orderByQuery} LIMIT ${query.paginationLimit + 1})`;
   } else {
-    let queries = query.sorting.map((value, index) => {
+    const queries = query.sorting.map((value, index) => {
       const part = query.sorting.slice(0, index + 1);
 
-      let parts = part
+      const parts = part
         .flatMap((value, index) => {
           return [
             sql2` AND `,
@@ -179,7 +179,7 @@ export async function fetchData<
     }
   }
 
-  let entitiesSchema =
+  const entitiesSchema =
     entitySchema["response"]["options"][0]["shape"]["data"]["shape"]["entities"]
 
   let entities: z.infer<
@@ -214,19 +214,13 @@ export async function fetchData<
     }
   }
 
-  let y = {
-    entities: entities as z.infer<
-      entitesType[R]["response"]["options"][0]["shape"]["data"]
-    >["entities"],
-    nextCursor: nextCursor as z.infer<
-      entitesType[R]["response"]["options"][0]["shape"]["data"]
-    >["nextCursor"],
-    previousCursor: previousCursor as z.infer<
-      entitesType[R]["response"]["options"][0]["shape"]["data"]
-    >["previousCursor"],
+  const y = {
+    entities: entities ,
+    nextCursor: nextCursor ,
+    previousCursor: previousCursor ,
   } as mappedInfer1<R>;
 
-  let a = {
+  const a = {
     success: true as const,
     data: y,
   } as z.infer<entitesType[R]["response"]>;

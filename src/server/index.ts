@@ -35,7 +35,7 @@ if (cluster.isPrimary) {
   for await (const f of getDirs("./src/server")) {
     (async () => {
       for await (const event of watch(f)) {
-        let oldWorkers = { ...cluster.workers };
+        const oldWorkers = { ...cluster.workers };
 
         cluster.fork().on("listening", (address) => {
           for (const id in oldWorkers) {
@@ -49,7 +49,7 @@ if (cluster.isPrimary) {
   for await (const f of getDirs("./src/lib")) {
     (async () => {
       for await (const event of watch(f)) {
-        let oldWorkers = { ...cluster.workers };
+        const oldWorkers = { ...cluster.workers };
 
         cluster.fork().on("listening", (address) => {
           for (const id in oldWorkers) {

@@ -62,7 +62,7 @@ export function requestHandler<P extends keyof typeof routes>(
     session_id: string | undefined
   ) => Promise<[OutgoingHttpHeaders, z.infer<typeof routes[P]["response"]>]>
 ): (request: IncomingMessage | Http2ServerRequest, response: ServerResponse | Http2ServerResponse) => Promise<boolean> {
-  let fn = async (request: IncomingMessage | Http2ServerRequest, response: ServerResponse | Http2ServerResponse) => {
+  const fn = async (request: IncomingMessage | Http2ServerRequest, response: ServerResponse | Http2ServerResponse) => {
     try {
       if (request.method !== "GET" && request.method !== "POST") {
         throw new Error("Unsupported http method!");
@@ -75,7 +75,7 @@ export function requestHandler<P extends keyof typeof routes>(
         throw new Error("No CSRF header!");
       }
 
-      let url = new URL(request.url!, "https://localhost:8443");
+      const url = new URL(request.url!, "https://localhost:8443");
       if (
         request.method === method &&
         new RegExp(path).test(/** @type {string} */ url.pathname)
@@ -83,7 +83,7 @@ export function requestHandler<P extends keyof typeof routes>(
         let user = undefined;
         let session_id: string | undefined = undefined;
         if (request.headers.cookie) {
-          var cookies = cookie.parse(request.headers.cookie);
+          const cookies = cookie.parse(request.headers.cookie);
 
           // implementing https://datatracker.ietf.org/doc/html/draft-ietf-httpbis-rfc6265bis-02#section-8.8.2
           session_id =

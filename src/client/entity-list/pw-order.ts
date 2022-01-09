@@ -78,9 +78,9 @@ export class PwOrder<P extends keyof typeof entityRoutes> extends LitElement {
         @click=${() => {
           const urlSearchParams = this.history.url.searchParams;
 
-          let order = [...urlSearchParams.getAll("order")];
+          const order = [...urlSearchParams.getAll("order")];
 
-          let oldElementIndex = order.findIndex((e) =>
+          const oldElementIndex = order.findIndex((e) =>
             e.startsWith(this.name + "-")
           );
           let oldElement;
@@ -119,7 +119,7 @@ export class PwOrder<P extends keyof typeof entityRoutes> extends LitElement {
         id=${this.randomId}
       >
         ${(() => {
-          let value = this.history.url.searchParams
+          const value = this.history.url.searchParams
             .getAll("order")
             .find((e) => e.startsWith(this.name + "-"))
             ?.split("-")[1];

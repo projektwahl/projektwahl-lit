@@ -160,7 +160,7 @@ class PwApp extends LitElement {
 
   override disconnectedCallback(): void {
     super.disconnectedCallback();
-    window.removeEventListener("popstate", this.popstateListener!);
+    window.removeEventListener("popstate", this.popstateListener);
   }
 
   constructor() {

@@ -55,7 +55,7 @@ class PwLogin extends PwForm<"/api/v1/login"> {
       });
       this.form.value?.dispatchEvent(formDataEvent);
 
-      let result = await myFetch<"/api/v1/login">("/api/v1/login", {
+      const result = await myFetch<"/api/v1/login">("/api/v1/login", {
         method: "POST",
         headers: {
           "content-type": "text/json",

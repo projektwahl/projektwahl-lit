@@ -34,7 +34,7 @@ class PwForm<P extends keyof typeof routes> extends LitElement {
     };
   }
 
-  disabled: boolean = false;
+  disabled = false;
 
   get actionText(): string {
     throw new Error("not implemented");

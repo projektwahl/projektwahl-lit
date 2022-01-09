@@ -31,12 +31,12 @@ import { pwOrder } from "../../entity-list/pw-order.js";
 import { ifDefined } from "lit/directives/if-defined";
 
 export const pwUsers = async (url: URL) => {
-  let result = await taskFunction([url.searchParams]);
+  const result = await taskFunction([url.searchParams]);
   return html`<pw-users title=${msg("Users")} .initial=${result}></pw-users>`;
 };
 
 export const taskFunction = async ([searchParams]: [URLSearchParams]) => {
-  let response = await myFetch<"/api/v1/users">(
+  const response = await myFetch<"/api/v1/users">(
     `/api/v1/users?${searchParams}`,
     {}
   );

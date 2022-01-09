@@ -39,9 +39,9 @@ await sql.begin("READ WRITE", async (sql) => {
     cache: false, // TODO FIXME doesnt seem to work properly
   });
 
-  let hash = await hashPassword("changeme");
+  const hash = await hashPassword("changeme");
 
-  let admin = rawUserSchema.parse(
+  const admin = rawUserSchema.parse(
     (await sql`INSERT INTO users (username, password_hash, type) VALUES ('admin', ${hash}, 'admin') ON CONFLICT DO NOTHING RETURNING id;`)[0]);
 
   const projects = z.array(rawProjectSchema).parse(

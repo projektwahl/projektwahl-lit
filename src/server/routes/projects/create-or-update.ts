@@ -58,7 +58,7 @@ export async function createOrUpdateProjectsHandler(
       }
 
       try {
-        let [row] = await sql.begin("READ WRITE", async (sql) => {
+        const [row] = await sql.begin("READ WRITE", async (sql) => {
           if (project.id) {
             const field = (name: string) =>
               updateField("projects_with_deleted", project, name);
@@ -87,7 +87,7 @@ export async function createOrUpdateProjectsHandler(
           } else {
             // TODO FIXME we can use our nice query building here
             // or postgres also has builtin features for insert and update
-            let res =
+            const res =
               await sql`INSERT INTO projects_with_deleted (title, info, place, costs, min_age, max_age, min_participants, max_participants, random_assignments, deleted, last_updated_by)
             (SELECT 
     ${project.title ?? null},

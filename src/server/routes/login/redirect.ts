@@ -37,7 +37,7 @@ export async function openidRedirectHandler(
   response: ServerResponse | Http2ServerResponse
 ) {
   return await requestHandler("GET", "/api/v1/redirect", async function () {
-    let url = new URL(request.url!, "https://localhost:8443");
+    const url = new URL(request.url!, "https://localhost:8443");
 
     const searchParams = z
       .object({

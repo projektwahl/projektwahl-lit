@@ -34,7 +34,7 @@ import { pwOrder } from "../../entity-list/pw-order.js";
 import { ifDefined } from "lit/directives/if-defined";
 
 export const pwProjectUsers = async (url: URL) => {
-  let result = await taskFunction([url.searchParams]);
+  const result = await taskFunction([url.searchParams]);
   return html`<pw-project-users .initial=${result}></pw-project-users>`;
 };
 

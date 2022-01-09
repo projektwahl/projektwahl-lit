@@ -32,8 +32,8 @@ import type { routes } from "../../../lib/routes.js";
 import { setupHmr } from "../../hmr.js";
 import { pwInput } from "../../form/pw-input.js";
 
-export async function pwProject(id: number, viewOnly: boolean = false) {
-  let result = await taskFunction([id]);
+export async function pwProject(id: number, viewOnly = false) {
+  const result = await taskFunction([id]);
   return html`<pw-project-create
     ?disabled=${viewOnly}
     .initial=${result}
@@ -100,7 +100,7 @@ export const PwProjectCreate = setupHmr(
         this.form.value?.dispatchEvent(formDataEvent);
         formDataEvent.detail.id = this.initial?.id ?? null;
 
-        let result = await myFetch<"/api/v1/projects/create-or-update">(
+        const result = await myFetch<"/api/v1/projects/create-or-update">(
           "/api/v1/projects/create-or-update",
           {
             method: "POST",
