@@ -56,11 +56,11 @@ export async function* getDirs(dir: string): AsyncIterable<string> {
 async function replaceAsync(
   str: string,
   regex: RegExp,
-  asyncFn: (match: string, args: any) => Promise<string>
+  asyncFn: (match: string, args: string[]) => Promise<string>
 ): Promise<string> {
   const promises: Promise<string>[] = [];
   str.replaceAll(regex, (match, ...args) => {
-    const promise = asyncFn(match, args);
+    const promise = asyncFn(match, args as string[]);
     promises.push(promise);
     return "";
   });
@@ -95,7 +95,7 @@ export async function serverHandler(
     });
 
     for await (const f of getDirs("./src/client")) {
-      (async () => {
+      void (async () => {
         for await (const event of watch(f)) {
           const baseUrl = resolve(fileURLToPath(import.meta.url), "../../..");
 
@@ -147,7 +147,7 @@ export async function serverHandler(
           {
             parentURL: import.meta.url,
           },
-          (specifier: string, context: { parentURL: string | undefined }, defaultResolve: Function) => {
+          (specifier: string, context: { parentURL: string | undefined }, _defaultResolve: () => void) => {
             const baseURL = pathToFileURL(`${cwd()}/`).href;
             const { parentURL = baseURL } = context;
             const targetUrl = new URL(specifier, parentURL);

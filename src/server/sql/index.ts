@@ -35,7 +35,7 @@ import type { WritableTemplateStringsArray } from "../../lib/types";
 
 export function unsafe2(
   string: null | string | number | symbol
-): [TemplateStringsArray, ...any[]] {
+): [TemplateStringsArray, ...(string | number | boolean | string[])[]] {
   const r: import("../../lib/types").WritableTemplateStringsArray = [
     String(string),
   ];
@@ -81,7 +81,7 @@ export function sql2(
   const flattened: [
     TemplateStringsArray,
     ...(string | string[] | boolean | number)[]
-    // @ts-expect-error
+    // @ts-expect-error TODO FIXME
   ][] = stringsAsTemplates.flatMap((m, i) => {
     if (i == keys.length) {
       return [m];
@@ -121,9 +121,9 @@ export function sql2(
         templateStrings as TemplateStringsArray,
         ...previous.slice(1),
         ...current.slice(1),
-      ] as [TemplateStringsArray, ...any[]];
+      ] as [TemplateStringsArray, ...(string | number | boolean | string[])[]];
     },
-    [r] as [TemplateStringsArray, ...any[]]
+    [r] as [TemplateStringsArray, ...(string | number | boolean | string[])[]]
   );
 
   //console.log("result", result)

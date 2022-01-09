@@ -70,6 +70,7 @@ export async function resolve(
  * @param {string} url
  * @param {undefined} context
  * @param {{ (url: string): Promise<{ source: string; }>; (arg0: any, arg1: any, arg2: any): PromiseLike<{ source: any; }> | { source: any; }; }} defaultLoad
+ * @returns {{ format: "module"; source: string; }}
  */
 export async function load(url, context, defaultLoad) {
   if (/\.ts$/.test(url)) {
