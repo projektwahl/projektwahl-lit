@@ -36,7 +36,7 @@ import { retryableBegin, sql } from "./database.js";
 import cookie from "cookie";
 import type { IncomingMessage, ServerResponse } from "node:http";
 import { defaultHeaders } from "./server-handler.js";
-import type { OutgoingHttpHeaders } from "http2";
+import type { Http2ServerRequest, Http2ServerResponse, OutgoingHttpHeaders } from "http2";
 
 const userMapper = <
   T extends { [k: string]: ZodTypeAny },
@@ -66,8 +66,8 @@ export function requestHandler<P extends keyof typeof routes>(
     user: z.infer<typeof userSchema>,
     session_id: string | undefined
   ) => Promise<[OutgoingHttpHeaders, z.infer<typeof routes[P]["response"]>]>
-): (request: IncomingMessage, response: ServerResponse) => Promise<boolean> {
-  let fn = async (request: IncomingMessage, response: ServerResponse) => {
+): (request: IncomingMessage | Http2ServerRequest, response: ServerResponse | Http2ServerResponse) => Promise<boolean> {
+  let fn = async (request: IncomingMessage | Http2ServerRequest, response: ServerResponse | Http2ServerResponse) => {
     try {
       if (request.method !== "GET" && request.method !== "POST") {
         throw new Error("Unsupported http method!");

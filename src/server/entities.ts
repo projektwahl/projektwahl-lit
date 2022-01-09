@@ -21,7 +21,7 @@ SPDX-License-Identifier: AGPL-3.0-or-later
 SPDX-FileCopyrightText: 2021 Moritz Hedtke <Moritz.Hedtke@t-online.de>
 */
 import type { IncomingMessage } from "node:http";
-import type { OutgoingHttpHeaders } from "node:http2";
+import type { Http2ServerRequest, OutgoingHttpHeaders } from "node:http2";
 import { z } from "zod";
 import { entityRoutes } from "../lib/routes.js";
 import type { BaseQuery } from "../lib/types.js";
@@ -59,7 +59,7 @@ export async function fetchData<
   R extends keyof typeof entityRoutes
 >(
   path: R,
-  request: IncomingMessage,
+  request: IncomingMessage | Http2ServerRequest,
   table: string,
   columns: readonly [string, ...string[]],
   filters: Q,

@@ -23,10 +23,11 @@ SPDX-FileCopyrightText: 2021 Moritz Hedtke <Moritz.Hedtke@t-online.de>
 import { requestHandler } from "../../express.js";
 import { client } from "./openid-client.js";
 import type { IncomingMessage, ServerResponse } from "node:http";
+import type { Http2ServerRequest, Http2ServerResponse } from "node:http2";
 
 export async function openidLoginHandler(
-  request: IncomingMessage,
-  response: ServerResponse
+  request: IncomingMessage | Http2ServerRequest,
+  response: ServerResponse | Http2ServerResponse
 ) {
   return await requestHandler("GET", "/api/v1/openid-login", async function () {
     // https://github.com/AzureAD/microsoft-authentication-library-for-js/tree/dev/lib/msal-browser

@@ -29,14 +29,15 @@ import { hashPassword } from "../../password.js";
 import { sql2, unsafe2 } from "../../sql/index.js";
 import { updateField } from "../../entities.js";
 import type { IncomingMessage, ServerResponse } from "node:http";
+import type { Http2ServerRequest, Http2ServerResponse } from "node:http2";
 
 // TODO FIXME somehow ensure all attributes are read here because this is an easy way to loose data
 // Also ensure create and update has the same attributes
 // TO IMPROVE this maybe return the full column and also read back that data at all places
 
 export async function createOrUpdateUsersHandler(
-  request: IncomingMessage,
-  response: ServerResponse
+  request: IncomingMessage | Http2ServerRequest,
+  response: ServerResponse | Http2ServerResponse
 ) {
   // TODO FIXME create or update multiple
   return await requestHandler(

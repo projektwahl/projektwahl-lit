@@ -26,10 +26,11 @@ import { updateField } from "../../entities.js";
 import { requestHandler } from "../../express.js";
 import { sql2 } from "../../sql/index.js";
 import type { IncomingMessage, ServerResponse } from "node:http";
+import type { Http2ServerRequest, Http2ServerResponse } from "node:http2";
 
 export async function createOrUpdateProjectsHandler(
-  request: IncomingMessage,
-  response: ServerResponse
+  request: IncomingMessage | Http2ServerRequest,
+  response: ServerResponse | Http2ServerResponse
 ) {
   // TODO FIXME create or update multiple
   return await requestHandler(

@@ -32,10 +32,11 @@ import { sql } from "../../database.js";
 import { requestHandler } from "../../express.js";
 import { client } from "./openid-client.js";
 import type { IncomingMessage, ServerResponse } from "node:http";
+import type { Http2ServerRequest, Http2ServerResponse } from "node:http2";
 
 export async function openidRedirectHandler(
-  request: IncomingMessage,
-  response: ServerResponse
+  request: IncomingMessage | Http2ServerRequest,
+  response: ServerResponse | Http2ServerResponse
 ) {
   return await requestHandler("GET", "/api/v1/redirect", async function () {
     let url = new URL(request.url!, "https://localhost:8443");

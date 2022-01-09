@@ -30,14 +30,15 @@ import {
 import { fetchData } from "../../entities.js";
 import { requestHandler } from "../../express.js";
 import { sql2 } from "../../sql/index.js";
+import type { Http2ServerRequest, Http2ServerResponse } from "node:http2";
 
 function includes<T, U extends T>(arr: readonly U[], elem: T): elem is U {
   return arr.includes(elem as any);
 }
 
 export async function usersHandler(
-  request: IncomingMessage,
-  response: ServerResponse
+  request: IncomingMessage | Http2ServerRequest,
+  response: ServerResponse | Http2ServerResponse
 ) {
   return await requestHandler(
     "GET",

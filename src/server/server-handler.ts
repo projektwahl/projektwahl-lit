@@ -38,6 +38,7 @@ import { logoutHandler } from "./routes/login/logout.js";
 import zlib from "node:zlib";
 import { pipeline, Readable } from "node:stream";
 import type { IncomingMessage, ServerResponse } from "node:http";
+import type { Http2ServerRequest, Http2ServerResponse } from "node:http2";
 
 //const startTime = Date.now();
 
@@ -74,8 +75,8 @@ export const defaultHeaders = {
 };
 
 export async function serverHandler(
-  request: IncomingMessage,
-  response: ServerResponse
+  request: IncomingMessage | Http2ServerRequest,
+  response: ServerResponse | Http2ServerResponse
 ) {
   const path = z.string().parse(request.url);
 
@@ -100,7 +101,7 @@ export async function serverHandler(
 
           let url = relative(baseUrl, join(f, event.filename));
 
-          response.write(`data: ${url}\n\n`);
+          (response.write as (chunk: string | Uint8Array, callback?: ((err: Error) => void) | undefined) => boolean)(`data: ${url}\n\n`);
         }
       })();
     }

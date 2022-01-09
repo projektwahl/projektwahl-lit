@@ -20,7 +20,7 @@ https://github.com/projektwahl/projektwahl-lit
 SPDX-License-Identifier: AGPL-3.0-or-later
 SPDX-FileCopyrightText: 2021 Moritz Hedtke <Moritz.Hedtke@t-online.de>
 */
-import { sensitiveHeaders } from "node:http2";
+import type { Http2ServerRequest, Http2ServerResponse } from "node:http2";
 import type { z, ZodObject, ZodTypeAny } from "zod";
 import {
   rawSessionType,
@@ -49,8 +49,8 @@ const users = <
   });
 
 export async function loginHandler(
-  request: IncomingMessage,
-  response: ServerResponse
+  request: IncomingMessage | Http2ServerRequest,
+  response: ServerResponse | Http2ServerResponse
 ) {
   return await requestHandler("POST", "/api/v1/login", async function (body) {
     const r =
