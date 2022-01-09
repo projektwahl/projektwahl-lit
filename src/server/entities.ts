@@ -117,7 +117,7 @@ export async function fetchData<
 
   // TODO FIXME remove this useless struct
   const _query: BaseQuery<T> = {
-    paginationCursor: pagination.p_cursor,
+    paginationCursor: pagination.p_cursor as T,
     paginationDirection: pagination.p_direction,
     paginationLimit: pagination.p_limit,
     sorting,

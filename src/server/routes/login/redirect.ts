@@ -119,7 +119,7 @@ export async function openidRedirectHandler(
           await sql.begin("READ WRITE", async (sql) => {
             return await sql`INSERT INTO sessions (user_id) VALUES (${dbUser.id}) RETURNING session_id`;
           })
-        )[0]
+        ).columns[0]
       );
 
       /** @type {import("node:http2").OutgoingHttpHeaders} */

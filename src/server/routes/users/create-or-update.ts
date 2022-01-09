@@ -62,7 +62,7 @@ export async function createOrUpdateUsersHandler(
       }
 
       try {
-        const [row] = await sql.begin("READ WRITE", async (sql) => {
+        const row = (await sql.begin("READ WRITE", async (sql) => {
           if (user.id) {
             const field = (name: keyof typeof user) =>
               updateField("users_with_deleted", user, name);
@@ -98,7 +98,7 @@ export async function createOrUpdateUsersHandler(
               loggedInUser.id
             }) RETURNING id, project_leader_id, force_in_project_id;`;
           }
-        });
+        })).columns[0];
 
         console.log(row);
 
