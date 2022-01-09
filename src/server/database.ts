@@ -33,7 +33,7 @@ export const sql = postgres(process.env["DATABASE_URL"], {
   },
 });
 
-type UnwrapPromiseArray<T> = T extends any[]
+type UnwrapPromiseArray<T> = T extends any[] // eslint-disable-line @typescript-eslint/no-explicit-any
   ? {
       [k in keyof T]: T[k] extends Promise<infer R> ? R : T[k];
     }
@@ -41,9 +41,9 @@ type UnwrapPromiseArray<T> = T extends any[]
 
 export async function retryableBegin<T>(
   options: string,
-  cb: (tsql: TransactionSql<{}>) => T | Promise<T>
+  cb: (tsql: TransactionSql<Record<string, never>>) => T | Promise<T>
 ): Promise<UnwrapPromiseArray<T>> {
-  while (true) {
+  for (;;) {
     try {
       return await sql.begin(options, cb);
     } catch (error) {

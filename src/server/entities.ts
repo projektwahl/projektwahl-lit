@@ -41,8 +41,7 @@ type mappedInfer1<R extends keyof typeof entityRoutes> = {
   >]: z.infer<entitesType[R]["response"]["options"][0]["shape"]["data"]>[K];
 };
 
-// TODO FIXME make this function generic over name and entity here
-export function updateField(table: string, entity: any, name: string) {
+export function updateField<E extends { [name: string]: string | number | null }, K extends keyof E>(table: string, entity: E, name: K) {
   return sql2`"${unsafe2(name)}" = CASE WHEN ${
     entity[name] !== undefined
   } THEN ${entity[name] ?? null} ELSE "${unsafe2(table)}"."${unsafe2(
@@ -75,6 +74,8 @@ export async function fetchData<
 
   const url = new URL(request.url, "https://localhost:8443");
 
+  // TODO FIXME make all this a json object as get parameter
+
   const pagination = z
     .object({
       p_cursor: z
@@ -92,7 +93,7 @@ export async function fetchData<
             message: "The cursor is invalid. This is an internal error.",
           }
         )
-        .transform((s) => JSON.parse(s))
+        .transform((s) => JSON.parse(s) as unknown)
         .optional(),
       p_direction: z.enum(["forwards", "backwards"]).default("forwards"),
       p_limit: z

@@ -60,10 +60,15 @@ Catchall extends ZodTypeAny = ZodTypeAny
 s: ZodObject<T, UnknownKeys, Catchall>
 ) => z.union([successResult(s), failureResult(z.record(z.string()))]);
 
-export const zod2result = <T extends z.ZodTypeAny>(
-  schema: T,
+export const zod2result = <
+Z extends ZodType<Output, Def, Input>,
+Output,
+Def extends ZodTypeDef = ZodTypeDef,
+Input = Output,
+>(
+  schema: Z,
   input: unknown
-): z.infer<T> => { // TODO FIXME wrong
+) => { // TODO FIXME wrong
   const result = schema.safeParse(input);
   if (result.success) {
     return result;
@@ -83,7 +88,7 @@ export const zod2result = <T extends z.ZodTypeAny>(
         Object.entries(errors).map(([k, v]) => [k, v.join(". ")])
       );
     return {
-      success: false,
+      success: false as const,
       error: errors2,
     };
   }

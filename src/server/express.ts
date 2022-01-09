@@ -110,8 +110,8 @@ export function requestHandler<P extends keyof typeof routes>(
           );
           //console.log("responseBody", responseBody);
           routes[path].response.parse(responseBody);
-          const { ":status": test, ...finalHeaders } = new_headers;
-          response.writeHead(Number(new_headers[":status"]!), {
+          const { ":status": _, ...finalHeaders } = new_headers;
+          response.writeHead(Number(new_headers[":status"]), {
             ...defaultHeaders,
             ...finalHeaders,
           });

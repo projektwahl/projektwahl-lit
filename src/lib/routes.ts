@@ -57,39 +57,7 @@ export const rawUserSchema = z
 })
 .strict();
 
-export const makeCreateOrUpdate = <
-  T extends { [k: string]: ZodTypeAny },
-  UnknownKeys extends UnknownKeysParam = "strip",
-  Catchall extends ZodTypeAny = ZodTypeAny
->(
-  s: ZodObject<T, UnknownKeys, Catchall>
-) =>
-  z
-    .object({
-      id: z.number().nullable(),
-    })
-    .passthrough()
-    .superRefine((value, ctx) => {
-      // KEEP this line synchronized with the one below
-      const schema = value.id
-        ? s.partial().setKey("id", z.number())
-        : s.extend({
-            id: z.null(),
-          });
-      const parsed = schema.safeParse(value);
-      if (!parsed.success) {
-        parsed.error.issues.forEach(ctx.addIssue);
-      }
-    })
-    .transform((value) => {
-      // KEEP this line synchronized with the one above
-      const schema = value.id
-        ? s.partial().setKey("id", z.number())
-        : s.extend({
-            id: z.null(),
-          });
-      return schema.parse(value);
-    });
+// setKey("id", z.number().nullable())
 
 export const rawProjectSchema = z
   .object({
@@ -161,7 +129,6 @@ const usersCreateOrUpdate = <
 >(
   s: ZodObject<T, UnknownKeys, Catchall>
 ) =>
-  makeCreateOrUpdate(
     s
       .pick({
         age: true,
@@ -176,8 +143,8 @@ const usersCreateOrUpdate = <
       })
       .extend({
         password: z.string(),
-      })
-  );
+      }).partial()
+  
 
 /*
 const jo = usersCreateOrUpdate(rawUserVoterSchema)
@@ -286,7 +253,7 @@ export const routes = identity({
     response: result(createOrUpdateUserResponse(rawUserSchema)),
   },
   "/api/v1/projects/create-or-update": {
-    request: makeCreateOrUpdate(rawProjectSchema),
+    request: rawProjectSchema.partial(),
     response: result(z.object({}).extend({ id: z.number() })),
   },
   "/api/v1/users": {
