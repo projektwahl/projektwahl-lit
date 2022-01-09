@@ -74,15 +74,15 @@ class PwProjects extends PwEntityList<"/api/v1/projects"> {
                       the only nice way is probably submit buttons that do things like "oder_by_id_asc" and then redirect to the new state (because you need to remove the old state)
                     -->
         <th class="table-cell-hover p-0" scope="col">
-          ${pwOrder({ name: "id", title: msg("ID") })}
+          ${pwOrder<"/api/v1/projects">({ name: "id", title: msg("ID") })}
         </th>
 
         <th class="table-cell-hover p-0" scope="col">
-          ${pwOrder({ name: "title", title: msg("Title") })}
+          ${pwOrder<"/api/v1/projects">({ name: "title", title: msg("Title") })}
         </th>
 
         <th class="table-cell-hover p-0" scope="col">
-          ${pwOrder({ name: "info", title: msg("Info") })}
+          ${pwOrder<"/api/v1/projects">({ name: "info", title: msg("Info") })}
         </th>
 
         <th class="table-cell-hover">${msg("Actions")}</th>

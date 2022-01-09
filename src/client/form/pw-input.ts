@@ -31,9 +31,9 @@ import type { routes } from "../../lib/routes.js";
 import type { z } from "zod";
 
 // workaround see https://github.com/runem/lit-analyzer/issues/149#issuecomment-1006162839
-export function pwInput<T, Q extends keyof T>(
+export function pwInput<P extends keyof typeof routes, Q extends keyof z.infer<typeof routes[P]["request"]>>(
   props: Pick<
-    PwInput<T, Q>,
+    PwInput<P, Q>,
     | "type"
     | "autocomplete"
     | "disabled"
@@ -43,7 +43,7 @@ export function pwInput<T, Q extends keyof T>(
     | "options"
     | "task"
   > &
-    Partial<Pick<PwInput<T, Q>, "onchange">>
+    Partial<Pick<PwInput<P, Q>, "onchange">>
 ) {
   let {
     onchange,
@@ -93,7 +93,7 @@ export class PwInput<P extends keyof typeof routes, Q extends keyof z.infer<type
     };
   }
 
-  disabled: boolean = false;
+  disabled?: boolean = false;
 
   randomId;
 
@@ -110,7 +110,7 @@ export class PwInput<P extends keyof typeof routes, Q extends keyof z.infer<type
     z.infer<typeof routes[P]["request"]>
   >;
 
-  initial: z.infer<typeof routes[P]["request"]> | undefined;
+  initial?: z.infer<typeof routes[P]["request"]>;
 
   value!: string;
 
