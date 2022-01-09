@@ -21,14 +21,15 @@ SPDX-License-Identifier: AGPL-3.0-or-later
 SPDX-FileCopyrightText: 2021 Moritz Hedtke <Moritz.Hedtke@t-online.de>
 */
 
-import { z, ZodType, ZodTypeDef } from "zod";
+import { z, ZodObject, ZodType, ZodTypeAny, ZodTypeDef } from "zod";
+import type { UnknownKeysParam } from "./routes.js";
 
 export const successResult = <
-  Output,
-  Def extends ZodTypeDef = ZodTypeDef,
-  Input = Output
+  T extends { [k: string]: ZodTypeAny },
+  UnknownKeys extends UnknownKeysParam = "strip",
+  Catchall extends ZodTypeAny = ZodTypeAny
 >(
-  s: ZodType<Output, Def, Input>
+  s: ZodObject<T, UnknownKeys, Catchall>
 ) =>
   z
     .object({
@@ -52,19 +53,23 @@ export const failureResult = <
     .strict();
 
 export const result = <
+  T extends { [k: string]: ZodTypeAny },
+  UnknownKeys extends UnknownKeysParam = "strip",
+  Catchall extends ZodTypeAny = ZodTypeAny
+>(
+  s: ZodObject<T, UnknownKeys, Catchall>
+) => z.union([successResult(s), failureResult(z.record(z.string()))]);
+
+export const zod2result = <
+  Z extends ZodType<Output, Def, Input>,
   Output,
   Def extends ZodTypeDef = ZodTypeDef,
   Input = Output
 >(
-  s: ZodType<Output, Def, Input>
-) => z.union([successResult(s), failureResult(z.record(z.string()))]);
-
-export const anyResult = result(z.object({}));
-
-export const zod2result = <T extends z.ZodTypeAny>(
-  schema: T,
+  schema: Z,
   input: unknown
-): z.infer<T> => {
+) => {
+  // TODO FIXME wrong
   const result = schema.safeParse(input);
   if (result.success) {
     return result;
@@ -84,7 +89,7 @@ export const zod2result = <T extends z.ZodTypeAny>(
         Object.entries(errors).map(([k, v]) => [k, v.join(". ")])
       );
     return {
-      success: false,
+      success: false as const,
       error: errors2,
     };
   }

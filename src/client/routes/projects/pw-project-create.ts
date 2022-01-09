@@ -32,8 +32,8 @@ import type { routes } from "../../../lib/routes.js";
 import { setupHmr } from "../../hmr.js";
 import { pwInput } from "../../form/pw-input.js";
 
-export async function pwProject(id: number, viewOnly: boolean = false) {
-  let result = await taskFunction([id]);
+export async function pwProject(id: number, viewOnly = false) {
+  const result = await taskFunction([id]);
   return html`<pw-project-create
     ?disabled=${viewOnly}
     .initial=${result}
@@ -43,10 +43,9 @@ export async function pwProject(id: number, viewOnly: boolean = false) {
 const taskFunction = async ([id]: [number]) => {
   const [_, response] = await Promise.all([
     import("../projects/pw-project-users.js"),
-    await myFetch<"/api/v1/projects">(`/api/v1/projects/?f_id=${id}`, {
-      //agent: new Agent({rejectUnauthorized: false})
-    }),
+    await myFetch<"/api/v1/projects">(`/api/v1/projects/?f_id=${id}`, {}),
   ]);
+  // TODO FIXME really fix this here
   return response.success ? response.data.entities[0] : null; // TODO FIXME error handling, PwForm already has some form of error handling
 };
 
@@ -77,7 +76,9 @@ export const PwProjectCreate = setupHmr(
     initialRender: boolean;
 
     initial:
-      | z.infer<typeof routes["/api/v1/projects/create-or-update"]["request"]>
+      | z.infer<
+          typeof routes["/api/v1/projects"]["response"]["options"][0]["shape"]["data"]["shape"]["entities"]
+        >[number]
       | undefined;
 
     constructor() {
@@ -99,9 +100,9 @@ export const PwProjectCreate = setupHmr(
           },
         });
         this.form.value?.dispatchEvent(formDataEvent);
-        formDataEvent.detail.id = this.initial?.id ?? null;
+        formDataEvent.detail.id = this.initial?.id;
 
-        let result = await myFetch<"/api/v1/projects/create-or-update">(
+        const result = await myFetch<"/api/v1/projects/create-or-update">(
           "/api/v1/projects/create-or-update",
           {
             method: "POST",
@@ -207,14 +208,14 @@ export const PwProjectCreate = setupHmr(
         <!-- TODO FIXME view only -->
         ${this.initial
           ? html`<pw-project-users
-              projectId=${this.initial.id!}
+              projectId=${this.initial.id}
               name=${"project_leader_id"}
               title=${msg("Project leaders")}
             ></pw-project-users>`
           : html``}
         ${this.initial
           ? html`<pw-project-users
-              projectId=${this.initial.id!}
+              projectId=${this.initial.id}
               name=${"force_in_project_id"}
               title=${msg("Guaranteed project members")}
             ></pw-project-users>`

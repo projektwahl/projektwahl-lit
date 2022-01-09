@@ -25,6 +25,8 @@ import { fileURLToPath, pathToFileURL } from "node:url";
 import esbuild from "esbuild";
 import { stat } from "node:fs/promises";
 
+// npx tsc --declaration --allowJs --emitDeclarationOnly src/loader.js
+
 const baseURL = pathToFileURL(`${cwd()}/`).href;
 
 const fileExists = (/** @type {import("fs").PathLike} */ path) =>
@@ -34,8 +36,8 @@ const fileExists = (/** @type {import("fs").PathLike} */ path) =>
   );
 
 /**
- * @param {{ parentURL: any; }} context
- * @param {{ (specifier: any, context: any, defaultResolve: any): { url: string; }; (arg0: string, arg1: any, arg2: any): any; }} defaultResolve
+ * @param {{ parentURL: string; }} context
+ * @param { (specifier: string, context: { parentURL: string; }) => { url: string; } } defaultResolve
  */
 export async function resolve(
   /** @type {string} */ specifier,
@@ -69,7 +71,8 @@ export async function resolve(
 /**
  * @param {string} url
  * @param {undefined} context
- * @param {{ (url: string): Promise<{ source: string; }>; (arg0: any, arg1: any, arg2: any): PromiseLike<{ source: any; }> | { source: any; }; }} defaultLoad
+ * @param { (url: string) => Promise<{ source: string; }> } defaultLoad
+ * @returns {Promise<{ format: "module"; source: string; }>}
  */
 export async function load(url, context, defaultLoad) {
   if (/\.ts$/.test(url)) {

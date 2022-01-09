@@ -24,17 +24,20 @@ import { html, LitElement } from "lit";
 import { bootstrapCss } from "../index.js";
 import { HistoryController } from "../history-controller.js";
 import { msg, str } from "@lit/localize";
+import type { entityRoutes } from "../../lib/routes.js";
+import type { z } from "zod";
 
 // workaround see https://github.com/runem/lit-analyzer/issues/149#issuecomment-1006162839
-export function pwOrder<T, Q extends keyof T>(
-  props: Pick<PwOrder<T, Q>, "name" | "title">
+export function pwOrder<P extends keyof typeof entityRoutes>(
+  props: Pick<PwOrder<P>, "name" | "title">
 ) {
-  let { name, title, ...rest } = props;
-  rest = {}; // ensure no property is missed
+  const { name, title, ...rest } = props;
+  let _ = rest;
+  _ = 1; // ensure no property is missed - Don't use `{}` as a type. `{}` actually means "any non-nullish value".
   return html`<pw-order .name=${name} title=${title}></pw-order>`;
 }
 
-export class PwOrder<T, Q extends keyof T> extends LitElement {
+export class PwOrder<P extends keyof typeof entityRoutes> extends LitElement {
   static override get properties() {
     return {
       title: { type: String },
@@ -47,7 +50,9 @@ export class PwOrder<T, Q extends keyof T> extends LitElement {
     return this;
   }
 
-  name!: Q;
+  name!: keyof z.infer<
+    typeof entityRoutes[P]["response"]["options"][0]
+  >["data"]["entities"][number]; // TODO FIXME pass order using json and then use that schema here
 
   title!: string;
 
@@ -74,14 +79,14 @@ export class PwOrder<T, Q extends keyof T> extends LitElement {
         @click=${() => {
           const urlSearchParams = this.history.url.searchParams;
 
-          let order = [...urlSearchParams.getAll("order")];
+          const order = [...urlSearchParams.getAll("order")];
 
-          let oldElementIndex = order.findIndex((e) =>
-            e.startsWith(this.name + "-")
+          const oldElementIndex = order.findIndex((e) =>
+            e.startsWith(`${this.name as string}-`)
           );
           let oldElement;
           if (oldElementIndex == -1) {
-            oldElement = `${this.name}-downup`;
+            oldElement = `${this.name as string}-downup`;
           } else {
             oldElement = order.splice(oldElementIndex, 1)[0];
           }
@@ -105,7 +110,7 @@ export class PwOrder<T, Q extends keyof T> extends LitElement {
           ].forEach((v) => urlSearchParams.append("order", v));
 
           HistoryController.goto(
-            new URL(`?${urlSearchParams}`, window.location.href),
+            new URL(`?${urlSearchParams.toString()}`, window.location.href),
             {}
           );
         }}
@@ -115,9 +120,9 @@ export class PwOrder<T, Q extends keyof T> extends LitElement {
         id=${this.randomId}
       >
         ${(() => {
-          let value = this.history.url.searchParams
+          const value = this.history.url.searchParams
             .getAll("order")
-            .find((e) => e.startsWith(this.name + "-"))
+            .find((e) => e.startsWith(`${this.name as string}-`))
             ?.split("-")[1];
           return value === "ASC"
             ? html`<svg

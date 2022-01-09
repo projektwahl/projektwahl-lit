@@ -25,6 +25,7 @@ import { createRef, ref } from "lit/directives/ref.js";
 import { bootstrapCss } from "../index.js";
 import { msg } from "@lit/localize";
 import type { routes } from "../../lib/routes.js";
+import type { z } from "zod";
 
 class PwForm<P extends keyof typeof routes> extends LitElement {
   static get properties() {
@@ -33,18 +34,16 @@ class PwForm<P extends keyof typeof routes> extends LitElement {
     };
   }
 
-  disabled: boolean = false;
+  disabled = false;
 
   get actionText(): string {
     throw new Error("not implemented");
   }
 
   _task!: import("@lit-labs/task").Task<
-    any,
-    import("zod").infer<typeof import("../../lib/result.js").anyResult>
+    unknown[],
+    z.infer<typeof routes[P]["response"]>
   >;
-
-  fakeSlot!: import("lit").TemplateResult;
 
   form: import("lit/directives/ref").Ref<HTMLFormElement>;
 
@@ -52,12 +51,6 @@ class PwForm<P extends keyof typeof routes> extends LitElement {
     super();
 
     this.form = createRef();
-  }
-
-  protected submit(event: SubmitEvent) {
-    event.preventDefault();
-
-    this._task.run();
   }
 
   // TODO FIXME really important
@@ -135,7 +128,11 @@ if ('FormDataEvent' in window) {
               ${ref(this.form)}
               method="POST"
               action="/no-javascript"
-              @submit=${this.submit}
+              @submit=${async (event: Event) => {
+                event.preventDefault();
+
+                await this._task.run();
+              }}
             >
               ${this.getInputs()}
               ${!this.disabled
@@ -149,7 +146,7 @@ if ('FormDataEvent' in window) {
                       }) as boolean}
                       class="btn btn-primary"
                     >
-                      ${this.actionText} ${this._task.status}
+                      ${this.actionText}
                     </button>
                   `
                 : undefined}

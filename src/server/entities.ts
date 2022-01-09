@@ -20,12 +20,12 @@ https://github.com/projektwahl/projektwahl-lit
 SPDX-License-Identifier: AGPL-3.0-or-later
 SPDX-FileCopyrightText: 2021 Moritz Hedtke <Moritz.Hedtke@t-online.de>
 */
-import type { IncomingMessage } from "node:http";
 import type { OutgoingHttpHeaders } from "node:http2";
-import { z, ZodTypeAny } from "zod";
+import { z } from "zod";
 import { entityRoutes } from "../lib/routes.js";
 import type { BaseQuery } from "../lib/types.js";
 import { sql } from "./database.js";
+import type { MyRequest } from "./express.js";
 import { sql2, unsafe2 } from "./sql/index.js";
 
 // Mapped Types
@@ -35,15 +35,16 @@ type entitesType = {
   [K in keyof typeof entityRoutes]: typeof entityRoutes[K];
 };
 
-// { entities: z.TypeOf<entitesType[R]["response"]["options"][0]["shape"]["data"]>["entities"]; nextCursor: z.TypeOf<entitesType[R]["response"]["options"][0]["shape"]["data"]>["nextCursor"]; previousCursor: z.TypeOf<entitesType[R]["response"]["options"][0]["shape"]["data"]>["previousCursor"]; }
 type mappedInfer1<R extends keyof typeof entityRoutes> = {
   [K in keyof z.infer<
     entitesType[R]["response"]["options"][0]["shape"]["data"]
   >]: z.infer<entitesType[R]["response"]["options"][0]["shape"]["data"]>[K];
 };
 
-// TODO FIXME make this function generic over name and entity
-export function updateField(table: string, entity: any, name: string) {
+export function updateField<
+  E extends { [name: string]: boolean | string | number | null },
+  K extends keyof E
+>(table: string, entity: E, name: K) {
   return sql2`"${unsafe2(name)}" = CASE WHEN ${
     entity[name] !== undefined
   } THEN ${entity[name] ?? null} ELSE "${unsafe2(table)}"."${unsafe2(
@@ -60,7 +61,7 @@ export async function fetchData<
   R extends keyof typeof entityRoutes
 >(
   path: R,
-  request: IncomingMessage,
+  request: MyRequest,
   table: string,
   columns: readonly [string, ...string[]],
   filters: Q,
@@ -72,9 +73,11 @@ export async function fetchData<
     ...(null | string | string[] | boolean | number | Buffer)[]
   ]
 ): Promise<[OutgoingHttpHeaders, z.infer<typeof entityRoutes[R]["response"]>]> {
-  let entitySchema: entitesType[R] = entityRoutes[path];
+  const entitySchema: entitesType[R] = entityRoutes[path];
 
-  const url = new URL(request.url!, "https://localhost:8443");
+  const url = new URL(request.url, "https://localhost:8443");
+
+  // TODO FIXME make all this a json object as get parameter
 
   const pagination = z
     .object({
@@ -93,7 +96,7 @@ export async function fetchData<
             message: "The cursor is invalid. This is an internal error.",
           }
         )
-        .transform((s) => JSON.parse(s))
+        .transform((s) => JSON.parse(s) as unknown)
         .optional(),
       p_direction: z.enum(["forwards", "backwards"]).default("forwards"),
       p_limit: z
@@ -102,15 +105,19 @@ export async function fetchData<
         .transform((s) => (s === "" ? undefined : Number(s)))
         .default("10"),
     })
-    .parse(Object.fromEntries(url.searchParams as any));
+    .parse(
+      Object.fromEntries(
+        url.searchParams as unknown as Iterable<readonly [string, string]>
+      )
+    );
 
   const sorting = z
     .array(z.tuple([z.enum(columns), z.enum(["ASC", "DESC"])]))
     .parse(url.searchParams.getAll("order").map((o) => o.split("-")));
 
-  // TODO FIXMe remove this useless struct
-  let _query: BaseQuery<T> = {
-    paginationCursor: pagination.p_cursor,
+  // TODO FIXME remove this useless struct
+  const _query: BaseQuery<T> = {
+    paginationCursor: pagination.p_cursor as T,
     paginationDirection: pagination.p_direction,
     paginationLimit: pagination.p_limit,
     sorting,
@@ -144,10 +151,10 @@ export async function fetchData<
       filters
     )} ORDER BY ${orderByQuery} LIMIT ${query.paginationLimit + 1})`;
   } else {
-    let queries = query.sorting.map((value, index) => {
+    const queries = query.sorting.map((value, index) => {
       const part = query.sorting.slice(0, index + 1);
 
-      let parts = part
+      const parts = part
         .flatMap((value, index) => {
           return [
             sql2` AND `,
@@ -180,8 +187,7 @@ export async function fetchData<
     }
   }
 
-  // [TemplateStringsArray, ...(null | string | string[] | boolean | number)[]]
-  let entitiesSchema: entitesType[R]["response"]["options"][0]["shape"]["data"]["shape"]["entities"] =
+  const entitiesSchema =
     entitySchema["response"]["options"][0]["shape"]["data"]["shape"][
       "entities"
     ];
@@ -218,19 +224,13 @@ export async function fetchData<
     }
   }
 
-  let y = {
-    entities: entities as z.infer<
-      entitesType[R]["response"]["options"][0]["shape"]["data"]
-    >["entities"],
-    nextCursor: nextCursor as z.infer<
-      entitesType[R]["response"]["options"][0]["shape"]["data"]
-    >["nextCursor"],
-    previousCursor: previousCursor as z.infer<
-      entitesType[R]["response"]["options"][0]["shape"]["data"]
-    >["previousCursor"],
+  const y = {
+    entities: entities,
+    nextCursor: nextCursor,
+    previousCursor: previousCursor,
   } as mappedInfer1<R>;
 
-  let a = {
+  const a = {
     success: true as const,
     data: y,
   } as z.infer<entitesType[R]["response"]>;

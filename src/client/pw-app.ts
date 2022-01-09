@@ -28,7 +28,7 @@ import {
   TemplateResult,
 } from "lit";
 import { bootstrapCss } from "./index.js";
-import { HistoryController } from "./history-controller.js";
+import { HistoryController, HistoryState } from "./history-controller.js";
 import { aClick } from "./pw-a.js";
 import jscookie from "js-cookie";
 import { msg, str } from "@lit/localize";
@@ -48,29 +48,33 @@ window.addEventListener("error", function (event) {
   alert("unknown error: " + event.message);
 });
 
-window.addEventListener("unhandledrejection", function (event) {
-  console.error("window.unhandledrejection", event.promise);
-  alert("unknown error: " + event.reason);
-});
+window.addEventListener(
+  "unhandledrejection",
+  function (event: PromiseRejectionEvent) {
+    console.error("window.unhandledrejection", event.promise);
+    alert("unknown error: " + String(event.reason));
+  }
+);
 
 ReactiveElement.enableWarning?.("migration");
 ReactiveElement.enableWarning?.("change-in-update");
 
 // TODO FIXME create a pw-app directive that can be awaited on the server side.
 // so we actually get server side rendering with datae
-
+/*
 export const pwApp = async (url: URL) => {
   let page = await nextPage(url);
   return html`<pw-app .initial=${Promise.resolve(page)}></pw-app>`;
 };
-
+*/
+/*
 function identity<
   T extends {
     [r: string]: (url: URL) => Promise<TemplateResult<any>>;
   }
 >(v: T) {
   return v;
-}
+}*/
 
 const pages = {
   "^/$": async () => {
@@ -91,12 +95,14 @@ const pages = {
   },
   "^/users/edit/d+/$": async (url: URL) => {
     const { pwUser } = await import("./routes/users/pw-user-create.js");
-    return await pwUser(Number(url.pathname.match(/^users\/edit\/(\d+)$/)![1]));
+    return await pwUser(
+      Number(url.pathname.match(/^users\/edit\/(\d+)$/)?.[1])
+    );
   },
   "^/users/view/d+/$": async (url: URL) => {
     const { pwUser } = await import("./routes/users/pw-user-create.js");
     return await pwUser(
-      Number(url.pathname.match(/^users\/view\/(\d+)$/)![1]),
+      Number(url.pathname.match(/^users\/view\/(\d+)$/)?.[1]),
       true
     );
   },
@@ -105,9 +111,7 @@ const pages = {
     return await pwProjects(url);
   },
   "^/projects/create$": async () => {
-    const { pwProject } = await import(
-      "./routes/projects/pw-project-create.js"
-    );
+    await import("./routes/projects/pw-project-create.js");
     await import("./routes/projects/pw-project-users.js");
     return html`<pw-project-create></pw-project-create>`;
   },
@@ -116,7 +120,7 @@ const pages = {
       "./routes/projects/pw-project-create.js"
     );
     return await pwProject(
-      Number(url.pathname.match(/^projects\/edit\/(\d+)$/)![1])
+      Number(url.pathname.match(/^projects\/edit\/(\d+)$/)?.[1])
     );
   },
   "^/projects/view/d+/$": async (url: URL) => {
@@ -124,7 +128,7 @@ const pages = {
       "./routes/projects/pw-project-create.js"
     );
     return await pwProject(
-      Number(url.pathname.match(/^projects\/view\/(\d+)$/)![1]),
+      Number(url.pathname.match(/^projects\/view\/(\d+)$/)?.[1]),
       true
     );
   },
@@ -149,25 +153,20 @@ class PwApp extends LitElement {
 
   private popstateListener: (this: Window, ev: PopStateEvent) => void;
 
-  private navigateListener: (
-    this: Window,
-    event: CustomEvent<{ url: URL; state: HistoryState }>
-  ) => void;
+  protected _apiTask!: Task<[keyof typeof pages | undefined], TemplateResult>;
 
-  protected _apiTask!: Task<[URLSearchParams], TemplateResult>;
-
-  nextPage: any;
+  nextPage: ([key]: [
+    keyof typeof pages | undefined
+  ]) => Promise<TemplateResult>;
 
   override connectedCallback(): void {
     super.connectedCallback();
     window.addEventListener("popstate", this.popstateListener);
-    window.addEventListener("navigate", this.navigateListener);
   }
 
   override disconnectedCallback(): void {
     super.disconnectedCallback();
-    window.removeEventListener("popstate", this.popstateListener!);
-    window.removeEventListener("navigate", this.navigateListener!);
+    window.removeEventListener("popstate", this.popstateListener);
   }
 
   constructor() {
@@ -191,7 +190,7 @@ class PwApp extends LitElement {
 
     this.popstateListener = (event: PopStateEvent) => {
       const url = new URL(window.location.href);
-      const state = /** @type {HistoryState} */ event.state;
+      const state = event.state as HistoryState;
       HistoryController.goto(url, state);
     };
 
@@ -208,7 +207,7 @@ class PwApp extends LitElement {
     this._apiTask = new Task(this, this.nextPage, () => [
       Object.keys(pages).find((k) =>
         new RegExp(k).test(this.history.url.pathname)
-      ),
+      ) as keyof typeof pages,
     ]);
   }
 

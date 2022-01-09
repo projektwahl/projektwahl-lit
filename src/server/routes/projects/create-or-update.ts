@@ -23,15 +23,15 @@ SPDX-FileCopyrightText: 2021 Moritz Hedtke <Moritz.Hedtke@t-online.de>
 import postgres from "postgres";
 import { sql } from "../../database.js";
 import { updateField } from "../../entities.js";
-import { requestHandler } from "../../express.js";
+import { MyRequest, requestHandler } from "../../express.js";
 import { sql2 } from "../../sql/index.js";
-import type { IncomingMessage, ServerResponse } from "node:http";
-
-// TODO FIXME you can accidentialy create instead of update if you forget to pass the id. maybe force id and setting it to null means creation.
+import type { ServerResponse } from "node:http";
+import type { Http2ServerResponse } from "node:http2";
+import { rawProjectSchema } from "../../../lib/routes.js";
 
 export async function createOrUpdateProjectsHandler(
-  request: IncomingMessage,
-  response: ServerResponse
+  request: MyRequest,
+  response: ServerResponse | Http2ServerResponse
 ) {
   // TODO FIXME create or update multiple
   return await requestHandler(
@@ -59,12 +59,14 @@ export async function createOrUpdateProjectsHandler(
       }
 
       try {
-        let [row] = await sql.begin("READ WRITE", async (sql) => {
-          if (project.id) {
-            const field = (name: string) =>
-              updateField("projects_with_deleted", project, name);
+        const row = rawProjectSchema.parse(
+          (
+            await sql.begin("READ WRITE", async (sql) => {
+              if (project.id) {
+                const field = (name: keyof typeof project) =>
+                  updateField("projects_with_deleted", project, name);
 
-            const finalQuery = sql2`UPDATE projects_with_deleted SET
+                const finalQuery = sql2`UPDATE projects_with_deleted SET
             ${field("title")},
             ${field("info")},
             ${field("place")},
@@ -79,17 +81,17 @@ export async function createOrUpdateProjectsHandler(
             FROM users_with_deleted WHERE projects_with_deleted.id = ${
               project.id
             } AND users_with_deleted.id = ${
-              loggedInUser.id
-            } AND (users_with_deleted.project_leader_id = ${
-              project.id
-            } AND users_with_deleted.type = 'helper' OR users_with_deleted.type = 'admin') RETURNING projects_with_deleted.id;`;
+                  loggedInUser.id
+                } AND (users_with_deleted.project_leader_id = ${
+                  project.id
+                } AND users_with_deleted.type = 'helper' OR users_with_deleted.type = 'admin') RETURNING projects_with_deleted.id;`;
 
-            return await sql(...finalQuery);
-          } else {
-            // TODO FIXME we can use our nice query building here
-            // or postgres also has builtin features for insert and update
-            let res =
-              await sql`INSERT INTO projects_with_deleted (title, info, place, costs, min_age, max_age, min_participants, max_participants, random_assignments, deleted, last_updated_by)
+                return await sql(...finalQuery);
+              } else {
+                // TODO FIXME we can use our nice query building here
+                // or postgres also has builtin features for insert and update
+                const res =
+                  await sql`INSERT INTO projects_with_deleted (title, info, place, costs, min_age, max_age, min_participants, max_participants, random_assignments, deleted, last_updated_by)
             (SELECT 
     ${project.title ?? null},
     ${project.info ?? null},
@@ -100,22 +102,26 @@ export async function createOrUpdateProjectsHandler(
     ${project.min_participants ?? null},
     ${project.max_participants ?? null},
     ${project.random_assignments ?? false}, ${project.deleted ?? false}, ${
-                loggedInUser.id
-              } FROM users_with_deleted WHERE users_with_deleted.id = ${
-                loggedInUser.id
-              } AND (users_with_deleted.type = 'helper' OR users_with_deleted.type = 'admin'))
+                    loggedInUser.id
+                  } FROM users_with_deleted WHERE users_with_deleted.id = ${
+                    loggedInUser.id
+                  } AND (users_with_deleted.type = 'helper' OR users_with_deleted.type = 'admin'))
     RETURNING id;`;
 
-            // TODO FIXME make this in sql directly
-            if (loggedInUser.type === "helper") {
-              await sql`UPDATE users_with_deleted SET project_leader_id = ${
-                res[0].id as number
-              } WHERE project_leader_id IS NULL AND id = ${loggedInUser.id}`;
-            }
+                // TODO FIXME make this in sql directly
+                if (loggedInUser.type === "helper") {
+                  await sql`UPDATE users_with_deleted SET project_leader_id = ${
+                    res[0].id as number
+                  } WHERE project_leader_id IS NULL AND id = ${
+                    loggedInUser.id
+                  }`;
+                }
 
-            return res;
-          }
-        });
+                return res;
+              }
+            })
+          ).columns[0]
+        );
 
         if (!row) {
           // insufficient permissions

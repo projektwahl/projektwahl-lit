@@ -251,7 +251,7 @@ export function register<T>(key, clazz: T): T {
 }
 
 if (!window.PRODUCTION) {
-  let eventSource = new EventSource("/api/v1/hmr");
+  const eventSource = new EventSource("/api/v1/hmr");
   eventSource.addEventListener("error", function (error) {
     console.error(error);
     // eventSource = new EventSource("/api/v1/hmr");
@@ -260,11 +260,11 @@ if (!window.PRODUCTION) {
     console.log(event);
   });
   eventSource.addEventListener("message", async function (event) {
-    let updatedUrl = new URL(event.data, document.location.origin);
+    const updatedUrl = new URL(event.data, document.location.origin);
 
     console.log("hmr updating");
 
-    let response = await import(`${updatedUrl.toString()}?${Date.now()}`);
+    const response = await import(`${updatedUrl.toString()}?${Date.now()}`);
 
     console.log("update", updatedUrl.toString());
   });

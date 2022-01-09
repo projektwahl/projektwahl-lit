@@ -23,29 +23,33 @@ SPDX-FileCopyrightText: 2021 Moritz Hedtke <Moritz.Hedtke@t-online.de>
 import { sensitiveHeaders } from "node:http2";
 import { z, ZodObject, ZodTypeAny } from "zod";
 import {
-  rawUserHelperOrAdminSchema,
+  rawSessionType,
   rawUserSchema,
-  rawUserVoterSchema,
   UnknownKeysParam,
 } from "../../../lib/routes.js";
 import { sql } from "../../database.js";
-import { requestHandler } from "../../express.js";
+import { MyRequest, requestHandler } from "../../express.js";
 import { client } from "./openid-client.js";
-import type { IncomingMessage, ServerResponse } from "node:http";
+import type { ServerResponse } from "node:http";
+import type { Http2ServerResponse } from "node:http2";
 
 export async function openidRedirectHandler(
-  request: IncomingMessage,
-  response: ServerResponse
+  request: MyRequest,
+  response: ServerResponse | Http2ServerResponse
 ) {
   return await requestHandler("GET", "/api/v1/redirect", async function () {
-    let url = new URL(request.url, "https://localhost:8443");
+    const url = new URL(request.url, "https://localhost:8443");
 
     const searchParams = z
       .object({
         session_state: z.string(),
         code: z.string(),
       })
-      .parse(Object.fromEntries(url.searchParams as any));
+      .parse(
+        Object.fromEntries(
+          url.searchParams as unknown as Iterable<readonly [string, string]>
+        )
+      );
 
     // https://github.com/AzureAD/microsoft-authentication-library-for-js/tree/dev/lib/msal-browser
     // https://docs.microsoft.com/en-us/azure/active-directory/develop/scenario-spa-app-registration
@@ -55,8 +59,12 @@ export async function openidRedirectHandler(
     // https://github.com/projektwahl/projektwahl-sveltekit/blob/work/src/routes/login/index.json.ts
     // https://github.com/projektwahl/projektwahl-sveltekit/blob/work/src/routes/redirect/index.ts_old
 
+    if (!client) {
+      throw new Error("OpenID not configured!");
+    }
+
     try {
-      const result = await client!.callback(
+      const result = await client.callback(
         `${"https://localhost:8443"}/api/v1/redirect`,
         searchParams
       );
@@ -82,10 +90,7 @@ export async function openidRedirectHandler(
           password_hash: true,
         });
 
-      const dbUser = rawUserSchema(
-        pickFn(rawUserVoterSchema),
-        pickFn(rawUserHelperOrAdminSchema)
-      ).parse(
+      const dbUser = pickFn(rawUserSchema).parse(
         (
           await sql`SELECT id, username, type FROM users WHERE openid_id = ${
             result.claims().sub
@@ -109,9 +114,13 @@ export async function openidRedirectHandler(
       }
 
       /** @type {[Pick<import("../../../lib/types").RawSessionType, "session_id">]} */
-      const [session] = await sql.begin("READ WRITE", async (sql) => {
-        return await sql`INSERT INTO sessions (user_id) VALUES (${dbUser.id}) RETURNING session_id`;
-      });
+      const session = rawSessionType.parse(
+        (
+          await sql.begin("READ WRITE", async (sql) => {
+            return await sql`INSERT INTO sessions (user_id) VALUES (${dbUser.id}) RETURNING session_id`;
+          })
+        ).columns[0]
+      );
 
       /** @type {import("node:http2").OutgoingHttpHeaders} */
       const responseHeaders: import("node:http2").OutgoingHttpHeaders = {
@@ -149,7 +158,7 @@ export async function openidRedirectHandler(
         {
           success: false,
           error: {
-            login: `${error}`,
+            login: String(error),
           },
         },
       ];

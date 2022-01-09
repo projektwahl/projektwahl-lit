@@ -24,18 +24,17 @@ SPDX-FileCopyrightText: 2021 Moritz Hedtke <Moritz.Hedtke@t-online.de>
 import { zod2result } from "../lib/result.js";
 import { json } from "node:stream/consumers";
 import { URL } from "url";
-import {
-  rawUserHelperOrAdminSchema,
-  rawUserSchema,
-  rawUserVoterSchema,
-  routes,
-  UnknownKeysParam,
-} from "../lib/routes.js";
+import { rawUserSchema, routes, UnknownKeysParam } from "../lib/routes.js";
 import type { z, ZodObject, ZodTypeAny } from "zod";
-import { retryableBegin, sql } from "./database.js";
+import { retryableBegin } from "./database.js";
 import cookie from "cookie";
 import type { IncomingMessage, ServerResponse } from "node:http";
 import { defaultHeaders } from "./server-handler.js";
+import type {
+  Http2ServerRequest,
+  Http2ServerResponse,
+  OutgoingHttpHeaders,
+} from "http2";
 
 const userMapper = <
   T extends { [k: string]: ZodTypeAny },
@@ -52,14 +51,10 @@ const userMapper = <
     age: true,
   });
 
-const userSchema = rawUserSchema(
-  userMapper(rawUserVoterSchema),
-  userMapper(rawUserHelperOrAdminSchema)
-).optional();
+const userSchema = userMapper(rawUserSchema).optional();
 
-const sleep = (milliseconds) => {
-  return new Promise((resolve) => setTimeout(resolve, milliseconds));
-};
+export type MyRequest = (IncomingMessage | Http2ServerRequest) &
+  Required<Pick<IncomingMessage | Http2ServerRequest, "url" | "method">>;
 
 export function requestHandler<P extends keyof typeof routes>(
   method: string,
@@ -68,12 +63,16 @@ export function requestHandler<P extends keyof typeof routes>(
     r: z.infer<typeof routes[P]["request"]>,
     user: z.infer<typeof userSchema>,
     session_id: string | undefined
-  ) => Promise<[OutgoingHttpHeaders, z.infer<typeof routes[P]["response"]>]>
-): (request: IncomingMessage, response: ServerResponse) => Promise<boolean> {
-  let fn = async (request: IncomingMessage, response: ServerResponse) => {
+  ) => PromiseLike<[OutgoingHttpHeaders, z.infer<typeof routes[P]["response"]>]>
+): (
+  request: MyRequest,
+  response: ServerResponse | Http2ServerResponse
+) => Promise<boolean> {
+  const fn = async (
+    request: MyRequest,
+    response: ServerResponse | Http2ServerResponse
+  ) => {
     try {
-      await sleep(Math.random() * 1000);
-
       if (request.method !== "GET" && request.method !== "POST") {
         throw new Error("Unsupported http method!");
       }
@@ -85,30 +84,29 @@ export function requestHandler<P extends keyof typeof routes>(
         throw new Error("No CSRF header!");
       }
 
-      let url = new URL(request.url, "https://localhost:8443");
+      const url = new URL(request.url, "https://localhost:8443");
       if (
         request.method === method &&
         new RegExp(path).test(/** @type {string} */ url.pathname)
       ) {
-        let user = undefined;
-        let session_id: string | undefined = undefined;
-        if (request.headers.cookie) {
-          var cookies = cookie.parse(request.headers.cookie);
+        let user: z.infer<typeof userSchema> | undefined = undefined;
+        const cookies = request.headers.cookie
+          ? cookie.parse(request.headers.cookie)
+          : {};
+        const session_id: string | undefined =
+          request.method === "GET" ? cookies.lax_id : cookies.strict_id;
 
-          // implementing https://datatracker.ietf.org/doc/html/draft-ietf-httpbis-rfc6265bis-02#section-8.8.2
-          session_id =
-            request.method === "GET" ? cookies.lax_id : cookies.strict_id;
-          if (session_id) {
-            user = userSchema.parse(
-              (
-                await retryableBegin("READ WRITE", async (sql) => {
-                  //await sql`DELETE FROM sessions WHERE CURRENT_TIMESTAMP >= updated_at + interval '24 hours' AND session_id != ${session_id} `
-                  return await sql`UPDATE sessions SET updated_at = CURRENT_TIMESTAMP FROM users WHERE users.id = sessions.user_id AND session_id = ${session_id!} AND CURRENT_TIMESTAMP < updated_at + interval '24 hours' RETURNING users.id, users.type, users.username, users.group, users.age`;
-                })
-              )[0]
-            );
-            //console.log(user)
-          }
+        // implementing https://datatracker.ietf.org/doc/html/draft-ietf-httpbis-rfc6265bis-02#section-8.8.2
+        if (session_id) {
+          user = userSchema.parse(
+            (
+              await retryableBegin("READ WRITE", async (sql) => {
+                //await sql`DELETE FROM sessions WHERE CURRENT_TIMESTAMP >= updated_at + interval '24 hours' AND session_id != ${session_id} `
+                return await sql`UPDATE sessions SET updated_at = CURRENT_TIMESTAMP FROM users WHERE users.id = sessions.user_id AND session_id = ${session_id} AND CURRENT_TIMESTAMP < updated_at + interval '24 hours' RETURNING users.id, users.type, users.username, users.group, users.age`;
+              })
+            ).columns[0]
+          );
+          //console.log(user)
         }
 
         const body =
@@ -122,8 +120,8 @@ export function requestHandler<P extends keyof typeof routes>(
           );
           //console.log("responseBody", responseBody);
           routes[path].response.parse(responseBody);
-          const { ":status": test, ...finalHeaders } = new_headers;
-          response.writeHead(new_headers[":status"], {
+          const { ":status": _, ...finalHeaders } = new_headers;
+          response.writeHead(Number(new_headers[":status"]), {
             ...defaultHeaders,
             ...finalHeaders,
           });

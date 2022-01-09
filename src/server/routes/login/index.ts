@@ -20,19 +20,17 @@ https://github.com/projektwahl/projektwahl-lit
 SPDX-License-Identifier: AGPL-3.0-or-later
 SPDX-FileCopyrightText: 2021 Moritz Hedtke <Moritz.Hedtke@t-online.de>
 */
-import { sensitiveHeaders } from "node:http2";
-import type { z, ZodObject, ZodTypeAny } from "zod";
+import type { Http2ServerResponse } from "node:http2";
+import type { ZodObject, ZodTypeAny } from "zod";
 import {
   rawSessionType,
-  rawUserHelperOrAdminSchema,
   rawUserSchema,
-  rawUserVoterSchema,
   UnknownKeysParam,
 } from "../../../lib/routes.js";
 import { sql } from "../../database.js";
-import { requestHandler } from "../../express.js";
+import { MyRequest, requestHandler } from "../../express.js";
 import { checkPassword } from "../../password.js";
-import type { IncomingMessage, ServerResponse } from "node:http";
+import type { ServerResponse } from "node:http";
 
 const users = <
   T extends { [k: string]: ZodTypeAny },
@@ -49,21 +47,14 @@ const users = <
   });
 
 export async function loginHandler(
-  request: IncomingMessage,
-  response: ServerResponse
+  request: MyRequest,
+  response: ServerResponse | Http2ServerResponse
 ) {
   return await requestHandler("POST", "/api/v1/login", async function (body) {
     const r =
       await sql`SELECT id, username, password_hash, type FROM users WHERE username = ${body.username} LIMIT 1`;
 
-    console.log(r);
-
-    const dbUser = rawUserSchema(
-      users(rawUserVoterSchema),
-      users(rawUserHelperOrAdminSchema)
-    )
-      .optional()
-      .parse(r[0]);
+    const dbUser = users(rawUserSchema).optional().parse(r[0]);
 
     // TODO FIXME this is vulnerable to side channel attacks
     // but maybe it's fine because we want to tell the user whether the account exists
@@ -128,7 +119,7 @@ export async function loginHandler(
         await sql.begin("READ WRITE", async (tsql) => {
           return await tsql`INSERT INTO sessions (user_id) VALUES (${dbUser.id}) RETURNING session_id`;
         })
-      )[0]
+      ).columns[0]
     );
 
     /** @type {import("node:http2").OutgoingHttpHeaders} */

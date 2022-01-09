@@ -21,22 +21,22 @@ SPDX-License-Identifier: AGPL-3.0-or-later
 SPDX-FileCopyrightText: 2021 Moritz Hedtke <Moritz.Hedtke@t-online.de>
 */
 import postgres from "postgres";
-import { z } from "zod";
 import { routes } from "../../../lib/routes.js";
 import { sql } from "../../database.js";
-import { requestHandler } from "../../express.js";
+import { MyRequest, requestHandler } from "../../express.js";
 import { hashPassword } from "../../password.js";
-import { sql2, unsafe2 } from "../../sql/index.js";
+import { sql2 } from "../../sql/index.js";
 import { updateField } from "../../entities.js";
-import type { IncomingMessage, ServerResponse } from "node:http";
+import type { ServerResponse } from "node:http";
+import type { Http2ServerResponse } from "node:http2";
 
 // TODO FIXME somehow ensure all attributes are read here because this is an easy way to loose data
 // Also ensure create and update has the same attributes
 // TO IMPROVE this maybe return the full column and also read back that data at all places
 
 export async function createOrUpdateUsersHandler(
-  request: IncomingMessage,
-  response: ServerResponse
+  request: MyRequest,
+  response: ServerResponse | Http2ServerResponse
 ) {
   // TODO FIXME create or update multiple
   return await requestHandler(
@@ -62,16 +62,17 @@ export async function createOrUpdateUsersHandler(
       }
 
       try {
-        const [row] = await sql.begin("READ WRITE", async (sql) => {
-          if (user.id) {
-            const field = (name: string) =>
-              updateField("users_with_deleted", user, name);
+        const row = (
+          await sql.begin("READ WRITE", async (sql) => {
+            if (user.id) {
+              const field = (name: keyof typeof user) =>
+                updateField("users_with_deleted", user, name);
 
-            const finalQuery = sql2`UPDATE users_with_deleted SET
+              const finalQuery = sql2`UPDATE users_with_deleted SET
             ${field("username")},
             password_hash = CASE WHEN ${!!user.password} THEN ${
-              user.password ? await hashPassword(user.password) : null
-            } ELSE password_hash END,
+                user.password ? await hashPassword(user.password) : null
+              } ELSE password_hash END,
             ${field("type")},
             ${field("group")},
             ${field("age")},
@@ -83,22 +84,23 @@ export async function createOrUpdateUsersHandler(
             WHERE id = ${
               user.id
             } RETURNING id, project_leader_id, force_in_project_id;`;
-            // TODO FIXME (found using fuzzer) if this tries to update a nonexisting user we should return an error
-            return await sql(...finalQuery);
-          } else {
-            return await sql`INSERT INTO users_with_deleted (username, password_hash, type, "group", age, away, project_leader_id, force_in_project_id, deleted, last_updated_by) VALUES (${
-              user.username ?? null
-            }, ${user.password ? await hashPassword(user.password) : null}, ${
-              user.type ?? null
-            }, ${user.type === "voter" ? user.group ?? null : null}, ${
-              user.type === "voter" ? user.age ?? null : null
-            }, ${user.away ?? false}, ${user.project_leader_id ?? null}, ${
-              user.force_in_project_id ?? null
-            }, ${user.deleted ?? false}, ${
-              loggedInUser.id
-            }) RETURNING id, project_leader_id, force_in_project_id;`;
-          }
-        });
+              // TODO FIXME (found using fuzzer) if this tries to update a nonexisting user we should return an error
+              return await sql(...finalQuery);
+            } else {
+              return await sql`INSERT INTO users_with_deleted (username, password_hash, type, "group", age, away, project_leader_id, force_in_project_id, deleted, last_updated_by) VALUES (${
+                user.username ?? null
+              }, ${user.password ? await hashPassword(user.password) : null}, ${
+                user.type ?? null
+              }, ${user.type === "voter" ? user.group ?? null : null}, ${
+                user.type === "voter" ? user.age ?? null : null
+              }, ${user.away ?? false}, ${user.project_leader_id ?? null}, ${
+                user.force_in_project_id ?? null
+              }, ${user.deleted ?? false}, ${
+                loggedInUser.id
+              }) RETURNING id, project_leader_id, force_in_project_id;`;
+            }
+          })
+        ).columns[0];
 
         console.log(row);
 

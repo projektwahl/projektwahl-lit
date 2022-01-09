@@ -22,15 +22,15 @@ SPDX-FileCopyrightText: 2021 Moritz Hedtke <Moritz.Hedtke@t-online.de>
 */
 import { z } from "zod";
 import type { rawProjectSchema } from "../../../lib/routes.js";
-import { sql } from "../../database.js";
 import { fetchData } from "../../entities.js";
-import { requestHandler } from "../../express.js";
+import { MyRequest, requestHandler } from "../../express.js";
 import { sql2 } from "../../sql/index.js";
-import type { IncomingMessage, ServerResponse } from "node:http";
+import type { ServerResponse } from "node:http";
+import type { Http2ServerResponse } from "node:http2";
 
 export async function projectsHandler(
-  request: IncomingMessage,
-  response: ServerResponse
+  request: MyRequest,
+  response: ServerResponse | Http2ServerResponse
 ) {
   return await requestHandler(
     "GET",
@@ -71,7 +71,11 @@ export async function projectsHandler(
             .optional(),
           f_title: z.string().optional(),
         })
-        .parse(Object.fromEntries(url.searchParams as any));
+        .parse(
+          Object.fromEntries(
+            url.searchParams as unknown as Iterable<readonly [string, string]>
+          )
+        );
 
       const columns = [
         "id",

@@ -23,16 +23,20 @@ SPDX-FileCopyrightText: 2021 Moritz Hedtke <Moritz.Hedtke@t-online.de>
 import { html, literal } from "lit/static-html.js";
 import { LitElement, noChange } from "lit";
 import { bootstrapCss } from "../index.js";
-import { HistoryController } from "../history-controller.js";
 import { ifDefined } from "lit/directives/if-defined.js";
 import { msg } from "@lit/localize";
 import { createRef, ref } from "lit/directives/ref.js";
 import { repeat } from "lit/directives/repeat.js";
+import type { routes } from "../../lib/routes.js";
+import type { z } from "zod";
 
 // workaround see https://github.com/runem/lit-analyzer/issues/149#issuecomment-1006162839
-export function pwInput<T, Q extends keyof T>(
+export function pwInput<
+  P extends keyof typeof routes,
+  Q extends keyof z.infer<typeof routes[P]["request"]>
+>(
   props: Pick<
-    PwInput<T, Q>,
+    PwInput<P, Q>,
     | "type"
     | "autocomplete"
     | "disabled"
@@ -42,9 +46,9 @@ export function pwInput<T, Q extends keyof T>(
     | "options"
     | "task"
   > &
-    Partial<Pick<PwInput<T, Q>, "onchange">>
+    Partial<Pick<PwInput<P, Q>, "onchange">>
 ) {
-  let {
+  const {
     onchange,
     disabled,
     initial,
@@ -56,7 +60,8 @@ export function pwInput<T, Q extends keyof T>(
     autocomplete,
     ...rest
   } = props;
-  rest = {}; // ensure no property is missed
+  let _ = rest;
+  _ = 1; // ensure no property is missed - Don't use `{}` as a type. `{}` actually means "any non-nullish value".
   return html`<pw-input
     type=${type}
     ?disabled=${disabled}
@@ -70,7 +75,10 @@ export function pwInput<T, Q extends keyof T>(
   ></pw-input>`;
 }
 
-export class PwInput<T, Q extends keyof T> extends LitElement {
+export class PwInput<
+  P extends keyof typeof routes,
+  Q extends keyof z.infer<typeof routes[P]["request"]>
+> extends LitElement {
   static override get properties() {
     return {
       label: { type: String },
@@ -92,11 +100,9 @@ export class PwInput<T, Q extends keyof T> extends LitElement {
     };
   }
 
-  disabled: boolean = false;
+  disabled?: boolean = false;
 
   randomId;
-
-  private history;
 
   label!: string;
 
@@ -107,25 +113,23 @@ export class PwInput<T, Q extends keyof T> extends LitElement {
   autocomplete?: "username" | "current-password" | "new-password";
 
   task!: import("@lit-labs/task").Task<
-    any,
-    import("zod").infer<typeof import("../../lib/result.js").anyResult>
+    unknown[],
+    z.infer<typeof routes[P]["response"]>
   >;
 
-  initial: T | undefined;
+  initial?: z.infer<typeof routes[P]["request"]>;
 
   value!: string;
 
-  input: import("lit/directives/ref").Ref<HTMLInputElement>;
+  input: import("lit/directives/ref").Ref<HTMLElement>;
 
   form!: HTMLFormElement;
 
-  options?: { value: T[Q]; text: string }[];
+  options?: { value: z.infer<typeof routes[P]["request"]>[Q]; text: string }[];
 
   constructor() {
     super();
     this.randomId = "id" + Math.random().toString().replace(".", "");
-
-    this.history = new HistoryController(this, /.*/);
 
     this.type = "text";
 
@@ -137,25 +141,29 @@ export class PwInput<T, Q extends keyof T> extends LitElement {
     return this;
   }
 
-  myformdataEventListener = (event: CustomEvent) => {
-    console.log(this);
-    console.log(this.input);
+  myformdataEventListener = (
+    event: CustomEvent<z.infer<typeof routes[P]["request"]>>
+  ) => {
     if (this.type === "number") {
       event.detail[this.name] =
-        this.input.value?.value === "" ? null : this.input.value?.valueAsNumber;
+        (this.input.value as HTMLInputElement).value === ""
+          ? null
+          : (this.input.value as HTMLInputElement).valueAsNumber;
     } else if (this.type === "checkbox") {
-      event.detail[this.name] = this.input.value?.checked;
+      event.detail[this.name] = (this.input.value as HTMLInputElement).checked;
     } else if (this.type === "select") {
       event.detail[this.name] =
-        this.input.value!.selectedIndex == -1 ? null : this.input.value!.value;
+        (this.input.value as HTMLSelectElement).selectedIndex == -1
+          ? null
+          : (this.input.value as HTMLInputElement).value;
     } else {
-      event.detail[this.name] = this.input.value!.value;
+      event.detail[this.name] = (this.input.value as HTMLInputElement).value;
     }
   };
 
   override connectedCallback() {
     super.connectedCallback();
-    this.form = this.closest("form")!;
+    this.form = this.closest("form") as HTMLFormElement;
     this.form.addEventListener("myformdata", this.myformdataEventListener);
   }
 
@@ -214,7 +222,10 @@ export class PwInput<T, Q extends keyof T> extends LitElement {
           ${
             this.type === "select"
               ? repeat(
-                  this.options,
+                  this.options as {
+                    value: z.infer<typeof routes[P]["request"]>[Q];
+                    text: string;
+                  }[],
                   (o) => o.value,
                   (o) =>
                     html`<option
@@ -258,15 +269,19 @@ export class PwInput<T, Q extends keyof T> extends LitElement {
             : undefined
         }
         ${this.task.render({
-          complete: (v) =>
-            !v.success && v.error[this.name as string] !== undefined
-              ? html` <div
+          complete: (v) => {
+            if (!v.success) {
+              if (v.error[this.name as string] !== undefined) {
+                return html` <div
                   id="${this.randomId}-feedback"
                   class="invalid-feedback"
                 >
                   ${v.error[this.name as string]}
-                </div>`
-              : undefined,
+                </div>`;
+              }
+              return undefined;
+            }
+          },
           initial: () => undefined,
           pending: () => noChange,
         })}

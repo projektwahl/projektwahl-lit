@@ -28,18 +28,17 @@ import { msg } from "@lit/localize";
 import { PwEntityList } from "../../entity-list/pw-entitylist.js";
 import { pwOrder } from "../../entity-list/pw-order.js";
 import { myFetch } from "../../utils.js";
+import { ifDefined } from "lit/directives/if-defined";
 
 export const pwProjects = async (url: URL) => {
-  let result = await taskFunction([url.searchParams]);
+  const result = await taskFunction([url.searchParams]);
   return html`<pw-projects .initial=${result}></pw-projects>`;
 };
 
 const taskFunction = async ([searchParams]: [URLSearchParams]) => {
-  let response = await myFetch<"/api/v1/projects">(
-    `/api/v1/projects?${searchParams}`,
-    {
-      //agent: new Agent({rejectUnauthorized: false})
-    }
+  const response = await myFetch<"/api/v1/projects">(
+    `/api/v1/projects?${searchParams.toString()}`,
+    {}
   );
   return response;
 };
@@ -64,6 +63,9 @@ class PwProjects extends PwEntityList<"/api/v1/projects"> {
   }
 
   override get head() {
+    const f_id = this.history.url.searchParams.get("f_id");
+    const f_title = this.history.url.searchParams.get("f_title");
+    const f_info = this.history.url.searchParams.get("f_info");
     return html`
       <tr>
         <!--
@@ -71,15 +73,15 @@ class PwProjects extends PwEntityList<"/api/v1/projects"> {
                       the only nice way is probably submit buttons that do things like "oder_by_id_asc" and then redirect to the new state (because you need to remove the old state)
                     -->
         <th class="table-cell-hover p-0" scope="col">
-          ${pwOrder({ name: "id", title: msg("ID") })}
+          ${pwOrder<"/api/v1/projects">({ name: "id", title: msg("ID") })}
         </th>
 
         <th class="table-cell-hover p-0" scope="col">
-          ${pwOrder({ name: "title", title: msg("Title") })}
+          ${pwOrder<"/api/v1/projects">({ name: "title", title: msg("Title") })}
         </th>
 
         <th class="table-cell-hover p-0" scope="col">
-          ${pwOrder({ name: "info", title: msg("Info") })}
+          ${pwOrder<"/api/v1/projects">({ name: "info", title: msg("Info") })}
         </th>
 
         <th class="table-cell-hover">${msg("Actions")}</th>
@@ -92,7 +94,7 @@ class PwProjects extends PwEntityList<"/api/v1/projects"> {
             type="text"
             class="form-control"
             id="projects-filter-{name}"
-            value=${this.history.url.searchParams.get("f_id")}
+            value=${ifDefined(f_id === null ? undefined : f_id)}
           />
         </th>
 
@@ -102,7 +104,7 @@ class PwProjects extends PwEntityList<"/api/v1/projects"> {
             type="text"
             class="form-control"
             id="projects-filter-{name}"
-            value=${this.history.url.searchParams.get("f_title")}
+            value=${ifDefined(f_title === null ? undefined : f_title)}
           />
         </th>
 
@@ -112,7 +114,7 @@ class PwProjects extends PwEntityList<"/api/v1/projects"> {
             type="text"
             class="form-control"
             id="projects-filter-{name}"
-            value=${this.history.url.searchParams.get("f_info")}
+            value=${ifDefined(f_info === null ? undefined : f_info)}
           />
         </th>
 

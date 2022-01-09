@@ -31,6 +31,6 @@ declare global {
   }
 
   interface HTMLElementEventMap {
-    myformdata: CustomEvent<{}>;
+    myformdata: CustomEvent<Record<string, unknown>>;
   }
 }

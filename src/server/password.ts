@@ -105,7 +105,7 @@ export async function checkPassword(
   hash: string,
   password: string
 ): Promise<[boolean, boolean, string]> {
-  const needsRehash = await argon2.needsRehash(hash, argon2Options);
+  const needsRehash = argon2.needsRehash(hash, argon2Options);
   return [
     await argon2.verify(hash, password, argon2Options),
     needsRehash,

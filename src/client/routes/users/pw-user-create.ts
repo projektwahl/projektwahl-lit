@@ -32,8 +32,8 @@ import type { routes } from "../../../lib/routes.js";
 import type { z } from "zod";
 import { pwInput } from "../../form/pw-input.js";
 
-export async function pwUser(id: number, viewOnly: boolean = false) {
-  let result = await taskFunction([id]);
+export async function pwUser(id: number, viewOnly = false) {
+  const result = await taskFunction([id]);
   return html`<pw-user-create
     ?disabled=${viewOnly}
     .initial=${result}
@@ -41,13 +41,13 @@ export async function pwUser(id: number, viewOnly: boolean = false) {
 }
 
 const taskFunction = async ([id]: [number]) => {
-  let response = await myFetch<"/api/v1/users">(`/api/v1/users/?f_id=${id}`, {
-    //agent: new Agent({rejectUnauthorized: false})
-  });
+  const response = await myFetch<"/api/v1/users">(
+    `/api/v1/users/?f_id=${id}`,
+    {}
+  );
   return response.success ? response.data.entities[0] : null; // TODO FIXME error handling, PwForm already has some form of error handling
 };
 
-// maybe extending actually breaks shit
 class PwUserCreate extends PwForm<"/api/v1/users/create-or-update"> {
   static get properties() {
     return {
@@ -79,9 +79,6 @@ class PwUserCreate extends PwForm<"/api/v1/users/create-or-update"> {
   constructor() {
     super();
 
-    /**
-     * @override
-     */
     this._task = new Task(this, async () => {
       const formDataEvent = new CustomEvent<
         z.infer<typeof routes["/api/v1/users/create-or-update"]["request"]>
@@ -93,13 +90,13 @@ class PwUserCreate extends PwForm<"/api/v1/users/create-or-update"> {
         },
       });
       this.form.value?.dispatchEvent(formDataEvent);
-      formDataEvent.detail.id = this.initial?.id ?? null;
+      formDataEvent.detail.id = this.initial?.id;
       if (!this.initial?.id) {
         formDataEvent.detail.project_leader_id = null;
         formDataEvent.detail.force_in_project_id = null;
       }
 
-      let result = await myFetch<"/api/v1/users/create-or-update">(
+      const result = await myFetch<"/api/v1/users/create-or-update">(
         "/api/v1/users/create-or-update",
         {
           method: "POST",

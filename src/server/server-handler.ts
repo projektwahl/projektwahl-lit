@@ -37,7 +37,9 @@ import { resolve as loaderResolve, load as loaderLoad } from "../loader.js";
 import { logoutHandler } from "./routes/login/logout.js";
 import zlib from "node:zlib";
 import { pipeline, Readable } from "node:stream";
-import type { IncomingMessage, ServerResponse } from "node:http";
+import type { ServerResponse } from "node:http";
+import type { Http2ServerResponse } from "node:http2";
+import type { MyRequest } from "./express.js";
 
 //const startTime = Date.now();
 
@@ -55,11 +57,11 @@ export async function* getDirs(dir: string): AsyncIterable<string> {
 async function replaceAsync(
   str: string,
   regex: RegExp,
-  asyncFn: (match: string, args: any) => Promise<string>
+  asyncFn: (match: string, args: string[]) => Promise<string>
 ): Promise<string> {
   const promises: Promise<string>[] = [];
   str.replaceAll(regex, (match, ...args) => {
-    const promise = asyncFn(match, args);
+    const promise = asyncFn(match, args as string[]);
     promises.push(promise);
     return "";
   });
@@ -72,13 +74,14 @@ export const defaultHeaders = {
   "x-frame-options": "DENY",
   "cache-control": "private, no-cache",
 };
+
 export async function serverHandler(
-  request: IncomingMessage,
-  response: ServerResponse
+  request: MyRequest,
+  response: ServerResponse | Http2ServerResponse
 ) {
   const path = z.string().parse(request.url);
 
-  let url = new URL(path, "https://localhost:8443");
+  const url = new URL(path, "https://localhost:8443");
 
   if (url.pathname === "/favicon.ico" || url.pathname === "/robots.txt") {
     response.writeHead(404, {
@@ -93,19 +96,24 @@ export async function serverHandler(
     });
 
     for await (const f of getDirs("./src/client")) {
-      (async () => {
+      void (async () => {
         for await (const event of watch(f)) {
-          let baseUrl = resolve(fileURLToPath(import.meta.url), "../../..");
+          const baseUrl = resolve(fileURLToPath(import.meta.url), "../../..");
 
-          let url = relative(baseUrl, join(f, event.filename));
+          const url = relative(baseUrl, join(f, event.filename));
 
-          response.write(`data: ${url}\n\n`);
+          (
+            response.write as (
+              chunk: string | Uint8Array,
+              callback?: ((err: Error) => void) | undefined
+            ) => boolean
+          )(`data: ${url}\n\n`);
         }
       })();
     }
   } else if (url.pathname.startsWith("/api")) {
     // TODO FIXME store this in a routing table and automatically extract types from that
-    let executed =
+    const executed =
       (await loginHandler(request, response)) ||
       (await logoutHandler(request, response)) ||
       (await openidLoginHandler(request, response)) ||
@@ -125,9 +133,9 @@ export async function serverHandler(
     // TODO FIXME AUDIT
     // curl --insecure --path-as-is -v https://localhost:8443/../src/index.js
 
-    let filename = resolve("." + url.pathname);
+    const filename = resolve("." + url.pathname);
 
-    let baseUrl = resolve(fileURLToPath(import.meta.url), "../../..");
+    const baseUrl = resolve(fileURLToPath(import.meta.url), "../../..");
 
     if (
       filename.startsWith(join(baseUrl, "/src/")) ||
@@ -145,7 +153,7 @@ export async function serverHandler(
           {
             parentURL: import.meta.url,
           },
-          (specifier, context, defaultResolve) => {
+          (specifier: string, context: { parentURL: string | undefined }) => {
             const baseURL = pathToFileURL(`${cwd()}/`).href;
             const { parentURL = baseURL } = context;
             const targetUrl = new URL(specifier, parentURL);
@@ -173,7 +181,12 @@ export async function serverHandler(
             contents,
             /import( )?["']([^"']+)["']/g,
             async (match, args) => {
-              let url = await import.meta.resolve!(
+              if (!import.meta.resolve) {
+                throw new Error(
+                  "need to run with --experimental-import-meta-resolve"
+                );
+              }
+              let url = await import.meta.resolve(
                 args[1],
                 pathToFileURL(filename)
               );
@@ -190,7 +203,12 @@ export async function serverHandler(
             contents,
             /([*} ])from ?["']([^"']+)["']/g,
             async (match, args) => {
-              let url = await import.meta.resolve!(
+              if (!import.meta.resolve) {
+                throw new Error(
+                  "need to run with --experimental-import-meta-resolve"
+                );
+              }
+              let url = await import.meta.resolve(
                 args[1],
                 pathToFileURL(filename)
               );
@@ -218,7 +236,7 @@ export async function serverHandler(
           acceptEncoding = "";
         }
 
-        const onError = (err: any) => {
+        const onError = (err: NodeJS.ErrnoException | null) => {
           if (err) {
             // If an error occurs, there's not much we can do because
             // the server has already sent the 200 response code and
@@ -258,7 +276,7 @@ export async function serverHandler(
         response.end();
       }
     } else {
-      let rawContents = `<!DOCTYPE html>
+      const rawContents = `<!DOCTYPE html>
   <html lang="en">
     <head>
       <!-- Required meta tags -->

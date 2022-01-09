@@ -31,9 +31,10 @@ import "../../form/pw-input.js";
 import { setupHmr } from "../../hmr.js";
 import { aClick } from "../../pw-a.js";
 import { pwOrder } from "../../entity-list/pw-order.js";
+import { ifDefined } from "lit/directives/if-defined";
 
 export const pwProjectUsers = async (url: URL) => {
-  let result = await taskFunction([url.searchParams]);
+  const result = await taskFunction([url.searchParams]);
   return html`<pw-project-users .initial=${result}></pw-project-users>`;
 };
 
@@ -48,7 +49,7 @@ export const PwProjectUsers = setupHmr(
       };
     }
 
-    name!: string; // f_project_leader
+    name!: "project_leader_id" | "force_in_project_id";
 
     projectId!: number;
 
@@ -57,6 +58,10 @@ export const PwProjectUsers = setupHmr(
     }
 
     override get head() {
+      const f_name = this.history.url.searchParams.get(`f_${this.name}`);
+      const f_id = this.history.url.searchParams.get("f_id");
+      const f_username = this.history.url.searchParams.get("f_username");
+      const f_type = this.history.url.searchParams.get("f_type");
       return html`<tr>
           <!--
       do not support this without javascript because there is literally zero useful ways to do this useful.
@@ -65,15 +70,18 @@ export const PwProjectUsers = setupHmr(
           <th class="table-cell-hover" scope="col">${msg(html`&#x2713;`)}</th>
 
           <th class="table-cell-hover p-0" scope="col">
-            ${pwOrder({ name: "id", title: msg("ID") })}
+            ${pwOrder<"/api/v1/users">({ name: "id", title: msg("ID") })}
           </th>
 
           <th class="table-cell-hover p-0" scope="col">
-            ${pwOrder({ name: "username", title: msg("Name") })}
+            ${pwOrder<"/api/v1/users">({
+              name: "username",
+              title: msg("Name"),
+            })}
           </th>
 
           <th class="table-cell-hover p-0" scope="col">
-            ${pwOrder({ name: "type", title: msg("Type") })}
+            ${pwOrder<"/api/v1/users">({ name: "type", title: msg("Type") })}
           </th>
         </tr>
 
@@ -83,7 +91,7 @@ export const PwProjectUsers = setupHmr(
               name=${`f_${this.name}`}
               type="checkbox"
               class="form-check-input"
-              value=${this.history.url.searchParams.get(`f_${this.name}`)}
+              value=${ifDefined(f_name === null ? undefined : f_name)}
             />
           </th>
 
@@ -93,7 +101,7 @@ export const PwProjectUsers = setupHmr(
               type="text"
               class="form-control"
               id="projects-filter-{name}"
-              value=${this.history.url.searchParams.get("f_id")}
+              value=${ifDefined(f_id === null ? undefined : f_id)}
             />
           </th>
 
@@ -103,7 +111,7 @@ export const PwProjectUsers = setupHmr(
               type="text"
               class="form-control"
               id="projects-filter-{name}"
-              value=${this.history.url.searchParams.get("f_username")}
+              value=${ifDefined(f_username === null ? undefined : f_username)}
             />
           </th>
 
@@ -113,7 +121,7 @@ export const PwProjectUsers = setupHmr(
               type="text"
               class="form-control"
               id="projects-filter-{name}"
-              value=${this.history.url.searchParams.get("f_type")}
+              value=${f_type}
             />
           </th>
 

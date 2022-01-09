@@ -65,7 +65,7 @@ class PwProjectUserCheckbox extends LitElement {
     this.form = createRef();
 
     this._task = new Task(this, async () => {
-      let result = await myFetch<"/api/v1/users/create-or-update">(
+      const result = await myFetch<"/api/v1/users/create-or-update">(
         "/api/v1/users/create-or-update",
         {
           method: "POST",
@@ -107,8 +107,8 @@ class PwProjectUserCheckbox extends LitElement {
         })}
 
         <input
-          @change=${(e: Event) => {
-            this._task.run();
+          @change=${async () => {
+            await this._task.run();
           }}
           type="checkbox"
           ?disabled=${this._task.status === TaskStatus.PENDING}
