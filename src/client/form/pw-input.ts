@@ -114,7 +114,7 @@ export class PwInput<
 
   task!: import("@lit-labs/task").Task<
     unknown[],
-    z.infer<typeof routes[P]["request"]>
+    z.infer<typeof routes[P]["response"]>
   >;
 
   initial?: z.infer<typeof routes[P]["request"]>;
@@ -144,20 +144,20 @@ export class PwInput<
   myformdataEventListener = (event: CustomEvent<z.infer<typeof routes[P]["request"]>>) => {
     if (this.type === "number") {
       event.detail[this.name] =
-        (this.input.value! as HTMLInputElement).value === "" ? null : (this.input.value! as HTMLInputElement).valueAsNumber;
+        (this.input.value as HTMLInputElement).value === "" ? null : (this.input.value as HTMLInputElement).valueAsNumber;
     } else if (this.type === "checkbox") {
-      event.detail[this.name] = (this.input.value! as HTMLInputElement).checked;
+      event.detail[this.name] = (this.input.value as HTMLInputElement).checked;
     } else if (this.type === "select") {
       event.detail[this.name] =
-        (this.input.value! as HTMLSelectElement).selectedIndex == -1 ? null : (this.input.value! as HTMLInputElement).value;
+        (this.input.value as HTMLSelectElement).selectedIndex == -1 ? null : (this.input.value as HTMLInputElement).value;
     } else {
-      event.detail[this.name] = (this.input.value! as HTMLInputElement).value;
+      event.detail[this.name] = (this.input.value as HTMLInputElement).value;
     }
   };
 
   override connectedCallback() {
     super.connectedCallback();
-    this.form = this.closest("form")!;
+    this.form = this.closest("form") as HTMLFormElement;
     this.form.addEventListener("myformdata", this.myformdataEventListener);
   }
 
@@ -216,7 +216,7 @@ export class PwInput<
           ${
             this.type === "select"
               ? repeat(
-                  this.options!,
+                  this.options as { value: z.infer<typeof routes[P]["request"]>[Q]; text: string }[],
                   (o) => o.value,
                   (o) =>
                     html`<option
@@ -260,15 +260,19 @@ export class PwInput<
             : undefined
         }
         ${this.task.render({
-          complete: (v) =>
-            !v.success && v.error[this.name as string] !== undefined
-              ? html` <div
+          complete: (v) => {
+            if (!v.success) {
+              if (v.error[this.name as string] !== undefined) {
+                return html` <div
                   id="${this.randomId}-feedback"
                   class="invalid-feedback"
                 >
                   ${v.error[this.name as string]}
                 </div>`
-              : undefined,
+              }
+              return undefined
+            }
+          },
           initial: () => undefined,
           pending: () => noChange,
         })}
