@@ -107,8 +107,8 @@ class PwProjectUserCheckbox extends LitElement {
         })}
 
         <input
-          @change=${(e: Event) => {
-            this._task.run();
+          @change=${async () => {
+            await this._task.run();
           }}
           type="checkbox"
           ?disabled=${this._task.status === TaskStatus.PENDING}

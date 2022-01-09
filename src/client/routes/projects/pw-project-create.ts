@@ -76,7 +76,7 @@ export const PwProjectCreate = setupHmr(
     initialRender: boolean;
 
     initial:
-      | z.infer<typeof routes["/api/v1/projects/create-or-update"]["request"]>
+      | z.infer<typeof routes["/api/v1/projects"]["response"]["options"][0]["shape"]["data"]["shape"]["entities"]>[number]
       | undefined;
 
     constructor() {
@@ -206,14 +206,14 @@ export const PwProjectCreate = setupHmr(
         <!-- TODO FIXME view only -->
         ${this.initial
           ? html`<pw-project-users
-              projectId=${this.initial.id!}
+              projectId=${this.initial.id}
               name=${"project_leader_id"}
               title=${msg("Project leaders")}
             ></pw-project-users>`
           : html``}
         ${this.initial
           ? html`<pw-project-users
-              projectId=${this.initial.id!}
+              projectId=${this.initial.id}
               name=${"force_in_project_id"}
               title=${msg("Guaranteed project members")}
             ></pw-project-users>`

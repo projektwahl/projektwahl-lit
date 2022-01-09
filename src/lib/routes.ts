@@ -173,10 +173,6 @@ export const entities = <
     })
   );
 
-const a = entities(z.object({}));
-
-let b: z.infer<typeof a>;
-
 const users = <
   T extends { [k: string]: ZodTypeAny },
   UnknownKeys extends UnknownKeysParam = "strip",
