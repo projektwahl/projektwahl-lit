@@ -53,6 +53,8 @@ const userMapper = <
 
 const userSchema = userMapper(rawUserSchema).optional();
 
+export type MyRequest = (IncomingMessage | Http2ServerRequest) & Required<Pick<IncomingMessage | Http2ServerRequest, "url" | "method">>;
+
 export function requestHandler<P extends keyof typeof routes>(
   method: string,
   path: P,
@@ -61,8 +63,8 @@ export function requestHandler<P extends keyof typeof routes>(
     user: z.infer<typeof userSchema>,
     session_id: string | undefined
   ) => Promise<[OutgoingHttpHeaders, z.infer<typeof routes[P]["response"]>]>
-): (request: IncomingMessage | Http2ServerRequest, response: ServerResponse | Http2ServerResponse) => Promise<boolean> {
-  const fn = async (request: IncomingMessage | Http2ServerRequest, response: ServerResponse | Http2ServerResponse) => {
+): (request: MyRequest, response: ServerResponse | Http2ServerResponse) => Promise<boolean> {
+  const fn = async (request: MyRequest, response: ServerResponse | Http2ServerResponse) => {
     try {
       if (request.method !== "GET" && request.method !== "POST") {
         throw new Error("Unsupported http method!");

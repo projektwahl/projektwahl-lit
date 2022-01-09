@@ -28,7 +28,7 @@ import {
   UnknownKeysParam,
 } from "../../../lib/routes.js";
 import { sql } from "../../database.js";
-import { requestHandler } from "../../express.js";
+import { MyRequest, requestHandler } from "../../express.js";
 import { checkPassword } from "../../password.js";
 import type { IncomingMessage, ServerResponse } from "node:http";
 
@@ -47,7 +47,7 @@ const users = <
   });
 
 export async function loginHandler(
-  request: IncomingMessage | Http2ServerRequest,
+  request: MyRequest,
   response: ServerResponse | Http2ServerResponse
 ) {
   return await requestHandler("POST", "/api/v1/login", async function (body) {

@@ -39,6 +39,7 @@ import zlib from "node:zlib";
 import { pipeline, Readable } from "node:stream";
 import type { IncomingMessage, ServerResponse } from "node:http";
 import type { Http2ServerRequest, Http2ServerResponse } from "node:http2";
+import type { MyRequest } from "./express.js";
 
 //const startTime = Date.now();
 
@@ -75,7 +76,7 @@ export const defaultHeaders = {
 };
 
 export async function serverHandler(
-  request: IncomingMessage | Http2ServerRequest,
+  request: MyRequest,
   response: ServerResponse | Http2ServerResponse
 ) {
   const path = z.string().parse(request.url);
@@ -147,7 +148,7 @@ export async function serverHandler(
           {
             parentURL: import.meta.url,
           },
-          (specifier: string, context: { parentURL: string | undefined }, _defaultResolve: () => void) => {
+          (specifier: string, context: { parentURL: string | undefined }) => {
             const baseURL = pathToFileURL(`${cwd()}/`).href;
             const { parentURL = baseURL } = context;
             const targetUrl = new URL(specifier, parentURL);
@@ -175,7 +176,10 @@ export async function serverHandler(
             contents,
             /import( )?["']([^"']+)["']/g,
             async (match, args) => {
-              let url = await import.meta.resolve!(
+              if (!import.meta.resolve) {
+                throw new Error("need to run with --experimental-import-meta-resolve")
+              }
+              let url = await import.meta.resolve(
                 args[1],
                 pathToFileURL(filename)
               );
@@ -192,7 +196,10 @@ export async function serverHandler(
             contents,
             /([*} ])from ?["']([^"']+)["']/g,
             async (match, args) => {
-              let url = await import.meta.resolve!(
+              if (!import.meta.resolve) {
+                throw new Error("need to run with --experimental-import-meta-resolve")
+              }
+              let url = await import.meta.resolve(
                 args[1],
                 pathToFileURL(filename)
               );
@@ -220,7 +227,7 @@ export async function serverHandler(
           acceptEncoding = "";
         }
 
-        const onError = (err: any) => {
+        const onError = (err: NodeJS.ErrnoException | null) => {
           if (err) {
             // If an error occurs, there's not much we can do because
             // the server has already sent the 200 response code and

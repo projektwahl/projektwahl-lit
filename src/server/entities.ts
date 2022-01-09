@@ -26,6 +26,7 @@ import { z } from "zod";
 import { entityRoutes } from "../lib/routes.js";
 import type { BaseQuery } from "../lib/types.js";
 import { sql } from "./database.js";
+import type { MyRequest } from "./express.js";
 import { sql2, unsafe2 } from "./sql/index.js";
 
 // Mapped Types
@@ -59,7 +60,7 @@ export async function fetchData<
   R extends keyof typeof entityRoutes
 >(
   path: R,
-  request: IncomingMessage | Http2ServerRequest,
+  request: MyRequest,
   table: string,
   columns: readonly [string, ...string[]],
   filters: Q,

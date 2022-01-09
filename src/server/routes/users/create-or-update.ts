@@ -24,7 +24,7 @@ import postgres from "postgres";
 import { z } from "zod";
 import { routes } from "../../../lib/routes.js";
 import { sql } from "../../database.js";
-import { requestHandler } from "../../express.js";
+import { MyRequest, requestHandler } from "../../express.js";
 import { hashPassword } from "../../password.js";
 import { sql2, unsafe2 } from "../../sql/index.js";
 import { updateField } from "../../entities.js";
@@ -36,7 +36,7 @@ import type { Http2ServerRequest, Http2ServerResponse } from "node:http2";
 // TO IMPROVE this maybe return the full column and also read back that data at all places
 
 export async function createOrUpdateUsersHandler(
-  request: IncomingMessage | Http2ServerRequest,
+  request: MyRequest,
   response: ServerResponse | Http2ServerResponse
 ) {
   // TODO FIXME create or update multiple

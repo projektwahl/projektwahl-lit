@@ -23,13 +23,13 @@ SPDX-FileCopyrightText: 2021 Moritz Hedtke <Moritz.Hedtke@t-online.de>
 import { z } from "zod";
 import type { rawProjectSchema } from "../../../lib/routes.js";
 import { fetchData } from "../../entities.js";
-import { requestHandler } from "../../express.js";
+import { MyRequest, requestHandler } from "../../express.js";
 import { sql2 } from "../../sql/index.js";
 import type { IncomingMessage, ServerResponse } from "node:http";
 import type { Http2ServerRequest, Http2ServerResponse } from "node:http2";
 
 export async function projectsHandler(
-  request: IncomingMessage | Http2ServerRequest,
+  request: MyRequest,
   response: ServerResponse | Http2ServerResponse
 ) {
   return await requestHandler(

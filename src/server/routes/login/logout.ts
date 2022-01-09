@@ -21,12 +21,12 @@ SPDX-License-Identifier: AGPL-3.0-or-later
 SPDX-FileCopyrightText: 2021 Moritz Hedtke <Moritz.Hedtke@t-online.de>
 */
 import { sql } from "../../database.js";
-import { requestHandler } from "../../express.js";
+import { MyRequest, requestHandler } from "../../express.js";
 import type { IncomingMessage, ServerResponse } from "node:http";
 import type { Http2ServerRequest, Http2ServerResponse } from "node:http2";
 
 export async function logoutHandler(
-  request: IncomingMessage | Http2ServerRequest,
+  request: MyRequest,
   response: ServerResponse | Http2ServerResponse
 ) {
   return await requestHandler(

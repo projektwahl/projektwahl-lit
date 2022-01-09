@@ -26,22 +26,22 @@ import {
   rawUserSchema,
 } from "../../../lib/routes.js";
 import { fetchData } from "../../entities.js";
-import { requestHandler } from "../../express.js";
+import { MyRequest, requestHandler } from "../../express.js";
 import { sql2 } from "../../sql/index.js";
 import type { Http2ServerRequest, Http2ServerResponse } from "node:http2";
 
 function includes<T, U extends T>(arr: readonly U[], elem: T): elem is U {
-  return arr.includes(elem as any);
+  return arr.includes(elem as U);
 }
 
 export async function usersHandler(
-  request: IncomingMessage | Http2ServerRequest,
+  request: MyRequest,
   response: ServerResponse | Http2ServerResponse
 ) {
   return await requestHandler(
     "GET",
     "/api/v1/users",
-    async function (_, loggedInUser, session_id) {
+    async function (_, loggedInUser) {
       // helper is allowed to read the normal data
       // voter is not allowed to do anything
 
