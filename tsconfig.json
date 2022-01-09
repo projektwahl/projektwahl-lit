@@ -13,7 +13,8 @@
     "allowSyntheticDefaultImports": true,
     "noErrorTruncation": true,
     "useDefineForClassFields": false,
-    "strictNullChecks": true
+    "strictNullChecks": true,
+    "keyofStringsOnly": true
   },
   "include": ["**/*.ts", "**/*.js"]
 }

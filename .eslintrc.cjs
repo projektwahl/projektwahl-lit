@@ -44,5 +44,5 @@ module.exports = {
     "plugin:@typescript-eslint/recommended-requiring-type-checking",
     "prettier",
   ],
-  "ignorePatterns": ["dist/", "src/client/hmr.ts"],
+  "ignorePatterns": ["dist/", "src/client/hmr.ts", "rollup.config.js"],
 };

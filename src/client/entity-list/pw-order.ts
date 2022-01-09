@@ -82,7 +82,7 @@ export class PwOrder<P extends keyof typeof entityRoutes> extends LitElement {
           const order = [...urlSearchParams.getAll("order")];
 
           const oldElementIndex = order.findIndex((e) =>
-            e.startsWith(this.name + "-")
+            e.startsWith(`${this.name}-`)
           );
           let oldElement;
           if (oldElementIndex == -1) {
@@ -110,7 +110,7 @@ export class PwOrder<P extends keyof typeof entityRoutes> extends LitElement {
           ].forEach((v) => urlSearchParams.append("order", v));
 
           HistoryController.goto(
-            new URL(`?${urlSearchParams}`, window.location.href),
+            new URL(`?${urlSearchParams.toString()}`, window.location.href),
             {}
           );
         }}

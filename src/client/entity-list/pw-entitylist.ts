@@ -78,10 +78,10 @@ export class PwEntityList<
 
   protected history;
 
-  taskFunction: ([searchParams]: [URLSearchParams]) => Promise<any>;
+  taskFunction: ([searchParams]: [URLSearchParams]) => Promise<z.infer<typeof entityRoutes[P]["response"]>>;
 
   constructor(
-    taskFunction: ([searchParams]: [URLSearchParams]) => Promise<any>
+    taskFunction: ([searchParams]: [URLSearchParams]) => Promise<z.infer<typeof entityRoutes[P]["response"]>>
   ) {
     super();
 
@@ -134,14 +134,14 @@ export class PwEntityList<
           <div class="col-auto">${this.buttons}</div>
           <div class="col-3">
             <select
-              @change=${(event: Event) => {
+              @change=${async (event: Event) => {
                 const url = new URL(window.location.href);
                 url.searchParams.set(
                   "p_limit",
                   (event.target as HTMLSelectElement).value
                 );
                 HistoryController.goto(url, {});
-                this._apiTask.run();
+                await this._apiTask.run();
               }}
               .value=${this.history.url.searchParams.get("p_limit") ?? "10"}
               class="form-select"
@@ -165,7 +165,7 @@ export class PwEntityList<
 
         <form
           ${ref(this.formRef)}
-          @input=${() => {
+          @input=${async () => {
             // TODO FIXME convert to the better form api (then it needs urlsearchparams support)
             const urlSearchParams = new URLSearchParams( // @ts-expect-error probably wrong typings
               new FormData(this.formRef.value)
@@ -186,10 +186,10 @@ export class PwEntityList<
               }
             }
             HistoryController.goto(
-              new URL(`?${urlSearchParams}`, window.location.href),
+              new URL(`?${urlSearchParams.toString()}`, window.location.href),
               {}
             );
-            this._apiTask.run();
+            await this._apiTask.run();
           }}
           @submit=${(e: Event) => e.preventDefault()}
         >
@@ -214,7 +214,7 @@ export class PwEntityList<
                       : ""}"
                   >
                     <a
-                      @click=${(e: Event) => {
+                      @click=${async (e: Event) => {
                         e.preventDefault();
                         const url = new URL(window.location.href);
                         if (this._apiTask.value?.success) {
@@ -227,7 +227,7 @@ export class PwEntityList<
                         }
                         url.searchParams.set("p_direction", "backwards");
                         HistoryController.goto(url, {});
-                        this._apiTask.run();
+                        await this._apiTask.run();
                       }}
                       class="page-link"
                       href="/"
@@ -250,7 +250,7 @@ export class PwEntityList<
                       : ""}"
                   >
                     <a
-                      @click=${(e: Event) => {
+                      @click=${async (e: Event) => {
                         e.preventDefault();
                         const url = new URL(window.location.href);
                         if (this._apiTask.value?.success) {
@@ -261,7 +261,7 @@ export class PwEntityList<
                         }
                         url.searchParams.set("p_direction", "forwards");
                         HistoryController.goto(url, {});
-                        this._apiTask.run();
+                        await this._apiTask.run();
                       }}
                       class="page-link"
                       href="/"
