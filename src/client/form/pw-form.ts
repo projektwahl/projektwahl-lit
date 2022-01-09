@@ -53,12 +53,6 @@ class PwForm<P extends keyof typeof routes> extends LitElement {
     this.form = createRef();
   }
 
-  protected submit(event: SubmitEvent) {
-    event.preventDefault();
-
-    this._task.run();
-  }
-
   // TODO FIXME really important
   // get the inputs from there and check that the errors returned from the server don't contain additional
   // this needs to be done dynamically as e.g. the create user form dynamically changes the form inputs
@@ -134,7 +128,11 @@ if ('FormDataEvent' in window) {
               ${ref(this.form)}
               method="POST"
               action="/no-javascript"
-              @submit=${this.submit}
+              @submit=${async (event: Event) => {
+                 event.preventDefault();
+
+                 await this._task.run();
+              }}
             >
               ${this.getInputs()}
               ${!this.disabled
