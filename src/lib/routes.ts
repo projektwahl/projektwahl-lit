@@ -48,54 +48,14 @@ const rawUserCommon = {
   deleted: z.boolean(),
 };
 
-// TODO FIXME just combine these two and do this otherwise as this here just creates too many problems
-export const rawUserHelperOrAdminSchema = z
-  .object({
-    type: z.enum(["helper", "admin"]),
-    group: z.string().nullable(), // TODO FIXME add validation inside database that these are null as this depends on the type value and the previous type value
-    age: z.number().nullable(),
-    ...rawUserCommon,
-  })
-  .strict();
-
-export const rawUserVoterSchema = z
-  .object({
-    type: z.enum(["voter"]),
-    group: z.string().min(1).max(100),
-    age: z.number().min(0).max(200),
-    ...rawUserCommon,
-  })
-  .strict();
-
-export const rawUserSchema = <
-  O1,
-  O2,
-  D1 extends ZodTypeDef = ZodTypeDef,
-  D2 extends ZodTypeDef = ZodTypeDef,
-  I1 = O1,
-  I2 = O2
->(
-  v1: ZodType<O1, D1, I1>,
-  v2: ZodType<O2, D2, I2>
-) =>
-  z
-    .object({
-      type: z.enum(["helper", "admin", "voter"]).optional(),
-    })
-    .passthrough()
-    .superRefine((value, ctx) => {
-      // KEEP this line synchronized with the one below
-      let schema = value.type === "voter" ? v1 : v2;
-      let parsed = schema.safeParse(value);
-      if (!parsed.success) {
-        parsed.error.issues.forEach(ctx.addIssue);
-      }
-    })
-    .transform((value) => {
-      // KEEP this line synchronized with the one above
-      let schema = value.type === "voter" ? v1 : v2;
-      return schema.parse(value);
-    });
+export const rawUserSchema = z
+.object({
+  type: z.enum(["voter", "helper", "admin"]),
+  group: z.string().min(1).max(100).nullable(),
+  age: z.number().min(0).max(200).nullable(),
+  ...rawUserCommon,
+})
+.strict();
 
 export const makeCreateOrUpdate = <
   T extends { [k: string]: ZodTypeAny },
@@ -322,16 +282,8 @@ export const routes = identity({
     response: result(z.object({})),
   },
   "/api/v1/users/create-or-update": {
-    request: rawUserSchema(
-      usersCreateOrUpdate(rawUserVoterSchema),
-      usersCreateOrUpdate(rawUserHelperOrAdminSchema)
-    ),
-    response: result(
-      rawUserSchema(
-        createOrUpdateUserResponse(rawUserVoterSchema),
-        createOrUpdateUserResponse(rawUserHelperOrAdminSchema)
-      )
-    ),
+    request: usersCreateOrUpdate(rawUserSchema),
+    response: result(createOrUpdateUserResponse(rawUserSchema)),
   },
   "/api/v1/projects/create-or-update": {
     request: makeCreateOrUpdate(rawProjectSchema),
@@ -341,20 +293,9 @@ export const routes = identity({
     request: z.undefined(),
     response: result(
       z.object({
-        entities: z.array(
-          rawUserSchema(
-            users(rawUserVoterSchema),
-            users(rawUserHelperOrAdminSchema)
-          )
-        ),
-        previousCursor: rawUserSchema(
-          users(rawUserVoterSchema),
-          users(rawUserHelperOrAdminSchema)
-        ).nullable(),
-        nextCursor: rawUserSchema(
-          users(rawUserVoterSchema),
-          users(rawUserHelperOrAdminSchema)
-        ).nullable(),
+        entities: z.array(users(rawUserSchema)),
+        previousCursor: users(rawUserSchema).nullable(),
+        nextCursor: users(rawUserSchema).nullable(),
       })
     ),
   },

@@ -24,8 +24,6 @@ import type { IncomingMessage, ServerResponse } from "node:http";
 import { z } from "zod";
 import {
   rawUserSchema,
-  rawUserVoterSchema,
-  rawUserHelperOrAdminSchema,
 } from "../../../lib/routes.js";
 import { fetchData } from "../../entities.js";
 import { requestHandler } from "../../express.js";
@@ -106,10 +104,7 @@ export async function usersHandler(
         "deleted",
       ] as const;
 
-      const schema = rawUserSchema(
-        rawUserVoterSchema,
-        rawUserHelperOrAdminSchema
-      );
+      const schema = rawUserSchema;
 
       return await fetchData<
         z.infer<typeof schema>,

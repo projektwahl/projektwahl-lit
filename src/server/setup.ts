@@ -21,7 +21,7 @@ SPDX-License-Identifier: AGPL-3.0-or-later
 SPDX-FileCopyrightText: 2021 Moritz Hedtke <Moritz.Hedtke@t-online.de>
 */
 import { z } from "zod";
-import { rawProjectSchema, rawUserHelperOrAdminSchema } from "../lib/routes.js";
+import { rawProjectSchema, rawUserSchema } from "../lib/routes.js";
 import { sql } from "./database.js";
 import { hashPassword } from "./password.js";
 
@@ -41,7 +41,7 @@ await sql.begin("READ WRITE", async (sql) => {
 
   let hash = await hashPassword("changeme");
 
-  let admin = rawUserHelperOrAdminSchema.parse(
+  let admin = rawUserSchema.parse(
     (await sql`INSERT INTO users (username, password_hash, type) VALUES ('admin', ${hash}, 'admin') ON CONFLICT DO NOTHING RETURNING id;`)[0]);
 
   const projects = z.array(rawProjectSchema).parse(
@@ -96,7 +96,7 @@ await sql.begin("READ WRITE", async (sql) => {
 		console.log(keycloakUser)^;
 		*/
 
-    const user =rawUserHelperOrAdminSchema.parse(
+    const user = rawUserSchema.parse(
       (await sql`INSERT INTO users (username, type, "group", age, last_updated_by) VALUES (${`user${Math.random()}`}, 'voter', 'a', 10, ${
         admin.id
       }) ON CONFLICT DO NOTHING RETURNING *;`)[0]);

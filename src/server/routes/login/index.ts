@@ -24,9 +24,7 @@ import type { Http2ServerRequest, Http2ServerResponse } from "node:http2";
 import type { z, ZodObject, ZodTypeAny } from "zod";
 import {
   rawSessionType,
-  rawUserHelperOrAdminSchema,
   rawUserSchema,
-  rawUserVoterSchema,
   UnknownKeysParam,
 } from "../../../lib/routes.js";
 import { sql } from "../../database.js";
@@ -56,10 +54,7 @@ export async function loginHandler(
     const r =
       await sql`SELECT id, username, password_hash, type FROM users WHERE username = ${body.username} LIMIT 1`;
 
-    const dbUser = rawUserSchema(
-      users(rawUserVoterSchema),
-      users(rawUserHelperOrAdminSchema)
-    )
+    const dbUser = users(rawUserSchema)
       .optional()
       .parse(r[0]);
 

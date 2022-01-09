@@ -23,9 +23,7 @@ SPDX-FileCopyrightText: 2021 Moritz Hedtke <Moritz.Hedtke@t-online.de>
 import { sensitiveHeaders } from "node:http2";
 import { z, ZodObject, ZodTypeAny } from "zod";
 import {
-  rawUserHelperOrAdminSchema,
   rawUserSchema,
-  rawUserVoterSchema,
   UnknownKeysParam,
 } from "../../../lib/routes.js";
 import { sql } from "../../database.js";
@@ -83,10 +81,7 @@ export async function openidRedirectHandler(
           password_hash: true,
         });
 
-      const dbUser = rawUserSchema(
-        pickFn(rawUserVoterSchema),
-        pickFn(rawUserHelperOrAdminSchema)
-      ).parse(
+      const dbUser = pickFn(rawUserSchema).parse(
         (
           await sql`SELECT id, username, type FROM users WHERE openid_id = ${
             result.claims().sub

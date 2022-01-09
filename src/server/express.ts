@@ -25,9 +25,7 @@ import { zod2result } from "../lib/result.js";
 import { json } from "node:stream/consumers";
 import { URL } from "url";
 import {
-  rawUserHelperOrAdminSchema,
   rawUserSchema,
-  rawUserVoterSchema,
   routes,
   UnknownKeysParam,
 } from "../lib/routes.js";
@@ -53,10 +51,7 @@ const userMapper = <
     age: true,
   });
 
-const userSchema = rawUserSchema(
-  userMapper(rawUserVoterSchema),
-  userMapper(rawUserHelperOrAdminSchema)
-).optional();
+const userSchema = userMapper(rawUserSchema).optional();
 
 export function requestHandler<P extends keyof typeof routes>(
   method: string,
