@@ -33,13 +33,13 @@ if (cluster.isPrimary) {
   cluster.fork();
 
   for await (const f of getDirs("./src/server")) {
-    (async () => {
-      for await (const event of watch(f)) {
+    void (async () => {
+      for await (const _ of watch(f)) {
         const oldWorkers = { ...cluster.workers };
 
-        cluster.fork().on("listening", (address) => {
+        cluster.fork().on("listening", () => {
           for (const id in oldWorkers) {
-            oldWorkers[id]?.send("shutdown", () => {});
+            oldWorkers[id]?.send("shutdown");
           }
         });
       }
@@ -47,13 +47,13 @@ if (cluster.isPrimary) {
   }
 
   for await (const f of getDirs("./src/lib")) {
-    (async () => {
-      for await (const event of watch(f)) {
+    void (async () => {
+      for await (const _ of watch(f)) {
         const oldWorkers = { ...cluster.workers };
 
-        cluster.fork().on("listening", (address) => {
+        cluster.fork().on("listening", () => {
           for (const id in oldWorkers) {
-            oldWorkers[id]?.send("shutdown", () => {});
+            oldWorkers[id]?.send("shutdown");
           }
         });
       }

@@ -34,8 +34,12 @@ module.exports = {
     es2021: true,
     node: true,
   },
+  rules: {
+    "@typescript-eslint/no-unused-vars": ["error", { "varsIgnorePattern": "^_" }]
+  },
   extends: [
     "eslint:recommended",
+    "plugin:@typescript-eslint/eslint-recommended",
     "plugin:@typescript-eslint/recommended",
     "plugin:@typescript-eslint/recommended-requiring-type-checking",
     "prettier",
