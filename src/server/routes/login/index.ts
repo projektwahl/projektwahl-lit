@@ -119,7 +119,7 @@ export async function loginHandler(
         await sql.begin("READ WRITE", async (tsql) => {
           return await tsql`INSERT INTO sessions (user_id) VALUES (${dbUser.id}) RETURNING session_id`;
         })
-      ).columns[0]
+      )[0]
     );
 
     /** @type {import("node:http2").OutgoingHttpHeaders} */
