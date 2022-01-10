@@ -83,7 +83,7 @@ const pages = {
   },
   "^/tests/basic$": async () => {
     await import("./routes/tests/pw-test-basic.js");
-    return html`<pw-test-basic></pw-test-basic>`
+    return html`<pw-test-basic></pw-test-basic>`;
   },
   "^/login$": async () => {
     const { pwLogin } = await import("./routes/login/pw-login.js");

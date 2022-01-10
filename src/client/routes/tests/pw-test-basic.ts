@@ -24,17 +24,41 @@ import { msg } from "@lit/localize";
 import { html, LitElement } from "lit";
 import { bootstrapCss } from "../../index.js";
 import type { PwApp } from "../../pw-app.js";
+import { sleep } from "../../utils.js";
 
+// https://localhost:8443/tests/basic
 class PwTestBasic extends LitElement {
   protected render() {
     return html` ${bootstrapCss} Test page`;
   }
 
   connectedCallback(): void {
-      super.connectedCallback();
+    super.connectedCallback();
 
-      const pwApp = document.querySelector('pw-app')?.shadowRoot as ShadowRoot;
-      (pwApp.querySelector('a[href="/login"]') as HTMLAnchorElement).click();
+    (async () => {
+
+      const pwApp = document.querySelector("pw-app") as PwApp;
+
+      const pwAppShadow = pwApp?.shadowRoot as ShadowRoot;
+
+      (
+        pwAppShadow.querySelector('a[href="/login"]') as HTMLAnchorElement
+      ).click();
+
+      await sleep(500);
+
+      const pwLogin = pwAppShadow.querySelector("pw-login")
+        ?.shadowRoot as ShadowRoot;
+      (
+        pwLogin.querySelector('input[name="username"]') as HTMLInputElement
+      ).value = "admin";
+      (
+        pwLogin.querySelector('input[name="password"]') as HTMLInputElement
+      ).value = "changeme";
+      (
+        pwLogin.querySelector('button[type="submit"]') as HTMLButtonElement
+      ).click();
+    })();
   }
 }
 
