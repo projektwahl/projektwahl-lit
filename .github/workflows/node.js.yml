@@ -15,7 +15,7 @@ jobs:
 
     #container: node:16
     services:
-      postgres:
+      projektwahl:
         image: postgres
         env:
           POSTGRES_USER: projektwahl
