@@ -37,6 +37,7 @@ jobs:
     steps:
       - run: apt update && apt install -y python3 make g++
       - uses: actions/checkout@v2
+      - run: mkdir ./src/client/generated_locales
       - name: Use Node.js ${{ matrix.node-version }}
         uses: actions/setup-node@v2
         with:
