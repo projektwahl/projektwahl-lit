@@ -182,11 +182,11 @@ export class PwEntityList<
             if (this.projectId) {
               if (urlSearchParams.has("f_project_leader_id")) {
                 // @ts-expect-error you know
-                urlSearchParams.set("f_project_leader_id", this.projectId);
+                urlSearchParams.set("f_project_leader_id", this.projectId); // eslint-disable-line @typescript-eslint/no-unsafe-argument
               }
               if (urlSearchParams.has("f_force_in_project_id")) {
                 // @ts-expect-error you know
-                urlSearchParams.set("f_force_in_project_id", this.projectId);
+                urlSearchParams.set("f_force_in_project_id", this.projectId); // eslint-disable-line @typescript-eslint/no-unsafe-argument
               }
             }
             HistoryController.goto(

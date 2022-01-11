@@ -3,8 +3,6 @@ import assert from "assert/strict";
 import {
   Builder,
   By,
-  Key,
-  until,
   Capabilities,
   Capability,
   WebElement,
@@ -22,11 +20,11 @@ import {
 // https://w3c.github.io/webdriver/#get-element-shadow-root
 
 export async function shadow(element: WebElement) {
-  return (await element.getShadowRoot()) as WebElement;
+  return (await element.getShadowRoot()) as WebElement; // eslint-disable-line @typescript-eslint/no-unsafe-call
 }
 
 // SELENIUM_BROWSER=chrome node  --experimental-loader ./src/loader.js --enable-source-maps tests/e2e/welcome.js
-let driver = await new Builder()
+const driver = await new Builder()
   .forBrowser("firefox")
   .withCapabilities(Capabilities.firefox().set("acceptInsecureCerts", true))
   .withCapabilities(
@@ -48,21 +46,21 @@ try {
     await shadow(pwApp)
   ).findElement(By.css('a[href="/login"]'));
 
-  loginButton.click();
+  await loginButton.click();
 
   const pwLogin = await (await shadow(pwApp)).findElement(By.css("pw-login"));
 
   const usernameField = await (
     await shadow(pwLogin)
   ).findElement(By.css('input[name="username"]'));
-  usernameField.sendKeys("admin");
+  await usernameField.sendKeys("admin");
 
   const passwordField = await (
     await shadow(pwLogin)
   ).findElement(By.css('input[name="password"]'));
-  passwordField.sendKeys("changeme");
+  await passwordField.sendKeys("changeme");
 
-  (
+  await (
     await (await shadow(pwLogin)).findElement(By.css('button[type="submit"]'))
   ).click();
 
