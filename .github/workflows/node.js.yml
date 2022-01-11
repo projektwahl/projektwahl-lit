@@ -36,6 +36,7 @@ jobs:
 
     steps:
       - uses: actions/checkout@v2
+      - run: cat /etc/passwd
       - run: mkdir ./src/client/generated_locales
       - run: id
       - run: ls -la ./src/client/generated_locales
