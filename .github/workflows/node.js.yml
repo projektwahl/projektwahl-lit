@@ -48,5 +48,5 @@ jobs:
       - run: npm run purgecss
       - run: DATABASE_URL=postgres://projektwahl:projektwahl@projektwahl/projektwahl npm run setup
       - run: |
-        DATABASE_URL=postgres://projektwahl:projektwahl@projektwahl/projektwahl npm run server &
-        npm test
+          DATABASE_URL=postgres://projektwahl:projektwahl@projektwahl/projektwahl npm run server &
+          npm test
