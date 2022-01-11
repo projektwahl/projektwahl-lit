@@ -1,4 +1,4 @@
-import assert from 'assert/strict';
+import assert from "assert/strict";
 
 import {
   Builder,
@@ -22,47 +22,55 @@ import {
 // https://w3c.github.io/webdriver/#get-element-shadow-root
 
 export async function shadow(element: WebElement) {
-  return await element.getShadowRoot() as WebElement;
+  return (await element.getShadowRoot()) as WebElement;
 }
 
 // SELENIUM_BROWSER=chrome node  --experimental-loader ./src/loader.js --enable-source-maps tests/e2e/welcome.js
-(async function example() {
-  let driver = await new Builder()
-    .forBrowser("firefox")
-    .withCapabilities(Capabilities.firefox().set("acceptInsecureCerts", true))
-    .withCapabilities(
-      Capabilities.chrome().set(Capability.ACCEPT_INSECURE_TLS_CERTS, true)
-    )
-    .build();
-  await driver.manage().setTimeouts({
-    implicit: 1000,
-  });
+let driver = await new Builder()
+  .forBrowser("firefox")
+  .withCapabilities(Capabilities.firefox().set("acceptInsecureCerts", true))
+  .withCapabilities(
+    Capabilities.chrome().set(Capability.ACCEPT_INSECURE_TLS_CERTS, true)
+  )
+  .build();
+await driver.manage().setTimeouts({
+  implicit: 1000,
+});
 
-  try {
-    await driver.get("https://localhost:8443/");
-    const pwApp = await driver.findElement(By.css('pw-app'));
-    
-    // doesn't work on firefox
-    //const pwAppShadow: WebElement = await driver.executeScript("return arguments[0].shadowRoot", pwApp);
+try {
+  await driver.get("https://localhost:8443/");
+  const pwApp = await driver.findElement(By.css("pw-app"));
 
-    const loginButton = await (await shadow(pwApp)).findElement(By.css('a[href="/login"]'));
+  // doesn't work on firefox
+  //const pwAppShadow: WebElement = await driver.executeScript("return arguments[0].shadowRoot", pwApp);
 
-    loginButton.click();
+  const loginButton = await (
+    await shadow(pwApp)
+  ).findElement(By.css('a[href="/login"]'));
 
-    const pwLogin = await (await shadow(pwApp)).findElement(By.css('pw-login'));
+  loginButton.click();
 
-    const usernameField = await (await shadow(pwLogin)).findElement(By.css('input[name="username"]'));
-    usernameField.sendKeys("admin");
+  const pwLogin = await (await shadow(pwApp)).findElement(By.css("pw-login"));
 
-    const passwordField = await (await shadow(pwLogin)).findElement(By.css('input[name="password"]'));
-    passwordField.sendKeys("changeme");
+  const usernameField = await (
+    await shadow(pwLogin)
+  ).findElement(By.css('input[name="username"]'));
+  usernameField.sendKeys("admin");
 
-    (await (await shadow(pwLogin)).findElement(By.css('button[type="submit"]'))).click();
+  const passwordField = await (
+    await shadow(pwLogin)
+  ).findElement(By.css('input[name="password"]'));
+  passwordField.sendKeys("changeme");
 
-    const logoutButton = await (await shadow(pwApp)).findElement(By.partialLinkText("Logout"));
-    
-    assert.equal(await logoutButton.getText(), "Logout admin")
-  } finally {
-    await driver.quit();
-  }
-})();
+  (
+    await (await shadow(pwLogin)).findElement(By.css('button[type="submit"]'))
+  ).click();
+
+  const logoutButton = await (
+    await shadow(pwApp)
+  ).findElement(By.partialLinkText("Logout"));
+
+  assert.equal(await logoutButton.getText(), "Logout admin");
+} finally {
+  await driver.quit();
+}
