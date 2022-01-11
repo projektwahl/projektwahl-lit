@@ -100,7 +100,7 @@ export async function createOrUpdateUsersHandler(
               }) RETURNING id, project_leader_id, force_in_project_id;`;
             }
           })
-        ).columns[0];
+        )[0];
 
         console.log(row);
 

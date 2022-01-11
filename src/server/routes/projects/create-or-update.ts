@@ -120,7 +120,7 @@ export async function createOrUpdateProjectsHandler(
                 return res;
               }
             })
-          ).columns[0]
+          )[0]
         );
 
         if (!row) {

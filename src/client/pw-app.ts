@@ -134,7 +134,7 @@ const pages = {
   },
 };
 
-class PwApp extends LitElement {
+export class PwApp extends LitElement {
   static override get properties() {
     return {
       initial: { attribute: false },

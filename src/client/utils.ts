@@ -81,10 +81,10 @@ export const myFetch = async <P extends import("../lib/routes").keys>(
   //return routes[url].response.parse(result)
 };
 
-export const sleep = (): Promise<void> => {
+export const sleep = (timeout: number): Promise<void> => {
   return new Promise((resolve) => {
     setTimeout(() => {
       resolve();
-    }, 500);
+    }, timeout);
   });
 };

@@ -23,7 +23,7 @@ SPDX-FileCopyrightText: 2021 Moritz Hedtke <Moritz.Hedtke@t-online.de>
 {
   description = "projektwahl-lit's development flake";
 
-  inputs.nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable-small";
+  inputs.nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
   inputs.flake-utils.url = "github:numtide/flake-utils";
 
   outputs = { self, nixpkgs, flake-utils }:
@@ -56,8 +56,11 @@ SPDX-FileCopyrightText: 2021 Moritz Hedtke <Moritz.Hedtke@t-online.de>
               pkgs.brotli
               pkgs.openssl
 
+              pkgs.geckodriver
+              pkgs.chromedriver
+
               pkgs.zap
-              pkgs.wapiti
+              #pkgs.wapiti
               #pkgs.burpsuite
             ];
           };

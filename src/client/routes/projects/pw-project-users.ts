@@ -31,7 +31,7 @@ import "../../form/pw-input.js";
 import { setupHmr } from "../../hmr.js";
 import { aClick } from "../../pw-a.js";
 import { pwOrder } from "../../entity-list/pw-order.js";
-import { ifDefined } from "lit/directives/if-defined";
+import { ifDefined } from "lit/directives/if-defined.js";
 
 export const pwProjectUsers = async (url: URL) => {
   const result = await taskFunction([url.searchParams]);
