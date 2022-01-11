@@ -15,7 +15,7 @@ jobs:
 
     container: 
       image: node
-      #options: "--user user"
+      options: "--user node"
 
     #container: node:16
     services:
@@ -42,7 +42,7 @@ jobs:
       - run: mkdir ./src/client/generated_locales
       - run: id
       - run: ls -la ./src/client/generated_locales
-      - run: apt update && apt install -y python3 make g++
+      - run: sudo apt update && sudo apt install -y python3 make g++
       - name: Use Node.js ${{ matrix.node-version }}
         uses: actions/setup-node@v2
         with:
