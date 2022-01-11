@@ -46,4 +46,7 @@ jobs:
       - run: npm run lint
       - run: npm run build
       - run: npm run purgecss
-      - run: npm test
+      - run: DATABASE_URL=postgres://projektwahl:projektwahl@projektwahl/projektwahl npm run setup
+      - run: |
+        DATABASE_URL=postgres://projektwahl:projektwahl@projektwahl/projektwahl npm run server &
+        npm test
