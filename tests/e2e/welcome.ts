@@ -1,3 +1,5 @@
+import assert from 'assert/strict';
+
 import {
   Builder,
   By,
@@ -58,9 +60,8 @@ export async function shadow(element: WebElement) {
     (await (await shadow(pwLogin)).findElement(By.css('button[type="submit"]'))).click();
 
     const logoutButton = await (await shadow(pwApp)).findElement(By.partialLinkText("Logout"));
-
-    console.log(await logoutButton.getText())
     
+    assert.equal(await logoutButton.getText(), "Logout admin")
   } finally {
     await driver.quit();
   }
