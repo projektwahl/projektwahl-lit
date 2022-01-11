@@ -5,10 +5,9 @@ import {
   By,
   Capabilities,
   Capability,
-  WebElement
+  WebElement,
 } from "selenium-webdriver";
-import chrome from 'selenium-webdriver/chrome.js'
-
+import chrome from "selenium-webdriver/chrome.js";
 
 // https://chrome.google.com/webstore/detail/selenium-ide/mooikfkahbdckldjjndioackbalphokd
 // https://www.selenium.dev/selenium/docs/api/javascript/module/selenium-webdriver/
@@ -32,7 +31,13 @@ const driver = await new Builder()
   .withCapabilities(
     Capabilities.chrome().set(Capability.ACCEPT_INSECURE_TLS_CERTS, true)
   )
-  .setChromeOptions(new chrome.Options().addArguments('--headless','--no-sandbox', '--disable-dev-shm-usage'))
+  .setChromeOptions(
+    new chrome.Options().addArguments(
+      "--headless",
+      "--no-sandbox",
+      "--disable-dev-shm-usage"
+    )
+  )
   .build();
 await driver.manage().setTimeouts({
   implicit: 1000,
