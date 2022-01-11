@@ -17,8 +17,8 @@
   "description": "Software to manage choosing projects and automatically assigning people to projects.",
   "type": "module",
   "scripts": {
-    "format": "prettier --write .",
-    "format:check": "prettier --check .",
+    "format": "prettier --ignore-path .gitignore --write .",
+    "format:check": "prettier --ignore-path .gitignore --check .",
     "rebuild": "node-pre-gyp rebuild -C ./node_modules/argon2",
     "test": "SELENIUM_BROWSER=chrome node  --experimental-loader ./src/loader.js --enable-source-maps tests/e2e/welcome.js",
     "lint": "eslint .",
