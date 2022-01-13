@@ -28,9 +28,11 @@ import { PwForm } from "../../form/pw-form.js";
 import { HistoryController } from "../../history-controller.js";
 import { msg } from "@lit/localize";
 import type { z } from "zod";
-import type { routes } from "../../../lib/routes.js";
+import { routes } from "../../../lib/routes.js";
 import { setupHmr } from "../../hmr.js";
 import { pwInput } from "../../form/pw-input.js";
+import { result } from "../../../lib/result.js";
+import { bootstrapCss } from "../../index.js";
 
 export async function pwProject(id: number, viewOnly = false) {
   const result = await taskFunction([id]);
@@ -45,9 +47,10 @@ const taskFunction = async ([id]: [number]) => {
     import("../projects/pw-project-users.js"),
     await myFetch<"/api/v1/projects">(`/api/v1/projects/?f_id=${id}`, {}),
   ]);
-  // TODO FIXME really fix this here
-  return response.success ? response.data.entities[0] : null; // TODO FIXME error handling, PwForm already has some form of error handling
+  return response
 };
+
+const initialResult = result(routes["/api/v1/projects"]["response"]["options"][0]["shape"]["data"]["shape"]["entities"]["element"])
 
 export const PwProjectCreate = setupHmr(
   "PwProjectCreate",
@@ -75,11 +78,8 @@ export const PwProjectCreate = setupHmr(
 
     initialRender: boolean;
 
-    initial:
-      | z.infer<
-          typeof routes["/api/v1/projects"]["response"]["options"][0]["shape"]["data"]["shape"]["entities"]
-        >[number]
-      | undefined;
+    initial: z.infer<typeof initialResult>
+    | undefined;
 
     constructor() {
       super();
@@ -119,6 +119,23 @@ export const PwProjectCreate = setupHmr(
 
         return result;
       });
+    }
+
+    override render() {
+      if (this.initial === undefined || this.initial.success) {
+        return super.render();
+      } else {
+        const errors = Object.entries(this.initial.error)
+                      .map(([k, v]) => html`${k}: ${v}<br />`);
+        return html`${bootstrapCss}
+        <main class="container">
+          <h1 class="text-center">${this.actionText}</h1>
+          <div class="alert alert-danger" role="alert">
+                        ${msg("Some errors occurred!")}<br />
+                        ${errors}
+                      </div>
+        </main>`
+      }
     }
 
     override getInputs() {
