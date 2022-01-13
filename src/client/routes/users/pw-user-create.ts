@@ -28,24 +28,29 @@ import { PwForm } from "../../form/pw-form.js";
 import { HistoryController } from "../../history-controller.js";
 import { msg } from "@lit/localize";
 import "../../form/pw-input.js";
-import type { routes } from "../../../lib/routes.js";
+import { routes } from "../../../lib/routes.js";
 import type { z } from "zod";
 import { pwInput } from "../../form/pw-input.js";
+import { result } from "../../../lib/result.js";
+import { bootstrapCss } from "../../index.js";
 
 export async function pwUser(id: number, viewOnly = false) {
   const result = await taskFunction([id]);
+  // TODO FIXME the types aren't checked correctly here - maybe they are with lit-analyzer
   return html`<pw-user-create
     ?disabled=${viewOnly}
     .initial=${result}
   ></pw-user-create>`;
 }
 
+const initialResult = result(routes["/api/v1/users"]["response"]["options"]["0"]["shape"]["data"]["shape"]["entities"]["element"])
+
 const taskFunction = async ([id]: [number]) => {
   const response = await myFetch<"/api/v1/users">(
     `/api/v1/users/?f_id=${id}`,
     {}
   );
-  return response.success ? response.data.entities[0] : null; // TODO FIXME error handling, PwForm already has some form of error handling
+  return response
 };
 
 class PwUserCreate extends PwForm<"/api/v1/users/create-or-update"> {
@@ -70,10 +75,7 @@ class PwUserCreate extends PwForm<"/api/v1/users/create-or-update"> {
 
   type?: "voter" | "admin" | "helper";
 
-  initial:
-    | z.infer<
-        typeof routes["/api/v1/users"]["response"]["options"]["0"]["shape"]["data"]
-      >["entities"][number]
+  initial: z.infer<typeof initialResult>
     | undefined;
 
   constructor() {
@@ -113,6 +115,23 @@ class PwUserCreate extends PwForm<"/api/v1/users/create-or-update"> {
 
       return result;
     });
+  }
+
+  override render() {
+    if (this.initial === undefined || this.initial.success) {
+      return super.render();
+    } else {
+      const errors = Object.entries(this.initial.error)
+                    .map(([k, v]) => html`${k}: ${v}<br />`);
+      return html`${bootstrapCss}
+      <main class="container">
+        <h1 class="text-center">${this.actionText}</h1>
+        <div class="alert alert-danger" role="alert">
+                      ${msg("Some errors occurred!")}<br />
+                      ${errors}
+                    </div>
+      </main>`
+    }
   }
 
   override getInputs() {
