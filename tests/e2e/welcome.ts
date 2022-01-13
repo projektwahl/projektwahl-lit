@@ -25,7 +25,7 @@ export async function shadow(element: WebElement) {
   return (await element.getShadowRoot()) as WebElement; // eslint-disable-line @typescript-eslint/no-unsafe-call
 }
 
-// SELENIUM_BROWSER=chrome node  --experimental-loader ./src/loader.js --enable-source-maps tests/e2e/welcome.js
+// SELENIUM_BROWSER=chrome node --experimental-loader ./src/loader.js --enable-source-maps tests/e2e/welcome.js
 const driver = await new Builder()
   .forBrowser("firefox")
   .withCapabilities(Capabilities.firefox().set("acceptInsecureCerts", true))
@@ -43,6 +43,10 @@ const driver = await new Builder()
 await driver.manage().setTimeouts({
   implicit: 10000,
 });
+await driver.manage().window().setRect({
+  width: 500,
+  height: 1000,
+});
 
 try {
   await driver.get("https://localhost:8443/");
@@ -51,13 +55,17 @@ try {
   // doesn't work on firefox
   //const pwAppShadow: WebElement = await driver.executeScript("return arguments[0].shadowRoot", pwApp);
 
-  const loginButton = await (
+  const navbarButton = await (
+    await shadow(pwApp)
+  ).findElement(By.css("button.navbar-toggler"));
+
+  await navbarButton.click();
+
+  const loginLink = await (
     await shadow(pwApp)
   ).findElement(By.css('a[href="/login"]'));
 
-  await driver.wait(until.elementIsVisible(loginButton), 10000);
-
-  await loginButton.click();
+  await loginLink.click();
 
   const pwLogin = await (await shadow(pwApp)).findElement(By.css("pw-login"));
 
@@ -71,9 +79,11 @@ try {
   ).findElement(By.css('input[name="password"]'));
   await passwordField.sendKeys("changeme");
 
-  await (
-    await (await shadow(pwLogin)).findElement(By.css('button[type="submit"]'))
-  ).click();
+  const loginButton = await (
+    await shadow(pwLogin)
+  ).findElement(By.css('button[type="submit"]'));
+
+  await loginButton.click();
 
   const logoutButton = await (
     await shadow(pwApp)
