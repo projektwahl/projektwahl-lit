@@ -96,13 +96,13 @@ const pages = {
   "^/users/edit/\\d+$": async (url: URL) => {
     const { pwUser } = await import("./routes/users/pw-user-create.js");
     return await pwUser(
-      Number(url.pathname.match(/^users\/edit\/(\d+)$/)?.[1])
+      Number(url.pathname.match(/^\/users\/edit\/(\d+)$/)?.[1])
     );
   },
   "^/users/view/\\d+$": async (url: URL) => {
     const { pwUser } = await import("./routes/users/pw-user-create.js");
     return await pwUser(
-      Number(url.pathname.match(/^users\/view\/(\d+)$/)?.[1]),
+      Number(url.pathname.match(/^\/users\/view\/(\d+)$/)?.[1]),
       true
     );
   },
@@ -120,7 +120,7 @@ const pages = {
       "./routes/projects/pw-project-create.js"
     );
     return await pwProject(
-      Number(url.pathname.match(/^projects\/edit\/(\d+)$/)?.[1])
+      Number(url.pathname.match(/^\/projects\/edit\/(\d+)$/)?.[1])
     );
   },
   "^/projects/view/\\d+$": async (url: URL) => {
@@ -128,7 +128,7 @@ const pages = {
       "./routes/projects/pw-project-create.js"
     );
     return await pwProject(
-      Number(url.pathname.match(/^projects\/view\/(\d+)$/)?.[1]),
+      Number(url.pathname.match(/^\/projects\/view\/(\d+)$/)?.[1]),
       true
     );
   },
