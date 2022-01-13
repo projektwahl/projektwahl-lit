@@ -93,13 +93,13 @@ const pages = {
     await import("./routes/users/pw-user-create.js");
     return html`<pw-user-create></pw-user-create>`;
   },
-  "^/users/edit/d+/$": async (url: URL) => {
+  "^/users/edit/\\d+$": async (url: URL) => {
     const { pwUser } = await import("./routes/users/pw-user-create.js");
     return await pwUser(
       Number(url.pathname.match(/^users\/edit\/(\d+)$/)?.[1])
     );
   },
-  "^/users/view/d+/$": async (url: URL) => {
+  "^/users/view/\\d+$": async (url: URL) => {
     const { pwUser } = await import("./routes/users/pw-user-create.js");
     return await pwUser(
       Number(url.pathname.match(/^users\/view\/(\d+)$/)?.[1]),
@@ -115,7 +115,7 @@ const pages = {
     await import("./routes/projects/pw-project-users.js");
     return html`<pw-project-create></pw-project-create>`;
   },
-  "^/projects/edit/d+/$": async (url: URL) => {
+  "^/projects/edit/\\d+$": async (url: URL) => {
     const { pwProject } = await import(
       "./routes/projects/pw-project-create.js"
     );
@@ -123,7 +123,7 @@ const pages = {
       Number(url.pathname.match(/^projects\/edit\/(\d+)$/)?.[1])
     );
   },
-  "^/projects/view/d+/$": async (url: URL) => {
+  "^/projects/view/\\d+$": async (url: URL) => {
     const { pwProject } = await import(
       "./routes/projects/pw-project-create.js"
     );

@@ -97,6 +97,14 @@ try {
 
   await accountsLink.click();
 
+  const pwUsers = await (await shadow(pwApp)).findElement(By.css("pw-users"));
+
+  const user2 = await (
+    await shadow(pwUsers)
+  ).findElement(By.css('a[href="/users/view/2"]'));
+
+  user2.click()
+
   const theRepl = repl.start();
   theRepl.context.driver = driver;
   theRepl.context.shadow = shadow;
@@ -107,5 +115,6 @@ try {
     await driver.quit();
   })
 } catch (error) {
+  console.error(error)
   await driver.quit();
 }
