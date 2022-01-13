@@ -8,6 +8,7 @@ import {
   WebElement,
 } from "selenium-webdriver";
 import chrome from "selenium-webdriver/chrome.js";
+import repl from 'repl'
 
 // https://chrome.google.com/webstore/detail/selenium-ide/mooikfkahbdckldjjndioackbalphokd
 // https://www.selenium.dev/selenium/docs/api/javascript/module/selenium-webdriver/
@@ -31,13 +32,13 @@ const driver = await new Builder()
   .withCapabilities(
     Capabilities.chrome().set(Capability.ACCEPT_INSECURE_TLS_CERTS, true)
   )
-  .setChromeOptions(
+  /*.setChromeOptions(
     new chrome.Options().addArguments(
       "--headless",
       "--no-sandbox",
       "--disable-dev-shm-usage"
     )
-  )
+  )*/
   .build();
 await driver.manage().setTimeouts({
   implicit: 10000,
@@ -89,6 +90,22 @@ try {
   ).findElement(By.partialLinkText("Logout"));
 
   assert.equal(await logoutButton.getText(), "Logout admin");
-} finally {
+
+  const accountsLink = await (
+    await shadow(pwApp)
+  ).findElement(By.css('a[href="/users"]'));
+
+  await accountsLink.click();
+
+  const theRepl = repl.start();
+  theRepl.context.driver = driver;
+  theRepl.context.shadow = shadow;
+  theRepl.context.pwApp = pwApp;
+  theRepl.context.By = (await import("selenium-webdriver")).By
+
+  theRepl.on("exit", async () => {
+    await driver.quit();
+  })
+} catch (error) {
   await driver.quit();
 }
