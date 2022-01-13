@@ -50,6 +50,12 @@ const taskFunction = async ([id]: [number]) => {
     `/api/v1/users/?f_id=${id}`,
     {}
   );
+  if (response.success) {
+    return {
+      success: true,
+      data: response.data.entities[0]
+    }
+  }
   return response
 };
 

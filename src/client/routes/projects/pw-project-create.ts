@@ -47,6 +47,12 @@ const taskFunction = async ([id]: [number]) => {
     import("../projects/pw-project-users.js"),
     await myFetch<"/api/v1/projects">(`/api/v1/projects/?f_id=${id}`, {}),
   ]);
+  if (response.success) {
+    return {
+      success: true,
+      data: response.data.entities[0]
+    }
+  }
   return response
 };
 
