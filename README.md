@@ -53,6 +53,12 @@ DATABASE_URL=postgres://projektwahl:projektwahl@projektwahl/projektwahl npm run 
 # https://localhost:8443/
 ```
 
+## Development
+
+```bash
+ln -s \$PWD/pre-commit .git/hooks/pre-commit
+```
+
 ## Database access
 
 ```
