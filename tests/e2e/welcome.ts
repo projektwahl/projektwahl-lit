@@ -117,7 +117,7 @@ try {
 
     const pwUserGroup = await (await shadow(pwUserCreate)).findElement(By.css('input[name="group"]'));
 
-    assert.equal(await pwUserGroup.getAttribute("value"), "");
+    assert.equal(await pwUserGroup.getAttribute("value"), "a");
 
     await driver.navigate().back()
   }
@@ -137,6 +137,7 @@ try {
 
     const pwUserGroup = await (await shadow(pwUserCreate)).findElement(By.css('input[name="group"]'));
 
+    pwUserGroup.clear()
     pwUserGroup.sendKeys("awesomegroup");
 
     const submitButton = await (
