@@ -5,6 +5,7 @@ import {
   By,
   Capabilities,
   Capability,
+  until,
   WebElement,
 } from "selenium-webdriver";
 import chrome from "selenium-webdriver/chrome.js";
@@ -53,6 +54,8 @@ try {
   const loginButton = await (
     await shadow(pwApp)
   ).findElement(By.css('a[href="/login"]'));
+
+  await driver.wait(until.elementIsVisible(loginButton), 10000);
 
   await loginButton.click();
 
