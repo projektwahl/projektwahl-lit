@@ -67,7 +67,7 @@ export function pwInput<
     ?disabled=${disabled}
     @change=${onchange}
     label=${label}
-    .name=${name}
+    name=${name}
     .options=${options}
     autocomplete=${ifDefined(autocomplete)}
     .task=${task}
@@ -82,7 +82,7 @@ export class PwInput<
   static override get properties() {
     return {
       label: { type: String },
-      name: { attribute: false },
+      name: { type: String },
       type: { type: String },
       options: { attribute: false },
       autocomplete: { type: String },

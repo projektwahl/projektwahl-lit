@@ -341,6 +341,8 @@ export class PwApp extends LitElement {
         error: (e) => e,
         pending: () => noChange,
       })}
+
+      <br />
     `;
   }
 }

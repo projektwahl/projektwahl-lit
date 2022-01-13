@@ -5,6 +5,7 @@ import {
   By,
   Capabilities,
   Capability,
+  until,
   WebElement,
 } from "selenium-webdriver";
 import chrome from "selenium-webdriver/chrome.js";
@@ -15,6 +16,9 @@ import repl from 'repl'
 
 // https://bugzilla.mozilla.org/show_bug.cgi?id=1489490
 // Firefox 96, geckodriver 0.31.0 required
+
+// https://github.com/mozilla/geckodriver/issues/776
+// https://github.com/w3c/webdriver/issues/1005
 
 // https://github.com/SeleniumHQ/selenium/commit/4e24e999b7f12510793e8bf515314bf2fa7ae5e8
 // @types/selenium-webdriver is probably missing those
@@ -41,7 +45,7 @@ const driver = await new Builder()
   )*/
   .build();
 await driver.manage().setTimeouts({
-  implicit: 10000,
+  implicit: 1000,
 });
 await driver.manage().window().setRect({
   width: 500,
@@ -97,13 +101,54 @@ try {
 
   await accountsLink.click();
 
-  const pwUsers = await (await shadow(pwApp)).findElement(By.css("pw-users"));
 
-  const user2 = await (
-    await shadow(pwUsers)
-  ).findElement(By.css('a[href="/users/view/2"]'));
+  {
+    // view user
 
-  user2.click()
+    const pwUsers = await (await shadow(pwApp)).findElement(By.css("pw-users"));
+
+    const user2 = await (
+      await shadow(pwUsers)
+    ).findElement(By.css('a[href="/users/view/2"]'));
+
+    user2.click()
+
+    const pwUserCreate = await (await shadow(pwApp)).findElement(By.css("pw-user-create"));
+
+    const pwUserGroup = await (await shadow(pwUserCreate)).findElement(By.css('input[name="group"]'));
+
+    assert.equal(await pwUserGroup.getAttribute("value"), "");
+
+    await driver.navigate().back()
+  }
+
+  {
+    // edit user
+
+    const pwUsers = await (await shadow(pwApp)).findElement(By.css("pw-users"));
+
+    const user2 = await (
+      await shadow(pwUsers)
+    ).findElement(By.css('a[href="/users/edit/2"]'));
+
+    user2.click()
+
+    const pwUserCreate = await (await shadow(pwApp)).findElement(By.css("pw-user-create"));
+
+    const pwUserGroup = await (await shadow(pwUserCreate)).findElement(By.css('input[name="group"]'));
+
+    pwUserGroup.sendKeys("awesomegroup");
+
+    const submitButton = await (
+      await shadow(pwUserCreate)
+    ).findElement(By.css('button[type="submit"]'));
+
+    await driver.executeScript("arguments[0].scrollIntoView(true);", submitButton)
+
+    await driver.sleep(250);
+    
+    await submitButton.click();
+  }
 
   const theRepl = repl.start();
   theRepl.context.driver = driver;
@@ -116,5 +161,5 @@ try {
   })
 } catch (error) {
   console.error(error)
-  await driver.quit();
+  //await driver.quit();
 }
