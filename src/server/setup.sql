@@ -76,9 +76,14 @@ BEGIN
 END;
 $body$ LANGUAGE plpgsql;
 
+DROP TRIGGER IF EXISTS projects_audit_insert_delete ON projects_with_deleted;
+
 CREATE TRIGGER projects_audit_insert_delete
 AFTER INSERT OR DELETE ON projects_with_deleted FOR EACH ROW
 EXECUTE PROCEDURE log_history_projects();
+
+
+DROP TRIGGER IF EXISTS projects_audit_update_selective ON projects_with_deleted;
 
 CREATE TRIGGER projects_audit_update_selective
 AFTER UPDATE ON projects_with_deleted FOR EACH ROW
@@ -201,9 +206,15 @@ BEGIN
 END;
 $body$ LANGUAGE plpgsql;
 
+
+DROP TRIGGER IF EXISTS users_audit_insert_delete ON users_with_deleted;
+
 CREATE TRIGGER users_audit_insert_delete
 AFTER INSERT OR DELETE ON users_with_deleted FOR EACH ROW
 EXECUTE PROCEDURE log_history_users();
+
+
+DROP TRIGGER IF EXISTS users_audit_update_selective ON users_with_deleted;
 
 CREATE TRIGGER users_audit_update_selective
 AFTER UPDATE ON users_with_deleted FOR EACH ROW
@@ -255,9 +266,15 @@ BEGIN
 END;
 $body$ LANGUAGE plpgsql;
 
+
+DROP TRIGGER IF EXISTS choices_audit_insert_delete ON choices;
+
 CREATE TRIGGER choices_audit_insert_delete
 AFTER INSERT OR DELETE ON choices FOR EACH ROW
 EXECUTE PROCEDURE log_history_choices();
+
+
+DROP TRIGGER IF EXISTS choices_audit_update_selective ON choices;
 
 CREATE TRIGGER choices_audit_update_selective
 AFTER UPDATE ON choices FOR EACH ROW

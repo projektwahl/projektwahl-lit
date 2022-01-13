@@ -1,0 +1,59 @@
+# This workflow will do a clean install of node dependencies, cache/restore them, build the source code and run tests across different versions of node
+# For more information see: https://help.github.com/actions/language-and-framework-guides/using-nodejs-with-github-actions
+
+name: Node.js CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    services:
+      projektwahl:
+        image: postgres
+        ports:
+          - 5432:5432
+        env:
+          POSTGRES_USER: projektwahl
+          POSTGRES_DB: projektwahl
+          POSTGRES_PASSWORD: projektwahl
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    strategy:
+      matrix:
+        node-version: [16.x] # 17.x
+
+    steps:
+      - uses: actions/checkout@v2
+      - run: cat /etc/passwd
+      - run: mkdir ./src/client/generated_locales
+      - run: id
+      - run: ls -la ./src/client/generated_locales
+      - run: sudo apt update && sudo apt install -y python3 make g++
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v2
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: "npm"
+      - run: npm ci
+      - run: npm run rebuild
+      - run: npm run localize-build
+      - run: npm run format:check
+      - run: npm run lint
+      - run: npm run build
+      - run: npm run purgecss
+      - run: openssl req -x509 -newkey rsa:2048 -nodes -sha256 -subj '/CN=localhost' -keyout localhost-privkey.pem -out localhost-cert.pem # or use actual certificates
+      - run: DATABASE_URL=postgres://projektwahl:projektwahl@localhost/projektwahl npm run setup
+      - run: |
+          DATABASE_URL=postgres://projektwahl:projektwahl@localhost/projektwahl npm run server &
+          sleep 1
+          npm test

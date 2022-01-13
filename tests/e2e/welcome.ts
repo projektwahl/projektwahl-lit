@@ -3,12 +3,11 @@ import assert from "assert/strict";
 import {
   Builder,
   By,
-  Key,
-  until,
   Capabilities,
   Capability,
   WebElement,
 } from "selenium-webdriver";
+import chrome from "selenium-webdriver/chrome.js";
 
 // https://chrome.google.com/webstore/detail/selenium-ide/mooikfkahbdckldjjndioackbalphokd
 // https://www.selenium.dev/selenium/docs/api/javascript/module/selenium-webdriver/
@@ -22,19 +21,30 @@ import {
 // https://w3c.github.io/webdriver/#get-element-shadow-root
 
 export async function shadow(element: WebElement) {
-  return (await element.getShadowRoot()) as WebElement;
+  return (await element.getShadowRoot()) as WebElement; // eslint-disable-line @typescript-eslint/no-unsafe-call
 }
 
-// SELENIUM_BROWSER=chrome node  --experimental-loader ./src/loader.js --enable-source-maps tests/e2e/welcome.js
-let driver = await new Builder()
+// SELENIUM_BROWSER=chrome node --experimental-loader ./src/loader.js --enable-source-maps tests/e2e/welcome.js
+const driver = await new Builder()
   .forBrowser("firefox")
   .withCapabilities(Capabilities.firefox().set("acceptInsecureCerts", true))
   .withCapabilities(
     Capabilities.chrome().set(Capability.ACCEPT_INSECURE_TLS_CERTS, true)
   )
+  .setChromeOptions(
+    new chrome.Options().addArguments(
+      "--headless",
+      "--no-sandbox",
+      "--disable-dev-shm-usage"
+    )
+  )
   .build();
 await driver.manage().setTimeouts({
-  implicit: 1000,
+  implicit: 10000,
+});
+await driver.manage().window().setRect({
+  width: 500,
+  height: 1000,
 });
 
 try {
@@ -44,27 +54,35 @@ try {
   // doesn't work on firefox
   //const pwAppShadow: WebElement = await driver.executeScript("return arguments[0].shadowRoot", pwApp);
 
-  const loginButton = await (
+  const navbarButton = await (
+    await shadow(pwApp)
+  ).findElement(By.css("button.navbar-toggler"));
+
+  await navbarButton.click();
+
+  const loginLink = await (
     await shadow(pwApp)
   ).findElement(By.css('a[href="/login"]'));
 
-  loginButton.click();
+  await loginLink.click();
 
   const pwLogin = await (await shadow(pwApp)).findElement(By.css("pw-login"));
 
   const usernameField = await (
     await shadow(pwLogin)
   ).findElement(By.css('input[name="username"]'));
-  usernameField.sendKeys("admin");
+  await usernameField.sendKeys("admin");
 
   const passwordField = await (
     await shadow(pwLogin)
   ).findElement(By.css('input[name="password"]'));
-  passwordField.sendKeys("changeme");
+  await passwordField.sendKeys("changeme");
 
-  (
-    await (await shadow(pwLogin)).findElement(By.css('button[type="submit"]'))
-  ).click();
+  const loginButton = await (
+    await shadow(pwLogin)
+  ).findElement(By.css('button[type="submit"]'));
+
+  await loginButton.click();
 
   const logoutButton = await (
     await shadow(pwApp)
