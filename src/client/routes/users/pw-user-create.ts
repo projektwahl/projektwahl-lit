@@ -92,8 +92,8 @@ class PwUserCreate extends PwForm<"/api/v1/users/create-or-update"> {
         },
       });
       this.form.value?.dispatchEvent(formDataEvent);
-      formDataEvent.detail.id = this.initial?.id;
-      if (!this.initial?.id) {
+      formDataEvent.detail.id = this.initial?.success ? this.initial.data.id : undefined;
+      if (this.initial?.success && !this.initial.data.id) {
         formDataEvent.detail.project_leader_id = null;
         formDataEvent.detail.force_in_project_id = null;
       }
@@ -135,16 +135,20 @@ class PwUserCreate extends PwForm<"/api/v1/users/create-or-update"> {
   }
 
   override getInputs() {
+    if (!this.initial?.success) {
+      return html``;
+    }
+
     return html`
-      ${pwInput({
+      ${pwInput<"/api/v1/users/create-or-update", "username">({
         type: "text",
         disabled: this.disabled,
         label: msg("Username"),
         name: "username",
         task: this._task,
-        initial: this.initial,
+        initial: this.initial.data,
       })}
-      ${pwInput({
+      ${pwInput<"/api/v1/users/create-or-update", "type">({
         type: "select",
         disabled: this.disabled,
         onchange: (event: Event) =>
@@ -160,54 +164,54 @@ class PwUserCreate extends PwForm<"/api/v1/users/create-or-update"> {
           { value: "admin", text: "Admin" },
         ],
         task: this._task,
-        initial: { type: this.type ?? this.initial?.type ?? "voter" },
+        initial: { type: this.type ?? this.initial?.data.type ?? "voter" },
       })}
-      ${(this.type ?? this.initial?.type ?? "voter") === "voter"
-        ? html`${pwInput({
+      ${(this.type ?? this.initial?.data.type ?? "voter") === "voter"
+        ? html`${pwInput<"/api/v1/users/create-or-update", "group">({
             type: "text",
             disabled: this.disabled,
             label: msg("Group"),
             name: "group",
             task: this._task,
-            initial: this.initial,
+            initial: this.initial.data,
           })}
-          ${pwInput({
+          ${pwInput<"/api/v1/users/create-or-update", "age">({
             type: "number",
             disabled: this.disabled,
             label: msg("Age"),
             name: "age",
             task: this._task,
-            initial: this.initial,
+            initial: this.initial.data,
           })}`
         : undefined}
       ${!this.disabled
         ? html`
-            ${pwInput({
+            ${pwInput<"/api/v1/users/create-or-update", "password">({
               type: "password",
               disabled: this.disabled,
               label: msg("Password"),
               name: "password",
               task: this._task,
               autocomplete: "new-password",
-              initial: this.initial,
+              initial: this.initial.data,
             })}
           `
         : undefined}
-      ${pwInput({
+      ${pwInput<"/api/v1/users/create-or-update", "away">({
         type: "checkbox",
         disabled: this.disabled,
         label: msg("Away"),
         name: "away",
         task: this._task,
-        initial: this.initial,
+        initial: this.initial.data,
       })}
-      ${pwInput({
+      ${pwInput<"/api/v1/users/create-or-update", "deleted">({
         type: "checkbox",
         disabled: this.disabled,
         label: msg("Mark this user as deleted"),
         name: "deleted",
         task: this._task,
-        initial: this.initial,
+        initial: this.initial.data,
       })}
     `;
   }

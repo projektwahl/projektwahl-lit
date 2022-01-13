@@ -100,7 +100,7 @@ export const PwProjectCreate = setupHmr(
           },
         });
         this.form.value?.dispatchEvent(formDataEvent);
-        formDataEvent.detail.id = this.initial?.id;
+        formDataEvent.detail.id = this.initial?.success ? this.initial.data.id : undefined;
 
         const result = await myFetch<"/api/v1/projects/create-or-update">(
           "/api/v1/projects/create-or-update",
@@ -139,100 +139,104 @@ export const PwProjectCreate = setupHmr(
     }
 
     override getInputs() {
+      if (!this.initial?.success) {
+        return html``;
+      }
+
       return html`
-        ${pwInput({
+        ${pwInput<"/api/v1/projects/create-or-update", "title">({
           type: "text",
           disabled: this.disabled,
           label: msg("Title"),
           name: "title",
           task: this._task,
-          initial: this.initial,
+          initial: this.initial.data,
         })}
-        ${pwInput({
+        ${pwInput<"/api/v1/projects/create-or-update", "info">({
           type: "text",
           disabled: this.disabled,
           label: msg("Info"),
           name: "info",
           task: this._task,
-          initial: this.initial,
+          initial: this.initial.data,
         })}
-        ${pwInput({
+        ${pwInput<"/api/v1/projects/create-or-update", "place">({
           type: "text",
           disabled: this.disabled,
           label: msg("Place"),
           name: "place",
           task: this._task,
-          initial: this.initial,
+          initial: this.initial.data,
         })}
-        ${pwInput({
+        ${pwInput<"/api/v1/projects/create-or-update", "costs">({
           type: "number",
           disabled: this.disabled,
           label: msg("Costs"),
           name: "costs",
           task: this._task,
-          initial: this.initial,
+          initial: this.initial.data,
         })}
-        ${pwInput({
+        ${pwInput<"/api/v1/projects/create-or-update", "min_age">({
           type: "number",
           disabled: this.disabled,
           label: msg("Minimum age"),
           name: "min_age",
           task: this._task,
-          initial: this.initial,
+          initial: this.initial.data,
         })}
-        ${pwInput({
+        ${pwInput<"/api/v1/projects/create-or-update", "max_age">({
           type: "number",
           disabled: this.disabled,
           label: msg("Maximum age"),
           name: "max_age",
           task: this._task,
-          initial: this.initial,
+          initial: this.initial.data,
         })}
-        ${pwInput({
+        ${pwInput<"/api/v1/projects/create-or-update", "min_participants">({
           type: "number",
           disabled: this.disabled,
           label: msg("Minimum participants"),
           name: "min_participants",
           task: this._task,
-          initial: this.initial,
+          initial: this.initial.data,
         })}
-        ${pwInput({
+        ${pwInput<"/api/v1/projects/create-or-update", "max_participants">({
           type: "number",
           disabled: this.disabled,
           label: msg("Maximum participants"),
           name: "max_participants",
           task: this._task,
-          initial: this.initial,
+          initial: this.initial.data,
         })}
-        ${pwInput({
+        ${pwInput<"/api/v1/projects/create-or-update", "random_assignments">({
           type: "checkbox",
           disabled: this.disabled,
           label: msg("Allow random assignments"),
           name: "random_assignments",
           task: this._task,
-          initial: this.initial,
+          initial: this.initial.data,
         })}
-        ${pwInput({
+        ${pwInput<"/api/v1/projects/create-or-update", "deleted">({
           type: "checkbox",
           disabled: this.disabled,
           label: msg("Mark this project as deleted"),
           name: "deleted",
           task: this._task,
-          initial: this.initial,
+          initial: this.initial.data,
         })}
 
         <!-- Projektleitende -->
         <!-- TODO FIXME view only -->
         ${this.initial
           ? html`<pw-project-users
-              projectId=${this.initial.id}
+              projectId=${this.initial.data.id}
               name=${"project_leader_id"}
               title=${msg("Project leaders")}
             ></pw-project-users>`
           : html``}
         ${this.initial
           ? html`<pw-project-users
-              projectId=${this.initial.id}
+              projectId=${this.initial.data.id}
               name=${"force_in_project_id"}
               title=${msg("Guaranteed project members")}
             ></pw-project-users>`

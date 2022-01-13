@@ -32,8 +32,8 @@ import type { z } from "zod";
 
 // workaround see https://github.com/runem/lit-analyzer/issues/149#issuecomment-1006162839
 export function pwInput<
-  P extends keyof typeof routes,
-  Q extends keyof z.infer<typeof routes[P]["request"]>
+  P extends keyof typeof routes = never,
+  Q extends keyof z.infer<typeof routes[P]["request"]> = never
 >(
   props: Pick<
     PwInput<P, Q>,
