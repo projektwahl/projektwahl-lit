@@ -51,6 +51,7 @@ jobs:
       - run: npm run lint
       - run: npm run build
       - run: npm run purgecss
+      - run: openssl req -x509 -newkey rsa:2048 -nodes -sha256 -subj '/CN=localhost' -keyout localhost-privkey.pem -out localhost-cert.pem # or use actual certificates
       - run: DATABASE_URL=postgres://projektwahl:projektwahl@localhost/projektwahl npm run setup
       - run: |
           DATABASE_URL=postgres://projektwahl:projektwahl@localhost/projektwahl npm run server &
