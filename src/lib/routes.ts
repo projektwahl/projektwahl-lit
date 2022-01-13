@@ -46,6 +46,7 @@ const rawUserCommon = {
   force_in_project_id: z.number().nullable(),
   computed_in_project_id: z.number().nullable(),
   deleted: z.boolean(),
+  last_updated_by: z.number(),
 };
 
 export const rawUserSchema = z
@@ -72,6 +73,7 @@ export const rawProjectSchema = z
     max_participants: z.number().min(1).max(1000),
     random_assignments: z.boolean(),
     deleted: z.boolean(),
+    last_updated_by: z.number(),
   })
   .strict();
 

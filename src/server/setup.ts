@@ -46,18 +46,18 @@ await sql.begin("READ WRITE", async (sql) => {
 
   const hash = await hashPassword("changeme");
 
-  const admin = rawUserSchema.parse(
+  const admin = rawUserSchema.pick({
+    id: true
+  }).parse(
     (
-      await sql`INSERT INTO users (username, password_hash, type) VALUES ('admin', ${hash}, 'admin') ON CONFLICT DO NOTHING RETURNING id;`
+      await sql`INSERT INTO users_with_deleted (username, password_hash, type) VALUES ('admin', ${hash}, 'admin') ON CONFLICT (username) DO UPDATE SET "group" = "users_with_deleted"."group" RETURNING id;`
     )[0]
   );
 
   const projects = z
     .array(rawProjectSchema)
     .parse(
-      (
         await sql`INSERT INTO projects (title, info, place, costs, min_age, max_age, min_participants, max_participants, random_assignments, last_updated_by) (SELECT generate_series, '', '', 0, 5, 13, 5, 20, FALSE, ${admin.id} FROM generate_series(1, 10)) RETURNING *;`
-      )[0]
     );
 
   console.log(projects);
@@ -109,11 +109,13 @@ await sql.begin("READ WRITE", async (sql) => {
 		console.log(keycloakUser)^;
 		*/
 
-    const user = rawUserSchema.parse(
+    const user = rawUserSchema.pick({
+      id: true
+    }).parse(
       (
         await sql`INSERT INTO users (username, type, "group", age, last_updated_by) VALUES (${`user${Math.random()}`}, 'voter', 'a', 10, ${
           admin.id
-        }) ON CONFLICT DO NOTHING RETURNING *;`
+        }) ON CONFLICT DO NOTHING RETURNING users.id;`
       )[0]
     );
     shuffleArray(projects);
