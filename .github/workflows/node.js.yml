@@ -55,4 +55,5 @@ jobs:
       - run: DATABASE_URL=postgres://projektwahl:projektwahl@localhost/projektwahl npm run setup
       - run: |
           DATABASE_URL=postgres://projektwahl:projektwahl@localhost/projektwahl npm run server &
+          sleep 1
           npm test
