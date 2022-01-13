@@ -40,7 +40,7 @@ const driver = await new Builder()
   )
   .build();
 await driver.manage().setTimeouts({
-  implicit: 1000,
+  implicit: 10000,
 });
 
 try {
