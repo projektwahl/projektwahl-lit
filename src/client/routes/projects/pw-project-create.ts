@@ -50,13 +50,17 @@ const taskFunction = async ([id]: [number]) => {
   if (response.success) {
     return {
       success: true,
-      data: response.data.entities[0]
-    }
+      data: response.data.entities[0],
+    };
   }
-  return response
+  return response;
 };
 
-const initialResult = result(routes["/api/v1/projects"]["response"]["options"][0]["shape"]["data"]["shape"]["entities"]["element"])
+const initialResult = result(
+  routes["/api/v1/projects"]["response"]["options"][0]["shape"]["data"][
+    "shape"
+  ]["entities"]["element"]
+);
 
 export const PwProjectCreate = setupHmr(
   "PwProjectCreate",
@@ -84,8 +88,7 @@ export const PwProjectCreate = setupHmr(
 
     initialRender: boolean;
 
-    initial: z.infer<typeof initialResult>
-    | undefined;
+    initial: z.infer<typeof initialResult> | undefined;
 
     constructor() {
       super();
@@ -106,7 +109,9 @@ export const PwProjectCreate = setupHmr(
           },
         });
         this.form.value?.dispatchEvent(formDataEvent);
-        formDataEvent.detail.id = this.initial?.success ? this.initial.data.id : undefined;
+        formDataEvent.detail.id = this.initial?.success
+          ? this.initial.data.id
+          : undefined;
 
         const result = await myFetch<"/api/v1/projects/create-or-update">(
           "/api/v1/projects/create-or-update",
@@ -131,16 +136,17 @@ export const PwProjectCreate = setupHmr(
       if (this.initial === undefined || this.initial.success) {
         return super.render();
       } else {
-        const errors = Object.entries(this.initial.error)
-                      .map(([k, v]) => html`${k}: ${v}<br />`);
+        const errors = Object.entries(this.initial.error).map(
+          ([k, v]) => html`${k}: ${v}<br />`
+        );
         return html`${bootstrapCss}
-        <main class="container">
-          <h1 class="text-center">${this.actionText}</h1>
-          <div class="alert alert-danger" role="alert">
-                        ${msg("Some errors occurred!")}<br />
-                        ${errors}
-                      </div>
-        </main>`
+          <main class="container">
+            <h1 class="text-center">${this.actionText}</h1>
+            <div class="alert alert-danger" role="alert">
+              ${msg("Some errors occurred!")}<br />
+              ${errors}
+            </div>
+          </main>`;
       }
     }
 

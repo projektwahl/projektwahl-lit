@@ -5,12 +5,11 @@ import {
   By,
   Capabilities,
   Capability,
-  until,
   WebElement,
 } from "selenium-webdriver";
-import chrome from "selenium-webdriver/chrome.js";
-import repl from 'repl'
-import crypto from 'node:crypto'
+//import chrome from "selenium-webdriver/chrome.js";
+import repl from "repl";
+import crypto from "node:crypto";
 const webcrypto = crypto.webcrypto as unknown as Crypto;
 
 // https://chrome.google.com/webstore/detail/selenium-ide/mooikfkahbdckldjjndioackbalphokd
@@ -103,7 +102,9 @@ try {
 
   await accountsLink.click();
 
-  const groupName = [...webcrypto.getRandomValues(new Uint8Array(8))].map(b => b.toString(16).padStart(2, '0')).join('');
+  const groupName = [...webcrypto.getRandomValues(new Uint8Array(8))]
+    .map((b) => b.toString(16).padStart(2, "0"))
+    .join("");
 
   {
     // edit user
@@ -114,30 +115,40 @@ try {
       await shadow(pwUsers)
     ).findElement(By.css('a[href="/users/edit/2"]'));
 
-    user2.click()
+    await user2.click();
 
-    const pwUserCreate = await (await shadow(pwApp)).findElement(By.css("pw-user-create"));
+    const pwUserCreate = await (
+      await shadow(pwApp)
+    ).findElement(By.css("pw-user-create"));
 
-    const pwUserGroup = await (await shadow(pwUserCreate)).findElement(By.css('input[name="group"]'));
+    const pwUserGroup = await (
+      await shadow(pwUserCreate)
+    ).findElement(By.css('input[name="group"]'));
 
-    pwUserGroup.clear()
-    pwUserGroup.sendKeys(groupName);
+    await pwUserGroup.clear();
+    await pwUserGroup.sendKeys(groupName);
 
     const submitButton = await (
       await shadow(pwUserCreate)
     ).findElement(By.css('button[type="submit"]'));
 
-    await driver.executeScript("arguments[0].scrollIntoView(true);", submitButton)
+    await driver.executeScript(
+      "arguments[0].scrollIntoView(true);",
+      submitButton
+    );
 
     await driver.sleep(250);
-    
+
     await submitButton.click();
   }
 
   {
     // view user
 
-    await driver.executeScript("arguments[0].scrollIntoView(true);", accountsLink)
+    await driver.executeScript(
+      "arguments[0].scrollIntoView(true);",
+      accountsLink
+    );
 
     await driver.sleep(250);
 
@@ -149,27 +160,31 @@ try {
       await shadow(pwUsers)
     ).findElement(By.css('a[href="/users/view/2"]'));
 
-    user2.click()
+    await user2.click();
 
-    const pwUserCreate = await (await shadow(pwApp)).findElement(By.css("pw-user-create"));
+    const pwUserCreate = await (
+      await shadow(pwApp)
+    ).findElement(By.css("pw-user-create"));
 
-    const pwUserGroup = await (await shadow(pwUserCreate)).findElement(By.css('input[name="group"]'));
+    const pwUserGroup = await (
+      await shadow(pwUserCreate)
+    ).findElement(By.css('input[name="group"]'));
 
     assert.equal(await pwUserGroup.getAttribute("value"), groupName);
 
-    await driver.navigate().back()
+    await driver.navigate().back();
   }
 
   const theRepl = repl.start();
   theRepl.context.driver = driver;
   theRepl.context.shadow = shadow;
   theRepl.context.pwApp = pwApp;
-  theRepl.context.By = (await import("selenium-webdriver")).By
+  theRepl.context.By = (await import("selenium-webdriver")).By;
 
-  theRepl.on("exit", async () => {
-    await driver.quit();
-  })
+  theRepl.on("exit", () => {
+    void driver.quit();
+  });
 } catch (error) {
-  console.error(error)
+  console.error(error);
   //await driver.quit();
 }

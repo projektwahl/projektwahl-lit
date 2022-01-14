@@ -43,7 +43,11 @@ export async function pwUser(id: number, viewOnly = false) {
   ></pw-user-create>`;
 }
 
-const initialResult = result(routes["/api/v1/users"]["response"]["options"]["0"]["shape"]["data"]["shape"]["entities"]["element"])
+const initialResult = result(
+  routes["/api/v1/users"]["response"]["options"]["0"]["shape"]["data"]["shape"][
+    "entities"
+  ]["element"]
+);
 
 const taskFunction = async ([id]: [number]) => {
   const response = await myFetch<"/api/v1/users">(
@@ -53,10 +57,10 @@ const taskFunction = async ([id]: [number]) => {
   if (response.success) {
     return {
       success: true,
-      data: response.data.entities[0]
-    }
+      data: response.data.entities[0],
+    };
   }
-  return response
+  return response;
 };
 
 class PwUserCreate extends PwForm<"/api/v1/users/create-or-update"> {
@@ -81,8 +85,7 @@ class PwUserCreate extends PwForm<"/api/v1/users/create-or-update"> {
 
   type?: "voter" | "admin" | "helper";
 
-  initial: z.infer<typeof initialResult>
-    | undefined;
+  initial: z.infer<typeof initialResult> | undefined;
 
   constructor() {
     super();
@@ -98,7 +101,9 @@ class PwUserCreate extends PwForm<"/api/v1/users/create-or-update"> {
         },
       });
       this.form.value?.dispatchEvent(formDataEvent);
-      formDataEvent.detail.id = this.initial?.success ? this.initial.data.id : undefined;
+      formDataEvent.detail.id = this.initial?.success
+        ? this.initial.data.id
+        : undefined;
       if (this.initial?.success && !this.initial.data.id) {
         formDataEvent.detail.project_leader_id = null;
         formDataEvent.detail.force_in_project_id = null;
@@ -127,16 +132,17 @@ class PwUserCreate extends PwForm<"/api/v1/users/create-or-update"> {
     if (this.initial === undefined || this.initial.success) {
       return super.render();
     } else {
-      const errors = Object.entries(this.initial.error)
-                    .map(([k, v]) => html`${k}: ${v}<br />`);
+      const errors = Object.entries(this.initial.error).map(
+        ([k, v]) => html`${k}: ${v}<br />`
+      );
       return html`${bootstrapCss}
-      <main class="container">
-        <h1 class="text-center">${this.actionText}</h1>
-        <div class="alert alert-danger" role="alert">
-                      ${msg("Some errors occurred!")}<br />
-                      ${errors}
-                    </div>
-      </main>`
+        <main class="container">
+          <h1 class="text-center">${this.actionText}</h1>
+          <div class="alert alert-danger" role="alert">
+            ${msg("Some errors occurred!")}<br />
+            ${errors}
+          </div>
+        </main>`;
     }
   }
 
