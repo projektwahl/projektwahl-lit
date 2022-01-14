@@ -20,13 +20,16 @@ https://github.com/projektwahl/projektwahl-lit
 SPDX-License-Identifier: AGPL-3.0-or-later
 SPDX-FileCopyrightText: 2021 Moritz Hedtke <Moritz.Hedtke@t-online.de>
 */
-import { createSecureServer } from "node:http2";
+import { createServer } from "node:http";
 import { readFileSync } from "node:fs";
 import "./routes/login/openid-client.js";
-import cluster from "cluster";
-import { watch } from "node:fs/promises";
+//import cluster from "cluster";
+import { watch, readdir } from "node:fs/promises";
 import { getDirs, serverHandler } from "./server-handler.js";
 
+console.log(await readdir("/dev/fd/"));
+
+/*
 if (cluster.isPrimary) {
   console.log(`Primary is running`);
 
@@ -59,12 +62,12 @@ if (cluster.isPrimary) {
       }
     })();
   }
-} else {
+} else {*/
   /*
   openssl req -x509 -newkey rsa:2048 -nodes -sha256 -subj '/CN=localhost' -keyout localhost-privkey.pem -out localhost-cert.pem
   */
 
-  const server = createSecureServer(
+  const server = createServer(
     {
       key: readFileSync("localhost-privkey.pem"),
       cert: readFileSync("localhost-cert.pem"),
@@ -78,14 +81,14 @@ if (cluster.isPrimary) {
     }
   );
 
-  server.listen(8443, () => {
-    console.log(
+  server.listen({ _handle: { fd: 3 } }, 511, () => {
+    /*console.log(
       `[${
         cluster.worker?.id ?? "unknown"
       }] Server started at https://localhost:8443/`
-    );
+    );*/
   });
-
+/*
   cluster.worker?.on("message", (message) => {
     //let getConnections = promisify(server.getConnections).bind(server)
     //console.log(await getConnections())
@@ -97,8 +100,8 @@ if (cluster.isPrimary) {
       cluster.worker?.removeAllListeners("message");
       cluster.worker?.kill();
     }
-  });
-}
+  });*/
+//}
 
 //repl.start({})
 
