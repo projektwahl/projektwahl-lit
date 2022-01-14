@@ -27,6 +27,7 @@ const webcrypto = crypto.webcrypto as unknown as Crypto;
 // https://w3c.github.io/webdriver/#get-element-shadow-root
 
 export async function shadow(element: WebElement) {
+  // @ts-expect-error wrong typings
   return (await element.getShadowRoot()) as WebElement; // eslint-disable-line @typescript-eslint/no-unsafe-call
 }
 
