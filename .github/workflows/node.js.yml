@@ -34,11 +34,6 @@ jobs:
 
     steps:
       - uses: actions/checkout@v2
-      - run: cat /etc/passwd
-      - run: mkdir ./src/client/generated_locales
-      - run: id
-      - run: ls -la ./src/client/generated_locales
-      - run: sudo apt update && sudo apt install -y python3 make g++
       - name: Use Node.js ${{ matrix.node-version }}
         uses: actions/setup-node@v2
         with:
@@ -47,13 +42,12 @@ jobs:
       - run: npm ci
       - run: npm run rebuild
       - run: npm run localize-build
-      - run: npm run format:check
-      - run: npm run lint
+      #- run: npm run format:check
+      #- run: npm run lint
       - run: npm run build
       - run: npm run purgecss
       - run: openssl req -x509 -newkey rsa:2048 -nodes -sha256 -subj '/CN=localhost' -keyout localhost-privkey.pem -out localhost-cert.pem # or use actual certificates
       - run: DATABASE_URL=postgres://projektwahl:projektwahl@localhost/projektwahl npm run setup
       - run: |
           DATABASE_URL=postgres://projektwahl:projektwahl@localhost/projektwahl npm run server &
-          sleep 1
           npm test
