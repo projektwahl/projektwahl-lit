@@ -26,6 +26,7 @@ import "./routes/login/openid-client.js";
 //import cluster from "cluster";
 import { watch, readdir } from "node:fs/promises";
 import { getDirs, serverHandler } from "./server-handler.js";
+import net from 'net';
 
 console.log(await readdir("/dev/fd/"));
 
@@ -81,7 +82,7 @@ if (cluster.isPrimary) {
     }
   );
 
-  server.listen({ _handle: { fd: 3 } }, 511, () => {
+  server.listen(new net.Socket({fd: 3}), 511, () => {
     /*console.log(
       `[${
         cluster.worker?.id ?? "unknown"
