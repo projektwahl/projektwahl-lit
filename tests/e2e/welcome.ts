@@ -10,6 +10,8 @@ import {
 } from "selenium-webdriver";
 import chrome from "selenium-webdriver/chrome.js";
 import repl from 'repl'
+import crypto from 'node:crypto'
+const webcrypto = crypto.webcrypto as unknown as Crypto;
 
 // https://chrome.google.com/webstore/detail/selenium-ide/mooikfkahbdckldjjndioackbalphokd
 // https://www.selenium.dev/selenium/docs/api/javascript/module/selenium-webdriver/
@@ -101,26 +103,7 @@ try {
 
   await accountsLink.click();
 
-
-  {
-    // view user
-
-    const pwUsers = await (await shadow(pwApp)).findElement(By.css("pw-users"));
-
-    const user2 = await (
-      await shadow(pwUsers)
-    ).findElement(By.css('a[href="/users/view/2"]'));
-
-    user2.click()
-
-    const pwUserCreate = await (await shadow(pwApp)).findElement(By.css("pw-user-create"));
-
-    const pwUserGroup = await (await shadow(pwUserCreate)).findElement(By.css('input[name="group"]'));
-
-    assert.equal(await pwUserGroup.getAttribute("value"), "a");
-
-    await driver.navigate().back()
-  }
+  const groupName = [...webcrypto.getRandomValues(new Uint8Array(8))].map(b => b.toString(16).padStart(2, '0')).join('');
 
   {
     // edit user
@@ -138,7 +121,7 @@ try {
     const pwUserGroup = await (await shadow(pwUserCreate)).findElement(By.css('input[name="group"]'));
 
     pwUserGroup.clear()
-    pwUserGroup.sendKeys("awesomegroup");
+    pwUserGroup.sendKeys(groupName);
 
     const submitButton = await (
       await shadow(pwUserCreate)
@@ -149,6 +132,32 @@ try {
     await driver.sleep(250);
     
     await submitButton.click();
+  }
+
+  {
+    // view user
+
+    await driver.executeScript("arguments[0].scrollIntoView(true);", accountsLink)
+
+    await driver.sleep(250);
+
+    await accountsLink.click();
+
+    const pwUsers = await (await shadow(pwApp)).findElement(By.css("pw-users"));
+
+    const user2 = await (
+      await shadow(pwUsers)
+    ).findElement(By.css('a[href="/users/view/2"]'));
+
+    user2.click()
+
+    const pwUserCreate = await (await shadow(pwApp)).findElement(By.css("pw-user-create"));
+
+    const pwUserGroup = await (await shadow(pwUserCreate)).findElement(By.css('input[name="group"]'));
+
+    assert.equal(await pwUserGroup.getAttribute("value"), groupName);
+
+    await driver.navigate().back()
   }
 
   const theRepl = repl.start();
