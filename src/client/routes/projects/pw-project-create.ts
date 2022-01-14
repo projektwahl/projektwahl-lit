@@ -28,9 +28,11 @@ import { PwForm } from "../../form/pw-form.js";
 import { HistoryController } from "../../history-controller.js";
 import { msg } from "@lit/localize";
 import type { z } from "zod";
-import type { routes } from "../../../lib/routes.js";
+import { routes } from "../../../lib/routes.js";
 import { setupHmr } from "../../hmr.js";
 import { pwInput } from "../../form/pw-input.js";
+import { result } from "../../../lib/result.js";
+import { bootstrapCss } from "../../index.js";
 
 export async function pwProject(id: number, viewOnly = false) {
   const result = await taskFunction([id]);
@@ -45,9 +47,20 @@ const taskFunction = async ([id]: [number]) => {
     import("../projects/pw-project-users.js"),
     await myFetch<"/api/v1/projects">(`/api/v1/projects/?f_id=${id}`, {}),
   ]);
-  // TODO FIXME really fix this here
-  return response.success ? response.data.entities[0] : null; // TODO FIXME error handling, PwForm already has some form of error handling
+  if (response.success) {
+    return {
+      success: true,
+      data: response.data.entities[0],
+    };
+  }
+  return response;
 };
+
+const initialResult = result(
+  routes["/api/v1/projects"]["response"]["options"][0]["shape"]["data"][
+    "shape"
+  ]["entities"]["element"]
+);
 
 export const PwProjectCreate = setupHmr(
   "PwProjectCreate",
@@ -75,11 +88,7 @@ export const PwProjectCreate = setupHmr(
 
     initialRender: boolean;
 
-    initial:
-      | z.infer<
-          typeof routes["/api/v1/projects"]["response"]["options"][0]["shape"]["data"]["shape"]["entities"]
-        >[number]
-      | undefined;
+    initial: z.infer<typeof initialResult> | undefined;
 
     constructor() {
       super();
@@ -100,7 +109,9 @@ export const PwProjectCreate = setupHmr(
           },
         });
         this.form.value?.dispatchEvent(formDataEvent);
-        formDataEvent.detail.id = this.initial?.id;
+        formDataEvent.detail.id = this.initial?.success
+          ? this.initial.data.id
+          : undefined;
 
         const result = await myFetch<"/api/v1/projects/create-or-update">(
           "/api/v1/projects/create-or-update",
@@ -121,101 +132,123 @@ export const PwProjectCreate = setupHmr(
       });
     }
 
+    override render() {
+      if (this.initial === undefined || this.initial.success) {
+        return super.render();
+      } else {
+        const errors = Object.entries(this.initial.error).map(
+          ([k, v]) => html`${k}: ${v}<br />`
+        );
+        return html`${bootstrapCss}
+          <main class="container">
+            <h1 class="text-center">${this.actionText}</h1>
+            <div class="alert alert-danger" role="alert">
+              ${msg("Some errors occurred!")}<br />
+              ${errors}
+            </div>
+          </main>`;
+      }
+    }
+
     override getInputs() {
+      if (!this.initial?.success) {
+        return html``;
+      }
+
       return html`
-        ${pwInput({
+        ${pwInput<"/api/v1/projects/create-or-update", "title">({
           type: "text",
           disabled: this.disabled,
           label: msg("Title"),
           name: "title",
           task: this._task,
-          initial: this.initial,
+          initial: this.initial.data,
         })}
-        ${pwInput({
+        ${pwInput<"/api/v1/projects/create-or-update", "info">({
           type: "text",
           disabled: this.disabled,
           label: msg("Info"),
           name: "info",
           task: this._task,
-          initial: this.initial,
+          initial: this.initial.data,
         })}
-        ${pwInput({
+        ${pwInput<"/api/v1/projects/create-or-update", "place">({
           type: "text",
           disabled: this.disabled,
           label: msg("Place"),
           name: "place",
           task: this._task,
-          initial: this.initial,
+          initial: this.initial.data,
         })}
-        ${pwInput({
+        ${pwInput<"/api/v1/projects/create-or-update", "costs">({
           type: "number",
           disabled: this.disabled,
           label: msg("Costs"),
           name: "costs",
           task: this._task,
-          initial: this.initial,
+          initial: this.initial.data,
         })}
-        ${pwInput({
+        ${pwInput<"/api/v1/projects/create-or-update", "min_age">({
           type: "number",
           disabled: this.disabled,
           label: msg("Minimum age"),
           name: "min_age",
           task: this._task,
-          initial: this.initial,
+          initial: this.initial.data,
         })}
-        ${pwInput({
+        ${pwInput<"/api/v1/projects/create-or-update", "max_age">({
           type: "number",
           disabled: this.disabled,
           label: msg("Maximum age"),
           name: "max_age",
           task: this._task,
-          initial: this.initial,
+          initial: this.initial.data,
         })}
-        ${pwInput({
+        ${pwInput<"/api/v1/projects/create-or-update", "min_participants">({
           type: "number",
           disabled: this.disabled,
           label: msg("Minimum participants"),
           name: "min_participants",
           task: this._task,
-          initial: this.initial,
+          initial: this.initial.data,
         })}
-        ${pwInput({
+        ${pwInput<"/api/v1/projects/create-or-update", "max_participants">({
           type: "number",
           disabled: this.disabled,
           label: msg("Maximum participants"),
           name: "max_participants",
           task: this._task,
-          initial: this.initial,
+          initial: this.initial.data,
         })}
-        ${pwInput({
+        ${pwInput<"/api/v1/projects/create-or-update", "random_assignments">({
           type: "checkbox",
           disabled: this.disabled,
           label: msg("Allow random assignments"),
           name: "random_assignments",
           task: this._task,
-          initial: this.initial,
+          initial: this.initial.data,
         })}
-        ${pwInput({
+        ${pwInput<"/api/v1/projects/create-or-update", "deleted">({
           type: "checkbox",
           disabled: this.disabled,
           label: msg("Mark this project as deleted"),
           name: "deleted",
           task: this._task,
-          initial: this.initial,
+          initial: this.initial.data,
         })}
 
         <!-- Projektleitende -->
         <!-- TODO FIXME view only -->
         ${this.initial
           ? html`<pw-project-users
-              projectId=${this.initial.id}
+              projectId=${this.initial.data.id}
               name=${"project_leader_id"}
               title=${msg("Project leaders")}
             ></pw-project-users>`
           : html``}
         ${this.initial
           ? html`<pw-project-users
-              projectId=${this.initial.id}
+              projectId=${this.initial.data.id}
               name=${"force_in_project_id"}
               title=${msg("Guaranteed project members")}
             ></pw-project-users>`
