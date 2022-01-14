@@ -36,14 +36,6 @@ const shuffleArray = <T>(array: T[]) => {
 };
 
 await sql.begin("READ WRITE", async (sql) => {
-  await sql.file(
-    "./src/server/setup.sql",
-    undefined as unknown as SerializableParameter[],
-    {
-      cache: false, // TODO FIXME doesnt seem to work properly
-    }
-  );
-
   const hash = await hashPassword("changeme");
 
   const admin = rawUserSchema
