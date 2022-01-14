@@ -121,7 +121,7 @@ export const PwProjectUsers = setupHmr(
               type="text"
               class="form-control"
               id="projects-filter-{name}"
-              value=${f_type}
+              value=${ifDefined(f_type === null ? undefined : f_type)}
             />
           </th>
 

@@ -33,7 +33,7 @@ import type { z } from "zod";
 // workaround see https://github.com/runem/lit-analyzer/issues/149#issuecomment-1006162839
 export function pwInput<
   P extends keyof typeof routes = never,
-  Q extends keyof z.infer<typeof routes[P]["request"]> = never
+  Q extends keyof z.infer<typeof routes[P]["request"]> & string = never
 >(
   props: Pick<
     PwInput<P, Q>,
@@ -67,7 +67,7 @@ export function pwInput<
     ?disabled=${disabled}
     @change=${onchange}
     label=${label}
-    name=${name}
+    .name=${name}
     .options=${options}
     autocomplete=${ifDefined(autocomplete)}
     .task=${task}
@@ -77,7 +77,7 @@ export function pwInput<
 
 export class PwInput<
   P extends keyof typeof routes,
-  Q extends keyof z.infer<typeof routes[P]["request"]>
+  Q extends keyof z.infer<typeof routes[P]["request"]> & string
 > extends LitElement {
   static override get properties() {
     return {
