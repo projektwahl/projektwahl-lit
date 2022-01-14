@@ -7,7 +7,7 @@ import {
   Capability,
   WebElement,
 } from "selenium-webdriver";
-//import chrome from "selenium-webdriver/chrome.js";
+import chrome from "selenium-webdriver/chrome.js";
 import repl from "repl";
 import crypto from "node:crypto";
 const webcrypto = crypto.webcrypto as unknown as Crypto;
@@ -37,13 +37,13 @@ const driver = await new Builder()
   .withCapabilities(
     Capabilities.chrome().set(Capability.ACCEPT_INSECURE_TLS_CERTS, true)
   )
-  /*.setChromeOptions(
+  .setChromeOptions(
     new chrome.Options().addArguments(
       "--headless",
       "--no-sandbox",
       "--disable-dev-shm-usage"
     )
-  )*/
+  )
   .build();
 await driver.manage().setTimeouts({
   implicit: 1000,
