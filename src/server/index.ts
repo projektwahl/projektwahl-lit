@@ -89,13 +89,17 @@ const server = createSecureServer(
   }
 );
 
-server.listen(process.env.PORT ? Number(process.env.PORT) : new net.Socket({ fd: 3 }), 511, () => {
-  /*console.log(
+server.listen(
+  process.env.PORT ? Number(process.env.PORT) : new net.Socket({ fd: 3 }),
+  511,
+  () => {
+    /*console.log(
       `[${
         cluster.worker?.id ?? "unknown"
       }] Server started at ${process.env.BASE_URL}`
     );*/
-});
+  }
+);
 /*
   cluster.worker?.on("message", (message) => {
     //let getConnections = promisify(server.getConnections).bind(server)
