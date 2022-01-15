@@ -13,3 +13,9 @@ LoadCredentialEncrypted=
 ## Login Hash Calculation DOS
 
 Many login requests probably cause severe memory and cpu pressure as argon2id is compute intensive. Maybe we should ratelimit it.
+
+```bash
+sudo apt install apache2-utils -y
+echo '{"username":"admin","password":"changeme"}' > post.txt
+ab -p post.txt -T 'text/json' -m POST -k -H 'x-csrf-protection: projektwahl' http://116.203.125.40:8443/api/v1/login
+```
