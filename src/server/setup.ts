@@ -20,7 +20,6 @@ https://github.com/projektwahl/projektwahl-lit
 SPDX-License-Identifier: AGPL-3.0-or-later
 SPDX-FileCopyrightText: 2021 Moritz Hedtke <Moritz.Hedtke@t-online.de>
 */
-import type { SerializableParameter } from "postgres";
 import { z } from "zod";
 import { rawProjectSchema, rawUserSchema } from "../lib/routes.js";
 import { sql } from "./database.js";
@@ -36,14 +35,6 @@ const shuffleArray = <T>(array: T[]) => {
 };
 
 await sql.begin("READ WRITE", async (sql) => {
-  await sql.file(
-    "./src/server/setup.sql",
-    undefined as unknown as SerializableParameter[],
-    {
-      cache: false, // TODO FIXME doesnt seem to work properly
-    }
-  );
-
   const hash = await hashPassword("changeme");
 
   const admin = rawUserSchema

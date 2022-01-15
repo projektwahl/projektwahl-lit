@@ -21,6 +21,8 @@ SPDX-License-Identifier: AGPL-3.0-or-later
 SPDX-FileCopyrightText: 2021 Moritz Hedtke <Moritz.Hedtke@t-online.de>
 */
 
+BEGIN READ WRITE;
+
 -- if you remove this you get a CVE for free - so don't. (because the triggers can have race conditions then)
 -- https://www.postgresql.org/docs/current/transaction-iso.html
 ALTER DATABASE projektwahl SET default_transaction_isolation = 'serializable';
@@ -28,7 +30,7 @@ ALTER DATABASE projektwahl SET default_transaction_read_only = true;
 
 -- TODO FIXME at some point create the tables based on the zod definitions? so min/max etc. are checked correctly?
 CREATE TABLE IF NOT EXISTS projects_with_deleted (
-  id SERIAL PRIMARY KEY NOT NULL,
+  id INT GENERATED ALWAYS AS IDENTITY PRIMARY KEY NOT NULL,
   title VARCHAR(255) NOT NULL,
   info VARCHAR(4096) NOT NULL,
   place VARCHAR(256) NOT NULL,
@@ -43,7 +45,7 @@ CREATE TABLE IF NOT EXISTS projects_with_deleted (
 );
 
 CREATE TABLE IF NOT EXISTS projects_history (
-  history_id SERIAL PRIMARY KEY NOT NULL,
+  history_id INT GENERATED ALWAYS AS IDENTITY PRIMARY KEY NOT NULL,
   operation TEXT NOT NULL,
 
   id INTEGER NOT NULL,
@@ -97,7 +99,7 @@ END $$;
 
 -- TODO ADd check that group and age is NULL if type is not voter
 CREATE TABLE IF NOT EXISTS users_with_deleted (
-  id SERIAL PRIMARY KEY NOT NULL,
+  id INT GENERATED ALWAYS AS IDENTITY PRIMARY KEY NOT NULL,
   username VARCHAR(64) UNIQUE NOT NULL,
   openid_id VARCHAR(256) UNIQUE,
   password_hash VARCHAR(256),
@@ -114,7 +116,7 @@ CREATE TABLE IF NOT EXISTS users_with_deleted (
 );
 
 CREATE TABLE IF NOT EXISTS users_history (
-  history_id SERIAL PRIMARY KEY NOT NULL,
+  history_id INT GENERATED ALWAYS AS IDENTITY PRIMARY KEY NOT NULL,
   operation TEXT NOT NULL,
 
   id INTEGER NOT NULL,
@@ -236,7 +238,7 @@ CREATE TABLE IF NOT EXISTS choices (
 );
 
 CREATE TABLE IF NOT EXISTS choices_history (
-  history_id SERIAL PRIMARY KEY NOT NULL,
+  history_id INT GENERATED ALWAYS AS IDENTITY PRIMARY KEY NOT NULL,
   operation TEXT NOT NULL,
 
   rank INTEGER NOT NULL, -- TODO FIXME add checks here and on other places e.g. that this is from 1 - 5
@@ -383,3 +385,5 @@ EXECUTE FUNCTION check_project_leader_choices();
 
 
 INSERT INTO settings (id, election_running) VALUES (1, false) ON CONFLICT DO NOTHING;
+
+COMMIT;

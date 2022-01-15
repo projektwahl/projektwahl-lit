@@ -8,9 +8,14 @@ import {
   WebElement,
 } from "selenium-webdriver";
 import chrome from "selenium-webdriver/chrome.js";
-import repl from "repl";
+//import repl from "repl";
 import crypto from "node:crypto";
 const webcrypto = crypto.webcrypto as unknown as Crypto;
+
+if (!process.env["BASE_URL"]) {
+  console.error("BASE_URL not set!");
+  process.exit(1);
+}
 
 // https://chrome.google.com/webstore/detail/selenium-ide/mooikfkahbdckldjjndioackbalphokd
 // https://www.selenium.dev/selenium/docs/api/javascript/module/selenium-webdriver/
@@ -55,7 +60,7 @@ await driver.manage().window().setRect({
 });
 
 try {
-  await driver.get("https://localhost:8443/");
+  await driver.get(process.env.BASE_URL);
   const pwApp = await driver.findElement(By.css("pw-app"));
 
   // doesn't work on firefox
@@ -114,7 +119,7 @@ try {
 
     const user2 = await (
       await shadow(pwUsers)
-    ).findElement(By.css('a[href="/users/edit/2"]'));
+    ).findElement(By.css('a[href="/users/edit/7"]'));
 
     await user2.click();
 
@@ -159,7 +164,7 @@ try {
 
     const user2 = await (
       await shadow(pwUsers)
-    ).findElement(By.css('a[href="/users/view/2"]'));
+    ).findElement(By.css('a[href="/users/view/7"]'));
 
     await user2.click();
 
@@ -175,7 +180,7 @@ try {
 
     await driver.navigate().back();
   }
-
+  /*
   const theRepl = repl.start();
   theRepl.context.driver = driver;
   theRepl.context.shadow = shadow;
@@ -185,7 +190,8 @@ try {
   theRepl.on("exit", () => {
     void driver.quit();
   });
+*/
 } catch (error) {
   console.error(error);
-  //await driver.quit();
+  await driver.quit();
 }
