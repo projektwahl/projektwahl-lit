@@ -15,7 +15,9 @@ exit
 
 ssh -A moritz@x.x.x.x
 curl -fsSL https://deb.nodesource.com/setup_16.x | sudo -E bash -
-sudo apt-get install -y nodejs gcc g++ make git postgresql
+sudo apt-get install -y nodejs gcc g++ make git postgresql certbot
+
+sudo certbot certonly --standalone
 
 cd /opt
 sudo mkdir projektwahl-lit
