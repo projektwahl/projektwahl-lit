@@ -55,7 +55,7 @@ await driver.manage().window().setRect({
 });
 
 try {
-  await driver.get("https://localhost:8443/");
+  await driver.get("https://staging.projektwahl.selfmade4u.de/");
   const pwApp = await driver.findElement(By.css("pw-app"));
 
   // doesn't work on firefox
@@ -114,7 +114,7 @@ try {
 
     const user2 = await (
       await shadow(pwUsers)
-    ).findElement(By.css('a[href="/users/edit/2"]'));
+    ).findElement(By.css('a[href="/users/edit/7"]'));
 
     await user2.click();
 
@@ -159,7 +159,7 @@ try {
 
     const user2 = await (
       await shadow(pwUsers)
-    ).findElement(By.css('a[href="/users/view/2"]'));
+    ).findElement(By.css('a[href="/users/view/7"]'));
 
     await user2.click();
 
