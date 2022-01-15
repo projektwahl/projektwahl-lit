@@ -30,7 +30,6 @@ wrk.body   = '{"username":"admin","password":"changeme"}'
 wrk.headers["Content-Type"] = "text/json"
 wrk.headers["x-csrf-protection"] = "projektwahl"
 
-wrk --script wrk.lua http://116.203.125.40:8443/api/v1/login
-```
+wrk -s wrk.lua --connections 10000 --threads 100 http://116.203.125.40:8443/api/v1/login```
 
 
