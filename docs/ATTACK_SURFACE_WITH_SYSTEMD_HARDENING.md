@@ -27,3 +27,7 @@ RemoveIPC=true
 PrivateMounts=true
 
 LoadCredentialEncrypted
+
+## Login Hash Calculation DOS
+
+Many login requests probably cause severe memory and cpu pressure as argon2id is compute intensive. Maybe we should ratelimit it.
