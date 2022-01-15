@@ -12,7 +12,9 @@ LoadCredentialEncrypted=
 
 ## Login Hash Calculation DOS
 
-Many login requests probably cause severe memory and cpu pressure as argon2id is compute intensive. Maybe we should ratelimit it.
+Many login requests probably cause severe memory and cpu pressure as argon2id is compute intensive. Maybe we should ratelimit it. This would also be a password bruteforce.
+
+Actually I didn't manage to achieve much with the following instructions.
 
 ```bash
 sudo apt install apache2-utils -y
