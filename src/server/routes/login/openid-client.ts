@@ -43,7 +43,7 @@ if (process.env["OPENID_URL"]) {
     client = new Client({
       client_id: process.env["CLIENT_ID"],
       client_secret: process.env["CLIENT_SECRET"],
-      redirect_uris: ["https://localhost:8443/api/v1/redirect"],
+      redirect_uris: [`${process.env.BASE_URL as string}/api/v1/redirect`],
       response_types: ["code"],
       // id_token_signed_response_alg (default "RS256")
       // token_endpoint_auth_method (default "client_secret_basic")
@@ -55,4 +55,4 @@ if (process.env["OPENID_URL"]) {
 
 export { client };
 
-// https://localhost:8443/api/v1/openid-login
+// ${process.env.BASE_URL}/api/v1/openid-login

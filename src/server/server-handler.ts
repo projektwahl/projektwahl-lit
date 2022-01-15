@@ -81,7 +81,7 @@ export async function serverHandler(
 ) {
   const path = z.string().parse(request.url);
 
-  const url = new URL(path, "https://localhost:8443");
+  const url = new URL(path, process.env.BASE_URL);
 
   if (url.pathname === "/favicon.ico" || url.pathname === "/robots.txt") {
     response.writeHead(404, {
@@ -131,7 +131,7 @@ export async function serverHandler(
     }
   } else {
     // TODO FIXME AUDIT
-    // curl --insecure --path-as-is -v https://localhost:8443/../src/index.js
+    // curl --insecure --path-as-is -v `${process.env.BASE_URL}/../src/index.js`
 
     const filename = resolve("." + url.pathname);
 

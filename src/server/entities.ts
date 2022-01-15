@@ -75,7 +75,7 @@ export async function fetchData<
 ): Promise<[OutgoingHttpHeaders, z.infer<typeof entityRoutes[R]["response"]>]> {
   const entitySchema: entitesType[R] = entityRoutes[path];
 
-  const url = new URL(request.url, "https://localhost:8443");
+  const url = new URL(request.url, process.env.BASE_URL);
 
   // TODO FIXME make all this a json object as get parameter
 

@@ -60,7 +60,7 @@ export async function usersHandler(
         ];
       }
 
-      const url = new URL(request.url, "https://localhost:8443");
+      const url = new URL(request.url, process.env.BASE_URL);
 
       const filters = z
         .object({

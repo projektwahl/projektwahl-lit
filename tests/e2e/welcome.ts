@@ -12,6 +12,11 @@ import repl from "repl";
 import crypto from "node:crypto";
 const webcrypto = crypto.webcrypto as unknown as Crypto;
 
+if (!process.env["BASE_URL"]) {
+  console.error("BASE_URL not set!");
+  process.exit(1);
+}
+
 // https://chrome.google.com/webstore/detail/selenium-ide/mooikfkahbdckldjjndioackbalphokd
 // https://www.selenium.dev/selenium/docs/api/javascript/module/selenium-webdriver/
 
@@ -55,7 +60,7 @@ await driver.manage().window().setRect({
 });
 
 try {
-  await driver.get("https://staging.projektwahl.selfmade4u.de/");
+  await driver.get(process.env.BASE_URL);
   const pwApp = await driver.findElement(By.css("pw-app"));
 
   // doesn't work on firefox
