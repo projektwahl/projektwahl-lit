@@ -20,7 +20,7 @@ https://github.com/projektwahl/projektwahl-lit
 SPDX-License-Identifier: AGPL-3.0-or-later
 SPDX-FileCopyrightText: 2021 Moritz Hedtke <Moritz.Hedtke@t-online.de>
 */
-import { createServer } from "node:http";
+import { createSecureServer } from "node:http2";
 import { readFileSync } from "node:fs";
 import "./routes/login/openid-client.js";
 //import cluster from "cluster";
@@ -68,10 +68,10 @@ if (cluster.isPrimary) {
   openssl req -x509 -newkey rsa:2048 -nodes -sha256 -subj '/CN=localhost' -keyout localhost-privkey.pem -out localhost-cert.pem
   */
 
-  const server = createServer(
+  const server = createSecureServer(
     {
-      key: readFileSync("localhost-privkey.pem"),
-      cert: readFileSync("localhost-cert.pem"),
+      key: readFileSync(process.env.CREDENTIALS_DIRECTORY + "/key.pem"),
+      cert: readFileSync(process.env.CREDENTIALS_DIRECTORY + "/cert.pem"),
       allowHTTP1: true,
     },
     (request, response) => {
