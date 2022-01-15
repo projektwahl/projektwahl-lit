@@ -15,7 +15,7 @@ exit
 
 ssh -A moritz@x.x.x.x
 curl -fsSL https://deb.nodesource.com/setup_16.x | sudo -E bash -
-sudo apt-get install -y nodejs gcc g++ make git postgresql certbot
+sudo apt-get install -y nodejs gcc g++ make git postgresql certbot chromium p7zip-full
 
 sudo certbot certonly --standalone
 
@@ -32,6 +32,9 @@ npm run build
 npm run purgecss
 
 
+curl -OL https://chromedriver.storage.googleapis.com/97.0.4692.71/chromedriver_linux64.zip
+7z x chromedriver_linux64.zip
+npm run test
 
 
 
