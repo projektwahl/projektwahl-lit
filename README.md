@@ -47,9 +47,9 @@ npx node-pre-gyp rebuild -C ./node_modules/argon2
 npm run localize-build
 
 DATABASE_URL=postgres://projektwahl:projektwahl@projektwahl/projektwahl npm run setup
-BASE_URL=https://localhost:8443 DATABASE_URL=postgres://projektwahl:projektwahl@projektwahl/projektwahl OPENID_URL=openid_url CLIENT_ID=client_id CLIENT_SECRET=secret CREDENTIALS_DIRECTORY=$PWD npm run server
+PORT=8443 BASE_URL=https://localhost:8443 DATABASE_URL=postgres://projektwahl:projektwahl@projektwahl/projektwahl OPENID_URL=openid_url CLIENT_ID=client_id CLIENT_SECRET=secret CREDENTIALS_DIRECTORY=$PWD npm run server
 # or
-BASE_URL=https://localhost:8443 DATABASE_URL=postgres://projektwahl:projektwahl@projektwahl/projektwahl CREDENTIALS_DIRECTORY=$PWD npm run server
+PORT=8443 BASE_URL=https://localhost:8443 DATABASE_URL=postgres://projektwahl:projektwahl@projektwahl/projektwahl CREDENTIALS_DIRECTORY=$PWD npm run server
 # https://localhost:8443/
 ```
 

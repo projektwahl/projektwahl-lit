@@ -89,7 +89,7 @@ const server = createSecureServer(
   }
 );
 
-server.listen(new net.Socket({ fd: 3 }), 511, () => {
+server.listen(process.env.PORT ? Number(process.env.PORT) : new net.Socket({ fd: 3 }), 511, () => {
   /*console.log(
       `[${
         cluster.worker?.id ?? "unknown"

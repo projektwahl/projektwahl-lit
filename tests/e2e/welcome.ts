@@ -8,7 +8,7 @@ import {
   WebElement,
 } from "selenium-webdriver";
 import chrome from "selenium-webdriver/chrome.js";
-import repl from "repl";
+//import repl from "repl";
 import crypto from "node:crypto";
 const webcrypto = crypto.webcrypto as unknown as Crypto;
 
@@ -180,7 +180,7 @@ try {
 
     await driver.navigate().back();
   }
-
+/*
   const theRepl = repl.start();
   theRepl.context.driver = driver;
   theRepl.context.shadow = shadow;
@@ -190,7 +190,8 @@ try {
   theRepl.on("exit", () => {
     void driver.quit();
   });
+*/
 } catch (error) {
   console.error(error);
-  //await driver.quit();
+  await driver.quit();
 }
