@@ -5,7 +5,7 @@ concurrency: staging
 on:
   push:
     branches:
-      - main
+      - deploy
 
 jobs:
   deployment:
@@ -15,4 +15,4 @@ jobs:
       - name: deploy
         env:
           SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
-        run: ssh -i <(cat $SSH_PRIVATE_KEY) moritz@staging.projektwahl.selfmade4u.de echo test
+        run: ssh -i <(echo $SSH_PRIVATE_KEY) moritz@staging.projektwahl.selfmade4u.de echo test
