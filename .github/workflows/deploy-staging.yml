@@ -18,4 +18,13 @@ jobs:
           echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
           echo "${{ secrets.SSH_KNOWN_HOSTS }}" > ~/.ssh/known_hosts
       - name: SSH
-        run: ssh moritz@staging.projektwahl.selfmade4u.de echo test
+        run: |
+          ssh moritz@staging.projektwahl.selfmade4u.de << EOF
+          cd /opt/projektwahl-lit
+          git worktree add ../projektwahl-lits/deploy origin/deploy
+          cd ../projektwahl-lits/main
+          npm install
+          npx node-pre-gyp rebuild -C ./node_modules/argon2
+          npm run localize-build
+          sudo systemctl enable --now projektwahl@deploy.service
+          EOF
