@@ -29,12 +29,16 @@ import type { z } from "zod";
 
 // workaround see https://github.com/runem/lit-analyzer/issues/149#issuecomment-1006162839
 export function pwOrder<P extends keyof typeof entityRoutes>(
-  props: Pick<PwOrder<P>, "name" | "title">
+  props: Pick<PwOrder<P>, "name" | "title" | "refreshEntityList">
 ) {
-  const { name, title, ...rest } = props;
+  const { name, title, refreshEntityList, ...rest } = props;
   let _ = rest;
   _ = 1; // ensure no property is missed - Don't use `{}` as a type. `{}` actually means "any non-nullish value".
-  return html`<pw-order .name=${name} title=${title}></pw-order>`;
+  return html`<pw-order
+    .name=${name}
+    title=${title}
+    .refreshEntityList=${refreshEntityList}
+  ></pw-order>`;
 }
 
 export class PwOrder<P extends keyof typeof entityRoutes> extends LitElement {
@@ -42,6 +46,7 @@ export class PwOrder<P extends keyof typeof entityRoutes> extends LitElement {
     return {
       title: { type: String },
       name: { attribute: false },
+      refreshEntityList: { attribute: false },
     };
   }
 
@@ -60,6 +65,8 @@ export class PwOrder<P extends keyof typeof entityRoutes> extends LitElement {
 
   history;
 
+  refreshEntityList!: () => Promise<void>;
+
   constructor() {
     super();
 
@@ -76,7 +83,7 @@ export class PwOrder<P extends keyof typeof entityRoutes> extends LitElement {
     return html`
       ${bootstrapCss}
       <button
-        @click=${() => {
+        @click=${async () => {
           const urlSearchParams = this.history.url.searchParams;
 
           const order = [...urlSearchParams.getAll("order")];
@@ -113,6 +120,7 @@ export class PwOrder<P extends keyof typeof entityRoutes> extends LitElement {
             new URL(`?${urlSearchParams.toString()}`, window.location.href),
             {}
           );
+          await this.refreshEntityList();
         }}
         name="${this.name.toString()}"
         type="button"

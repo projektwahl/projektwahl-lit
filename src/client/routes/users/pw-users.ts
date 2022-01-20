@@ -75,15 +75,27 @@ export class PwUsers extends PwEntityList<"/api/v1/users"> {
       the only nice way is probably submit buttons that do things like "oder_by_id_asc" and then redirect to the new state (because you need to remove the old state)
     -->
         <th class="table-cell-hover p-0" scope="col">
-          ${pwOrder<"/api/v1/users">({ name: "id", title: msg("ID") })}
+          ${pwOrder<"/api/v1/users">({
+            refreshEntityList: () => this._apiTask.run(),
+            name: "id",
+            title: msg("ID"),
+          })}
         </th>
 
         <th class="table-cell-hover p-0" scope="col">
-          ${pwOrder<"/api/v1/users">({ name: "username", title: msg("Name") })}
+          ${pwOrder<"/api/v1/users">({
+            refreshEntityList: () => this._apiTask.run(),
+            name: "username",
+            title: msg("Name"),
+          })}
         </th>
 
         <th class="table-cell-hover p-0" scope="col">
-          ${pwOrder<"/api/v1/users">({ name: "type", title: msg("Type") })}
+          ${pwOrder<"/api/v1/users">({
+            refreshEntityList: () => this._apiTask.run(),
+            name: "type",
+            title: msg("Type"),
+          })}
         </th>
 
         <th class="table-cell-hover">${msg("Actions")}</th>
