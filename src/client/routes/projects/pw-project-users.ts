@@ -70,18 +70,27 @@ export const PwProjectUsers = setupHmr(
           <th class="table-cell-hover" scope="col">${msg(html`&#x2713;`)}</th>
 
           <th class="table-cell-hover p-0" scope="col">
-            ${pwOrder<"/api/v1/users">({ name: "id", title: msg("ID") })}
+            ${pwOrder<"/api/v1/users">({
+              refreshEntityList: () => this._apiTask.run(),
+              name: "id",
+              title: msg("ID"),
+            })}
           </th>
 
           <th class="table-cell-hover p-0" scope="col">
             ${pwOrder<"/api/v1/users">({
+              refreshEntityList: () => this._apiTask.run(),
               name: "username",
               title: msg("Name"),
             })}
           </th>
 
           <th class="table-cell-hover p-0" scope="col">
-            ${pwOrder<"/api/v1/users">({ name: "type", title: msg("Type") })}
+            ${pwOrder<"/api/v1/users">({
+              refreshEntityList: () => this._apiTask.run(),
+              name: "type",
+              title: msg("Type"),
+            })}
           </th>
         </tr>
 
