@@ -26,5 +26,5 @@ jobs:
           npm install
           npx node-pre-gyp rebuild -C ./node_modules/argon2
           npm run localize-build
-          sudo systemctl enable --now projektwahl@deploy.service
+          sudo /usr/bin/systemctl enable --now projektwahl@deploy.socket
           EOF
