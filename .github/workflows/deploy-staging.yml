@@ -12,7 +12,10 @@ jobs:
     runs-on: ubuntu-latest
     environment: staging
     steps:
-      - name: deploy
-        env:
-          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
-        run: ssh -i <(echo $SSH_PRIVATE_KEY) moritz@staging.projektwahl.selfmade4u.de echo test
+      - name: Setup SSH
+        run: |
+          install -m 600 -D /dev/null ~/.ssh/id_rsa
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
+          echo "${{ secrets.SSH_KNOWN_HOSTS }}" > ~/.ssh/known_hosts
+      - name: SSH
+        run: ssh moritz@staging.projektwahl.selfmade4u.de echo test
