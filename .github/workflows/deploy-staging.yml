@@ -23,6 +23,7 @@ jobs:
           cd /opt/projektwahl-lit
           git worktree add ../projektwahl-lits/deploy origin/deploy
           cd ../projektwahl-lits/deploy
+          git pull origin deploy
           npm install
           npx node-pre-gyp rebuild -C ./node_modules/argon2
           npm run localize-build
