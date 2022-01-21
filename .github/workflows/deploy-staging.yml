@@ -32,11 +32,11 @@ jobs:
           cd /opt/projektwahl-lits/$GIT_BRANCH
           git pull origin $GIT_BRANCH
           PORT=\$(cat /opt/projektwahl-lits/$GIT_BRANCH/.github/port)
-          echo $PORT
+          echo \$PORT
           npm install
           npx node-pre-gyp rebuild -C ./node_modules/argon2
           npm run localize-build
           npm run build
           npm run purgecss
-          sudo /usr/bin/systemctl enable --now projektwahl@$PORT.socket
+          sudo /usr/bin/systemctl enable --now projektwahl@\$PORT.socket
           EOF
