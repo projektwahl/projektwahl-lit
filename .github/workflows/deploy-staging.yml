@@ -21,6 +21,7 @@ jobs:
           echo "${{ secrets.SSH_KNOWN_HOSTS }}" > ~/.ssh/known_hosts
       - name: SSH
         run: |
+          set -x
           GIT_BRANCH=${GITHUB_BASE_REF:-${GITHUB_REF#refs/heads/}}
           echo $GIT_BRANCH
           ssh moritz@staging.projektwahl.selfmade4u.de << EOF
