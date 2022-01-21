@@ -25,6 +25,7 @@ jobs:
           GIT_BRANCH=${GITHUB_BASE_REF:-${GITHUB_REF#refs/heads/}}
           echo $GIT_BRANCH
           ssh moritz@staging.projektwahl.selfmade4u.de << EOF
+          set -x
           cd /opt/projektwahl-lit
           git fetch origin
           git worktree add ../projektwahl-lits/$GIT_BRANCH origin/$GIT_BRANCH
