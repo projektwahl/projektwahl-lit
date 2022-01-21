@@ -21,15 +21,15 @@ jobs:
       - name: SSH
         run: |
           GIT_BRANCH=${GITHUB_BASE_REF:-${GITHUB_REF#refs/heads/}}
-          PORT=$(cat /opt/projektwahl-lits/$GIT_BRANCH/.github/port)
           echo $GIT_BRANCH
-          echo $PORT
           ssh moritz@staging.projektwahl.selfmade4u.de << EOF
           cd /opt/projektwahl-lit
           git fetch origin
-          git worktree add ../projektwahl-lits/$PORT origin/$GIT_BRANCH
-          cd /opt/projektwahl-lits/$PORT
+          git worktree add ../projektwahl-lits/$GIT_BRANCH origin/$GIT_BRANCH
+          cd /opt/projektwahl-lits/$GIT_BRANCH
           git pull origin $GIT_BRANCH
+          PORT=$(cat /opt/projektwahl-lits/$GIT_BRANCH/.github/port)
+          echo $PORT
           npm install
           npx node-pre-gyp rebuild -C ./node_modules/argon2
           npm run localize-build
