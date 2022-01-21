@@ -42,4 +42,17 @@ jobs:
           npm run build
           npm run purgecss
           sudo /usr/bin/systemctl enable --now projektwahl@\$PORT.socket
+          echo "server {
+            server_name $GIT_BRANCH.projektwahl.selfmade4u.de;
+            location / {
+              proxy_pass https://localhost:$\PORT;
+            }
+            listen [::]:443 ssl; # managed by Certbot
+            listen 443 ssl; # managed by Certbot
+            ssl_certificate /etc/letsencrypt/live/projektwahl.selfmade4u.de/fullchain.pem; # managed by Certbot
+            ssl_certificate_key /etc/letsencrypt/live/projektwahl.selfmade4u.de/privkey.pem; # managed by Certbot
+            include /etc/letsencrypt/options-ssl-nginx.conf; # managed by Certbot
+            ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem; # managed by Certbot
+          }" | sudo tee /etc/nginx/sites-enabled/projektwahl-$GIT_BRANCH
+          sudo /usr/bin/systemctl reload nginx
           EOF
