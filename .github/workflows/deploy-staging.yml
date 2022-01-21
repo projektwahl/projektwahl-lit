@@ -8,6 +8,7 @@ on:
       - main
       - mohe2015-patch-1
       - staging
+      - release
 
 jobs:
   deployment:
