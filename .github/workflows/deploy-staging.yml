@@ -33,8 +33,8 @@ jobs:
           git pull origin $GIT_BRANCH
           PORT=\$(cat /opt/projektwahl-lits/$GIT_BRANCH/.github/port)
           echo \$PORT
-          git worktree add /opt/projektwahl-lits/$PORT origin/$GIT_BRANCH
-          cd /opt/projektwahl-lits/$PORT
+          git worktree add /opt/projektwahl-lits/\$PORT origin/$GIT_BRANCH
+          cd /opt/projektwahl-lits/\$PORT
           git pull origin $GIT_BRANCH
           npm install
           npx node-pre-gyp rebuild -C ./node_modules/argon2
