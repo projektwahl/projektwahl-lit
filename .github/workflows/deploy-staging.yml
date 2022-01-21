@@ -43,10 +43,11 @@ jobs:
           npm run build
           npm run purgecss
           sudo /usr/bin/systemctl enable --now projektwahl@\$PORT.socket
+          export PORT=\$PORT
           echo "server {
             server_name $GIT_BRANCH.projektwahl.selfmade4u.de;
             location / {
-              proxy_pass https://localhost:$\PORT;
+              proxy_pass https://localhost:$PORT;
             }
             listen [::]:443 ssl; # managed by Certbot
             listen 443 ssl; # managed by Certbot
