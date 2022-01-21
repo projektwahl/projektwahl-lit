@@ -228,7 +228,7 @@ export class PwApp extends LitElement {
       >
         <div class="container-fluid">
           <a @click=${aClick} class="navbar-brand" href="/"
-            >${msg("Projektwahl")}hihi</a
+            >${msg("Projektwahl")}-testing</a
           >
           <button
             class="navbar-toggler"
