@@ -90,7 +90,7 @@ const server = createSecureServer(
 );
 
 server.listen(
-  process.env.PORT ? Number(process.env.PORT) : (process.env.SOCKET ? process.env.SOCKET : new net.Socket({ fd: 3 })),
+  process.env.PORT ? Number(process.env.PORT) : (process.env.SOCKET ? { exclusive: true, path: process.env.SOCKET } : new net.Socket({ fd: 3 })),
   511,
   () => {
     /*console.log(
