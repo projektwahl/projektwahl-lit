@@ -5,7 +5,7 @@ concurrency: staging
 on:
   push:
     branches:
-      - deploy
+      - main
 
 jobs:
   deployment:
@@ -21,13 +21,13 @@ jobs:
         run: |
           ssh moritz@staging.projektwahl.selfmade4u.de << EOF
           cd /opt/projektwahl-lit
-          git worktree add ../projektwahl-lits/deploy origin/deploy
-          cd ../projektwahl-lits/deploy
-          git pull origin deploy
+          git worktree add ../projektwahl-lits/main origin/main
+          cd ../projektwahl-lits/main
+          git pull origin main
           npm install
           npx node-pre-gyp rebuild -C ./node_modules/argon2
           npm run localize-build
           npm run build
           npm run purgecss
-          sudo /usr/bin/systemctl enable --now projektwahl@deploy.socket
+          sudo /usr/bin/systemctl enable --now projektwahl@main.socket
           EOF
