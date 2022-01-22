@@ -78,7 +78,6 @@ class PwLogin extends PwForm<"/api/v1/login"> {
         role="button"
         >${msg("Login with third party account")}</a
       >
-
       <h3 class="text-center">${msg("Login as guest")}</h3>
 
       ${pwInput<"/api/v1/login", "username">({
