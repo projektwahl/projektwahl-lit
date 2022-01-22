@@ -37,14 +37,13 @@ export async function shadow(element: WebElement) {
 }
 
 export async function click(element: WebElement) {
-  await driver.executeScript(
-    "arguments[0].scrollIntoView(true);",
-    element
-  );
+  // currently this is just too buggy
 
-  await driver.sleep(250);
+  //await driver.executeScript(`arguments[0].scrollIntoView(true);`, element);
 
-  await element.click();
+  //await driver.sleep(250);
+
+  await driver.executeScript(`arguments[0].click()`, element);
 }
 
 // SELENIUM_BROWSER=chrome node --experimental-loader ./src/loader.js --enable-source-maps tests/e2e/welcome.js
@@ -56,7 +55,7 @@ const driver = await new Builder()
   )
   .setChromeOptions(
     new chrome.Options().addArguments(
-      "--headless",
+      //"--headless",
       "--no-sandbox",
       "--disable-dev-shm-usage"
     )
@@ -73,9 +72,6 @@ await driver.manage().window().setRect({
 try {
   await driver.get(process.env.BASE_URL);
   const pwApp = await driver.findElement(By.css("pw-app"));
-
-  // doesn't work on firefox
-  //const pwAppShadow: WebElement = await driver.executeScript("return arguments[0].shadowRoot", pwApp);
 
   const navbarButton = await (
     await shadow(pwApp)
@@ -105,7 +101,7 @@ try {
     await shadow(pwLogin)
   ).findElement(By.css('button[type="submit"]'));
 
-  await click(loginButton)
+  await click(loginButton);
 
   const logoutButton = await (
     await shadow(pwApp)
@@ -149,7 +145,7 @@ try {
       await shadow(pwUserCreate)
     ).findElement(By.css('button[type="submit"]'));
 
-    await click(submitButton)
+    await click(submitButton);
   }
 
   {
@@ -170,7 +166,7 @@ try {
       await shadow(pwUsers)
     ).findElement(By.css('a[href="/users/view/7"]'));
 
-    await click(user2)
+    await click(user2);
 
     const pwUserCreate = await (
       await shadow(pwApp)

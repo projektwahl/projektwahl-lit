@@ -358,7 +358,7 @@ export class PwApp extends LitElement {
           })}
         </div>
 
-        <main class="flex-shrink-0">
+        <main class="flex-shrink-0 pb-3">
           ${this._apiTask.render({
             complete: (v) => v,
             error: (e) => e,
