@@ -5,11 +5,13 @@ import {
   By,
   Capabilities,
   Capability,
+  until,
   WebElement,
 } from "selenium-webdriver";
 import chrome from "selenium-webdriver/chrome.js";
 //import repl from "repl";
 import crypto from "node:crypto";
+import { Command } from "selenium-webdriver/lib/command";
 const webcrypto = crypto.webcrypto as unknown as Crypto;
 
 if (!process.env["BASE_URL"]) {
@@ -62,7 +64,7 @@ const driver = await new Builder()
   )
   .build();
 await driver.manage().setTimeouts({
-  implicit: 1000,
+  implicit: 2000,
 });
 await driver.manage().window().setRect({
   width: 500,
@@ -70,6 +72,15 @@ await driver.manage().window().setRect({
 });
 
 try {
+  // the typescript bindings are heavily outdated
+  // @ts-expect-error
+  await driver.setNetworkConditions({
+    offline: false,
+    latency: 100, // Additional latency (ms).
+    download_throughput: 50 * 1024, // Maximal aggregated download throughput.
+    upload_throughput: 50 * 1024, // Maximal aggregated upload throughput.
+  });
+
   await driver.get(process.env.BASE_URL);
 
   {
@@ -152,6 +163,8 @@ try {
     ).findElement(By.css('button[type="submit"]'));
 
     await click(submitButton);
+
+    await (await shadow(pwApp)).findElement(By.css("pw-welcome"));
   }
 
   {
@@ -237,6 +250,38 @@ try {
   }
 
   {
+    // filtering
+
+    const pwApp = await driver.findElement(By.css("pw-app"));
+
+    const accountsLink = await (
+      await shadow(pwApp)
+    ).findElement(By.css('a[href="/users"]'));
+
+    await click(accountsLink);
+
+    const pwUsers = await (await shadow(pwApp)).findElement(By.css("pw-users"));
+
+    const filterUsername = await (
+      await shadow(pwUsers)
+    ).findElement(By.css('input[name="f_username"]'));
+
+    await filterUsername.sendKeys("admin");
+
+    const loadingSpinner = await (
+      await shadow(pwUsers)
+    ).findElement(By.css(".spinner-grow"));
+
+    assert.ok(loadingSpinner.isDisplayed());
+
+    console.log(new Date());
+
+    await driver.wait(until.stalenessOf(loadingSpinner));
+
+    console.log(new Date());
+  }
+
+  {
     // logout
     const pwApp = await driver.findElement(By.css("pw-app"));
 
@@ -253,6 +298,26 @@ try {
     ).findElement(By.css('a[href="/login"]'));
 
     assert.equal(await loginLink.getText(), "Login");
+  }
+
+  {
+    // check logged out by checking no permissions
+
+    const pwApp = await driver.findElement(By.css("pw-app"));
+
+    const accountsLink = await (
+      await shadow(pwApp)
+    ).findElement(By.css('a[href="/users"]'));
+
+    await click(accountsLink);
+
+    const pwUsers = await (await shadow(pwApp)).findElement(By.css("pw-users"));
+
+    const alert = await (
+      await shadow(pwUsers)
+    ).findElement(By.css('div[class="alert alert-danger"]'));
+
+    assert.match(await alert.getText(), /Insufficient permissions!/);
   }
 
   /*
