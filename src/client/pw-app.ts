@@ -380,7 +380,7 @@ export class PwApp extends LitElement {
                 href="https://github.com/projektwahl/projektwahl-lit/blob/main/LICENSE"
                 target="_blank"
                 rel="noopener noreferrer"
-                >${msg("Full license")}</a
+                >${msg("License")}</a
               >
               |
               <a href="/imprint" target="_blank" rel="noopener noreferrer"
