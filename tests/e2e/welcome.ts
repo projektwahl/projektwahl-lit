@@ -177,6 +177,53 @@ try {
 
     await driver.navigate().back();
   }
+
+  {
+    // imprint
+
+    const imprintLink = await (
+      await shadow(pwApp)
+    ).findElement(By.css('a[href="/imprint"]'));
+
+    await click(imprintLink);
+
+    await driver.switchTo().window((await driver.getAllWindowHandles())[1]);
+    const pwApp2 = await driver.findElement(By.css("pw-app"));
+
+    const pwImprint = await (
+      await shadow(pwApp2)
+    ).findElement(By.css("pw-imprint"));
+
+    assert.match(await pwImprint.getText(), /boilerplate imprint text/);
+
+    await driver.close();
+
+    await driver.switchTo().window((await driver.getAllWindowHandles())[0]);
+  }
+
+  {
+    // privacy
+
+    const privacyLink = await (
+      await shadow(pwApp)
+    ).findElement(By.css('a[href="/privacy"]'));
+
+    await click(privacyLink);
+
+    await driver.switchTo().window((await driver.getAllWindowHandles())[1]);
+    const pwApp2 = await driver.findElement(By.css("pw-app"));
+
+    const pwPrivacy = await (
+      await shadow(pwApp2)
+    ).findElement(By.css("pw-privacy"));
+
+    assert.match(await pwPrivacy.getText(), /boilerplate privacy policy text/);
+
+    await driver.close();
+
+    await driver.switchTo().window((await driver.getAllWindowHandles())[0]);
+  }
+
   /*
   const theRepl = repl.start();
   theRepl.context.driver = driver;
