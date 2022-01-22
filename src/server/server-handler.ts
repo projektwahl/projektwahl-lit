@@ -293,14 +293,14 @@ export async function serverHandler(
         }
       </style>
       <link
-        href="/dist/bootstrap.min.css"
+        href="/node_modules/bootstrap/dist/css/bootstrap.css"
         rel="stylesheet"
       />
       <!--<link rel="preload" href="/dist/chunk-O27XPTNE.js" as="script" crossorigin="anonymous">-->
   
       <title>Projektwahl</title>
     </head>
-    <body>
+    <body style="height: 100vh;">
       <script
         type="module"
         src="/src/client/pw-app.js"

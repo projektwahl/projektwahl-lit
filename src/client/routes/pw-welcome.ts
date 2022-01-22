@@ -47,8 +47,7 @@ export const PwWelcome = setupHmr(
           <p>
             projektwahl-lit is a software to manage choosing projects and
             automatically assigning people to projects.<br />
-            Copyright (C) 2021 Moritz Hedtke &lt;Moritz.Hedtke at t-online dot
-            de&gt;
+            Copyright (C) 2021 Moritz Hedtke &lt;Moritz.Hedtke@t-online.de&gt;
           </p>
 
           <p>
@@ -74,22 +73,6 @@ export const PwWelcome = setupHmr(
               rel="noopener noreferrer"
               >https://www.gnu.org/licenses/</a
             >.
-          </p>
-
-          <p class="text-center">
-            <a
-              href="https://github.com/projektwahl/projektwahl-lit"
-              target="_blank"
-              rel="noopener noreferrer"
-              >${msg("Source code")}</a
-            >
-            |
-            <a
-              href="https://github.com/projektwahl/projektwahl-lit/blob/main/LICENSE"
-              target="_blank"
-              rel="noopener noreferrer"
-              >${msg("Full license")}</a
-            >
           </p>
         </div>
       `;

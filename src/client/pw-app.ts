@@ -77,6 +77,14 @@ function identity<
 }*/
 
 const pages = {
+  "^/privacy$": async () => {
+    await import("./routes/pw-privacy.js");
+    return html`<pw-privacy></pw-privacy>`;
+  },
+  "^/imprint$": async () => {
+    await import("./routes/pw-imprint.js");
+    return html`<pw-imprint></pw-imprint>`;
+  },
   "^/$": async () => {
     await import("./routes/pw-welcome.js");
     return html`<pw-welcome></pw-welcome>`;
@@ -223,126 +231,169 @@ export class PwApp extends LitElement {
 
     return html`
       ${bootstrapCss}
-      <nav
-        class="navbar navbar-expand-lg navbar-light bg-light shadow p-3 mb-5"
-      >
-        <div class="container-fluid">
-          <a @click=${aClick} class="navbar-brand" href="/"
-            >${msg("Projektwahl")}hihi</a
+      <style>
+        :host {
+          height: 100vh;
+          display: block;
+        }
+      </style>
+      <div class="d-flex flex-column h-100">
+        <header>
+          <nav
+            class="navbar navbar-expand-lg navbar-light bg-light shadow p-3 mb-5"
           >
-          <button
-            class="navbar-toggler"
-            type="button"
-            data-bs-toggle="collapse"
-            data-bs-target="#navbarSupportedContent"
-            aria-controls="navbarSupportedContent"
-            aria-expanded="false"
-            aria-label=${msg("Toggle navigation")}
-            @click=${() => (this.navbarOpen = !this.navbarOpen)}
-          >
-            <span class="navbar-toggler-icon"></span>
-          </button>
-          <div
-            class="collapse navbar-collapse ${this.navbarOpen ? "show" : ""}"
-            id="navbarSupportedContent"
-          >
-            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-              <li class="nav-item">
-                <a
-                  @click=${aClick}
-                  class="nav-link ${this.history.url.pathname === "/"
-                    ? "active"
-                    : ""}"
-                  aria-current="page"
-                  href="/"
-                  >${msg("Home")}</a
-                >
-              </li>
-              <li class="nav-item">
-                <a
-                  @click=${aClick}
-                  class="nav-link ${this.history.url.pathname === "/users"
-                    ? "active"
-                    : ""}"
-                  href="/users"
-                  >${msg("Accounts")}</a
-                >
-              </li>
-              <li>
-                <a
-                  @click=${aClick}
-                  class="nav-link ${this.history.url.pathname === "/projects"
-                    ? "active"
-                    : ""}"
-                  href="/projects"
-                  >${msg("Projects")}</a
-                >
-              </li>
-              <li>
-                <a
-                  @click=${aClick}
-                  class="nav-link ${this.history.url.pathname === "/election"
-                    ? "active"
-                    : ""}"
-                  href="/election"
-                  >${msg("Election")}</a
-                >
-              </li>
-            </ul>
-            <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
-              ${jscookie.get("username")
-                ? html`<li class="nav-item">
-                    <a
-                      @click=${async () => {
-                        await myFetch<"/api/v1/logout">("/api/v1/logout", {
-                          method: "POST",
-                          body: "{}",
-                        });
-                        HistoryController.goto(
-                          new URL("/login", window.location.href),
-                          {}
-                        );
-                      }}
-                      class="nav-link"
-                      href="#"
-                      >${msg(str`Logout ${jscookie.get("username")}`)}</a
-                    >
-                  </li>`
-                : html` <li class="nav-item">
+            <div class="container-fluid">
+              <a @click=${aClick} class="navbar-brand" href="/"
+                >${msg("Projektwahl")}-testing</a
+              >
+              <button
+                class="navbar-toggler"
+                type="button"
+                data-bs-toggle="collapse"
+                data-bs-target="#navbarSupportedContent"
+                aria-controls="navbarSupportedContent"
+                aria-expanded="false"
+                aria-label=${msg("Toggle navigation")}
+                @click=${() => (this.navbarOpen = !this.navbarOpen)}
+              >
+                <span class="navbar-toggler-icon"></span>
+              </button>
+              <div
+                class="collapse navbar-collapse ${this.navbarOpen
+                  ? "show"
+                  : ""}"
+                id="navbarSupportedContent"
+              >
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                  <li class="nav-item">
                     <a
                       @click=${aClick}
-                      class="nav-link ${this.history.url.pathname === "/login"
+                      class="nav-link ${this.history.url.pathname === "/"
                         ? "active"
                         : ""}"
-                      href="/login"
-                      >${msg("Login")}</a
+                      aria-current="page"
+                      href="/"
+                      >${msg("Home")}</a
                     >
-                  </li>`}
-            </ul>
-          </div>
+                  </li>
+                  <li class="nav-item">
+                    <a
+                      @click=${aClick}
+                      class="nav-link ${this.history.url.pathname === "/users"
+                        ? "active"
+                        : ""}"
+                      href="/users"
+                      >${msg("Accounts")}</a
+                    >
+                  </li>
+                  <li>
+                    <a
+                      @click=${aClick}
+                      class="nav-link ${this.history.url.pathname ===
+                      "/projects"
+                        ? "active"
+                        : ""}"
+                      href="/projects"
+                      >${msg("Projects")}</a
+                    >
+                  </li>
+                  <li>
+                    <a
+                      @click=${aClick}
+                      class="nav-link ${this.history.url.pathname ===
+                      "/election"
+                        ? "active"
+                        : ""}"
+                      href="/election"
+                      >${msg("Election")}</a
+                    >
+                  </li>
+                </ul>
+                <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
+                  ${jscookie.get("username")
+                    ? html`<li class="nav-item">
+                        <a
+                          @click=${async () => {
+                            await myFetch<"/api/v1/logout">("/api/v1/logout", {
+                              method: "POST",
+                              body: "{}",
+                            });
+                            HistoryController.goto(
+                              new URL("/login", window.location.href),
+                              {}
+                            );
+                          }}
+                          class="nav-link"
+                          href="#"
+                          >${msg(str`Logout ${jscookie.get("username")}`)}</a
+                        >
+                      </li>`
+                    : html` <li class="nav-item">
+                        <a
+                          @click=${aClick}
+                          class="nav-link ${this.history.url.pathname ===
+                          "/login"
+                            ? "active"
+                            : ""}"
+                          href="/login"
+                          >${msg("Login")}</a
+                        >
+                      </li>`}
+                </ul>
+              </div>
+            </div>
+          </nav>
+        </header>
+
+        <div
+          style="position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 1337;"
+        >
+          ${this._apiTask.render({
+            pending: () => html`<div
+              class="spinner-grow text-primary"
+              role="status"
+            >
+              <span class="visually-hidden">${msg("Loading...")}</span>
+            </div>`,
+          })}
         </div>
-      </nav>
 
-      <div
-        style="position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 1337;"
-      >
-        ${this._apiTask.render({
-          pending: () => html`<div
-            class="spinner-grow text-primary"
-            role="status"
-          >
-            <span class="visually-hidden">${msg("Loading...")}</span>
-          </div>`,
-        })}
+        <main class="flex-shrink-0">
+          ${this._apiTask.render({
+            complete: (v) => v,
+            error: (e) => e,
+            pending: () => noChange,
+          })}
+        </main>
+
+        <footer class="footer mt-auto py-3 bg-light">
+          <div class="container">
+            <span class="text-muted">
+              <a
+                href="https://github.com/projektwahl/projektwahl-lit"
+                target="_blank"
+                rel="noopener noreferrer"
+                >${msg("Source code")}</a
+              >
+              |
+              <a
+                href="https://github.com/projektwahl/projektwahl-lit/blob/main/LICENSE"
+                target="_blank"
+                rel="noopener noreferrer"
+                >${msg("Full license")}</a
+              >
+              |
+              <a href="/imprint" target="_blank" rel="noopener noreferrer"
+                >${msg("Imprint")}</a
+              >
+              |
+              <a href="/privacy" target="_blank" rel="noopener noreferrer"
+                >${msg("Privacy Policy")}</a
+              >
+            </span>
+          </div>
+        </footer>
       </div>
-
-      ${this._apiTask.render({
-        complete: (v) => v,
-        error: (e) => e,
-        pending: () => noChange,
-      })}
-
-      <br />
     `;
   }
 }

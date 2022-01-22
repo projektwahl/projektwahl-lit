@@ -20,10 +20,30 @@ https://github.com/projektwahl/projektwahl-lit
 SPDX-License-Identifier: AGPL-3.0-or-later
 SPDX-FileCopyrightText: 2021 Moritz Hedtke <Moritz.Hedtke@t-online.de>
 */
-import { unsafeHTML } from "lit/directives/unsafe-html.js";
+import { msg } from "@lit/localize";
+import { html, LitElement } from "lit";
+import { setupHmr } from "../hmr.js";
+import { bootstrapCss } from "../index.js";
 
-export const bootstrapCss = unsafeHTML(`<link
-href="/node_modules/bootstrap/dist/css/bootstrap.css"
-rel="stylesheet"
-/>
-`);
+export const PwPrivacy = setupHmr(
+  "PwPrivacy",
+  class PwPrivacy extends LitElement {
+    protected render() {
+      return html`
+        ${bootstrapCss}
+
+        <div class="container">
+          <h1 class="text-center">${msg("Privacy policy")}</h1>
+
+          <p>
+            ${msg(
+              "This is some boilerplate privacy policy text that can be adapted by changing the translation."
+            )}
+          </p>
+        </div>
+      `;
+    }
+  }
+);
+
+customElements.define("pw-privacy", PwPrivacy);

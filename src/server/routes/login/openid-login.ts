@@ -43,7 +43,7 @@ export async function openidLoginHandler(
     // https://github.com/projektwahl/projektwahl-sveltekit/blob/work/src/routes/redirect/index.ts_old
     const url = client.authorizationUrl({
       redirect_uri: `${process.env.BASE_URL as string}/api/v1/redirect`,
-      scope: "openid email profile",
+      scope: "openid",
     });
 
     console.log(url);

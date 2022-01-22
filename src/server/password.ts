@@ -20,7 +20,7 @@ https://github.com/projektwahl/projektwahl-lit
 SPDX-License-Identifier: AGPL-3.0-or-later
 SPDX-FileCopyrightText: 2021 Moritz Hedtke <Moritz.Hedtke@t-online.de>
 */
-import argon2 from "argon2";
+import argon2 from "@dev.mohe/argon2";
 
 // TODO FIXME probably switch back to argon2 it seems like we may be able to build it from source using the instructions in README
 // for now probably not too important as almost everybody should be using OpenID
