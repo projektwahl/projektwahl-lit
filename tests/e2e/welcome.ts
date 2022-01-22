@@ -36,6 +36,17 @@ export async function shadow(element: WebElement) {
   return (await element.getShadowRoot()) as WebElement; // eslint-disable-line @typescript-eslint/no-unsafe-call
 }
 
+export async function click(element: WebElement) {
+  await driver.executeScript(
+    "arguments[0].scrollIntoView(true);",
+    element
+  );
+
+  await driver.sleep(250);
+
+  await element.click();
+}
+
 // SELENIUM_BROWSER=chrome node --experimental-loader ./src/loader.js --enable-source-maps tests/e2e/welcome.js
 const driver = await new Builder()
   .forBrowser("firefox")
@@ -70,13 +81,13 @@ try {
     await shadow(pwApp)
   ).findElement(By.css("button.navbar-toggler"));
 
-  await navbarButton.click();
+  await click(navbarButton);
 
   const loginLink = await (
     await shadow(pwApp)
   ).findElement(By.css('a[href="/login"]'));
 
-  await loginLink.click();
+  await click(loginLink);
 
   const pwLogin = await (await shadow(pwApp)).findElement(By.css("pw-login"));
 
@@ -94,7 +105,7 @@ try {
     await shadow(pwLogin)
   ).findElement(By.css('button[type="submit"]'));
 
-  await loginButton.click();
+  await click(loginButton)
 
   const logoutButton = await (
     await shadow(pwApp)
@@ -106,7 +117,7 @@ try {
     await shadow(pwApp)
   ).findElement(By.css('a[href="/users"]'));
 
-  await accountsLink.click();
+  await click(accountsLink);
 
   const groupName = [...webcrypto.getRandomValues(new Uint8Array(8))]
     .map((b) => b.toString(16).padStart(2, "0"))
@@ -121,7 +132,7 @@ try {
       await shadow(pwUsers)
     ).findElement(By.css('a[href="/users/edit/7"]'));
 
-    await user2.click();
+    await click(user2);
 
     const pwUserCreate = await (
       await shadow(pwApp)
@@ -138,14 +149,7 @@ try {
       await shadow(pwUserCreate)
     ).findElement(By.css('button[type="submit"]'));
 
-    await driver.executeScript(
-      "arguments[0].scrollIntoView(true);",
-      submitButton
-    );
-
-    await driver.sleep(250);
-
-    await submitButton.click();
+    await click(submitButton)
   }
 
   {
@@ -158,7 +162,7 @@ try {
 
     await driver.sleep(250);
 
-    await accountsLink.click();
+    await click(accountsLink);
 
     const pwUsers = await (await shadow(pwApp)).findElement(By.css("pw-users"));
 
@@ -166,7 +170,7 @@ try {
       await shadow(pwUsers)
     ).findElement(By.css('a[href="/users/view/7"]'));
 
-    await user2.click();
+    await click(user2)
 
     const pwUserCreate = await (
       await shadow(pwApp)
