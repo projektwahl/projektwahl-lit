@@ -29,7 +29,7 @@
     "localize-extract": "npm exec --package=@lit/localize-tools -- lit-localize extract",
     "localize-build": "npm exec --package=@lit/localize-tools -- lit-localize build",
     "typecheck": "tsc",
-    "lit-analyze": "npm exec --package=lit-analyzer -- lit-analyze --strict --rules.no-unknown-attribute off src",
+    "lit-analyze": "npm exec --package=lit-analyzer -- lit-analyzer --strict --rules.no-unknown-attribute off src",
     "build": "esbuild --format=esm --bundle src/client/pw-app.ts --charset=utf8 --define:window.PRODUCTION=true --entry-names=[dir]/[name]-[hash] --sourcemap --analyze --outdir=dist --minify-whitespace --minify-identifiers --minify-syntax --tree-shaking=true --minify",
     "purgecss": "npm exec --package=purgecss -- purgecss --css node_modules/bootstrap/dist/css/bootstrap.css --content dist/*.js --output dist/bootstrap.min.css --font-face --keyframes --variables"
   },
