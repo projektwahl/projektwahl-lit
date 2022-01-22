@@ -18,20 +18,20 @@
   "type": "module",
   "scripts": {
     "prepare": "echo test",
-    "format": "npx prettier --ignore-path .gitignore --write .",
-    "format:check": "npx prettier --ignore-path .gitignore --check .",
+    "format": "npm exec --package=prettier -- prettier --ignore-path .gitignore --write .",
+    "format:check": "npm exec --package=prettier -- prettier --ignore-path .gitignore --check .",
     "rebuild": "node-pre-gyp rebuild -C ./node_modules/argon2",
     "test": "SELENIUM_BROWSER=chrome node  --experimental-loader ./src/loader.js --enable-source-maps tests/e2e/welcome.js",
-    "lint": "npx @typescript-eslint/eslint-plugin eslint-config-prettier eslint .",
-    "lint:fix": "npx @typescript-eslint/parser eslint-config-prettier eslint --fix .",
+    "lint": "npm exec --package=eslint --package=@typescript-eslint/eslint-plugin --package=eslint-config-prettier -- eslint .",
+    "lint:fix": "npm exec --package=eslint --package=@typescript-eslint/eslint-plugin --package=eslint-config-prettier -- eslint --fix .",
     "setup": "node --experimental-loader ./src/loader.js --enable-source-maps ./src/server/setup.js",
     "server": "node --experimental-loader ./src/loader.js --enable-source-maps --experimental-import-meta-resolve ./src/server/index.js",
     "localize-extract": "npm exec --package=@lit/localize-tools -- lit-localize extract",
     "localize-build": "npm exec --package=@lit/localize-tools -- lit-localize build",
     "typecheck": "tsc",
-    "lit-analyze": "npx lit-analyzer --strict --rules.no-unknown-attribute off src",
+    "lit-analyze": "npm exec --package=lit-analyzer -- lit-analyze --strict --rules.no-unknown-attribute off src",
     "build": "esbuild --format=esm --bundle src/client/pw-app.ts --charset=utf8 --define:window.PRODUCTION=true --entry-names=[dir]/[name]-[hash] --sourcemap --analyze --outdir=dist --minify-whitespace --minify-identifiers --minify-syntax --tree-shaking=true --minify",
-    "purgecss": "npx purgecss --css node_modules/bootstrap/dist/css/bootstrap.css --content dist/*.js --output dist/bootstrap.min.css --font-face --keyframes --variables"
+    "purgecss": "npm exec --package=purgecss -- purgecss --css node_modules/bootstrap/dist/css/bootstrap.css --content dist/*.js --output dist/bootstrap.min.css --font-face --keyframes --variables"
   },
   "dependencies": {
     "@dev.mohe/argon2": "^0.29.0",
@@ -62,6 +62,10 @@
   "optionalDependenciesComments": {
     "@lit/localize-tools": "^0.5.0",
     "selenium-webdriver": "^4.1.1",
-    "@types/selenium-webdriver": "^4.0.16"
+    "@types/selenium-webdriver": "^4.0.16",
+  },
+  "optionalDependencies": {
+    "eslint-config-prettier": "^8.3.0",
+    "@typescript-eslint/eslint-plugin": "^5.10.0"
   }
 }

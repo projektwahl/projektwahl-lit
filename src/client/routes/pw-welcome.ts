@@ -75,22 +75,6 @@ export const PwWelcome = setupHmr(
               >https://www.gnu.org/licenses/</a
             >.
           </p>
-
-          <p class="text-center">
-            <a
-              href="https://github.com/projektwahl/projektwahl-lit"
-              target="_blank"
-              rel="noopener noreferrer"
-              >${msg("Source code")}</a
-            >
-            |
-            <a
-              href="https://github.com/projektwahl/projektwahl-lit/blob/main/LICENSE"
-              target="_blank"
-              rel="noopener noreferrer"
-              >${msg("Full license")}</a
-            >
-          </p>
         </div>
       `;
     }
