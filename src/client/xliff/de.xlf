@@ -1,31 +1,28 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <xliff version="1.2" xmlns="urn:oasis:names:tc:xliff:document:1.2">
-<!--
-/*
-projektwahl-lit is a software to manage choosing projects and automatically assigning people to projects.
-Copyright (C) 2021 Moritz Hedtke
-
-This program is free software: you can redistribute it and/or modify
-it under the terms of the GNU Affero General Public License as published
-by the Free Software Foundation, either version 3 of the License, or
-(at your option) any later version.
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-GNU Affero General Public License for more details.
-
-You should have received a copy of the GNU Affero General Public License
-along with this program. If not, see https://www.gnu.org/licenses/.
-*/
-/*!
-https://github.com/projektwahl/projektwahl-lit
-SPDX-License-Identifier: AGPL-3.0-or-later
-SPDX-FileCopyrightText: 2021 Moritz Hedtke <Moritz.Hedtke@t-online.de>
-*/
--->
 <file target-language="de" source-language="en" original="lit-localize-inputs" datatype="plaintext">
 <body>
+<trans-unit id="sef4999e4b768721f">
+  <source>Privacy policy</source>
+</trans-unit>
+<trans-unit id="sb45694349ae396ac">
+  <source>This is some boilerplate privacy policy text that can be adapted by changing the translation.</source>
+</trans-unit>
+<trans-unit id="s1f7e12b71164c5da">
+  <source>Imprint</source>
+</trans-unit>
+<trans-unit id="sd390c325eabf76cf">
+  <source>This is some boilerplate imprint text that can be adapted by changing the translation.</source>
+</trans-unit>
+<trans-unit id="scdb1bac161852c73">
+  <source>Welcome</source>
+</trans-unit>
+<trans-unit id="se478d5906376d65e">
+  <source>This is some boilerplate welcome text that can be adapted by changing the translation.</source>
+</trans-unit>
+<trans-unit id="s7a391ae3182a86b5">
+  <source>Credits</source>
+</trans-unit>
 <trans-unit id="s6c2062b9249e8c19">
   <source>getInputs must be implemented by subclass</source>
   <target>getInputs muss von Unterklasse implementiert werden</target>
@@ -38,9 +35,40 @@ SPDX-FileCopyrightText: 2021 Moritz Hedtke <Moritz.Hedtke@t-online.de>
   <source>Some errors occurred!</source>
   <target>Einige Fehler sind aufgetreten!</target>
 </trans-unit>
-<trans-unit id="s416ccf81fded518c">
-  <source>sort by <x id="0" equiv-text="${this.title}"/></source>
-  <target>Nach <x id="0" equiv-text="${this.title}"/> sortieren</target>
+<trans-unit id="s05ca1d6cf0a89899">
+  <source>Denk dran: Lange Passwörter sind viel sicherer als welche mit vielen Sonderzeichen.</source>
+</trans-unit>
+<trans-unit id="he49e57357d4caee2">
+  <source> Also lieber "Ich mag fliegende Autos." anstatt
+                  "Moritz1234!".<x id="0" equiv-text="&lt;br>"/>Du kannst auch einen Passwort-Manager
+                  verwenden, z.B.</source>
+</trans-unit>
+<trans-unit id="s1dc79c57a4bab199">
+  <source>Bitwarden</source>
+</trans-unit>
+<trans-unit id="sc8da3cc71de63832">
+  <source>Login</source>
+  <target>Anmelden</target>
+</trans-unit>
+<trans-unit id="s0561a43eeaf34c64">
+  <source>Login with third party account</source>
+  <target>Mit Schulaccount anmelden</target>
+</trans-unit>
+<trans-unit id="s8bfdcea2687691c2">
+  <source>Login as guest</source>
+  <target>Als Gast anmelden</target>
+</trans-unit>
+<trans-unit id="s03f42eea72154959">
+  <source>Username</source>
+  <target>Accountname</target>
+</trans-unit>
+<trans-unit id="sf6e1665c7022a1f8">
+  <source>Password</source>
+  <target>Passwort</target>
+</trans-unit>
+<trans-unit id="s49730f3d5751a433">
+  <source>Loading...</source>
+  <target>Wird geladen...</target>
 </trans-unit>
 <trans-unit id="s7dc552fda8bc803d">
   <source><x id="0" equiv-text="${count}"/> per page</source>
@@ -57,6 +85,10 @@ SPDX-FileCopyrightText: 2021 Moritz Hedtke <Moritz.Hedtke@t-online.de>
 <trans-unit id="s530b5e503198f143">
   <source>next page</source>
   <target>Nächste Seite</target>
+</trans-unit>
+<trans-unit id="s416ccf81fded518c">
+  <source>sort by <x id="0" equiv-text="${this.title}"/></source>
+  <target>Nach <x id="0" equiv-text="${this.title}"/> sortieren</target>
 </trans-unit>
 <trans-unit id="s586d6bd2eca2da93">
   <source>Users</source>
@@ -88,10 +120,6 @@ SPDX-FileCopyrightText: 2021 Moritz Hedtke <Moritz.Hedtke@t-online.de>
 <trans-unit id="sa86d79c867c8f453">
   <source>Update account</source>
 </trans-unit>
-<trans-unit id="s03f42eea72154959">
-  <source>Username</source>
-  <target>Accountname</target>
-</trans-unit>
 <trans-unit id="s9f9492d30a96b9c6">
   <source>User type</source>
   <target>Accounttyp</target>
@@ -104,22 +132,16 @@ SPDX-FileCopyrightText: 2021 Moritz Hedtke <Moritz.Hedtke@t-online.de>
   <source>Age</source>
   <target>Jahrgang</target>
 </trans-unit>
-<trans-unit id="sf6e1665c7022a1f8">
-  <source>Password</source>
-  <target>Passwort</target>
-</trans-unit>
 <trans-unit id="sececb48b4688a29b">
   <source>Away</source>
   <target>Abwesend</target>
 </trans-unit>
-<trans-unit id="hd684a0e714c0d252">
-  <source>✓</source>
+<trans-unit id="s83efd873c2040478">
+  <source>Mark this user as deleted</source>
 </trans-unit>
-<trans-unit id="s3e9c025477abb23d">
-  <source>View project</source>
-</trans-unit>
-<trans-unit id="s7bef03c295945331">
-  <source>Update project</source>
+<trans-unit id="s199f5853f4e718f7">
+  <source>Projects</source>
+  <target>Projekte</target>
 </trans-unit>
 <trans-unit id="sfb43be2359ccab14">
   <source>Create project</source>
@@ -132,6 +154,15 @@ SPDX-FileCopyrightText: 2021 Moritz Hedtke <Moritz.Hedtke@t-online.de>
 <trans-unit id="s2063a9d17c280fe5">
   <source>Info</source>
   <target>Info</target>
+</trans-unit>
+<trans-unit id="hd684a0e714c0d252">
+  <source>✓</source>
+</trans-unit>
+<trans-unit id="s3e9c025477abb23d">
+  <source>View project</source>
+</trans-unit>
+<trans-unit id="s7bef03c295945331">
+  <source>Update project</source>
 </trans-unit>
 <trans-unit id="s13b3f5afa0862d1c">
   <source>Place</source>
@@ -157,52 +188,18 @@ SPDX-FileCopyrightText: 2021 Moritz Hedtke <Moritz.Hedtke@t-online.de>
   <source>Maximum participants</source>
   <target>maximale Teilnehmer</target>
 </trans-unit>
+<trans-unit id="s840d9c93fd926ecb">
+  <source>Allow random assignments</source>
+  <target>Zufällige Projektzuweisungen erlaubt</target>
+</trans-unit>
+<trans-unit id="sd0a19e0b6e7d20e2">
+  <source>Mark this project as deleted</source>
+</trans-unit>
 <trans-unit id="s7e3a936c4f113dd4">
   <source>Project leaders</source>
 </trans-unit>
 <trans-unit id="sea8d39886fdb9cf5">
   <source>Guaranteed project members</source>
-</trans-unit>
-<trans-unit id="s840d9c93fd926ecb">
-  <source>Allow random assignments</source>
-  <target>Zufällige Projektzuweisungen erlaubt</target>
-</trans-unit>
-<trans-unit id="sc8da3cc71de63832">
-  <source>Login</source>
-  <target>Anmelden</target>
-</trans-unit>
-<trans-unit id="s0561a43eeaf34c64">
-  <source>Login with third party account</source>
-  <target>Mit Schulaccount anmelden</target>
-</trans-unit>
-<trans-unit id="s8bfdcea2687691c2">
-  <source>Login as guest</source>
-  <target>Als Gast anmelden</target>
-</trans-unit>
-<trans-unit id="scdb1bac161852c73">
-  <source>Welcome</source>
-</trans-unit>
-<trans-unit id="se478d5906376d65e">
-  <source>This is some boilerplate welcome text that can be adapted by changing the translation.</source>
-</trans-unit>
-<trans-unit id="s7a391ae3182a86b5">
-  <source>Credits</source>
-</trans-unit>
-<trans-unit id="s1d7b0c0421a2c3bb">
-  <source>Copyright (C) 2021 Moritz Hedtke</source>
-</trans-unit>
-<trans-unit id="s002eca353a21fdbe">
-  <source>projektwahl-lit</source>
-</trans-unit>
-<trans-unit id="sd492e73c3bfe5cf7">
-  <source> is licensed under the </source>
-</trans-unit>
-<trans-unit id="sb998e2a6393b7b37">
-  <source>GNU Affero General Public License v3.0</source>
-</trans-unit>
-<trans-unit id="s199f5853f4e718f7">
-  <source>Projects</source>
-  <target>Projekte</target>
 </trans-unit>
 <trans-unit id="hc66aaa662761137a">
   <source>Not Found</source>
@@ -236,9 +233,14 @@ SPDX-FileCopyrightText: 2021 Moritz Hedtke <Moritz.Hedtke@t-online.de>
   <source>Logout <x id="0" equiv-text="${jscookie.get(&quot;username&quot;)}"/></source>
   <target><x id="0" equiv-text="${jscookie.get(&quot;username&quot;)}"/> abmelden</target>
 </trans-unit>
-<trans-unit id="s49730f3d5751a433">
-  <source>Loading...</source>
-  <target>Wird geladen...</target>
+<trans-unit id="sfebb69bee8b5102d">
+  <source>Source code</source>
+</trans-unit>
+<trans-unit id="s38921a33bbe6bbbf">
+  <source>Full license</source>
+</trans-unit>
+<trans-unit id="sab07cf2bfae8483f">
+  <source>Privacy Policy</source>
 </trans-unit>
 </body>
 </file>
