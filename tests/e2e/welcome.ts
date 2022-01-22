@@ -151,14 +151,11 @@ try {
   {
     // view user
 
-    await driver.executeScript(
-      "arguments[0].scrollIntoView(true);",
-      accountsLink
-    );
+    const accountsLink2 = await (
+      await shadow(pwApp)
+    ).findElement(By.css('a[href="/users"]'));
 
-    await driver.sleep(250);
-
-    await click(accountsLink);
+    await click(accountsLink2);
 
     const pwUsers = await (await shadow(pwApp)).findElement(By.css("pw-users"));
 
