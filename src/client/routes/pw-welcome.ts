@@ -47,8 +47,7 @@ export const PwWelcome = setupHmr(
           <p>
             projektwahl-lit is a software to manage choosing projects and
             automatically assigning people to projects.<br />
-            Copyright (C) 2021 Moritz Hedtke &lt;Moritz.Hedtke at t-online dot
-            de&gt;
+            Copyright (C) 2021 Moritz Hedtke &lt;Moritz.Hedtke@t-online.de&gt;
           </p>
 
           <p>
