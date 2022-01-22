@@ -77,6 +77,14 @@ function identity<
 }*/
 
 const pages = {
+  "^/privacy$": async () => {
+    await import("./routes/pw-privacy.js");
+    return html`<pw-privacy></pw-privacy>`;
+  },
+  "^/imprint$": async () => {
+    await import("./routes/pw-imprint.js");
+    return html`<pw-imprint></pw-imprint>`;
+  },
   "^/$": async () => {
     await import("./routes/pw-welcome.js");
     return html`<pw-welcome></pw-welcome>`;
