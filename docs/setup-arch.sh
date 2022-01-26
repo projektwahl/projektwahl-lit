@@ -48,10 +48,15 @@ cat debug.txt
 reboot
 
 
-script_verbose=info /usr/lib/mkinitcpio-systemd-tool/initrd-shell.sh
+#script_verbose=info /usr/lib/mkinitcpio-systemd-tool/initrd-shell.sh
 
 
-ls /run/systemd/ask-password/
+#ls /run/systemd/ask-password/
 
-systemctl list-jobs
-systemd-ask-password
+#systemctl list-jobs
+#systemd-ask-password
+
+useradd -m -G wheel moritz
+passwd moritz
+ssh-copy-id moritz@162.55.211.18
+
