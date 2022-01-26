@@ -11,7 +11,6 @@ import {
 import chrome from "selenium-webdriver/chrome.js";
 //import repl from "repl";
 import crypto from "node:crypto";
-import { Command } from "selenium-webdriver/lib/command";
 const webcrypto = crypto.webcrypto as unknown as Crypto;
 
 if (!process.env["BASE_URL"]) {
@@ -72,8 +71,8 @@ await driver.manage().window().setRect({
 });
 
 try {
-  // the typescript bindings are heavily outdated
-  // @ts-expect-error
+  // @ts-expect-error the typescript bindings are heavily outdated
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-call
   await driver.setNetworkConditions({
     offline: false,
     latency: 100, // Additional latency (ms).
