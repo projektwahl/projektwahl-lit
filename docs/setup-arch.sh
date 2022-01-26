@@ -92,6 +92,7 @@ sudo ufw allow http
 sudo ufw allow https
 
 
-
+sudo nano /etc/nginx/nginx.conf
+# edit server_name aes.selfmade4u.de
 sudo pacman -S certbot-nginx
 sudo certbot --nginx -d aes.selfmade4u.de -m Moritz.Hedtke@t-online.de --agree-tos -n
