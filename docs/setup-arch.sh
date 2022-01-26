@@ -66,4 +66,8 @@ exit
 ssh-copy-id moritz@162.55.211.18
 
 ssh moritz@162.55.211.18
+sudo nano /etc/ssh/sshd_config
+Port 2121
+PermitRootLogin no              
+sudo systemctl restart sshd
 
