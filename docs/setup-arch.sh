@@ -85,3 +85,9 @@ sudo pacman -S postgresql
 sudo -iu postgres initdb -D /var/lib/postgres/data
 sudo systemctl --now enable postgresql
 sudo pacman -S nodejs
+
+sudo pacman -S nginx-mainline
+sudo systemctl enable --now nginx
+sudo ufw allow http
+sudo ufw allow https
+
