@@ -33,7 +33,11 @@ export const PwPrivacy = setupHmr(
       return html`
         ${bootstrapCss}
 
-        
+        <h1 class="text-center">Datenschutzerklärung</h1>
+
+        <h2 class="text-center">Verantwortlicher</h2>
+
+        Der Name und die Kontaktdaten des Verantwortlichen nach <a href="https://eur-lex.europa.eu/legal-content/DE/TXT/HTML/?uri=CELEX:32016R0679&from=DE#d1e2269-1-1">Artikel 13 Absatz 1a DSGVO</a> lauten:
       `;
     }
   }
