@@ -56,7 +56,14 @@ reboot
 #systemctl list-jobs
 #systemd-ask-password
 
+pacman -S sudo
+visudo
+# uncomment wheel line
+
 useradd -m -G wheel moritz
 passwd moritz
+exit
 ssh-copy-id moritz@162.55.211.18
+
+ssh moritz@162.55.211.18
 
