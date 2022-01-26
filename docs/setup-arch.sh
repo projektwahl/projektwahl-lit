@@ -22,15 +22,14 @@ ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIKpm6jXKndgHfeANK/Dipr2f5x75EDY17/NfUieutEJ4
 nano /tmp/post-install.sh
 #!/bin/bash
 
-pacman -S mkinitcpio-systemd-tool
+pacman --noconfirm -S mkinitcpio-systemd-tool # tinyssh
 cat /etc/mkinitcpio.conf
-echo "HOOKS=(base autodetect modconf block filesystems keyboard fsck systemd systemd-tool)" > /etc/mkinitcpio.conf
+# echo "HOOKS=(base autodetect modconf block filesystems keyboard fsck systemd systemd-tool)" > /etc/mkinitcpio.conf
 
-edit /etc/mkinitcpio-systemd-tool/config/crypttab
-edit /etc/mkinitcpio-systemd-tool/config/fstab
+# nano /etc/mkinitcpio-systemd-tool/config/crypttab
+# nano /etc/mkinitcpio-systemd-tool/config/fstab
 systemctl enable initrd-cryptsetup.path
 systemctl enable initrd-tinysshd.service
-systemctl enable initrd-debug-progs.service
 systemctl enable initrd-sysroot-mount.service
 
 mkinitcpio -v -p linux > build.log
