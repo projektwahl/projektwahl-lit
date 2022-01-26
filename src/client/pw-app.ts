@@ -41,7 +41,7 @@ export const { getLocale, setLocale } = configureLocalization({
   targetLocales,
   loadLocale: (locale) => import(`/src/client/generated_locales/${locale}.js`),
 });
-await setLocale("de-aes")
+await setLocale("de-aes");
 
 // TODO FIXME show more details if possible (maybe error page)
 window.addEventListener("error", function (event) {
@@ -384,11 +384,19 @@ export class PwApp extends LitElement {
                 >${msg("License")}</a
               >
               |
-              <a @click=${aClick} href="/imprint" target="_blank" rel="noopener noreferrer"
+              <a
+                @click=${aClick}
+                href="/imprint"
+                target="_blank"
+                rel="noopener noreferrer"
                 >${msg("Imprint")}</a
               >
               |
-              <a @click=${aClick} href="/privacy" target="_blank" rel="noopener noreferrer"
+              <a
+                @click=${aClick}
+                href="/privacy"
+                target="_blank"
+                rel="noopener noreferrer"
                 >${msg("Privacy Policy")}</a
               >
             </span>
