@@ -80,3 +80,8 @@ sudo ufw default deny
 sudo ufw allow 2121
 sudo ufw logging off
 sudo ufw enable
+
+sudo pacman -S postgresql
+sudo -iu postgres initdb -D /var/lib/postgres/data
+sudo systemctl --now enable postgresql
+sudo pacman -S nodejs
