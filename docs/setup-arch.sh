@@ -22,7 +22,7 @@ ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIKpm6jXKndgHfeANK/Dipr2f5x75EDY17/NfUieutEJ4
 nano /tmp/post-install.sh
 #!/bin/bash
 
-pacman --noconfirm -S mkinitcpio-systemd-tool tinyssh
+pacman --noconfirm -S mkinitcpio-systemd-tool tinyssh busybox
 cat /etc/mkinitcpio.conf
 echo "HOOKS=(base autodetect modconf block filesystems keyboard fsck systemd systemd-tool)" >> /etc/mkinitcpio.conf
 
