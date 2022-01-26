@@ -40,4 +40,4 @@ chmod +x /tmp/post-install.sh
 
 
 installimage -a -c /tmp/setup.conf -x /tmp/post-install.sh
-
+cat debug.txt
