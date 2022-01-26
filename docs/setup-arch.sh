@@ -91,3 +91,7 @@ sudo systemctl enable --now nginx
 sudo ufw allow http
 sudo ufw allow https
 
+
+
+sudo pacman -S certbot-nginx
+sudo certbot --nginx -d aes.selfmade4u.de -m Moritz.Hedtke@t-online.de --agree-tos -n
