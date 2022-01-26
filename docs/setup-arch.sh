@@ -26,10 +26,10 @@ pacman --noconfirm -S mkinitcpio-systemd-tool tinyssh busybox cryptsetup
 cat /etc/mkinitcpio.conf
 echo "HOOKS=(base autodetect modconf block filesystems keyboard fsck systemd systemd-tool)" >> /etc/mkinitcpio.conf
 
-vi /etc/mkinitcpio-systemd-tool/config/crypttab
-#  root           /dev/sda1       none                luks
-vi /etc/mkinitcpio-systemd-tool/config/fstab
-#  /dev/mapper/root      /sysroot         auto         x-systemd.device-timeout=9999h     0       1
+#vi /etc/mkinitcpio-systemd-tool/config/crypttab
+echo "root           /dev/sda1       none                luks" >> /etc/mkinitcpio-systemd-tool/config/crypttab
+#vi /etc/mkinitcpio-systemd-tool/config/fstab
+echo "/dev/mapper/root      /sysroot         auto         x-systemd.device-timeout=9999h     0       1" >> /etc/mkinitcpio-systemd-tool/config/fstab
 systemctl enable initrd-cryptsetup.path
 systemctl enable initrd-tinysshd.service
 systemctl enable initrd-sysroot-mount.service
@@ -40,7 +40,6 @@ lsinitcpio -l /boot/initramfs-linux.img
 bash
 
 chmod +x /tmp/post-install.sh
-
 
 installimage -a -c /tmp/setup.conf -x /tmp/post-install.sh
 cat debug.txt
