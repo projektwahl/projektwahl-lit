@@ -68,6 +68,15 @@ ssh-copy-id moritz@162.55.211.18
 ssh moritz@162.55.211.18
 sudo nano /etc/ssh/sshd_config
 Port 2121
-PermitRootLogin no              
-sudo systemctl restart sshd
+PermitRootLogin no      
+PasswordAuthentication no
+AuthenticationMethods publickey
 
+sudo systemctl restart sshd
+ssh moritz@162.55.211.18 -p 2121
+
+sudo pacman -S ufw
+sudo ufw default deny
+sudo ufw allow 2121
+sudo ufw logging off
+sudo ufw enable
