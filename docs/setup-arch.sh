@@ -40,3 +40,8 @@ chmod +x /tmp/post-install.sh
 
 installimage -a -c /tmp/setup.conf -x /tmp/post-install.sh
 cat debug.txt
+
+reboot
+
+
+script_verbose=info /usr/lib/mkinitcpio-systemd-tool/initrd-shell.sh
