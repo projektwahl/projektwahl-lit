@@ -32,6 +32,7 @@ echo "root           /dev/sda1       none                luks" >> /etc/mkinitcpi
 echo "/dev/mapper/root      /sysroot         auto         x-systemd.device-timeout=9999h     0       1" >> /etc/mkinitcpio-systemd-tool/config/fstab
 systemctl enable initrd-cryptsetup.path
 systemctl enable initrd-tinysshd.service
+# systemctl enable initrd-debug-progs.service # really helpful also adds cryptsetup tool
 systemctl enable initrd-sysroot-mount.service
 
 mkinitcpio -v -p linux > build.log
