@@ -48,3 +48,5 @@ script_verbose=info /usr/lib/mkinitcpio-systemd-tool/initrd-shell.sh
 
 
 ls /run/systemd/ask-password/
+
+systemctl list-jobs
