@@ -27,7 +27,7 @@ cat /etc/mkinitcpio.conf
 echo "HOOKS=(base autodetect modconf block filesystems keyboard fsck systemd systemd-tool)" >> /etc/mkinitcpio.conf
 
 #vi /etc/mkinitcpio-systemd-tool/config/crypttab
-echo "root           /dev/sda1       none                luks" >> /etc/mkinitcpio-systemd-tool/config/crypttab
+echo "root           /dev/sda2       none                luks" >> /etc/mkinitcpio-systemd-tool/config/crypttab
 #vi /etc/mkinitcpio-systemd-tool/config/fstab
 echo "/dev/mapper/root      /sysroot         auto         x-systemd.device-timeout=9999h     0       1" >> /etc/mkinitcpio-systemd-tool/config/fstab
 systemctl enable initrd-cryptsetup.path
