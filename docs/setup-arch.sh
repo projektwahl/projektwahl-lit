@@ -24,7 +24,7 @@ nano /tmp/post-install.sh
 
 pacman --noconfirm -S mkinitcpio-systemd-tool tinyssh
 cat /etc/mkinitcpio.conf
-# echo "HOOKS=(base autodetect modconf block filesystems keyboard fsck systemd systemd-tool)" > /etc/mkinitcpio.conf
+echo "HOOKS=(base autodetect modconf block filesystems keyboard fsck systemd systemd-tool)" >> /etc/mkinitcpio.conf
 
 # nano /etc/mkinitcpio-systemd-tool/config/crypttab
 # nano /etc/mkinitcpio-systemd-tool/config/fstab
