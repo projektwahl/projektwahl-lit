@@ -17,4 +17,4 @@ sgdisk --print /dev/sda
 
 # https://wiki.archlinux.org/title/Dm-crypt/Encrypting_an_entire_system#Encrypted_boot_partition_(GRUB)
 # https://wiki.archlinux.org/title/GRUB#Encrypted_/boot
-cryptsetup luksFormat --type luks2 --pbkdf pbkdf2 /dev/sda1
+cryptsetup luksFormat --type luks2 --pbkdf pbkdf2 /dev/sda2
