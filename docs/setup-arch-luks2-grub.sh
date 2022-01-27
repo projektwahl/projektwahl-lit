@@ -1,4 +1,5 @@
 # THESE DONT WORK
+# probably easier if everything luks1 but well I never did this here before
 
 # boot with iso mounted
 # https://wiki.archlinux.org/title/Installation_guide
