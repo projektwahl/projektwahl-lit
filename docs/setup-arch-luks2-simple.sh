@@ -58,12 +58,16 @@ Name=en*
 
 [Network]
 Gateway=172.31.1.1
-DNS=185.12.64.1 185.12.64.2
+DNS=185.12.64.1
+DNS=185.12.64.2
 
 [Address]
 Address=168.119.156.152/32
 Peer=172.31.1.1/32
 
+
+
+systemctl enable systemd-resolved
 
 
 exit
