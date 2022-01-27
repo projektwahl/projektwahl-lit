@@ -57,7 +57,7 @@ nano /etc/systemd/network/20-wired.network
 Name=en*
 
 [Network]
-Address=2a01:4f8:c010:4c33::/64
+Address=2a01:4f8:c010:4c33::1/64
 Gateway=172.31.1.1
 Gateway=fe80::1
 DNS=185.12.64.1
