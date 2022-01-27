@@ -50,9 +50,9 @@ echo "GRUB_ENABLE_CRYPTODISK=y" >> /etc/default/grub
 blkid
 echo 'GRUB_CMDLINE_LINUX="cryptdevice=UUID=7d91ab1b-e428-441f-aa58-477586e04d13:root"' >> /etc/default/grub
 
-GRUB_PRELOAD_MODULES="part_gpt part_msdos luks cryptodisk lvm ext4"
+GRUB_PRELOAD_MODULES="part_gpt part_msdos luks cryptodisk lvm ext2"
 
-grub-install --target=i386-pc --modules="part_gpt part_msdos luks cryptodisk lvm ext4" --recheck /dev/sda
+grub-install --target=i386-pc --modules="part_gpt part_msdos luks cryptodisk lvm ext2" --recheck /dev/sda
 
 grub-mkconfig -o /boot/grub/grub.cfg
 
