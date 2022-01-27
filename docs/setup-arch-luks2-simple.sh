@@ -59,6 +59,11 @@ Gateway=172.31.1.1
 DNS=185.12.64.1 185.12.64.2
 
 
+exit
+sudo umount /mnt/boot
+sudo umount /mnt
+cryptsetup close root
+reboot
 
 # recover from liveiso
 mount /dev/sda3 /mnt
