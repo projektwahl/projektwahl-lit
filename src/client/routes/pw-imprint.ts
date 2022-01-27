@@ -20,7 +20,6 @@ https://github.com/projektwahl/projektwahl-lit
 SPDX-License-Identifier: AGPL-3.0-or-later
 SPDX-FileCopyrightText: 2021 Moritz Hedtke <Moritz.Hedtke@t-online.de>
 */
-import { msg } from "@lit/localize";
 import { html, LitElement } from "lit";
 import { setupHmr } from "../hmr.js";
 import { bootstrapCss } from "../index.js";
@@ -33,13 +32,16 @@ export const PwImprint = setupHmr(
         ${bootstrapCss}
 
         <div class="container">
-          <h1 class="text-center">${msg("Imprint")}</h1>
+          <h1 class="text-center">Impressum</h1>
 
-          <p>
-            ${msg(
-              "This is some boilerplate imprint text that can be adapted by changing the translation."
-            )}
-          </p>
+          <h2>Angaben gemäß § 5 TMG</h2>
+          <address>
+            Moritz Hedtke<br />
+            Anne-Frank-Straße 10<br />
+            64354 Reinheim<br />
+            Telefon: +49 (0) 6162 2918<br />
+            E-Mail: Moritz.Hedtke@t-online.de
+          </address>
         </div>
       `;
     }
