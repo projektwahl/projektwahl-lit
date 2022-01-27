@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <xliff version="1.2" xmlns="urn:oasis:names:tc:xliff:document:1.2">
-<file target-language="de" source-language="en" original="lit-localize-inputs" datatype="plaintext">
+<file target-language="de-aes" source-language="en" original="lit-localize-inputs" datatype="plaintext">
 <body>
 <trans-unit id="scdb1bac161852c73">
   <source>Welcome</source>
@@ -229,6 +229,7 @@
 </trans-unit>
 <trans-unit id="s1f7e12b71164c5da">
   <source>Imprint</source>
+  <target>Impressum</target>
 </trans-unit>
 <trans-unit id="sab07cf2bfae8483f">
   <source>Privacy Policy</source>

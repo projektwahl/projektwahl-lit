@@ -31,16 +31,17 @@ import { bootstrapCss } from "./index.js";
 import { HistoryController, HistoryState } from "./history-controller.js";
 import { aClick } from "./pw-a.js";
 import jscookie from "js-cookie";
-import { msg, str } from "@lit/localize";
-//import { sourceLocale, targetLocales } from "./generated_locales/locales.js";
+import { configureLocalization, msg, str } from "@lit/localize";
+import { sourceLocale, targetLocales } from "./generated_locales/locales.js";
 import { myFetch } from "./utils.js";
 import { Task, TaskStatus } from "@lit-labs/task";
 
-/**export const { getLocale, setLocale } = configureLocalization({
+export const { getLocale, setLocale } = configureLocalization({
   sourceLocale,
   targetLocales,
   loadLocale: (locale) => import(`/src/client/generated_locales/${locale}.js`),
-});*/
+});
+await setLocale("de-aes");
 
 // TODO FIXME show more details if possible (maybe error page)
 window.addEventListener("error", function (event) {
@@ -358,7 +359,7 @@ export class PwApp extends LitElement {
           })}
         </div>
 
-        <main class="flex-shrink-0">
+        <main class="flex-shrink-0 pb-3">
           ${this._apiTask.render({
             complete: (v) => v,
             error: (e) => e,
@@ -380,14 +381,22 @@ export class PwApp extends LitElement {
                 href="https://github.com/projektwahl/projektwahl-lit/blob/main/LICENSE"
                 target="_blank"
                 rel="noopener noreferrer"
-                >${msg("Full license")}</a
+                >${msg("License")}</a
               >
               |
-              <a href="/imprint" target="_blank" rel="noopener noreferrer"
+              <a
+                @click=${aClick}
+                href="/imprint"
+                target="_blank"
+                rel="noopener noreferrer"
                 >${msg("Imprint")}</a
               >
               |
-              <a href="/privacy" target="_blank" rel="noopener noreferrer"
+              <a
+                @click=${aClick}
+                href="/privacy"
+                target="_blank"
+                rel="noopener noreferrer"
                 >${msg("Privacy Policy")}</a
               >
             </span>
