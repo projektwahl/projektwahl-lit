@@ -85,3 +85,52 @@ mount /dev/sda3 /mnt
 mount /dev/sda2 /mnt/boot
 arch-chroot /mnt
 cryptsetup close root
+
+
+
+
+
+
+
+
+
+pacman -S sudo
+visudo
+# uncomment wheel line
+
+useradd -m -G wheel moritz
+passwd moritz
+exit
+ssh-copy-id moritz@162.55.211.18
+
+ssh moritz@162.55.211.18
+sudo nano /etc/ssh/sshd_config
+Port 2121
+PermitRootLogin no      
+PasswordAuthentication no
+AuthenticationMethods publickey
+
+sudo systemctl restart sshd
+ssh moritz@162.55.211.18 -p 2121
+
+sudo pacman -S ufw
+sudo ufw default deny
+sudo ufw allow 2121
+sudo ufw logging off
+sudo ufw enable
+
+sudo pacman -S postgresql
+sudo -iu postgres initdb -D /var/lib/postgres/data
+sudo systemctl --now enable postgresql
+sudo pacman -S nodejs
+
+sudo pacman -S nginx-mainline
+sudo systemctl enable --now nginx
+sudo ufw allow http
+sudo ufw allow https
+
+
+sudo nano /etc/nginx/nginx.conf
+# edit server_name aes.selfmade4u.de
+sudo pacman -S certbot-nginx
+sudo certbot --nginx -d aes.selfmade4u.de -m Moritz.Hedtke@t-online.de --agree-tos -n
