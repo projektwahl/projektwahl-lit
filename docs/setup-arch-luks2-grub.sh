@@ -2,9 +2,8 @@
 # https://wiki.archlinux.org/title/Installation_guide
 # https://wiki.archlinux.org/title/Install_Arch_Linux_from_existing_Linux
 ssh root@168.119.156.152
-timedatectl set-ntp true
 
-cryptsetup open --type plain -d /dev/urandom /dev/sda
+cryptsetup open --type plain -d /dev/urandom /dev/sda to_be_wiped
 dd if=/dev/zero of=/dev/mapper/to_be_wiped status=progress bs=1M 
 cryptsetup close to_be_wiped
 
@@ -52,7 +51,7 @@ pacman -S grub
 nano /etc/default/grub
 GRUB_ENABLE_CRYPTODISK=y
 
-cat /etc/fstab
+
 nano /etc/default/grub
 GRUB_CMDLINE_LINUX="... cryptdevice=UUID=ac3767c9-c918-40e1-be26-57224f756c2f:root ..."
 
