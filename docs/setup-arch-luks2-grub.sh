@@ -28,7 +28,8 @@ mount /dev/mapper/root /mnt
 pacstrap /mnt base linux
 genfstab -U /mnt >> /mnt/etc/fstab
 arch-chroot /mnt
-ln -sf /usr/share/zoneinfo/Region/City /etc/localtime
+pacman -S nano
+ln -sf /usr/share/zoneinfo/Europe/Berlin /etc/localtime
 hwclock --systohc
 nano /etc/locale.gen
 locale-gen
@@ -39,18 +40,21 @@ KEYMAP=de-latin1
 nano /etc/hostname
 arch-luks2
 
-nano /mnt/etc/mkinitcpio.conf
-HOOKS=(base udev autodetect keyboard keymap consolefont modconf block encrypt lvm2 filesystems fsck)
+nano /etc/mkinitcpio.conf
+HOOKS=(base udev autodetect keyboard keymap consolefont modconf block encrypt filesystems fsck)
 
 mkinitcpio -P
 
 passwd
 
+pacman -S grub
+
 nano /etc/default/grub
 GRUB_ENABLE_CRYPTODISK=y
 
+cat /etc/fstab
 nano /etc/default/grub
-GRUB_CMDLINE_LINUX="... cryptdevice=UUID=device-UUID:cryptlvm ..."
+GRUB_CMDLINE_LINUX="... cryptdevice=UUID=ac3767c9-c918-40e1-be26-57224f756c2f:root ..."
 
 grub-install --target=i386-pc --recheck /dev/sda
 
@@ -58,3 +62,12 @@ grub-mkconfig -o /boot/grub/grub.cfg
 
 # https://wiki.archlinux.org/title/Systemd-networkd
 
+systemctl enable systemd-networkd
+nano /etc/systemd/network/20-wired.network
+[Match] 
+Name=en*   
+
+[Network]
+Address=168.119.156.152/32
+Gateway=172.31.1.1
+DNS=185.12.64.1 185.12.64.2
