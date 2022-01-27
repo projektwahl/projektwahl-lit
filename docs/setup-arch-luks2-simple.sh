@@ -42,6 +42,7 @@ passwd
 
 pacman -S --noconfirm nano grub
 
+blkid | grep /dev/sda2
 echo 'GRUB_CMDLINE_LINUX="cryptdevice=UUID=b352c2ce-d336-4ea1-9c1d-75a45c7448aa:root root=/dev/mapper/root"' >> /etc/default/grub
 
 grub-install --target=i386-pc --recheck /dev/sda
