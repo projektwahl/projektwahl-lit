@@ -70,6 +70,10 @@ Peer=172.31.1.1/32
 systemctl enable systemd-resolved
 
 
+pacman -S openssh
+systemctl enable sshd
+
+
 exit
 sudo umount /mnt/boot
 sudo umount /mnt
