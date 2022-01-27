@@ -84,6 +84,94 @@ Gemäß <a href="https://eur-lex.europa.eu/legal-content/DE/TXT/HTML/?uri=CELEX:
 
 <h2 class="text-center">Anmeldung mit Microsoft-Schulaccount</h2>
 
+Bei der Anmeldung mit einem Microsoft-Schulaccount übermitteln Sie den Nutzernamen und das Passwort direkt an Microsoft. 
+Bei erfolgreichem Login erhalten wir Ihre Nutzer-ID, Name, Nutzername, E-Mail und weitere grundlegende Nutzerinformationen, sowie digital signierte Tokens, damit die Echtheit der Anmeldung verifiziert werden kann. Diese werden ausschließlich verwendet, um Sie auf unserer Website zu authentifizieren und nicht gespeichert. Es wird nur ein Sitzungs-Cookie gesetzt, das mit Ihrem lokalen Account verknüpft ist. Dieses gilt maximal wenige Tage und wird dann gelöscht.
+Sie können das Cookie in Ihrem Browser jederzeit löschen, wodurch sie abgemeldet werden. Wenn Sie den Logout-Button verwenden, wird ihre Sitzung auch auf dem Server gelöscht, was sicherer ist.
+
+<h2 class="text-center">Lokale Anmeldung</h2>
+Bei der lokalen Anmeldung übermitteln Sie uns direkt ihren Nutzernamen und das lokale Passwort über eine sicher verschlüsselte Verbindung. Das Passwort wird nicht gespeichert, sondern nur mithilfe eines „verschlüsselten“ Passworts (technisch genannt „gehasht“) geprüft und Sie ggf. angemeldet. Es wird ein Sitzungs-Cookie gesetzt, das mit Ihrem lokalen Account verknüpft ist. Dieses gilt maximal wenige Tage und wird dann gelöscht.
+Sie können das Cookie in Ihrem Browser jederzeit löschen, wodurch sie abgemeldet werden. Wenn Sie den Logout-Button verwenden, wird ihre Sitzung auch auf dem Server gelöscht, was sicherer ist.
+
+<h2 class="text-center">Rechte</h2>
+
+Gemäß <a href="https://eur-lex.europa.eu/legal-content/DE/TXT/HTML/?uri=CELEX:32016R0679&from=DE#d1e2528-1-1">Artikel 15 DSGVO</a> haben Sie das Recht auf Auskunft.
+Gemäß <a href="https://eur-lex.europa.eu/legal-content/DE/TXT/HTML/?uri=CELEX:32016R0679&from=DE#d1e2614-1-1">Artikel 16 DSGVO</a> haben Sie das Recht auf Berichtigung.
+Gemäß <a href="https://eur-lex.europa.eu/legal-content/DE/TXT/HTML/?uri=CELEX:32016R0679&from=DE#d1e2621-1-1">Artikel 17 DSGVO</a> haben Sie das Recht auf Löschung.
+Gemäß <a href="https://eur-lex.europa.eu/legal-content/DE/TXT/HTML/?uri=CELEX:32016R0679&from=DE#d1e2715-1-1">Artikel 18 DSGVO</a> haben Sie das Recht auf Einschränkung der Verarbeitung.
+Gemäß <a href="https://eur-lex.europa.eu/legal-content/DE/TXT/HTML/?uri=CELEX:32016R0679&from=DE#d1e2761-1-1">Artikel 19 DSGVO</a> werden allen Empfängern, denen personenbezogene Daten offengelegt wurden, jede Berichtigung, Löschung oder Einschränkung der Verarbeitung gemäß den dort genannten Einschränkungen mitgeteilt.
+Gemäß <a href="https://eur-lex.europa.eu/legal-content/DE/TXT/HTML/?uri=CELEX:32016R0679&from=DE#d1e2768-1-1">Artikel 20 DSGVO</a> haben Sie das Recht auf Datenübertragbarkeit.
+<strong>Gemäß <a href="https://eur-lex.europa.eu/legal-content/DE/TXT/HTML/?uri=CELEX:32016R0679&from=DE#d1e2818-1-1">Artikel 21 DSGVO</a> haben Sie das Recht, jederzeit gegen die Verarbeitung Sie betreffender personenbezogener Daten zu widersprechen.</strong>
+Mit Hetzner wurde ein Auftragsverarbeitungsvertrag nach <a href="https://eur-lex.europa.eu/legal-content/DE/TXT/HTML/?uri=CELEX:32016R0679&from=DE#d1e3162-1-1">Artikel 28 DSGVO</a> abgeschlossen.
+Ebenfalls werden die Daten im Einklang mit <a href="https://eur-lex.europa.eu/legal-content/DE/TXT/HTML/?uri=CELEX:32016R0679&from=DE#d1e3395-1-1">Artikel 32 DSGVO</a> sicher verarbeitet:
+
+<ul>
+
+<li>
+Die Verbindung zum Server ist TLS 1.2 oder TLS 1.3 verschlüsselt.
+</li>
+
+
+<li>
+Die Daten sind mit Passwörtern oder durch Anmeldung mit einem Microsoft-Schulaccount geschützt.
+</li>
+
+
+<li>
+Die personenbezogenen Daten sind vor unbefugter oder unrechtmäßiger Verarbeitung und vor unbeabsichtigtem Verlust, unbeabsichtigter Zerstörung oder unbeabsichtigter Schädigung durch geeignete technische und organisatorische Maßnahmen geschützt:
+
+<ul>
+
+
+
+
+<li>
+Sie werden auf einem Server in der Hetzner Cloud in Deutschland gespeichert und ein Auftragsverarbeitungsvertrag wurde abgeschlossen.
+</li>
+
+
+<li>
+Der Quellcode ist unter https://github.com/projektwahl/projektwahl-lit/ einsehbar.
+</li>
+
+
+<li>
+Die Entwicker führen Sicherheitstests durch, was unter https://github.com/projektwahl/projektwahl-lit/issues/56 einsehbar ist.
+</li>
+
+
+<li>
+Es gibt einen eigenen Server pro Projektwoche.
+</li>
+
+
+<li>
+Die Software auf dem Server wird stets auf dem aktuellen Stand gehalten.
+</li>
+
+
+<li>
+Es gibt explizit eine Kontaktadresse zum Melden von Sicherheitslücken, siehe https://github.com/projektwahl/projektwahl-lit/blob/main/SECURITY.md
+</li>
+
+
+<li>
+Nur Moritz Hedtke (und der Serverhoster Hetzner) haben direkten Zugriff auf den Server.
+</li>
+
+
+
+
+
+</ul>
+
+</li>
+
+</ul>
+
+Gemäß Artikel 34 DSGVO benachrichtigen wir Sie im Falle einer Verletzung des Schutzes Sie betreffender personenbezogener Daten.
+
+Gemäß Artikel 77 DSGVO haben Sie das Recht auf Beschwerde bei der zuständigen Aufsichtsbehörde.
+
 </div>
     `;
   }
