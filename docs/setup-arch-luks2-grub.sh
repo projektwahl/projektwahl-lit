@@ -22,8 +22,29 @@ cryptsetup open /dev/sda2 root
 mkfs.ext4 /dev/mapper/root
 mount /dev/mapper/root /mnt
 
+
+
+
+pacstrap /mnt base linux
+genfstab -U /mnt >> /mnt/etc/fstab
+arch-chroot /mnt
+ln -sf /usr/share/zoneinfo/Region/City /etc/localtime
+hwclock --systohc
+nano /etc/locale.gen
+locale-gen
+nano /etc/locale.conf
+LANG=en_US.UTF-8
+nano /etc/vconsole.conf
+KEYMAP=de-latin1
+nano /etc/hostname
+arch-luks2
+
 nano /mnt/etc/mkinitcpio.conf
 HOOKS=(base udev autodetect keyboard keymap consolefont modconf block encrypt lvm2 filesystems fsck)
+
+mkinitcpio -P
+
+passwd
 
 nano /etc/default/grub
 GRUB_ENABLE_CRYPTODISK=y
@@ -34,3 +55,6 @@ GRUB_CMDLINE_LINUX="... cryptdevice=UUID=device-UUID:cryptlvm ..."
 grub-install --target=i386-pc --recheck /dev/sda
 
 grub-mkconfig -o /boot/grub/grub.cfg
+
+# https://wiki.archlinux.org/title/Systemd-networkd
+
