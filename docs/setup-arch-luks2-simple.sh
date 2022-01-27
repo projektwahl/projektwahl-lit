@@ -101,9 +101,9 @@ visudo
 useradd -m -G wheel moritz
 passwd moritz
 exit
-ssh-copy-id moritz@162.55.211.18
+ssh-copy-id moritz@168.119.156.152
 
-ssh moritz@162.55.211.18
+ssh moritz@168.119.156.152
 sudo nano /etc/ssh/sshd_config
 Port 2121
 PermitRootLogin no      
@@ -111,7 +111,7 @@ PasswordAuthentication no
 AuthenticationMethods publickey
 
 sudo systemctl restart sshd
-ssh moritz@162.55.211.18 -p 2121
+ssh moritz@168.119.156.152 -p 2121
 
 sudo pacman -S ufw
 sudo ufw default deny
