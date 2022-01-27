@@ -52,8 +52,8 @@ pacman -S --noconfirm nano grub
  
 echo "GRUB_ENABLE_CRYPTODISK=y" >> /etc/default/grub
 
-blkid
-echo 'GRUB_CMDLINE_LINUX="cryptdevice=UUID=7d91ab1b-e428-441f-aa58-477586e04d13:root"' >> /etc/default/grub
+blkid | grep /dev/sda2
+echo 'GRUB_CMDLINE_LINUX="cryptdevice=UUID=b352c2ce-d336-4ea1-9c1d-75a45c7448aa:boot"' >> /etc/default/grub
 
 echo 'GRUB_PRELOAD_MODULES="part_gpt part_msdos luks cryptodisk ext2"' >> /etc/default/grub
 
