@@ -63,9 +63,8 @@ DNS=185.12.64.2
 
 [Address]
 Address=168.119.156.152/32
+Address=2a01:4f8:c010:4c33::/64
 Peer=172.31.1.1/32
-
-
 
 systemctl enable systemd-resolved
 
