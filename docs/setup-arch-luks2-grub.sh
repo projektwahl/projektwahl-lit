@@ -18,3 +18,19 @@ sgdisk --print /dev/sda
 # https://wiki.archlinux.org/title/Dm-crypt/Encrypting_an_entire_system#Encrypted_boot_partition_(GRUB)
 # https://wiki.archlinux.org/title/GRUB#Encrypted_/boot
 cryptsetup luksFormat --type luks2 --pbkdf pbkdf2 /dev/sda2
+cryptsetup open /dev/sda2 root
+mkfs.ext4 /dev/mapper/root
+mount /dev/mapper/root /mnt
+
+nano /mnt/etc/mkinitcpio.conf
+HOOKS=(base udev autodetect keyboard keymap consolefont modconf block encrypt lvm2 filesystems fsck)
+
+nano /etc/default/grub
+GRUB_ENABLE_CRYPTODISK=y
+
+nano /etc/default/grub
+GRUB_CMDLINE_LINUX="... cryptdevice=UUID=device-UUID:cryptlvm ..."
+
+grub-install --target=i386-pc --recheck /dev/sda
+
+grub-mkconfig -o /boot/grub/grub.cfg
