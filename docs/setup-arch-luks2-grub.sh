@@ -1,3 +1,5 @@
+# THESE DONT WORK
+
 # boot with iso mounted
 # https://wiki.archlinux.org/title/Installation_guide
 # https://wiki.archlinux.org/title/Install_Arch_Linux_from_existing_Linux
