@@ -78,3 +78,4 @@ DNS=185.12.64.1 185.12.64.2
 cryptsetup open /dev/sda2 root
 mount /dev/mapper/root /mnt
 arch-chroot /mnt
+cryptsetup close root
