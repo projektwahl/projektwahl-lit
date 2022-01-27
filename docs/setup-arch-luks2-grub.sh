@@ -10,6 +10,7 @@ cryptsetup close to_be_wiped
 
 sgdisk --clear /dev/sda
 sgdisk -n 0:0:+1MiB -t 0:ef02 -c 0:grub /dev/sda
+sgdisk -n 0:0:+512MiB -t 0:ea00 -c 0:boot /dev/sda
 sgdisk -n 0:0:0 -t 0:8300 -c 0:root /dev/sda
 sgdisk --print /dev/sda 
 
@@ -18,12 +19,15 @@ sgdisk --print /dev/sda
 # https://wiki.archlinux.org/title/Dm-crypt/Encrypting_an_entire_system#Encrypted_boot_partition_(GRUB)
 # seems to work badly without lvm
 # https://wiki.archlinux.org/title/GRUB#Encrypted_/boot
-cryptsetup luksFormat --type luks2 --pbkdf pbkdf2 /dev/sda2
-cryptsetup open /dev/sda2 root
+cryptsetup luksFormat --type luks2 /dev/sda3
+cryptsetup open /dev/sda3 root
 mkfs.ext4 /dev/mapper/root
 mount /dev/mapper/root /mnt
 
-
+cryptsetup luksFormat --type luks1 /dev/sda2
+cryptsetup open /dev/sda2 boot
+mkfs.ext4 /dev/mapper/boot
+mount /dev/mapper/boot /mnt/boot
 
 
 pacstrap /mnt base linux
@@ -50,9 +54,9 @@ echo "GRUB_ENABLE_CRYPTODISK=y" >> /etc/default/grub
 blkid
 echo 'GRUB_CMDLINE_LINUX="cryptdevice=UUID=7d91ab1b-e428-441f-aa58-477586e04d13:root"' >> /etc/default/grub
 
-GRUB_PRELOAD_MODULES="part_gpt part_msdos luks cryptodisk lvm ext2"
+echo 'GRUB_PRELOAD_MODULES="part_gpt part_msdos luks cryptodisk ext2"' >> /etc/default/grub
 
-grub-install --target=i386-pc --modules="part_gpt part_msdos luks cryptodisk lvm ext2" --recheck /dev/sda
+grub-install --target=i386-pc --modules="part_gpt part_msdos luks cryptodisk ext2" --recheck /dev/sda
 
 grub-mkconfig -o /boot/grub/grub.cfg
 
