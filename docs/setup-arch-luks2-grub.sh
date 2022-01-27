@@ -51,7 +51,7 @@ pacman -S grub
 nano /etc/default/grub
 GRUB_ENABLE_CRYPTODISK=y
 
-
+blkid
 nano /etc/default/grub
 GRUB_CMDLINE_LINUX="... cryptdevice=UUID=ac3767c9-c918-40e1-be26-57224f756c2f:root ..."
 
