@@ -56,7 +56,7 @@ const driver = await new Builder()
   )
   .setChromeOptions(
     new chrome.Options().addArguments(
-      //"--headless",
+      "--headless",
       "--no-sandbox",
       "--disable-dev-shm-usage"
     )

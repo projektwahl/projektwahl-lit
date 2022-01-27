@@ -7,7 +7,7 @@
   "output": {
     "outputDir": "./src/client/generated_locales/",
     "mode": "runtime",
-    "localeCodesModule": "./src/client/generated_locales/locales.js"
+    "localeCodesModule": "./src/client/generated_locales/locales.ts"
   },
   "interchange": {
     "format": "xliff",
