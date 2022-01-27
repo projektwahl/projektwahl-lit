@@ -2,12 +2,6 @@
 <xliff version="1.2" xmlns="urn:oasis:names:tc:xliff:document:1.2">
 <file target-language="de" source-language="en" original="lit-localize-inputs" datatype="plaintext">
 <body>
-<trans-unit id="s1f7e12b71164c5da">
-  <source>Imprint</source>
-</trans-unit>
-<trans-unit id="sd390c325eabf76cf">
-  <source>This is some boilerplate imprint text that can be adapted by changing the translation.</source>
-</trans-unit>
 <trans-unit id="scdb1bac161852c73">
   <source>Welcome</source>
 </trans-unit>
@@ -232,6 +226,9 @@
 </trans-unit>
 <trans-unit id="s17597a8bb4810524">
   <source>License</source>
+</trans-unit>
+<trans-unit id="s1f7e12b71164c5da">
+  <source>Imprint</source>
 </trans-unit>
 <trans-unit id="sab07cf2bfae8483f">
   <source>Privacy Policy</source>
