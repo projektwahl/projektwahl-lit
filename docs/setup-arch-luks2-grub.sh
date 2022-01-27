@@ -27,33 +27,26 @@ mount /dev/mapper/root /mnt
 pacstrap /mnt base linux
 genfstab -U /mnt >> /mnt/etc/fstab
 arch-chroot /mnt
-pacman -S nano
 ln -sf /usr/share/zoneinfo/Europe/Berlin /etc/localtime
 hwclock --systohc
-nano /etc/locale.gen
+echo "en_US.UTF-8 UTF-8" >> /etc/locale.gen
 locale-gen
-nano /etc/locale.conf
-LANG=en_US.UTF-8
-nano /etc/vconsole.conf
-KEYMAP=de-latin1
-nano /etc/hostname
-arch-luks2
+echo "LANG=en_US.UTF-8" >> /etc/locale.conf
+echo "KEYMAP=de-latin1" >> /etc/vconsole.conf
+echo "arch-luks2" >> /etc/hostname
 
-nano /etc/mkinitcpio.conf
-HOOKS=(base udev autodetect keyboard keymap consolefont modconf block encrypt filesystems fsck)
+echo "HOOKS=(base udev autodetect keyboard keymap consolefont modconf block encrypt filesystems fsck)" >> /etc/mkinitcpio.conf
 
 mkinitcpio -P
 
 passwd
 
-pacman -S grub
-
-nano /etc/default/grub
-GRUB_ENABLE_CRYPTODISK=y
+pacman -S --noconfirm nano grub
+ 
+echo "GRUB_ENABLE_CRYPTODISK=y" >> /etc/default/grub
 
 blkid
-nano /etc/default/grub
-GRUB_CMDLINE_LINUX="... cryptdevice=UUID=ac3767c9-c918-40e1-be26-57224f756c2f:root ..."
+echo 'GRUB_CMDLINE_LINUX="cryptdevice=UUID=7d91ab1b-e428-441f-aa58-477586e04d13:root"' >> /etc/default/grub
 
 grub-install --target=i386-pc --recheck /dev/sda
 
