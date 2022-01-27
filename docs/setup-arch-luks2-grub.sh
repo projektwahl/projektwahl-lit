@@ -8,7 +8,12 @@ cryptsetup open --type plain -d /dev/urandom /dev/sda
 dd if=/dev/zero of=/dev/mapper/to_be_wiped status=progress bs=1M 
 cryptsetup close to_be_wiped
 
-parted /dev/sda mklabel gpt mkpart boot boot 0MiB 1MiB set boot bios_grub on mkpart root ext4 1MiB 100% 
+sgdisk --clear /dev/sda
+sgdisk -n 0:0:+1MiB -t 0:ef02 -c 0:grub /dev/sda
+sgdisk -n 0:0:0 -t 0:8300 -c 0:root /dev/sda
+sgdisk --print /dev/sda 
+
+
 
 # https://wiki.archlinux.org/title/Dm-crypt/Encrypting_an_entire_system#Encrypted_boot_partition_(GRUB)
 # https://wiki.archlinux.org/title/GRUB#Encrypted_/boot
