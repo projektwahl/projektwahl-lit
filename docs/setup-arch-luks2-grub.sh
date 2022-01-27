@@ -27,6 +27,7 @@ mount /dev/mapper/root /mnt
 cryptsetup luksFormat --type luks1 /dev/sda2
 cryptsetup open /dev/sda2 boot
 mkfs.ext4 /dev/mapper/boot
+mkdir /mnt/boot
 mount /dev/mapper/boot /mnt/boot
 
 
