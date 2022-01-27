@@ -20,6 +20,7 @@ mkfs.ext4 /dev/mapper/root
 mount /dev/mapper/root /mnt
 
 mkfs.ext4 /dev/sda2
+mkdir /mnt/boot
 mount /dev/sda2 /mnt/boot
 
 pacstrap /mnt base linux
