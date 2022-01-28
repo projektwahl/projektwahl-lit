@@ -116,6 +116,11 @@ export class PwEntityList<
             detail: {} as z.infer<typeof entityRoutes[P]["request"]>,
           });
           (this.form.value as HTMLFormElement).dispatchEvent(formDataEvent);
+
+          console.log(encodeURIComponent(
+            JSON.stringify(formDataEvent.detail)
+          ))
+
           const result = await myFetch<P>(
             `${this.url}?${encodeURIComponent(
               JSON.stringify(formDataEvent.detail)

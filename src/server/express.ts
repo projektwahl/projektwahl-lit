@@ -108,11 +108,13 @@ export function requestHandler<P extends keyof typeof routes>(
           );
           //console.log(user)
         }
+        
+        const rawGetBody = decodeURIComponent(url.search).substring(1)
 
         const body =
           request.method === "POST"
             ? await json(request)
-            : JSON.parse(url.search);
+            : JSON.parse(rawGetBody);
         const requestBody = zod2result(routes[path].request, body);
         if (requestBody.success) {
           const [new_headers, responseBody] = await handler(

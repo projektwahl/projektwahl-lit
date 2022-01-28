@@ -31,10 +31,13 @@ import { pwOrder } from "../../entity-list/pw-order.js";
 import { ifDefined } from "lit/directives/if-defined.js";
 import { pwInput } from "../../form/pw-input.js";
 
+/*
+// TODO FIXME use pw-entitylists function here
 export const pwUsers = async (url: URL) => {
   const result = await taskFunction([url.searchParams]);
   return html`<pw-users title=${msg("Users")} .initial=${result}></pw-users>`;
 };
+*/
 
 export const taskFunction = async ([searchParams]: [URLSearchParams]) => {
   const response = await myFetch<"/api/v1/users">(

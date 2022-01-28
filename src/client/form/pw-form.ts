@@ -64,7 +64,7 @@ class PwForm<P extends keyof typeof routes> extends LitElement {
       composed: true,
       detail: {},
     });
-    this.form.value.dispatchEvent(formDataEvent);
+    this.form.value?.dispatchEvent(formDataEvent);
 
     return Object.keys(formDataEvent.detail);
   }
