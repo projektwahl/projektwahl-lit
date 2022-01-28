@@ -56,6 +56,10 @@ export class PwUsers extends PwEntityList<"/api/v1/users"> {
     super(taskFunction);
   }
 
+  override get url() {
+    return "/api/v1/users" as const;
+  }
+
   override get buttons() {
     return html` <a
       @click=${aClick}

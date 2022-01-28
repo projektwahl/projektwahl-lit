@@ -24,12 +24,13 @@ import { css, html, TemplateResult } from "lit";
 import { HistoryController } from "../history-controller.js";
 import { createRef, ref } from "lit/directives/ref.js";
 import { Task, TaskStatus } from "@lit-labs/task";
-import type { entityRoutes } from "../../lib/routes.js";
+import type { entityRoutes, routes } from "../../lib/routes.js";
 import type { z } from "zod";
 import { PwForm } from "../form/pw-form.js";
 import { bootstrapCss } from "../index.js";
 import { msg, str } from "@lit/localize";
 import { ifDefined } from "lit/directives/if-defined.js";
+import { myFetch } from "../utils.js";
 
 export class PwEntityList<
   P extends keyof typeof entityRoutes
@@ -71,6 +72,10 @@ export class PwEntityList<
     return "blub";
   }
 
+  get url(): P {
+    throw new Error("not implemented");
+  }
+
   _task!: Task<[URLSearchParams], z.infer<typeof entityRoutes[P]["response"]>>;
 
   formRef;
@@ -106,8 +111,34 @@ export class PwEntityList<
       this.initialRender = false;
 
       this._task = new Task(this, {
-        task: this.taskFunction,
-        args: () => [this.history.url.searchParams] as [URLSearchParams],
+        task: async () => {
+          const formDataEvent = new CustomEvent<
+            z.infer<typeof entityRoutes[P]["request"]>
+          >("myformdata", {
+            bubbles: true,
+            composed: true,
+            detail: {} as z.infer<typeof entityRoutes[P]["request"]>,
+          });
+          this.form.value?.dispatchEvent(formDataEvent);
+          const result = await myFetch<P>(
+            `${this.url}?${encodeURIComponent(
+              JSON.stringify(formDataEvent.detail)
+            )}`,
+            {
+              method: "GET",
+            }
+          );
+
+          HistoryController.goto(
+            new URL(
+              `?${encodeURIComponent(JSON.stringify(formDataEvent.detail))}`,
+              window.location.href
+            ),
+            {}
+          );
+
+          return result;
+        },
         autoRun: false, // TODO FIXME this would be way simpler if there would be a no first run or so
       });
 
