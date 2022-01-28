@@ -78,8 +78,6 @@ export class PwEntityList<
 
   _task!: Task<[URLSearchParams], z.infer<typeof entityRoutes[P]["response"]>>;
 
-  formRef;
-
   initialRender: boolean;
 
   initial: Promise<z.infer<typeof entityRoutes[P]["response"]>> | undefined;
@@ -101,8 +99,6 @@ export class PwEntityList<
 
     this.history = new HistoryController(this, /.*/);
 
-    this.formRef = createRef();
-
     this.initialRender = true;
   }
 
@@ -119,7 +115,7 @@ export class PwEntityList<
             composed: true,
             detail: {} as z.infer<typeof entityRoutes[P]["request"]>,
           });
-          this.form.value?.dispatchEvent(formDataEvent);
+          (this.form.value as HTMLFormElement).dispatchEvent(formDataEvent);
           const result = await myFetch<P>(
             `${this.url}?${encodeURIComponent(
               JSON.stringify(formDataEvent.detail)
@@ -207,7 +203,7 @@ export class PwEntityList<
         ${this.getErrors()}
 
         <form
-          ${ref(this.formRef)}
+          ${ref(this.form)}
           @input=${async () => {
             await this._task.run();
           }}
