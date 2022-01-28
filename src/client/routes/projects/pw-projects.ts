@@ -74,7 +74,7 @@ class PwProjects extends PwEntityList<"/api/v1/projects"> {
                     -->
         <th class="table-cell-hover p-0" scope="col">
           ${pwOrder<"/api/v1/projects">({
-            refreshEntityList: () => this._apiTask.run(),
+            refreshEntityList: () => this._task.run(),
             name: "id",
             title: msg("ID"),
           })}
@@ -82,7 +82,7 @@ class PwProjects extends PwEntityList<"/api/v1/projects"> {
 
         <th class="table-cell-hover p-0" scope="col">
           ${pwOrder<"/api/v1/projects">({
-            refreshEntityList: () => this._apiTask.run(),
+            refreshEntityList: () => this._task.run(),
             name: "title",
             title: msg("Title"),
           })}
@@ -90,7 +90,7 @@ class PwProjects extends PwEntityList<"/api/v1/projects"> {
 
         <th class="table-cell-hover p-0" scope="col">
           ${pwOrder<"/api/v1/projects">({
-            refreshEntityList: () => this._apiTask.run(),
+            refreshEntityList: () => this._task.run(),
             name: "info",
             title: msg("Info"),
           })}
@@ -136,7 +136,7 @@ class PwProjects extends PwEntityList<"/api/v1/projects"> {
   }
   override get body() {
     return html`
-      ${this._apiTask.render({
+      ${this._task.render({
         pending: () => {
           return noChange;
         },

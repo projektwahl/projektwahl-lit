@@ -76,7 +76,7 @@ export class PwUsers extends PwEntityList<"/api/v1/users"> {
     -->
         <th class="table-cell-hover p-0" scope="col">
           ${pwOrder<"/api/v1/users">({
-            refreshEntityList: () => this._apiTask.run(),
+            refreshEntityList: () => this._task.run(),
             name: "id",
             title: msg("ID"),
           })}
@@ -84,7 +84,7 @@ export class PwUsers extends PwEntityList<"/api/v1/users"> {
 
         <th class="table-cell-hover p-0" scope="col">
           ${pwOrder<"/api/v1/users">({
-            refreshEntityList: () => this._apiTask.run(),
+            refreshEntityList: () => this._task.run(),
             name: "username",
             title: msg("Name"),
           })}
@@ -92,7 +92,7 @@ export class PwUsers extends PwEntityList<"/api/v1/users"> {
 
         <th class="table-cell-hover p-0" scope="col">
           ${pwOrder<"/api/v1/users">({
-            refreshEntityList: () => this._apiTask.run(),
+            refreshEntityList: () => this._task.run(),
             name: "type",
             title: msg("Type"),
           })}
@@ -137,7 +137,7 @@ export class PwUsers extends PwEntityList<"/api/v1/users"> {
   }
 
   override get body() {
-    return html`${this._apiTask.render({
+    return html`${this._task.render({
       pending: () => {
         return noChange;
       },
