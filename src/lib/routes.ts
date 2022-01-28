@@ -231,6 +231,7 @@ const baseQuery = <
   z.object({
     paginationDirection: z.enum(["forwards", "backwards"]),
     paginationCursor: s.nullable(), // if this is null the start is at start/end depending on paginationDirection
+    filters: s,
     sorting: z.array(
       z.tuple([
         z.enum(
