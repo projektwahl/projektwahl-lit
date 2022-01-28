@@ -88,3 +88,9 @@ export const sleep = (timeout: number): Promise<void> => {
     }, timeout);
   });
 };
+
+type PathTree<T> = {
+  [P in keyof T]-?: T[P] extends object ? [P] | [P, ...Path<T[P]>] : [P];
+};
+
+export type Path<T> = PathTree<T>[keyof PathTree<T>];

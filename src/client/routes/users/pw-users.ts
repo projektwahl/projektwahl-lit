@@ -101,13 +101,12 @@ export class PwUsers extends PwEntityList<"/api/v1/users"> {
 
       <tr>
         <th scope="col">
-          ${pwInput<"/api/v1/users", "filters.id">({
+          ${pwInput<"/api/v1/users", ["filters", "id"]>({
             label: null,
-            name: "filters.id",
+            name: ["filters", "id"],
             task: this._task,
             type: "number",
-            initial: this.initial, // TODO FIXME put this into task (as initial data),
-            update: (v, r) => (v.filters.id = r),
+            initial: this.initial,
           })}
         </th>
 

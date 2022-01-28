@@ -29,11 +29,12 @@ import { createRef, ref } from "lit/directives/ref.js";
 import { repeat } from "lit/directives/repeat.js";
 import type { routes } from "../../lib/routes.js";
 import type { z } from "zod";
+import type { Path } from "../utils.js";
 
 // workaround see https://github.com/runem/lit-analyzer/issues/149#issuecomment-1006162839
 export function pwInput<
   P extends keyof typeof routes = never,
-  Q extends keyof z.infer<typeof routes[P]["request"]> & string = never
+  Q extends Path<z.infer<typeof routes[P]["request"]>> = never
 >(
   props: Pick<
     PwInput<P, Q>,
@@ -77,7 +78,7 @@ export function pwInput<
 
 export class PwInput<
   P extends keyof typeof routes,
-  Q extends keyof z.infer<typeof routes[P]["request"]> & string
+  Q extends Path<z.infer<typeof routes[P]["request"]>> = never
 > extends LitElement {
   static override get properties() {
     return {
