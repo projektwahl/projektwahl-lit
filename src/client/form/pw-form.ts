@@ -57,10 +57,6 @@ class PwForm<P extends keyof typeof routes> extends LitElement {
   // get the inputs from there and check that the errors returned from the server don't contain additional
   // this needs to be done dynamically as e.g. the create user form dynamically changes the form inputs
   // attributes. Otherwise we're eating errors and that's not healthy.xit
-  /** @abstract @type {() => import("lit").TemplateResult} */
-  getInputs(): import("lit").TemplateResult {
-    throw new Error(msg("getInputs must be implemented by subclass"));
-  }
 
   /** @private */ getCurrentInputElements() {
     const formDataEvent = new CustomEvent("myformdata", {
@@ -71,6 +67,25 @@ class PwForm<P extends keyof typeof routes> extends LitElement {
     this.form.value?.dispatchEvent(formDataEvent);
 
     return Object.keys(formDataEvent.detail);
+  }
+
+  getErrors() {
+    return this._task.render({
+      complete: (data) => {
+        if (!data.success) {
+          const errors = Object.entries(data.error)
+            .filter(([k]) => !this.getCurrentInputElements().includes(k))
+            .map(([k, v]) => html`${k}: ${v}<br />`);
+          if (errors.length > 0) {
+            return html`<div class="alert alert-danger" role="alert">
+              ${msg("Some errors occurred!")}<br />
+              ${errors}
+            </div>`;
+          }
+        }
+        return html``;
+      },
+    });
   }
 
   // https://www.chromestatus.com/feature/4708990554472448
@@ -105,24 +120,7 @@ if ('FormDataEvent' in window) {
 
         <div class="row justify-content-center">
           <div class="col-md-7 col-lg-8">
-            ${this._task.render({
-              complete: (data) => {
-                if (!data.success) {
-                  const errors = Object.entries(data.error)
-                    .filter(
-                      ([k]) => !this.getCurrentInputElements().includes(k)
-                    )
-                    .map(([k, v]) => html`${k}: ${v}<br />`);
-                  if (errors.length > 0) {
-                    return html`<div class="alert alert-danger" role="alert">
-                      ${msg("Some errors occurred!")}<br />
-                      ${errors}
-                    </div>`;
-                  }
-                }
-                return html``;
-              },
-            })}
+            ${this.getErrors()}
 
             <form
               ${ref(this.form)}

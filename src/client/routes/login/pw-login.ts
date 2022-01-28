@@ -29,6 +29,8 @@ import { HistoryController } from "../../history-controller.js";
 import { msg } from "@lit/localize";
 import "../../form/pw-input.js";
 import { pwInput } from "../../form/pw-input.js";
+import { bootstrapCss } from "../../index.js";
+import { ref } from "lit/directives/ref.js";
 
 class PwLogin extends PwForm<"/api/v1/login"> {
   static override get properties() {
@@ -71,29 +73,72 @@ class PwLogin extends PwForm<"/api/v1/login"> {
     });
   }
 
-  override getInputs() {
-    return html` <a
-        class="btn btn-primary btn-lg w-100 my-5"
-        href="/api/v1/openid-login"
-        role="button"
-        >${msg("Login with third party account")}</a
-      >
-      <h3 class="text-center">${msg("Login as guest")}</h3>
+  override render() {
+    if (this.actionText === undefined) {
+      throw new Error(msg("component not fully initialized"));
+    }
 
-      ${pwInput<"/api/v1/login", "username">({
-        type: "text",
-        autocomplete: "username",
-        label: msg("Username"),
-        name: "username",
-        task: this._task,
-      })}
-      ${pwInput<"/api/v1/login", "password">({
-        type: "password",
-        label: msg("Password"),
-        name: "password",
-        autocomplete: "current-password",
-        task: this._task,
-      })}`;
+    return html`
+      ${bootstrapCss}
+      <main class="container">
+        <h1 class="text-center">${this.actionText}</h1>
+
+        <div class="row justify-content-center">
+          <div class="col-md-7 col-lg-8">
+            ${this.getErrors()}
+
+            <form
+              ${ref(this.form)}
+              method="POST"
+              action="/no-javascript"
+              @submit=${async (event: Event) => {
+                event.preventDefault();
+
+                await this._task.run();
+              }}
+            >
+              <a
+                class="btn btn-primary btn-lg w-100 my-5"
+                href="/api/v1/openid-login"
+                role="button"
+                >${msg("Login with third party account")}</a
+              >
+              <h3 class="text-center">${msg("Login as guest")}</h3>
+
+              ${pwInput<"/api/v1/login", "username">({
+                type: "text",
+                autocomplete: "username",
+                label: msg("Username"),
+                name: "username",
+                task: this._task,
+              })}
+              ${pwInput<"/api/v1/login", "password">({
+                type: "password",
+                label: msg("Password"),
+                name: "password",
+                autocomplete: "current-password",
+                task: this._task,
+              })}
+              ${!this.disabled
+                ? html`
+                    <button
+                      type="submit"
+                      ?disabled=${this._task.render({
+                        pending: () => true,
+                        complete: () => false,
+                        initial: () => false,
+                      }) as boolean}
+                      class="btn btn-primary"
+                    >
+                      ${this.actionText}
+                    </button>
+                  `
+                : undefined}
+            </form>
+          </div>
+        </div>
+      </main>
+    `;
   }
 }
 
