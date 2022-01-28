@@ -66,7 +66,7 @@ export function pwInput<
     type=${type}
     ?disabled=${disabled}
     @change=${onchange}
-    label=${label}
+    .label=${label}
     .name=${name}
     .options=${options}
     autocomplete=${ifDefined(autocomplete)}
@@ -81,7 +81,7 @@ export class PwInput<
 > extends LitElement {
   static override get properties() {
     return {
-      label: { type: String },
+      label: { attribute: false },
       name: { type: String },
       type: { type: String },
       options: { attribute: false },
@@ -104,7 +104,7 @@ export class PwInput<
 
   randomId;
 
-  label!: string;
+  label!: string | null;
 
   name!: Q;
 
@@ -185,7 +185,7 @@ export class PwInput<
       ${bootstrapCss}
       <div class="mb-3">
         ${
-          this.type !== "checkbox"
+          this.type !== "checkbox" && this.label !== null
             ? html`<label for=${this.randomId} class="form-label"
                 >${this.label}:</label
               >`
@@ -262,7 +262,7 @@ export class PwInput<
             : undefined
         }
         ${
-          this.type === "checkbox"
+          this.type === "checkbox" && this.label !== null
             ? html`<label for=${this.randomId} class="form-check-label"
                 >${this.label}</label
               >`

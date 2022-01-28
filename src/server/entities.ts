@@ -74,7 +74,7 @@ export async function fetchData<
   ]
 ): Promise<[OutgoingHttpHeaders, z.infer<typeof entityRoutes[R]["response"]>]> {
   const entitySchema: entitesType[R] = entityRoutes[path];
-  
+
   // BaseQuery
 
   const query = _query;

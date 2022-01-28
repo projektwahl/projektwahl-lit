@@ -33,8 +33,4 @@ declare global {
   interface HTMLElementEventMap {
     myformdata: CustomEvent<Record<string, unknown>>;
   }
-
-  interface ObjectConstructor {
-    keys<T>(obj: T): Array<keyof T>
-  }
 }

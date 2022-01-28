@@ -110,7 +110,9 @@ export function requestHandler<P extends keyof typeof routes>(
         }
 
         const body =
-          request.method === "POST" ? await json(request) : JSON.parse(url.search);
+          request.method === "POST"
+            ? await json(request)
+            : JSON.parse(url.search);
         const requestBody = zod2result(routes[path].request, body);
         if (requestBody.success) {
           const [new_headers, responseBody] = await handler(

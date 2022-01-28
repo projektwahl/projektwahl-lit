@@ -222,17 +222,25 @@ const project = rawProjectSchema.pick({
 });
 
 const baseQuery = <
-T extends { [k: string]: ZodTypeAny },
-UnknownKeys extends UnknownKeysParam = "strip",
-Catchall extends ZodTypeAny = ZodTypeAny
+  T extends { [k: string]: ZodTypeAny },
+  UnknownKeys extends UnknownKeysParam = "strip",
+  Catchall extends ZodTypeAny = ZodTypeAny
 >(
-s: ZodObject<T, UnknownKeys, Catchall>
-) => z.object({
-  paginationDirection: z.enum(["forwards", "backwards"]),
-  paginationCursor: s.nullable(), // if this is null the start is at start/end depending on paginationDirection
-  sorting: z.array(z.tuple([z.enum(Object.keys(s.shape) as [keyof T & string, ...(keyof T & string)[]]), z.enum(["ASC", "DESC"])])), // TODO FIXME keys
-  paginationLimit: z.number()
-});
+  s: ZodObject<T, UnknownKeys, Catchall>
+) =>
+  z.object({
+    paginationDirection: z.enum(["forwards", "backwards"]),
+    paginationCursor: s.nullable(), // if this is null the start is at start/end depending on paginationDirection
+    sorting: z.array(
+      z.tuple([
+        z.enum(
+          Object.keys(s.shape) as [keyof T & string, ...(keyof T & string)[]]
+        ),
+        z.enum(["ASC", "DESC"]),
+      ])
+    ), // TODO FIXME keys
+    paginationLimit: z.number(),
+  });
 
 export const routes = identity({
   "/api/v1/logout": {

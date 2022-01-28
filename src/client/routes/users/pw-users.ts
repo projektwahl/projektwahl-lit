@@ -97,8 +97,8 @@ export class PwUsers extends PwEntityList<"/api/v1/users"> {
 
       <tr>
         <th scope="col">
-          ${pwInput<"/api/v1/users", "id">({
-            label: "bruh",
+          ${pwInput<"/api/v1/users", "">({
+            label: null,
             name: "f_id",
             task: this._task,
             type: "number",
@@ -107,23 +107,23 @@ export class PwUsers extends PwEntityList<"/api/v1/users"> {
         </th>
 
         <th scope="col">
-          <input
-            name="f_username"
-            type="text"
-            class="form-control"
-            id="projects-filter-{name}"
-            value=${ifDefined(f_username === null ? undefined : f_username)}
-          />
+          ${pwInput<"/api/v1/users", "">({
+            label: null,
+            name: "f_username",
+            task: this._task,
+            type: "text",
+            initial: this.initial,
+          })}
         </th>
 
         <th scope="col">
-          <input
-            name="f_type"
-            type="text"
-            class="form-control"
-            id="projects-filter-{name}"
-            value=${ifDefined(f_type === null ? undefined : f_type)}
-          />
+          ${pwInput<"/api/v1/users", "">({
+            label: null,
+            name: "f_type",
+            task: this._task,
+            type: "text",
+            initial: this.initial,
+          })}
         </th>
 
         <th scope="col"></th>
