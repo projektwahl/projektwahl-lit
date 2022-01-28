@@ -108,52 +108,6 @@ if ('FormDataEvent' in window) {
     return this;
   }
 */
-  override render() {
-    if (this.actionText === undefined) {
-      throw new Error(msg("component not fully initialized"));
-    }
-
-    return html`
-      ${bootstrapCss}
-      <main class="container">
-        <h1 class="text-center">${this.actionText}</h1>
-
-        <div class="row justify-content-center">
-          <div class="col-md-7 col-lg-8">
-            ${this.getErrors()}
-
-            <form
-              ${ref(this.form)}
-              method="POST"
-              action="/no-javascript"
-              @submit=${async (event: Event) => {
-                event.preventDefault();
-
-                await this._task.run();
-              }}
-            >
-              ${this.getInputs()}
-              ${!this.disabled
-                ? html`
-                    <button
-                      type="submit"
-                      ?disabled=${this._task.render({
-                        pending: () => true,
-                        complete: () => false,
-                        initial: () => false,
-                      }) as boolean}
-                      class="btn btn-primary"
-                    >
-                      ${this.actionText}
-                    </button>
-                  `
-                : undefined}
-            </form>
-          </div>
-        </div>
-      </main>
-    `;
-  }
 }
 
 export { PwForm };

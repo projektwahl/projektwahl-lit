@@ -120,11 +120,13 @@ export class PwEntityList<
       }
     }
 
-    return super.render();
+    if (this.actionText === undefined) {
+      throw new Error(msg("component not fully initialized"));
+    }
 
     return html`
       ${bootstrapCss}
-      <div class="container">
+      <main class="container">
         <div
           style="position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 1337;"
         >
@@ -170,6 +172,8 @@ export class PwEntityList<
             </select>
           </div>
         </div>
+
+        ${this.getErrors()}
 
         <form
           ${ref(this.formRef)}
@@ -266,7 +270,7 @@ export class PwEntityList<
               </nav>
             `
           : undefined}
-      </div>
+      </main>
     `;
   }
 }
