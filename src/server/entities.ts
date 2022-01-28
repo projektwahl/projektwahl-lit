@@ -74,54 +74,8 @@ export async function fetchData<
   ]
 ): Promise<[OutgoingHttpHeaders, z.infer<typeof entityRoutes[R]["response"]>]> {
   const entitySchema: entitesType[R] = entityRoutes[path];
-
-  const url = new URL(request.url, process.env.BASE_URL);
-
-  // TODO FIXME make all this a json object as get parameter
-
-  const pagination = z
-    .object({
-      p_cursor: z
-        .string()
-        .refine(
-          (s) => {
-            try {
-              JSON.parse(s);
-            } catch (e) {
-              return false;
-            }
-            return true;
-          },
-          {
-            message: "The cursor is invalid. This is an internal error.",
-          }
-        )
-        .transform((s) => JSON.parse(s) as unknown)
-        .optional(),
-      p_direction: z.enum(["forwards", "backwards"]).default("forwards"),
-      p_limit: z
-        .string()
-        .refine((s) => /^\d*$/.test(s))
-        .transform((s) => (s === "" ? undefined : Number(s)))
-        .default("10"),
-    })
-    .parse(
-      Object.fromEntries(
-        url.searchParams as unknown as Iterable<readonly [string, string]>
-      )
-    );
-
-  const sorting = z
-    .array(z.tuple([z.enum(columns), z.enum(["ASC", "DESC"])]))
-    .parse(url.searchParams.getAll("order").map((o) => o.split("-")));
-
-  // TODO FIXME remove this useless struct
-  const _query: BaseQuery<T> = {
-    paginationCursor: pagination.p_cursor as T,
-    paginationDirection: pagination.p_direction,
-    paginationLimit: pagination.p_limit,
-    sorting,
-  };
+  
+  // BaseQuery
 
   const query = _query;
 

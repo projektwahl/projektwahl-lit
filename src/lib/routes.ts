@@ -221,6 +221,19 @@ const project = rawProjectSchema.pick({
   deleted: true,
 });
 
+const baseQuery = <
+T extends { [k: string]: ZodTypeAny },
+UnknownKeys extends UnknownKeysParam = "strip",
+Catchall extends ZodTypeAny = ZodTypeAny
+>(
+s: ZodObject<T, UnknownKeys, Catchall>
+) => z.object({
+  paginationDirection: z.enum(["forwards", "backwards"]),
+  paginationCursor: s.nullable(), // if this is null the start is at start/end depending on paginationDirection
+  sorting: z.array(z.tuple([z.enum(Object.keys(s.shape) as [keyof T & string, ...(keyof T & string)[]]), z.enum(["ASC", "DESC"])])), // TODO FIXME keys
+  paginationLimit: z.number()
+});
+
 export const routes = identity({
   "/api/v1/logout": {
     request: z.any(),
@@ -255,7 +268,7 @@ export const routes = identity({
     response: result(z.object({}).extend({ id: z.number() })),
   },
   "/api/v1/users": {
-    request: z.undefined(),
+    request: baseQuery(rawUserSchema),
     response: result(
       z.object({
         entities: z.array(users(rawUserSchema)),
@@ -265,7 +278,7 @@ export const routes = identity({
     ),
   },
   "/api/v1/projects": {
-    request: z.undefined(),
+    request: baseQuery(rawProjectSchema),
     response: result(
       z.object({
         entities: z.array(project),

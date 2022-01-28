@@ -29,6 +29,7 @@ import { PwEntityList } from "../../entity-list/pw-entitylist.js";
 import { myFetch } from "../../utils.js";
 import { pwOrder } from "../../entity-list/pw-order.js";
 import { ifDefined } from "lit/directives/if-defined.js";
+import { pwInput } from "../../form/pw-input.js";
 
 export const pwUsers = async (url: URL) => {
   const result = await taskFunction([url.searchParams]);
@@ -66,14 +67,7 @@ export class PwUsers extends PwEntityList<"/api/v1/users"> {
   }
 
   override get head() {
-    const f_id = this.history.url.searchParams.get("f_id");
-    const f_username = this.history.url.searchParams.get("f_username");
-    const f_type = this.history.url.searchParams.get("f_type");
     return html`<tr>
-        <!--
-      do not support this without javascript because there is literally zero useful ways to do this useful.
-      the only nice way is probably submit buttons that do things like "oder_by_id_asc" and then redirect to the new state (because you need to remove the old state)
-    -->
         <th class="table-cell-hover p-0" scope="col">
           ${pwOrder<"/api/v1/users">({
             refreshEntityList: () => this._task.run(),
@@ -103,13 +97,13 @@ export class PwUsers extends PwEntityList<"/api/v1/users"> {
 
       <tr>
         <th scope="col">
-          <input
-            name="f_id"
-            type="text"
-            class="form-control"
-            id="projects-filter-{name}"
-            value=${ifDefined(f_id === null ? undefined : f_id)}
-          />
+          ${pwInput<"/api/v1/users", "id">({
+            label: "bruh",
+            name: "f_id",
+            task: this._task,
+            type: "number",
+            initial: this.initial,
+          })}
         </th>
 
         <th scope="col">

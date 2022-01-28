@@ -35,7 +35,7 @@ export async function projectsHandler(
   return await requestHandler(
     "GET",
     "/api/v1/projects",
-    async function (_, loggedInUser) {
+    async function (query, loggedInUser) {
       // helper is allowed to read the normal data
       // voter is allowed to read the normal data
 
@@ -60,23 +60,6 @@ export async function projectsHandler(
         ];
       }
 
-      const url = new URL(request.url, process.env.BASE_URL);
-
-      const filters = z
-        .object({
-          f_id: z
-            .string()
-            .refine((s) => /^\d*$/.test(s))
-            .transform((s) => (s === "" ? undefined : Number(s)))
-            .optional(),
-          f_title: z.string().optional(),
-        })
-        .parse(
-          Object.fromEntries(
-            url.searchParams as unknown as Iterable<readonly [string, string]>
-          )
-        );
-
       const columns = [
         "id",
         "title",
@@ -93,14 +76,14 @@ export async function projectsHandler(
 
       return await fetchData<
         z.infer<typeof rawProjectSchema>,
-        typeof filters,
+        typeof query,
         "/api/v1/projects"
       >(
         "/api/v1/projects" as const,
         request,
         "projects_with_deleted",
         columns,
-        filters,
+        query,
         {},
         (query) => {
           return sql2`(${!query.f_id} OR id = ${

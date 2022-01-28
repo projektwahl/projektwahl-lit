@@ -39,7 +39,7 @@ export async function usersHandler(
   return await requestHandler(
     "GET",
     "/api/v1/users",
-    async function (_, loggedInUser) {
+    async function (query, loggedInUser) {
       // helper is allowed to read the normal data
       // voter is not allowed to do anything
 
@@ -60,40 +60,6 @@ export async function usersHandler(
         ];
       }
 
-      const url = new URL(request.url, process.env.BASE_URL);
-
-      const filters = z
-        .object({
-          f_id: z
-            .string()
-            .refine((s) => /^\d*$/.test(s))
-            .transform((s) => (s === "" ? undefined : Number(s)))
-            .optional(),
-          f_username: z.string().optional(),
-          f_type: z
-            .string()
-            .refine((s: string): s is "admin" | "helper" | "voter" | "" =>
-              includes(["admin", "helper", "voter", ""] as const, s)
-            )
-            .transform((s) => (s === "" ? undefined : s))
-            .optional(),
-          f_project_leader_id: z
-            .string()
-            .refine((s) => /^\d*$/.test(s))
-            .transform((s) => (s === "" ? undefined : Number(s)))
-            .optional(),
-          f_force_in_project_id: z
-            .string()
-            .refine((s) => /^\d*$/.test(s))
-            .transform((s) => (s === "" ? undefined : Number(s)))
-            .optional(),
-        })
-        .parse(
-          Object.fromEntries(
-            url.searchParams as unknown as Iterable<readonly [string, string]>
-          )
-        );
-
       const columns = [
         "id",
         "type",
@@ -110,14 +76,14 @@ export async function usersHandler(
 
       return await fetchData<
         z.infer<typeof schema>,
-        typeof filters,
+        typeof query,
         "/api/v1/users"
       >(
         "/api/v1/users" as const,
         request,
         "users_with_deleted",
         columns,
-        filters,
+        query,
         {
           id: "nulls-first",
           type: "nulls-first",

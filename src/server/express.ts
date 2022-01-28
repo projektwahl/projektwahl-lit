@@ -84,7 +84,7 @@ export function requestHandler<P extends keyof typeof routes>(
         throw new Error("No CSRF header!");
       }
 
-      const url = new URL(request.url, "https://localhost:8443");
+      const url = new URL(request.url, process.env.BASE_URL);
       if (
         request.method === method &&
         new RegExp(path).test(/** @type {string} */ url.pathname)
@@ -110,7 +110,7 @@ export function requestHandler<P extends keyof typeof routes>(
         }
 
         const body =
-          request.method === "POST" ? await json(request) : undefined;
+          request.method === "POST" ? await json(request) : JSON.parse(url.search);
         const requestBody = zod2result(routes[path].request, body);
         if (requestBody.success) {
           const [new_headers, responseBody] = await handler(
