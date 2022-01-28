@@ -20,25 +20,27 @@ https://github.com/projektwahl/projektwahl-lit
 SPDX-License-Identifier: AGPL-3.0-or-later
 SPDX-FileCopyrightText: 2021 Moritz Hedtke <Moritz.Hedtke@t-online.de>
 */
-import { css, html, LitElement, TemplateResult } from "lit";
-import { bootstrapCss } from "../index.js";
+import { css, html, TemplateResult } from "lit";
 import { HistoryController } from "../history-controller.js";
-import { msg, str } from "@lit/localize";
 import { createRef, ref } from "lit/directives/ref.js";
 import { Task, TaskStatus } from "@lit-labs/task";
 import type { entityRoutes } from "../../lib/routes.js";
 import type { z } from "zod";
+import { PwForm } from "../form/pw-form.js";
+import { bootstrapCss } from "../index.js";
+import { msg, str } from "@lit/localize";
 import { ifDefined } from "lit/directives/if-defined.js";
 
 export class PwEntityList<
   P extends keyof typeof entityRoutes
-> extends LitElement {
+> extends PwForm<P> {
   static override get properties() {
     return {
       task: { attribute: false },
       initial: { attribute: false },
       initialRender: { state: true },
       debouncedUrl: { state: true },
+      ...super.properties,
     };
   }
 
@@ -65,10 +67,11 @@ export class PwEntityList<
     throw new Error("not implemented");
   }
 
-  protected _apiTask!: Task<
-    [URLSearchParams],
-    z.infer<typeof entityRoutes[P]["response"]>
-  >;
+  get actionText(): string {
+    return "blub";
+  }
+
+  _task!: Task<[URLSearchParams], z.infer<typeof entityRoutes[P]["response"]>>;
 
   formRef;
 
@@ -102,7 +105,7 @@ export class PwEntityList<
     if (this.initialRender) {
       this.initialRender = false;
 
-      this._apiTask = new Task(this, {
+      this._task = new Task(this, {
         task: this.taskFunction,
         args: () => [this.history.url.searchParams] as [URLSearchParams],
         autoRun: false, // TODO FIXME this would be way simpler if there would be a no first run or so
@@ -110,12 +113,14 @@ export class PwEntityList<
 
       if (this.initial !== undefined) {
         // TODO FIXME goddammit the private attributes get minified
-        this._apiTask.status = TaskStatus.COMPLETE;
+        this._task.status = TaskStatus.COMPLETE;
         // @ts-expect-error See https://github.com/lit/lit/issues/2367
-        this._apiTask.p = this.initial;
+        this._task.p = this.initial;
         // TODO FIXMe if we set the currentArgs here somehow I think this may work
       }
     }
+
+    return super.render();
 
     return html`
       ${bootstrapCss}
@@ -123,7 +128,7 @@ export class PwEntityList<
         <div
           style="position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 1337;"
         >
-          ${this._apiTask.render({
+          ${this._task.render({
             pending: () => html`<div
               class="spinner-grow text-primary"
               role="status"
@@ -140,12 +145,11 @@ export class PwEntityList<
             <select
               @change=${async (event: Event) => {
                 const url = new URL(window.location.href);
-                url.searchParams.set(
-                  "p_limit",
-                  (event.target as HTMLSelectElement).value
-                );
+                const value = JSON.parse(url.search);
+                value.limit = (event.target as HTMLSelectElement).value;
+                url.search = JSON.stringify(value);
                 HistoryController.goto(url, {});
-                await this._apiTask.run();
+                await this._task.run();
               }}
               .value=${this.history.url.searchParams.get("p_limit") ?? "10"}
               class="form-select"
@@ -170,30 +174,7 @@ export class PwEntityList<
         <form
           ${ref(this.formRef)}
           @input=${async () => {
-            // TODO FIXME convert to the better form api (then it needs urlsearchparams support)
-            const urlSearchParams = new URLSearchParams( // @ts-expect-error probably wrong typings
-              new FormData(this.formRef.value)
-            );
-            urlSearchParams.delete("order");
-            this.history.url.searchParams
-              .getAll("order")
-              .forEach((v) => urlSearchParams.append("order", v));
-            // @ts-expect-error terrible quick hack - don't look at this
-            if (this.projectId) {
-              if (urlSearchParams.has("f_project_leader_id")) {
-                // @ts-expect-error you know
-                urlSearchParams.set("f_project_leader_id", this.projectId); // eslint-disable-line @typescript-eslint/no-unsafe-argument
-              }
-              if (urlSearchParams.has("f_force_in_project_id")) {
-                // @ts-expect-error you know
-                urlSearchParams.set("f_force_in_project_id", this.projectId); // eslint-disable-line @typescript-eslint/no-unsafe-argument
-              }
-            }
-            HistoryController.goto(
-              new URL(`?${urlSearchParams.toString()}`, window.location.href),
-              {}
-            );
-            await this._apiTask.run();
+            await this._task.run();
           }}
           @submit=${(e: Event) => e.preventDefault()}
         >
@@ -207,48 +188,12 @@ export class PwEntityList<
           </table>
         </form>
 
-        ${this._apiTask.value?.success
+        ${this._task.value?.success
           ? html`
               <nav aria-label="${msg("navigation of user list")}">
                 <ul class="pagination justify-content-center">
                   <li
-                    class="page-item ${this._apiTask.value?.data
-                      .previousCursor === null
-                      ? "disabled"
-                      : ""}"
-                  >
-                    <a
-                      @click=${async (e: Event) => {
-                        e.preventDefault();
-                        const url = new URL(window.location.href);
-                        if (this._apiTask.value?.success) {
-                          url.searchParams.set(
-                            "p_cursor",
-                            JSON.stringify(
-                              this._apiTask.value?.data.previousCursor
-                            )
-                          );
-                        }
-                        url.searchParams.set("p_direction", "backwards");
-                        HistoryController.goto(url, {});
-                        await this._apiTask.run();
-                      }}
-                      class="page-link"
-                      href="/"
-                      aria-label="${msg("previous page")}"
-                      tabindex=${ifDefined(
-                        this._apiTask.value?.data.previousCursor === null
-                          ? undefined
-                          : -1
-                      )}
-                      aria-disabled=${this._apiTask.value?.data
-                        .previousCursor === null}
-                    >
-                      <span aria-hidden="true">&laquo;</span>
-                    </a>
-                  </li>
-                  <li
-                    class="page-item ${this._apiTask.value?.data.nextCursor ===
+                    class="page-item ${this._task.value?.data.previousCursor ===
                     null
                       ? "disabled"
                       : ""}"
@@ -257,25 +202,61 @@ export class PwEntityList<
                       @click=${async (e: Event) => {
                         e.preventDefault();
                         const url = new URL(window.location.href);
-                        if (this._apiTask.value?.success) {
+                        if (this._task.value?.success) {
                           url.searchParams.set(
                             "p_cursor",
-                            JSON.stringify(this._apiTask.value?.data.nextCursor)
+                            JSON.stringify(
+                              this._task.value?.data.previousCursor
+                            )
+                          );
+                        }
+                        url.searchParams.set("p_direction", "backwards");
+                        HistoryController.goto(url, {});
+                        await this._task.run();
+                      }}
+                      class="page-link"
+                      href="/"
+                      aria-label="${msg("previous page")}"
+                      tabindex=${ifDefined(
+                        this._task.value?.data.previousCursor === null
+                          ? undefined
+                          : -1
+                      )}
+                      aria-disabled=${this._task.value?.data.previousCursor ===
+                      null}
+                    >
+                      <span aria-hidden="true">&laquo;</span>
+                    </a>
+                  </li>
+                  <li
+                    class="page-item ${this._task.value?.data.nextCursor ===
+                    null
+                      ? "disabled"
+                      : ""}"
+                  >
+                    <a
+                      @click=${async (e: Event) => {
+                        e.preventDefault();
+                        const url = new URL(window.location.href);
+                        if (this._task.value?.success) {
+                          url.searchParams.set(
+                            "p_cursor",
+                            JSON.stringify(this._task.value?.data.nextCursor)
                           );
                         }
                         url.searchParams.set("p_direction", "forwards");
                         HistoryController.goto(url, {});
-                        await this._apiTask.run();
+                        await this._task.run();
                       }}
                       class="page-link"
                       href="/"
                       aria-label="${msg("next page")}"
                       tabindex=${ifDefined(
-                        this._apiTask.value?.data.nextCursor === null
+                        this._task.value?.data.nextCursor === null
                           ? undefined
                           : -1
                       )}
-                      aria-disabled=${this._apiTask.value?.data.nextCursor ===
+                      aria-disabled=${this._task.value?.data.nextCursor ===
                       null}
                     >
                       <span aria-hidden="true">&raquo;</span>
