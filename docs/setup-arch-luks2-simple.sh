@@ -95,7 +95,12 @@ lynis audit system
 
 
 # TODO https://wiki.archlinux.org/title/AppArmor
-
+pacman -S apparmor
+sudo systemctl enable --now apparmor
+cat /sys/kernel/security/lsm # on the arch not the installer system
+nano /etc/default/grub
+GRUB_CMDLINE_LINUX_DEFAULT="lsm=landlock,lockdown,yama,apparmor,bpf"
+grub-mkconfig -o /boot/grub/grub.cfg
 
 exit
 sudo umount /mnt/boot
