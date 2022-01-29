@@ -109,6 +109,7 @@ export class PwUsers extends PwEntityList<"/api/v1/users"> {
             name: ["filters", "id"],
             task: this._task,
             type: "number",
+            defaultValue: undefined,
             initial: this.initial,
           })}
         </th>

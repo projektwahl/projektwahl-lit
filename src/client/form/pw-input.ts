@@ -48,6 +48,7 @@ export function pwInput<
     | "name"
     | "options"
     | "task"
+    | "defaultValue"
   > &
     Partial<Pick<PwInput<P, Q>, "onchange">>
 ) {
@@ -61,6 +62,7 @@ export function pwInput<
     task,
     type,
     autocomplete,
+    defaultValue,
     ...rest
   } = props;
   let _ = rest;
@@ -75,6 +77,7 @@ export function pwInput<
     autocomplete=${ifDefined(autocomplete)}
     .task=${task}
     .initial=${initial}
+    .defaultValue=${defaultValue}
   ></pw-input>`;
 }
 
@@ -91,6 +94,7 @@ export class PwInput<
       autocomplete: { type: String },
       disabled: { type: Boolean },
       randomId: { state: true },
+      defaultValue: { attribute: false },
       task: {
         attribute: false,
         hasChanged: () => {
@@ -131,6 +135,8 @@ export class PwInput<
   // z.infer<typeof routes[P]["request"]>[Q]
   options?: { value: any; text: string }[];
 
+  defaultValue: any;
+
   constructor() {
     super();
     this.randomId = "id" + Math.random().toString().replace(".", "");
@@ -138,6 +144,8 @@ export class PwInput<
     this.type = "text";
 
     this.input = createRef();
+
+    this.defaultValue = null;
   }
 
   // because forms in shadow root are garbage
@@ -151,14 +159,14 @@ export class PwInput<
     if (this.type === "number") {
       set(event.detail, this.name as string[],
         (this.input.value as HTMLInputElement).value === ""
-          ? null
+          ? this.defaultValue
           : (this.input.value as HTMLInputElement).valueAsNumber);
     } else if (this.type === "checkbox") {
       set(event.detail, this.name as string[], (this.input.value as HTMLInputElement).checked);
     } else if (this.type === "select") {
       set(event.detail, this.name as string[],
         (this.input.value as HTMLSelectElement).selectedIndex == -1
-          ? null
+          ? this.defaultValue
           : (this.input.value as HTMLInputElement).value);
     } else {
       set(event.detail, this.name as string[], (this.input.value as HTMLInputElement).value);
