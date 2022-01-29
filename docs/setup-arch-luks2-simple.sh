@@ -112,12 +112,6 @@ sudo grub-mkconfig -o /boot/grub/grub.cfg
 sudo nano /etc/fstab
 proc	/proc	proc	nosuid,nodev,noexec,hidepid=2,gid=proc	0	0
 
-sudo mkdir /etc/systemd/logind.conf.d/
-sudo nano /etc/systemd/logind.conf.d/hidepid.conf
-
-
-cat /sys/kernel/security/lockdown
-
 
 # https://security.archlinux.org/
 
