@@ -86,7 +86,7 @@ pacman -S arch-audit
 arch-audit
 
 pacman -S lynis
-lynis audit system
+sudo lynis audit system
 
 
 sudo chmod 700 /boot
@@ -120,6 +120,11 @@ cat /sys/kernel/security/lockdown
 
 
 # https://security.archlinux.org/
+
+
+
+# TODO DNSSEC
+# TODO nginx A+ ssllabs
 
 
 # TODO backups
@@ -169,6 +174,18 @@ Port 2121
 PermitRootLogin no      
 PasswordAuthentication no
 AuthenticationMethods publickey
+
+
+AllowTcpForwarding no
+ClientAliveCountMax 2
+Compression no
+LogLevel verbose
+MaxAuthTries 3
+MaxSessions 2
+TCPKeepAlive no
+AllowAgentForwarding no
+
+
 
 sudo systemctl restart sshd
 ssh moritz@168.119.156.152 -p 2121
