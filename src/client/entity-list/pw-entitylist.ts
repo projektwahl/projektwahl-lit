@@ -113,13 +113,17 @@ export class PwEntityList<
           >("myformdata", {
             bubbles: true,
             composed: true,
-            detail: {} as z.infer<typeof entityRoutes[P]["request"]>,
+            detail: {
+              // TODO FIXME put old data from url in here (at least for some of them)
+              sorting: [],
+              paginationCursor: null,
+            } as z.infer<typeof entityRoutes[P]["request"]>,
           });
           (this.form.value as HTMLFormElement).dispatchEvent(formDataEvent);
 
-          console.log(encodeURIComponent(
+          console.log(
             JSON.stringify(formDataEvent.detail)
-          ))
+          )
 
           const result = await myFetch<P>(
             `${this.url}?${encodeURIComponent(

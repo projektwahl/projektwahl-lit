@@ -21,7 +21,7 @@ SPDX-License-Identifier: AGPL-3.0-or-later
 SPDX-FileCopyrightText: 2021 Moritz Hedtke <Moritz.Hedtke@t-online.de>
 */
 import type { ServerResponse } from "node:http";
-import { z } from "zod";
+import type { z } from "zod";
 import { rawUserSchema } from "../../../lib/routes.js";
 import { fetchData } from "../../entities.js";
 import { MyRequest, requestHandler } from "../../express.js";
@@ -75,30 +75,27 @@ export async function usersHandler(
       const schema = rawUserSchema;
 
       return await fetchData<
-        z.infer<typeof schema>,
-        typeof query,
         "/api/v1/users"
       >(
         "/api/v1/users" as const,
-        request,
         "users_with_deleted",
         columns,
         query,
-        {
+        /*{
           id: "nulls-first",
           type: "nulls-first",
           username: "nulls-first",
           password_hash: "nulls-first",
-        },
+        },*/
         (query) => {
-          return sql2`(${!query.f_id} OR id = ${
-            query.f_id ?? null
-          }) AND username LIKE ${"%" + (query.f_username ?? "") + "%"}
-           AND (${!query.f_project_leader_id} OR project_leader_id = ${
-            query.f_project_leader_id ?? null
+          return sql2`(${!query.filters.id} OR id = ${
+            query.filters.id ?? null
+          }) AND username LIKE ${"%" + (query.filters.username ?? "") + "%"}
+           AND (${!query.filters.project_leader_id} OR project_leader_id = ${
+            query.filters.project_leader_id ?? null
           })
-           AND (${!query.f_force_in_project_id} OR force_in_project_id = ${
-            query.f_force_in_project_id ?? null
+           AND (${!query.filters.force_in_project_id} OR force_in_project_id = ${
+            query.filters.force_in_project_id ?? null
           })`;
         }
       );

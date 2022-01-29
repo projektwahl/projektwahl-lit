@@ -21,11 +21,9 @@ SPDX-License-Identifier: AGPL-3.0-or-later
 SPDX-FileCopyrightText: 2021 Moritz Hedtke <Moritz.Hedtke@t-online.de>
 */
 import type { OutgoingHttpHeaders } from "node:http2";
-import { z } from "zod";
+import type { z } from "zod";
 import { entityRoutes } from "../lib/routes.js";
-import type { BaseQuery } from "../lib/types.js";
 import { sql } from "./database.js";
-import type { MyRequest } from "./express.js";
 import { sql2, unsafe2 } from "./sql/index.js";
 
 // Mapped Types
@@ -53,31 +51,20 @@ export function updateField<
 }
 
 export async function fetchData<
-  T extends {
-    id: number;
-    [index: string]: null | string | string[] | boolean | number;
-  },
-  Q,
   R extends keyof typeof entityRoutes
 >(
   path: R,
-  request: MyRequest,
   table: string,
   columns: readonly [string, ...string[]],
-  filters: Q,
-  orderByInfo: { [field: string]: "nulls-first" | "nulls-last" },
+  query: z.infer<typeof entityRoutes[R]["request"]>,
   customFilterQuery: (
-    query: Q
+    query: z.infer<typeof entityRoutes[R]["request"]>
   ) => [
     TemplateStringsArray,
     ...(null | string | string[] | boolean | number | Buffer)[]
   ]
 ): Promise<[OutgoingHttpHeaders, z.infer<typeof entityRoutes[R]["response"]>]> {
   const entitySchema: entitesType[R] = entityRoutes[path];
-
-  // BaseQuery
-
-  const query = _query;
 
   if (!query.sorting.find((e) => e[0] == "id")) {
     query.sorting.push(["id", "ASC"]);
@@ -102,7 +89,7 @@ export async function fetchData<
     finalQuery = sql2`(SELECT ${unsafe2(
       columns.map((c) => `"${c}"`).join(", ")
     )} FROM ${unsafe2(table)} WHERE ${customFilterQuery(
-      filters
+      query
     )} ORDER BY ${orderByQuery} LIMIT ${query.paginationLimit + 1})`;
   } else {
     const queries = query.sorting.map((value, index) => {
@@ -126,7 +113,7 @@ export async function fetchData<
       return sql2`(SELECT ${unsafe2(columns.join(", "))} FROM ${unsafe2(
         table
       )} WHERE ${customFilterQuery(
-        filters
+        query
       )} AND (${parts}) ORDER BY ${orderByQuery} LIMIT ${
         query.paginationLimit + 1
       })`;
@@ -159,21 +146,21 @@ export async function fetchData<
     entitesType[R]["response"]["options"][0]["shape"]["data"]
   >["previousCursor"] = null;
   // TODO FIXME also recalculate the other cursor because data could've been deleted in between / the filters have changed
-  if (pagination.p_direction === "forwards") {
-    if (pagination.p_cursor) {
+  if (query.paginationDirection === "forwards") {
+    if (query.paginationCursor) {
       previousCursor = entities[0] ?? null;
     }
-    if (entities.length > pagination.p_limit) {
+    if (entities.length > query.paginationLimit) {
       entities.pop();
       nextCursor = entities[entities.length - 1] ?? null;
     }
-  } else if (pagination.p_direction === "backwards") {
+  } else if (query.paginationDirection === "backwards") {
     entities = entities.reverse(); // fixup as we needed to switch up orders above
-    if (entities.length > pagination.p_limit) {
+    if (entities.length > query.paginationLimit) {
       entities.shift();
       previousCursor = entities[0] ?? null;
     }
-    if (pagination.p_cursor) {
+    if (query.paginationCursor) {
       nextCursor = entities[entities.length - 1] ?? null;
     }
   }
