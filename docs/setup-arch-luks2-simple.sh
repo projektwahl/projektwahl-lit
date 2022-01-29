@@ -62,16 +62,39 @@ Gateway=172.31.1.1
 Gateway=fe80::1
 DNS=185.12.64.1
 DNS=185.12.64.2
+LLMNR=no
 
 [Address]
 Address=168.119.156.152/32
 Peer=172.31.1.1/32
+
+
+
+sudo nano /etc/systemd/resolved.conf
+LLMNR=no
+
 
 systemctl enable systemd-resolved
 
 
 pacman -S openssh
 systemctl enable sshd
+
+
+
+pacman -S arch-audit
+arch-audit
+
+pacman -S lynis
+lynis audit system
+
+
+
+# https://security.archlinux.org/
+
+
+
+# TODO https://wiki.archlinux.org/title/AppArmor
 
 
 exit
