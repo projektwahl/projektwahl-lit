@@ -62,10 +62,17 @@ Gateway=172.31.1.1
 Gateway=fe80::1
 DNS=185.12.64.1
 DNS=185.12.64.2
+LLMNR=no
 
 [Address]
 Address=168.119.156.152/32
 Peer=172.31.1.1/32
+
+
+
+sudo nano /etc/systemd/resolved.conf
+LLMNR=no
+
 
 systemctl enable systemd-resolved
 
@@ -73,6 +80,58 @@ systemctl enable systemd-resolved
 pacman -S openssh
 systemctl enable sshd
 
+
+
+pacman -S arch-audit
+arch-audit
+
+pacman -S lynis
+sudo lynis audit system
+
+
+sudo chmod 700 /boot
+
+sudo nano /etc/profile
+umask 077
+
+# https://wiki.archlinux.org/title/Security
+sudo nano /etc/sysctl.d/42-my-hardenings.conf
+kernel.kptr_restrict=1
+net.core.bpf_jit_harden=2
+kernel.unprivileged_bpf_disabled=1
+kernel.kexec_load_disabled=1
+kernel.unprivileged_userns_clone=0
+
+
+
+sudo nano /etc/default/grub
+GRUB_CMDLINE_LINUX_DEFAULT="lockdown=confidentiality kernel.yama.ptrace_scope=2 module.sig_enforce=1"
+sudo grub-mkconfig -o /boot/grub/grub.cfg
+
+
+sudo nano /etc/fstab
+proc	/proc	proc	nosuid,nodev,noexec,hidepid=2,gid=proc	0	0
+
+
+# https://security.archlinux.org/
+
+
+
+# TODO DNSSEC
+# TODO nginx A+ ssllabs
+
+
+# TODO backups
+
+
+
+# TODO https://wiki.archlinux.org/title/AppArmor
+pacman -S apparmor
+sudo systemctl enable --now apparmor
+cat /sys/kernel/security/lsm # on the arch not the installer system
+nano /etc/default/grub
+GRUB_CMDLINE_LINUX_DEFAULT="lsm=landlock,lockdown,yama,apparmor,bpf"
+grub-mkconfig -o /boot/grub/grub.cfg
 
 exit
 sudo umount /mnt/boot
@@ -109,6 +168,18 @@ Port 2121
 PermitRootLogin no      
 PasswordAuthentication no
 AuthenticationMethods publickey
+
+
+AllowTcpForwarding no
+ClientAliveCountMax 2
+Compression no
+LogLevel verbose
+MaxAuthTries 3
+MaxSessions 2
+TCPKeepAlive no
+AllowAgentForwarding no
+
+
 
 sudo systemctl restart sshd
 ssh moritz@168.119.156.152 -p 2121
