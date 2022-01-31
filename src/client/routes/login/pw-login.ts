@@ -105,17 +105,17 @@ class PwLogin extends PwForm<"/api/v1/login"> {
               >
               <h3 class="text-center">${msg("Login as guest")}</h3>
 
-              ${pwInput<"/api/v1/login", "username">({
+              ${pwInput<"/api/v1/login", ["username"]>({
                 type: "text",
                 autocomplete: "username",
                 label: msg("Username"),
-                name: "username",
+                name: ["username"],
                 task: this._task,
               })}
-              ${pwInput<"/api/v1/login", "password">({
+              ${pwInput<"/api/v1/login", ["password"]>({
                 type: "password",
                 label: msg("Password"),
-                name: "password",
+                name: ["password"],
                 autocomplete: "current-password",
                 task: this._task,
               })}

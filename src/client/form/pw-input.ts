@@ -133,7 +133,7 @@ export class PwInput<
   // z.infer<typeof routes[P]["request"]>[Q]
   options?: { value: any; text: string }[];
 
-  defaultValue: any;
+  defaultValue?: any;
 
   constructor() {
     super();
