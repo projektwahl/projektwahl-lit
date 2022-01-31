@@ -27,11 +27,12 @@ import { ifDefined } from "lit/directives/if-defined.js";
 import { msg } from "@lit/localize";
 import { createRef, ref } from "lit/directives/ref.js";
 import { repeat } from "lit/directives/repeat.js";
-import type { routes } from "../../lib/routes.js";
+import type { routes, ResponseType } from "../../lib/routes.js";
 import type { z } from "zod";
 import type { Path } from "../utils.js";
 import get from "lodash-es/get.js";
 import set from "lodash-es/set.js";
+import type { Task } from "@lit-labs/task";
 
 // workaround see https://github.com/runem/lit-analyzer/issues/149#issuecomment-1006162839
 export function pwInput<
@@ -119,10 +120,7 @@ export class PwInput<
 
   autocomplete?: "username" | "current-password" | "new-password";
 
-  task!: import("@lit-labs/task").Task<
-    unknown[],
-    z.infer<typeof routes[P]["response"]>
-  >;
+  task!: Task<[URLSearchParams], ResponseType<P>>;
 
   initial?: z.infer<typeof routes[P]["request"]>;
 
@@ -228,7 +226,7 @@ export class PwInput<
           } ${this.task.render({
       pending: () => "",
       complete: (v) =>
-        !v.success && get(v.error, this.name as string[]) !== undefined
+        !v.success && v.error.issues.find(i => JSON.stringify(i.path) == JSON.stringify(this.name)) !== undefined
           ? "is-invalid"
           : "is-valid",
       initial: () => "",
@@ -299,12 +297,12 @@ export class PwInput<
         ${this.task.render({
           complete: (v) => {
             if (!v.success) {
-              if (get(v.error, this.name as string[]) !== undefined) {
+              if (v.error.issues.find(i => JSON.stringify(i.path) == JSON.stringify(this.name)) !== undefined) {
                 return html` <div
                   id="${this.randomId}-feedback"
                   class="invalid-feedback"
                 >
-                  ${get(v.error, this.name as string[])}
+                  ${v.error.issues.find(i => JSON.stringify(i.path) == JSON.stringify(this.name))?.message}
                 </div>`;
               }
               return undefined;
