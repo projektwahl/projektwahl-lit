@@ -20,9 +20,9 @@ https://github.com/projektwahl/projektwahl-lit
 SPDX-License-Identifier: AGPL-3.0-or-later
 SPDX-FileCopyrightText: 2021 Moritz Hedtke <Moritz.Hedtke@t-online.de>
 */
-import type { ServerResponse } from "node:http";
-import type { z } from "zod";
-import { rawUserSchema } from "../../../lib/routes.js";
+import type { OutgoingHttpHeaders, ServerResponse } from "node:http";
+import { z, ZodIssueCode } from "zod";
+import { rawUserSchema, ResponseType } from "../../../lib/routes.js";
 import { fetchData } from "../../entities.js";
 import { MyRequest, requestHandler } from "../../express.js";
 import { sql2 } from "../../sql/index.js";
@@ -46,7 +46,7 @@ export async function usersHandler(
       if (
         !(loggedInUser?.type === "admin" || loggedInUser?.type === "helper")
       ) {
-        return [
+        const ret: [OutgoingHttpHeaders, ResponseType<"/api/v1/users">] = [
           {
             "content-type": "text/json; charset=utf-8",
             ":status": 403,
@@ -54,7 +54,13 @@ export async function usersHandler(
           {
             success: false as const,
             error: {
-              forbidden: "Insufficient permissions!",
+                issues: [
+{
+  code: ZodIssueCode.custom,
+  path: ["forbidden"],
+  message: "Insufficient permissions!",
+}
+                ]
             },
           },
         ];
@@ -74,7 +80,7 @@ export async function usersHandler(
 
       const schema = rawUserSchema;
 
-      return await fetchData<
+      const ret: [OutgoingHttpHeaders, ResponseType<"/api/v1/users">] = await fetchData<
         "/api/v1/users"
       >(
         "/api/v1/users" as const,
@@ -99,6 +105,7 @@ export async function usersHandler(
           })`;
         }
       );
+      return ret;
     }
   )(request, response);
 }

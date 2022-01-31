@@ -97,6 +97,7 @@ export function requestHandler<P extends keyof typeof routes>(
           request.method === "GET" ? cookies.lax_id : cookies.strict_id;
 
         // implementing https://datatracker.ietf.org/doc/html/draft-ietf-httpbis-rfc6265bis-02#section-8.8.2
+        // TODO FIXME don't do all this for static resource requests
         if (session_id) {
           user = userSchema.parse(
             (

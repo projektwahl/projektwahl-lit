@@ -22,7 +22,7 @@ SPDX-FileCopyrightText: 2021 Moritz Hedtke <Moritz.Hedtke@t-online.de>
 */
 import type { OutgoingHttpHeaders } from "node:http2";
 import type { z } from "zod";
-import { entityRoutes } from "../lib/routes.js";
+import { entityRoutes, ResponseType } from "../lib/routes.js";
 import { sql } from "./database.js";
 import { sql2, unsafe2 } from "./sql/index.js";
 
@@ -63,7 +63,7 @@ export async function fetchData<
     TemplateStringsArray,
     ...(null | string | string[] | boolean | number | Buffer)[]
   ]
-): Promise<[OutgoingHttpHeaders, z.infer<typeof entityRoutes[R]["response"]>]> {
+): Promise<[OutgoingHttpHeaders, ResponseType<R>]> {
   const entitySchema: entitesType[R] = entityRoutes[path];
 
   if (!query.sorting.find((e) => e[0] == "id")) {
