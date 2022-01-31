@@ -21,7 +21,6 @@ SPDX-License-Identifier: AGPL-3.0-or-later
 SPDX-FileCopyrightText: 2021 Moritz Hedtke <Moritz.Hedtke@t-online.de>
 */
 
-import { zod2result } from "../lib/result.js";
 import { json } from "node:stream/consumers";
 import { URL } from "url";
 import { rawUserSchema, routes, UnknownKeysParam } from "../lib/routes.js";
@@ -115,7 +114,7 @@ export function requestHandler<P extends keyof typeof routes>(
           request.method === "POST"
             ? await json(request)
             : JSON.parse(rawGetBody);
-        const requestBody = zod2result(routes[path].request, body);
+        const requestBody = routes[path].request.safeParse(body);
         if (requestBody.success) {
           const [new_headers, responseBody] = await handler(
             requestBody.data,
@@ -131,7 +130,9 @@ export function requestHandler<P extends keyof typeof routes>(
           });
           response.end(JSON.stringify(responseBody));
         } else {
-          //console.log(requestBody);
+          // https://github.com/colinhacks/zod/blob/master/ERROR_HANDLING.md
+          console.log(requestBody.error.issues)
+
           response.writeHead(200, {
             ...defaultHeaders,
             "content-type": "text/json; charset=utf-8",

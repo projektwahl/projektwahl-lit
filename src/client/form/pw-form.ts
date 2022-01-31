@@ -73,13 +73,13 @@ class PwForm<P extends keyof typeof routes> extends LitElement {
     return this._task.render({
       complete: (data) => {
         if (!data.success) {
-          const errors = Object.entries(data.error)
+          /*const errors = Object.entries(data.error)
             .filter(([k]) => !this.getCurrentInputElements().includes(k))
-            .map(([k, v]) => html`${k}: ${v}<br />`);
-          if (errors.length > 0) {
+            .map(([k, v]) => html`${k}: ${v}<br />`);*/
+          if (data.error.issues > 0) {
             return html`<div class="alert alert-danger" role="alert">
               ${msg("Some errors occurred!")}<br />
-              ${errors}
+              ${data.error.issues}
             </div>`;
           }
         }
