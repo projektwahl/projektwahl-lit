@@ -62,7 +62,7 @@ export function requestHandler<P extends keyof typeof routes>(
     r: z.infer<typeof routes[P]["request"]>,
     user: z.infer<typeof userSchema>,
     session_id: string | undefined
-  ) => PromiseLike<[OutgoingHttpHeaders, z.infer<typeof routes[P]["response"]>]>
+  ) => PromiseLike<[OutgoingHttpHeaders, z.SafeParseSuccess<z.infer<typeof routes[P]["response"]>> | z.SafeParseError<z.infer<typeof routes[P]["request"]>>]>
 ): (
   request: MyRequest,
   response: ServerResponse | Http2ServerResponse

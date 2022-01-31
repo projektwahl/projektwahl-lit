@@ -21,12 +21,13 @@ SPDX-License-Identifier: AGPL-3.0-or-later
 SPDX-FileCopyrightText: 2021 Moritz Hedtke <Moritz.Hedtke@t-online.de>
 */
 
-import type { z } from "zod";
+import { z, ZodIssueCode } from "zod";
+import type { routes } from "../lib/routes";
 
 export const myFetch = async <P extends import("../lib/routes").keys>(
   url: `${P}${string}`,
   options: RequestInit | undefined
-): Promise<z.infer<typeof import("../lib/routes").routes[P]["response"]>> => {
+): Promise<z.SafeParseSuccess<z.infer<typeof routes[P]["response"]>> | z.SafeParseError<z.infer<typeof routes[P]["request"]>>> => {
   try {
     const response = await fetch(url.toString(), {
       ...options,
@@ -41,7 +42,13 @@ export const myFetch = async <P extends import("../lib/routes").keys>(
         return {
           success: false,
           error: {
-            network: `Failed to request ${url}: ${response.status} ${response.statusText}\nAdditional information: ${additionalInfo}`,
+            issues: [
+              {
+                code: ZodIssueCode.custom,
+                path: ["network"],
+                message: `Failed to request ${url}: ${response.status} ${response.statusText}\nAdditional information: ${additionalInfo}`
+              }
+            ]
           },
         };
       } catch (error) {
