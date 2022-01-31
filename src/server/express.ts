@@ -127,8 +127,11 @@ export function requestHandler<P extends keyof typeof routes>(
             user,
             session_id
           );
-          //console.log("responseBody", responseBody);
-          routes[path].response.parse(responseBody);
+          console.log("responseBody", responseBody);
+          // TODO FIXME add schema for the result shit around that
+          if (responseBody.success) {
+            routes[path].response.parse(responseBody.data);
+          }
           const { ":status": _, ...finalHeaders } = new_headers;
           response.writeHead(Number(new_headers[":status"]), {
             ...defaultHeaders,
