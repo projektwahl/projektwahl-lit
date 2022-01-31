@@ -23,13 +23,6 @@ SPDX-FileCopyrightText: 2021 Moritz Hedtke <Moritz.Hedtke@t-online.de>
 import { z, ZodObject, ZodTypeAny } from "zod";
 import { result } from "./result.js";
 
-export const loginInputSchema = z
-  .object({
-    username: z.string().min(3).max(100),
-    password: z.string(),
-  })
-  .strict();
-
 if (!globalThis.Buffer) {
   // @ts-expect-error hack for client
   globalThis.Buffer = ArrayBuffer;
@@ -84,8 +77,6 @@ export const rawSessionType = z.object({
   user_id: z.number(),
 });
 
-export const loginOutputSchema = result(z.object({}));
-
 export type keys =
   | "/api/v1/login"
   | "/api/v1/logout"
@@ -102,20 +93,7 @@ function identity<
   T extends {
     [r in keys]: {
       request: z.ZodTypeAny;
-      response: z.ZodUnion<
-        [
-          z.ZodObject<
-            { success: z.ZodLiteral<true>; data: z.ZodTypeAny },
-            "strict",
-            z.ZodTypeAny
-          >,
-          z.ZodObject<
-            { success: z.ZodLiteral<false>; error: z.ZodTypeAny },
-            "strict",
-            z.ZodTypeAny
-          >
-        ]
-      >;
+      response: z.ZodTypeAny;
     };
   }
 >(v: T) {
@@ -247,55 +225,58 @@ const baseQuery = <
 export const routes = identity({
   "/api/v1/logout": {
     request: z.any(),
-    response: result(z.object({})),
+    response: z.object({}),
   },
   "/api/v1/login": {
-    request: loginInputSchema,
-    response: loginOutputSchema,
+    request: z
+    .object({
+      username: z.string().min(3).max(100),
+      password: z.string(),
+    })
+    .strict(),
+    response: z.object({}),
   },
   "/api/v1/openid-login": {
     request: z.any(),
-    response: result(z.object({})),
+    response: z.object({}),
   },
   "/api/v1/redirect": {
     request: z.any(),
-    response: result(z.object({})),
+    response: z.object({}),
   },
   "/api/v1/sleep": {
     request: z.undefined(),
-    response: result(z.object({})),
+    response: z.object({}),
   },
   "/api/v1/update": {
     request: z.undefined(),
-    response: result(z.object({})),
+    response: z.object({}),
   },
   "/api/v1/users/create-or-update": {
     request: usersCreateOrUpdate(rawUserSchema),
-    response: result(createOrUpdateUserResponse(rawUserSchema)),
+    response: createOrUpdateUserResponse(rawUserSchema),
   },
   "/api/v1/projects/create-or-update": {
     request: rawProjectSchema.partial(),
-    response: result(z.object({}).extend({ id: z.number() })),
+    response: z.object({}).extend({ id: z.number() }),
   },
   "/api/v1/users": {
     request: baseQuery(rawUserSchema),
-    response: result(
+    response: 
       z.object({
         entities: z.array(users(rawUserSchema)),
         previousCursor: users(rawUserSchema).nullable(),
         nextCursor: users(rawUserSchema).nullable(),
       })
-    ),
   },
   "/api/v1/projects": {
     request: baseQuery(rawProjectSchema),
-    response: result(
+    response: 
       z.object({
         entities: z.array(project),
         previousCursor: project.nullable(),
         nextCursor: project.nullable(),
       })
-    ),
   },
 } as const);
 
