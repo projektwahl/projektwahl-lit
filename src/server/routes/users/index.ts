@@ -54,13 +54,13 @@ export async function usersHandler(
           {
             success: false as const,
             error: {
-                issues: [
-{
-  code: ZodIssueCode.custom,
-  path: ["forbidden"],
-  message: "Insufficient permissions!",
-}
-                ]
+              issues: [
+                {
+                  code: ZodIssueCode.custom,
+                  path: ["forbidden"],
+                  message: "Insufficient permissions!",
+                },
+              ],
             },
           },
         ];
@@ -80,31 +80,31 @@ export async function usersHandler(
 
       const schema = rawUserSchema;
 
-      const ret: [OutgoingHttpHeaders, ResponseType<"/api/v1/users">] = await fetchData<
-        "/api/v1/users"
-      >(
-        "/api/v1/users" as const,
-        "users_with_deleted",
-        columns,
-        query,
-        /*{
+      const ret: [OutgoingHttpHeaders, ResponseType<"/api/v1/users">] =
+        await fetchData<"/api/v1/users">(
+          "/api/v1/users" as const,
+          "users_with_deleted",
+          columns,
+          query,
+          /*{
           id: "nulls-first",
           type: "nulls-first",
           username: "nulls-first",
           password_hash: "nulls-first",
         },*/
-        (query) => {
-          return sql2`(${!query.filters.id} OR id = ${
-            query.filters.id ?? null
-          }) AND username LIKE ${"%" + (query.filters.username ?? "") + "%"}
+          (query) => {
+            return sql2`(${!query.filters.id} OR id = ${
+              query.filters.id ?? null
+            }) AND username LIKE ${"%" + (query.filters.username ?? "") + "%"}
            AND (${!query.filters.project_leader_id} OR project_leader_id = ${
-            query.filters.project_leader_id ?? null
-          })
-           AND (${!query.filters.force_in_project_id} OR force_in_project_id = ${
-            query.filters.force_in_project_id ?? null
-          })`;
-        }
-      );
+              query.filters.project_leader_id ?? null
+            })
+           AND (${!query.filters
+             .force_in_project_id} OR force_in_project_id = ${
+              query.filters.force_in_project_id ?? null
+            })`;
+          }
+        );
       return ret;
     }
   )(request, response);

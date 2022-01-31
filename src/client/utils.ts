@@ -46,9 +46,9 @@ export const myFetch = async <P extends import("../lib/routes").keys>(
               {
                 code: ZodIssueCode.custom,
                 path: ["network"],
-                message: `Failed to request ${url}: ${response.status} ${response.statusText}\nAdditional information: ${additionalInfo}`
-              }
-            ]
+                message: `Failed to request ${url}: ${response.status} ${response.statusText}\nAdditional information: ${additionalInfo}`,
+              },
+            ],
           },
         };
       } catch (error) {
@@ -60,8 +60,8 @@ export const myFetch = async <P extends import("../lib/routes").keys>(
                 code: ZodIssueCode.custom,
                 path: ["network"],
                 message: `Failed to request ${url}: ${response.status} ${response.statusText}\n`,
-              }
-            ]
+              },
+            ],
           },
         };
         return r;
@@ -83,9 +83,9 @@ export const myFetch = async <P extends import("../lib/routes").keys>(
               path: ["network"],
               message: `Failed to request ${url}: ${
                 error.message
-              }\nAdditional information: ${error.stack ?? "none"}`,   
-            }
-          ]
+              }\nAdditional information: ${error.stack ?? "none"}`,
+            },
+          ],
         },
       };
     } else {
@@ -97,8 +97,8 @@ export const myFetch = async <P extends import("../lib/routes").keys>(
               code: ZodIssueCode.custom,
               path: ["network"],
               message: `Failed to request ${url}: Unknown error see console.`,
-            }
-          ]
+            },
+          ],
         },
       };
     }

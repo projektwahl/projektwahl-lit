@@ -23,7 +23,12 @@ SPDX-FileCopyrightText: 2021 Moritz Hedtke <Moritz.Hedtke@t-online.de>
 
 import { json } from "node:stream/consumers";
 import { URL } from "url";
-import { rawUserSchema, routes, UnknownKeysParam, ResponseType } from "../lib/routes.js";
+import {
+  rawUserSchema,
+  routes,
+  UnknownKeysParam,
+  ResponseType,
+} from "../lib/routes.js";
 import type { z, ZodObject, ZodTypeAny } from "zod";
 import { retryableBegin } from "./database.js";
 import cookie from "cookie";
@@ -54,7 +59,6 @@ const userSchema = userMapper(rawUserSchema).optional();
 
 export type MyRequest = (IncomingMessage | Http2ServerRequest) &
   Required<Pick<IncomingMessage | Http2ServerRequest, "url" | "method">>;
-
 
 export function requestHandler<P extends keyof typeof routes>(
   method: string,
@@ -109,8 +113,8 @@ export function requestHandler<P extends keyof typeof routes>(
           );
           //console.log(user)
         }
-        
-        const rawGetBody = decodeURIComponent(url.search).substring(1)
+
+        const rawGetBody = decodeURIComponent(url.search).substring(1);
 
         const body =
           request.method === "POST"
@@ -133,7 +137,7 @@ export function requestHandler<P extends keyof typeof routes>(
           response.end(JSON.stringify(responseBody));
         } else {
           // https://github.com/colinhacks/zod/blob/master/ERROR_HANDLING.md
-          console.log(requestBody.error.issues)
+          console.log(requestBody.error.issues);
 
           response.writeHead(200, {
             ...defaultHeaders,

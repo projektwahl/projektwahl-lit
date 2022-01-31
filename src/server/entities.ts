@@ -34,9 +34,9 @@ type entitesType = {
 };
 
 type mappedInfer1<R extends keyof typeof entityRoutes> = {
-  [K in keyof z.infer<
+  [K in keyof z.infer<entitesType[R]["response"]>]: z.infer<
     entitesType[R]["response"]
-  >]: z.infer<entitesType[R]["response"]>[K];
+  >[K];
 };
 
 export function updateField<
@@ -50,9 +50,7 @@ export function updateField<
   )}" END`;
 }
 
-export async function fetchData<
-  R extends keyof typeof entityRoutes
->(
+export async function fetchData<R extends keyof typeof entityRoutes>(
   path: R,
   table: string,
   columns: readonly [string, ...string[]],
@@ -128,23 +126,16 @@ export async function fetchData<
     }
   }
 
-  const entitiesSchema =
-    entitySchema["response"]["shape"][
-      "entities"
-    ];
+  const entitiesSchema = entitySchema["response"]["shape"]["entities"];
 
-  let entities: z.infer<
-    entitesType[R]["response"]
-  >["entities"] = entitiesSchema.parse(await sql(...finalQuery));
+  let entities: z.infer<entitesType[R]["response"]>["entities"] =
+    entitiesSchema.parse(await sql(...finalQuery));
 
   // https://github.com/projektwahl/projektwahl-sveltekit/blob/work/src/lib/list-entities.ts#L30
 
-  let nextCursor: z.infer<
-    entitesType[R]["response"]
-  >["nextCursor"] = null;
-  let previousCursor: z.infer<
-    entitesType[R]["response"]
-  >["previousCursor"] = null;
+  let nextCursor: z.infer<entitesType[R]["response"]>["nextCursor"] = null;
+  let previousCursor: z.infer<entitesType[R]["response"]>["previousCursor"] =
+    null;
   // TODO FIXME also recalculate the other cursor because data could've been deleted in between / the filters have changed
   if (query.paginationDirection === "forwards") {
     if (query.paginationCursor) {

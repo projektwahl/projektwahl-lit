@@ -30,8 +30,8 @@ import { repeat } from "lit/directives/repeat.js";
 import type { routes } from "../../lib/routes.js";
 import type { z } from "zod";
 import type { Path } from "../utils.js";
-import get from 'lodash-es/get.js';
-import set from 'lodash-es/set.js';
+import get from "lodash-es/get.js";
+import set from "lodash-es/set.js";
 
 // workaround see https://github.com/runem/lit-analyzer/issues/149#issuecomment-1006162839
 export function pwInput<
@@ -157,20 +157,34 @@ export class PwInput<
     event: CustomEvent<z.infer<typeof routes[P]["request"]>>
   ) => {
     if (this.type === "number") {
-      set(event.detail, this.name as string[],
+      set(
+        event.detail,
+        this.name as string[],
         (this.input.value as HTMLInputElement).value === ""
           ? this.defaultValue
-          : (this.input.value as HTMLInputElement).valueAsNumber);
+          : (this.input.value as HTMLInputElement).valueAsNumber
+      );
     } else if (this.type === "checkbox") {
-      set(event.detail, this.name as string[], (this.input.value as HTMLInputElement).checked);
+      set(
+        event.detail,
+        this.name as string[],
+        (this.input.value as HTMLInputElement).checked
+      );
     } else if (this.type === "select") {
-      set(event.detail, this.name as string[],
+      set(
+        event.detail,
+        this.name as string[],
         (this.input.value as HTMLSelectElement).selectedIndex == -1
           ? this.defaultValue
-          : (this.input.value as HTMLInputElement).value);
+          : (this.input.value as HTMLInputElement).value
+      );
     } else {
-      const val = (this.input.value as HTMLInputElement).value
-      set(event.detail, this.name as string[], val === "" ? this.defaultValue : val);
+      const val = (this.input.value as HTMLInputElement).value;
+      set(
+        event.detail,
+        this.name as string[],
+        val === "" ? this.defaultValue : val
+      );
     }
   };
 
@@ -236,13 +250,14 @@ export class PwInput<
             this.type === "select"
               ? repeat(
                   this.options as {
-                    value: any//z.infer<typeof routes[P]["request"]>[Q];
+                    value: any; //z.infer<typeof routes[P]["request"]>[Q];
                     text: string;
                   }[],
                   (o) => o.value,
                   (o) =>
                     html`<option
-                      ?selected=${get(this.initial, this.name as string[]) === o.value}
+                      ?selected=${get(this.initial, this.name as string[]) ===
+                      o.value}
                       value=${o.value}
                     >
                       ${o.text}

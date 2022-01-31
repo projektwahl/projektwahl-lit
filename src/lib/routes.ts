@@ -229,11 +229,11 @@ export const routes = identity({
   },
   "/api/v1/login": {
     request: z
-    .object({
-      username: z.string().min(3).max(100),
-      password: z.string(),
-    })
-    .strict(),
+      .object({
+        username: z.string().min(3).max(100),
+        password: z.string(),
+      })
+      .strict(),
     response: z.object({}),
   },
   "/api/v1/openid-login": {
@@ -262,21 +262,19 @@ export const routes = identity({
   },
   "/api/v1/users": {
     request: baseQuery(rawUserSchema),
-    response: 
-      z.object({
-        entities: z.array(users(rawUserSchema)),
-        previousCursor: users(rawUserSchema).nullable(),
-        nextCursor: users(rawUserSchema).nullable(),
-      })
+    response: z.object({
+      entities: z.array(users(rawUserSchema)),
+      previousCursor: users(rawUserSchema).nullable(),
+      nextCursor: users(rawUserSchema).nullable(),
+    }),
   },
   "/api/v1/projects": {
     request: baseQuery(rawProjectSchema),
-    response: 
-      z.object({
-        entities: z.array(project),
-        previousCursor: project.nullable(),
-        nextCursor: project.nullable(),
-      })
+    response: z.object({
+      entities: z.array(project),
+      previousCursor: project.nullable(),
+      nextCursor: project.nullable(),
+    }),
   },
 } as const);
 
@@ -294,4 +292,6 @@ export declare type MinimalSafeParseError<Input> = {
   error: MinimalZodError<Input>;
 };
 
-export type ResponseType<P extends keyof typeof routes> = z.SafeParseSuccess<z.infer<typeof routes[P]["response"]>> | MinimalSafeParseError<z.infer<typeof routes[P]["request"]>>
+export type ResponseType<P extends keyof typeof routes> =
+  | z.SafeParseSuccess<z.infer<typeof routes[P]["response"]>>
+  | MinimalSafeParseError<z.infer<typeof routes[P]["request"]>>;
