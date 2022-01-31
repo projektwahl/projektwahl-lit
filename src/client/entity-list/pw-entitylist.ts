@@ -76,8 +76,6 @@ export class PwEntityList<
     throw new Error("not implemented");
   }
 
-  _task!: Task<[URLSearchParams], ResponseType<P>>;
-
   initialRender: boolean;
 
   initial: Promise<z.infer<typeof entityRoutes[P]["response"]>> | undefined;

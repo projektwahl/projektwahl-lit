@@ -24,8 +24,9 @@ import { html, LitElement } from "lit";
 import { createRef, ref } from "lit/directives/ref.js";
 import { bootstrapCss } from "../index.js";
 import { msg } from "@lit/localize";
-import type { routes } from "../../lib/routes.js";
+import type { routes, ResponseType } from "../../lib/routes.js";
 import type { z } from "zod";
+import type { Task } from "@lit-labs/task";
 
 class PwForm<P extends keyof typeof routes> extends LitElement {
   static get properties() {
@@ -40,10 +41,7 @@ class PwForm<P extends keyof typeof routes> extends LitElement {
     throw new Error("not implemented");
   }
 
-  _task!: import("@lit-labs/task").Task<
-    unknown[],
-    z.infer<typeof routes[P]["response"]>
-  >;
+  _task!: Task<[URLSearchParams], ResponseType<P>>;
 
   form: import("lit/directives/ref").Ref<HTMLFormElement>;
 
@@ -76,10 +74,12 @@ class PwForm<P extends keyof typeof routes> extends LitElement {
           /*const errors = Object.entries(data.error)
             .filter(([k]) => !this.getCurrentInputElements().includes(k))
             .map(([k, v]) => html`${k}: ${v}<br />`);*/
-          if (data.error.issues > 0) {
+          if (data.error.issues.length > 0) {
             return html`<div class="alert alert-danger" role="alert">
               ${msg("Some errors occurred!")}<br />
-              ${data.error.issues}
+              ${data.error.issues.map(issue => html`
+                ${issue.path}: ${issue.message}<br />
+              `)}
             </div>`;
           }
         }

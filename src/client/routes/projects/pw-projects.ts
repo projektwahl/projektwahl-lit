@@ -184,16 +184,7 @@ class PwProjects extends PwEntityList<"/api/v1/projects"> {
                   </td>
                 </tr>`
               )
-            : html`<tr>
-                <td colspan="4">
-                  <div class="alert alert-danger" role="alert">
-                    ${msg("Some errors occurred!")}<br />
-                    ${Object.entries(result.error).map(
-                      ([k, v]) => html`${k}: ${v}<br />`
-                    )}
-                  </div>
-                </td>
-              </tr>`;
+            : undefined;
         },
         initial: () => {
           return html`hi`;

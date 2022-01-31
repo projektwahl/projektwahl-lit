@@ -29,7 +29,7 @@ import {
   UnknownKeysParam,
   ResponseType,
 } from "../lib/routes.js";
-import type { z, ZodObject, ZodTypeAny } from "zod";
+import { z, ZodIssueCode, ZodObject, ZodTypeAny } from "zod";
 import { retryableBegin } from "./database.js";
 import cookie from "cookie";
 import type { IncomingMessage, ServerResponse } from "node:http";
@@ -154,10 +154,17 @@ export function requestHandler<P extends keyof typeof routes>(
         ...defaultHeaders,
       });
       response.end(
+        // TODO FIXME typings
         JSON.stringify({
           success: false,
           error: {
-            error: String(error),
+            issues: [
+              {
+                code: ZodIssueCode.custom,
+                path: ["internal_error"],
+                message: String(error),
+              }
+            ]
           },
         })
       );
