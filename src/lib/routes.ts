@@ -20,7 +20,7 @@ https://github.com/projektwahl/projektwahl-lit
 SPDX-License-Identifier: AGPL-3.0-or-later
 SPDX-FileCopyrightText: 2021 Moritz Hedtke <Moritz.Hedtke@t-online.de>
 */
-import { z, ZodObject, ZodTypeAny } from "zod";
+import { z, ZodIssue, ZodObject, ZodTypeAny } from "zod";
 import { result } from "./result.js";
 
 if (!globalThis.Buffer) {
@@ -285,4 +285,13 @@ export const entityRoutes = {
   "/api/v1/projects": routes["/api/v1/projects"],
 };
 
-//const test: z.infer<typeof routes["/api/v1/projects/create-or-update"]["request"]> = 1 as any;
+export declare class MinimalZodError<T = any> {
+  issues: ZodIssue[];
+}
+
+export declare type MinimalSafeParseError<Input> = {
+  success: false;
+  error: MinimalZodError<Input>;
+};
+
+export type ResponseType<P extends keyof typeof routes> = z.SafeParseSuccess<z.infer<typeof routes[P]["response"]>> | MinimalSafeParseError<z.infer<typeof routes[P]["request"]>>

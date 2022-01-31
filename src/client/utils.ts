@@ -22,12 +22,12 @@ SPDX-FileCopyrightText: 2021 Moritz Hedtke <Moritz.Hedtke@t-online.de>
 */
 
 import { z, ZodIssueCode } from "zod";
-import type { routes } from "../lib/routes";
+import type { ResponseType } from "../lib/routes";
 
 export const myFetch = async <P extends import("../lib/routes").keys>(
   url: `${P}${string}`,
   options: RequestInit | undefined
-): Promise<z.SafeParseSuccess<z.infer<typeof routes[P]["response"]>> | z.SafeParseError<z.infer<typeof routes[P]["request"]>>> => {
+): Promise<ResponseType<P>> => {
   try {
     const response = await fetch(url.toString(), {
       ...options,
@@ -52,12 +52,19 @@ export const myFetch = async <P extends import("../lib/routes").keys>(
           },
         };
       } catch (error) {
-        return {
+        const r: ResponseType<P> = {
           success: false,
           error: {
-            network: `Failed to request ${url}: ${response.status} ${response.statusText}\n`,
+            issues: [
+              {
+                code: ZodIssueCode.custom,
+                path: ["network"],
+                message: `Failed to request ${url}: ${response.status} ${response.statusText}\n`,
+              }
+            ]
           },
         };
+        return r;
       }
     }
     const result = (await response.json()) as z.infer<
@@ -70,16 +77,28 @@ export const myFetch = async <P extends import("../lib/routes").keys>(
       return {
         success: false,
         error: {
-          network: `Failed to request ${url}: ${
-            error.message
-          }\nAdditional information: ${error.stack ?? "none"}`,
+          issues: [
+            {
+              code: ZodIssueCode.custom,
+              path: ["network"],
+              message: `Failed to request ${url}: ${
+                error.message
+              }\nAdditional information: ${error.stack ?? "none"}`,   
+            }
+          ]
         },
       };
     } else {
       return {
         success: false,
         error: {
-          network: `Failed to request ${url}: Unknown error see console.`,
+          issues: [
+            {
+              code: ZodIssueCode.custom,
+              path: ["network"],
+              message: `Failed to request ${url}: Unknown error see console.`,
+            }
+          ]
         },
       };
     }

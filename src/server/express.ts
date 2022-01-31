@@ -23,7 +23,7 @@ SPDX-FileCopyrightText: 2021 Moritz Hedtke <Moritz.Hedtke@t-online.de>
 
 import { json } from "node:stream/consumers";
 import { URL } from "url";
-import { rawUserSchema, routes, UnknownKeysParam } from "../lib/routes.js";
+import { rawUserSchema, routes, UnknownKeysParam, ResponseType } from "../lib/routes.js";
 import type { z, ZodObject, ZodTypeAny } from "zod";
 import { retryableBegin } from "./database.js";
 import cookie from "cookie";
@@ -55,6 +55,7 @@ const userSchema = userMapper(rawUserSchema).optional();
 export type MyRequest = (IncomingMessage | Http2ServerRequest) &
   Required<Pick<IncomingMessage | Http2ServerRequest, "url" | "method">>;
 
+
 export function requestHandler<P extends keyof typeof routes>(
   method: string,
   path: P,
@@ -62,7 +63,7 @@ export function requestHandler<P extends keyof typeof routes>(
     r: z.infer<typeof routes[P]["request"]>,
     user: z.infer<typeof userSchema>,
     session_id: string | undefined
-  ) => PromiseLike<[OutgoingHttpHeaders, z.SafeParseSuccess<z.infer<typeof routes[P]["response"]>> | z.SafeParseError<z.infer<typeof routes[P]["request"]>>]>
+  ) => PromiseLike<[OutgoingHttpHeaders, ResponseType<P>]>
 ): (
   request: MyRequest,
   response: ServerResponse | Http2ServerResponse
