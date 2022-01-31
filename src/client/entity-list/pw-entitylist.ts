@@ -24,7 +24,7 @@ import { css, html, TemplateResult } from "lit";
 import { HistoryController } from "../history-controller.js";
 import { createRef, ref } from "lit/directives/ref.js";
 import { Task, TaskStatus } from "@lit-labs/task";
-import type { entityRoutes, routes } from "../../lib/routes.js";
+import type { entityRoutes, routes, ResponseType } from "../../lib/routes.js";
 import type { z } from "zod";
 import { PwForm } from "../form/pw-form.js";
 import { bootstrapCss } from "../index.js";
@@ -76,7 +76,7 @@ export class PwEntityList<
     throw new Error("not implemented");
   }
 
-  _task!: Task<[URLSearchParams], z.infer<typeof entityRoutes[P]["response"]>>;
+  _task!: Task<[URLSearchParams], ResponseType<P>>;
 
   initialRender: boolean;
 

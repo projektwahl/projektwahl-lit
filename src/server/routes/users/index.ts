@@ -64,6 +64,7 @@ export async function usersHandler(
             },
           },
         ];
+        return ret
       }
 
       const columns = [
