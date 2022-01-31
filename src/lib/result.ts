@@ -76,6 +76,7 @@ export const zod2result = <
   } else {
     const flattenedErrors = result.error.flatten();
     console.log(result.error);
+    console.log(flattenedErrors)
 
     /** @type {{[k: string]: string[];}} */
     const errors: { [k: string]: string[] } = {

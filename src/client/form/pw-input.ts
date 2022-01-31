@@ -169,7 +169,8 @@ export class PwInput<
           ? this.defaultValue
           : (this.input.value as HTMLInputElement).value);
     } else {
-      set(event.detail, this.name as string[], (this.input.value as HTMLInputElement).value);
+      const val = (this.input.value as HTMLInputElement).value
+      set(event.detail, this.name as string[], val === "" ? this.defaultValue : val);
     }
   };
 

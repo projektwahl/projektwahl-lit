@@ -115,9 +115,9 @@ export class PwUsers extends PwEntityList<"/api/v1/users"> {
         </th>
 
         <th scope="col">
-          ${pwInput<"/api/v1/users", "">({
+          ${pwInput<"/api/v1/users", ["filters", "username"]>({
             label: null,
-            name: "f_username",
+            name: ["filters", "username"],
             task: this._task,
             type: "text",
             initial: this.initial,
@@ -125,11 +125,12 @@ export class PwUsers extends PwEntityList<"/api/v1/users"> {
         </th>
 
         <th scope="col">
-          ${pwInput<"/api/v1/users", "">({
+          ${pwInput<"/api/v1/users", ["filters", "type"]>({
             label: null,
-            name: "f_type",
+            name: ["filters", "type"],
             task: this._task,
             type: "text",
+            defaultValue: undefined,
             initial: this.initial,
           })}
         </th>
