@@ -58,7 +58,7 @@ const taskFunction = async ([id]: [number]) => {
 };
 
 const initialResult = result(
-  routes["/api/v1/projects"]["response"]["options"][0]["shape"]["data"][
+  routes["/api/v1/projects"]["response"][
     "shape"
   ]["entities"]["element"]
 );
@@ -158,92 +158,92 @@ export const PwProjectCreate = setupHmr(
                     await this._task.run();
                   }}
                 >
-                  ${pwInput<"/api/v1/projects/create-or-update", "title">({
+                  ${pwInput<"/api/v1/projects/create-or-update", ["title"]>({
                     type: "text",
                     disabled: this.disabled,
                     label: msg("Title"),
-                    name: "title",
+                    name: ["title"],
                     task: this._task,
                     initial: this.initial?.data,
                   })}
-                  ${pwInput<"/api/v1/projects/create-or-update", "info">({
+                  ${pwInput<"/api/v1/projects/create-or-update", ["info"]>({
                     type: "text",
                     disabled: this.disabled,
                     label: msg("Info"),
-                    name: "info",
+                    name: ["info"],
                     task: this._task,
                     initial: this.initial?.data,
                   })}
-                  ${pwInput<"/api/v1/projects/create-or-update", "place">({
+                  ${pwInput<"/api/v1/projects/create-or-update", ["place"]>({
                     type: "text",
                     disabled: this.disabled,
                     label: msg("Place"),
-                    name: "place",
+                    name: ["place"],
                     task: this._task,
                     initial: this.initial?.data,
                   })}
-                  ${pwInput<"/api/v1/projects/create-or-update", "costs">({
+                  ${pwInput<"/api/v1/projects/create-or-update", ["costs"]>({
                     type: "number",
                     disabled: this.disabled,
                     label: msg("Costs"),
-                    name: "costs",
+                    name: ["costs"],
                     task: this._task,
                     initial: this.initial?.data,
                   })}
-                  ${pwInput<"/api/v1/projects/create-or-update", "min_age">({
+                  ${pwInput<"/api/v1/projects/create-or-update", ["min_age"]>({
                     type: "number",
                     disabled: this.disabled,
                     label: msg("Minimum age"),
-                    name: "min_age",
+                    name: ["min_age"],
                     task: this._task,
                     initial: this.initial?.data,
                   })}
-                  ${pwInput<"/api/v1/projects/create-or-update", "max_age">({
+                  ${pwInput<"/api/v1/projects/create-or-update", ["max_age"]>({
                     type: "number",
                     disabled: this.disabled,
                     label: msg("Maximum age"),
-                    name: "max_age",
+                    name: ["max_age"],
                     task: this._task,
                     initial: this.initial?.data,
                   })}
                   ${pwInput<
                     "/api/v1/projects/create-or-update",
-                    "min_participants"
+                    ["min_participants"]
                   >({
                     type: "number",
                     disabled: this.disabled,
                     label: msg("Minimum participants"),
-                    name: "min_participants",
+                    name: ["min_participants"],
                     task: this._task,
                     initial: this.initial?.data,
                   })}
                   ${pwInput<
                     "/api/v1/projects/create-or-update",
-                    "max_participants"
+                    ["max_participants"]
                   >({
                     type: "number",
                     disabled: this.disabled,
                     label: msg("Maximum participants"),
-                    name: "max_participants",
+                    name: ["max_participants"],
                     task: this._task,
                     initial: this.initial?.data,
                   })}
                   ${pwInput<
                     "/api/v1/projects/create-or-update",
-                    "random_assignments"
+                    ["random_assignments"]
                   >({
                     type: "checkbox",
                     disabled: this.disabled,
                     label: msg("Allow random assignments"),
-                    name: "random_assignments",
+                    name: ["random_assignments"],
                     task: this._task,
                     initial: this.initial?.data,
                   })}
-                  ${pwInput<"/api/v1/projects/create-or-update", "deleted">({
+                  ${pwInput<"/api/v1/projects/create-or-update", ["deleted"]>({
                     type: "checkbox",
                     disabled: this.disabled,
                     label: msg("Mark this project as deleted"),
-                    name: "deleted",
+                    name: ["deleted"],
                     task: this._task,
                     initial: this.initial?.data,
                   })}

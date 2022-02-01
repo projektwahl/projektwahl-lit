@@ -45,7 +45,7 @@ export async function pwUser(id: number, viewOnly = false) {
 }
 
 const initialResult = result(
-  routes["/api/v1/users"]["response"]["options"]["0"]["shape"]["data"]["shape"][
+  routes["/api/v1/users"]["response"]["shape"][
     "entities"
   ]["element"]
 );
@@ -154,15 +154,15 @@ class PwUserCreate extends PwForm<"/api/v1/users/create-or-update"> {
                   await this._task.run();
                 }}
               >
-                ${pwInput<"/api/v1/users/create-or-update", "username">({
+                ${pwInput<"/api/v1/users/create-or-update", ["username"]>({
                   type: "text",
                   disabled: this.disabled,
                   label: msg("Username"),
-                  name: "username",
+                  name: ["username"],
                   task: this._task,
                   initial: this.initial?.data,
                 })}
-                ${pwInput<"/api/v1/users/create-or-update", "type">({
+                ${pwInput<"/api/v1/users/create-or-update", ["type"]>({
                   type: "select",
                   disabled: this.disabled,
                   onchange: (event: Event) =>
@@ -171,7 +171,7 @@ class PwUserCreate extends PwForm<"/api/v1/users/create-or-update"> {
                       | "admin"
                       | "voter"),
                   label: msg("User type"),
-                  name: "type",
+                  name: ["type"],
                   options: [
                     { value: "voter", text: "Schüler" },
                     { value: "helper", text: "Helfer" },
@@ -183,49 +183,49 @@ class PwUserCreate extends PwForm<"/api/v1/users/create-or-update"> {
                   },
                 })}
                 ${(this.type ?? this.initial?.data.type ?? "voter") === "voter"
-                  ? html`${pwInput<"/api/v1/users/create-or-update", "group">({
+                  ? html`${pwInput<"/api/v1/users/create-or-update", ["group"]>({
                       type: "text",
                       disabled: this.disabled,
                       label: msg("Group"),
-                      name: "group",
+                      name: ["group"],
                       task: this._task,
                       initial: this.initial?.data,
                     })}
-                    ${pwInput<"/api/v1/users/create-or-update", "age">({
+                    ${pwInput<"/api/v1/users/create-or-update", ["age"]>({
                       type: "number",
                       disabled: this.disabled,
                       label: msg("Age"),
-                      name: "age",
+                      name: ["age"],
                       task: this._task,
                       initial: this.initial?.data,
                     })}`
                   : undefined}
                 ${!this.disabled
                   ? html`
-                      ${pwInput<"/api/v1/users/create-or-update", "password">({
+                      ${pwInput<"/api/v1/users/create-or-update", ["password"]>({
                         type: "password",
                         disabled: this.disabled,
                         label: msg("Password"),
-                        name: "password",
+                        name: ["password"],
                         task: this._task,
                         autocomplete: "new-password",
                         initial: this.initial?.data,
                       })}
                     `
                   : undefined}
-                ${pwInput<"/api/v1/users/create-or-update", "away">({
+                ${pwInput<"/api/v1/users/create-or-update", ["away"]>({
                   type: "checkbox",
                   disabled: this.disabled,
                   label: msg("Away"),
-                  name: "away",
+                  name: ["away"],
                   task: this._task,
                   initial: this.initial?.data,
                 })}
-                ${pwInput<"/api/v1/users/create-or-update", "deleted">({
+                ${pwInput<"/api/v1/users/create-or-update", ["deleted"]>({
                   type: "checkbox",
                   disabled: this.disabled,
                   label: msg("Mark this user as deleted"),
-                  name: "deleted",
+                  name: ["deleted"],
                   task: this._task,
                   initial: this.initial?.data,
                 })}

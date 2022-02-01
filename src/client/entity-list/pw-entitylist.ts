@@ -83,12 +83,12 @@ export class PwEntityList<
   protected history;
 
   taskFunction: ([searchParams]: [URLSearchParams]) => Promise<
-    z.infer<typeof entityRoutes[P]["response"]>
+    ResponseType<P>
   >;
 
   constructor(
     taskFunction: ([searchParams]: [URLSearchParams]) => Promise<
-      z.infer<typeof entityRoutes[P]["response"]>
+    ResponseType<P>
     >
   ) {
     super();

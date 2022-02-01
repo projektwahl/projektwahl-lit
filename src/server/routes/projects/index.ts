@@ -21,11 +21,11 @@ SPDX-License-Identifier: AGPL-3.0-or-later
 SPDX-FileCopyrightText: 2021 Moritz Hedtke <Moritz.Hedtke@t-online.de>
 */
 import { z } from "zod";
-import type { rawProjectSchema } from "../../../lib/routes.js";
+import type { rawProjectSchema, ResponseType } from "../../../lib/routes.js";
 import { fetchData } from "../../entities.js";
 import { MyRequest, requestHandler } from "../../express.js";
 import { sql2 } from "../../sql/index.js";
-import type { ServerResponse } from "node:http";
+import type { OutgoingHttpHeaders, ServerResponse } from "node:http";
 import type { Http2ServerResponse } from "node:http2";
 
 export async function projectsHandler(
@@ -46,7 +46,7 @@ export async function projectsHandler(
           loggedInUser?.type === "voter"
         )
       ) {
-        return [
+        const returnValue: [OutgoingHttpHeaders, ResponseType<"/api/v1/projects">] = [
           {
             "content-type": "text/json; charset=utf-8",
             ":status": 403,
@@ -75,20 +75,16 @@ export async function projectsHandler(
       ] as const;
 
       return await fetchData<
-        z.infer<typeof rawProjectSchema>,
-        typeof query,
         "/api/v1/projects"
       >(
         "/api/v1/projects" as const,
-        request,
         "projects_with_deleted",
         columns,
         query,
-        {},
         (query) => {
-          return sql2`(${!query.f_id} OR id = ${
-            query.f_id ?? null
-          }) AND title LIKE ${"%" + (query.f_title ?? "") + "%"}`;
+          return sql2`(${!query.filters.id} OR id = ${
+            query.filters.id ?? null
+          }) AND title LIKE ${"%" + (query.filters.title ?? "") + "%"}`;
         }
       );
     }

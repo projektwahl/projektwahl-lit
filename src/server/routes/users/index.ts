@@ -46,7 +46,7 @@ export async function usersHandler(
       if (
         !(loggedInUser?.type === "admin" || loggedInUser?.type === "helper")
       ) {
-        const ret: [OutgoingHttpHeaders, ResponseType<"/api/v1/users">] = [
+        const returnValue: [OutgoingHttpHeaders, ResponseType<"/api/v1/users">] = [
           {
             "content-type": "text/json; charset=utf-8",
             ":status": 403,
@@ -64,7 +64,7 @@ export async function usersHandler(
             },
           },
         ];
-        return ret
+        return returnValue
       }
 
       const columns = [

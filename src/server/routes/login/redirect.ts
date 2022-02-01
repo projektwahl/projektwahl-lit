@@ -26,11 +26,12 @@ import {
   rawSessionType,
   rawUserSchema,
   UnknownKeysParam,
+  ResponseType,
 } from "../../../lib/routes.js";
 import { sql } from "../../database.js";
 import { MyRequest, requestHandler } from "../../express.js";
 import { client } from "./openid-client.js";
-import type { ServerResponse } from "node:http";
+import type { OutgoingHttpHeaders, ServerResponse } from "node:http";
 import type { Http2ServerResponse } from "node:http2";
 
 export async function openidRedirectHandler(
@@ -99,7 +100,7 @@ export async function openidRedirectHandler(
       );
 
       if (dbUser === undefined) {
-        return [
+        const returnValue: [OutgoingHttpHeaders, ResponseType<"/api/v1/redirect">] = [
           {
             "content-type": "text/json; charset=utf-8",
             ":status": 200,
@@ -111,6 +112,7 @@ export async function openidRedirectHandler(
             },
           },
         ];
+        return returnValue
       }
 
       /** @type {[Pick<import("../../../lib/types").RawSessionType, "session_id">]} */
@@ -150,7 +152,7 @@ export async function openidRedirectHandler(
         },
       ];
     } catch (error) {
-      return [
+      const returnValue: [OutgoingHttpHeaders, ResponseType<"/api/v1/redirect">] = [
         {
           "content-type": "text/json; charset=utf-8",
           ":status": 200,

@@ -25,9 +25,9 @@ import { sql } from "../../database.js";
 import { updateField } from "../../entities.js";
 import { MyRequest, requestHandler } from "../../express.js";
 import { sql2 } from "../../sql/index.js";
-import type { ServerResponse } from "node:http";
+import type { OutgoingHttpHeaders, ServerResponse } from "node:http";
 import type { Http2ServerResponse } from "node:http2";
-import { rawProjectSchema } from "../../../lib/routes.js";
+import { rawProjectSchema, ResponseType } from "../../../lib/routes.js";
 
 export async function createOrUpdateProjectsHandler(
   request: MyRequest,
@@ -44,7 +44,7 @@ export async function createOrUpdateProjectsHandler(
       if (
         !(loggedInUser?.type === "admin" || loggedInUser?.type === "helper")
       ) {
-        return [
+        const returnValue: [OutgoingHttpHeaders, ResponseType<"/api/v1/projects/create-or-update">] = [
           {
             "content-type": "text/json; charset=utf-8",
             ":status": 403,
@@ -56,6 +56,7 @@ export async function createOrUpdateProjectsHandler(
             },
           },
         ];
+        return returnValue
       }
 
       try {
@@ -125,7 +126,7 @@ export async function createOrUpdateProjectsHandler(
 
         if (!row) {
           // insufficient permissions
-          return [
+          const returnValue: [OutgoingHttpHeaders, ResponseType<"/api/v1/projects/create-or-update">] = [
             {
               "content-type": "text/json; charset=utf-8",
               ":status": 403,
@@ -155,7 +156,7 @@ export async function createOrUpdateProjectsHandler(
             error.constraint_name === "users_with_deleted_username_key"
           ) {
             // unique violation
-            return [
+            const returnValue: [OutgoingHttpHeaders, ResponseType<"/api/v1/projects/create-or-update">] = [
               {
                 "content-type": "text/json; charset=utf-8",
                 ":status": 200,
@@ -170,7 +171,7 @@ export async function createOrUpdateProjectsHandler(
           }
         }
         console.error(error);
-        return [
+        const returnValue: [OutgoingHttpHeaders, ResponseType<"/api/v1/projects/create-or-update">] = [
           {
             "content-type": "text/json; charset=utf-8",
             ":status": 500,
