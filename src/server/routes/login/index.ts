@@ -21,16 +21,17 @@ SPDX-License-Identifier: AGPL-3.0-or-later
 SPDX-FileCopyrightText: 2021 Moritz Hedtke <Moritz.Hedtke@t-online.de>
 */
 import type { Http2ServerResponse } from "node:http2";
-import type { ZodObject, ZodTypeAny } from "zod";
+import { ZodIssueCode, ZodObject, ZodTypeAny } from "zod";
 import {
   rawSessionType,
   rawUserSchema,
   UnknownKeysParam,
+  ResponseType
 } from "../../../lib/routes.js";
 import { sql } from "../../database.js";
 import { MyRequest, requestHandler } from "../../express.js";
 import { checkPassword } from "../../password.js";
-import type { ServerResponse } from "node:http";
+import type { OutgoingHttpHeaders, ServerResponse } from "node:http";
 
 const users = <
   T extends { [k: string]: ZodTypeAny },
@@ -59,7 +60,7 @@ export async function loginHandler(
     // TODO FIXME this is vulnerable to side channel attacks
     // but maybe it's fine because we want to tell the user whether the account exists
     if (dbUser === undefined) {
-      return [
+      const returnValue: [OutgoingHttpHeaders, ResponseType<"/api/v1/login">] = [
         {
           "content-type": "text/json; charset=utf-8",
           ":status": "200",
@@ -67,15 +68,21 @@ export async function loginHandler(
         {
           success: false as const,
           error: {
-            // TODO FIXME fix this next
-            username: "Nutzer existiert nicht!",
+            issues: [
+              {
+                code: ZodIssueCode.custom,
+                path: ["username"],
+                message: "Nutzer existiert nicht!",
+              }
+            ]
           },
         },
       ];
+      return returnValue
     }
 
     if (dbUser.password_hash == null) {
-      return [
+      const returnValue: [OutgoingHttpHeaders, ResponseType<"/api/v1/login">] = [
         {
           "content-type": "text/json; charset=utf-8",
           ":status": "200",
@@ -83,10 +90,17 @@ export async function loginHandler(
         {
           success: false as const,
           error: {
-            password: "Kein Password für Account gesetzt!",
+            issues: [
+              {
+                code: ZodIssueCode.custom,
+                path: ["password"],
+                message: "Kein Password für Account gesetzt!",
+              }
+            ]
           },
         },
       ];
+      return returnValue
     }
 
     const [valid, needsRehash, newHash] = await checkPassword(
@@ -95,7 +109,7 @@ export async function loginHandler(
     );
 
     if (!valid) {
-      return [
+      const returnValue: [OutgoingHttpHeaders, ResponseType<"/api/v1/login">] = [
         {
           "content-type": "text/json; charset=utf-8",
           ":status": "200",
@@ -103,10 +117,15 @@ export async function loginHandler(
         {
           success: false as const,
           error: {
-            password: "Falsches Passwort!",
+            issues: [{
+              code: ZodIssueCode.custom,
+              path: ["password"],
+              message: "Falsches Passwort!",
+            }]
           },
         },
       ];
+      return returnValue
     }
 
     if (needsRehash) {
