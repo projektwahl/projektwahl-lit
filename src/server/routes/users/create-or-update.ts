@@ -48,7 +48,10 @@ export async function createOrUpdateUsersHandler(
       // voter is not allowed to do anything
 
       if (!(loggedInUser?.type === "admin")) {
-        const returnValue: [OutgoingHttpHeaders, ResponseType<"/api/v1/users/create-or-update">] = [
+        const returnValue: [
+          OutgoingHttpHeaders,
+          ResponseType<"/api/v1/users/create-or-update">
+        ] = [
           {
             "content-type": "text/json; charset=utf-8",
             ":status": 403,
@@ -61,12 +64,12 @@ export async function createOrUpdateUsersHandler(
                   code: ZodIssueCode.custom,
                   path: ["forbidden"],
                   message: "Insufficient permissions!",
-                }
-              ]
+                },
+              ],
             },
           },
         ];
-        return returnValue
+        return returnValue;
       }
 
       try {
@@ -112,17 +115,22 @@ export async function createOrUpdateUsersHandler(
 
         console.log(row);
 
-        const returnValue = [
+        const returnValue: [
+          OutgoingHttpHeaders,
+          ResponseType<"/api/v1/users/create-or-update">
+        ] = [
           {
             "content-type": "text/json; charset=utf-8",
             ":status": 200,
           },
           {
             success: true as const,
-            data: routes["/api/v1/users/create-or-update"]["response"].parse(row),
+            data: routes["/api/v1/users/create-or-update"]["response"].parse(
+              row
+            ),
           },
         ];
-        return returnValue
+        return returnValue;
       } catch (error: unknown) {
         if (error instanceof postgres.PostgresError) {
           if (
@@ -130,7 +138,10 @@ export async function createOrUpdateUsersHandler(
             error.constraint_name === "users_with_deleted_username_key"
           ) {
             // unique violation
-            const returnValue: [OutgoingHttpHeaders, ResponseType<"/api/v1/users/create-or-update">] = [
+            const returnValue: [
+              OutgoingHttpHeaders,
+              ResponseType<"/api/v1/users/create-or-update">
+            ] = [
               {
                 "content-type": "text/json; charset=utf-8",
                 ":status": 200,
@@ -143,15 +154,18 @@ export async function createOrUpdateUsersHandler(
                       code: ZodIssueCode.custom,
                       path: ["username"],
                       message: "Nutzer mit diesem Namen existiert bereits!",
-                    }
-                  ]
+                    },
+                  ],
                 },
               },
             ];
-            return returnValue
+            return returnValue;
           } else {
             // TODO FIXME do this everywhere else / unify
-            const returnValue: [OutgoingHttpHeaders, ResponseType<"/api/v1/users/create-or-update">] = [
+            const returnValue: [
+              OutgoingHttpHeaders,
+              ResponseType<"/api/v1/users/create-or-update">
+            ] = [
               {
                 "content-type": "text/json; charset=utf-8",
                 ":status": 200,
@@ -164,16 +178,19 @@ export async function createOrUpdateUsersHandler(
                       code: ZodIssueCode.custom,
                       path: [error.column_name ?? "database"],
                       message: `${error.message}`,
-                    }
-                  ]
+                    },
+                  ],
                 },
               },
             ];
-            return returnValue
+            return returnValue;
           }
         }
         console.error(error);
-        const returnValue: [OutgoingHttpHeaders, ResponseType<"/api/v1/users/create-or-update">] = [
+        const returnValue: [
+          OutgoingHttpHeaders,
+          ResponseType<"/api/v1/users/create-or-update">
+        ] = [
           {
             "content-type": "text/json; charset=utf-8",
             ":status": 500,
@@ -186,12 +203,12 @@ export async function createOrUpdateUsersHandler(
                   code: ZodIssueCode.custom,
                   path: ["unknown"],
                   message: "Interner Fehler!",
-                }
-              ]
+                },
+              ],
             },
           },
         ];
-        return returnValue
+        return returnValue;
       }
     }
   )(request, response);

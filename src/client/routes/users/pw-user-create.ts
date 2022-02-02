@@ -45,9 +45,7 @@ export async function pwUser(id: number, viewOnly = false) {
 }
 
 const initialResult = result(
-  routes["/api/v1/users"]["response"]["shape"][
-    "entities"
-  ]["element"]
+  routes["/api/v1/users"]["response"]["shape"]["entities"]["element"]
 );
 
 const taskFunction = async ([id]: [number]) => {
@@ -183,14 +181,16 @@ class PwUserCreate extends PwForm<"/api/v1/users/create-or-update"> {
                   },
                 })}
                 ${(this.type ?? this.initial?.data.type ?? "voter") === "voter"
-                  ? html`${pwInput<"/api/v1/users/create-or-update", ["group"]>({
-                      type: "text",
-                      disabled: this.disabled,
-                      label: msg("Group"),
-                      name: ["group"],
-                      task: this._task,
-                      initial: this.initial?.data,
-                    })}
+                  ? html`${pwInput<"/api/v1/users/create-or-update", ["group"]>(
+                      {
+                        type: "text",
+                        disabled: this.disabled,
+                        label: msg("Group"),
+                        name: ["group"],
+                        task: this._task,
+                        initial: this.initial?.data,
+                      }
+                    )}
                     ${pwInput<"/api/v1/users/create-or-update", ["age"]>({
                       type: "number",
                       disabled: this.disabled,
@@ -202,15 +202,17 @@ class PwUserCreate extends PwForm<"/api/v1/users/create-or-update"> {
                   : undefined}
                 ${!this.disabled
                   ? html`
-                      ${pwInput<"/api/v1/users/create-or-update", ["password"]>({
-                        type: "password",
-                        disabled: this.disabled,
-                        label: msg("Password"),
-                        name: ["password"],
-                        task: this._task,
-                        autocomplete: "new-password",
-                        initial: this.initial?.data,
-                      })}
+                      ${pwInput<"/api/v1/users/create-or-update", ["password"]>(
+                        {
+                          type: "password",
+                          disabled: this.disabled,
+                          label: msg("Password"),
+                          name: ["password"],
+                          task: this._task,
+                          autocomplete: "new-password",
+                          initial: this.initial?.data,
+                        }
+                      )}
                     `
                   : undefined}
                 ${pwInput<"/api/v1/users/create-or-update", ["away"]>({

@@ -82,13 +82,11 @@ export class PwEntityList<
 
   protected history;
 
-  taskFunction: ([searchParams]: [URLSearchParams]) => Promise<
-    ResponseType<P>
-  >;
+  taskFunction: ([searchParams]: [URLSearchParams]) => Promise<ResponseType<P>>;
 
   constructor(
     taskFunction: ([searchParams]: [URLSearchParams]) => Promise<
-    ResponseType<P>
+      ResponseType<P>
     >
   ) {
     super();

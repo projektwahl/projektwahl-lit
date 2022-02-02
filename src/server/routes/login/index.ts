@@ -26,7 +26,7 @@ import {
   rawSessionType,
   rawUserSchema,
   UnknownKeysParam,
-  ResponseType
+  ResponseType,
 } from "../../../lib/routes.js";
 import { sql } from "../../database.js";
 import { MyRequest, requestHandler } from "../../express.js";
@@ -60,47 +60,49 @@ export async function loginHandler(
     // TODO FIXME this is vulnerable to side channel attacks
     // but maybe it's fine because we want to tell the user whether the account exists
     if (dbUser === undefined) {
-      const returnValue: [OutgoingHttpHeaders, ResponseType<"/api/v1/login">] = [
-        {
-          "content-type": "text/json; charset=utf-8",
-          ":status": "200",
-        },
-        {
-          success: false as const,
-          error: {
-            issues: [
-              {
-                code: ZodIssueCode.custom,
-                path: ["username"],
-                message: "Nutzer existiert nicht!",
-              }
-            ]
+      const returnValue: [OutgoingHttpHeaders, ResponseType<"/api/v1/login">] =
+        [
+          {
+            "content-type": "text/json; charset=utf-8",
+            ":status": "200",
           },
-        },
-      ];
-      return returnValue
+          {
+            success: false as const,
+            error: {
+              issues: [
+                {
+                  code: ZodIssueCode.custom,
+                  path: ["username"],
+                  message: "Nutzer existiert nicht!",
+                },
+              ],
+            },
+          },
+        ];
+      return returnValue;
     }
 
     if (dbUser.password_hash == null) {
-      const returnValue: [OutgoingHttpHeaders, ResponseType<"/api/v1/login">] = [
-        {
-          "content-type": "text/json; charset=utf-8",
-          ":status": "200",
-        },
-        {
-          success: false as const,
-          error: {
-            issues: [
-              {
-                code: ZodIssueCode.custom,
-                path: ["password"],
-                message: "Kein Password für Account gesetzt!",
-              }
-            ]
+      const returnValue: [OutgoingHttpHeaders, ResponseType<"/api/v1/login">] =
+        [
+          {
+            "content-type": "text/json; charset=utf-8",
+            ":status": "200",
           },
-        },
-      ];
-      return returnValue
+          {
+            success: false as const,
+            error: {
+              issues: [
+                {
+                  code: ZodIssueCode.custom,
+                  path: ["password"],
+                  message: "Kein Password für Account gesetzt!",
+                },
+              ],
+            },
+          },
+        ];
+      return returnValue;
     }
 
     const [valid, needsRehash, newHash] = await checkPassword(
@@ -109,23 +111,26 @@ export async function loginHandler(
     );
 
     if (!valid) {
-      const returnValue: [OutgoingHttpHeaders, ResponseType<"/api/v1/login">] = [
-        {
-          "content-type": "text/json; charset=utf-8",
-          ":status": "200",
-        },
-        {
-          success: false as const,
-          error: {
-            issues: [{
-              code: ZodIssueCode.custom,
-              path: ["password"],
-              message: "Falsches Passwort!",
-            }]
+      const returnValue: [OutgoingHttpHeaders, ResponseType<"/api/v1/login">] =
+        [
+          {
+            "content-type": "text/json; charset=utf-8",
+            ":status": "200",
           },
-        },
-      ];
-      return returnValue
+          {
+            success: false as const,
+            error: {
+              issues: [
+                {
+                  code: ZodIssueCode.custom,
+                  path: ["password"],
+                  message: "Falsches Passwort!",
+                },
+              ],
+            },
+          },
+        ];
+      return returnValue;
     }
 
     if (needsRehash) {

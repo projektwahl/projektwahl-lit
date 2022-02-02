@@ -100,7 +100,10 @@ export async function openidRedirectHandler(
       );
 
       if (dbUser === undefined) {
-        const returnValue: [OutgoingHttpHeaders, ResponseType<"/api/v1/redirect">] = [
+        const returnValue: [
+          OutgoingHttpHeaders,
+          ResponseType<"/api/v1/redirect">
+        ] = [
           {
             "content-type": "text/json; charset=utf-8",
             ":status": 200,
@@ -113,12 +116,12 @@ export async function openidRedirectHandler(
                   code: ZodIssueCode.custom,
                   path: ["username"],
                   message: "Nutzer existiert nicht!",
-                }
-              ]
+                },
+              ],
             },
           },
         ];
-        return returnValue
+        return returnValue;
       }
 
       /** @type {[Pick<import("../../../lib/types").RawSessionType, "session_id">]} */
@@ -158,7 +161,10 @@ export async function openidRedirectHandler(
         },
       ];
     } catch (error) {
-      const returnValue: [OutgoingHttpHeaders, ResponseType<"/api/v1/redirect">] = [
+      const returnValue: [
+        OutgoingHttpHeaders,
+        ResponseType<"/api/v1/redirect">
+      ] = [
         {
           "content-type": "text/json; charset=utf-8",
           ":status": 200,
@@ -170,12 +176,13 @@ export async function openidRedirectHandler(
               {
                 code: ZodIssueCode.custom,
                 path: ["login"],
-                message: String(error)
-              }
-            ]
+                message: String(error),
+              },
+            ],
           },
         },
       ];
+      return returnValue;
     }
   })(request, response);
 }

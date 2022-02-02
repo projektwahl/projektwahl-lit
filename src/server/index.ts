@@ -39,7 +39,6 @@ if (!process.env["CREDENTIALS_DIRECTORY"]) {
   process.exit(1);
 }
 
-
 if (cluster.isPrimary) {
   console.log(`Primary is running`);
 
@@ -73,39 +72,39 @@ if (cluster.isPrimary) {
     })();
   }
 } else {
-/*
+  /*
   openssl req -x509 -newkey rsa:2048 -nodes -sha256 -subj '/CN=localhost' -keyout key.pem -out cert.pem
   */
 
-const server = createSecureServer(
-  {
-    key: readFileSync(process.env.CREDENTIALS_DIRECTORY + "/key.pem"),
-    cert: readFileSync(process.env.CREDENTIALS_DIRECTORY + "/cert.pem"),
-    allowHTTP1: true,
-  },
-  (request, response) => {
-    serverHandler(request, response).catch((error) => {
-      // TODO FIXME try sending a 500 in a try catch
-      console.error(error);
-    });
-  }
-);
+  const server = createSecureServer(
+    {
+      key: readFileSync(process.env.CREDENTIALS_DIRECTORY + "/key.pem"),
+      cert: readFileSync(process.env.CREDENTIALS_DIRECTORY + "/cert.pem"),
+      allowHTTP1: true,
+    },
+    (request, response) => {
+      serverHandler(request, response).catch((error) => {
+        // TODO FIXME try sending a 500 in a try catch
+        console.error(error);
+      });
+    }
+  );
 
-server.listen(
-  process.env.PORT
-    ? Number(process.env.PORT)
-    : process.env.SOCKET
-    ? { path: process.env.SOCKET }
-    : new net.Socket({ fd: 3 }),
-  511,
-  () => {
-    console.log(
-      `[${
-        cluster.worker?.id ?? "unknown"
-      }] Server started at ${process.env.BASE_URL}`
-    );
-  }
-);
+  server.listen(
+    process.env.PORT
+      ? Number(process.env.PORT)
+      : process.env.SOCKET
+      ? { path: process.env.SOCKET }
+      : new net.Socket({ fd: 3 }),
+    511,
+    () => {
+      console.log(
+        `[${cluster.worker?.id ?? "unknown"}] Server started at ${
+          process.env.BASE_URL
+        }`
+      );
+    }
+  );
 
   cluster.worker?.on("message", (message) => {
     //let getConnections = promisify(server.getConnections).bind(server)

@@ -226,7 +226,10 @@ export class PwInput<
           } ${this.task.render({
       pending: () => "",
       complete: (v) =>
-        !v.success && v.error.issues.find(i => JSON.stringify(i.path) == JSON.stringify(this.name)) !== undefined
+        !v.success &&
+        v.error.issues.find(
+          (i) => JSON.stringify(i.path) == JSON.stringify(this.name)
+        ) !== undefined
           ? "is-invalid"
           : "is-valid",
       initial: () => "",
@@ -297,12 +300,18 @@ export class PwInput<
         ${this.task.render({
           complete: (v) => {
             if (!v.success) {
-              if (v.error.issues.find(i => JSON.stringify(i.path) == JSON.stringify(this.name)) !== undefined) {
+              if (
+                v.error.issues.find(
+                  (i) => JSON.stringify(i.path) == JSON.stringify(this.name)
+                ) !== undefined
+              ) {
                 return html` <div
                   id="${this.randomId}-feedback"
                   class="invalid-feedback"
                 >
-                  ${v.error.issues.find(i => JSON.stringify(i.path) == JSON.stringify(this.name))?.message}
+                  ${v.error.issues.find(
+                    (i) => JSON.stringify(i.path) == JSON.stringify(this.name)
+                  )?.message}
                 </div>`;
               }
               return undefined;

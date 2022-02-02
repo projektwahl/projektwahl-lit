@@ -48,7 +48,8 @@ class PwProjectUserCheckbox extends LitElement {
   _task;
 
   user!: z.infer<
-    typeof routes["/api/v1/users"]["response"]>["entities"][number];
+    typeof routes["/api/v1/users"]["response"]
+  >["entities"][number];
 
   projectId!: number;
 

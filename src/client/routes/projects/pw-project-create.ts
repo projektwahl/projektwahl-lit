@@ -58,9 +58,7 @@ const taskFunction = async ([id]: [number]) => {
 };
 
 const initialResult = result(
-  routes["/api/v1/projects"]["response"][
-    "shape"
-  ]["entities"]["element"]
+  routes["/api/v1/projects"]["response"]["shape"]["entities"]["element"]
 );
 
 export const PwProjectCreate = setupHmr(

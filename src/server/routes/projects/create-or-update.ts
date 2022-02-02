@@ -45,7 +45,10 @@ export async function createOrUpdateProjectsHandler(
       if (
         !(loggedInUser?.type === "admin" || loggedInUser?.type === "helper")
       ) {
-        const returnValue: [OutgoingHttpHeaders, ResponseType<"/api/v1/projects/create-or-update">] = [
+        const returnValue: [
+          OutgoingHttpHeaders,
+          ResponseType<"/api/v1/projects/create-or-update">
+        ] = [
           {
             "content-type": "text/json; charset=utf-8",
             ":status": 403,
@@ -58,12 +61,12 @@ export async function createOrUpdateProjectsHandler(
                   code: ZodIssueCode.custom,
                   path: ["forbidden"],
                   message: "Insufficient permissions!",
-                }
-              ]
+                },
+              ],
             },
           },
         ];
-        return returnValue
+        return returnValue;
       }
 
       try {
@@ -133,7 +136,10 @@ export async function createOrUpdateProjectsHandler(
 
         if (!row) {
           // insufficient permissions
-          const returnValue: [OutgoingHttpHeaders, ResponseType<"/api/v1/projects/create-or-update">] = [
+          const returnValue: [
+            OutgoingHttpHeaders,
+            ResponseType<"/api/v1/projects/create-or-update">
+          ] = [
             {
               "content-type": "text/json; charset=utf-8",
               ":status": 403,
@@ -146,11 +152,12 @@ export async function createOrUpdateProjectsHandler(
                     code: ZodIssueCode.custom,
                     path: ["forbidden"],
                     message: "Insufficient permissions!",
-                  }
-                ]
+                  },
+                ],
               },
             },
           ];
+          return returnValue;
         }
         return [
           {
@@ -169,7 +176,10 @@ export async function createOrUpdateProjectsHandler(
             error.constraint_name === "users_with_deleted_username_key"
           ) {
             // unique violation
-            const returnValue: [OutgoingHttpHeaders, ResponseType<"/api/v1/projects/create-or-update">] = [
+            const returnValue: [
+              OutgoingHttpHeaders,
+              ResponseType<"/api/v1/projects/create-or-update">
+            ] = [
               {
                 "content-type": "text/json; charset=utf-8",
                 ":status": 200,
@@ -182,15 +192,19 @@ export async function createOrUpdateProjectsHandler(
                       code: ZodIssueCode.custom,
                       path: ["username"],
                       message: "Nutzer mit diesem Namen existiert bereits!",
-                    }
-                  ]
+                    },
+                  ],
                 },
               },
             ];
+            return returnValue;
           }
         }
         console.error(error);
-        const returnValue: [OutgoingHttpHeaders, ResponseType<"/api/v1/projects/create-or-update">] = [
+        const returnValue: [
+          OutgoingHttpHeaders,
+          ResponseType<"/api/v1/projects/create-or-update">
+        ] = [
           {
             "content-type": "text/json; charset=utf-8",
             ":status": 500,
@@ -203,11 +217,12 @@ export async function createOrUpdateProjectsHandler(
                   code: ZodIssueCode.custom,
                   path: ["unknown"],
                   message: "Interner Fehler!",
-                }
-              ]
+                },
+              ],
             },
           },
         ];
+        return returnValue;
       }
     }
   )(request, response);

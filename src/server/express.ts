@@ -166,8 +166,8 @@ export function requestHandler<P extends keyof typeof routes>(
                 code: ZodIssueCode.custom,
                 path: ["internal_error"],
                 message: String(error),
-              }
-            ]
+              },
+            ],
           },
         })
       );

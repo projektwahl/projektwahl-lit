@@ -77,9 +77,9 @@ class PwForm<P extends keyof typeof routes> extends LitElement {
           if (data.error.issues.length > 0) {
             return html`<div class="alert alert-danger" role="alert">
               ${msg("Some errors occurred!")}<br />
-              ${data.error.issues.map(issue => html`
-                ${issue.path}: ${issue.message}<br />
-              `)}
+              ${data.error.issues.map(
+                (issue) => html` ${issue.path}: ${issue.message}<br /> `
+              )}
             </div>`;
           }
         }

@@ -46,7 +46,10 @@ export async function projectsHandler(
           loggedInUser?.type === "voter"
         )
       ) {
-        const returnValue: [OutgoingHttpHeaders, ResponseType<"/api/v1/projects">] = [
+        const returnValue: [
+          OutgoingHttpHeaders,
+          ResponseType<"/api/v1/projects">
+        ] = [
           {
             "content-type": "text/json; charset=utf-8",
             ":status": 403,
@@ -59,8 +62,8 @@ export async function projectsHandler(
                   code: ZodIssueCode.custom,
                   path: ["forbidden"],
                   message: "Insufficient permissions!",
-                }
-              ]
+                },
+              ],
             },
           },
         ];
@@ -80,9 +83,7 @@ export async function projectsHandler(
         "deleted",
       ] as const;
 
-      return await fetchData<
-        "/api/v1/projects"
-      >(
+      return await fetchData<"/api/v1/projects">(
         "/api/v1/projects" as const,
         "projects_with_deleted",
         columns,
