@@ -39,6 +39,18 @@ type mappedInfer1<R extends keyof typeof entityRoutes> = {
   >[K];
 };
 
+type entitesType0 = {
+  [K in keyof typeof entityRoutes]: z.infer<typeof entityRoutes[K]["request"]>;
+};
+
+type entitesType1<R extends keyof typeof entityRoutes> = {
+  [K in keyof entitesType0]: entitesType0[R]["sorting"];
+};
+
+type entitesType2<R extends keyof typeof entityRoutes> = {
+  [K in keyof entitesType0]: entitesType0[R]["paginationCursor"];
+};
+
 export function updateField<
   E extends { [name: string]: boolean | string | number | null },
   K extends keyof E
@@ -54,9 +66,9 @@ export async function fetchData<R extends keyof typeof entityRoutes>(
   path: R,
   table: string,
   columns: readonly [string, ...string[]],
-  query: z.infer<typeof entityRoutes[R]["request"]>,
+  query: entitesType2[R],
   customFilterQuery: (
-    query: z.infer<typeof entityRoutes[R]["request"]>
+    query: entitesType2[R]
   ) => [
     TemplateStringsArray,
     ...(null | string | string[] | boolean | number | Buffer)[]
@@ -64,7 +76,7 @@ export async function fetchData<R extends keyof typeof entityRoutes>(
 ): Promise<[OutgoingHttpHeaders, ResponseType<R>]> {
   const entitySchema: entitesType[R] = entityRoutes[path];
 
-  let sorting: [string, "ASC"|"DESC"][] = query.sorting
+  let sorting: entitesType1<R> = query.sorting
 
   if (!sorting.find((e) => e[0] == "id")) {
     sorting.push(["id", "ASC"]);
@@ -82,7 +94,7 @@ export async function fetchData<R extends keyof typeof entityRoutes>(
     .flatMap((v) => [sql2`,`, sql2`${unsafe2(v[0])} ${unsafe2(v[1])}`])
     .slice(1);
 
-  const paginationCursor = query.paginationCursor;
+  const paginationCursor: entitesType2<R> = query.paginationCursor;
 
   let finalQuery;
   if (!paginationCursor) {
