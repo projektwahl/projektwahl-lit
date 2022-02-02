@@ -64,19 +64,21 @@ export async function fetchData<R extends keyof typeof entityRoutes>(
 ): Promise<[OutgoingHttpHeaders, ResponseType<R>]> {
   const entitySchema: entitesType[R] = entityRoutes[path];
 
-  if (!query.sorting.find((e) => e[0] == "id")) {
-    query.sorting.push(["id", "ASC"]);
+  let sorting: [string, "ASC"|"DESC"][] = query.sorting
+
+  if (!sorting.find((e) => e[0] == "id")) {
+    sorting.push(["id", "ASC"]);
   }
 
   // orderBy needs to be reversed for backwards pagination
   if (query.paginationDirection === "backwards") {
-    query.sorting = query.sorting.map((v) => [
+    sorting = sorting.map((v) => [
       v[0],
       v[1] === "ASC" ? "DESC" : "ASC",
     ]);
   }
 
-  const orderByQuery = query.sorting
+  const orderByQuery = sorting
     .flatMap((v) => [sql2`,`, sql2`${unsafe2(v[0])} ${unsafe2(v[1])}`])
     .slice(1);
 
@@ -90,8 +92,8 @@ export async function fetchData<R extends keyof typeof entityRoutes>(
       query
     )} ORDER BY ${orderByQuery} LIMIT ${query.paginationLimit + 1})`;
   } else {
-    const queries = query.sorting.map((value, index) => {
-      const part = query.sorting.slice(0, index + 1);
+    const queries = sorting.map((value, index) => {
+      const part = sorting.slice(0, index + 1);
 
       const parts = part
         .flatMap((value, index) => {

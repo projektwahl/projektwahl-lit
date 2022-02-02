@@ -78,7 +78,7 @@ export class PwEntityList<
 
   initialRender: boolean;
 
-  initial: Promise<z.infer<typeof entityRoutes[P]["response"]>> | undefined;
+  initial: Promise<ResponseType<P>> | undefined;
 
   protected history;
 
@@ -113,6 +113,9 @@ export class PwEntityList<
               // TODO FIXME put old data from url in here (at least for some of them)
               sorting: [],
               paginationCursor: null,
+              filters: {},
+              paginationDirection: "forwards",
+              paginationLimit: 100
             } as z.infer<typeof entityRoutes[P]["request"]>,
           });
           (this.form.value as HTMLFormElement).dispatchEvent(formDataEvent);

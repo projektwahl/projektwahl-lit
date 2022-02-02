@@ -67,9 +67,7 @@ export const myFetch = async <P extends import("../lib/routes").keys>(
         return r;
       }
     }
-    const result = (await response.json()) as z.infer<
-      typeof import("../lib/routes").routes[P]["response"]
-    >;
+    const result = (await response.json()) as ResponseType<P>;
     return result;
   } catch (error) {
     console.error(error);
