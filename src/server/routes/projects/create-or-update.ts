@@ -28,6 +28,7 @@ import { sql2 } from "../../sql/index.js";
 import type { OutgoingHttpHeaders, ServerResponse } from "node:http";
 import type { Http2ServerResponse } from "node:http2";
 import { rawProjectSchema, ResponseType } from "../../../lib/routes.js";
+import { ZodIssueCode } from "zod";
 
 export async function createOrUpdateProjectsHandler(
   request: MyRequest,
@@ -52,7 +53,13 @@ export async function createOrUpdateProjectsHandler(
           {
             success: false as const,
             error: {
-              forbidden: "Insufficient permissions!",
+              issues: [
+                {
+                  code: ZodIssueCode.custom,
+                  path: ["forbidden"],
+                  message: "Insufficient permissions!",
+                }
+              ]
             },
           },
         ];
@@ -134,7 +141,13 @@ export async function createOrUpdateProjectsHandler(
             {
               success: false as const,
               error: {
-                forbidden: "Insufficient permissions!",
+                issues: [
+                  {
+                    code: ZodIssueCode.custom,
+                    path: ["forbidden"],
+                    message: "Insufficient permissions!",
+                  }
+                ]
               },
             },
           ];
@@ -164,7 +177,13 @@ export async function createOrUpdateProjectsHandler(
               {
                 success: false as const,
                 error: {
-                  username: "Nutzer mit diesem Namen existiert bereits!",
+                  issues: [
+                    {
+                      code: ZodIssueCode.custom,
+                      path: ["username"],
+                      message: "Nutzer mit diesem Namen existiert bereits!",
+                    }
+                  ]
                 },
               },
             ];
@@ -179,7 +198,13 @@ export async function createOrUpdateProjectsHandler(
           {
             success: false as const,
             error: {
-              unknown: "Interner Fehler!",
+              issues: [
+                {
+                  code: ZodIssueCode.custom,
+                  path: ["unknown"],
+                  message: "Interner Fehler!",
+                }
+              ]
             },
           },
         ];

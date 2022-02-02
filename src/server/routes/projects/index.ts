@@ -20,7 +20,7 @@ https://github.com/projektwahl/projektwahl-lit
 SPDX-License-Identifier: AGPL-3.0-or-later
 SPDX-FileCopyrightText: 2021 Moritz Hedtke <Moritz.Hedtke@t-online.de>
 */
-import { z } from "zod";
+import { z, ZodIssueCode } from "zod";
 import type { rawProjectSchema, ResponseType } from "../../../lib/routes.js";
 import { fetchData } from "../../entities.js";
 import { MyRequest, requestHandler } from "../../express.js";
@@ -54,7 +54,13 @@ export async function projectsHandler(
           {
             success: false as const,
             error: {
-              forbidden: "Insufficient permissions!",
+              issues: [
+                {
+                  code: ZodIssueCode.custom,
+                  path: ["forbidden"],
+                  message: "Insufficient permissions!",
+                }
+              ]
             },
           },
         ];

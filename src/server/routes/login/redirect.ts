@@ -21,7 +21,7 @@ SPDX-License-Identifier: AGPL-3.0-or-later
 SPDX-FileCopyrightText: 2021 Moritz Hedtke <Moritz.Hedtke@t-online.de>
 */
 import { sensitiveHeaders } from "node:http2";
-import { z, ZodObject, ZodTypeAny } from "zod";
+import { z, ZodIssueCode, ZodObject, ZodTypeAny } from "zod";
 import {
   rawSessionType,
   rawUserSchema,
@@ -108,7 +108,13 @@ export async function openidRedirectHandler(
           {
             success: false,
             error: {
-              username: "Nutzer existiert nicht!",
+              issues: [
+                {
+                  code: ZodIssueCode.custom,
+                  path: ["username"],
+                  message: "Nutzer existiert nicht!",
+                }
+              ]
             },
           },
         ];
@@ -160,7 +166,13 @@ export async function openidRedirectHandler(
         {
           success: false,
           error: {
-            login: String(error),
+            issues: [
+              {
+                code: ZodIssueCode.custom,
+                path: ["login"],
+                message: String(error)
+              }
+            ]
           },
         },
       ];

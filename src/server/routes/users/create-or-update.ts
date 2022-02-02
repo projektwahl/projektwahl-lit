@@ -29,6 +29,7 @@ import { sql2 } from "../../sql/index.js";
 import { updateField } from "../../entities.js";
 import type { OutgoingHttpHeaders, ServerResponse } from "node:http";
 import type { Http2ServerResponse } from "node:http2";
+import { ZodIssueCode } from "zod";
 
 // TODO FIXME somehow ensure all attributes are read here because this is an easy way to loose data
 // Also ensure create and update has the same attributes
@@ -55,7 +56,13 @@ export async function createOrUpdateUsersHandler(
           {
             success: false as const,
             error: {
-              forbidden: "Insufficient permissions!",
+              issues: [
+                {
+                  code: ZodIssueCode.custom,
+                  path: ["forbidden"],
+                  message: "Insufficient permissions!",
+                }
+              ]
             },
           },
         ];
@@ -131,7 +138,13 @@ export async function createOrUpdateUsersHandler(
               {
                 success: false as const,
                 error: {
-                  username: "Nutzer mit diesem Namen existiert bereits!",
+                  issues: [
+                    {
+                      code: ZodIssueCode.custom,
+                      path: ["username"],
+                      message: "Nutzer mit diesem Namen existiert bereits!",
+                    }
+                  ]
                 },
               },
             ];
@@ -146,7 +159,13 @@ export async function createOrUpdateUsersHandler(
               {
                 success: false as const,
                 error: {
-                  [error.column_name ?? "database"]: `${error.message}`,
+                  issues: [
+                    {
+                      code: ZodIssueCode.custom,
+                      path: [error.column_name ?? "database"],
+                      message: `${error.message}`,
+                    }
+                  ]
                 },
               },
             ];
@@ -162,7 +181,13 @@ export async function createOrUpdateUsersHandler(
           {
             success: false as const,
             error: {
-              unknown: "Interner Fehler!",
+              issues: [
+                {
+                  code: ZodIssueCode.custom,
+                  path: ["unknown"],
+                  message: "Interner Fehler!",
+                }
+              ]
             },
           },
         ];
