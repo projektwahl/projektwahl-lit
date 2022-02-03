@@ -115,7 +115,7 @@ export class PwEntityList<
               paginationCursor: null,
               filters: {},
               paginationDirection: "forwards",
-              paginationLimit: 100
+              paginationLimit: 100,
             } as z.infer<typeof entityRoutes[P]["request"]>,
           });
           (this.form.value as HTMLFormElement).dispatchEvent(formDataEvent);

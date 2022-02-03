@@ -86,7 +86,8 @@ export async function fetchData<R extends keyof typeof entityRoutes>(
     .flatMap((v) => [sql2`,`, sql2`${unsafe2(v[0])} ${unsafe2(v[1])}`])
     .slice(1);
 
-  const paginationCursor: entitesType0[R]["paginationCursor"] = query.paginationCursor;
+  const paginationCursor: entitesType0[R]["paginationCursor"] =
+    query.paginationCursor;
 
   let finalQuery;
   if (!paginationCursor) {
