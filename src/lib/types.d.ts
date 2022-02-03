@@ -45,13 +45,6 @@ type FilterType<Type> = {
   [Property in keyof Type as `f_${string & Property}`]?: Type[Property];
 };
 
-type BaseQuery<C> = {
-  paginationDirection: "forwards" | "backwards";
-  paginationCursor: C | null; // if this is null the start is at start/end depending on paginationDirection
-  sorting: [keyof C, "ASC" | "DESC"][];
-  paginationLimit: number;
-};
-
 export interface WritableTemplateStringsArray extends Array<string> {
   raw?: string[];
 }

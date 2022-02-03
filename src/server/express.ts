@@ -21,11 +21,15 @@ SPDX-License-Identifier: AGPL-3.0-or-later
 SPDX-FileCopyrightText: 2021 Moritz Hedtke <Moritz.Hedtke@t-online.de>
 */
 
-import { zod2result } from "../lib/result.js";
 import { json } from "node:stream/consumers";
 import { URL } from "url";
-import { rawUserSchema, routes, UnknownKeysParam } from "../lib/routes.js";
-import type { z, ZodObject, ZodTypeAny } from "zod";
+import {
+  rawUserSchema,
+  routes,
+  UnknownKeysParam,
+  ResponseType,
+} from "../lib/routes.js";
+import { z, ZodIssueCode, ZodObject, ZodTypeAny } from "zod";
 import { retryableBegin } from "./database.js";
 import cookie from "cookie";
 import type { IncomingMessage, ServerResponse } from "node:http";
@@ -63,7 +67,7 @@ export function requestHandler<P extends keyof typeof routes>(
     r: z.infer<typeof routes[P]["request"]>,
     user: z.infer<typeof userSchema>,
     session_id: string | undefined
-  ) => PromiseLike<[OutgoingHttpHeaders, z.infer<typeof routes[P]["response"]>]>
+  ) => PromiseLike<[OutgoingHttpHeaders, ResponseType<P>]>
 ): (
   request: MyRequest,
   response: ServerResponse | Http2ServerResponse
@@ -84,7 +88,7 @@ export function requestHandler<P extends keyof typeof routes>(
         throw new Error("No CSRF header!");
       }
 
-      const url = new URL(request.url, "https://localhost:8443");
+      const url = new URL(request.url, process.env.BASE_URL);
       if (
         request.method === method &&
         new RegExp(path).test(/** @type {string} */ url.pathname)
@@ -97,6 +101,7 @@ export function requestHandler<P extends keyof typeof routes>(
           request.method === "GET" ? cookies.lax_id : cookies.strict_id;
 
         // implementing https://datatracker.ietf.org/doc/html/draft-ietf-httpbis-rfc6265bis-02#section-8.8.2
+        // TODO FIXME don't do all this for static resource requests
         if (session_id) {
           user = userSchema.parse(
             (
@@ -110,16 +115,25 @@ export function requestHandler<P extends keyof typeof routes>(
         }
 
         const body =
-          request.method === "POST" ? await json(request) : undefined;
-        const requestBody = zod2result(routes[path].request, body);
+          request.method === "POST"
+            ? await json(request)
+            : JSON.parse(
+                decodeURIComponent(
+                  url.search == "" ? "{}" : url.search.substring(1)
+                )
+              ); // TODO FIXME if this throws
+        const requestBody = routes[path].request.safeParse(body);
         if (requestBody.success) {
           const [new_headers, responseBody] = await handler(
             requestBody.data,
             user,
             session_id
           );
-          //console.log("responseBody", responseBody);
-          routes[path].response.parse(responseBody);
+          console.log("responseBody", responseBody);
+          // TODO FIXME add schema for the result shit around that
+          if (responseBody.success) {
+            routes[path].response.parse(responseBody.data);
+          }
           const { ":status": _, ...finalHeaders } = new_headers;
           response.writeHead(Number(new_headers[":status"]), {
             ...defaultHeaders,
@@ -127,7 +141,9 @@ export function requestHandler<P extends keyof typeof routes>(
           });
           response.end(JSON.stringify(responseBody));
         } else {
-          //console.log(requestBody);
+          // https://github.com/colinhacks/zod/blob/master/ERROR_HANDLING.md
+          console.log(requestBody.error.issues);
+
           response.writeHead(200, {
             ...defaultHeaders,
             "content-type": "text/json; charset=utf-8",
@@ -143,10 +159,17 @@ export function requestHandler<P extends keyof typeof routes>(
         ...defaultHeaders,
       });
       response.end(
+        // TODO FIXME typings
         JSON.stringify({
           success: false,
           error: {
-            error: String(error),
+            issues: [
+              {
+                code: ZodIssueCode.custom,
+                path: ["internal_error"],
+                message: String(error),
+              },
+            ],
           },
         })
       );

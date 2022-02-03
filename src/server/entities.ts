@@ -21,11 +21,9 @@ SPDX-License-Identifier: AGPL-3.0-or-later
 SPDX-FileCopyrightText: 2021 Moritz Hedtke <Moritz.Hedtke@t-online.de>
 */
 import type { OutgoingHttpHeaders } from "node:http2";
-import { z } from "zod";
-import { entityRoutes } from "../lib/routes.js";
-import type { BaseQuery } from "../lib/types.js";
+import type { z } from "zod";
+import { entityRoutes, ResponseType } from "../lib/routes.js";
 import { sql } from "./database.js";
-import type { MyRequest } from "./express.js";
 import { sql2, unsafe2 } from "./sql/index.js";
 
 // Mapped Types
@@ -36,9 +34,13 @@ type entitesType = {
 };
 
 type mappedInfer1<R extends keyof typeof entityRoutes> = {
-  [K in keyof z.infer<
-    entitesType[R]["response"]["options"][0]["shape"]["data"]
-  >]: z.infer<entitesType[R]["response"]["options"][0]["shape"]["data"]>[K];
+  [K in keyof z.infer<entitesType[R]["response"]>]: z.infer<
+    entitesType[R]["response"]
+  >[K];
+};
+
+type entitesType0 = {
+  [K in keyof typeof entityRoutes]: z.infer<typeof entityRoutes[K]["request"]>;
 };
 
 export function updateField<
@@ -52,85 +54,28 @@ export function updateField<
   )}" END`;
 }
 
-export async function fetchData<
-  T extends {
-    id: number;
-    [index: string]: null | string | string[] | boolean | number;
-  },
-  Q,
-  R extends keyof typeof entityRoutes
->(
+export async function fetchData<R extends keyof typeof entityRoutes>(
   path: R,
-  request: MyRequest,
   table: string,
   columns: readonly [string, ...string[]],
-  filters: Q,
-  orderByInfo: { [field: string]: "nulls-first" | "nulls-last" },
+  query: entitesType0[R],
   customFilterQuery: (
-    query: Q
+    query: entitesType0[R]
   ) => [
     TemplateStringsArray,
     ...(null | string | string[] | boolean | number | Buffer)[]
   ]
-): Promise<[OutgoingHttpHeaders, z.infer<typeof entityRoutes[R]["response"]>]> {
+): Promise<[OutgoingHttpHeaders, ResponseType<R>]> {
   const entitySchema: entitesType[R] = entityRoutes[path];
 
-  const url = new URL(request.url, process.env.BASE_URL);
-
-  // TODO FIXME make all this a json object as get parameter
-
-  const pagination = z
-    .object({
-      p_cursor: z
-        .string()
-        .refine(
-          (s) => {
-            try {
-              JSON.parse(s);
-            } catch (e) {
-              return false;
-            }
-            return true;
-          },
-          {
-            message: "The cursor is invalid. This is an internal error.",
-          }
-        )
-        .transform((s) => JSON.parse(s) as unknown)
-        .optional(),
-      p_direction: z.enum(["forwards", "backwards"]).default("forwards"),
-      p_limit: z
-        .string()
-        .refine((s) => /^\d*$/.test(s))
-        .transform((s) => (s === "" ? undefined : Number(s)))
-        .default("10"),
-    })
-    .parse(
-      Object.fromEntries(
-        url.searchParams as unknown as Iterable<readonly [string, string]>
-      )
-    );
-
-  const sorting = z
-    .array(z.tuple([z.enum(columns), z.enum(["ASC", "DESC"])]))
-    .parse(url.searchParams.getAll("order").map((o) => o.split("-")));
-
-  // TODO FIXME remove this useless struct
-  const _query: BaseQuery<T> = {
-    paginationCursor: pagination.p_cursor as T,
-    paginationDirection: pagination.p_direction,
-    paginationLimit: pagination.p_limit,
-    sorting,
-  };
-
-  const query = _query;
-
+  // @ts-expect-error
   if (!query.sorting.find((e) => e[0] == "id")) {
     query.sorting.push(["id", "ASC"]);
   }
 
   // orderBy needs to be reversed for backwards pagination
   if (query.paginationDirection === "backwards") {
+    // @ts-expect-error
     query.sorting = query.sorting.map((v) => [
       v[0],
       v[1] === "ASC" ? "DESC" : "ASC",
@@ -141,14 +86,15 @@ export async function fetchData<
     .flatMap((v) => [sql2`,`, sql2`${unsafe2(v[0])} ${unsafe2(v[1])}`])
     .slice(1);
 
-  const paginationCursor = query.paginationCursor;
+  const paginationCursor: entitesType0[R]["paginationCursor"] =
+    query.paginationCursor;
 
   let finalQuery;
   if (!paginationCursor) {
     finalQuery = sql2`(SELECT ${unsafe2(
       columns.map((c) => `"${c}"`).join(", ")
     )} FROM ${unsafe2(table)} WHERE ${customFilterQuery(
-      filters
+      query
     )} ORDER BY ${orderByQuery} LIMIT ${query.paginationLimit + 1})`;
   } else {
     const queries = query.sorting.map((value, index) => {
@@ -158,6 +104,7 @@ export async function fetchData<
         .flatMap((value, index) => {
           return [
             sql2` AND `,
+            // @ts-expect-error
             sql2`${paginationCursor ? paginationCursor[value[0]] : null} ${
               index === part.length - 1
                 ? value[1] === "ASC"
@@ -172,7 +119,7 @@ export async function fetchData<
       return sql2`(SELECT ${unsafe2(columns.join(", "))} FROM ${unsafe2(
         table
       )} WHERE ${customFilterQuery(
-        filters
+        query
       )} AND (${parts}) ORDER BY ${orderByQuery} LIMIT ${
         query.paginationLimit + 1
       })`;
@@ -187,39 +134,32 @@ export async function fetchData<
     }
   }
 
-  const entitiesSchema =
-    entitySchema["response"]["options"][0]["shape"]["data"]["shape"][
-      "entities"
-    ];
+  const entitiesSchema = entitySchema["response"]["shape"]["entities"];
 
-  let entities: z.infer<
-    entitesType[R]["response"]["options"][0]["shape"]["data"]
-  >["entities"] = entitiesSchema.parse(await sql(...finalQuery));
+  let entities: z.infer<entitesType[R]["response"]>["entities"] =
+    entitiesSchema.parse(await sql(...finalQuery));
 
   // https://github.com/projektwahl/projektwahl-sveltekit/blob/work/src/lib/list-entities.ts#L30
 
-  let nextCursor: z.infer<
-    entitesType[R]["response"]["options"][0]["shape"]["data"]
-  >["nextCursor"] = null;
-  let previousCursor: z.infer<
-    entitesType[R]["response"]["options"][0]["shape"]["data"]
-  >["previousCursor"] = null;
+  let nextCursor: z.infer<entitesType[R]["response"]>["nextCursor"] = null;
+  let previousCursor: z.infer<entitesType[R]["response"]>["previousCursor"] =
+    null;
   // TODO FIXME also recalculate the other cursor because data could've been deleted in between / the filters have changed
-  if (pagination.p_direction === "forwards") {
-    if (pagination.p_cursor) {
+  if (query.paginationDirection === "forwards") {
+    if (query.paginationCursor) {
       previousCursor = entities[0] ?? null;
     }
-    if (entities.length > pagination.p_limit) {
+    if (entities.length > query.paginationLimit) {
       entities.pop();
       nextCursor = entities[entities.length - 1] ?? null;
     }
-  } else if (pagination.p_direction === "backwards") {
+  } else if (query.paginationDirection === "backwards") {
     entities = entities.reverse(); // fixup as we needed to switch up orders above
-    if (entities.length > pagination.p_limit) {
+    if (entities.length > query.paginationLimit) {
       entities.shift();
       previousCursor = entities[0] ?? null;
     }
-    if (pagination.p_cursor) {
+    if (query.paginationCursor) {
       nextCursor = entities[entities.length - 1] ?? null;
     }
   }
@@ -233,7 +173,7 @@ export async function fetchData<
   const a = {
     success: true as const,
     data: y,
-  } as z.infer<entitesType[R]["response"]>;
+  } as ResponseType<R>;
 
   return [
     {

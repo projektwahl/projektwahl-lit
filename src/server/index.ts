@@ -24,8 +24,10 @@ import { createSecureServer } from "node:http2";
 import { readFileSync } from "node:fs";
 import "./routes/login/openid-client.js";
 //import cluster from "cluster";
-import { serverHandler } from "./server-handler.js";
+import { getDirs, serverHandler } from "./server-handler.js";
 import net from "net";
+import cluster from "cluster";
+import { watch } from "node:fs/promises";
 
 if (!process.env["BASE_URL"]) {
   console.error("BASE_URL not set!");
@@ -37,7 +39,6 @@ if (!process.env["CREDENTIALS_DIRECTORY"]) {
   process.exit(1);
 }
 
-/*
 if (cluster.isPrimary) {
   console.log(`Primary is running`);
 
@@ -70,41 +71,41 @@ if (cluster.isPrimary) {
       }
     })();
   }
-} else {*/
-/*
+} else {
+  /*
   openssl req -x509 -newkey rsa:2048 -nodes -sha256 -subj '/CN=localhost' -keyout key.pem -out cert.pem
   */
 
-const server = createSecureServer(
-  {
-    key: readFileSync(process.env.CREDENTIALS_DIRECTORY + "/key.pem"),
-    cert: readFileSync(process.env.CREDENTIALS_DIRECTORY + "/cert.pem"),
-    allowHTTP1: true,
-  },
-  (request, response) => {
-    serverHandler(request, response).catch((error) => {
-      // TODO FIXME try sending a 500 in a try catch
-      console.error(error);
-    });
-  }
-);
+  const server = createSecureServer(
+    {
+      key: readFileSync(process.env.CREDENTIALS_DIRECTORY + "/key.pem"),
+      cert: readFileSync(process.env.CREDENTIALS_DIRECTORY + "/cert.pem"),
+      allowHTTP1: true,
+    },
+    (request, response) => {
+      serverHandler(request, response).catch((error) => {
+        // TODO FIXME try sending a 500 in a try catch
+        console.error(error);
+      });
+    }
+  );
 
-server.listen(
-  process.env.PORT
-    ? Number(process.env.PORT)
-    : process.env.SOCKET
-    ? { path: process.env.SOCKET }
-    : new net.Socket({ fd: 3 }),
-  511,
-  () => {
-    /*console.log(
-      `[${
-        cluster.worker?.id ?? "unknown"
-      }] Server started at ${process.env.BASE_URL}`
-    );*/
-  }
-);
-/*
+  server.listen(
+    process.env.PORT
+      ? Number(process.env.PORT)
+      : process.env.SOCKET
+      ? { path: process.env.SOCKET }
+      : new net.Socket({ fd: 3 }),
+    511,
+    () => {
+      console.log(
+        `[${cluster.worker?.id ?? "unknown"}] Server started at ${
+          process.env.BASE_URL
+        }`
+      );
+    }
+  );
+
   cluster.worker?.on("message", (message) => {
     //let getConnections = promisify(server.getConnections).bind(server)
     //console.log(await getConnections())
@@ -116,8 +117,8 @@ server.listen(
       cluster.worker?.removeAllListeners("message");
       cluster.worker?.kill();
     }
-  });*/
-//}
+  });
+}
 
 //repl.start({})
 

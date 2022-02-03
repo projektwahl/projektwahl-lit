@@ -21,16 +21,17 @@ SPDX-License-Identifier: AGPL-3.0-or-later
 SPDX-FileCopyrightText: 2021 Moritz Hedtke <Moritz.Hedtke@t-online.de>
 */
 import { sensitiveHeaders } from "node:http2";
-import { z, ZodObject, ZodTypeAny } from "zod";
+import { z, ZodIssueCode, ZodObject, ZodTypeAny } from "zod";
 import {
   rawSessionType,
   rawUserSchema,
   UnknownKeysParam,
+  ResponseType,
 } from "../../../lib/routes.js";
 import { sql } from "../../database.js";
 import { MyRequest, requestHandler } from "../../express.js";
 import { client } from "./openid-client.js";
-import type { ServerResponse } from "node:http";
+import type { OutgoingHttpHeaders, ServerResponse } from "node:http";
 import type { Http2ServerResponse } from "node:http2";
 
 export async function openidRedirectHandler(
@@ -99,7 +100,10 @@ export async function openidRedirectHandler(
       );
 
       if (dbUser === undefined) {
-        return [
+        const returnValue: [
+          OutgoingHttpHeaders,
+          ResponseType<"/api/v1/redirect">
+        ] = [
           {
             "content-type": "text/json; charset=utf-8",
             ":status": 200,
@@ -107,10 +111,17 @@ export async function openidRedirectHandler(
           {
             success: false,
             error: {
-              username: "Nutzer existiert nicht!",
+              issues: [
+                {
+                  code: ZodIssueCode.custom,
+                  path: ["username"],
+                  message: "Nutzer existiert nicht!",
+                },
+              ],
             },
           },
         ];
+        return returnValue;
       }
 
       /** @type {[Pick<import("../../../lib/types").RawSessionType, "session_id">]} */
@@ -150,7 +161,10 @@ export async function openidRedirectHandler(
         },
       ];
     } catch (error) {
-      return [
+      const returnValue: [
+        OutgoingHttpHeaders,
+        ResponseType<"/api/v1/redirect">
+      ] = [
         {
           "content-type": "text/json; charset=utf-8",
           ":status": 200,
@@ -158,10 +172,17 @@ export async function openidRedirectHandler(
         {
           success: false,
           error: {
-            login: String(error),
+            issues: [
+              {
+                code: ZodIssueCode.custom,
+                path: ["login"],
+                message: String(error),
+              },
+            ],
           },
         },
       ];
+      return returnValue;
     }
   })(request, response);
 }

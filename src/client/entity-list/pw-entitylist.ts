@@ -20,25 +20,28 @@ https://github.com/projektwahl/projektwahl-lit
 SPDX-License-Identifier: AGPL-3.0-or-later
 SPDX-FileCopyrightText: 2021 Moritz Hedtke <Moritz.Hedtke@t-online.de>
 */
-import { css, html, LitElement, TemplateResult } from "lit";
-import { bootstrapCss } from "../index.js";
+import { css, html, TemplateResult } from "lit";
 import { HistoryController } from "../history-controller.js";
-import { msg, str } from "@lit/localize";
 import { createRef, ref } from "lit/directives/ref.js";
 import { Task, TaskStatus } from "@lit-labs/task";
-import type { entityRoutes } from "../../lib/routes.js";
+import type { entityRoutes, routes, ResponseType } from "../../lib/routes.js";
 import type { z } from "zod";
+import { PwForm } from "../form/pw-form.js";
+import { bootstrapCss } from "../index.js";
+import { msg, str } from "@lit/localize";
 import { ifDefined } from "lit/directives/if-defined.js";
+import { myFetch } from "../utils.js";
 
 export class PwEntityList<
   P extends keyof typeof entityRoutes
-> extends LitElement {
+> extends PwForm<P> {
   static override get properties() {
     return {
       task: { attribute: false },
       initial: { attribute: false },
       initialRender: { state: true },
       debouncedUrl: { state: true },
+      ...super.properties,
     };
   }
 
@@ -65,35 +68,24 @@ export class PwEntityList<
     throw new Error("not implemented");
   }
 
-  protected _apiTask!: Task<
-    [URLSearchParams],
-    z.infer<typeof entityRoutes[P]["response"]>
-  >;
+  get actionText(): string {
+    return "blub";
+  }
 
-  formRef;
+  get url(): P {
+    throw new Error("not implemented");
+  }
 
   initialRender: boolean;
 
-  initial: Promise<z.infer<typeof entityRoutes[P]["response"]>> | undefined;
+  initial: Promise<ResponseType<P>> | undefined;
 
   protected history;
 
-  taskFunction: ([searchParams]: [URLSearchParams]) => Promise<
-    z.infer<typeof entityRoutes[P]["response"]>
-  >;
-
-  constructor(
-    taskFunction: ([searchParams]: [URLSearchParams]) => Promise<
-      z.infer<typeof entityRoutes[P]["response"]>
-    >
-  ) {
+  constructor() {
     super();
 
-    this.taskFunction = taskFunction;
-
     this.history = new HistoryController(this, /.*/);
-
-    this.formRef = createRef();
 
     this.initialRender = true;
   }
@@ -102,28 +94,70 @@ export class PwEntityList<
     if (this.initialRender) {
       this.initialRender = false;
 
-      this._apiTask = new Task(this, {
-        task: this.taskFunction,
-        args: () => [this.history.url.searchParams] as [URLSearchParams],
+      this._task = new Task(this, {
+        task: async () => {
+          const formDataEvent = new CustomEvent<
+            z.infer<typeof entityRoutes[P]["request"]>
+          >("myformdata", {
+            bubbles: true,
+            composed: true,
+            detail: {
+              // TODO FIXME put old data from url in here (at least for some of them)
+              sorting: [],
+              paginationCursor: null,
+              filters: {},
+              paginationDirection: "forwards",
+              paginationLimit: 100,
+            } as z.infer<typeof entityRoutes[P]["request"]>,
+          });
+          this.form.value?.dispatchEvent(formDataEvent);
+
+          console.log(JSON.stringify(formDataEvent.detail));
+
+          const result = await myFetch<P>(
+            `${this.url}?${encodeURIComponent(
+              JSON.stringify(formDataEvent.detail)
+            )}`,
+            {
+              method: "GET",
+            }
+          );
+
+          HistoryController.goto(
+            new URL(
+              `?${encodeURIComponent(JSON.stringify(formDataEvent.detail))}`,
+              window.location.href
+            ),
+            {}
+          );
+
+          return result;
+        },
         autoRun: false, // TODO FIXME this would be way simpler if there would be a no first run or so
       });
 
       if (this.initial !== undefined) {
         // TODO FIXME goddammit the private attributes get minified
-        this._apiTask.status = TaskStatus.COMPLETE;
+        this._task.status = TaskStatus.COMPLETE;
         // @ts-expect-error See https://github.com/lit/lit/issues/2367
-        this._apiTask.p = this.initial;
+        this._task.p = this.initial;
         // TODO FIXMe if we set the currentArgs here somehow I think this may work
+      } else {
+        this._task.run();
       }
+    }
+
+    if (this.actionText === undefined) {
+      throw new Error(msg("component not fully initialized"));
     }
 
     return html`
       ${bootstrapCss}
-      <div class="container">
+      <main class="container">
         <div
           style="position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 1337;"
         >
-          ${this._apiTask.render({
+          ${this._task.render({
             pending: () => html`<div
               class="spinner-grow text-primary"
               role="status"
@@ -140,12 +174,11 @@ export class PwEntityList<
             <select
               @change=${async (event: Event) => {
                 const url = new URL(window.location.href);
-                url.searchParams.set(
-                  "p_limit",
-                  (event.target as HTMLSelectElement).value
-                );
+                const value = JSON.parse(url.search);
+                value.limit = (event.target as HTMLSelectElement).value;
+                url.search = JSON.stringify(value);
                 HistoryController.goto(url, {});
-                await this._apiTask.run();
+                await this._task.run();
               }}
               .value=${this.history.url.searchParams.get("p_limit") ?? "10"}
               class="form-select"
@@ -167,33 +200,12 @@ export class PwEntityList<
           </div>
         </div>
 
+        ${this.getErrors()}
+
         <form
-          ${ref(this.formRef)}
+          ${ref(this.form)}
           @input=${async () => {
-            // TODO FIXME convert to the better form api (then it needs urlsearchparams support)
-            const urlSearchParams = new URLSearchParams( // @ts-expect-error probably wrong typings
-              new FormData(this.formRef.value)
-            );
-            urlSearchParams.delete("order");
-            this.history.url.searchParams
-              .getAll("order")
-              .forEach((v) => urlSearchParams.append("order", v));
-            // @ts-expect-error terrible quick hack - don't look at this
-            if (this.projectId) {
-              if (urlSearchParams.has("f_project_leader_id")) {
-                // @ts-expect-error you know
-                urlSearchParams.set("f_project_leader_id", this.projectId); // eslint-disable-line @typescript-eslint/no-unsafe-argument
-              }
-              if (urlSearchParams.has("f_force_in_project_id")) {
-                // @ts-expect-error you know
-                urlSearchParams.set("f_force_in_project_id", this.projectId); // eslint-disable-line @typescript-eslint/no-unsafe-argument
-              }
-            }
-            HistoryController.goto(
-              new URL(`?${urlSearchParams.toString()}`, window.location.href),
-              {}
-            );
-            await this._apiTask.run();
+            await this._task.run();
           }}
           @submit=${(e: Event) => e.preventDefault()}
         >
@@ -207,48 +219,12 @@ export class PwEntityList<
           </table>
         </form>
 
-        ${this._apiTask.value?.success
+        ${this._task.value?.success
           ? html`
               <nav aria-label="${msg("navigation of user list")}">
                 <ul class="pagination justify-content-center">
                   <li
-                    class="page-item ${this._apiTask.value?.data
-                      .previousCursor === null
-                      ? "disabled"
-                      : ""}"
-                  >
-                    <a
-                      @click=${async (e: Event) => {
-                        e.preventDefault();
-                        const url = new URL(window.location.href);
-                        if (this._apiTask.value?.success) {
-                          url.searchParams.set(
-                            "p_cursor",
-                            JSON.stringify(
-                              this._apiTask.value?.data.previousCursor
-                            )
-                          );
-                        }
-                        url.searchParams.set("p_direction", "backwards");
-                        HistoryController.goto(url, {});
-                        await this._apiTask.run();
-                      }}
-                      class="page-link"
-                      href="/"
-                      aria-label="${msg("previous page")}"
-                      tabindex=${ifDefined(
-                        this._apiTask.value?.data.previousCursor === null
-                          ? undefined
-                          : -1
-                      )}
-                      aria-disabled=${this._apiTask.value?.data
-                        .previousCursor === null}
-                    >
-                      <span aria-hidden="true">&laquo;</span>
-                    </a>
-                  </li>
-                  <li
-                    class="page-item ${this._apiTask.value?.data.nextCursor ===
+                    class="page-item ${this._task.value?.data.previousCursor ===
                     null
                       ? "disabled"
                       : ""}"
@@ -257,25 +233,61 @@ export class PwEntityList<
                       @click=${async (e: Event) => {
                         e.preventDefault();
                         const url = new URL(window.location.href);
-                        if (this._apiTask.value?.success) {
+                        if (this._task.value?.success) {
                           url.searchParams.set(
                             "p_cursor",
-                            JSON.stringify(this._apiTask.value?.data.nextCursor)
+                            JSON.stringify(
+                              this._task.value?.data.previousCursor
+                            )
+                          );
+                        }
+                        url.searchParams.set("p_direction", "backwards");
+                        HistoryController.goto(url, {});
+                        await this._task.run();
+                      }}
+                      class="page-link"
+                      href="/"
+                      aria-label="${msg("previous page")}"
+                      tabindex=${ifDefined(
+                        this._task.value?.data.previousCursor === null
+                          ? undefined
+                          : -1
+                      )}
+                      aria-disabled=${this._task.value?.data.previousCursor ===
+                      null}
+                    >
+                      <span aria-hidden="true">&laquo;</span>
+                    </a>
+                  </li>
+                  <li
+                    class="page-item ${this._task.value?.data.nextCursor ===
+                    null
+                      ? "disabled"
+                      : ""}"
+                  >
+                    <a
+                      @click=${async (e: Event) => {
+                        e.preventDefault();
+                        const url = new URL(window.location.href);
+                        if (this._task.value?.success) {
+                          url.searchParams.set(
+                            "p_cursor",
+                            JSON.stringify(this._task.value?.data.nextCursor)
                           );
                         }
                         url.searchParams.set("p_direction", "forwards");
                         HistoryController.goto(url, {});
-                        await this._apiTask.run();
+                        await this._task.run();
                       }}
                       class="page-link"
                       href="/"
                       aria-label="${msg("next page")}"
                       tabindex=${ifDefined(
-                        this._apiTask.value?.data.nextCursor === null
+                        this._task.value?.data.nextCursor === null
                           ? undefined
                           : -1
                       )}
-                      aria-disabled=${this._apiTask.value?.data.nextCursor ===
+                      aria-disabled=${this._task.value?.data.nextCursor ===
                       null}
                     >
                       <span aria-hidden="true">&raquo;</span>
@@ -285,7 +297,7 @@ export class PwEntityList<
               </nav>
             `
           : undefined}
-      </div>
+      </main>
     `;
   }
 }

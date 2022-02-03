@@ -20,15 +20,8 @@ https://github.com/projektwahl/projektwahl-lit
 SPDX-License-Identifier: AGPL-3.0-or-later
 SPDX-FileCopyrightText: 2021 Moritz Hedtke <Moritz.Hedtke@t-online.de>
 */
-import { z, ZodObject, ZodTypeAny } from "zod";
+import { z, ZodIssue, ZodObject, ZodTypeAny } from "zod";
 import { result } from "./result.js";
-
-export const loginInputSchema = z
-  .object({
-    username: z.string().min(3).max(100),
-    password: z.string(),
-  })
-  .strict();
 
 if (!globalThis.Buffer) {
   // @ts-expect-error hack for client
@@ -84,8 +77,6 @@ export const rawSessionType = z.object({
   user_id: z.number(),
 });
 
-export const loginOutputSchema = result(z.object({}));
-
 export type keys =
   | "/api/v1/login"
   | "/api/v1/logout"
@@ -102,20 +93,7 @@ function identity<
   T extends {
     [r in keys]: {
       request: z.ZodTypeAny;
-      response: z.ZodUnion<
-        [
-          z.ZodObject<
-            { success: z.ZodLiteral<true>; data: z.ZodTypeAny },
-            "strict",
-            z.ZodTypeAny
-          >,
-          z.ZodObject<
-            { success: z.ZodLiteral<false>; error: z.ZodTypeAny },
-            "strict",
-            z.ZodTypeAny
-          >
-        ]
-      >;
+      response: z.ZodTypeAny;
     };
   }
 >(v: T) {
@@ -221,58 +199,82 @@ const project = rawProjectSchema.pick({
   deleted: true,
 });
 
+const baseQuery = <
+  T extends { [k: string]: ZodTypeAny },
+  UnknownKeys extends UnknownKeysParam = "strip",
+  Catchall extends ZodTypeAny = ZodTypeAny
+>(
+  s: ZodObject<T, UnknownKeys, Catchall>
+) =>
+  z.object({
+    paginationDirection: z.enum(["forwards", "backwards"]).default("forwards"),
+    paginationCursor: s.nullable(), // if this is null the start is at start/end depending on paginationDirection
+    filters: s.partial(),
+    sorting: z.array(
+      z.tuple([
+        z.enum(
+          // TODO FIXME keys
+          Object.keys(s.shape) as [keyof T & string, ...(keyof T & string)[]]
+        ),
+        z.enum(["ASC", "DESC"]),
+      ])
+    ),
+    paginationLimit: z.number().default(100),
+  });
+
 export const routes = identity({
   "/api/v1/logout": {
     request: z.any(),
-    response: result(z.object({})),
+    response: z.object({}),
   },
   "/api/v1/login": {
-    request: loginInputSchema,
-    response: loginOutputSchema,
+    request: z
+      .object({
+        username: z.string().min(3).max(100),
+        password: z.string(),
+      })
+      .strict(),
+    response: z.object({}),
   },
   "/api/v1/openid-login": {
     request: z.any(),
-    response: result(z.object({})),
+    response: z.object({}),
   },
   "/api/v1/redirect": {
     request: z.any(),
-    response: result(z.object({})),
+    response: z.object({}),
   },
   "/api/v1/sleep": {
     request: z.undefined(),
-    response: result(z.object({})),
+    response: z.object({}),
   },
   "/api/v1/update": {
     request: z.undefined(),
-    response: result(z.object({})),
+    response: z.object({}),
   },
   "/api/v1/users/create-or-update": {
     request: usersCreateOrUpdate(rawUserSchema),
-    response: result(createOrUpdateUserResponse(rawUserSchema)),
+    response: createOrUpdateUserResponse(rawUserSchema),
   },
   "/api/v1/projects/create-or-update": {
     request: rawProjectSchema.partial(),
-    response: result(z.object({}).extend({ id: z.number() })),
+    response: z.object({}).extend({ id: z.number() }),
   },
   "/api/v1/users": {
-    request: z.undefined(),
-    response: result(
-      z.object({
-        entities: z.array(users(rawUserSchema)),
-        previousCursor: users(rawUserSchema).nullable(),
-        nextCursor: users(rawUserSchema).nullable(),
-      })
-    ),
+    request: baseQuery(rawUserSchema),
+    response: z.object({
+      entities: z.array(users(rawUserSchema)),
+      previousCursor: users(rawUserSchema).nullable(),
+      nextCursor: users(rawUserSchema).nullable(),
+    }),
   },
   "/api/v1/projects": {
-    request: z.undefined(),
-    response: result(
-      z.object({
-        entities: z.array(project),
-        previousCursor: project.nullable(),
-        nextCursor: project.nullable(),
-      })
-    ),
+    request: baseQuery(rawProjectSchema),
+    response: z.object({
+      entities: z.array(project),
+      previousCursor: project.nullable(),
+      nextCursor: project.nullable(),
+    }),
   },
 } as const);
 
@@ -281,4 +283,15 @@ export const entityRoutes = {
   "/api/v1/projects": routes["/api/v1/projects"],
 };
 
-//const test: z.infer<typeof routes["/api/v1/projects/create-or-update"]["request"]> = 1 as any;
+export declare class MinimalZodError<T = any> {
+  issues: ZodIssue[];
+}
+
+export declare type MinimalSafeParseError<Input> = {
+  success: false;
+  error: MinimalZodError<Input>;
+};
+
+export type ResponseType<P extends keyof typeof routes> =
+  | z.SafeParseSuccess<z.infer<typeof routes[P]["response"]>>
+  | MinimalSafeParseError<z.infer<typeof routes[P]["request"]>>;

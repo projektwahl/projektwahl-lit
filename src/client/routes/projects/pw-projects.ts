@@ -29,23 +29,21 @@ import { PwEntityList } from "../../entity-list/pw-entitylist.js";
 import { pwOrder } from "../../entity-list/pw-order.js";
 import { myFetch } from "../../utils.js";
 import { ifDefined } from "lit/directives/if-defined.js";
+import { pwInput } from "../../form/pw-input.js";
 
 export const pwProjects = async (url: URL) => {
-  const result = await taskFunction([url.searchParams]);
-  return html`<pw-projects .initial=${result}></pw-projects>`;
-};
-
-const taskFunction = async ([searchParams]: [URLSearchParams]) => {
-  const response = await myFetch<"/api/v1/projects">(
-    `/api/v1/projects?${searchParams.toString()}`,
-    {}
-  );
-  return response;
+  //const result = await taskFunction([url.searchParams]);
+  // .initial=${result}
+  return html`<pw-projects></pw-projects>`;
 };
 
 class PwProjects extends PwEntityList<"/api/v1/projects"> {
   constructor() {
-    super(taskFunction);
+    super();
+  }
+
+  override get url() {
+    return "/api/v1/projects" as const;
   }
 
   override get title() {
@@ -63,9 +61,6 @@ class PwProjects extends PwEntityList<"/api/v1/projects"> {
   }
 
   override get head() {
-    const f_id = this.history.url.searchParams.get("f_id");
-    const f_title = this.history.url.searchParams.get("f_title");
-    const f_info = this.history.url.searchParams.get("f_info");
     return html`
       <tr>
         <!--
@@ -74,7 +69,7 @@ class PwProjects extends PwEntityList<"/api/v1/projects"> {
                     -->
         <th class="table-cell-hover p-0" scope="col">
           ${pwOrder<"/api/v1/projects">({
-            refreshEntityList: () => this._apiTask.run(),
+            refreshEntityList: () => this._task.run(),
             name: "id",
             title: msg("ID"),
           })}
@@ -82,7 +77,7 @@ class PwProjects extends PwEntityList<"/api/v1/projects"> {
 
         <th class="table-cell-hover p-0" scope="col">
           ${pwOrder<"/api/v1/projects">({
-            refreshEntityList: () => this._apiTask.run(),
+            refreshEntityList: () => this._task.run(),
             name: "title",
             title: msg("Title"),
           })}
@@ -90,7 +85,7 @@ class PwProjects extends PwEntityList<"/api/v1/projects"> {
 
         <th class="table-cell-hover p-0" scope="col">
           ${pwOrder<"/api/v1/projects">({
-            refreshEntityList: () => this._apiTask.run(),
+            refreshEntityList: () => this._task.run(),
             name: "info",
             title: msg("Info"),
           })}
@@ -101,33 +96,53 @@ class PwProjects extends PwEntityList<"/api/v1/projects"> {
 
       <tr>
         <th scope="col">
-          <input
-            name="f_id"
-            type="text"
-            class="form-control"
-            id="projects-filter-{name}"
-            value=${ifDefined(f_id === null ? undefined : f_id)}
-          />
+          ${pwInput<"/api/v1/projects", ["filters", "id"]>({
+            label: null,
+            name: ["filters", "id"],
+            task: this._task,
+            type: "number",
+            defaultValue: undefined,
+            initial: JSON.parse(
+              decodeURIComponent(
+                this.history.url.search == ""
+                  ? "{}"
+                  : this.history.url.search.substring(1)
+              )
+            ), // TODO FIXME
+          })}
         </th>
 
         <th scope="col">
-          <input
-            name="f_title"
-            type="text"
-            class="form-control"
-            id="projects-filter-{name}"
-            value=${ifDefined(f_title === null ? undefined : f_title)}
-          />
+          ${pwInput<"/api/v1/projects", ["filters", "title"]>({
+            label: null,
+            name: ["filters", "title"],
+            task: this._task,
+            type: "text",
+            initial: JSON.parse(
+              decodeURIComponent(
+                this.history.url.search == ""
+                  ? "{}"
+                  : this.history.url.search.substring(1)
+              )
+            ), // TODO FIXME
+          })}
         </th>
 
         <th scope="col">
-          <input
-            name="f_info"
-            type="text"
-            class="form-control"
-            id="projects-filter-{name}"
-            value=${ifDefined(f_info === null ? undefined : f_info)}
-          />
+          ${pwInput<"/api/v1/projects", ["filters", "info"]>({
+            label: null,
+            name: ["filters", "info"],
+            task: this._task,
+            type: "text",
+            defaultValue: undefined,
+            initial: JSON.parse(
+              decodeURIComponent(
+                this.history.url.search == ""
+                  ? "{}"
+                  : this.history.url.search.substring(1)
+              )
+            ), // TODO FIXME
+          })}
         </th>
 
         <th scope="col"></th>
@@ -136,7 +151,7 @@ class PwProjects extends PwEntityList<"/api/v1/projects"> {
   }
   override get body() {
     return html`
-      ${this._apiTask.render({
+      ${this._task.render({
         pending: () => {
           return noChange;
         },
@@ -184,16 +199,7 @@ class PwProjects extends PwEntityList<"/api/v1/projects"> {
                   </td>
                 </tr>`
               )
-            : html`<tr>
-                <td colspan="4">
-                  <div class="alert alert-danger" role="alert">
-                    ${msg("Some errors occurred!")}<br />
-                    ${Object.entries(result.error).map(
-                      ([k, v]) => html`${k}: ${v}<br />`
-                    )}
-                  </div>
-                </td>
-              </tr>`;
+            : undefined;
         },
         initial: () => {
           return html`hi`;

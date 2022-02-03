@@ -95,8 +95,9 @@ const pages = {
     return await pwLogin();
   },
   "^/users$": async (url: URL) => {
-    const { pwUsers } = await import("./routes/users/pw-users.js");
-    return await pwUsers(url);
+    await import("./routes/users/pw-users.js");
+    //return await pwUsers(url);
+    return html`<pw-users></pw-users>`;
   },
   "^/users/create$": async () => {
     await import("./routes/users/pw-user-create.js");

@@ -20,9 +20,9 @@ https://github.com/projektwahl/projektwahl-lit
 SPDX-License-Identifier: AGPL-3.0-or-later
 SPDX-FileCopyrightText: 2021 Moritz Hedtke <Moritz.Hedtke@t-online.de>
 */
-import type { ServerResponse } from "node:http";
-import { z } from "zod";
-import { rawUserSchema } from "../../../lib/routes.js";
+import type { OutgoingHttpHeaders, ServerResponse } from "node:http";
+import { z, ZodIssueCode } from "zod";
+import { rawUserSchema, ResponseType } from "../../../lib/routes.js";
 import { fetchData } from "../../entities.js";
 import { MyRequest, requestHandler } from "../../express.js";
 import { sql2 } from "../../sql/index.js";
@@ -39,14 +39,17 @@ export async function usersHandler(
   return await requestHandler(
     "GET",
     "/api/v1/users",
-    async function (_, loggedInUser) {
+    async function (query, loggedInUser) {
       // helper is allowed to read the normal data
       // voter is not allowed to do anything
 
       if (
         !(loggedInUser?.type === "admin" || loggedInUser?.type === "helper")
       ) {
-        return [
+        const returnValue: [
+          OutgoingHttpHeaders,
+          ResponseType<"/api/v1/users">
+        ] = [
           {
             "content-type": "text/json; charset=utf-8",
             ":status": 403,
@@ -54,45 +57,18 @@ export async function usersHandler(
           {
             success: false as const,
             error: {
-              forbidden: "Insufficient permissions!",
+              issues: [
+                {
+                  code: ZodIssueCode.custom,
+                  path: ["forbidden"],
+                  message: "Insufficient permissions!",
+                },
+              ],
             },
           },
         ];
+        return returnValue;
       }
-
-      const url = new URL(request.url, process.env.BASE_URL);
-
-      const filters = z
-        .object({
-          f_id: z
-            .string()
-            .refine((s) => /^\d*$/.test(s))
-            .transform((s) => (s === "" ? undefined : Number(s)))
-            .optional(),
-          f_username: z.string().optional(),
-          f_type: z
-            .string()
-            .refine((s: string): s is "admin" | "helper" | "voter" | "" =>
-              includes(["admin", "helper", "voter", ""] as const, s)
-            )
-            .transform((s) => (s === "" ? undefined : s))
-            .optional(),
-          f_project_leader_id: z
-            .string()
-            .refine((s) => /^\d*$/.test(s))
-            .transform((s) => (s === "" ? undefined : Number(s)))
-            .optional(),
-          f_force_in_project_id: z
-            .string()
-            .refine((s) => /^\d*$/.test(s))
-            .transform((s) => (s === "" ? undefined : Number(s)))
-            .optional(),
-        })
-        .parse(
-          Object.fromEntries(
-            url.searchParams as unknown as Iterable<readonly [string, string]>
-          )
-        );
 
       const columns = [
         "id",
@@ -108,34 +84,32 @@ export async function usersHandler(
 
       const schema = rawUserSchema;
 
-      return await fetchData<
-        z.infer<typeof schema>,
-        typeof filters,
-        "/api/v1/users"
-      >(
-        "/api/v1/users" as const,
-        request,
-        "users_with_deleted",
-        columns,
-        filters,
-        {
+      const ret: [OutgoingHttpHeaders, ResponseType<"/api/v1/users">] =
+        await fetchData<"/api/v1/users">(
+          "/api/v1/users" as const,
+          "users_with_deleted",
+          columns,
+          query,
+          /*{
           id: "nulls-first",
           type: "nulls-first",
           username: "nulls-first",
           password_hash: "nulls-first",
-        },
-        (query) => {
-          return sql2`(${!query.f_id} OR id = ${
-            query.f_id ?? null
-          }) AND username LIKE ${"%" + (query.f_username ?? "") + "%"}
-           AND (${!query.f_project_leader_id} OR project_leader_id = ${
-            query.f_project_leader_id ?? null
-          })
-           AND (${!query.f_force_in_project_id} OR force_in_project_id = ${
-            query.f_force_in_project_id ?? null
-          })`;
-        }
-      );
+        },*/
+          (query) => {
+            return sql2`(${!query.filters.id} OR id = ${
+              query.filters.id ?? null
+            }) AND username LIKE ${"%" + (query.filters.username ?? "") + "%"}
+           AND (${!query.filters.project_leader_id} OR project_leader_id = ${
+              query.filters.project_leader_id ?? null
+            })
+           AND (${!query.filters
+             .force_in_project_id} OR force_in_project_id = ${
+              query.filters.force_in_project_id ?? null
+            })`;
+          }
+        );
+      return ret;
     }
   )(request, response);
 }

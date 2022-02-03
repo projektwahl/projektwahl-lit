@@ -24,8 +24,9 @@ import { html, LitElement } from "lit";
 import { createRef, ref } from "lit/directives/ref.js";
 import { bootstrapCss } from "../index.js";
 import { msg } from "@lit/localize";
-import type { routes } from "../../lib/routes.js";
+import type { routes, ResponseType } from "../../lib/routes.js";
 import type { z } from "zod";
+import type { Task } from "@lit-labs/task";
 
 class PwForm<P extends keyof typeof routes> extends LitElement {
   static get properties() {
@@ -40,10 +41,7 @@ class PwForm<P extends keyof typeof routes> extends LitElement {
     throw new Error("not implemented");
   }
 
-  _task!: import("@lit-labs/task").Task<
-    unknown[],
-    z.infer<typeof routes[P]["response"]>
-  >;
+  _task!: Task<[URLSearchParams], ResponseType<P>>;
 
   form: import("lit/directives/ref").Ref<HTMLFormElement>;
 
@@ -57,10 +55,6 @@ class PwForm<P extends keyof typeof routes> extends LitElement {
   // get the inputs from there and check that the errors returned from the server don't contain additional
   // this needs to be done dynamically as e.g. the create user form dynamically changes the form inputs
   // attributes. Otherwise we're eating errors and that's not healthy.xit
-  /** @abstract @type {() => import("lit").TemplateResult} */
-  getInputs(): import("lit").TemplateResult {
-    throw new Error(msg("getInputs must be implemented by subclass"));
-  }
 
   /** @private */ getCurrentInputElements() {
     const formDataEvent = new CustomEvent("myformdata", {
@@ -71,6 +65,27 @@ class PwForm<P extends keyof typeof routes> extends LitElement {
     this.form.value?.dispatchEvent(formDataEvent);
 
     return Object.keys(formDataEvent.detail);
+  }
+
+  getErrors() {
+    return this._task.render({
+      complete: (data) => {
+        if (!data.success) {
+          /*const errors = Object.entries(data.error)
+            .filter(([k]) => !this.getCurrentInputElements().includes(k))
+            .map(([k, v]) => html`${k}: ${v}<br />`);*/
+          if (data.error.issues.length > 0) {
+            return html`<div class="alert alert-danger" role="alert">
+              ${msg("Some errors occurred!")}<br />
+              ${data.error.issues.map(
+                (issue) => html` ${issue.path}: ${issue.message}<br /> `
+              )}
+            </div>`;
+          }
+        }
+        return html``;
+      },
+    });
   }
 
   // https://www.chromestatus.com/feature/4708990554472448
@@ -93,69 +108,6 @@ if ('FormDataEvent' in window) {
     return this;
   }
 */
-  override render() {
-    if (this.actionText === undefined) {
-      throw new Error(msg("component not fully initialized"));
-    }
-
-    return html`
-      ${bootstrapCss}
-      <main class="container">
-        <h1 class="text-center">${this.actionText}</h1>
-
-        <div class="row justify-content-center">
-          <div class="col-md-7 col-lg-8">
-            ${this._task.render({
-              complete: (data) => {
-                if (!data.success) {
-                  const errors = Object.entries(data.error)
-                    .filter(
-                      ([k]) => !this.getCurrentInputElements().includes(k)
-                    )
-                    .map(([k, v]) => html`${k}: ${v}<br />`);
-                  if (errors.length > 0) {
-                    return html`<div class="alert alert-danger" role="alert">
-                      ${msg("Some errors occurred!")}<br />
-                      ${errors}
-                    </div>`;
-                  }
-                }
-                return html``;
-              },
-            })}
-
-            <form
-              ${ref(this.form)}
-              method="POST"
-              action="/no-javascript"
-              @submit=${async (event: Event) => {
-                event.preventDefault();
-
-                await this._task.run();
-              }}
-            >
-              ${this.getInputs()}
-              ${!this.disabled
-                ? html`
-                    <button
-                      type="submit"
-                      ?disabled=${this._task.render({
-                        pending: () => true,
-                        complete: () => false,
-                        initial: () => false,
-                      }) as boolean}
-                      class="btn btn-primary"
-                    >
-                      ${this.actionText}
-                    </button>
-                  `
-                : undefined}
-            </form>
-          </div>
-        </div>
-      </main>
-    `;
-  }
 }
 
 export { PwForm };

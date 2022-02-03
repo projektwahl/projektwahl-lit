@@ -21,12 +21,13 @@ SPDX-License-Identifier: AGPL-3.0-or-later
 SPDX-FileCopyrightText: 2021 Moritz Hedtke <Moritz.Hedtke@t-online.de>
 */
 
-import type { z } from "zod";
+import { z, ZodIssueCode } from "zod";
+import type { ResponseType } from "../lib/routes";
 
 export const myFetch = async <P extends import("../lib/routes").keys>(
   url: `${P}${string}`,
   options: RequestInit | undefined
-): Promise<z.infer<typeof import("../lib/routes").routes[P]["response"]>> => {
+): Promise<ResponseType<P>> => {
   try {
     const response = await fetch(url.toString(), {
       ...options,
@@ -41,21 +42,32 @@ export const myFetch = async <P extends import("../lib/routes").keys>(
         return {
           success: false,
           error: {
-            network: `Failed to request ${url}: ${response.status} ${response.statusText}\nAdditional information: ${additionalInfo}`,
+            issues: [
+              {
+                code: ZodIssueCode.custom,
+                path: ["network"],
+                message: `Failed to request ${url}: ${response.status} ${response.statusText}\nAdditional information: ${additionalInfo}`,
+              },
+            ],
           },
         };
       } catch (error) {
-        return {
+        const r: ResponseType<P> = {
           success: false,
           error: {
-            network: `Failed to request ${url}: ${response.status} ${response.statusText}\n`,
+            issues: [
+              {
+                code: ZodIssueCode.custom,
+                path: ["network"],
+                message: `Failed to request ${url}: ${response.status} ${response.statusText}\n`,
+              },
+            ],
           },
         };
+        return r;
       }
     }
-    const result = (await response.json()) as z.infer<
-      typeof import("../lib/routes").routes[P]["response"]
-    >;
+    const result = (await response.json()) as ResponseType<P>;
     return result;
   } catch (error) {
     console.error(error);
@@ -63,16 +75,28 @@ export const myFetch = async <P extends import("../lib/routes").keys>(
       return {
         success: false,
         error: {
-          network: `Failed to request ${url}: ${
-            error.message
-          }\nAdditional information: ${error.stack ?? "none"}`,
+          issues: [
+            {
+              code: ZodIssueCode.custom,
+              path: ["network"],
+              message: `Failed to request ${url}: ${
+                error.message
+              }\nAdditional information: ${error.stack ?? "none"}`,
+            },
+          ],
         },
       };
     } else {
       return {
         success: false,
         error: {
-          network: `Failed to request ${url}: Unknown error see console.`,
+          issues: [
+            {
+              code: ZodIssueCode.custom,
+              path: ["network"],
+              message: `Failed to request ${url}: Unknown error see console.`,
+            },
+          ],
         },
       };
     }
@@ -88,3 +112,9 @@ export const sleep = (timeout: number): Promise<void> => {
     }, timeout);
   });
 };
+
+type PathTree<T> = {
+  [P in keyof T]-?: T[P] extends object ? [P] | [P, ...Path<T[P]>] : [P];
+};
+
+export type Path<T> = PathTree<T>[keyof PathTree<T>];

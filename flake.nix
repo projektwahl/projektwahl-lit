@@ -23,7 +23,7 @@ SPDX-FileCopyrightText: 2021 Moritz Hedtke <Moritz.Hedtke@t-online.de>
 {
   description = "projektwahl-lit's development flake";
 
-  inputs.nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable-small";
+  inputs.nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
   inputs.flake-utils.url = "github:numtide/flake-utils";
 
   outputs = { self, nixpkgs, flake-utils }:
@@ -47,7 +47,7 @@ SPDX-FileCopyrightText: 2021 Moritz Hedtke <Moritz.Hedtke@t-online.de>
               pkgs.postgresql_14
               pkgs.reuse
               pkgs.nixpkgs-fmt
-              pkgs.nodePackages.npm-check-updates
+              #pkgs.nodePackages.npm-check-updates
               #pkgs.cbc
               pkgs.glpk
               #pkgs.lp_solve

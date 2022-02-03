@@ -21,14 +21,15 @@ SPDX-License-Identifier: AGPL-3.0-or-later
 SPDX-FileCopyrightText: 2021 Moritz Hedtke <Moritz.Hedtke@t-online.de>
 */
 import postgres from "postgres";
-import { routes } from "../../../lib/routes.js";
+import { routes, ResponseType } from "../../../lib/routes.js";
 import { sql } from "../../database.js";
 import { MyRequest, requestHandler } from "../../express.js";
 import { hashPassword } from "../../password.js";
 import { sql2 } from "../../sql/index.js";
 import { updateField } from "../../entities.js";
-import type { ServerResponse } from "node:http";
+import type { OutgoingHttpHeaders, ServerResponse } from "node:http";
 import type { Http2ServerResponse } from "node:http2";
+import { ZodIssueCode } from "zod";
 
 // TODO FIXME somehow ensure all attributes are read here because this is an easy way to loose data
 // Also ensure create and update has the same attributes
@@ -47,7 +48,10 @@ export async function createOrUpdateUsersHandler(
       // voter is not allowed to do anything
 
       if (!(loggedInUser?.type === "admin")) {
-        return [
+        const returnValue: [
+          OutgoingHttpHeaders,
+          ResponseType<"/api/v1/users/create-or-update">
+        ] = [
           {
             "content-type": "text/json; charset=utf-8",
             ":status": 403,
@@ -55,10 +59,17 @@ export async function createOrUpdateUsersHandler(
           {
             success: false as const,
             error: {
-              forbidden: "Insufficient permissions!",
+              issues: [
+                {
+                  code: ZodIssueCode.custom,
+                  path: ["forbidden"],
+                  message: "Insufficient permissions!",
+                },
+              ],
             },
           },
         ];
+        return returnValue;
       }
 
       try {
@@ -104,18 +115,22 @@ export async function createOrUpdateUsersHandler(
 
         console.log(row);
 
-        return [
+        const returnValue: [
+          OutgoingHttpHeaders,
+          ResponseType<"/api/v1/users/create-or-update">
+        ] = [
           {
             "content-type": "text/json; charset=utf-8",
             ":status": 200,
           },
           {
             success: true as const,
-            data: routes["/api/v1/users/create-or-update"]["response"][
-              "options"
-            ][0]["shape"]["data"].parse(row),
+            data: routes["/api/v1/users/create-or-update"]["response"].parse(
+              row
+            ),
           },
         ];
+        return returnValue;
       } catch (error: unknown) {
         if (error instanceof postgres.PostgresError) {
           if (
@@ -123,7 +138,10 @@ export async function createOrUpdateUsersHandler(
             error.constraint_name === "users_with_deleted_username_key"
           ) {
             // unique violation
-            return [
+            const returnValue: [
+              OutgoingHttpHeaders,
+              ResponseType<"/api/v1/users/create-or-update">
+            ] = [
               {
                 "content-type": "text/json; charset=utf-8",
                 ":status": 200,
@@ -131,13 +149,23 @@ export async function createOrUpdateUsersHandler(
               {
                 success: false as const,
                 error: {
-                  username: "Nutzer mit diesem Namen existiert bereits!",
+                  issues: [
+                    {
+                      code: ZodIssueCode.custom,
+                      path: ["username"],
+                      message: "Nutzer mit diesem Namen existiert bereits!",
+                    },
+                  ],
                 },
               },
             ];
+            return returnValue;
           } else {
             // TODO FIXME do this everywhere else / unify
-            return [
+            const returnValue: [
+              OutgoingHttpHeaders,
+              ResponseType<"/api/v1/users/create-or-update">
+            ] = [
               {
                 "content-type": "text/json; charset=utf-8",
                 ":status": 200,
@@ -145,14 +173,24 @@ export async function createOrUpdateUsersHandler(
               {
                 success: false as const,
                 error: {
-                  [error.column_name ?? "database"]: `${error.message}`,
+                  issues: [
+                    {
+                      code: ZodIssueCode.custom,
+                      path: [error.column_name ?? "database"],
+                      message: `${error.message}`,
+                    },
+                  ],
                 },
               },
             ];
+            return returnValue;
           }
         }
         console.error(error);
-        return [
+        const returnValue: [
+          OutgoingHttpHeaders,
+          ResponseType<"/api/v1/users/create-or-update">
+        ] = [
           {
             "content-type": "text/json; charset=utf-8",
             ":status": 500,
@@ -160,10 +198,17 @@ export async function createOrUpdateUsersHandler(
           {
             success: false as const,
             error: {
-              unknown: "Interner Fehler!",
+              issues: [
+                {
+                  code: ZodIssueCode.custom,
+                  path: ["unknown"],
+                  message: "Interner Fehler!",
+                },
+              ],
             },
           },
         ];
+        return returnValue;
       }
     }
   )(request, response);

@@ -48,8 +48,8 @@ class PwProjectUserCheckbox extends LitElement {
   _task;
 
   user!: z.infer<
-    typeof routes["/api/v1/users"]["response"]["options"][0]
-  >["data"]["entities"][number];
+    typeof routes["/api/v1/users"]["response"]
+  >["entities"][number];
 
   projectId!: number;
 
@@ -92,8 +92,8 @@ class PwProjectUserCheckbox extends LitElement {
         ${this._task.render({
           complete: (data) => {
             if (!data.success) {
-              const errors = Object.entries(data.error).map(
-                ([k, v]) => html`${k}: ${v}<br />`
+              const errors = data.error.issues.map(
+                (i) => html`${i.path}: ${i.message}<br />`
               );
               if (errors.length > 0) {
                 return html`<div class="alert alert-danger" role="alert">
