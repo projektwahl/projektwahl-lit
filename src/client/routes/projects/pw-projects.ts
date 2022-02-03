@@ -32,21 +32,18 @@ import { ifDefined } from "lit/directives/if-defined.js";
 import { pwInput } from "../../form/pw-input.js";
 
 export const pwProjects = async (url: URL) => {
-  const result = await taskFunction([url.searchParams]);
-  return html`<pw-projects .initial=${result}></pw-projects>`;
-};
-
-const taskFunction = async ([searchParams]: [URLSearchParams]) => {
-  const response = await myFetch<"/api/v1/projects">(
-    `/api/v1/projects?${searchParams.toString()}`,
-    {}
-  );
-  return response;
+  //const result = await taskFunction([url.searchParams]);
+  // .initial=${result}
+  return html`<pw-projects></pw-projects>`;
 };
 
 class PwProjects extends PwEntityList<"/api/v1/projects"> {
   constructor() {
-    super(taskFunction);
+    super();
+  }
+
+  override get url() {
+    return "/api/v1/projects" as const;
   }
 
   override get title() {

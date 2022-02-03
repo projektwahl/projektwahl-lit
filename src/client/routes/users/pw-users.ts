@@ -39,14 +39,6 @@ export const pwUsers = async (url: URL) => {
 };
 */
 
-export const taskFunction = async ([searchParams]: [URLSearchParams]) => {
-  const response = await myFetch<"/api/v1/users">(
-    `/api/v1/users?${searchParams.toString()}`,
-    {}
-  );
-  return response;
-};
-
 export class PwUsers extends PwEntityList<"/api/v1/users"> {
   static override get properties() {
     return {
@@ -56,7 +48,7 @@ export class PwUsers extends PwEntityList<"/api/v1/users"> {
   }
 
   constructor() {
-    super(taskFunction);
+    super();
   }
 
   override get url() {

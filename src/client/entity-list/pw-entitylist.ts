@@ -82,16 +82,8 @@ export class PwEntityList<
 
   protected history;
 
-  taskFunction: ([searchParams]: [URLSearchParams]) => Promise<ResponseType<P>>;
-
-  constructor(
-    taskFunction: ([searchParams]: [URLSearchParams]) => Promise<
-      ResponseType<P>
-    >
-  ) {
+  constructor() {
     super();
-
-    this.taskFunction = taskFunction;
 
     this.history = new HistoryController(this, /.*/);
 
