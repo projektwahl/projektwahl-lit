@@ -110,7 +110,7 @@ export class PwEntityList<
               paginationLimit: 100,
             } as z.infer<typeof entityRoutes[P]["request"]>,
           });
-          (this.form.value as HTMLFormElement).dispatchEvent(formDataEvent);
+          this.form.value?.dispatchEvent(formDataEvent);
 
           console.log(JSON.stringify(formDataEvent.detail));
 
@@ -142,6 +142,8 @@ export class PwEntityList<
         // @ts-expect-error See https://github.com/lit/lit/issues/2367
         this._task.p = this.initial;
         // TODO FIXMe if we set the currentArgs here somehow I think this may work
+      } else {
+        this._task.run()
       }
     }
 
