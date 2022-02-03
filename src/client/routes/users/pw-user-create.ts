@@ -28,7 +28,7 @@ import { PwForm } from "../../form/pw-form.js";
 import { HistoryController } from "../../history-controller.js";
 import { msg } from "@lit/localize";
 import "../../form/pw-input.js";
-import { routes } from "../../../lib/routes.js";
+import { routes, ResponseType, MinimalSafeParseError } from "../../../lib/routes.js";
 import type { z } from "zod";
 import { pwInput } from "../../form/pw-input.js";
 import { result } from "../../../lib/result.js";
@@ -84,7 +84,8 @@ class PwUserCreate extends PwForm<"/api/v1/users/create-or-update"> {
 
   type?: "voter" | "admin" | "helper";
 
-  initial: z.infer<typeof initialResult> | undefined;
+  initial: z.SafeParseSuccess<z.infer<typeof routes["/api/v1/users"]["response"]>["entities"][number]>
+  | MinimalSafeParseError<z.infer<typeof routes["/api/v1/users"]["request"]>> | undefined;
 
   constructor() {
     super();
@@ -252,17 +253,24 @@ class PwUserCreate extends PwForm<"/api/v1/users/create-or-update"> {
         </main>
       `;
     } else {
-      const errors = Object.entries(this.initial.error).map(
-        ([k, v]) => html`${k}: ${v}<br />`
-      );
-      return html`${bootstrapCss}
-        <main class="container">
-          <h1 class="text-center">${this.actionText}</h1>
-          <div class="alert alert-danger" role="alert">
-            ${msg("Some errors occurred!")}<br />
-            ${errors}
-          </div>
-        </main>`;
+      /*const errors = Object.entries(data.error)
+          .filter(([k]) => !this.getCurrentInputElements().includes(k))
+          .map(([k, v]) => html`${k}: ${v}<br />`);*/
+          if (this.initial.error.issues.length > 0) {
+            return html`${bootstrapCss}
+            <main class="container">
+              <h1 class="text-center">${this.actionText}</h1>
+              
+              <div class="alert alert-danger" role="alert">
+              ${msg("Some errors occurred!")}<br />
+              ${this.initial.error.issues.map(
+                (issue) => html` ${issue.path}: ${issue.message}<br /> `
+              )}
+            </div>
+            
+            </div>
+          </main>`;
+          }
     }
   }
 }

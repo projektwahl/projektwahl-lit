@@ -28,7 +28,7 @@ import { PwForm } from "../../form/pw-form.js";
 import { HistoryController } from "../../history-controller.js";
 import { msg } from "@lit/localize";
 import type { z } from "zod";
-import { routes } from "../../../lib/routes.js";
+import { routes, ResponseType, MinimalSafeParseError } from "../../../lib/routes.js";
 import { setupHmr } from "../../hmr.js";
 import { pwInput } from "../../form/pw-input.js";
 import { result } from "../../../lib/result.js";
@@ -37,6 +37,7 @@ import { ref } from "lit/directives/ref.js";
 
 export async function pwProject(id: number, viewOnly = false) {
   const result = await taskFunction([id]);
+  // TODO FIXME typecheck
   return html`<pw-project-create
     ?disabled=${viewOnly}
     .initial=${result}
@@ -87,8 +88,9 @@ export const PwProjectCreate = setupHmr(
 
     initialRender: boolean;
 
-    initial: z.infer<typeof initialResult> | undefined;
-
+    initial: z.SafeParseSuccess<z.infer<typeof routes["/api/v1/projects"]["response"]>["entities"][number]>
+    | MinimalSafeParseError<z.infer<typeof routes["/api/v1/projects"]["request"]>> | undefined;
+  
     constructor() {
       super();
 
@@ -283,17 +285,24 @@ export const PwProjectCreate = setupHmr(
           </main>
         `;
       } else {
-        const errors = Object.entries(this.initial.error).map(
-          ([k, v]) => html`${k}: ${v}<br />`
-        );
-        return html`${bootstrapCss}
+        /*const errors = Object.entries(data.error)
+          .filter(([k]) => !this.getCurrentInputElements().includes(k))
+          .map(([k, v]) => html`${k}: ${v}<br />`);*/
+        if (this.initial.error.issues.length > 0) {
+          return html`${bootstrapCss}
           <main class="container">
             <h1 class="text-center">${this.actionText}</h1>
+            
             <div class="alert alert-danger" role="alert">
-              ${msg("Some errors occurred!")}<br />
-              ${errors}
-            </div>
-          </main>`;
+            ${msg("Some errors occurred!")}<br />
+            ${this.initial.error.issues.map(
+              (issue) => html` ${issue.path}: ${issue.message}<br /> `
+            )}
+          </div>
+          
+          </div>
+        </main>`;
+        }
       }
     }
   }

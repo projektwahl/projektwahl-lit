@@ -25,7 +25,7 @@ import "../../entity-list/pw-order.js";
 import { html } from "lit";
 import { noChange } from "lit";
 import { msg } from "@lit/localize";
-import { PwUsers, taskFunction } from "../users/pw-users.js";
+import { PwUsers } from "../users/pw-users.js";
 import "./pw-project-user-checkbox.js";
 import "../../form/pw-input.js";
 import { setupHmr } from "../../hmr.js";
@@ -34,8 +34,9 @@ import { pwOrder } from "../../entity-list/pw-order.js";
 import { pwInput } from "../../form/pw-input.js";
 
 export const pwProjectUsers = async (url: URL) => {
-  const result = await taskFunction([url.searchParams]);
-  return html`<pw-project-users .initial=${result}></pw-project-users>`;
+  //const result = await taskFunction([url.searchParams]);
+  // .initial=${result}
+  return html`<pw-project-users></pw-project-users>`;
 };
 
 export const PwProjectUsers = setupHmr(
