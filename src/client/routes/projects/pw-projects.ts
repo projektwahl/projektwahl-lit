@@ -106,7 +106,7 @@ class PwProjects extends PwEntityList<"/api/v1/projects"> {
                   ? "{}"
                   : this.history.url.search.substring(1)
               )
-            ), // TODO FIXME
+            ), // TODO FIXME typings and error handling
           })}
         </th>
 

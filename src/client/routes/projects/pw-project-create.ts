@@ -70,10 +70,6 @@ const taskFunction = async ([id]: [number]) => {
   return response;
 };
 
-const initialResult = result(
-  routes["/api/v1/projects"]["response"]["shape"]["entities"]["element"]
-);
-
 export const PwProjectCreate = setupHmr(
   "PwProjectCreate",
   class PwProjectCreate extends PwForm<"/api/v1/projects/create-or-update"> {

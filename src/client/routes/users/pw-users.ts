@@ -106,7 +106,7 @@ export class PwUsers extends PwEntityList<"/api/v1/users"> {
                   ? "{}"
                   : this.history.url.search.substring(1)
               )
-            ), // TODO FIXME
+            ), // TODO FIXME typings
           })}
         </th>
 

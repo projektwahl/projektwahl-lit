@@ -122,7 +122,7 @@ export function requestHandler<P extends keyof typeof routes>(
                   url.search == "" ? "{}" : url.search.substring(1)
                 )
               ); // TODO FIXME if this throws
-        const requestBody = routes[path].request.safeParse(body);
+        const requestBody: ResponseType<P> = routes[path].request.safeParse(body);
         if (requestBody.success) {
           const [new_headers, responseBody] = await handler(
             requestBody.data,

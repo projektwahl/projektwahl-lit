@@ -143,7 +143,7 @@ export class PwEntityList<
         this._task.p = this.initial;
         // TODO FIXMe if we set the currentArgs here somehow I think this may work
       } else {
-        this._task.run();
+        void this._task.run();
       }
     }
 

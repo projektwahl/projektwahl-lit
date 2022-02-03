@@ -67,6 +67,7 @@ export async function projectsHandler(
             },
           },
         ];
+        return returnValue
       }
 
       const columns = [

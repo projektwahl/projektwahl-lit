@@ -283,15 +283,15 @@ export const entityRoutes = {
   "/api/v1/projects": routes["/api/v1/projects"],
 };
 
-export declare class MinimalZodError<T = any> {
+export declare class MinimalZodError {
   issues: ZodIssue[];
 }
 
-export declare type MinimalSafeParseError<Input> = {
+export declare type MinimalSafeParseError = {
   success: false;
-  error: MinimalZodError<Input>;
+  error: MinimalZodError;
 };
 
 export type ResponseType<P extends keyof typeof routes> =
   | z.SafeParseSuccess<z.infer<typeof routes[P]["response"]>>
-  | MinimalSafeParseError<z.infer<typeof routes[P]["request"]>>;
+  | MinimalSafeParseError; // <z.infer<typeof routes[P]["request"]>>
