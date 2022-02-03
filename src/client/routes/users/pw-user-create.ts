@@ -28,14 +28,12 @@ import { PwForm } from "../../form/pw-form.js";
 import { HistoryController } from "../../history-controller.js";
 import { msg } from "@lit/localize";
 import "../../form/pw-input.js";
-import {
+import type {
   routes,
-  ResponseType,
   MinimalSafeParseError,
 } from "../../../lib/routes.js";
 import type { z } from "zod";
 import { pwInput } from "../../form/pw-input.js";
-import { result } from "../../../lib/result.js";
 import { bootstrapCss } from "../../index.js";
 import { ref } from "lit/directives/ref.js";
 
@@ -47,10 +45,6 @@ export async function pwUser(id: number, viewOnly = false) {
     .initial=${result}
   ></pw-user-create>`;
 }
-
-const initialResult = result(
-  routes["/api/v1/users"]["response"]["shape"]["entities"]["element"]
-);
 
 const taskFunction = async ([id]: [number]) => {
   const response = await myFetch<"/api/v1/users">(

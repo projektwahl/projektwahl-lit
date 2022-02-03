@@ -21,7 +21,7 @@ SPDX-License-Identifier: AGPL-3.0-or-later
 SPDX-FileCopyrightText: 2021 Moritz Hedtke <Moritz.Hedtke@t-online.de>
 */
 
-import { z, ZodIssueCode } from "zod";
+import { ZodIssueCode } from "zod";
 import type { ResponseType } from "../lib/routes";
 
 export const myFetch = async <P extends import("../lib/routes").keys>(

@@ -114,7 +114,7 @@ export function requestHandler<P extends keyof typeof routes>(
           //console.log(user)
         }
 
-        const body =
+        const body: unknown =
           request.method === "POST"
             ? await json(request)
             : JSON.parse(

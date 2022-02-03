@@ -26,9 +26,7 @@ import { noChange } from "lit";
 import { aClick } from "../../pw-a.js";
 import { msg } from "@lit/localize";
 import { PwEntityList } from "../../entity-list/pw-entitylist.js";
-import { myFetch } from "../../utils.js";
 import { pwOrder } from "../../entity-list/pw-order.js";
-import { ifDefined } from "lit/directives/if-defined.js";
 import { pwInput } from "../../form/pw-input.js";
 
 /*

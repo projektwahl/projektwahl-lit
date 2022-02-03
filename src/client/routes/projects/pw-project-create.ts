@@ -30,7 +30,6 @@ import { msg } from "@lit/localize";
 import type { z } from "zod";
 import {
   routes,
-  ResponseType,
   MinimalSafeParseError,
 } from "../../../lib/routes.js";
 import { setupHmr } from "../../hmr.js";
