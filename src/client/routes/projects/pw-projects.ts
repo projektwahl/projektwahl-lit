@@ -29,6 +29,7 @@ import { PwEntityList } from "../../entity-list/pw-entitylist.js";
 import { pwOrder } from "../../entity-list/pw-order.js";
 import { myFetch } from "../../utils.js";
 import { ifDefined } from "lit/directives/if-defined.js";
+import { pwInput } from "../../form/pw-input.js";
 
 export const pwProjects = async (url: URL) => {
   const result = await taskFunction([url.searchParams]);
@@ -63,9 +64,6 @@ class PwProjects extends PwEntityList<"/api/v1/projects"> {
   }
 
   override get head() {
-    const f_id = this.history.url.searchParams.get("f_id");
-    const f_title = this.history.url.searchParams.get("f_title");
-    const f_info = this.history.url.searchParams.get("f_info");
     return html`
       <tr>
         <!--
@@ -101,33 +99,35 @@ class PwProjects extends PwEntityList<"/api/v1/projects"> {
 
       <tr>
         <th scope="col">
-          <input
-            name="f_id"
-            type="text"
-            class="form-control"
-            id="projects-filter-{name}"
-            value=${ifDefined(f_id === null ? undefined : f_id)}
-          />
+          ${pwInput<"/api/v1/projects", ["filters", "id"]>({
+            label: null,
+            name: ["filters", "id"],
+            task: this._task,
+            type: "number",
+            defaultValue: undefined,
+            initial: JSON.parse(decodeURIComponent(this.history.url.search.substring(1))), // TODO FIXME
+          })}
         </th>
 
         <th scope="col">
-          <input
-            name="f_title"
-            type="text"
-            class="form-control"
-            id="projects-filter-{name}"
-            value=${ifDefined(f_title === null ? undefined : f_title)}
-          />
+          ${pwInput<"/api/v1/projects", ["filters", "title"]>({
+            label: null,
+            name: ["filters", "title"],
+            task: this._task,
+            type: "text",
+            initial: JSON.parse(decodeURIComponent(this.history.url.search.substring(1))), // TODO FIXME
+          })}
         </th>
 
         <th scope="col">
-          <input
-            name="f_info"
-            type="text"
-            class="form-control"
-            id="projects-filter-{name}"
-            value=${ifDefined(f_info === null ? undefined : f_info)}
-          />
+          ${pwInput<"/api/v1/projects", ["filters", "info"]>({
+            label: null,
+            name: ["filters", "info"],
+            task: this._task,
+            type: "text",
+            defaultValue: undefined,
+            initial: JSON.parse(decodeURIComponent(this.history.url.search.substring(1))), // TODO FIXME
+          })}
         </th>
 
         <th scope="col"></th>

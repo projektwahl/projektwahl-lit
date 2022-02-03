@@ -31,7 +31,7 @@ import "../../form/pw-input.js";
 import { setupHmr } from "../../hmr.js";
 import { aClick } from "../../pw-a.js";
 import { pwOrder } from "../../entity-list/pw-order.js";
-import { ifDefined } from "lit/directives/if-defined.js";
+import { pwInput } from "../../form/pw-input.js";
 
 export const pwProjectUsers = async (url: URL) => {
   const result = await taskFunction([url.searchParams]);
@@ -58,10 +58,6 @@ export const PwProjectUsers = setupHmr(
     }
 
     override get head() {
-      const f_name = this.history.url.searchParams.get(`f_${this.name}`);
-      const f_id = this.history.url.searchParams.get("f_id");
-      const f_username = this.history.url.searchParams.get("f_username");
-      const f_type = this.history.url.searchParams.get("f_type");
       return html`<tr>
           <!--
       do not support this without javascript because there is literally zero useful ways to do this useful.
@@ -95,45 +91,48 @@ export const PwProjectUsers = setupHmr(
         </tr>
 
         <tr>
-          <!-- TODO fixme convert to form api shit and set to value here -->
           <th scope="col">
-            <input
-              name=${`f_${this.name}`}
-              type="checkbox"
-              class="form-check-input"
-              value=${ifDefined(f_name === null ? undefined : f_name)}
-            />
+            ${pwInput<"/api/v1/users", ["filters", "project_leader_id" | "force_in_project_id"]>({
+              label: null,
+              name: ["filters", this.name],
+              task: this._task,
+              type: "checkbox",
+              defaultValue: undefined,
+              initial: JSON.parse(decodeURIComponent(this.history.url.search.substring(1))), // TODO FIXME
+            })}
           </th>
 
           <th scope="col">
-            <input
-              name="f_id"
-              type="text"
-              class="form-control"
-              id="projects-filter-{name}"
-              value=${ifDefined(f_id === null ? undefined : f_id)}
-            />
-          </th>
+          ${pwInput<"/api/v1/users", ["filters", "id"]>({
+            label: null,
+            name: ["filters", "id"],
+            task: this._task,
+            type: "number",
+            defaultValue: undefined,
+            initial: JSON.parse(decodeURIComponent(this.history.url.search.substring(1))), // TODO FIXME
+          })}
+        </th>
 
-          <th scope="col">
-            <input
-              name="f_username"
-              type="text"
-              class="form-control"
-              id="projects-filter-{name}"
-              value=${ifDefined(f_username === null ? undefined : f_username)}
-            />
-          </th>
+        <th scope="col">
+          ${pwInput<"/api/v1/users", ["filters", "username"]>({
+            label: null,
+            name: ["filters", "username"],
+            task: this._task,
+            type: "text",
+            initial: JSON.parse(decodeURIComponent(this.history.url.search.substring(1))), // TODO FIXME
+          })}
+        </th>
 
-          <th scope="col">
-            <input
-              name="f_type"
-              type="text"
-              class="form-control"
-              id="projects-filter-{name}"
-              value=${ifDefined(f_type === null ? undefined : f_type)}
-            />
-          </th>
+        <th scope="col">
+          ${pwInput<"/api/v1/users", ["filters", "type"]>({
+            label: null,
+            name: ["filters", "type"],
+            task: this._task,
+            type: "text",
+            defaultValue: undefined,
+            initial: JSON.parse(decodeURIComponent(this.history.url.search.substring(1))), // TODO FIXME
+          })}
+        </th>
 
           <th scope="col"></th>
         </tr>`;
