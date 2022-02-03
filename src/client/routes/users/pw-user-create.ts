@@ -50,7 +50,13 @@ const initialResult = result(
 
 const taskFunction = async ([id]: [number]) => {
   const response = await myFetch<"/api/v1/users">(
-    `/api/v1/users/?f_id=${id}`,
+    `/api/v1/users/?${JSON.stringify({
+      filters: {
+        id
+      },
+      paginationCursor: null,
+      sorting: []
+    })}`,
     {}
   );
   if (response.success) {

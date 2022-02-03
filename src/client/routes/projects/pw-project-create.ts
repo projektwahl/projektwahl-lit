@@ -47,7 +47,13 @@ export async function pwProject(id: number, viewOnly = false) {
 const taskFunction = async ([id]: [number]) => {
   const [_, response] = await Promise.all([
     import("../projects/pw-project-users.js"),
-    await myFetch<"/api/v1/projects">(`/api/v1/projects/?f_id=${id}`, {}),
+    await myFetch<"/api/v1/projects">(`/api/v1/projects/?${JSON.stringify({
+      filters: {
+        id
+      },
+      paginationCursor: null,
+      sorting: []
+    })}`, {}),
   ]);
   if (response.success) {
     return {
