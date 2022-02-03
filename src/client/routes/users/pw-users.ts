@@ -102,7 +102,13 @@ export class PwUsers extends PwEntityList<"/api/v1/users"> {
             task: this._task,
             type: "number",
             defaultValue: undefined,
-            initial: JSON.parse(decodeURIComponent((this.history.url.search == "" ? "{}" : this.history.url.search.substring(1)))), // TODO FIXME
+            initial: JSON.parse(
+              decodeURIComponent(
+                this.history.url.search == ""
+                  ? "{}"
+                  : this.history.url.search.substring(1)
+              )
+            ), // TODO FIXME
           })}
         </th>
 
@@ -112,7 +118,13 @@ export class PwUsers extends PwEntityList<"/api/v1/users"> {
             name: ["filters", "username"],
             task: this._task,
             type: "text",
-            initial: JSON.parse(decodeURIComponent((this.history.url.search == "" ? "{}" : this.history.url.search.substring(1)))), // TODO FIXME
+            initial: JSON.parse(
+              decodeURIComponent(
+                this.history.url.search == ""
+                  ? "{}"
+                  : this.history.url.search.substring(1)
+              )
+            ), // TODO FIXME
           })}
         </th>
 
@@ -123,7 +135,13 @@ export class PwUsers extends PwEntityList<"/api/v1/users"> {
             task: this._task,
             type: "text",
             defaultValue: undefined,
-            initial: JSON.parse(decodeURIComponent((this.history.url.search == "" ? "{}" : this.history.url.search.substring(1)))), // TODO FIXME
+            initial: JSON.parse(
+              decodeURIComponent(
+                this.history.url.search == ""
+                  ? "{}"
+                  : this.history.url.search.substring(1)
+              )
+            ), // TODO FIXME
           })}
         </th>
 

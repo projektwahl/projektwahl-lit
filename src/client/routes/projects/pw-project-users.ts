@@ -93,47 +93,74 @@ export const PwProjectUsers = setupHmr(
 
         <tr>
           <th scope="col">
-            ${pwInput<"/api/v1/users", ["filters", "project_leader_id" | "force_in_project_id"]>({
+            ${pwInput<
+              "/api/v1/users",
+              ["filters", "project_leader_id" | "force_in_project_id"]
+            >({
               label: null,
               name: ["filters", this.name],
               task: this._task,
               type: "checkbox",
               defaultValue: undefined,
-              initial: JSON.parse(decodeURIComponent((this.history.url.search == "" ? "{}" : this.history.url.search.substring(1)))), // TODO FIXME
+              initial: JSON.parse(
+                decodeURIComponent(
+                  this.history.url.search == ""
+                    ? "{}"
+                    : this.history.url.search.substring(1)
+                )
+              ), // TODO FIXME
             })}
           </th>
 
           <th scope="col">
-          ${pwInput<"/api/v1/users", ["filters", "id"]>({
-            label: null,
-            name: ["filters", "id"],
-            task: this._task,
-            type: "number",
-            defaultValue: undefined,
-            initial: JSON.parse(decodeURIComponent((this.history.url.search == "" ? "{}" : this.history.url.search.substring(1)))), // TODO FIXME
-          })}
-        </th>
+            ${pwInput<"/api/v1/users", ["filters", "id"]>({
+              label: null,
+              name: ["filters", "id"],
+              task: this._task,
+              type: "number",
+              defaultValue: undefined,
+              initial: JSON.parse(
+                decodeURIComponent(
+                  this.history.url.search == ""
+                    ? "{}"
+                    : this.history.url.search.substring(1)
+                )
+              ), // TODO FIXME
+            })}
+          </th>
 
-        <th scope="col">
-          ${pwInput<"/api/v1/users", ["filters", "username"]>({
-            label: null,
-            name: ["filters", "username"],
-            task: this._task,
-            type: "text",
-            initial: JSON.parse(decodeURIComponent((this.history.url.search == "" ? "{}" : this.history.url.search.substring(1)))), // TODO FIXME
-          })}
-        </th>
+          <th scope="col">
+            ${pwInput<"/api/v1/users", ["filters", "username"]>({
+              label: null,
+              name: ["filters", "username"],
+              task: this._task,
+              type: "text",
+              initial: JSON.parse(
+                decodeURIComponent(
+                  this.history.url.search == ""
+                    ? "{}"
+                    : this.history.url.search.substring(1)
+                )
+              ), // TODO FIXME
+            })}
+          </th>
 
-        <th scope="col">
-          ${pwInput<"/api/v1/users", ["filters", "type"]>({
-            label: null,
-            name: ["filters", "type"],
-            task: this._task,
-            type: "text",
-            defaultValue: undefined,
-            initial: JSON.parse(decodeURIComponent((this.history.url.search == "" ? "{}" : this.history.url.search.substring(1)))), // TODO FIXME
-          })}
-        </th>
+          <th scope="col">
+            ${pwInput<"/api/v1/users", ["filters", "type"]>({
+              label: null,
+              name: ["filters", "type"],
+              task: this._task,
+              type: "text",
+              defaultValue: undefined,
+              initial: JSON.parse(
+                decodeURIComponent(
+                  this.history.url.search == ""
+                    ? "{}"
+                    : this.history.url.search.substring(1)
+                )
+              ), // TODO FIXME
+            })}
+          </th>
 
           <th scope="col"></th>
         </tr>`;

@@ -28,7 +28,11 @@ import { PwForm } from "../../form/pw-form.js";
 import { HistoryController } from "../../history-controller.js";
 import { msg } from "@lit/localize";
 import type { z } from "zod";
-import { routes, ResponseType, MinimalSafeParseError } from "../../../lib/routes.js";
+import {
+  routes,
+  ResponseType,
+  MinimalSafeParseError,
+} from "../../../lib/routes.js";
 import { setupHmr } from "../../hmr.js";
 import { pwInput } from "../../form/pw-input.js";
 import { result } from "../../../lib/result.js";
@@ -47,13 +51,16 @@ export async function pwProject(id: number, viewOnly = false) {
 const taskFunction = async ([id]: [number]) => {
   const [_, response] = await Promise.all([
     import("../projects/pw-project-users.js"),
-    await myFetch<"/api/v1/projects">(`/api/v1/projects/?${JSON.stringify({
-      filters: {
-        id
-      },
-      paginationCursor: null,
-      sorting: []
-    })}`, {}),
+    await myFetch<"/api/v1/projects">(
+      `/api/v1/projects/?${JSON.stringify({
+        filters: {
+          id,
+        },
+        paginationCursor: null,
+        sorting: [],
+      })}`,
+      {}
+    ),
   ]);
   if (response.success) {
     return {
@@ -94,9 +101,17 @@ export const PwProjectCreate = setupHmr(
 
     initialRender: boolean;
 
-    initial: z.SafeParseSuccess<z.infer<typeof routes["/api/v1/projects"]["response"]>["entities"][number]>
-    | MinimalSafeParseError<z.infer<typeof routes["/api/v1/projects"]["request"]>> | undefined;
-  
+    initial:
+      | z.SafeParseSuccess<
+          z.infer<
+            typeof routes["/api/v1/projects"]["response"]
+          >["entities"][number]
+        >
+      | MinimalSafeParseError<
+          z.infer<typeof routes["/api/v1/projects"]["request"]>
+        >
+      | undefined;
+
     constructor() {
       super();
 

@@ -28,7 +28,11 @@ import { PwForm } from "../../form/pw-form.js";
 import { HistoryController } from "../../history-controller.js";
 import { msg } from "@lit/localize";
 import "../../form/pw-input.js";
-import { routes, ResponseType, MinimalSafeParseError } from "../../../lib/routes.js";
+import {
+  routes,
+  ResponseType,
+  MinimalSafeParseError,
+} from "../../../lib/routes.js";
 import type { z } from "zod";
 import { pwInput } from "../../form/pw-input.js";
 import { result } from "../../../lib/result.js";
@@ -52,10 +56,10 @@ const taskFunction = async ([id]: [number]) => {
   const response = await myFetch<"/api/v1/users">(
     `/api/v1/users/?${JSON.stringify({
       filters: {
-        id
+        id,
       },
       paginationCursor: null,
-      sorting: []
+      sorting: [],
     })}`,
     {}
   );
@@ -90,8 +94,12 @@ class PwUserCreate extends PwForm<"/api/v1/users/create-or-update"> {
 
   type?: "voter" | "admin" | "helper";
 
-  initial: z.SafeParseSuccess<z.infer<typeof routes["/api/v1/users"]["response"]>["entities"][number]>
-  | MinimalSafeParseError<z.infer<typeof routes["/api/v1/users"]["request"]>> | undefined;
+  initial:
+    | z.SafeParseSuccess<
+        z.infer<typeof routes["/api/v1/users"]["response"]>["entities"][number]
+      >
+    | MinimalSafeParseError<z.infer<typeof routes["/api/v1/users"]["request"]>>
+    | undefined;
 
   constructor() {
     super();
@@ -262,8 +270,8 @@ class PwUserCreate extends PwForm<"/api/v1/users/create-or-update"> {
       /*const errors = Object.entries(data.error)
           .filter(([k]) => !this.getCurrentInputElements().includes(k))
           .map(([k, v]) => html`${k}: ${v}<br />`);*/
-          if (this.initial.error.issues.length > 0) {
-            return html`${bootstrapCss}
+      if (this.initial.error.issues.length > 0) {
+        return html`${bootstrapCss}
             <main class="container">
               <h1 class="text-center">${this.actionText}</h1>
               
@@ -276,7 +284,7 @@ class PwUserCreate extends PwForm<"/api/v1/users/create-or-update"> {
             
             </div>
           </main>`;
-          }
+      }
     }
   }
 }
