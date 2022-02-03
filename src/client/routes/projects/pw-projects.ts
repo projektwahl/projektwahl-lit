@@ -102,7 +102,7 @@ class PwProjects extends PwEntityList<"/api/v1/projects"> {
             task: this._task,
             type: "number",
             defaultValue: undefined,
-            initial: JSON.parse(decodeURIComponent(this.history.url.search.substring(1))), // TODO FIXME
+            initial: JSON.parse(decodeURIComponent((this.history.url.search == "" ? "{}" : this.history.url.search.substring(1)))), // TODO FIXME
           })}
         </th>
 
@@ -112,7 +112,7 @@ class PwProjects extends PwEntityList<"/api/v1/projects"> {
             name: ["filters", "title"],
             task: this._task,
             type: "text",
-            initial: JSON.parse(decodeURIComponent(this.history.url.search.substring(1))), // TODO FIXME
+            initial: JSON.parse(decodeURIComponent((this.history.url.search == "" ? "{}" : this.history.url.search.substring(1)))), // TODO FIXME
           })}
         </th>
 
@@ -123,7 +123,7 @@ class PwProjects extends PwEntityList<"/api/v1/projects"> {
             task: this._task,
             type: "text",
             defaultValue: undefined,
-            initial: JSON.parse(decodeURIComponent(this.history.url.search.substring(1))), // TODO FIXME
+            initial: JSON.parse(decodeURIComponent((this.history.url.search == "" ? "{}" : this.history.url.search.substring(1)))), // TODO FIXME
           })}
         </th>
 

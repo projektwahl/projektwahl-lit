@@ -114,13 +114,11 @@ export function requestHandler<P extends keyof typeof routes>(
           //console.log(user)
         }
 
-        const rawGetBody = decodeURIComponent(url.search).substring(1);
-        console.log(rawGetBody)
 
         const body =
           request.method === "POST"
             ? await json(request)
-            : JSON.parse(rawGetBody); // TODO FIXME if this throws
+            : JSON.parse(decodeURIComponent((url.search == "" ? "{}" : url.search.substring(1)))); // TODO FIXME if this throws
         const requestBody = routes[path].request.safeParse(body);
         if (requestBody.success) {
           const [new_headers, responseBody] = await handler(
