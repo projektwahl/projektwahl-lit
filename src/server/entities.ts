@@ -116,9 +116,9 @@ export async function fetchData<R extends keyof typeof entityRoutes>(
         })
         .slice(1);
 
-      return sql2`(SELECT ${unsafe2(columns.join(", "))} FROM ${unsafe2(
-        table
-      )} WHERE ${customFilterQuery(
+      return sql2`(SELECT ${unsafe2(
+        columns.map((c) => `"${c}"`).join(", ")
+      )} FROM ${unsafe2(table)} WHERE ${customFilterQuery(
         query
       )} AND (${parts}) ORDER BY ${orderByQuery} LIMIT ${
         query.paginationLimit + 1
