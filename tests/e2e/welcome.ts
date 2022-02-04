@@ -48,20 +48,23 @@ export async function click(element: WebElement) {
 }
 
 // SELENIUM_BROWSER=chrome node --experimental-loader ./src/loader.js --enable-source-maps tests/e2e/welcome.js
-const driver = await new Builder()
+const builder = new Builder()
   .forBrowser("firefox")
   .withCapabilities(Capabilities.firefox().set("acceptInsecureCerts", true))
   .withCapabilities(
     Capabilities.chrome().set(Capability.ACCEPT_INSECURE_TLS_CERTS, true)
-  )
-  .setChromeOptions(
+  );
+
+if (process.env.CI) {
+  builder.setChromeOptions(
     new chrome.Options().addArguments(
-      //"--headless",
+      "--headless",
       "--no-sandbox",
       "--disable-dev-shm-usage"
     )
-  )
-  .build();
+  );
+}
+const driver = builder.build();
 await driver.manage().setTimeouts({
   implicit: 5000,
 });
@@ -335,4 +338,6 @@ try {
 } catch (error) {
   console.error(error);
   //await driver.quit();
+
+  throw error;
 }
