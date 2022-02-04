@@ -385,17 +385,11 @@ export class PwApp extends LitElement {
                 >${msg("License")}</a
               >
               |
-              <a
-                href="/imprint"
-                target="_blank"
-                rel="noopener noreferrer"
+              <a href="/imprint" target="_blank" rel="noopener noreferrer"
                 >${msg("Imprint")}</a
               >
               |
-              <a
-                href="/privacy"
-                target="_blank"
-                rel="noopener noreferrer"
+              <a href="/privacy" target="_blank" rel="noopener noreferrer"
                 >${msg("Privacy Policy")}</a
               >
             </span>

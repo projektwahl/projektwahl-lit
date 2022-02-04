@@ -319,7 +319,7 @@ try {
     assert.match(await alert.getText(), /Insufficient permissions!/);
   }
 
-  await driver.quit()
+  await driver.quit();
 
   /*
   const theRepl = repl.start();
