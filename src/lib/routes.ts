@@ -30,7 +30,7 @@ if (!globalThis.Buffer) {
 
 const rawUserCommon = {
   id: z.number(),
-  username: z.string().min(3).max(100),
+  username: z.string().min(1).max(100),
   openid_id: z.string().optional(),
   password_hash: z.string(),
   away: z.boolean(),
@@ -208,17 +208,20 @@ const baseQuery = <
 ) =>
   z.object({
     paginationDirection: z.enum(["forwards", "backwards"]).default("forwards"),
-    paginationCursor: s.nullable(), // if this is null the start is at start/end depending on paginationDirection
-    filters: s.partial(),
-    sorting: z.array(
-      z.tuple([
-        z.enum(
-          // TODO FIXME keys
-          Object.keys(s.shape) as [keyof T & string, ...(keyof T & string)[]]
-        ),
-        z.enum(["ASC", "DESC"]),
-      ])
-    ),
+    paginationCursor: s.partial().nullish(), // if this is null the start is at start/end depending on paginationDirection
+    // @ts-expect-error why
+    filters: s.partial().default({}),
+    sorting: z
+      .array(
+        z.tuple([
+          z.enum(
+            // TODO FIXME keys
+            Object.keys(s.shape) as [keyof T & string, ...(keyof T & string)[]]
+          ),
+          z.enum(["ASC", "DESC"]),
+        ])
+      )
+      .default([]),
     paginationLimit: z.number().default(100),
   });
 
@@ -230,7 +233,7 @@ export const routes = identity({
   "/api/v1/login": {
     request: z
       .object({
-        username: z.string().min(3).max(100),
+        username: z.string().min(1).max(100),
         password: z.string(),
       })
       .strict(),
@@ -283,15 +286,15 @@ export const entityRoutes = {
   "/api/v1/projects": routes["/api/v1/projects"],
 };
 
-export declare class MinimalZodError<T = any> {
+export declare class MinimalZodError {
   issues: ZodIssue[];
 }
 
-export declare type MinimalSafeParseError<Input> = {
+export declare type MinimalSafeParseError = {
   success: false;
-  error: MinimalZodError<Input>;
+  error: MinimalZodError;
 };
 
 export type ResponseType<P extends keyof typeof routes> =
   | z.SafeParseSuccess<z.infer<typeof routes[P]["response"]>>
-  | MinimalSafeParseError<z.infer<typeof routes[P]["request"]>>;
+  | MinimalSafeParseError; // <z.infer<typeof routes[P]["request"]>>

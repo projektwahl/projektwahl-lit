@@ -28,11 +28,7 @@ import { PwForm } from "../../form/pw-form.js";
 import { HistoryController } from "../../history-controller.js";
 import { msg } from "@lit/localize";
 import type { z } from "zod";
-import {
-  routes,
-  ResponseType,
-  MinimalSafeParseError,
-} from "../../../lib/routes.js";
+import type { routes, MinimalSafeParseError } from "../../../lib/routes.js";
 import { setupHmr } from "../../hmr.js";
 import { pwInput } from "../../form/pw-input.js";
 import { result } from "../../../lib/result.js";
@@ -71,10 +67,6 @@ const taskFunction = async ([id]: [number]) => {
   return response;
 };
 
-const initialResult = result(
-  routes["/api/v1/projects"]["response"]["shape"]["entities"]["element"]
-);
-
 export const PwProjectCreate = setupHmr(
   "PwProjectCreate",
   class PwProjectCreate extends PwForm<"/api/v1/projects/create-or-update"> {
@@ -107,9 +99,7 @@ export const PwProjectCreate = setupHmr(
             typeof routes["/api/v1/projects"]["response"]
           >["entities"][number]
         >
-      | MinimalSafeParseError<
-          z.infer<typeof routes["/api/v1/projects"]["request"]>
-        >
+      | MinimalSafeParseError
       | undefined;
 
     constructor() {

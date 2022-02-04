@@ -27,9 +27,8 @@ import { aClick } from "../../pw-a.js";
 import { msg } from "@lit/localize";
 import { PwEntityList } from "../../entity-list/pw-entitylist.js";
 import { pwOrder } from "../../entity-list/pw-order.js";
-import { myFetch } from "../../utils.js";
-import { ifDefined } from "lit/directives/if-defined.js";
 import { pwInput } from "../../form/pw-input.js";
+import { routes } from "../../../lib/routes.js";
 
 export const pwProjects = async (url: URL) => {
   //const result = await taskFunction([url.searchParams]);
@@ -61,93 +60,91 @@ class PwProjects extends PwEntityList<"/api/v1/projects"> {
   }
 
   override get head() {
-    return html`
-      <tr>
-        <!--
+    try {
+      const initial = routes["/api/v1/projects"]["request"].parse(
+        JSON.parse(
+          decodeURIComponent(
+            this.history.url.search == ""
+              ? "{}"
+              : this.history.url.search.substring(1)
+          )
+        )
+      );
+      return html`
+        <tr>
+          <!--
                       do not support this without javascript because there is literally zero useful ways to do this useful.
                       the only nice way is probably submit buttons that do things like "oder_by_id_asc" and then redirect to the new state (because you need to remove the old state)
                     -->
-        <th class="table-cell-hover p-0" scope="col">
-          ${pwOrder<"/api/v1/projects">({
-            refreshEntityList: () => this._task.run(),
-            name: "id",
-            title: msg("ID"),
-          })}
-        </th>
+          <th class="table-cell-hover p-0" scope="col">
+            ${pwOrder<"/api/v1/projects">({
+              refreshEntityList: () => this._task.run(),
+              name: "id",
+              title: msg("ID"),
+            })}
+          </th>
 
-        <th class="table-cell-hover p-0" scope="col">
-          ${pwOrder<"/api/v1/projects">({
-            refreshEntityList: () => this._task.run(),
-            name: "title",
-            title: msg("Title"),
-          })}
-        </th>
+          <th class="table-cell-hover p-0" scope="col">
+            ${pwOrder<"/api/v1/projects">({
+              refreshEntityList: () => this._task.run(),
+              name: "title",
+              title: msg("Title"),
+            })}
+          </th>
 
-        <th class="table-cell-hover p-0" scope="col">
-          ${pwOrder<"/api/v1/projects">({
-            refreshEntityList: () => this._task.run(),
-            name: "info",
-            title: msg("Info"),
-          })}
-        </th>
+          <th class="table-cell-hover p-0" scope="col">
+            ${pwOrder<"/api/v1/projects">({
+              refreshEntityList: () => this._task.run(),
+              name: "info",
+              title: msg("Info"),
+            })}
+          </th>
 
-        <th class="table-cell-hover">${msg("Actions")}</th>
-      </tr>
+          <th class="table-cell-hover">${msg("Actions")}</th>
+        </tr>
 
-      <tr>
-        <th scope="col">
-          ${pwInput<"/api/v1/projects", ["filters", "id"]>({
-            label: null,
-            name: ["filters", "id"],
-            task: this._task,
-            type: "number",
-            defaultValue: undefined,
-            initial: JSON.parse(
-              decodeURIComponent(
-                this.history.url.search == ""
-                  ? "{}"
-                  : this.history.url.search.substring(1)
-              )
-            ), // TODO FIXME
-          })}
-        </th>
+        <tr>
+          <th scope="col">
+            ${pwInput<"/api/v1/projects", ["filters", "id"]>({
+              label: null,
+              name: ["filters", "id"],
+              task: this._task,
+              type: "number",
+              defaultValue: undefined,
+              initial,
+            })}
+          </th>
 
-        <th scope="col">
-          ${pwInput<"/api/v1/projects", ["filters", "title"]>({
-            label: null,
-            name: ["filters", "title"],
-            task: this._task,
-            type: "text",
-            initial: JSON.parse(
-              decodeURIComponent(
-                this.history.url.search == ""
-                  ? "{}"
-                  : this.history.url.search.substring(1)
-              )
-            ), // TODO FIXME
-          })}
-        </th>
+          <th scope="col">
+            ${pwInput<"/api/v1/projects", ["filters", "title"]>({
+              label: null,
+              name: ["filters", "title"],
+              task: this._task,
+              type: "text",
+              initial,
+            })}
+          </th>
 
-        <th scope="col">
-          ${pwInput<"/api/v1/projects", ["filters", "info"]>({
-            label: null,
-            name: ["filters", "info"],
-            task: this._task,
-            type: "text",
-            defaultValue: undefined,
-            initial: JSON.parse(
-              decodeURIComponent(
-                this.history.url.search == ""
-                  ? "{}"
-                  : this.history.url.search.substring(1)
-              )
-            ), // TODO FIXME
-          })}
-        </th>
+          <th scope="col">
+            ${pwInput<"/api/v1/projects", ["filters", "info"]>({
+              label: null,
+              name: ["filters", "info"],
+              task: this._task,
+              type: "text",
+              defaultValue: undefined,
+              initial,
+            })}
+          </th>
 
-        <th scope="col"></th>
-      </tr>
-    `;
+          <th scope="col"></th>
+        </tr>
+      `;
+    } catch (error) {
+      console.error(error);
+      return html`<div class="alert alert-danger" role="alert">
+        Ungültige URL! Bitte melden Sie diesen Fehler.
+      </div>`;
+    }
   }
   override get body() {
     return html`

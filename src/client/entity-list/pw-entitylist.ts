@@ -22,15 +22,16 @@ SPDX-FileCopyrightText: 2021 Moritz Hedtke <Moritz.Hedtke@t-online.de>
 */
 import { css, html, TemplateResult } from "lit";
 import { HistoryController } from "../history-controller.js";
-import { createRef, ref } from "lit/directives/ref.js";
+import { ref } from "lit/directives/ref.js";
 import { Task, TaskStatus } from "@lit-labs/task";
-import type { entityRoutes, routes, ResponseType } from "../../lib/routes.js";
+import type { entityRoutes, ResponseType } from "../../lib/routes.js";
 import type { z } from "zod";
 import { PwForm } from "../form/pw-form.js";
 import { bootstrapCss } from "../index.js";
 import { msg, str } from "@lit/localize";
 import { ifDefined } from "lit/directives/if-defined.js";
 import { myFetch } from "../utils.js";
+import { pwInput } from "../form/pw-input.js";
 
 export class PwEntityList<
   P extends keyof typeof entityRoutes
@@ -96,19 +97,20 @@ export class PwEntityList<
 
       this._task = new Task(this, {
         task: async () => {
+          const data = JSON.parse(
+            decodeURIComponent(
+              this.history.url.search == ""
+                ? "{}"
+                : this.history.url.search.substring(1)
+            )
+          );
+
           const formDataEvent = new CustomEvent<
             z.infer<typeof entityRoutes[P]["request"]>
           >("myformdata", {
             bubbles: true,
             composed: true,
-            detail: {
-              // TODO FIXME put old data from url in here (at least for some of them)
-              sorting: [],
-              paginationCursor: null,
-              filters: {},
-              paginationDirection: "forwards",
-              paginationLimit: 100,
-            } as z.infer<typeof entityRoutes[P]["request"]>,
+            detail: data as z.infer<typeof entityRoutes[P]["request"]>,
           });
           this.form.value?.dispatchEvent(formDataEvent);
 
@@ -143,13 +145,21 @@ export class PwEntityList<
         this._task.p = this.initial;
         // TODO FIXMe if we set the currentArgs here somehow I think this may work
       } else {
-        this._task.run();
+        void this._task.run();
       }
     }
 
     if (this.actionText === undefined) {
       throw new Error(msg("component not fully initialized"));
     }
+
+    const data = JSON.parse(
+      decodeURIComponent(
+        this.history.url.search == ""
+          ? "{}"
+          : this.history.url.search.substring(1)
+      )
+    );
 
     return html`
       ${bootstrapCss}
@@ -168,39 +178,6 @@ export class PwEntityList<
         </div>
 
         <h1 class="text-center">${this.title}</h1>
-        <div class="row justify-content-between">
-          <div class="col-auto">${this.buttons}</div>
-          <div class="col-3">
-            <select
-              @change=${async (event: Event) => {
-                const url = new URL(window.location.href);
-                const value = JSON.parse(url.search);
-                value.limit = (event.target as HTMLSelectElement).value;
-                url.search = JSON.stringify(value);
-                HistoryController.goto(url, {});
-                await this._task.run();
-              }}
-              .value=${this.history.url.searchParams.get("p_limit") ?? "10"}
-              class="form-select"
-              aria-label="Default select example"
-            >
-              <option value="10">
-                ${((count: number) => msg(str`${count} per page`))(10)}
-              </option>
-              <option value="25">
-                ${((count: number) => msg(str`${count} per page`))(25)}
-              </option>
-              <option value="50">
-                ${((count: number) => msg(str`${count} per page`))(50)}
-              </option>
-              <option selected value="100">
-                ${((count: number) => msg(str`${count} per page`))(100)}
-              </option>
-            </select>
-          </div>
-        </div>
-
-        ${this.getErrors()}
 
         <form
           ${ref(this.form)}
@@ -209,6 +186,39 @@ export class PwEntityList<
           }}
           @submit=${(e: Event) => e.preventDefault()}
         >
+          <div class="row justify-content-between">
+            <div class="col-auto">${this.buttons}</div>
+            <div class="col-3">
+              ${pwInput<P, ["paginationLimit"]>({
+                label: "Elemente pro Seite",
+                name: ["paginationLimit"],
+                task: this._task,
+                type: "select",
+                initial: data,
+                options: [
+                  {
+                    text: ((count: number) => msg(str`${count} per page`))(10),
+                    value: 10,
+                  },
+                  {
+                    text: ((count: number) => msg(str`${count} per page`))(25),
+                    value: 25,
+                  },
+                  {
+                    text: ((count: number) => msg(str`${count} per page`))(50),
+                    value: 50,
+                  },
+                  {
+                    text: ((count: number) => msg(str`${count} per page`))(100),
+                    value: 100,
+                  },
+                ],
+              })}
+            </div>
+          </div>
+
+          ${this.getErrors()}
+
           <table class="table">
             <thead>
               ${this.head}
@@ -232,17 +242,18 @@ export class PwEntityList<
                     <a
                       @click=${async (e: Event) => {
                         e.preventDefault();
-                        const url = new URL(window.location.href);
                         if (this._task.value?.success) {
-                          url.searchParams.set(
-                            "p_cursor",
-                            JSON.stringify(
-                              this._task.value?.data.previousCursor
-                            )
-                          );
+                          data.paginationCursor =
+                            this._task.value?.data.previousCursor;
+                          data.paginationDirection = "backwards";
                         }
-                        url.searchParams.set("p_direction", "backwards");
-                        HistoryController.goto(url, {});
+                        HistoryController.goto(
+                          new URL(
+                            `?${encodeURIComponent(JSON.stringify(data))}`,
+                            window.location.href
+                          ),
+                          {}
+                        );
                         await this._task.run();
                       }}
                       class="page-link"
@@ -268,15 +279,18 @@ export class PwEntityList<
                     <a
                       @click=${async (e: Event) => {
                         e.preventDefault();
-                        const url = new URL(window.location.href);
                         if (this._task.value?.success) {
-                          url.searchParams.set(
-                            "p_cursor",
-                            JSON.stringify(this._task.value?.data.nextCursor)
-                          );
+                          data.paginationCursor =
+                            this._task.value?.data.nextCursor;
+                          data.paginationDirection = "forwards";
                         }
-                        url.searchParams.set("p_direction", "forwards");
-                        HistoryController.goto(url, {});
+                        HistoryController.goto(
+                          new URL(
+                            `?${encodeURIComponent(JSON.stringify(data))}`,
+                            window.location.href
+                          ),
+                          {}
+                        );
                         await this._task.run();
                       }}
                       class="page-link"

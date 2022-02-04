@@ -21,11 +21,9 @@ SPDX-License-Identifier: AGPL-3.0-or-later
 SPDX-FileCopyrightText: 2021 Moritz Hedtke <Moritz.Hedtke@t-online.de>
 */
 import { html, LitElement } from "lit";
-import { createRef, ref } from "lit/directives/ref.js";
-import { bootstrapCss } from "../index.js";
+import { createRef } from "lit/directives/ref.js";
 import { msg } from "@lit/localize";
 import type { routes, ResponseType } from "../../lib/routes.js";
-import type { z } from "zod";
 import type { Task } from "@lit-labs/task";
 
 class PwForm<P extends keyof typeof routes> extends LitElement {

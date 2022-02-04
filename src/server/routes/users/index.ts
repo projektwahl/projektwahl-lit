@@ -21,16 +21,12 @@ SPDX-License-Identifier: AGPL-3.0-or-later
 SPDX-FileCopyrightText: 2021 Moritz Hedtke <Moritz.Hedtke@t-online.de>
 */
 import type { OutgoingHttpHeaders, ServerResponse } from "node:http";
-import { z, ZodIssueCode } from "zod";
-import { rawUserSchema, ResponseType } from "../../../lib/routes.js";
+import { ZodIssueCode } from "zod";
+import type { ResponseType } from "../../../lib/routes.js";
 import { fetchData } from "../../entities.js";
 import { MyRequest, requestHandler } from "../../express.js";
 import { sql2 } from "../../sql/index.js";
 import type { Http2ServerResponse } from "node:http2";
-
-function includes<T, U extends T>(arr: readonly U[], elem: T): elem is U {
-  return arr.includes(elem as U);
-}
 
 export async function usersHandler(
   request: MyRequest,
@@ -81,8 +77,6 @@ export async function usersHandler(
         "force_in_project_id",
         "deleted",
       ] as const;
-
-      const schema = rawUserSchema;
 
       const ret: [OutgoingHttpHeaders, ResponseType<"/api/v1/users">] =
         await fetchData<"/api/v1/users">(
