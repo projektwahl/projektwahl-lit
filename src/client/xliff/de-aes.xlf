@@ -11,17 +11,13 @@
 <trans-unit id="s7a391ae3182a86b5">
   <source>Credits</source>
 </trans-unit>
-<trans-unit id="s6c2062b9249e8c19">
-  <source>getInputs must be implemented by subclass</source>
-  <target>getInputs muss von Unterklasse implementiert werden</target>
+<trans-unit id="s494268b948a317a2">
+  <source>Some errors occurred!</source>
+  <target>Einige Fehler sind aufgetreten!</target>
 </trans-unit>
 <trans-unit id="s01dc5a60edf9e053">
   <source>component not fully initialized</source>
   <target>Komponente nicht vollständig initialisiert</target>
-</trans-unit>
-<trans-unit id="s494268b948a317a2">
-  <source>Some errors occurred!</source>
-  <target>Einige Fehler sind aufgetreten!</target>
 </trans-unit>
 <trans-unit id="s05ca1d6cf0a89899">
   <source>Denk dran: Lange Passwörter sind viel sicherer als welche mit vielen Sonderzeichen.</source>
@@ -77,10 +73,6 @@
 <trans-unit id="s416ccf81fded518c">
   <source>sort by <x id="0" equiv-text="${this.title}"/></source>
   <target>Nach <x id="0" equiv-text="${this.title}"/> sortieren</target>
-</trans-unit>
-<trans-unit id="s586d6bd2eca2da93">
-  <source>Users</source>
-  <target>Accounts</target>
 </trans-unit>
 <trans-unit id="s0c97387dc725a9e2">
   <source>Create account</source>
