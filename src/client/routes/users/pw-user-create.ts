@@ -89,7 +89,7 @@ class PwUserCreate extends PwForm<"/api/v1/users/create-or-update"> {
     | z.SafeParseSuccess<
         z.infer<typeof routes["/api/v1/users"]["response"]>["entities"][number]
       >
-    | MinimalSafeParseError<z.infer<typeof routes["/api/v1/users"]["request"]>>
+    | MinimalSafeParseError
     | undefined;
 
   constructor() {
