@@ -98,12 +98,12 @@ export class PwEntityList<
       this._task = new Task(this, {
         task: async () => {
           const data = JSON.parse(
-              decodeURIComponent(
-                this.history.url.search == ""
-                  ? "{}"
-                  : this.history.url.search.substring(1)
-              )
+            decodeURIComponent(
+              this.history.url.search == ""
+                ? "{}"
+                : this.history.url.search.substring(1)
             )
+          );
 
           const formDataEvent = new CustomEvent<
             z.infer<typeof entityRoutes[P]["request"]>
@@ -159,7 +159,7 @@ export class PwEntityList<
           ? "{}"
           : this.history.url.search.substring(1)
       )
-    )
+    );
 
     return html`
       ${bootstrapCss}
@@ -186,39 +186,38 @@ export class PwEntityList<
           }}
           @submit=${(e: Event) => e.preventDefault()}
         >
-
-        <div class="row justify-content-between">
-          <div class="col-auto">${this.buttons}</div>
-          <div class="col-3">
-            ${pwInput<P, ["paginationLimit"]>({
-              label: "Elemente pro Seite",
-              name: ["paginationLimit"],
-              task: this._task,
-              type: "select",
-              initial: data,
-              options: [
-                {
-                  text: ((count: number) => msg(str`${count} per page`))(10),
-                  value: 10
-                },
-                {
-                  text: ((count: number) => msg(str`${count} per page`))(25),
-                  value: 25
-                },
-                {
-                  text: ((count: number) => msg(str`${count} per page`))(50),
-                  value: 50
-                },{
-                  text: ((count: number) => msg(str`${count} per page`))(100),
-                  value: 100
-                }
-
-              ]
-            })}
+          <div class="row justify-content-between">
+            <div class="col-auto">${this.buttons}</div>
+            <div class="col-3">
+              ${pwInput<P, ["paginationLimit"]>({
+                label: "Elemente pro Seite",
+                name: ["paginationLimit"],
+                task: this._task,
+                type: "select",
+                initial: data,
+                options: [
+                  {
+                    text: ((count: number) => msg(str`${count} per page`))(10),
+                    value: 10,
+                  },
+                  {
+                    text: ((count: number) => msg(str`${count} per page`))(25),
+                    value: 25,
+                  },
+                  {
+                    text: ((count: number) => msg(str`${count} per page`))(50),
+                    value: 50,
+                  },
+                  {
+                    text: ((count: number) => msg(str`${count} per page`))(100),
+                    value: 100,
+                  },
+                ],
+              })}
+            </div>
           </div>
-        </div>
 
-        ${this.getErrors()}
+          ${this.getErrors()}
 
           <table class="table">
             <thead>
@@ -244,10 +243,9 @@ export class PwEntityList<
                       @click=${async (e: Event) => {
                         e.preventDefault();
                         if (this._task.value?.success) {
-                            data.paginationCursor = JSON.stringify(
-                              this._task.value?.data.previousCursor
-                            )
-                            data.paginationDirection = "backwards";
+                          data.paginationCursor =
+                            this._task.value?.data.previousCursor;
+                          data.paginationDirection = "backwards";
                         }
                         HistoryController.goto(
                           new URL(
@@ -282,10 +280,9 @@ export class PwEntityList<
                       @click=${async (e: Event) => {
                         e.preventDefault();
                         if (this._task.value?.success) {
-                            data.paginationCursor = JSON.stringify(
-                              this._task.value?.data.nextCursor
-                            )
-                            data.paginationDirection = "forwards";
+                          data.paginationCursor =
+                            this._task.value?.data.nextCursor;
+                          data.paginationDirection = "forwards";
                         }
                         HistoryController.goto(
                           new URL(

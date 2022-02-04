@@ -174,7 +174,9 @@ export class PwInput<
         this.name as string[],
         (this.input.value as HTMLSelectElement).selectedIndex == -1
           ? this.defaultValue
-          : (this.input.value as HTMLInputElement).value
+          : this.options?.find(
+              (v) => v.value == (this.input.value as HTMLInputElement).value
+            )?.value // To make numbers work
       );
     } else {
       const val = (this.input.value as HTMLInputElement).value;
