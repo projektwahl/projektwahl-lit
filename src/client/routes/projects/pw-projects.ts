@@ -140,6 +140,7 @@ class PwProjects extends PwEntityList<"/api/v1/projects"> {
         </tr>
       `;
     } catch (error) {
+      console.error(error);
       return html`<div class="alert alert-danger" role="alert">
         Ungültige URL! Bitte melden Sie diesen Fehler.
       </div>`;

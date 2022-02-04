@@ -208,17 +208,19 @@ const baseQuery = <
 ) =>
   z.object({
     paginationDirection: z.enum(["forwards", "backwards"]).default("forwards"),
-    paginationCursor: s.nullable(), // if this is null the start is at start/end depending on paginationDirection
-    filters: s.partial(),
-    sorting: z.array(
-      z.tuple([
-        z.enum(
-          // TODO FIXME keys
-          Object.keys(s.shape) as [keyof T & string, ...(keyof T & string)[]]
-        ),
-        z.enum(["ASC", "DESC"]),
-      ])
-    ),
+    paginationCursor: s.nullish(), // if this is null the start is at start/end depending on paginationDirection
+    filters: s.partial().default({}),
+    sorting: z
+      .array(
+        z.tuple([
+          z.enum(
+            // TODO FIXME keys
+            Object.keys(s.shape) as [keyof T & string, ...(keyof T & string)[]]
+          ),
+          z.enum(["ASC", "DESC"]),
+        ])
+      )
+      .default([]),
     paginationLimit: z.number().default(100),
   });
 

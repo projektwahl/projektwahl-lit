@@ -153,6 +153,7 @@ export const PwProjectUsers = setupHmr(
             <th scope="col"></th>
           </tr>`;
       } catch (error) {
+        console.error(error);
         return html`<div class="alert alert-danger" role="alert">
           Ungültige URL! Bitte melden Sie diesen Fehler.
         </div>`;
