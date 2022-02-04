@@ -67,7 +67,7 @@ export async function projectsHandler(
             },
           },
         ];
-        return returnValue
+        return returnValue;
       }
 
       const columns = [

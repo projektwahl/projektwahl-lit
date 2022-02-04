@@ -28,10 +28,7 @@ import { PwForm } from "../../form/pw-form.js";
 import { HistoryController } from "../../history-controller.js";
 import { msg } from "@lit/localize";
 import type { z } from "zod";
-import {
-  routes,
-  MinimalSafeParseError,
-} from "../../../lib/routes.js";
+import type { routes, MinimalSafeParseError } from "../../../lib/routes.js";
 import { setupHmr } from "../../hmr.js";
 import { pwInput } from "../../form/pw-input.js";
 import { result } from "../../../lib/result.js";
@@ -102,9 +99,7 @@ export const PwProjectCreate = setupHmr(
             typeof routes["/api/v1/projects"]["response"]
           >["entities"][number]
         >
-      | MinimalSafeParseError<
-          z.infer<typeof routes["/api/v1/projects"]["request"]>
-        >
+      | MinimalSafeParseError
       | undefined;
 
     constructor() {

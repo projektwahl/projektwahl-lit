@@ -28,10 +28,7 @@ import { PwForm } from "../../form/pw-form.js";
 import { HistoryController } from "../../history-controller.js";
 import { msg } from "@lit/localize";
 import "../../form/pw-input.js";
-import type {
-  routes,
-  MinimalSafeParseError,
-} from "../../../lib/routes.js";
+import type { routes, MinimalSafeParseError } from "../../../lib/routes.js";
 import type { z } from "zod";
 import { pwInput } from "../../form/pw-input.js";
 import { bootstrapCss } from "../../index.js";
