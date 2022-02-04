@@ -386,7 +386,6 @@ export class PwApp extends LitElement {
               >
               |
               <a
-                @click=${aClick}
                 href="/imprint"
                 target="_blank"
                 rel="noopener noreferrer"
@@ -394,7 +393,6 @@ export class PwApp extends LitElement {
               >
               |
               <a
-                @click=${aClick}
                 href="/privacy"
                 target="_blank"
                 rel="noopener noreferrer"

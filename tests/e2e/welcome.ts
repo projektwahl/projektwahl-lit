@@ -56,14 +56,14 @@ const driver = await new Builder()
   )
   .setChromeOptions(
     new chrome.Options().addArguments(
-      "--headless",
+      //"--headless",
       "--no-sandbox",
       "--disable-dev-shm-usage"
     )
   )
   .build();
 await driver.manage().setTimeouts({
-  implicit: 2000,
+  implicit: 5000,
 });
 await driver.manage().window().setRect({
   width: 500,
@@ -216,7 +216,7 @@ try {
       await shadow(pwApp2)
     ).findElement(By.css("pw-imprint"));
 
-    assert.match(await pwImprint.getText(), /boilerplate imprint text/);
+    assert.match(await pwImprint.getText(), /Angaben gemäß § 5 TMG/);
 
     await driver.close();
 
@@ -241,7 +241,7 @@ try {
       await shadow(pwApp2)
     ).findElement(By.css("pw-privacy"));
 
-    assert.match(await pwPrivacy.getText(), /boilerplate privacy policy text/);
+    assert.match(await pwPrivacy.getText(), /Verantwortlicher/);
 
     await driver.close();
 
@@ -263,7 +263,7 @@ try {
 
     const filterUsername = await (
       await shadow(pwUsers)
-    ).findElement(By.css('input[name="f_username"]'));
+    ).findElement(By.css('input[name="filters,username"]'));
 
     await filterUsername.sendKeys("admin");
 
@@ -286,9 +286,9 @@ try {
 
     const logoutButton = await (
       await shadow(pwApp)
-    ).findElement(By.partialLinkText("Logout"));
+    ).findElement(By.partialLinkText("abmelden"));
 
-    assert.equal(await logoutButton.getText(), "Logout admin");
+    assert.equal(await logoutButton.getText(), "admin abmelden");
 
     await logoutButton.click();
 
@@ -296,7 +296,7 @@ try {
       await shadow(pwApp)
     ).findElement(By.css('a[href="/login"]'));
 
-    assert.equal(await loginLink.getText(), "Login");
+    assert.equal(await loginLink.getText(), "Anmelden");
   }
 
   {
@@ -318,6 +318,8 @@ try {
 
     assert.match(await alert.getText(), /Insufficient permissions!/);
   }
+
+  await driver.quit()
 
   /*
   const theRepl = repl.start();
