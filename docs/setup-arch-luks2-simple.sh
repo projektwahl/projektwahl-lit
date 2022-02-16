@@ -222,7 +222,13 @@ sudo mkdir projektwahl-lit
 sudo chown moritz projektwahl-lit
 git clone git@github.com:projektwahl/projektwahl-lit.git
 cd projektwahl-lit
-npm install --omit optional
+
+npm ci # --omit optional we should probably put some more into dev dependencies (for building)
+npx node-pre-gyp rebuild -C ./node_modules/@dev.mohe/argon2
+npm run localize-build
+npm run build
+npm run purgecss
+
 openssl req -x509 -newkey rsa:2048 -nodes -sha256 -subj '/CN=localhost' -keyout localhost-privkey.pem -out localhost-cert.pem
 sudo chown -R moritz:projektwahl /opt/projektwahl-lit
 sudo chmod -R u=rwX,g=rX,o= /opt/projektwahl-lit/
