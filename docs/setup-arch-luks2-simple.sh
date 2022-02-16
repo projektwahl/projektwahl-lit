@@ -237,3 +237,13 @@ SET default_transaction_read_only = false;
 sudo -u projektwahl -i
 cd /opt/projektwahl-lit
 DATABASE_URL=postgres://projektwahl:projektwahl@localhost/projektwahl npm run setup
+
+
+
+
+# Backup
+sudo pg_dump --username projektwahl_admin projektwahl > dump.sql
+
+
+# Recover
+sudo psql --set ON_ERROR_STOP=on projektwahl < dump.sql
