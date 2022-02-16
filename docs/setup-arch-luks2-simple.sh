@@ -222,7 +222,7 @@ sudo mkdir projektwahl-lit
 sudo chown moritz projektwahl-lit
 git clone git@github.com:projektwahl/projektwahl-lit.git
 cd projektwahl-lit
-npm install
+npm install --omit optional
 openssl req -x509 -newkey rsa:2048 -nodes -sha256 -subj '/CN=localhost' -keyout localhost-privkey.pem -out localhost-cert.pem
 sudo chown -R moritz:projektwahl /opt/projektwahl-lit
 sudo chmod -R u=rwX,g=rX,o= /opt/projektwahl-lit/
@@ -253,3 +253,5 @@ sudo psql --username projektwahl_admin --set ON_ERROR_STOP=on projektwahl < dump
 
 sudo nano /etc/systemd/system/projektwahl.service
 # https://github.com/projektwahl/projektwahl-lit/blob/work/docs/projektwahl%40.service.conf
+
+
