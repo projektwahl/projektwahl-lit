@@ -177,7 +177,6 @@ LogLevel verbose
 MaxAuthTries 3
 MaxSessions 2
 TCPKeepAlive no
-AllowAgentForwarding no
 
 
 
