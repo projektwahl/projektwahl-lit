@@ -205,3 +205,34 @@ sudo nano /etc/nginx/nginx.conf
 # edit server_name aes.selfmade4u.de
 sudo pacman -S certbot-nginx
 sudo certbot --nginx -d aes.selfmade4u.de -m Moritz.Hedtke@t-online.de --agree-tos -n
+
+
+
+
+
+sudo -u postgres psql
+CREATE ROLE projektwahl LOGIN;
+CREATE ROLE projektwahl_admin LOGIN;
+CREATE DATABASE projektwahl;
+
+
+ssh -A moritz@aes.selfmade4u.de -p 2121
+sudo useradd -m projektwahl
+sudo -u projektwahl -i
+git clone git@github.com:projektwahl/projektwahl-lit.git
+
+
+sudo -u postgres psql --db projektwahl < src/server/setup.sql
+
+\dp
+
+sudo -u postgres psql --db projektwahl
+SET default_transaction_read_only = false;
+GRANT SELECT,INSERT,UPDATE ON users_with_deleted TO projektwahl;
+GRANT SELECT,INSERT,UPDATE ON users TO projektwahl;
+GRANT SELECT,INSERT,UPDATE ON projects_with_deleted TO projektwahl;
+GRANT SELECT,INSERT,UPDATE ON projects TO projektwahl;
+GRANT SELECT,INSERT,UPDATE ON choices TO projektwahl;
+GRANT SELECT,INSERT,UPDATE ON sessions TO projektwahl;
+
+DATABASE_URL=postgres://projektwahl:projektwahl@localhost/projektwahl npm run setup
