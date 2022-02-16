@@ -220,10 +220,11 @@ cd /opt
 sudo mkdir projektwahl-lit
 sudo chown moritz projektwahl-lit
 git clone git@github.com:projektwahl/projektwahl-lit.git
+cd projektwahl-lit
+npm install
 sudo chown -R moritz:projektwahl /opt/projektwahl-lit
 sudo chmod -R u=rwX,g=rX,o= /opt/projektwahl-lit/
 
-cd projektwahl-lit
 sudo -u postgres psql --db projektwahl < src/server/setup.sql
 
 \dp
@@ -252,5 +253,4 @@ GRANT SELECT,INSERT,UPDATE,DELETE ON users_history TO projektwahl_admin;
 
 sudo -u projektwahl -i
 cd /opt/projektwahl-lit
-npm install
 DATABASE_URL=postgres://projektwahl:projektwahl@localhost/projektwahl npm run setup
