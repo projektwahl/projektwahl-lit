@@ -224,7 +224,7 @@ git clone git@github.com:projektwahl/projektwahl-lit.git
 cd projektwahl-lit
 
 npm ci # --omit optional we should probably put some more into dev dependencies (for building)
-npx node-pre-gyp rebuild -C ./node_modules/@dev.mohe/argon2
+(cd ./node_modules/@dev.mohe/argon2 && node-gyp rebuild)
 npm run localize-build
 npm run build
 npm run purgecss
