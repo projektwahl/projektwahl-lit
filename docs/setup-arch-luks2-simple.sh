@@ -230,6 +230,8 @@ npm run build
 npm run purgecss
 
 openssl req -x509 -newkey rsa:2048 -nodes -sha256 -subj '/CN=localhost' -keyout key.pem -out cert.pem
+
+# These lines need to be repeated all the time... We should probably use ACLs
 sudo chown -R moritz:projektwahl /opt/projektwahl-lit
 sudo chmod -R u=rwX,g=rX,o= /opt/projektwahl-lit/
 
