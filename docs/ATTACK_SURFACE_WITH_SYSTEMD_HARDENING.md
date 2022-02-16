@@ -10,6 +10,12 @@ https://www.freedesktop.org/software/systemd/man/systemd.resource-control.html
 
 LoadCredentialEncrypted=
 
+# Nginx Reverse Proxy
+
+Prevents leaking the certificate in case the projektwahl service is compromised.
+
+May prevent some attacks by normalizing/denying requests.
+
 ## Login Hash Calculation DOS
 
 Many login requests probably cause severe memory and cpu pressure as argon2id is compute intensive. Maybe we should ratelimit it. This would also be a password bruteforce.
