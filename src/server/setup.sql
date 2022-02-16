@@ -393,8 +393,15 @@ CREATE TRIGGER trigger_check_project_leader_choices BEFORE INSERT ON choices
 FOR EACH ROW
 EXECUTE FUNCTION check_project_leader_choices();
 
-
-
 INSERT INTO settings (id, election_running) VALUES (1, false) ON CONFLICT DO NOTHING;
+
+
+GRANT SELECT,INSERT,UPDATE ON users_with_deleted TO projektwahl;
+GRANT SELECT,INSERT,UPDATE ON users TO projektwahl;
+GRANT SELECT,INSERT,UPDATE ON projects_with_deleted TO projektwahl;
+GRANT SELECT,INSERT,UPDATE ON projects TO projektwahl;
+GRANT SELECT,INSERT,UPDATE ON choices TO projektwahl;
+GRANT SELECT,INSERT,UPDATE ON sessions TO projektwahl;
+
 
 COMMIT;
