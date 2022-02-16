@@ -229,7 +229,7 @@ npm run localize-build
 npm run build
 npm run purgecss
 
-openssl req -x509 -newkey rsa:2048 -nodes -sha256 -subj '/CN=localhost' -keyout localhost-privkey.pem -out localhost-cert.pem
+openssl req -x509 -newkey rsa:2048 -nodes -sha256 -subj '/CN=localhost' -keyout key.pem -out cert.pem
 sudo chown -R moritz:projektwahl /opt/projektwahl-lit
 sudo chmod -R u=rwX,g=rX,o= /opt/projektwahl-lit/
 
