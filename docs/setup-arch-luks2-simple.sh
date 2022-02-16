@@ -234,9 +234,11 @@ openssl req -x509 -newkey rsa:2048 -nodes -sha256 -subj '/CN=localhost' -keyout 
 # These lines need to be repeated all the time... We should probably use ACLs
 sudo chown -R moritz:projektwahl /opt/projektwahl-lit
 sudo chmod -R u=rwX,g=rX,o= /opt/projektwahl-lit/
-chmod -R g+s /opt/projektwahl-lit/
 
-getfacl --access /opt/projektwahl-lit | setfacl -d -M- /opt/projektwahl-lit
+sudo setfacl --remove-all --recursive .
+#sudo setfacl --set=user::---,group::---,user:moritz:rwX,group:projektwahl:r-X,other::---,mask::--- --recursive --default .
+sudo setfacl --modify=user:moritz:rwX,group:projektwahl:r-X --recursive --default .
+
 
 
 sudo -u projektwahl_admin psql --db projektwahl < src/server/setup.sql
