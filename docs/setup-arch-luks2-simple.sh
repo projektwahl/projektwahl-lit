@@ -235,9 +235,9 @@ openssl req -x509 -newkey rsa:2048 -nodes -sha256 -subj '/CN=localhost' -keyout 
 sudo chown -R moritz:projektwahl /opt/projektwahl-lit
 sudo chmod -R u=rwX,g=rX,o= /opt/projektwahl-lit/
 
-sudo setfacl --remove-all --recursive .
+#sudo setfacl --remove-all --recursive .
 #sudo setfacl --set=user::---,group::---,user:moritz:rwX,group:projektwahl:r-X,other::---,mask::--- --recursive --default .
-sudo setfacl --modify=user:moritz:rwX,group:projektwahl:r-X --recursive --default .
+#sudo setfacl --modify=user:moritz:rwX,group:projektwahl:r-X --recursive --default .
 
 
 
