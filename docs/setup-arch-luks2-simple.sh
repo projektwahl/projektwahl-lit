@@ -242,8 +242,8 @@ DATABASE_URL=postgres://projektwahl:projektwahl@localhost/projektwahl npm run se
 
 
 # Backup
-sudo pg_dump --username projektwahl_admin projektwahl > dump.sql
-
+set -C
+sudo pg_dump --username projektwahl_admin projektwahl > "dump_$(date +"%F %T").sql"
 
 # Recover
 sudo psql --set ON_ERROR_STOP=on projektwahl < dump.sql
