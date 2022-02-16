@@ -269,3 +269,5 @@ sudo nano /etc/systemd/system/projektwahl.service
 # https://github.com/projektwahl/projektwahl-lit/blob/work/docs/projektwahl%40.service.conf
 
 
+sudo systemctl show projektwahl.service | grep --color Device
+
