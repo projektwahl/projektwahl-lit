@@ -227,16 +227,10 @@ sudo chown -R moritz:projektwahl /opt/projektwahl-lit
 sudo chmod -R u=rwX,g=rX,o= /opt/projektwahl-lit/
 
 sudo -u projektwahl_admin psql --db projektwahl < src/server/setup.sql
-# TODO put this into the setup file?
+
+# maintenance:
 sudo -u projektwahl_admin psql --db projektwahl
 SET default_transaction_read_only = false;
-GRANT SELECT,INSERT,UPDATE ON users_with_deleted TO projektwahl;
-GRANT SELECT,INSERT,UPDATE ON users TO projektwahl;
-GRANT SELECT,INSERT,UPDATE ON projects_with_deleted TO projektwahl;
-GRANT SELECT,INSERT,UPDATE ON projects TO projektwahl;
-GRANT SELECT,INSERT,UPDATE ON choices TO projektwahl;
-GRANT SELECT,INSERT,UPDATE ON sessions TO projektwahl;
-
 \dp
 
 
