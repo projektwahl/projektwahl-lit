@@ -192,7 +192,7 @@ sudo ufw enable
 sudo pacman -S postgresql
 sudo -iu postgres initdb -D /var/lib/postgres/data
 sudo systemctl --now enable postgresql
-sudo pacman -S nodejs
+sudo pacman -S nodejs npm make gcc
 
 sudo pacman -S nginx-mainline
 sudo systemctl enable --now nginx
@@ -247,4 +247,5 @@ GRANT SELECT,INSERT,UPDATE,DELETE ON projects_history TO projektwahl_admin;
 GRANT SELECT,INSERT,UPDATE,DELETE ON users_history TO projektwahl_admin;
 
 
+npm install
 DATABASE_URL=postgres://projektwahl:projektwahl@localhost/projektwahl npm run setup
