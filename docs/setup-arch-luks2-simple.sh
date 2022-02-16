@@ -234,4 +234,17 @@ GRANT SELECT,INSERT,UPDATE ON projects TO projektwahl;
 GRANT SELECT,INSERT,UPDATE ON choices TO projektwahl;
 GRANT SELECT,INSERT,UPDATE ON sessions TO projektwahl;
 
+
+GRANT SELECT,INSERT,UPDATE,DELETE ON users_with_deleted TO projektwahl_admin;
+GRANT SELECT,INSERT,UPDATE,DELETE ON users TO projektwahl_admin;
+GRANT SELECT,INSERT,UPDATE,DELETE ON projects_with_deleted TO projektwahl_admin;
+GRANT SELECT,INSERT,UPDATE,DELETE ON projects TO projektwahl_admin;
+GRANT SELECT,INSERT,UPDATE,DELETE ON choices TO projektwahl_admin;
+GRANT SELECT,INSERT,UPDATE,DELETE ON sessions TO projektwahl_admin;
+
+GRANT SELECT,INSERT,UPDATE,DELETE ON choices_history TO projektwahl_admin;
+GRANT SELECT,INSERT,UPDATE,DELETE ON projects_history TO projektwahl_admin;
+GRANT SELECT,INSERT,UPDATE,DELETE ON users_history TO projektwahl_admin;
+
+
 DATABASE_URL=postgres://projektwahl:projektwahl@localhost/projektwahl npm run setup
