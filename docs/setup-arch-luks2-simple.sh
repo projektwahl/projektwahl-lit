@@ -246,4 +246,4 @@ set -C
 sudo pg_dump --username projektwahl_admin projektwahl > "dump_$(date +"%F %T").sql"
 
 # Recover
-sudo psql --set ON_ERROR_STOP=on projektwahl < dump.sql
+sudo psql --username projektwahl_admin --set ON_ERROR_STOP=on projektwahl < dump.sql
