@@ -247,3 +247,8 @@ sudo pg_dump --username projektwahl_admin projektwahl > "dump_$(date +"%F %T").s
 
 # Recover
 sudo psql --username projektwahl_admin --set ON_ERROR_STOP=on projektwahl < dump.sql
+
+
+
+sudo nano /etc/systemd/system/projektwahl.service
+# https://github.com/projektwahl/projektwahl-lit/blob/work/docs/projektwahl%40.service.conf
