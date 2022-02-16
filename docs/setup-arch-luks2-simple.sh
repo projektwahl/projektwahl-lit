@@ -208,7 +208,6 @@ sudo certbot --nginx -d aes.selfmade4u.de -m Moritz.Hedtke@t-online.de --agree-t
 
 
 
-
 sudo -u postgres psql
 CREATE ROLE projektwahl LOGIN;
 CREATE ROLE projektwahl_admin LOGIN;
@@ -217,10 +216,11 @@ CREATE DATABASE projektwahl;
 
 ssh -A moritz@aes.selfmade4u.de -p 2121
 sudo useradd -m projektwahl
-sudo -u projektwahl -i
+cd /opt
+sudo mkdir projektwahl-lit
+sudo chown moritz:projektwahl projektwahl-lit
 git clone git@github.com:projektwahl/projektwahl-lit.git
-
-
+cd projektwahl-lit
 sudo -u postgres psql --db projektwahl < src/server/setup.sql
 
 \dp
