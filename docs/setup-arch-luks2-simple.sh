@@ -211,11 +211,12 @@ sudo certbot --nginx -d aes.selfmade4u.de -m Moritz.Hedtke@t-online.de --agree-t
 sudo -u postgres psql
 CREATE ROLE projektwahl LOGIN;
 CREATE ROLE projektwahl_admin LOGIN;
-CREATE DATABASE projektwahl;
+CREATE DATABASE projektwahl OWNER projektwahl_admin;
 
 
 ssh -A moritz@aes.selfmade4u.de -p 2121
 sudo useradd -m projektwahl
+sudo useradd -m projektwahl_admin
 cd /opt
 sudo mkdir projektwahl-lit
 sudo chown moritz projektwahl-lit
@@ -225,11 +226,12 @@ npm install
 sudo chown -R moritz:projektwahl /opt/projektwahl-lit
 sudo chmod -R u=rwX,g=rX,o= /opt/projektwahl-lit/
 
-sudo -u postgres psql --db projektwahl < src/server/setup.sql
+sudo -u projektwahl_admin psql --db projektwahl < src/server/setup.sql
 
 \dp
 
-sudo -u postgres psql --db projektwahl
+# TODO put this into the setup file?
+sudo -u projektwahl psql --db projektwahl
 SET default_transaction_read_only = false;
 GRANT SELECT,INSERT,UPDATE ON users_with_deleted TO projektwahl;
 GRANT SELECT,INSERT,UPDATE ON users TO projektwahl;
@@ -238,17 +240,6 @@ GRANT SELECT,INSERT,UPDATE ON projects TO projektwahl;
 GRANT SELECT,INSERT,UPDATE ON choices TO projektwahl;
 GRANT SELECT,INSERT,UPDATE ON sessions TO projektwahl;
 
-
-GRANT SELECT,INSERT,UPDATE,DELETE ON users_with_deleted TO projektwahl_admin;
-GRANT SELECT,INSERT,UPDATE,DELETE ON users TO projektwahl_admin;
-GRANT SELECT,INSERT,UPDATE,DELETE ON projects_with_deleted TO projektwahl_admin;
-GRANT SELECT,INSERT,UPDATE,DELETE ON projects TO projektwahl_admin;
-GRANT SELECT,INSERT,UPDATE,DELETE ON choices TO projektwahl_admin;
-GRANT SELECT,INSERT,UPDATE,DELETE ON sessions TO projektwahl_admin;
-
-GRANT SELECT,INSERT,UPDATE,DELETE ON choices_history TO projektwahl_admin;
-GRANT SELECT,INSERT,UPDATE,DELETE ON projects_history TO projektwahl_admin;
-GRANT SELECT,INSERT,UPDATE,DELETE ON users_history TO projektwahl_admin;
 
 
 sudo -u projektwahl -i
