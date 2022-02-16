@@ -39,7 +39,7 @@ if (!process.env["CREDENTIALS_DIRECTORY"]) {
   process.exit(1);
 }
 
-if (cluster.isPrimary) {
+/*if (cluster.isPrimary) {
   console.log(`Primary is running`);
 
   cluster.fork();
@@ -71,7 +71,7 @@ if (cluster.isPrimary) {
       }
     })();
   }
-} else {
+} else {*/
   /*
   openssl req -x509 -newkey rsa:2048 -nodes -sha256 -subj '/CN=localhost' -keyout key.pem -out cert.pem
   */
@@ -95,7 +95,7 @@ if (cluster.isPrimary) {
       ? Number(process.env.PORT)
       : process.env.SOCKET
       ? { path: process.env.SOCKET }
-      : new net.Socket({ fd: 3 }),
+      : new net.Socket({ fd: 3 }), // this doesn't work with cluster
     511,
     () => {
       console.log(
@@ -105,7 +105,7 @@ if (cluster.isPrimary) {
       );
     }
   );
-
+/*
   cluster.worker?.on("message", (message) => {
     //let getConnections = promisify(server.getConnections).bind(server)
     //console.log(await getConnections())
@@ -118,7 +118,7 @@ if (cluster.isPrimary) {
       cluster.worker?.kill();
     }
   });
-}
+}*/
 
 //repl.start({})
 
