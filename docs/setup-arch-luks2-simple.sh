@@ -325,6 +325,13 @@ sudo nano /etc/makepkg.conf
 sudo pacman -S asp
 # https://wiki.archlinux.org/title/DeveloperWiki:Building_in_a_clean_chroot
 
+
+asp checkout linux
+cd linux/trunk/
+CHROOT=$HOME/chroot makechrootpkg -c -r $CHROOT
+
+
+
 sudo pacman -S devtools pacman-contrib
 updpkgsums
 
