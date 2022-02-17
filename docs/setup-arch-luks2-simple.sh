@@ -271,3 +271,17 @@ sudo nano /etc/systemd/system/projektwahl.service
 
 sudo systemctl show projektwahl.service | grep --color Device
 
+
+
+
+
+
+
+# https://wiki.archlinux.org/title/Arch_Build_System
+sudo pacman -S asp
+# https://wiki.archlinux.org/title/DeveloperWiki:Building_in_a_clean_chroot
+
+sudo pacman -S devtools pacman-contrib
+updpkgsums
+
+
