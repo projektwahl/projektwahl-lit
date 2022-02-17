@@ -331,6 +331,11 @@ cd linux/trunk/
 CHROOT=$HOME/chroot makechrootpkg -c -r $CHROOT
 
 
+# hack
+sudo nano /usr/share/makepkg/source/git.sh 
+# if ! git clone --mirror --single-branch --depth 1 "$url" "$dir"; then
+
+
 
 sudo pacman -S devtools pacman-contrib
 updpkgsums
