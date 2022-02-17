@@ -371,5 +371,10 @@ sudo systemd-analyze security nginx
 sudo useradd nginx
 sudo setfacl --modify=user:nginx:r-- /etc/letsencrypt/live/aes.selfmade4u.de/fullchain.pem
 sudo setfacl --modify=user:nginx:r-- /etc/letsencrypt/live/aes.selfmade4u.de/privkey.pem
+sudo setfacl --modify=user:nginx:r-X /etc/letsencrypt/archive
+sudo setfacl --modify=user:nginx:r-X /etc/letsencrypt/archive/aes.selfmade4u.de/
+sudo setfacl --modify=user:nginx:r-X /etc/letsencrypt/live
+sudo setfacl --modify=user:nginx:r-X /etc/letsencrypt/live/aes.selfmade4u.de/
+
 
 
