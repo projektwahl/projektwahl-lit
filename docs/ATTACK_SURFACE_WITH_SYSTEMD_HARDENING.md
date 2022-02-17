@@ -93,3 +93,15 @@ wrk -s wrk.lua --connections 10000 --threads 100 http://116.203.125.40:8443/api/
 
 
 ````
+
+## Password Bruteforce
+
+The login *should* be ratelimited. Third-party login probably not as this is the responsibility of the third party.
+
+## Check existence of username
+
+You can check the existence of an account with a username by trying to login with it. This is intentional behaviour.
+
+## Data manipulation
+
+If there is a vulnerability in projektwahl it may be possible to manipulate the data in the database. It should not be possible to manipulate the audit tables though.
