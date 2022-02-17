@@ -382,4 +382,4 @@ sudo chown -R nginx:nginx /var/log/nginx/
 sudo systemctl daemon-reload && sudo systemctl stop nginx && sudo systemctl start nginx
 sudo journalctl -xeu nginx.service
 
-
+https://freedesktop.org/wiki/Software/systemd/DaemonSocketActivation/
