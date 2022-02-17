@@ -2,13 +2,64 @@
 
 ## Systemd sandboxing
 
-RootDirectory + BindPaths=, BindReadOnlyPaths=
+All relevant units (nginx, projektwahl, postgresql) are hardened using systemd.
 
-AppArmorProfile=
+### nginx
 
-https://www.freedesktop.org/software/systemd/man/systemd.resource-control.html
+```
+✗ RootDirectory=/RootImage=                                   Service runs within the host's root directory                                       0.1
+✗ AmbientCapabilities=                                        Service process receives ambient capabilities                                       0.1
+✗ RestrictAddressFamilies=~AF_(INET|INET6)                    Service may allocate Internet sockets                                               0.3
+✗ CapabilityBoundingSet=~CAP_NET_(BIND_SERVICE|BROADCAST|RAW) Service has elevated networking privileges                                          0.1
+✗ PrivateNetwork=                                             Service has access to the host's network                                            0.5
+✗ PrivateUsers=                                               Service has access to other users                                                   0.2
+✗ DeviceAllow=                                                Service has a device ACL with some special devices                                  0.1
+✗ IPAddressDeny=                                              Service does not define an IP address allow list                                    0.2
+```
 
-LoadCredentialEncrypted=
+#### Impact of takeover
+
+If the attacker is able to circumvent the MemoryDenyWriteExecute they would probably be able to create services on ports < 1024 (and also above). They could make requests to the internet and use computing resources of the server.
+
+#### Possible improvements
+
+Use socket activation and PrivateNetwork=true.
+
+### postgresql
+
+```
+✗ RootDirectory=/RootImage=                                   Service runs within the host's root directory                                       0.1
+✗ RestrictAddressFamilies=~AF_UNIX                            Service may allocate local sockets                                                  0.1
+✗ RestrictAddressFamilies=~AF_(INET|INET6)                    Service may allocate Internet sockets                                               0.3
+✗ DeviceAllow=                                                Service has a device ACL with some special devices                                  0.1
+✗ IPAddressDeny=                                              Service defines IP address allow list with only localhost entries                   0.1
+```
+
+#### Impact of takeover
+
+They would be able to fully manipulate and read all data (including the data for the projektwahl service). They should not be able to attack much other services on the local system and they should not have any remote network connectivity. They could use computing resources of the server.
+
+#### Possible improvements
+
+Remove the permissions above further so there is only RootDirectory and DeviceAllow left.
+
+### projektwahl
+
+```
+✗ RootDirectory=/RootImage=                                   Service runs within the host's root directory                                       0.1
+✗ MemoryDenyWriteExecute=                                     Service may create writable executable memory mappings                              0.1
+✗ RestrictAddressFamilies=~AF_UNIX                            Service may allocate local sockets                                                  0.1
+✗ DeviceAllow=                                                Service has a device ACL with some special devices                                  0.1
+✗ IPAddressDeny=                                              Service defines IP address allow list with only localhost entries                   0.1
+```
+
+#### Impact of takeover
+
+They would be able to manipulate incoming requests to the projektwahl service. They would be able to do queries to the database though they should not be able to permanently delete data as audit logs should be stored by the database itself. They could still take over useraccounts etc. They should not be able to attack much other services on the local system and they should not have any remote network connectivity where they could initiate requests themselves. They could use computing resources of the server.
+
+#### Possible improvements
+
+Probably not many on the hardening side. Maybe compilation options for nodejs could be hardened more. Also the IPAddressAllow could be even more restrictive to only allow connections to the nginx reverse proxy. Security auditing the source code itself is probably the best thing that can be done.
 
 # Nginx Reverse Proxy
 
@@ -42,3 +93,15 @@ wrk -s wrk.lua --connections 10000 --threads 100 http://116.203.125.40:8443/api/
 
 
 ````
+
+## Password Bruteforce
+
+The login *should* be ratelimited. Third-party login probably not as this is the responsibility of the third party.
+
+## Check existence of username
+
+You can check the existence of an account with a username by trying to login with it. This is intentional behaviour.
+
+## Data manipulation
+
+If there is a vulnerability in projektwahl it may be possible to manipulate the data in the database. It should not be possible to manipulate the audit tables though.
