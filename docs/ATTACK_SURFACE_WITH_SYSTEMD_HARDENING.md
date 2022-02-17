@@ -43,6 +43,24 @@ They would be able to fully manipulate and read all data (including the data for
 
 Remove the permissions above further so there is only RootDirectory and DeviceAllow left.
 
+### projektwahl
+
+```
+✗ RootDirectory=/RootImage=                                   Service runs within the host's root directory                                       0.1
+✗ MemoryDenyWriteExecute=                                     Service may create writable executable memory mappings                              0.1
+✗ RestrictAddressFamilies=~AF_UNIX                            Service may allocate local sockets                                                  0.1
+✗ DeviceAllow=                                                Service has a device ACL with some special devices                                  0.1
+✗ IPAddressDeny=                                              Service defines IP address allow list with only localhost entries                   0.1
+```
+
+#### Impact of takeover
+
+They would be able to manipulate incoming requests to the projektwahl service. They would be able to do queries to the database though they should not be able to permanently delete data as audit logs should be stored by the database itself. They could still take over useraccounts etc. They should not be able to attack much other services on the local system and they should not have any remote network connectivity where they could initiate requests themselves. They could use computing resources of the server.
+
+#### Possible improvements
+
+Probably not many on the hardening side. Maybe compilation options for nodejs could be hardened more. Also the IPAddressAllow could be even more restrictive to only allow connections to the nginx reverse proxy. Security auditing the source code itself is probably the best thing that can be done.
+
 # Nginx Reverse Proxy
 
 Prevents leaking the certificate in case the projektwahl service is compromised.
