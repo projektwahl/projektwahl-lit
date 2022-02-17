@@ -86,6 +86,7 @@ pacman -S arch-audit
 arch-audit
 
 glibc is affected by multiple issues. (CVE-2021-43396, CVE-2021-3999, CVE-2021-3998, CVE-2021-35942, CVE-2021-33574, CVE-2021-27645). High risk!
+Up to date, unknown if vulnerable.
 
 postgresql is affected by man-in-the-middle. (CVE-2021-23214). High risk!
 Already fixed in 13.5 https://www.postgresql.org/support/security/CVE-2021-23214/
@@ -94,6 +95,7 @@ apr is affected by information disclosure. (CVE-2021-35940). Medium risk!
 Shouldn't be used.
 
 binutils is affected by multiple issues, arbitrary code execution. (CVE-2021-3648, CVE-2021-3530, CVE-2021-20197, CVE-2021-3549). Medium risk!
+Should be fixed.
 
 krb5 is affected by denial of service. (CVE-2021-37750). Medium risk!
 Shouldn't be used.
@@ -102,6 +104,7 @@ libarchive is affected by arbitrary code execution. (CVE-2021-36976). Medium ris
 Already fixed in 3.6.0 https://nvd.nist.gov/vuln/detail/CVE-2021-36976
 
 linux is affected by multiple issues, insufficient validation. (CVE-2021-43976, CVE-2021-4095, CVE-2021-4028, CVE-2021-3847, CVE-2021-3752, CVE-2021-3669, CVE-2021-31615, CVE-2020-26560, CVE-2020-26559, CVE-2020-26557, CVE-2020-26556, CVE-2020-26555, CVE-2020-35501). Medium risk!
+Needs update to 5.16.10 (released yesterday)
 
 ncurses is affected by arbitrary code execution. (CVE-2021-39537). Medium risk!
 Don't care. sudo pacman -R perl
