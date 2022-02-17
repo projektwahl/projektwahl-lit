@@ -286,4 +286,4 @@ sudo pacman -S devtools pacman-contrib
 updpkgsums
 
 # postgresql 13.6
-
+sudo pacman -U *.tar.zst
