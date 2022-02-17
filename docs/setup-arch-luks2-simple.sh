@@ -368,6 +368,8 @@ sudo systemctl daemon-reload && sudo systemctl restart projektwahl.socket && sud
 sudo systemctl edit nginx
 sudo systemd-analyze security nginx
 
-
+sudo useradd nginx
+sudo setfacl --modify=user:nginx:r-- /etc/letsencrypt/live/aes.selfmade4u.de/fullchain.pem
+sudo setfacl --modify=user:nginx:r-- /etc/letsencrypt/live/aes.selfmade4u.de/privkey.pem
 
 
