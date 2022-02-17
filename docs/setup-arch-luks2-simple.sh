@@ -76,6 +76,10 @@ LLMNR=no
 
 systemctl enable systemd-resolved
 
+# https://wiki.archlinux.org/title/Systemd-resolved
+breaks gnupg by default ough
+sudo ln -rsf /run/systemd/resolve/stub-resolv.conf /etc/resolv.conf
+
 
 pacman -S openssh
 systemctl enable sshd
