@@ -2,13 +2,28 @@
 
 ## Systemd sandboxing
 
-RootDirectory + BindPaths=, BindReadOnlyPaths=
+All relevant units (nginx, projektwahl, postgresql) are hardened using systemd.
 
-AppArmorProfile=
+### nginx
 
-https://www.freedesktop.org/software/systemd/man/systemd.resource-control.html
+```
+✗ RootDirectory=/RootImage=                                   Service runs within the host's root directory                                       0.1
+✗ AmbientCapabilities=                                        Service process receives ambient capabilities                                       0.1
+✗ RestrictAddressFamilies=~AF_(INET|INET6)                    Service may allocate Internet sockets                                               0.3
+✗ CapabilityBoundingSet=~CAP_NET_(BIND_SERVICE|BROADCAST|RAW) Service has elevated networking privileges                                          0.1
+✗ PrivateNetwork=                                             Service has access to the host's network                                            0.5
+✗ PrivateUsers=                                               Service has access to other users                                                   0.2
+✗ DeviceAllow=                                                Service has a device ACL with some special devices                                  0.1
+✗ IPAddressDeny=                                              Service does not define an IP address allow list                                    0.2
+```
 
-LoadCredentialEncrypted=
+### Impact of takeover
+
+If the attacker is able to circumvent the MemoryDenyWriteExecute they would probably be able to create services on ports < 1024 (and also above). They could make requests to the internet and use computing resources of the server.
+
+### Possible improvements
+
+Use socket activation and PrivateNetwork=true.
 
 # Nginx Reverse Proxy
 
