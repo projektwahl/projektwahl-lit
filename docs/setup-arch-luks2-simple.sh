@@ -348,3 +348,11 @@ updpkgsums
 
 # postgresql 13.6
 sudo pacman -U *.tar.zst
+
+
+
+sudo nano /var/lib/postgres/data/postgresql.conf
+listen_addresses = ''
+
+sudo systemctl restart postgresql
+
