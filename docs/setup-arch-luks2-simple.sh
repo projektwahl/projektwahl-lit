@@ -275,7 +275,8 @@ sudo systemctl show projektwahl.service | grep --color Device
 
 
 
-
+sudo nano /etc/makepkg.conf 
+# makeflags
 
 # https://wiki.archlinux.org/title/Arch_Build_System
 sudo pacman -S asp
