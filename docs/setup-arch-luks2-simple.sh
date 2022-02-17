@@ -383,7 +383,11 @@ sudo systemctl daemon-reload && sudo systemctl stop nginx && sudo systemctl star
 sudo journalctl -xeu nginx.service
 
 
+
+error_log   /var/log/nginx/error.log;
 pid        /run/nginx/nginx.pid;
+access_log  /var/log/nginx/access.log  main;
+
 
 
 https://freedesktop.org/wiki/Software/systemd/DaemonSocketActivation/
