@@ -28,8 +28,9 @@
     "localize-build": "lit-localize build",
     "typecheck": "tsc",
     "lit-analyze": "lit-analyzer --strict --rules.no-unknown-attribute off src",
-    "build": "esbuild --format=esm --bundle src/client/pw-app.ts --charset=utf8 --define:window.PRODUCTION=true --entry-names=[dir]/[name]-[hash] --sourcemap --analyze --outdir=dist --minify-whitespace --minify-identifiers --minify-syntax --tree-shaking=true --minify",
-    "purgecss": "purgecss --css node_modules/bootstrap/dist/css/bootstrap.css --content dist/*.js --output dist/bootstrap.min.css --font-face --keyframes --variables"
+    "build": "node build.js",
+    "assets": "mv dist/pw-app.js dist/pw-app_$(sha256sum dist/pw-app.js | cut -d ' ' -f 1).js",
+    "purgecss": ""
   },
   "dependencies": {
     "@dev.mohe/argon2": "^0.29.0",
