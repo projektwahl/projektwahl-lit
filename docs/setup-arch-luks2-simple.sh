@@ -285,4 +285,5 @@ sudo pacman -S asp
 sudo pacman -S devtools pacman-contrib
 updpkgsums
 
+# postgresql 13.6
 
