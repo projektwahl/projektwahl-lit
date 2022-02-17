@@ -17,13 +17,31 @@ All relevant units (nginx, projektwahl, postgresql) are hardened using systemd.
 ✗ IPAddressDeny=                                              Service does not define an IP address allow list                                    0.2
 ```
 
-### Impact of takeover
+#### Impact of takeover
 
 If the attacker is able to circumvent the MemoryDenyWriteExecute they would probably be able to create services on ports < 1024 (and also above). They could make requests to the internet and use computing resources of the server.
 
-### Possible improvements
+#### Possible improvements
 
 Use socket activation and PrivateNetwork=true.
+
+### postgresql
+
+```
+✗ RootDirectory=/RootImage=                                   Service runs within the host's root directory                                       0.1
+✗ RestrictAddressFamilies=~AF_UNIX                            Service may allocate local sockets                                                  0.1
+✗ RestrictAddressFamilies=~AF_(INET|INET6)                    Service may allocate Internet sockets                                               0.3
+✗ DeviceAllow=                                                Service has a device ACL with some special devices                                  0.1
+✗ IPAddressDeny=                                              Service defines IP address allow list with only localhost entries                   0.1
+```
+
+#### Impact of takeover
+
+They would be able to fully manipulate and read all data (including the data for the projektwahl service). They should not be able to attack much other services on the local system and they should not have any remote network connectivity. They could use computing resources of the server.
+
+#### Possible improvements
+
+Remove the permissions above further so there is only RootDirectory and DeviceAllow left.
 
 # Nginx Reverse Proxy
 
