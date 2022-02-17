@@ -361,3 +361,13 @@ sudo systemctl edit --full projektwahl.service
 
 sudo systemctl daemon-reload && sudo systemctl restart projektwahl.socket && sudo systemctl stop projektwahl.service
 
+
+
+
+
+sudo systemctl edit nginx
+sudo systemd-analyze security nginx
+
+
+
+
