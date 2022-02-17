@@ -361,4 +361,3 @@ sudo systemctl edit --full projektwahl.service
 
 sudo systemctl daemon-reload && sudo systemctl restart projektwahl.socket && sudo systemctl stop projektwahl.service
 
-
