@@ -391,3 +391,7 @@ access_log  /var/log/nginx/access.log  main;
 
 
 https://freedesktop.org/wiki/Software/systemd/DaemonSocketActivation/
+
+
+
+# postgres hardening see postgresql.service.override.conf
