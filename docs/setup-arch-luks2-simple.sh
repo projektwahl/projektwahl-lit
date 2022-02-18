@@ -280,6 +280,10 @@ npm run build
 sudo chown -R moritz:projektwahl /opt/projektwahl-lit
 sudo chmod -R u=rwX,g=rX,o= /opt/projektwahl-lit/
 
+ps ax o user,group,gid,pid,%cpu,%mem,vsz,rss,tty,stat,start,time,comm
+
+# TODO FIXME we really should fix this
+
 #sudo setfacl --remove-all --recursive .
 #sudo setfacl --set=user::---,group::---,user:moritz:rwX,group:projektwahl:r-X,other::---,mask::--- --recursive --default .
 #sudo setfacl --modify=user:moritz:rwX,group:projektwahl:r-X --recursive --default .
@@ -370,6 +374,7 @@ sudo systemctl edit nginx
 sudo systemd-analyze security nginx
 
 sudo useradd nginx
+sudo usermod -a -G projektwahl nginx
 sudo setfacl --modify=user:nginx:r-- /etc/letsencrypt/live/aes.selfmade4u.de/fullchain.pem
 sudo setfacl --modify=user:nginx:r-- /etc/letsencrypt/live/aes.selfmade4u.de/privkey.pem
 sudo setfacl --modify=user:nginx:r-X /etc/letsencrypt/archive
