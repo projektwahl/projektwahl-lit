@@ -36,7 +36,7 @@ This software is licensed under the GNU Affero General Public License v3.0 or an
 - Postgresql database
 - OpenID credentials (optional)
 
-## Setup
+## Production environment
 
 ```bash
 git clone https://github.com/projektwahl/projektwahl-lit.git
@@ -47,17 +47,24 @@ npx node-gyp rebuild -C ./node_modules/@dev.mohe/argon2/
 npm run localize-build
 npm run build
 
-DATABASE_URL=postgres://projektwahl:projektwahl@projektwahl/projektwahl npm run setup
-PORT=8443 BASE_URL=https://localhost:8443 DATABASE_URL=postgres://projektwahl:projektwahl@projektwahl/projektwahl OPENID_URL=openid_url CLIENT_ID=client_id CLIENT_SECRET=secret CREDENTIALS_DIRECTORY=$PWD npm run server
-# or
-PORT=8443 BASE_URL=https://localhost:8443 DATABASE_URL=postgres://projektwahl:projektwahl@projektwahl/projektwahl CREDENTIALS_DIRECTORY=$PWD npm run server
-# https://localhost:8443/
+DATABASE_URL=postgres://projektwahl:projektwahl@projektwahl/projektwahl node --enable-source-maps dist/setup.cjs
+
+PORT=8443 BASE_URL=https://localhost:8443 DATABASE_URL=postgres://projektwahl:projektwahl@projektwahl/projektwahl CREDENTIALS_DIRECTORY=$PWD node  --enable-source-maps dist/server.cjs
+
 ```
 
-## Development
+## Development environment
 
 ```bash
 ln -s $PWD/pre-commit .git/hooks/pre-commit
+
+NODE_ENV=development DATABASE_URL=postgres://projektwahl:projektwahl@projektwahl/projektwahl npm run setup
+
+NODE_ENV=development PORT=8443 BASE_URL=https://localhost:8443 DATABASE_URL=postgres://projektwahl:projektwahl@projektwahl/projektwahl OPENID_URL=openid_url CLIENT_ID=client_id CLIENT_SECRET=secret CREDENTIALS_DIRECTORY=$PWD npm run server
+# or
+NODE_ENV=development PORT=8443 BASE_URL=https://localhost:8443 DATABASE_URL=postgres://projektwahl:projektwahl@projektwahl/projektwahl CREDENTIALS_DIRECTORY=$PWD npm run server
+
+# https://localhost:8443/
 ```
 
 ## Database access
