@@ -334,7 +334,36 @@ export async function serverHandler(
   } else {
     response.writeHead(404, {
       ...defaultHeaders,
+      "content-type": "text/html; charset=utf-8",
     });
-    response.end();
+    response.end(`
+    <!DOCTYPE html>
+  <html lang="en">
+    <head>
+      <!-- Required meta tags -->
+      <meta charset="utf-8" />
+      <meta name="viewport" content="width=device-width, initial-scale=1" />
+  
+      <!--
+  SPDX-License-Identifier: AGPL-3.0-or-later
+  SPDX-FileCopyrightText: 2021 Moritz Hedtke <Moritz.Hedtke@t-online.de>
+  -->
+      <style>
+        body {
+          overflow-y: scroll;
+        }
+      </style>
+  
+      <title>Projektwahl</title>
+    </head>
+    <body>
+      
+        <h1>404 Nicht gefunden</h1>
+
+        <p>Die Seite konnte leider nicht gefunden werden.</p>
+
+    </body>
+  </html>
+    `);
   }
 }
