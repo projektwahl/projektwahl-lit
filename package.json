@@ -37,7 +37,7 @@
     "bootstrap": "^5.1.3",
     "cookie": "^0.4.2",
     "js-cookie": "^3.0.1",
-    "lit": "^2.1.4",
+    "lit": "^2.2.0",
     "lodash-es": "^4.17.21",
     "openid-client": "^5.1.3",
     "postgres": "mohe2015/postgres#patch-1",
@@ -51,9 +51,9 @@
     "zod": "doesn't work from git because no prepare script. Should probably be installable without any building"
   },
   "devDependencies": {
-    "@lit/localize-tools": "^0.6.0",
-    "esbuild": "^0.14.22",
-    "esbuild-linux-64": "^0.14.22",
+    "@lit/localize-tools": "^0.6.1",
+    "esbuild": "^0.14.23",
+    "esbuild-linux-64": "^0.14.23",
     "purgecss": "^4.1.3"
   },
   "optionalDependencies": {

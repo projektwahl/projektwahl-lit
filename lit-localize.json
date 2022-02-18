@@ -1,16 +1,14 @@
 {
   "$schema": "https://raw.githubusercontent.com/lit/lit/main/packages/localize-tools/config.schema.json",
   "sourceLocale": "en",
-  "targetLocales": ["de", "de-aes"],
-  "tsConfig": "./tsconfig.json",
-  "inputFiles": ["./src/client/**/*.ts"],
+  "targetLocales": ["de"],
+  "tsConfig": "tsconfig.json",
   "output": {
-    "outputDir": "./src/client/generated_locales/",
-    "mode": "runtime",
-    "localeCodesModule": "./src/client/generated_locales/locales.ts"
+    "mode": "transform",
+    "localeCodesModule": "src/generated/locale-codes.ts"
   },
   "interchange": {
     "format": "xliff",
-    "xliffDir": "./src/client/xliff/"
+    "xliffDir": "xliff"
   }
 }

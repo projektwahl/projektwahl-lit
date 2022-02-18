@@ -96,3 +96,5 @@ This application will probably never work without JavaScript as this would requi
 ```
 npx license-checker --production --summary
 ```
+
+node node_modules/@lit/localize-tools/bin/lit-localize.js
