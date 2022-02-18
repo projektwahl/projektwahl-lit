@@ -270,13 +270,11 @@ sudo chown moritz projektwahl-lit
 git clone git@github.com:projektwahl/projektwahl-lit.git
 cd projektwahl-lit
 
-npm ci # --omit optional we should probably put some more into dev dependencies (for building)
-(cd ./node_modules/@dev.mohe/argon2 && node-gyp rebuild)
+openssl req -x509 -newkey rsa:2048 -nodes -sha256 -subj '/CN=localhost' -keyout key.pem -out cert.pem
+npm ci --ignore-scripts --omit=optional
+npx node-gyp rebuild -C ./node_modules/@dev.mohe/argon2/
 npm run localize-build
 npm run build
-npm run purgecss
-
-openssl req -x509 -newkey rsa:2048 -nodes -sha256 -subj '/CN=localhost' -keyout key.pem -out cert.pem
 
 # These lines need to be repeated all the time... We should probably use ACLs
 sudo chown -R moritz:projektwahl /opt/projektwahl-lit
@@ -298,7 +296,10 @@ SET default_transaction_read_only = false;
 
 sudo -u projektwahl -i
 cd /opt/projektwahl-lit
-DATABASE_URL=postgres://projektwahl:projektwahl@localhost/projektwahl npm run setup
+NODE_ENV=production DATABASE_URL=postgres://projektwahl:projektwahl@localhost/projektwahl node --enable-source-maps dist/setup.cjs
+
+
+NODE_ENV=production PORT=8443 BASE_URL=https://localhost:8443 DATABASE_URL=postgres://projektwahl:projektwahl@projektwahl/projektwahl CREDENTIALS_DIRECTORY=$PWD node  --enable-source-maps dist/server.cjs
 
 
 
