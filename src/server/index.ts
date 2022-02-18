@@ -28,6 +28,7 @@ import { getDirs, serverHandler } from "./server-handler.js";
 import net from "net";
 import cluster from "cluster";
 import { watch } from "node:fs/promises";
+import { setupClient } from "./routes/login/openid-client.js";
 
 if (!process.env["BASE_URL"]) {
   console.error("BASE_URL not set!");
@@ -76,6 +77,9 @@ if (!process.env["CREDENTIALS_DIRECTORY"]) {
   openssl req -x509 -newkey rsa:2048 -nodes -sha256 -subj '/CN=localhost' -keyout key.pem -out cert.pem
   */
 
+  (async () => {
+  await setupClient()
+
   const server = createSecureServer(
     {
       key: readFileSync(process.env.CREDENTIALS_DIRECTORY + "/key.pem"),
@@ -105,6 +109,7 @@ if (!process.env["CREDENTIALS_DIRECTORY"]) {
       );
     }
   );
+  })()
 /*
   cluster.worker?.on("message", (message) => {
     //let getConnections = promisify(server.getConnections).bind(server)
