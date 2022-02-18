@@ -12,7 +12,9 @@
     "allowSyntheticDefaultImports": true,
     "noErrorTruncation": true,
     "useDefineForClassFields": false,
-    "strictNullChecks": true
+    "strictNullChecks": true,
+    "rootDir": "src/",
+    "outDir": "dist/",
   },
   "include": ["src/**/*.ts"]
 }
