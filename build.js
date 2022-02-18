@@ -77,3 +77,25 @@ SPDX-FileCopyrightText: 2021 Moritz Hedtke <Moritz.Hedtke@t-online.de>
 `;
 
 await writeFile("dist/index.html", index);
+
+
+
+
+
+{
+  let { stdout, stderr } = await exec("esbuild --external:fs --external:url --external:stream --external:net --external:tls --external:crypto --format=esm --bundle src/server/setup.ts --external:@dev.mohe/argon2 --charset=utf8 --entry-names=[dir]/[name] --sourcemap --analyze --outdir=dist");
+//  --minify-whitespace --minify-identifiers --minify-syntax --tree-shaking=true --minify
+
+  console.log(stdout)
+  console.log(stderr)
+}
+
+
+
+{
+  let { stdout, stderr } = await exec("esbuild --external:node:http2 --external:node:fs --external:net --external:cluster --external:node:fs/promises --external:node:path --external:util --external:node:stream --external:node:zlib --external:node:process --external:path/posix --external:node:url --external:url --external:assert --external:url --external:querystring --external:http --external:https --external:crypto --external:fs --external:stream --external:events --external:fs --external:tls --external:os --external:path --external:child_process --external:tty --external:v8 --format=esm --bundle src/server/index.ts --external:@dev.mohe/argon2 --charset=utf8 --entry-names=[dir]/[name] --sourcemap --analyze --outdir=dist ");
+// --minify-whitespace --minify-identifiers --minify-syntax --tree-shaking=true --minify
+
+  console.log(stdout)
+  console.log(stderr)
+}
