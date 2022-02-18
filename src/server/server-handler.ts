@@ -79,16 +79,18 @@ export async function serverHandler(
   request: MyRequest,
   response: ServerResponse | Http2ServerResponse
 ) {
+  console.log("got request");
+
   const path = z.string().parse(request.url);
 
   const url = new URL(path, process.env.BASE_URL);
 
-  if (url.pathname === "/favicon.ico" || url.pathname === "/robots.txt") {
+  if (process.env.NODE_ENV === "development" && (url.pathname === "/favicon.ico" || url.pathname === "/robots.txt")) {
     response.writeHead(404, {
       ...defaultHeaders,
     });
     response.end();
-  } else if (url.pathname === "/api/v1/hmr") {
+  } else if (process.env.NODE_ENV === "development" && url.pathname === "/api/v1/hmr") {
     console.log("got request");
     response.writeHead(200, {
       ...defaultHeaders,
@@ -129,7 +131,7 @@ export async function serverHandler(
       });
       response.end();
     }
-  } else {
+  } else if (process.env.NODE_ENV === "development") {
     // TODO FIXME AUDIT
     // curl --insecure --path-as-is -v `${process.env.BASE_URL}/../src/index.js`
 
@@ -329,5 +331,39 @@ export async function serverHandler(
 
       response.end(rawContents);
     }
+  } else {
+    response.writeHead(404, {
+      ...defaultHeaders,
+      "content-type": "text/html; charset=utf-8",
+    });
+    response.end(`
+    <!DOCTYPE html>
+  <html lang="en">
+    <head>
+      <!-- Required meta tags -->
+      <meta charset="utf-8" />
+      <meta name="viewport" content="width=device-width, initial-scale=1" />
+  
+      <!--
+  SPDX-License-Identifier: AGPL-3.0-or-later
+  SPDX-FileCopyrightText: 2021 Moritz Hedtke <Moritz.Hedtke@t-online.de>
+  -->
+      <style>
+        body {
+          overflow-y: scroll;
+        }
+      </style>
+  
+      <title>Projektwahl</title>
+    </head>
+    <body>
+      
+        <h1>404 Nicht gefunden</h1>
+
+        <p>Die Seite konnte leider nicht gefunden werden.</p>
+
+    </body>
+  </html>
+    `);
   }
 }

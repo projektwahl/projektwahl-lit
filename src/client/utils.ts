@@ -21,7 +21,7 @@ SPDX-License-Identifier: AGPL-3.0-or-later
 SPDX-FileCopyrightText: 2021 Moritz Hedtke <Moritz.Hedtke@t-online.de>
 */
 
-import { ZodIssueCode } from "zod";
+//import { ZodIssueCode } from "zod";
 import type { ResponseType } from "../lib/routes";
 
 export const myFetch = async <P extends import("../lib/routes").keys>(
@@ -44,7 +44,7 @@ export const myFetch = async <P extends import("../lib/routes").keys>(
           error: {
             issues: [
               {
-                code: ZodIssueCode.custom,
+                code: "custom", // ZodIssueCode.custom,
                 path: ["network"],
                 message: `Failed to request ${url}: ${response.status} ${response.statusText}\nAdditional information: ${additionalInfo}`,
               },
@@ -57,7 +57,7 @@ export const myFetch = async <P extends import("../lib/routes").keys>(
           error: {
             issues: [
               {
-                code: ZodIssueCode.custom,
+                code: "custom", // ZodIssueCode.custom,
                 path: ["network"],
                 message: `Failed to request ${url}: ${response.status} ${response.statusText}\n`,
               },
@@ -77,7 +77,7 @@ export const myFetch = async <P extends import("../lib/routes").keys>(
         error: {
           issues: [
             {
-              code: ZodIssueCode.custom,
+              code: "custom", // ZodIssueCode.custom,
               path: ["network"],
               message: `Failed to request ${url}: ${
                 error.message
@@ -92,7 +92,7 @@ export const myFetch = async <P extends import("../lib/routes").keys>(
         error: {
           issues: [
             {
-              code: ZodIssueCode.custom,
+              code: "custom", // ZodIssueCode.custom,
               path: ["network"],
               message: `Failed to request ${url}: Unknown error see console.`,
             },

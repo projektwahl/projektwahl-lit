@@ -8,3 +8,4 @@ dist
 bootstrap.min.css
 zap*
 chromedriver*
+lib

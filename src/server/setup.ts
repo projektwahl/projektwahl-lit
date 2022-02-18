@@ -34,45 +34,46 @@ const shuffleArray = <T>(array: T[]) => {
   }
 };
 
-await sql.begin("READ WRITE", async (sql) => {
-  const hash = await hashPassword("changeme");
+(async () => {
+  await sql.begin("READ WRITE", async (sql) => {
+    const hash = await hashPassword("changeme");
 
-  const admin = rawUserSchema
-    .pick({
-      id: true,
-    })
-    .parse(
-      (
-        await sql`INSERT INTO users_with_deleted (username, password_hash, type) VALUES ('admin', ${hash}, 'admin') ON CONFLICT (username) DO UPDATE SET "group" = "users_with_deleted"."group" RETURNING id;`
-      )[0]
-    );
+    const admin = rawUserSchema
+      .pick({
+        id: true,
+      })
+      .parse(
+        (
+          await sql`INSERT INTO users_with_deleted (username, password_hash, type) VALUES ('admin', ${hash}, 'admin') ON CONFLICT (username) DO UPDATE SET "group" = "users_with_deleted"."group" RETURNING id;`
+        )[0]
+      );
 
-  const projects = z
-    .array(rawProjectSchema)
-    .parse(
-      await sql`INSERT INTO projects (title, info, place, costs, min_age, max_age, min_participants, max_participants, random_assignments, last_updated_by) (SELECT generate_series, '', '', 0, 5, 13, 5, 20, FALSE, ${admin.id} FROM generate_series(1, 10)) RETURNING *;`
-    );
+    const projects = z
+      .array(rawProjectSchema)
+      .parse(
+        await sql`INSERT INTO projects (title, info, place, costs, min_age, max_age, min_participants, max_participants, random_assignments, last_updated_by) (SELECT generate_series, '', '', 0, 5, 13, 5, 20, FALSE, ${admin.id} FROM generate_series(1, 10)) RETURNING *;`
+      );
 
-  console.log(projects);
+    console.log(projects);
 
-  // take care to set this value to project_count * min_participants <= user_count <= project_count * max_participants
-  for (let i = 0; i < 100; i++) {
-    // TODO FIXME add user to keycloak / import users from keycloak (probably easier)
-    // https://www.keycloak.org/documentation
-    // https://www.keycloak.org/docs-api/15.0/rest-api/index.html
+    // take care to set this value to project_count * min_participants <= user_count <= project_count * max_participants
+    for (let i = 0; i < 100; i++) {
+      // TODO FIXME add user to keycloak / import users from keycloak (probably easier)
+      // https://www.keycloak.org/documentation
+      // https://www.keycloak.org/docs-api/15.0/rest-api/index.html
 
-    // TODO compare our approach in general with https://github.com/keycloak/keycloak-quickstarts
+      // TODO compare our approach in general with https://github.com/keycloak/keycloak-quickstarts
 
-    // https://github.com/keycloak/keycloak-documentation/blob/master/server_admin/topics/admin-cli.adoc
+      // https://github.com/keycloak/keycloak-documentation/blob/master/server_admin/topics/admin-cli.adoc
 
-    // INTERESTING https://www.keycloak.org/docs/latest/server_admin/index.html#automatically-link-existing-first-login-flow
-    // https://github.com/keycloak/keycloak-documentation/blob/master/server_admin/topics/identity-broker/first-login-flow.adoc
+      // INTERESTING https://www.keycloak.org/docs/latest/server_admin/index.html#automatically-link-existing-first-login-flow
+      // https://github.com/keycloak/keycloak-documentation/blob/master/server_admin/topics/identity-broker/first-login-flow.adoc
 
-    // https://www.keycloak.org/docs-api/15.0/rest-api/index.html
+      // https://www.keycloak.org/docs-api/15.0/rest-api/index.html
 
-    // TODO we could use that admin URL
-    // Remove all user sessions associated with the user Also send notification to all clients that have an admin URL to invalidate the sessions for the particular user.
-    /*
+      // TODO we could use that admin URL
+      // Remove all user sessions associated with the user Also send notification to all clients that have an admin URL to invalidate the sessions for the particular user.
+      /*
 		const response = await myFetch(process.env['OPENID_ADMIN_URL']!, {
 			method: 'POST',
 			headers: {
@@ -102,26 +103,27 @@ await sql.begin("READ WRITE", async (sql) => {
 		console.log(keycloakUser)^;
 		*/
 
-    const user = rawUserSchema
-      .pick({
-        id: true,
-      })
-      .parse(
-        (
-          await sql`INSERT INTO users (username, type, "group", age, last_updated_by) VALUES (${`user${Math.random()}`}, 'voter', 'a', 10, ${
-            admin.id
-          }) ON CONFLICT DO NOTHING RETURNING users.id;`
-        )[0]
-      );
-    shuffleArray(projects);
-    for (let j = 0; j < 5; j++) {
-      // TODO FIXME generate users who voted incorrectly (maybe increase/decrease iterations)
-      // eslint-disable-next-line @typescript-eslint/await-thenable
-      await sql`INSERT INTO choices (user_id, project_id, rank) VALUES (${
-        user.id
-      }, ${projects[j]["id"]}, ${j + 1});`;
+      const user = rawUserSchema
+        .pick({
+          id: true,
+        })
+        .parse(
+          (
+            await sql`INSERT INTO users (username, type, "group", age, last_updated_by) VALUES (${`user${Math.random()}`}, 'voter', 'a', 10, ${
+              admin.id
+            }) ON CONFLICT DO NOTHING RETURNING users.id;`
+          )[0]
+        );
+      shuffleArray(projects);
+      for (let j = 0; j < 5; j++) {
+        // TODO FIXME generate users who voted incorrectly (maybe increase/decrease iterations)
+        // eslint-disable-next-line @typescript-eslint/await-thenable
+        await sql`INSERT INTO choices (user_id, project_id, rank) VALUES (${
+          user.id
+        }, ${projects[j]["id"]}, ${j + 1});`;
+      }
     }
-  }
-});
+  });
 
-await sql.end();
+  await sql.end();
+})();

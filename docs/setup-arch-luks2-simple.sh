@@ -76,6 +76,10 @@ LLMNR=no
 
 systemctl enable systemd-resolved
 
+# https://wiki.archlinux.org/title/Systemd-resolved
+breaks gnupg by default ough
+sudo ln -rsf /run/systemd/resolve/stub-resolv.conf /etc/resolv.conf
+
 
 pacman -S openssh
 systemctl enable sshd
@@ -84,6 +88,49 @@ systemctl enable sshd
 
 pacman -S arch-audit
 arch-audit
+
+glibc is affected by multiple issues. (CVE-2021-43396, CVE-2021-3999, CVE-2021-3998, CVE-2021-35942, CVE-2021-33574, CVE-2021-27645). High risk!
+Up to date, unknown if vulnerable.
+
+postgresql is affected by man-in-the-middle. (CVE-2021-23214). High risk!
+Already fixed in 13.5 https://www.postgresql.org/support/security/CVE-2021-23214/
+
+apr is affected by information disclosure. (CVE-2021-35940). Medium risk!
+Shouldn't be used.
+
+binutils is affected by multiple issues, arbitrary code execution. (CVE-2021-3648, CVE-2021-3530, CVE-2021-20197, CVE-2021-3549). Medium risk!
+Should be fixed.
+
+krb5 is affected by denial of service. (CVE-2021-37750). Medium risk!
+Shouldn't be used.
+
+libarchive is affected by arbitrary code execution. (CVE-2021-36976). Medium risk!
+Already fixed in 3.6.0 https://nvd.nist.gov/vuln/detail/CVE-2021-36976
+
+linux is affected by multiple issues, insufficient validation. (CVE-2021-43976, CVE-2021-4095, CVE-2021-4028, CVE-2021-3847, CVE-2021-3752, CVE-2021-3669, CVE-2021-31615, CVE-2020-26560, CVE-2020-26559, CVE-2020-26557, CVE-2020-26556, CVE-2020-26555, CVE-2020-35501). Medium risk!
+Needs update to 5.16.10 (released yesterday)
+
+ncurses is affected by arbitrary code execution. (CVE-2021-39537). Medium risk!
+Don't care. sudo pacman -R perl
+
+npm is affected by insufficient validation. (CVE-2021-43616). Medium risk!
+Already fixed in 8.5.0 https://nvd.nist.gov/vuln/detail/CVE-2021-43616
+
+perl is affected by signature forgery, directory traversal. (CVE-2020-16156, CVE-2021-36770). Medium risk!
+Shouldn't be used.
+
+rsync is affected by arbitrary command execution. (CVE-2021-3755). Medium risk!
+Shouldn't be used.
+
+openssh is affected by information disclosure. (CVE-2016-20012). Low risk!
+Already fixed in 8.8p1 https://nvd.nist.gov/vuln/detail/CVE-2016-20012
+
+postgresql-libs is affected by man-in-the-middle. (CVE-2021-23222). Low risk!
+Already fixed in 13.5 https://www.postgresql.org/support/security/CVE-2021-23222/
+
+
+
+
 
 pacman -S lynis
 sudo lynis audit system
@@ -177,7 +224,6 @@ LogLevel verbose
 MaxAuthTries 3
 MaxSessions 2
 TCPKeepAlive no
-AllowAgentForwarding no
 
 
 
@@ -193,7 +239,7 @@ sudo ufw enable
 sudo pacman -S postgresql
 sudo -iu postgres initdb -D /var/lib/postgres/data
 sudo systemctl --now enable postgresql
-sudo pacman -S nodejs
+sudo pacman -S nodejs npm make gcc
 
 sudo pacman -S nginx-mainline
 sudo systemctl enable --now nginx
@@ -205,3 +251,153 @@ sudo nano /etc/nginx/nginx.conf
 # edit server_name aes.selfmade4u.de
 sudo pacman -S certbot-nginx
 sudo certbot --nginx -d aes.selfmade4u.de -m Moritz.Hedtke@t-online.de --agree-tos -n
+
+
+
+
+sudo -u postgres psql
+CREATE ROLE projektwahl LOGIN;
+CREATE ROLE projektwahl_admin LOGIN;
+CREATE DATABASE projektwahl OWNER projektwahl_admin;
+
+
+ssh -A moritz@aes.selfmade4u.de -p 2121
+sudo useradd -m projektwahl
+sudo useradd -m projektwahl_admin
+cd /opt
+sudo mkdir projektwahl-lit
+sudo chown moritz projektwahl-lit
+git clone git@github.com:projektwahl/projektwahl-lit.git
+cd projektwahl-lit
+
+openssl req -x509 -newkey rsa:2048 -nodes -sha256 -subj '/CN=localhost' -keyout key.pem -out cert.pem
+npm ci --ignore-scripts --omit=optional
+npx node-gyp rebuild -C ./node_modules/@dev.mohe/argon2/
+npm run localize-build
+npm run build
+
+# These lines need to be repeated all the time... We should probably use ACLs
+sudo chown -R moritz:projektwahl /opt/projektwahl-lit
+sudo chmod -R u=rwX,g=rX,o= /opt/projektwahl-lit/
+
+ps ax o user,group,gid,pid,%cpu,%mem,vsz,rss,tty,stat,start,time,comm
+
+# TODO FIXME we really should fix this
+
+#sudo setfacl --remove-all --recursive .
+#sudo setfacl --set=user::---,group::---,user:moritz:rwX,group:projektwahl:r-X,other::---,mask::--- --recursive --default .
+#sudo setfacl --modify=user:moritz:rwX,group:projektwahl:r-X --recursive --default .
+
+
+
+sudo -u projektwahl_admin psql --db projektwahl < src/server/setup.sql
+
+# maintenance:
+sudo -u projektwahl_admin psql --db projektwahl
+SET default_transaction_read_only = false;
+\dp
+
+
+sudo -u projektwahl -i
+cd /opt/projektwahl-lit
+NODE_ENV=production DATABASE_URL=postgres://projektwahl:projektwahl@localhost/projektwahl node --enable-source-maps dist/setup.cjs
+
+
+NODE_ENV=production PORT=8443 BASE_URL=https://localhost:8443 DATABASE_URL=postgres://projektwahl:projektwahl@projektwahl/projektwahl CREDENTIALS_DIRECTORY=$PWD node  --enable-source-maps dist/server.cjs
+
+
+
+
+# Backup
+set -C
+sudo pg_dump --username projektwahl_admin projektwahl > "dump_$(date +"%F %T").sql"
+
+# Recover
+sudo psql --username projektwahl_admin --set ON_ERROR_STOP=on projektwahl < dump.sql
+
+
+
+sudo nano /etc/systemd/system/projektwahl.service
+# https://github.com/projektwahl/projektwahl-lit/blob/work/docs/projektwahl%40.service.conf
+
+
+sudo systemctl show projektwahl.service | grep --color Device
+
+
+
+
+
+sudo nano /etc/makepkg.conf 
+# makeflags
+
+# https://wiki.archlinux.org/title/Arch_Build_System
+sudo pacman -S asp
+# https://wiki.archlinux.org/title/DeveloperWiki:Building_in_a_clean_chroot
+
+
+asp checkout linux
+cd linux/trunk/
+CHROOT=$HOME/chroot makechrootpkg -c -r $CHROOT
+
+
+# hack
+sudo nano /usr/share/makepkg/source/git.sh 
+# if ! git clone --mirror --single-branch --depth 1 "$url" "$dir"; then
+
+makechrootpkg -c -r $HOME/chroot -- --holdver
+
+
+
+sudo pacman -S devtools pacman-contrib
+updpkgsums
+
+# postgresql 13.6
+sudo pacman -U *.tar.zst
+
+
+
+sudo nano /var/lib/postgres/data/postgresql.conf
+listen_addresses = ''
+
+sudo systemctl restart postgresql
+
+
+sudo systemctl edit --full projektwahl.service
+
+sudo systemctl daemon-reload && sudo systemctl restart projektwahl.socket && sudo systemctl stop projektwahl.service
+
+
+
+
+
+sudo systemctl edit nginx
+sudo systemd-analyze security nginx
+
+sudo useradd nginx
+sudo usermod -a -G projektwahl nginx
+sudo setfacl --modify=user:nginx:r-- /etc/letsencrypt/live/aes.selfmade4u.de/fullchain.pem
+sudo setfacl --modify=user:nginx:r-- /etc/letsencrypt/live/aes.selfmade4u.de/privkey.pem
+sudo setfacl --modify=user:nginx:r-X /etc/letsencrypt/archive
+sudo setfacl --modify=user:nginx:r-X /etc/letsencrypt/archive/aes.selfmade4u.de/
+sudo setfacl --modify=user:nginx:r-X /etc/letsencrypt/live
+sudo setfacl --modify=user:nginx:r-X /etc/letsencrypt/live/aes.selfmade4u.de/
+
+sudo chown -R nginx:nginx /var/log/nginx/
+
+
+sudo systemctl daemon-reload && sudo systemctl stop nginx && sudo systemctl start nginx
+sudo journalctl -xeu nginx.service
+
+
+
+error_log   /var/log/nginx/error.log;
+pid        /run/nginx/nginx.pid;
+access_log  /var/log/nginx/access.log  main;
+
+
+
+https://freedesktop.org/wiki/Software/systemd/DaemonSocketActivation/
+
+
+
+# postgres hardening see postgresql.service.override.conf

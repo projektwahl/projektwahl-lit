@@ -76,7 +76,12 @@ BEGIN
   INSERT INTO projects_history (operation, id, title, info, place, costs, min_age, max_age, min_participants, max_participants, random_assignments, deleted, last_updated_by) VALUES (TG_OP, d.id, d.title, d.info, d.place, d.costs, d.min_age, d.max_age, d.min_participants, d.max_participants, d.random_assignments, d.deleted, d.last_updated_by);
   RETURN NULL;
 END;
-$body$ LANGUAGE plpgsql;
+$body$ LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = public;
+
+REVOKE ALL ON FUNCTION log_history_projects() FROM PUBLIC;
+-- GRANT EXECUTE ON FUNCTION check_password(uname TEXT, pass TEXT) TO admins;
 
 DROP TRIGGER IF EXISTS projects_audit_insert_delete ON projects_with_deleted;
 
@@ -206,8 +211,11 @@ BEGIN
   INSERT INTO users_history (operation, id, username, openid_id, type, project_leader_id, "group", age, away, password_changed, force_in_project_id, computed_in_project_id, deleted, last_updated_by) VALUES (TG_OP, d.id, d.username, d.openid_id, d.type, d.project_leader_id, d."group", d.age, d.away, d.password_changed, d.force_in_project_id, d.computed_in_project_id, d.deleted, d.last_updated_by);
   RETURN NULL;
 END;
-$body$ LANGUAGE plpgsql;
+$body$ LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = public;
 
+REVOKE ALL ON FUNCTION log_history_users() FROM PUBLIC;
 
 DROP TRIGGER IF EXISTS users_audit_insert_delete ON users_with_deleted;
 
@@ -266,8 +274,11 @@ BEGIN
   INSERT INTO choices_history (operation, rank, project_id, user_id) VALUES (TG_OP, d.rank, d.project_id, d.user_id);
   RETURN NULL;
 END;
-$body$ LANGUAGE plpgsql;
+$body$ LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = public;
 
+REVOKE ALL ON FUNCTION log_history_choices() FROM PUBLIC;
 
 DROP TRIGGER IF EXISTS choices_audit_insert_delete ON choices;
 
@@ -382,8 +393,15 @@ CREATE TRIGGER trigger_check_project_leader_choices BEFORE INSERT ON choices
 FOR EACH ROW
 EXECUTE FUNCTION check_project_leader_choices();
 
-
-
 INSERT INTO settings (id, election_running) VALUES (1, false) ON CONFLICT DO NOTHING;
+
+
+GRANT SELECT,INSERT,UPDATE ON users_with_deleted TO projektwahl;
+GRANT SELECT,INSERT,UPDATE ON users TO projektwahl;
+GRANT SELECT,INSERT,UPDATE ON projects_with_deleted TO projektwahl;
+GRANT SELECT,INSERT,UPDATE ON projects TO projektwahl;
+GRANT SELECT,INSERT,UPDATE ON choices TO projektwahl;
+GRANT SELECT,INSERT,UPDATE ON sessions TO projektwahl;
+
 
 COMMIT;
