@@ -82,18 +82,25 @@ export class PwOrder<P extends keyof typeof entityRoutes> extends LitElement {
       ${bootstrapCss}
       <button
         @click=${async () => {
-          const urlSearchParams = this.history.url.searchParams;
+          const data = JSON.parse(
+            decodeURIComponent(
+              this.history.url.search == ""
+                ? "{}"
+                : this.history.url.search.substring(1)
+            )
+          );
+          if (!data.order) {
+            data.order = []
+          }
 
-          const order = [...urlSearchParams.getAll("order")];
-
-          const oldElementIndex = order.findIndex((e) =>
+          const oldElementIndex = data.order.findIndex((e) =>
             e.startsWith(`${this.name as string}-`)
           );
           let oldElement;
           if (oldElementIndex == -1) {
             oldElement = `${this.name as string}-downup`;
           } else {
-            oldElement = order.splice(oldElementIndex, 1)[0];
+            oldElement = data.order.splice(oldElementIndex, 1)[0];
           }
           let newElement;
           switch (oldElement.split("-")[1]) {
@@ -106,16 +113,18 @@ export class PwOrder<P extends keyof typeof entityRoutes> extends LitElement {
             default:
               newElement = null;
           }
-          urlSearchParams.delete("order");
-          [
-            ...order,
+          data.order = [
+            ...data.order,
             ...(newElement !== null
               ? [oldElement.split("-")[0] + "-" + newElement]
               : []),
-          ].forEach((v) => urlSearchParams.append("order", v));
+          ]
 
           HistoryController.goto(
-            new URL(`?${urlSearchParams.toString()}`, window.location.href),
+            new URL(
+              `?${encodeURIComponent(JSON.stringify(data))}`,
+              window.location.href
+            ),
             {}
           );
           await this.refreshEntityList();
@@ -126,8 +135,14 @@ export class PwOrder<P extends keyof typeof entityRoutes> extends LitElement {
         id=${this.randomId}
       >
         ${(() => {
-          const value = this.history.url.searchParams
-            .getAll("order")
+          const data = JSON.parse(
+            decodeURIComponent(
+              this.history.url.search == ""
+                ? "{}"
+                : this.history.url.search.substring(1)
+            )
+          );
+          const value = data.order
             .find((e) => e.startsWith(`${this.name as string}-`))
             ?.split("-")[1];
           return value === "ASC"
