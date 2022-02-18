@@ -89,18 +89,18 @@ export class PwOrder<P extends keyof typeof entityRoutes> extends LitElement {
                 : this.history.url.search.substring(1)
             )
           );
-          if (!data.order) {
-            data.order = []
+          if (!data.sorting) {
+            data.sorting = []
           }
 
-          const oldElementIndex = data.order.findIndex((e) =>
+          const oldElementIndex = data.sorting.findIndex((e) =>
             e.startsWith(`${this.name as string}-`)
           );
           let oldElement;
           if (oldElementIndex == -1) {
             oldElement = `${this.name as string}-downup`;
           } else {
-            oldElement = data.order.splice(oldElementIndex, 1)[0];
+            oldElement = data.sorting.splice(oldElementIndex, 1)[0];
           }
           let newElement;
           switch (oldElement.split("-")[1]) {
@@ -113,8 +113,8 @@ export class PwOrder<P extends keyof typeof entityRoutes> extends LitElement {
             default:
               newElement = null;
           }
-          data.order = [
-            ...data.order,
+          data.sorting = [
+            ...data.sorting,
             ...(newElement !== null
               ? [oldElement.split("-")[0] + "-" + newElement]
               : []),
@@ -142,7 +142,7 @@ export class PwOrder<P extends keyof typeof entityRoutes> extends LitElement {
                 : this.history.url.search.substring(1)
             )
           );
-          const value = data.order
+          const value = (data.sorting ?? [])
             .find((e) => e.startsWith(`${this.name as string}-`))
             ?.split("-")[1];
           return value === "ASC"
