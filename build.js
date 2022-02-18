@@ -7,7 +7,7 @@ const exec = promisify(unpromisifiedExec);
 
 {
   let { stdout, stderr } = await exec(
-    "esbuild --format=esm --bundle src/client/pw-app.ts --charset=utf8 --define:window.PRODUCTION=true --entry-names=[dir]/[name] --sourcemap --analyze --outdir=dist --minify-whitespace --minify-identifiers --minify-syntax --tree-shaking=true --minify"
+    "esbuild --format=esm --bundle src/client/pw-app.ts --charset=utf8 --define:window.PRODUCTION=true --entry-names=[dir]/[name] --sourcemap  --analyze --outdir=dist --minify-whitespace --minify-identifiers --minify-syntax --tree-shaking=true --minify"
   );
 
   console.log(stdout);
