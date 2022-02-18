@@ -73,12 +73,12 @@ if (!process.env["CREDENTIALS_DIRECTORY"]) {
     })();
   }
 } else {*/
-  /*
+/*
   openssl req -x509 -newkey rsa:2048 -nodes -sha256 -subj '/CN=localhost' -keyout key.pem -out cert.pem
   */
 
-  (async () => {
-  await setupClient()
+(async () => {
+  await setupClient();
 
   const server = createSecureServer(
     {
@@ -109,7 +109,7 @@ if (!process.env["CREDENTIALS_DIRECTORY"]) {
       );
     }
   );
-  })()
+})();
 /*
   cluster.worker?.on("message", (message) => {
     //let getConnections = promisify(server.getConnections).bind(server)

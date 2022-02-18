@@ -96,7 +96,7 @@ wrk -s wrk.lua --connections 10000 --threads 100 http://116.203.125.40:8443/api/
 
 ## Password Bruteforce
 
-The login *should* be ratelimited. Third-party login probably not as this is the responsibility of the third party.
+The login _should_ be ratelimited. Third-party login probably not as this is the responsibility of the third party.
 
 ## Check existence of username
 
