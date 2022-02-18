@@ -93,17 +93,17 @@ export class PwOrder<P extends keyof typeof entityRoutes> extends LitElement {
             data.sorting = []
           }
 
-          const oldElementIndex = data.sorting.findIndex((e) =>
-            e.startsWith(`${this.name as string}-`)
+          const oldElementIndex = data.sorting.findIndex(([e, d]) =>
+            e === `${this.name as string}`
           );
           let oldElement;
           if (oldElementIndex == -1) {
-            oldElement = `${this.name as string}-downup`;
+            oldElement = [`${this.name as string}`, `downup`];
           } else {
             oldElement = data.sorting.splice(oldElementIndex, 1)[0];
           }
           let newElement;
-          switch (oldElement.split("-")[1]) {
+          switch (oldElement[1]) {
             case "downup":
               newElement = "ASC";
               break;
@@ -116,7 +116,7 @@ export class PwOrder<P extends keyof typeof entityRoutes> extends LitElement {
           data.sorting = [
             ...data.sorting,
             ...(newElement !== null
-              ? [oldElement.split("-")[0] + "-" + newElement]
+              ? [[oldElement[0], newElement]]
               : []),
           ]
 
@@ -143,8 +143,8 @@ export class PwOrder<P extends keyof typeof entityRoutes> extends LitElement {
             )
           );
           const value = (data.sorting ?? [])
-            .find((e) => e.startsWith(`${this.name as string}-`))
-            ?.split("-")[1];
+            .find(([e, d]) => e === `${this.name as string}`)
+            ?.[1];
           return value === "ASC"
             ? html`<svg
                 xmlns="http://www.w3.org/2000/svg"
