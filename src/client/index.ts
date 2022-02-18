@@ -23,7 +23,7 @@ SPDX-FileCopyrightText: 2021 Moritz Hedtke <Moritz.Hedtke@t-online.de>
 import { unsafeHTML } from "lit/directives/unsafe-html.js";
 
 export const bootstrapCss = unsafeHTML(`<link
-href="/node_modules/bootstrap/dist/css/bootstrap.css"
+href="${window.BOOTSTRAP_CSS ?? "/node_modules/bootstrap/dist/css/bootstrap.css"}"
 rel="stylesheet"
 />
 `);

@@ -7,6 +7,15 @@ const exec = promisify(unpromisifiedExec);
 
 {
   let { stdout, stderr } = await exec(
+    "lit-localize build"
+  );
+
+  console.log(stdout);
+  console.log(stderr);
+}
+
+{
+  let { stdout, stderr } = await exec(
     "esbuild --format=esm --bundle dist/de/client/pw-app.js --charset=utf8 --define:window.PRODUCTION=true --entry-names=[dir]/[name] --sourcemap  --analyze --outdir=dist --minify-whitespace --minify-identifiers --minify-syntax --tree-shaking=true --minify"
   );
 
@@ -23,14 +32,6 @@ const exec = promisify(unpromisifiedExec);
   console.log(stderr);
 }
 
-let pwAppContents = await readFile("dist/pw-app.js", "utf8");
-
-let pwAppHash = createHash("sha256").update(pwAppContents).digest("hex");
-
-console.log(pwAppHash);
-
-await rename("dist/pw-app.js", `dist/pw-app_${pwAppHash}.js`);
-
 let bootstrapContents = await readFile("dist/bootstrap.min.css", "utf8");
 
 let bootstrapHash = createHash("sha256")
@@ -43,6 +44,24 @@ await rename(
   "dist/bootstrap.min.css",
   `dist/bootstrap_${bootstrapHash}.min.css`
 );
+
+// rebuild with path to bootstrap.css
+{
+  let { stdout, stderr } = await exec(
+    `esbuild --format=esm --bundle dist/de/client/pw-app.js --charset=utf8 --define:window.PRODUCTION=true --define:window.BOOTSTRAP_CSS=\\"dist/bootstrap_${bootstrapHash}.min.css\\" --entry-names=[dir]/[name] --sourcemap  --analyze --outdir=dist --minify-whitespace --minify-identifiers --minify-syntax --tree-shaking=true --minify`
+  );
+
+  console.log(stdout);
+  console.log(stderr);
+}
+
+let pwAppContents = await readFile("dist/pw-app.js", "utf8");
+
+let pwAppHash = createHash("sha256").update(pwAppContents).digest("hex");
+
+console.log(pwAppHash);
+
+await rename("dist/pw-app.js", `dist/pw-app_${pwAppHash}.js`);
 
 const index = `<!DOCTYPE html>
 <html lang="en">
