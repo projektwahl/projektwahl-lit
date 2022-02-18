@@ -401,7 +401,7 @@ GRANT SELECT,INSERT,UPDATE ON users TO projektwahl;
 GRANT SELECT,INSERT,UPDATE ON projects_with_deleted TO projektwahl;
 GRANT SELECT,INSERT,UPDATE ON projects TO projektwahl;
 GRANT SELECT,INSERT,UPDATE ON choices TO projektwahl;
-GRANT SELECT,INSERT,UPDATE ON sessions TO projektwahl;
+GRANT SELECT,INSERT,UPDATE,DELETE ON sessions TO projektwahl;
 
 
 COMMIT;
