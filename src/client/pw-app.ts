@@ -377,6 +377,13 @@ export class PwApp extends LitElement {
                 >${msg("License")}</a
               >
               |
+              <a
+                href="https://github.com/projektwahl/projektwahl-lit/security/policy"
+                target="_blank"
+                rel="noopener noreferrer"
+                >${msg("Security")}</a
+              >
+              |
               <a href="/imprint" target="_blank" rel="noopener noreferrer"
                 >${msg("Imprint")}</a
               >

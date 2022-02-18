@@ -79,8 +79,6 @@ export async function serverHandler(
   request: MyRequest,
   response: ServerResponse | Http2ServerResponse
 ) {
-  console.log("got request");
-
   const path = z.string().parse(request.url);
 
   const url = new URL(path, process.env.BASE_URL);
@@ -91,7 +89,6 @@ export async function serverHandler(
     });
     response.end();
   } else if (process.env.NODE_ENV === "development" && url.pathname === "/api/v1/hmr") {
-    console.log("got request");
     response.writeHead(200, {
       ...defaultHeaders,
       "content-type": "text/event-stream",
