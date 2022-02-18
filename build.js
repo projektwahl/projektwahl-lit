@@ -19,6 +19,8 @@ const exec = promisify(unpromisifiedExec);
     console.log(stderr)
 }
 
+
+
 let pwAppContents = await readFile("dist/pw-app.js", "utf8");
 
 let pwAppHash = createHash('sha256').update(pwAppContents).digest('hex');
@@ -36,6 +38,8 @@ let bootstrapHash = createHash('sha256').update(bootstrapContents).digest('hex')
 console.log(bootstrapHash)
 
 await rename("dist/bootstrap.min.css", `dist/bootstrap_${bootstrapHash}.min.css`)
+
+
 
 const index = `<!DOCTYPE html>
 <html lang="en">
