@@ -128,11 +128,17 @@ export class PwUsers extends PwEntityList<"/api/v1/users"> {
 
           <th scope="col">
             ${pwInput<"/api/v1/users", ["filters", "type"]>({
-              label: null,
+              type: "select",
+              disabled: this.disabled,
+              label: msg("Type"),
               name: ["filters", "type"],
+              options: [
+                { value: undefined, text: "Alle" },
+                { value: "voter", text: "Schüler" },
+                { value: "helper", text: "Helfer" },
+                { value: "admin", text: "Admin" },
+              ],
               task: this._task,
-              type: "text",
-              defaultValue: undefined,
               initial,
             })}
           </th>
