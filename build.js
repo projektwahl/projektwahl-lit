@@ -83,7 +83,7 @@ await writeFile("dist/index.html", index);
 
 {
   let { stdout, stderr } = await exec(
-    "esbuild --platform=node --format=cjs --bundle src/server/setup.ts --external:@dev.mohe/argon2 --charset=utf8 --entry-names=[dir]/[name] --sourcemap --analyze --outfile=dist/setup.cjs"
+    `esbuild --platform=node --format=cjs --bundle src/server/setup.ts --external:@dev.mohe/argon2 --define:process.env.NODE_ENV=\\"production\\"  --charset=utf8 --entry-names=[dir]/[name] --sourcemap --analyze --outfile=dist/setup.cjs`
   );
   //  --minify-whitespace --minify-identifiers --minify-syntax --tree-shaking=true --minify
 
@@ -93,7 +93,7 @@ await writeFile("dist/index.html", index);
 
 {
   let { stdout, stderr } = await exec(
-    "esbuild --platform=node --format=cjs --bundle src/server/index.ts --external:@dev.mohe/argon2 --charset=utf8 --entry-names=[dir]/[name] --sourcemap --analyze --outfile=dist/server.cjs"
+    `esbuild --platform=node --format=cjs --bundle src/server/index.ts --external:@dev.mohe/argon2 --external:esbuild --define:process.env.NODE_ENV=\\"production\\" --charset=utf8 --entry-names=[dir]/[name] --sourcemap --analyze --outfile=dist/server.cjs`
   );
   // --minify-whitespace --minify-identifiers --minify-syntax --tree-shaking=true --minify
 

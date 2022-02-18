@@ -83,12 +83,12 @@ export async function serverHandler(
 
   const url = new URL(path, process.env.BASE_URL);
 
-  if (url.pathname === "/favicon.ico" || url.pathname === "/robots.txt") {
+  if (process.env.NODE_ENV === "development" && (url.pathname === "/favicon.ico" || url.pathname === "/robots.txt")) {
     response.writeHead(404, {
       ...defaultHeaders,
     });
     response.end();
-  } else if (url.pathname === "/api/v1/hmr") {
+  } else if (process.env.NODE_ENV === "development" && url.pathname === "/api/v1/hmr") {
     console.log("got request");
     response.writeHead(200, {
       ...defaultHeaders,
@@ -129,7 +129,7 @@ export async function serverHandler(
       });
       response.end();
     }
-  } else {
+  } else if (process.env.NODE_ENV === "development") {
     // TODO FIXME AUDIT
     // curl --insecure --path-as-is -v `${process.env.BASE_URL}/../src/index.js`
 
