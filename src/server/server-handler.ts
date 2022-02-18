@@ -79,6 +79,8 @@ export async function serverHandler(
   request: MyRequest,
   response: ServerResponse | Http2ServerResponse
 ) {
+  console.log("got request");
+
   const path = z.string().parse(request.url);
 
   const url = new URL(path, process.env.BASE_URL);
@@ -329,5 +331,10 @@ export async function serverHandler(
 
       response.end(rawContents);
     }
+  } else {
+    response.writeHead(404, {
+      ...defaultHeaders,
+    });
+    response.end();
   }
 }
