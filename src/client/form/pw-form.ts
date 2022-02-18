@@ -55,27 +55,28 @@ class PwForm<P extends keyof typeof routes> extends LitElement {
   // attributes. Otherwise we're eating errors and that's not healthy.xit
 
   /** @private */ getCurrentInputElements() {
-    const formDataEvent = new CustomEvent("myformdata", {
+    const formKeysEvent = new CustomEvent<string[][]>("myformkeys", {
       bubbles: true,
       composed: true,
-      detail: {},
+      detail: [],
     });
-    this.form.value?.dispatchEvent(formDataEvent);
+    this.form.value?.dispatchEvent(formKeysEvent);
 
-    return Object.keys(formDataEvent.detail);
+    console.log(formKeysEvent.detail)
+
+    return formKeysEvent.detail;
   }
 
   getErrors() {
     return this._task.render({
       complete: (data) => {
         if (!data.success) {
-          /*const errors = Object.entries(data.error)
-            .filter(([k]) => !this.getCurrentInputElements().includes(k))
-            .map(([k, v]) => html`${k}: ${v}<br />`);*/
           if (data.error.issues.length > 0) {
             return html`<div class="alert alert-danger" role="alert">
               ${msg("Some errors occurred!")}<br />
-              ${data.error.issues.map(
+              ${data.error.issues
+                .filter(i => ![...this.getCurrentInputElements()].find(v => JSON.stringify(v) === JSON.stringify(i.path)))
+                .map(
                 (issue) => html` ${issue.path}: ${issue.message}<br /> `
               )}
             </div>`;

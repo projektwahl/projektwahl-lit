@@ -151,6 +151,10 @@ export class PwInput<
     return this;
   }
 
+  myformkeysEventListener = (event: CustomEvent<string[][]>) => {
+    event.detail.push(this.name);
+  }
+
   myformdataEventListener = (
     event: CustomEvent<z.infer<typeof routes[P]["request"]>>
   ) => {
@@ -192,11 +196,13 @@ export class PwInput<
     super.connectedCallback();
     this.form = this.closest("form") as HTMLFormElement;
     this.form.addEventListener("myformdata", this.myformdataEventListener);
+    this.form.addEventListener("myformkeys", this.myformkeysEventListener);
   }
 
   override disconnectedCallback() {
     super.disconnectedCallback();
     this.form.removeEventListener("myformdata", this.myformdataEventListener);
+    this.form.removeEventListener("myformkeys", this.myformkeysEventListener);
   }
 
   override render() {
