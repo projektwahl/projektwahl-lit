@@ -48,7 +48,7 @@ await rename(
 // rebuild with path to bootstrap.css
 {
   let { stdout, stderr } = await exec(
-    `esbuild --format=esm --bundle dist/de/client/pw-app.js --charset=utf8 --define:window.PRODUCTION=true --define:window.BOOTSTRAP_CSS=\\"dist/bootstrap_${bootstrapHash}.min.css\\" --entry-names=[dir]/[name] --sourcemap  --analyze --outdir=dist --minify-whitespace --minify-identifiers --minify-syntax --tree-shaking=true --minify`
+    `esbuild --format=esm --bundle dist/de/client/pw-app.js --charset=utf8 --define:window.PRODUCTION=true --define:window.BOOTSTRAP_CSS=\\"dist/bootstrap_${bootstrapHash}.min.css\\" --entry-names=[dir]/[name] --sourcemap --analyze --outdir=dist --minify-whitespace --minify-identifiers --minify-syntax --tree-shaking=true --minify`
   );
 
   console.log(stdout);
@@ -102,9 +102,8 @@ await writeFile("dist/index.html", index);
 
 {
   let { stdout, stderr } = await exec(
-    `esbuild --platform=node --format=cjs --bundle src/server/setup.ts --external:@dev.mohe/argon2 --define:process.env.NODE_ENV=\\"production\\"  --charset=utf8 --entry-names=[dir]/[name] --sourcemap --analyze --outfile=dist/setup.cjs`
+    `esbuild --platform=node --format=cjs --bundle src/server/setup.ts --external:@dev.mohe/argon2 --define:process.env.NODE_ENV=\\"production\\"  --charset=utf8 --entry-names=[dir]/[name] --sourcemap --analyze --outfile=dist/setup.cjs --minify-whitespace --minify-identifiers --minify-syntax --tree-shaking=true --minify`
   );
-  //  --minify-whitespace --minify-identifiers --minify-syntax --tree-shaking=true --minify
 
   console.log(stdout);
   console.log(stderr);
@@ -112,9 +111,8 @@ await writeFile("dist/index.html", index);
 
 {
   let { stdout, stderr } = await exec(
-    `esbuild --platform=node --format=cjs --bundle src/server/index.ts --external:@dev.mohe/argon2 --external:esbuild --define:process.env.NODE_ENV=\\"production\\" --charset=utf8 --entry-names=[dir]/[name] --sourcemap --analyze --outfile=dist/server.cjs`
+    `esbuild --platform=node --format=cjs --bundle src/server/index.ts --external:@dev.mohe/argon2 --define:process.env.NODE_ENV=\\"production\\" --charset=utf8 --entry-names=[dir]/[name] --sourcemap --analyze --outfile=dist/server.cjs --minify-whitespace --minify-identifiers --minify-syntax --tree-shaking=true --minify`
   );
-  // --minify-whitespace --minify-identifiers --minify-syntax --tree-shaking=true --minify
 
   console.log(stdout);
   console.log(stderr);
