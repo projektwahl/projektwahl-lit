@@ -57,7 +57,7 @@ They would be able to manipulate incoming requests to the projektwahl service. T
 
 #### Possible improvements
 
-Probably not many on the hardening side. Maybe compilation options for nodejs could be hardened more. Also the IPAddressAllow could be even more restrictive to only allow connections to the nginx reverse proxy. Security auditing the source code itself is probably the best thing that can be done.
+Probably not many on the hardening side. Maybe compilation options for nodejs could be hardened more. Also the IPAddressAllow could be even more restrictive to only allow connections to the nginx reverse proxy. Security auditing the source code itself is probably the best thing that can be done. IPAddressAllow on the socket unit.
 
 # Nginx Reverse Proxy
 
