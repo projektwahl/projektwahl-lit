@@ -13,6 +13,8 @@
     "noErrorTruncation": true,
     "useDefineForClassFields": false,
     "strictNullChecks": true,
+    "isolatedModules": true,
+    "esModuleInterop": true,
     "rootDir": "src/",
     "outDir": "dist/",
   },
