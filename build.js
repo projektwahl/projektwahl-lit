@@ -4,7 +4,7 @@ import { readFile, rename, writeFile } from "fs/promises";
 import { promisify } from "util";
 
 const exec = promisify(unpromisifiedExec);
-
+/*
 {
   let { stdout, stderr } = await exec(
     "lit-localize build"
@@ -13,7 +13,7 @@ const exec = promisify(unpromisifiedExec);
   console.log(stdout);
   console.log(stderr);
 }
-
+*/
 {
   let { stdout, stderr } = await exec(
     "esbuild --format=esm --bundle dist/de/client/pw-app.js --charset=utf8 --define:window.PRODUCTION=true --entry-names=[dir]/[name] --sourcemap  --analyze --outdir=dist --minify-whitespace --minify-identifiers --minify-syntax --tree-shaking=true --minify"
@@ -111,7 +111,7 @@ await writeFile("dist/index.html", index);
 
 {
   let { stdout, stderr } = await exec(
-    `esbuild --platform=node --format=cjs --bundle src/server/index.ts --external:@dev.mohe/argon2 --define:process.env.NODE_ENV=\\"production\\" --charset=utf8 --entry-names=[dir]/[name] --sourcemap --analyze --outfile=dist/server.cjs --minify-whitespace --minify-identifiers --minify-syntax --tree-shaking=true --minify`
+    `esbuild --platform=node --format=esm --bundle src/server/index.ts --external:@dev.mohe/argon2 --define:process.env.NODE_ENV=\\"production\\" --charset=utf8 --entry-names=[dir]/[name] --sourcemap --analyze --outfile=dist/server.js --inject:./require-shim.js --minify-whitespace --minify-identifiers --minify-syntax --tree-shaking=true --minify`
   );
 
   console.log(stdout);
