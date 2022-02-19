@@ -409,9 +409,11 @@ https://freedesktop.org/wiki/Software/systemd/DaemonSocketActivation/
 
 sudo mkdir /opt/projektwahl-container
 sudo pacstrap -c /opt/projektwahl-container nodejs
-sudo mkdir /opt/projektwahl-container/opt/projektwahl-lit/
-sudo cp /opt/projektwahl-lit/dist/server.js /opt/projektwahl-container/opt/projektwahl-lit/server.js
+sudo mkdir -p /opt/projektwahl-container/opt/projektwahl-lit/dist/
+sudo cp /opt/projektwahl-lit/dist/server.js /opt/projektwahl-container/opt/projektwahl-lit/dist/
+sudo cp /opt/projektwahl-lit/dist/*.node /opt/projektwahl-container/opt/projektwahl-lit/dist/
 
 sudo chmod 755 /opt/projektwahl-container/
 sudo chmod 755 /opt/projektwahl-container/opt/projektwahl-lit/
-sudo chmod 644 /opt/projektwahl-container/opt/projektwahl-lit/server.js
+sudo chmod 755 /opt/projektwahl-container/opt/projektwahl-lit/dist/
+sudo chmod 644 /opt/projektwahl-container/opt/projektwahl-lit/dist/*
