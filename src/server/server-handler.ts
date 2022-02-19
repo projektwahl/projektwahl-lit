@@ -33,7 +33,6 @@ import { z } from "zod";
 import { createOrUpdateProjectsHandler } from "./routes/projects/create-or-update.js";
 import { cwd } from "node:process";
 import { projectsHandler } from "./routes/projects/index.js";
-import { resolve as loaderResolve, load as loaderLoad } from "../loader.js";
 import { logoutHandler } from "./routes/login/logout.js";
 import zlib from "node:zlib";
 import { pipeline, Readable } from "node:stream";
@@ -131,6 +130,7 @@ export async function serverHandler(
   } else if (process.env.NODE_ENV === "development") {
     // TODO FIXME AUDIT
     // curl --insecure --path-as-is -v `${process.env.BASE_URL}/../src/index.js`
+    let { resolve: loaderResolve, load: loaderLoad } = await import("../loader.js");
 
     const filename = resolve("." + url.pathname);
 
