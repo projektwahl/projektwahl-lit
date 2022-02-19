@@ -42,7 +42,7 @@ const nativeNodeModulesPlugin = {
 }
 
 const exec = promisify(unpromisifiedExec);
-/*
+
 {
   let { stdout, stderr } = await exec(
     "lit-localize build"
@@ -51,7 +51,7 @@ const exec = promisify(unpromisifiedExec);
   console.log(stdout);
   console.log(stderr);
 }
-*/
+
 {
   let { stdout, stderr } = await exec(
     "esbuild --format=esm --bundle dist/de/client/pw-app.js --charset=utf8 --define:window.PRODUCTION=true --entry-names=[dir]/[name] --sourcemap  --analyze --outdir=dist --minify-whitespace --minify-identifiers --minify-syntax --tree-shaking=true --minify"

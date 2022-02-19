@@ -46,11 +46,9 @@ Remove the permissions above further so there is only RootDirectory and DeviceAl
 ### projektwahl
 
 ```
-✗ RootDirectory=/RootImage=                                   Service runs within the host's root directory                                       0.1
 ✗ MemoryDenyWriteExecute=                                     Service may create writable executable memory mappings                              0.1
 ✗ RestrictAddressFamilies=~AF_UNIX                            Service may allocate local sockets                                                  0.1
 ✗ DeviceAllow=                                                Service has a device ACL with some special devices                                  0.1
-✗ IPAddressDeny=                                              Service defines IP address allow list with only localhost entries                   0.1
 ```
 
 #### Impact of takeover
