@@ -404,7 +404,6 @@ https://freedesktop.org/wiki/Software/systemd/DaemonSocketActivation/
 
 
 
-
 sudo rm -Rf /opt/projektwahl-container
 sudo mkdir /opt/projektwahl-container
 sudo pacstrap -c /opt/projektwahl-container nodejs
