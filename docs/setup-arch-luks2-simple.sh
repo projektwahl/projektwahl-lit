@@ -273,7 +273,6 @@ cd projektwahl-lit
 openssl req -x509 -newkey rsa:2048 -nodes -sha256 -subj '/CN=localhost' -keyout key.pem -out cert.pem
 npm ci --ignore-scripts --omit=optional
 npx node-gyp rebuild -C ./node_modules/@dev.mohe/argon2/
-npm run localize-build
 npm run build
 
 # These lines need to be repeated all the time... We should probably use ACLs
@@ -406,11 +405,11 @@ https://freedesktop.org/wiki/Software/systemd/DaemonSocketActivation/
 
 
 
-
+sudo rm -Rf /opt/projektwahl-container
 sudo mkdir /opt/projektwahl-container
 sudo pacstrap -c /opt/projektwahl-container nodejs
 sudo mkdir -p /opt/projektwahl-container/opt/projektwahl-lit/dist/
-sudo cp /opt/projektwahl-lit/dist/server.js /opt/projektwahl-container/opt/projektwahl-lit/dist/
+sudo cp /opt/projektwahl-lit/dist/server.js /opt/projektwahl-container/opt/projektwahl-lit/dist/server.mjs
 sudo cp /opt/projektwahl-lit/dist/*.node /opt/projektwahl-container/opt/projektwahl-lit/dist/
 
 sudo chmod 755 /opt/projektwahl-container/
