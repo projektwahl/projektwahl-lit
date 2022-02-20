@@ -44,6 +44,7 @@ export async function createUsersHandler(
     request,
     response,
     async (
+      sql,
       user,
       loggedInUser: Exclude<z.infer<typeof userSchema>, undefined>
     ) => {
@@ -70,6 +71,7 @@ export async function updateUsersHandler(
     request,
     response,
     async (
+      sql,
       user,
       loggedInUser: Exclude<z.infer<typeof userSchema>, undefined>
     ) => {
@@ -102,6 +104,7 @@ export async function createOrUpdateUsersHandler<P extends "/api/v1/users/create
   request: MyRequest,
   response: ServerResponse | Http2ServerResponse,
   dbquery: (
+    sql: postgres.TransactionSql<{}>,
     user: z.infer<typeof routes[P]["request"]>,
     loggedInUser: Exclude<z.infer<typeof userSchema>, undefined>
   ) => any
@@ -142,7 +145,7 @@ export async function createOrUpdateUsersHandler<P extends "/api/v1/users/create
       try {
         const row = (
           await sql.begin("READ WRITE", async (sql) => {
-            return await dbquery(user, loggedInUser);
+            return await dbquery(sql, user, loggedInUser);
           })
         )[0];
 

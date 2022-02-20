@@ -44,6 +44,7 @@ export async function createProjectsHandler(
     request,
     response,
     async (
+      sql,
       project,
       loggedInUser: Exclude<z.infer<typeof userSchema>, undefined>
     ) => {
@@ -88,6 +89,7 @@ export async function updateProjectsHandler(
     request,
     response,
     async (
+      sql,
       project,
       loggedInUser: Exclude<z.infer<typeof userSchema>, undefined>
     ) => {
@@ -126,6 +128,7 @@ export async function createOrUpdateProjectsHandler<
   request: MyRequest,
   response: ServerResponse | Http2ServerResponse,
   dbquery: (
+    sql: postgres.TransactionSql<{}>,
     project: z.infer<typeof routes[P]["request"]>,
     loggedInUser: Exclude<z.infer<typeof userSchema>, undefined>
   ) => any
@@ -166,7 +169,7 @@ export async function createOrUpdateProjectsHandler<
         const row = rawProjectSchema.parse(
           (
             await sql.begin("READ WRITE", async (sql) => {
-              return await dbquery(project, loggedInUser);
+              return await dbquery(sql, project, loggedInUser);
             })
           )[0]
         );
