@@ -33,6 +33,16 @@ import { ifDefined } from "lit/directives/if-defined.js";
 import { myFetch } from "../utils.js";
 import { pwInput } from "../form/pw-input.js";
 
+export const taskFunction = async <P extends keyof typeof entityRoutes>(apiUrl: P, url: URL) => {
+  const result = await myFetch<P>(
+    `${apiUrl}${url.search}`,
+    {
+      method: "GET",
+    }
+  );
+  return result;
+}
+
 export class PwEntityList<
   P extends keyof typeof entityRoutes
 > extends PwForm<P> {
