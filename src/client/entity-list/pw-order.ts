@@ -41,6 +41,8 @@ export function pwOrder<P extends keyof typeof entityRoutes>(
   ></pw-order>`;
 }
 
+// TODO FIXME with prefix this doesnt work
+// TODO FIXME paginationLimit also doesnt work with this
 export class PwOrder<P extends keyof typeof entityRoutes> extends LitElement {
   static override get properties() {
     return {
