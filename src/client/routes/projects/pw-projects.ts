@@ -25,17 +25,15 @@ import { html } from "lit";
 import { noChange } from "lit";
 import { aClick } from "../../pw-a.js";
 import { msg } from "@lit/localize";
-import { PwEntityList } from "../../entity-list/pw-entitylist.js";
+import { PwEntityList, taskFunction } from "../../entity-list/pw-entitylist.js";
 import { pwOrder } from "../../entity-list/pw-order.js";
 import { pwInput } from "../../form/pw-input.js";
-import { routes } from "../../../lib/routes.js";
+import type { routes } from "../../../lib/routes.js";
 import type { z } from "zod";
 
-// TODO FIXME
 export const pwProjects = async (url: URL) => {
-  //const result = await taskFunction([url.searchParams]);
-  // .initial=${result}
-  return html`<pw-projects></pw-projects>`;
+  const result = await taskFunction("/api/v1/projects", url, "projects");
+  return html`<pw-projects .initial=${result} prefix="projects"></pw-projects>`;
 };
 
 class PwProjects extends PwEntityList<"/api/v1/projects"> {
