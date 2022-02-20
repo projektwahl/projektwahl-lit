@@ -166,7 +166,9 @@ export async function createOrUpdateProjectsHandler<
       }
 
       try {
-        const row = rawProjectSchema.parse(
+        const row = rawProjectSchema.pick({
+          id: true
+        }).parse(
           (
             await sql.begin("READ WRITE", async (sql) => {
               return await dbquery(sql, project, loggedInUser);
