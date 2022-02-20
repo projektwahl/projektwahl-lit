@@ -82,12 +82,18 @@ export async function serverHandler(
 
   const url = new URL(path, process.env.BASE_URL);
 
-  if (process.env.NODE_ENV === "development" && (url.pathname === "/favicon.ico" || url.pathname === "/robots.txt")) {
+  if (
+    process.env.NODE_ENV === "development" &&
+    (url.pathname === "/favicon.ico" || url.pathname === "/robots.txt")
+  ) {
     response.writeHead(404, {
       ...defaultHeaders,
     });
     response.end();
-  } else if (process.env.NODE_ENV === "development" && url.pathname === "/api/v1/hmr") {
+  } else if (
+    process.env.NODE_ENV === "development" &&
+    url.pathname === "/api/v1/hmr"
+  ) {
     response.writeHead(200, {
       ...defaultHeaders,
       "content-type": "text/event-stream",
@@ -130,7 +136,9 @@ export async function serverHandler(
   } else if (process.env.NODE_ENV === "development") {
     // TODO FIXME AUDIT
     // curl --insecure --path-as-is -v `${process.env.BASE_URL}/../src/index.js`
-    let { resolve: loaderResolve, load: loaderLoad } = await import("../loader.js");
+    let { resolve: loaderResolve, load: loaderLoad } = await import(
+      "../loader.js"
+    );
 
     const filename = resolve("." + url.pathname);
 

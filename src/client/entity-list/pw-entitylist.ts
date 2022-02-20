@@ -33,15 +33,15 @@ import { ifDefined } from "lit/directives/if-defined.js";
 import { myFetch } from "../utils.js";
 import { pwInput } from "../form/pw-input.js";
 
-export const taskFunction = async <P extends keyof typeof entityRoutes>(apiUrl: P, url: URL) => {
-  const result = await myFetch<P>(
-    `${apiUrl}${url.search}`,
-    {
-      method: "GET",
-    }
-  );
+export const taskFunction = async <P extends keyof typeof entityRoutes>(
+  apiUrl: P,
+  url: URL
+) => {
+  const result = await myFetch<P>(`${apiUrl}${url.search}`, {
+    method: "GET",
+  });
   return result;
-}
+};
 
 export class PwEntityList<
   P extends keyof typeof entityRoutes
@@ -146,7 +146,8 @@ export class PwEntityList<
           return result;
         },
         autoRun: false, // TODO FIXME this would be way simpler if there would be a no first run or so
-        initialStatus: this.initial !== undefined ? TaskStatus.COMPLETE : TaskStatus.INITIAL,
+        initialStatus:
+          this.initial !== undefined ? TaskStatus.COMPLETE : TaskStatus.INITIAL,
         initialValue: this.initial,
       });
 

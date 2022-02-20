@@ -213,12 +213,14 @@ export class PwApp extends LitElement {
       // this is especially a problem for the entity lists
       this._apiTask = new Task(this, {
         task: this.nextPage,
-        args: () => [
-          Object.keys(pages).find((k) =>
-            new RegExp(k).test(this.history.url.pathname)
-          ),
-        ] as [keyof typeof pages],
-        initialStatus: this.initial !== undefined ? TaskStatus.COMPLETE : TaskStatus.INITIAL,
+        args: () =>
+          [
+            Object.keys(pages).find((k) =>
+              new RegExp(k).test(this.history.url.pathname)
+            ),
+          ] as [keyof typeof pages],
+        initialStatus:
+          this.initial !== undefined ? TaskStatus.COMPLETE : TaskStatus.INITIAL,
         initialValue: this.initial,
       });
     }

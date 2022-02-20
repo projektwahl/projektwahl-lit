@@ -62,7 +62,7 @@ class PwForm<P extends keyof typeof routes> extends LitElement {
     });
     this.form.value?.dispatchEvent(formKeysEvent);
 
-    console.log(formKeysEvent.detail)
+    console.log(formKeysEvent.detail);
 
     return formKeysEvent.detail;
   }
@@ -75,10 +75,13 @@ class PwForm<P extends keyof typeof routes> extends LitElement {
             return html`<div class="alert alert-danger" role="alert">
               ${msg("Some errors occurred!")}<br />
               ${data.error.issues
-                .filter(i => ![...this.getCurrentInputElements()].find(v => JSON.stringify(v) === JSON.stringify(i.path)))
-                .map(
-                (issue) => html` ${issue.path}: ${issue.message}<br /> `
-              )}
+                .filter(
+                  (i) =>
+                    ![...this.getCurrentInputElements()].find(
+                      (v) => JSON.stringify(v) === JSON.stringify(i.path)
+                    )
+                )
+                .map((issue) => html` ${issue.path}: ${issue.message}<br /> `)}
             </div>`;
           }
         }

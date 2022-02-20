@@ -29,7 +29,7 @@ import { PwEntityList } from "../../entity-list/pw-entitylist.js";
 import { pwOrder } from "../../entity-list/pw-order.js";
 import { pwInput } from "../../form/pw-input.js";
 import { routes } from "../../../lib/routes.js";
-import { taskFunction } from "../../entity-list/pw-entitylist.js"
+import { taskFunction } from "../../entity-list/pw-entitylist.js";
 import type { z } from "zod";
 
 export const pwUsers = async (url: URL) => {
@@ -65,16 +65,14 @@ export class PwUsers extends PwEntityList<"/api/v1/users"> {
 
   override get head() {
     try {
-      const initial: z.infer<typeof routes["/api/v1/users"]["request"]> = 
+      const initial: z.infer<typeof routes["/api/v1/users"]["request"]> =
         JSON.parse(
           decodeURIComponent(
             this.history.url.search == ""
               ? "{}"
               : this.history.url.search.substring(1)
           )
-        )
-      ;
-
+        );
       return html`<tr>
           <th class="table-cell-hover p-0" scope="col">
             ${pwOrder<"/api/v1/users">({

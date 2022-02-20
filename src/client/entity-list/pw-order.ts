@@ -90,11 +90,11 @@ export class PwOrder<P extends keyof typeof entityRoutes> extends LitElement {
             )
           );
           if (!data.sorting) {
-            data.sorting = []
+            data.sorting = [];
           }
 
-          const oldElementIndex = data.sorting.findIndex(([e, d]) =>
-            e === `${this.name as string}`
+          const oldElementIndex = data.sorting.findIndex(
+            ([e, d]) => e === `${this.name as string}`
           );
           let oldElement;
           if (oldElementIndex == -1) {
@@ -115,10 +115,8 @@ export class PwOrder<P extends keyof typeof entityRoutes> extends LitElement {
           }
           data.sorting = [
             ...data.sorting,
-            ...(newElement !== null
-              ? [[oldElement[0], newElement]]
-              : []),
-          ]
+            ...(newElement !== null ? [[oldElement[0], newElement]] : []),
+          ];
 
           HistoryController.goto(
             new URL(
@@ -142,9 +140,9 @@ export class PwOrder<P extends keyof typeof entityRoutes> extends LitElement {
                 : this.history.url.search.substring(1)
             )
           );
-          const value = (data.sorting ?? [])
-            .find(([e, d]) => e === `${this.name as string}`)
-            ?.[1];
+          const value = (data.sorting ?? []).find(
+            ([e, d]) => e === `${this.name as string}`
+          )?.[1];
           return value === "ASC"
             ? html`<svg
                 xmlns="http://www.w3.org/2000/svg"

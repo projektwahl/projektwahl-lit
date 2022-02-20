@@ -36,7 +36,7 @@ export async function usersHandler(
     "GET",
     "/api/v1/users",
     async function (query, loggedInUser) {
-      console.log(query)
+      console.log(query);
 
       // helper is allowed to read the normal data
       // voter is not allowed to do anything
@@ -103,10 +103,9 @@ export async function usersHandler(
              .force_in_project_id} OR force_in_project_id = ${
               query.filters.force_in_project_id ?? null
             })
-            AND (${!query.filters
-              .type} OR type = ${
-               query.filters.type ?? null
-             })`;
+            AND (${!query.filters.type} OR type = ${
+              query.filters.type ?? null
+            })`;
           }
         );
       return ret;

@@ -153,7 +153,7 @@ export class PwInput<
 
   myformkeysEventListener = (event: CustomEvent<string[][]>) => {
     event.detail.push(this.name);
-  }
+  };
 
   myformdataEventListener = (
     event: CustomEvent<z.infer<typeof routes[P]["request"]>>
