@@ -33,7 +33,6 @@ import { z } from "zod";
 import { createOrUpdateProjectsHandler } from "./routes/projects/create-or-update.js";
 import { cwd } from "node:process";
 import { projectsHandler } from "./routes/projects/index.js";
-import { resolve as loaderResolve, load as loaderLoad } from "../loader.js";
 import { logoutHandler } from "./routes/login/logout.js";
 import zlib from "node:zlib";
 import { pipeline, Readable } from "node:stream";
@@ -79,19 +78,22 @@ export async function serverHandler(
   request: MyRequest,
   response: ServerResponse | Http2ServerResponse
 ) {
-  console.log("got request");
-
   const path = z.string().parse(request.url);
 
   const url = new URL(path, process.env.BASE_URL);
 
-  if (process.env.NODE_ENV === "development" && (url.pathname === "/favicon.ico" || url.pathname === "/robots.txt")) {
+  if (
+    process.env.NODE_ENV === "development" &&
+    (url.pathname === "/favicon.ico" || url.pathname === "/robots.txt")
+  ) {
     response.writeHead(404, {
       ...defaultHeaders,
     });
     response.end();
-  } else if (process.env.NODE_ENV === "development" && url.pathname === "/api/v1/hmr") {
-    console.log("got request");
+  } else if (
+    process.env.NODE_ENV === "development" &&
+    url.pathname === "/api/v1/hmr"
+  ) {
     response.writeHead(200, {
       ...defaultHeaders,
       "content-type": "text/event-stream",
@@ -134,6 +136,9 @@ export async function serverHandler(
   } else if (process.env.NODE_ENV === "development") {
     // TODO FIXME AUDIT
     // curl --insecure --path-as-is -v `${process.env.BASE_URL}/../src/index.js`
+    let { resolve: loaderResolve, load: loaderLoad } = await import(
+      "../loader.js"
+    );
 
     const filename = resolve("." + url.pathname);
 
@@ -309,7 +314,20 @@ export async function serverHandler(
       ></script>
       <noscript>Bitte aktiviere JavaScript!</noscript>
   
-      <pw-app></pw-app>
+      <pw-app>
+      
+      <div
+      style="position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 1337;"
+    >
+      <div
+          class="spinner-grow text-primary"
+          role="status"
+        >
+          <span class="visually-hidden">Loading...</span>
+        </div>
+    </div>
+      
+      </pw-app>
     </body>
   </html>
   `;

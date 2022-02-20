@@ -33,6 +33,16 @@ import { ifDefined } from "lit/directives/if-defined.js";
 import { myFetch } from "../utils.js";
 import { pwInput } from "../form/pw-input.js";
 
+export const taskFunction = async <P extends keyof typeof entityRoutes>(
+  apiUrl: P,
+  url: URL
+) => {
+  const result = await myFetch<P>(`${apiUrl}${url.search}`, {
+    method: "GET",
+  });
+  return result;
+};
+
 export class PwEntityList<
   P extends keyof typeof entityRoutes
 > extends PwForm<P> {
@@ -79,7 +89,7 @@ export class PwEntityList<
 
   initialRender: boolean;
 
-  initial: Promise<ResponseType<P>> | undefined;
+  initial: ResponseType<P> | undefined;
 
   protected history;
 
@@ -136,15 +146,12 @@ export class PwEntityList<
           return result;
         },
         autoRun: false, // TODO FIXME this would be way simpler if there would be a no first run or so
+        initialStatus:
+          this.initial !== undefined ? TaskStatus.COMPLETE : TaskStatus.INITIAL,
+        initialValue: this.initial,
       });
 
-      if (this.initial !== undefined) {
-        // TODO FIXME goddammit the private attributes get minified
-        this._task.status = TaskStatus.COMPLETE;
-        // @ts-expect-error See https://github.com/lit/lit/issues/2367
-        this._task.p = this.initial;
-        // TODO FIXMe if we set the currentArgs here somehow I think this may work
-      } else {
+      if (this.initial === undefined) {
         void this._task.run();
       }
     }

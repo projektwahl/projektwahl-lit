@@ -82,21 +82,28 @@ export class PwOrder<P extends keyof typeof entityRoutes> extends LitElement {
       ${bootstrapCss}
       <button
         @click=${async () => {
-          const urlSearchParams = this.history.url.searchParams;
+          const data = JSON.parse(
+            decodeURIComponent(
+              this.history.url.search == ""
+                ? "{}"
+                : this.history.url.search.substring(1)
+            )
+          );
+          if (!data.sorting) {
+            data.sorting = [];
+          }
 
-          const order = [...urlSearchParams.getAll("order")];
-
-          const oldElementIndex = order.findIndex((e) =>
-            e.startsWith(`${this.name as string}-`)
+          const oldElementIndex = data.sorting.findIndex(
+            ([e, d]) => e === `${this.name as string}`
           );
           let oldElement;
           if (oldElementIndex == -1) {
-            oldElement = `${this.name as string}-downup`;
+            oldElement = [`${this.name as string}`, `downup`];
           } else {
-            oldElement = order.splice(oldElementIndex, 1)[0];
+            oldElement = data.sorting.splice(oldElementIndex, 1)[0];
           }
           let newElement;
-          switch (oldElement.split("-")[1]) {
+          switch (oldElement[1]) {
             case "downup":
               newElement = "ASC";
               break;
@@ -106,16 +113,16 @@ export class PwOrder<P extends keyof typeof entityRoutes> extends LitElement {
             default:
               newElement = null;
           }
-          urlSearchParams.delete("order");
-          [
-            ...order,
-            ...(newElement !== null
-              ? [oldElement.split("-")[0] + "-" + newElement]
-              : []),
-          ].forEach((v) => urlSearchParams.append("order", v));
+          data.sorting = [
+            ...data.sorting,
+            ...(newElement !== null ? [[oldElement[0], newElement]] : []),
+          ];
 
           HistoryController.goto(
-            new URL(`?${urlSearchParams.toString()}`, window.location.href),
+            new URL(
+              `?${encodeURIComponent(JSON.stringify(data))}`,
+              window.location.href
+            ),
             {}
           );
           await this.refreshEntityList();
@@ -126,10 +133,16 @@ export class PwOrder<P extends keyof typeof entityRoutes> extends LitElement {
         id=${this.randomId}
       >
         ${(() => {
-          const value = this.history.url.searchParams
-            .getAll("order")
-            .find((e) => e.startsWith(`${this.name as string}-`))
-            ?.split("-")[1];
+          const data = JSON.parse(
+            decodeURIComponent(
+              this.history.url.search == ""
+                ? "{}"
+                : this.history.url.search.substring(1)
+            )
+          );
+          const value = (data.sorting ?? []).find(
+            ([e, d]) => e === `${this.name as string}`
+          )?.[1];
           return value === "ASC"
             ? html`<svg
                 xmlns="http://www.w3.org/2000/svg"

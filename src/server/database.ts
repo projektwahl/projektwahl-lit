@@ -28,10 +28,10 @@ if (!process.env["DATABASE_URL"]) {
 }
 
 export const sql = postgres(process.env["DATABASE_URL"], {
-  host: "/run/postgresql",
-  debug: (conn, query, params) => {
+  host: process.env["DATABASE_HOST"],
+  /*debug: (conn, query, params) => {
     console.log(query, params);
-  },
+  },*/ // this seems to be a performance issue
 });
 
 type UnwrapPromiseArray<T> = T extends any[] // eslint-disable-line @typescript-eslint/no-explicit-any

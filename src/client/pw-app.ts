@@ -33,8 +33,10 @@ import { aClick } from "./pw-a.js";
 import jscookie from "js-cookie";
 import { myFetch } from "./utils.js";
 import { Task, TaskStatus } from "@lit-labs/task";
+import { msg, str } from "@lit/localize";
 
 // TODO FIXME show more details if possible (maybe error page)
+// TODO FIXME do this inline in the main page? In case it doesnt load so even on old browsers some error is shown
 window.addEventListener("error", function (event) {
   console.error("window.error", event.error);
   alert("unknown error: " + event.message);
@@ -86,9 +88,8 @@ const pages = {
     return await pwLogin();
   },
   "^/users$": async (url: URL) => {
-    await import("./routes/users/pw-users.js");
-    //return await pwUsers(url);
-    return html`<pw-users></pw-users>`;
+    const { pwUsers } = await import("./routes/users/pw-users.js");
+    return await pwUsers(url);
   },
   "^/users/create$": async () => {
     await import("./routes/users/pw-user-create.js");
@@ -139,16 +140,16 @@ export class PwApp extends LitElement {
   static override get properties() {
     return {
       initial: { attribute: false },
-      initialUsed: { state: true },
+      initialRender: { state: true },
       navbarOpen: { state: true },
     };
   }
 
   private history;
 
-  initialUsed: boolean;
+  initialRender: boolean;
 
-  initial: Promise<import("lit").TemplateResult> | undefined;
+  initial: import("lit").TemplateResult | undefined;
 
   navbarOpen: boolean;
 
@@ -172,6 +173,8 @@ export class PwApp extends LitElement {
 
   constructor() {
     super();
+
+    this.initialRender = true;
 
     this.nextPage = async ([key]: [keyof typeof pages | undefined]) => {
       console.log("newPage");
@@ -198,28 +201,28 @@ export class PwApp extends LitElement {
     this.navbarOpen = false;
 
     this.history = new HistoryController(this, /.*/);
-
-    this.initialUsed = false;
-
-    // TODO FIXME I think we should only update here if the PAGE changes.
-    // if the url changes but not the page I think this should be the responsibility of that page
-    // I think this makes sense as otherwise the page would potentially be unloaded and could not react to keyboard input
-    // this is especially a problem for the entity lists
-    this._apiTask = new Task(this, this.nextPage, () => [
-      Object.keys(pages).find((k) =>
-        new RegExp(k).test(this.history.url.pathname)
-      ) as keyof typeof pages,
-    ]);
   }
 
   override render() {
-    if (this.initial !== undefined && !this.initialUsed) {
-      this.initialUsed = true;
+    if (this.initialRender) {
+      this.initialRender = false;
 
-      // TODO FIXME goddammit the private attributes get minified
-      this._apiTask.status = TaskStatus.COMPLETE;
-      // @ts-expect-error See https://github.com/lit/lit/issues/2367
-      this._apiTask.p = this.initial;
+      // TODO FIXME I think we should only update here if the PAGE changes.
+      // if the url changes but not the page I think this should be the responsibility of that page
+      // I think this makes sense as otherwise the page would potentially be unloaded and could not react to keyboard input
+      // this is especially a problem for the entity lists
+      this._apiTask = new Task(this, {
+        task: this.nextPage,
+        args: () =>
+          [
+            Object.keys(pages).find((k) =>
+              new RegExp(k).test(this.history.url.pathname)
+            ),
+          ] as [keyof typeof pages],
+        initialStatus:
+          this.initial !== undefined ? TaskStatus.COMPLETE : TaskStatus.INITIAL,
+        initialValue: this.initial,
+      });
     }
 
     return html`
@@ -374,6 +377,13 @@ export class PwApp extends LitElement {
                 target="_blank"
                 rel="noopener noreferrer"
                 >${msg("License")}</a
+              >
+              |
+              <a
+                href="https://github.com/projektwahl/projektwahl-lit/security/policy"
+                target="_blank"
+                rel="noopener noreferrer"
+                >${msg("Security")}</a
               >
               |
               <a href="/imprint" target="_blank" rel="noopener noreferrer"

@@ -25,7 +25,6 @@
     "setup": "node --experimental-loader ./src/loader.js --enable-source-maps ./src/server/setup.js",
     "server": "node --experimental-loader ./src/loader.js --enable-source-maps --experimental-import-meta-resolve ./src/server/index.js",
     "localize-extract": "lit-localize extract",
-    "localize-build": "lit-localize build",
     "typecheck": "tsc",
     "lit-analyze": "lit-analyzer --strict --rules.no-unknown-attribute off src",
     "build": "node build.js"
@@ -48,7 +47,8 @@
     "lit": "monorepos can't be installed from git afaik and also it probably doesnt work by default",
     "postgres": "v2.0.0-beta.11",
     "typescript": "installing the dependencies is probably more dangerous...",
-    "zod": "doesn't work from git because no prepare script. Should probably be installable without any building"
+    "zod": "doesn't work from git because no prepare script. Should probably be installable without any building",
+    "opentelemetry": "https://nodejs.org/dist/latest-v17.x/docs/api/perf_hooks.html https://www.jaegertracing.io/"
   },
   "devDependencies": {
     "@lit/localize-tools": "^0.6.1",
@@ -65,7 +65,7 @@
     "@types/selenium-webdriver": "^4.0.18",
     "@typescript-eslint/eslint-plugin": "^5.12.0",
     "eslint": "^8.9.0",
-    "eslint-config-prettier": "^8.3.0",
+    "eslint-config-prettier": "^8.4.0",
     "lit-analyzer": "^1.2.1",
     "prettier": "^2.5.1",
     "selenium-webdriver": "^4.1.1",

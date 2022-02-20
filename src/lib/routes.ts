@@ -223,7 +223,7 @@ const baseQuery = <
       )
       .default([]),
     paginationLimit: z.number().default(100),
-  });
+  }).strict();
 
 export const routes = identity({
   "/api/v1/logout": {

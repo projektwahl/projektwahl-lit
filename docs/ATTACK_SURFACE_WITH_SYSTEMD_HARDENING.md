@@ -46,11 +46,9 @@ Remove the permissions above further so there is only RootDirectory and DeviceAl
 ### projektwahl
 
 ```
-✗ RootDirectory=/RootImage=                                   Service runs within the host's root directory                                       0.1
 ✗ MemoryDenyWriteExecute=                                     Service may create writable executable memory mappings                              0.1
 ✗ RestrictAddressFamilies=~AF_UNIX                            Service may allocate local sockets                                                  0.1
 ✗ DeviceAllow=                                                Service has a device ACL with some special devices                                  0.1
-✗ IPAddressDeny=                                              Service defines IP address allow list with only localhost entries                   0.1
 ```
 
 #### Impact of takeover
@@ -59,7 +57,7 @@ They would be able to manipulate incoming requests to the projektwahl service. T
 
 #### Possible improvements
 
-Probably not many on the hardening side. Maybe compilation options for nodejs could be hardened more. Also the IPAddressAllow could be even more restrictive to only allow connections to the nginx reverse proxy. Security auditing the source code itself is probably the best thing that can be done.
+Probably not many on the hardening side. Maybe compilation options for nodejs could be hardened more. Also the IPAddressAllow could be even more restrictive to only allow connections to the nginx reverse proxy. Security auditing the source code itself is probably the best thing that can be done. IPAddressAllow on the socket unit.
 
 # Nginx Reverse Proxy
 
