@@ -28,6 +28,7 @@ import {
   routes,
   UnknownKeysParam,
   ResponseType,
+  userSchema,
 } from "../lib/routes.js";
 import { z, ZodIssueCode, ZodObject, ZodTypeAny } from "zod";
 import { retryableBegin } from "./database.js";
@@ -39,23 +40,6 @@ import type {
   Http2ServerResponse,
   OutgoingHttpHeaders,
 } from "http2";
-
-const userMapper = <
-  T extends { [k: string]: ZodTypeAny },
-  UnknownKeys extends UnknownKeysParam = "strip",
-  Catchall extends ZodTypeAny = ZodTypeAny
->(
-  s: ZodObject<T, UnknownKeys, Catchall>
-) =>
-  s.pick({
-    id: true,
-    type: true,
-    username: true,
-    group: true,
-    age: true,
-  });
-
-const userSchema = userMapper(rawUserSchema).optional();
 
 export type MyRequest = (IncomingMessage | Http2ServerRequest) &
   Required<Pick<IncomingMessage | Http2ServerRequest, "url" | "method">>;

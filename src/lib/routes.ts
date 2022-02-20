@@ -77,10 +77,29 @@ export type keys =
   | "/api/v1/redirect"
   | "/api/v1/sleep"
   | "/api/v1/update"
-  | "/api/v1/users/create-or-update"
-  | "/api/v1/projects/create-or-update"
+  | "/api/v1/users/create"
+  | "/api/v1/users/update"
+  | "/api/v1/projects/create"
+  | "/api/v1/projects/update"
   | "/api/v1/users"
   | "/api/v1/projects";
+
+const userMapper = <
+  T extends { [k: string]: ZodTypeAny },
+  UnknownKeys extends UnknownKeysParam = "strip",
+  Catchall extends ZodTypeAny = ZodTypeAny
+>(
+  s: ZodObject<T, UnknownKeys, Catchall>
+) =>
+  s.pick({
+    id: true,
+    type: true,
+    username: true,
+    group: true,
+    age: true,
+  });
+
+export const userSchema = userMapper(rawUserSchema).optional();
 
 function identity<
   T extends {
@@ -116,8 +135,7 @@ const usersCreateOrUpdate = <
     })
     .extend({
       password: z.string(),
-    })
-    .partial();
+    });
 
 export const entities = <
   T extends { [k: string]: ZodTypeAny },
@@ -242,11 +260,19 @@ export const routes = identity({
     request: z.undefined(),
     response: z.object({}),
   },
-  "/api/v1/users/create-or-update": {
+  "/api/v1/users/create": {
     request: usersCreateOrUpdate(rawUserSchema),
     response: createOrUpdateUserResponse(rawUserSchema),
   },
-  "/api/v1/projects/create-or-update": {
+  "/api/v1/users/update": {
+    request: usersCreateOrUpdate(rawUserSchema).partial(),
+    response: createOrUpdateUserResponse(rawUserSchema),
+  },
+  "/api/v1/projects/create": {
+    request: rawProjectSchema,
+    response: z.object({}).extend({ id: z.number() }),
+  },
+  "/api/v1/projects/update": {
     request: rawProjectSchema.partial(),
     response: z.object({}).extend({ id: z.number() }),
   },

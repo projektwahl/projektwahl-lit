@@ -27,17 +27,113 @@ import { MyRequest, requestHandler } from "../../express.js";
 import { sql2 } from "../../sql/index.js";
 import type { OutgoingHttpHeaders, ServerResponse } from "node:http";
 import type { Http2ServerResponse } from "node:http2";
-import { rawProjectSchema, ResponseType } from "../../../lib/routes.js";
-import { ZodIssueCode } from "zod";
+import {
+  rawProjectSchema,
+  ResponseType,
+  routes,
+  userSchema,
+} from "../../../lib/routes.js";
+import { z, ZodIssueCode } from "zod";
 
-export async function createOrUpdateProjectsHandler(
+export async function createProjectsHandler(
   request: MyRequest,
   response: ServerResponse | Http2ServerResponse
+) {
+  return await createOrUpdateProjectsHandler(
+    "/api/v1/projects/create",
+    request,
+    response,
+    async (
+      project,
+      loggedInUser: Exclude<z.infer<typeof userSchema>, undefined>
+    ) => {
+      // TODO FIXME we can use our nice query building here
+      // or postgres also has builtin features for insert and update
+      const res =
+        await sql`INSERT INTO projects_with_deleted (title, info, place, costs, min_age, max_age, min_participants, max_participants, random_assignments, deleted, last_updated_by)
+            (SELECT 
+    ${project.title ?? null},
+    ${project.info ?? null},
+    ${project.place ?? null},
+    ${project.costs ?? 0},
+    ${project.min_age ?? null},
+    ${project.max_age ?? null},
+    ${project.min_participants ?? null},
+    ${project.max_participants ?? null},
+    ${project.random_assignments ?? false}, ${project.deleted ?? false}, ${
+          loggedInUser.id
+        } FROM users_with_deleted WHERE users_with_deleted.id = ${
+          loggedInUser.id
+        } AND (users_with_deleted.type = 'helper' OR users_with_deleted.type = 'admin'))
+    RETURNING id;`;
+
+      // TODO FIXME make this in sql directly
+      if (loggedInUser.type === "helper") {
+        await sql`UPDATE users_with_deleted SET project_leader_id = ${
+          res[0].id as number
+        } WHERE project_leader_id IS NULL AND id = ${loggedInUser.id}`;
+      }
+
+      return res;
+    }
+  );
+}
+
+export async function updateProjectsHandler(
+  request: MyRequest,
+  response: ServerResponse | Http2ServerResponse
+) {
+  return await createOrUpdateProjectsHandler(
+    "/api/v1/projects/update",
+    request,
+    response,
+    async (
+      project,
+      loggedInUser: Exclude<z.infer<typeof userSchema>, undefined>
+    ) => {
+      const field = (name: keyof typeof project) =>
+        updateField("projects_with_deleted", project, name);
+
+      const finalQuery = sql2`UPDATE projects_with_deleted SET
+${field("title")},
+${field("info")},
+${field("place")},
+${field("costs")},
+${field("min_age")},
+${field("max_age")},
+${field("min_participants")},
+${field("max_participants")},
+${field("random_assignments")},
+${field("deleted")},
+last_updated_by = ${loggedInUser.id}
+FROM users_with_deleted WHERE projects_with_deleted.id = ${
+        project.id
+      } AND users_with_deleted.id = ${
+        loggedInUser.id
+      } AND (users_with_deleted.project_leader_id = ${
+        project.id
+      } AND users_with_deleted.type = 'helper' OR users_with_deleted.type = 'admin') RETURNING projects_with_deleted.id;`;
+
+      return await sql(...finalQuery);
+    }
+  );
+}
+
+export async function createOrUpdateProjectsHandler<
+  P extends "/api/v1/projects/create" | "/api/v1/projects/update"
+>(
+  path: P,
+  request: MyRequest,
+  response: ServerResponse | Http2ServerResponse,
+  dbquery: (
+    project: z.infer<typeof routes[P]["request"]>,
+    loggedInUser: Exclude<z.infer<typeof userSchema>, undefined>
+  ) => any
 ) {
   // TODO FIXME create or update multiple
   return await requestHandler(
     "POST",
-    "/api/v1/projects/create-or-update",
+    path,
     async function (project, loggedInUser) {
       // helper is allowed to create projects and change their own projects
       // voter is not allowed to do anything
@@ -45,10 +141,7 @@ export async function createOrUpdateProjectsHandler(
       if (
         !(loggedInUser?.type === "admin" || loggedInUser?.type === "helper")
       ) {
-        const returnValue: [
-          OutgoingHttpHeaders,
-          ResponseType<"/api/v1/projects/create-or-update">
-        ] = [
+        const returnValue: [OutgoingHttpHeaders, ResponseType<P>] = [
           {
             "content-type": "text/json; charset=utf-8",
             ":status": 403,
@@ -73,73 +166,14 @@ export async function createOrUpdateProjectsHandler(
         const row = rawProjectSchema.parse(
           (
             await sql.begin("READ WRITE", async (sql) => {
-              if (project.id) {
-                const field = (name: keyof typeof project) =>
-                  updateField("projects_with_deleted", project, name);
-
-                const finalQuery = sql2`UPDATE projects_with_deleted SET
-            ${field("title")},
-            ${field("info")},
-            ${field("place")},
-            ${field("costs")},
-            ${field("min_age")},
-            ${field("max_age")},
-            ${field("min_participants")},
-            ${field("max_participants")},
-            ${field("random_assignments")},
-            ${field("deleted")},
-            last_updated_by = ${loggedInUser.id}
-            FROM users_with_deleted WHERE projects_with_deleted.id = ${
-              project.id
-            } AND users_with_deleted.id = ${
-                  loggedInUser.id
-                } AND (users_with_deleted.project_leader_id = ${
-                  project.id
-                } AND users_with_deleted.type = 'helper' OR users_with_deleted.type = 'admin') RETURNING projects_with_deleted.id;`;
-
-                return await sql(...finalQuery);
-              } else {
-                // TODO FIXME we can use our nice query building here
-                // or postgres also has builtin features for insert and update
-                const res =
-                  await sql`INSERT INTO projects_with_deleted (title, info, place, costs, min_age, max_age, min_participants, max_participants, random_assignments, deleted, last_updated_by)
-            (SELECT 
-    ${project.title ?? null},
-    ${project.info ?? null},
-    ${project.place ?? null},
-    ${project.costs ?? 0},
-    ${project.min_age ?? null},
-    ${project.max_age ?? null},
-    ${project.min_participants ?? null},
-    ${project.max_participants ?? null},
-    ${project.random_assignments ?? false}, ${project.deleted ?? false}, ${
-                    loggedInUser.id
-                  } FROM users_with_deleted WHERE users_with_deleted.id = ${
-                    loggedInUser.id
-                  } AND (users_with_deleted.type = 'helper' OR users_with_deleted.type = 'admin'))
-    RETURNING id;`;
-
-                // TODO FIXME make this in sql directly
-                if (loggedInUser.type === "helper") {
-                  await sql`UPDATE users_with_deleted SET project_leader_id = ${
-                    res[0].id as number
-                  } WHERE project_leader_id IS NULL AND id = ${
-                    loggedInUser.id
-                  }`;
-                }
-
-                return res;
-              }
+              return await dbquery(project, loggedInUser);
             })
           )[0]
         );
 
         if (!row) {
           // insufficient permissions
-          const returnValue: [
-            OutgoingHttpHeaders,
-            ResponseType<"/api/v1/projects/create-or-update">
-          ] = [
+          const returnValue: [OutgoingHttpHeaders, ResponseType<P>] = [
             {
               "content-type": "text/json; charset=utf-8",
               ":status": 403,
@@ -176,10 +210,7 @@ export async function createOrUpdateProjectsHandler(
             error.constraint_name === "users_with_deleted_username_key"
           ) {
             // unique violation
-            const returnValue: [
-              OutgoingHttpHeaders,
-              ResponseType<"/api/v1/projects/create-or-update">
-            ] = [
+            const returnValue: [OutgoingHttpHeaders, ResponseType<P>] = [
               {
                 "content-type": "text/json; charset=utf-8",
                 ":status": 200,
@@ -201,10 +232,7 @@ export async function createOrUpdateProjectsHandler(
           }
         }
         console.error(error);
-        const returnValue: [
-          OutgoingHttpHeaders,
-          ResponseType<"/api/v1/projects/create-or-update">
-        ] = [
+        const returnValue: [OutgoingHttpHeaders, ResponseType<P>] = [
           {
             "content-type": "text/json; charset=utf-8",
             ":status": 500,
