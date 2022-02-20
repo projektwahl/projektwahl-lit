@@ -22,8 +22,6 @@ SPDX-FileCopyrightText: 2021 Moritz Hedtke <Moritz.Hedtke@t-online.de>
 */
 import argon2 from "@dev.mohe/argon2";
 
-// TODO FIXME probably switch back to argon2 it seems like we may be able to build it from source using the instructions in README
-// for now probably not too important as almost everybody should be using OpenID
 // we could also additionally do the PBKDF2 client side so no log leaks etc would be possible.
 
 // https://datatracker.ietf.org/doc/html/rfc9106#section-4

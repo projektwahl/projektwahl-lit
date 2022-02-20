@@ -76,13 +76,11 @@ export async function resolve(
  */
 export async function load(url, context, defaultLoad) {
   if (/\.ts$/.test(url)) {
-    //console.log("a")
     const { source: rawSource } = await defaultLoad(
       url,
       { format: "module" },
       defaultLoad
     );
-    //console.log(rawSource)
     const transformedSource = (
       await esbuild.transform(rawSource.toString(), {
         format: "esm",
