@@ -23,11 +23,6 @@ SPDX-FileCopyrightText: 2021 Moritz Hedtke <Moritz.Hedtke@t-online.de>
 import { z, ZodIssue, ZodObject, ZodTypeAny } from "zod";
 import { result } from "./result.js";
 
-if (!globalThis.Buffer) {
-  // @ts-expect-error hack for client
-  globalThis.Buffer = ArrayBuffer;
-}
-
 const rawUserCommon = {
   id: z.number(),
   username: z.string().min(1).max(100),
@@ -50,8 +45,6 @@ export const rawUserSchema = z
     ...rawUserCommon,
   })
   .strict();
-
-// setKey("id", z.number().nullable())
 
 export const rawProjectSchema = z
   .object({
@@ -125,18 +118,6 @@ const usersCreateOrUpdate = <
       password: z.string(),
     })
     .partial();
-
-/*
-const jo = usersCreateOrUpdate(rawUserVoterSchema)
-let a: z.infer<typeof jo>;
-
-const jo2 = usersCreateOrUpdate(rawUserHelperOrAdminSchema)
-let a2: z.infer<typeof jo2>;
-*/
-
-//console.log(rawUserHelperOrAdminSchema.safeParse({}))
-// TODO FIXME report upstream (picking missing keys breaks)
-//console.log(usersCreateOrUpdate(rawUserHelperOrAdminSchema).safeParse({}))
 
 export const entities = <
   T extends { [k: string]: ZodTypeAny },
@@ -215,7 +196,6 @@ const baseQuery = <
       .array(
         z.tuple([
           z.enum(
-            // TODO FIXME keys
             Object.keys(s.shape) as [keyof T & string, ...(keyof T & string)[]]
           ),
           z.enum(["ASC", "DESC"]),
@@ -297,4 +277,4 @@ export declare type MinimalSafeParseError = {
 
 export type ResponseType<P extends keyof typeof routes> =
   | z.SafeParseSuccess<z.infer<typeof routes[P]["response"]>>
-  | MinimalSafeParseError; // <z.infer<typeof routes[P]["request"]>>
+  | MinimalSafeParseError;

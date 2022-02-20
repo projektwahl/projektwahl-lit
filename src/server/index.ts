@@ -40,7 +40,7 @@ if (!process.env["CREDENTIALS_DIRECTORY"]) {
   process.exit(1);
 }
 
-/*if (cluster.isPrimary) {
+if (process.env.NODE_ENV === "development" && cluster.isPrimary) {
   console.log(`Primary is running`);
 
   cluster.fork();
@@ -72,7 +72,7 @@ if (!process.env["CREDENTIALS_DIRECTORY"]) {
       }
     })();
   }
-} else {*/
+} else {
 /*
   openssl req -x509 -newkey rsa:2048 -nodes -sha256 -subj '/CN=localhost' -keyout key.pem -out cert.pem
   */
@@ -109,21 +109,22 @@ if (!process.env["CREDENTIALS_DIRECTORY"]) {
       );
     }
   );
+
+  if (process.env.NODE_ENV === "development") {
+    cluster.worker?.on("message", (message) => {
+      //let getConnections = promisify(server.getConnections).bind(server)
+      //console.log(await getConnections())
+
+      if (message === "shutdown") {
+        console.log(`[${cluster.worker?.id ?? "unknown"}] Shutting down`);
+        server.close();
+
+        cluster.worker?.removeAllListeners("message");
+        cluster.worker?.kill();
+      }
+    });
+  }
 })();
-/*
-  cluster.worker?.on("message", (message) => {
-    //let getConnections = promisify(server.getConnections).bind(server)
-    //console.log(await getConnections())
-
-    if (message === "shutdown") {
-      console.log(`[${cluster.worker?.id ?? "unknown"}] Shutting down`);
-      server.close();
-
-      cluster.worker?.removeAllListeners("message");
-      cluster.worker?.kill();
-    }
-  });
-}*/
 
 //repl.start({})
 

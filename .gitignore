@@ -1,11 +1,10 @@
 # SPDX-License-Identifier: AGPL-3.0-or-later
 # SPDX-FileCopyrightText: 2021 Moritz Hedtke <Moritz.Hedtke@t-online.de>
-node_modules
-.tmp
-src/client/generated_locales/
-dist
-*.pem
+/node_modules
+/.tmp
+/dist
+/*.pem
 bootstrap.min.css
-zap*
-chromedriver*
-lib
+/zap*
+/chromedriver*
+/lit
