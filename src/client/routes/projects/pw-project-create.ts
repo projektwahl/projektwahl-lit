@@ -41,6 +41,7 @@ export async function pwProject(id: number, viewOnly = false) {
   return html`<pw-project-create
     ?disabled=${viewOnly}
     .initial=${result}
+    .url=${"/api/v1/projects/update"}
   ></pw-project-create>`;
 }
 
@@ -102,6 +103,8 @@ export const PwProjectCreate = setupHmr(
       | MinimalSafeParseError
       | undefined;
 
+    url!: "/api/v1/projects/create"|"/api/v1/projects/update"
+
     constructor() {
       super();
 
@@ -126,7 +129,7 @@ export const PwProjectCreate = setupHmr(
           : undefined;
 
         const result = await myFetch<"/api/v1/projects/create"|"/api/v1/projects/update">(
-          "/api/v1/projects/create"|"/api/v1/projects/update",
+          this.url,
           {
             method: "POST",
             headers: {

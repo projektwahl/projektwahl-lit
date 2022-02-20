@@ -40,6 +40,7 @@ export async function pwUser(id: number, viewOnly = false) {
   return html`<pw-user-create
     ?disabled=${viewOnly}
     .initial=${result}
+    .url=${"/api/v1/users/update"}
   ></pw-user-create>`;
 }
 
@@ -92,6 +93,8 @@ class PwUserCreate extends PwForm<"/api/v1/users/create"|"/api/v1/users/update">
     | MinimalSafeParseError
     | undefined;
 
+  url!: "/api/v1/users/create"|"/api/v1/users/update"
+
   constructor() {
     super();
 
@@ -115,7 +118,7 @@ class PwUserCreate extends PwForm<"/api/v1/users/create"|"/api/v1/users/update">
       }
 
       const result = await myFetch<"/api/v1/users/create"|"/api/v1/users/update">(
-        "/api/v1/users/create"|"/api/v1/users/update",
+        this.url,
         {
           method: "POST",
           headers: {
