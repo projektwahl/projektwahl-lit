@@ -269,6 +269,7 @@ export const PwProjectCreate = setupHmr(
                         projectId=${this.initial.data.id}
                         name=${"project_leader_id"}
                         title=${msg("Project leaders")}
+                        prefix="leaders"
                       ></pw-project-users>`
                     : html``}
                   ${this.initial
@@ -276,6 +277,7 @@ export const PwProjectCreate = setupHmr(
                         projectId=${this.initial.data.id}
                         name=${"force_in_project_id"}
                         title=${msg("Guaranteed project members")}
+                        prefix="members"
                       ></pw-project-users>`
                     : html``}
                   ${!this.disabled
