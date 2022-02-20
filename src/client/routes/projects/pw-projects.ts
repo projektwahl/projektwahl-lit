@@ -29,7 +29,9 @@ import { PwEntityList } from "../../entity-list/pw-entitylist.js";
 import { pwOrder } from "../../entity-list/pw-order.js";
 import { pwInput } from "../../form/pw-input.js";
 import { routes } from "../../../lib/routes.js";
+import type { z } from "zod";
 
+// TODO FIXME
 export const pwProjects = async (url: URL) => {
   //const result = await taskFunction([url.searchParams]);
   // .initial=${result}
@@ -61,21 +63,16 @@ class PwProjects extends PwEntityList<"/api/v1/projects"> {
 
   override get head() {
     try {
-      const initial = routes["/api/v1/projects"]["request"].parse(
+      const initial: z.infer<typeof routes["/api/v1/projects"]["request"]> = 
         JSON.parse(
           decodeURIComponent(
             this.history.url.search == ""
               ? "{}"
               : this.history.url.search.substring(1)
           )
-        )
-      );
+        );
       return html`
         <tr>
-          <!--
-                      do not support this without javascript because there is literally zero useful ways to do this useful.
-                      the only nice way is probably submit buttons that do things like "oder_by_id_asc" and then redirect to the new state (because you need to remove the old state)
-                    -->
           <th class="table-cell-hover p-0" scope="col">
             ${pwOrder<"/api/v1/projects">({
               refreshEntityList: () => this._task.run(),

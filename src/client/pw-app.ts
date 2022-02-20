@@ -36,6 +36,7 @@ import { Task, TaskStatus } from "@lit-labs/task";
 import { msg, str } from "@lit/localize";
 
 // TODO FIXME show more details if possible (maybe error page)
+// TODO FIXME do this inline in the main page? In case it doesnt load so even on old browsers some error is shown
 window.addEventListener("error", function (event) {
   console.error("window.error", event.error);
   alert("unknown error: " + event.message);
