@@ -98,9 +98,10 @@ export class PwInput<
       defaultValue: { attribute: false },
       task: {
         attribute: false,
-        hasChanged: () => {
+        /*hasChanged: () => {
           return true; // TODO FIXME bug in @lit-labs/task
-        },
+          // I think the problem was that passing down a @lit-labs/task doesnt work as this doesnt trigger updates in the subcomponent
+        },*/
       },
       initial: {
         attribute: false,
@@ -114,7 +115,7 @@ export class PwInput<
 
   label!: string | null;
 
-  name!: Q;
+  name!: Q & string[];
 
   type: "text" | "password" | "number" | "checkbox" | "select";
 

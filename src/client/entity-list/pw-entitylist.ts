@@ -145,7 +145,7 @@ export class PwEntityList<
 
           return result;
         },
-        autoRun: false, // TODO FIXME this would be way simpler if there would be a no first run or so
+        autoRun: false,
         initialStatus:
           this.initial !== undefined ? TaskStatus.COMPLETE : TaskStatus.INITIAL,
         initialValue: this.initial,
