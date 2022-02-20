@@ -70,7 +70,7 @@ const shuffleArray = <T>(array: T[]) => {
           )[0]
         );
       shuffleArray(projects);
-      for (let j = 0; j < 5+Math.random()*3-1.5; j++) {
+      for (let j = 0; j < 5 + Math.random() * 3 - 1.5; j++) {
         // eslint-disable-next-line @typescript-eslint/await-thenable
         await sql`INSERT INTO choices (user_id, project_id, rank) VALUES (${
           user.id

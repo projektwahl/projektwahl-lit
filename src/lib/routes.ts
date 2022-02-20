@@ -187,23 +187,30 @@ const baseQuery = <
 >(
   s: ZodObject<T, UnknownKeys, Catchall>
 ) =>
-  z.object({
-    paginationDirection: z.enum(["forwards", "backwards"]).default("forwards"),
-    paginationCursor: s.partial().nullish(), // if this is null the start is at start/end depending on paginationDirection
-    // @ts-expect-error why
-    filters: s.partial().default({}),
-    sorting: z
-      .array(
-        z.tuple([
-          z.enum(
-            Object.keys(s.shape) as [keyof T & string, ...(keyof T & string)[]]
-          ),
-          z.enum(["ASC", "DESC"]),
-        ])
-      )
-      .default([]),
-    paginationLimit: z.number().default(100),
-  }).strict();
+  z
+    .object({
+      paginationDirection: z
+        .enum(["forwards", "backwards"])
+        .default("forwards"),
+      paginationCursor: s.partial().nullish(), // if this is null the start is at start/end depending on paginationDirection
+      // @ts-expect-error why
+      filters: s.partial().default({}),
+      sorting: z
+        .array(
+          z.tuple([
+            z.enum(
+              Object.keys(s.shape) as [
+                keyof T & string,
+                ...(keyof T & string)[]
+              ]
+            ),
+            z.enum(["ASC", "DESC"]),
+          ])
+        )
+        .default([]),
+      paginationLimit: z.number().default(100),
+    })
+    .strict();
 
 export const routes = identity({
   "/api/v1/logout": {

@@ -38,9 +38,7 @@ export interface WritableTemplateStringsArray extends Array<string> {
 export function unsafe2(
   string: null | string | number | symbol
 ): [TemplateStringsArray, ...(string | number | boolean | string[])[]] {
-  const r: WritableTemplateStringsArray = [
-    String(string),
-  ];
+  const r: WritableTemplateStringsArray = [String(string)];
   r.raw = [String(string)];
   return [r as TemplateStringsArray];
 }
