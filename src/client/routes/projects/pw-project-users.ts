@@ -32,13 +32,13 @@ import { setupHmr } from "../../hmr.js";
 import { aClick } from "../../pw-a.js";
 import { pwOrder } from "../../entity-list/pw-order.js";
 import { pwInput } from "../../form/pw-input.js";
-import { routes } from "../../../lib/routes.js";
+import type { routes } from "../../../lib/routes.js";
+import type { z } from "zod";
+import { taskFunction } from "../../entity-list/pw-entitylist.js";
 
-// TODO FIXME
-export const pwProjectUsers = async (url: URL) => {
-  //const result = await taskFunction([url.searchParams]);
-  // .initial=${result}
-  return html`<pw-project-users></pw-project-users>`;
+export const pwProjectUsers = async (url: URL, prefix: string) => {
+  const result = await taskFunction("/api/v1/users", url, prefix);
+  return html`<pw-project-users .initial=${result} prefix=${prefix}></pw-project-users>`;
 };
 
 export const PwProjectUsers = setupHmr(
@@ -62,15 +62,15 @@ export const PwProjectUsers = setupHmr(
 
     override get head() {
       try {
-        const initial = routes["/api/v1/users"]["request"].parse(
+        const initial: z.infer<typeof routes["/api/v1/users"]["request"]> = 
           JSON.parse(
             decodeURIComponent(
               this.history.url.search == ""
                 ? "{}"
                 : this.history.url.search.substring(1)
             )
-          )
-        );
+          );
+        
 
         return html`<tr>
             <!--

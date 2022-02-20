@@ -35,9 +35,19 @@ import { pwInput } from "../form/pw-input.js";
 
 export const taskFunction = async <P extends keyof typeof entityRoutes>(
   apiUrl: P,
-  url: URL
+  url: URL,
+  prefix: string,
 ) => {
-  const result = await myFetch<P>(`${apiUrl}${url.search}`, {
+  const data = JSON.parse(
+    decodeURIComponent(
+      url.search == ""
+        ? "{}"
+        : url.search.substring(1)
+    )
+  );
+  const result = await myFetch<P>(`${apiUrl}?${encodeURIComponent(JSON.stringify(
+    data[prefix]
+  ))}`, {
     method: "GET",
   });
   return result;
@@ -52,6 +62,7 @@ export class PwEntityList<
       initial: { attribute: false },
       initialRender: { state: true },
       debouncedUrl: { state: true },
+      prefix: { type: String },
       ...super.properties,
     };
   }
@@ -93,8 +104,12 @@ export class PwEntityList<
 
   protected history;
 
+  prefix: string;
+
   constructor() {
     super();
+
+    this.prefix = "";
 
     this.history = new HistoryController(this, /.*/);
 
@@ -102,6 +117,10 @@ export class PwEntityList<
   }
 
   override render() {
+    if (this.prefix === undefined) {
+      throw new Error("prefix not set")
+    }
+
     if (this.initialRender) {
       this.initialRender = false;
 
@@ -120,7 +139,7 @@ export class PwEntityList<
           >("myformdata", {
             bubbles: true,
             composed: true,
-            detail: data as z.infer<typeof entityRoutes[P]["request"]>,
+            detail: data[this.prefix] as z.infer<typeof entityRoutes[P]["request"]>,
           });
           this.form.value?.dispatchEvent(formDataEvent);
 
@@ -137,7 +156,10 @@ export class PwEntityList<
 
           HistoryController.goto(
             new URL(
-              `?${encodeURIComponent(JSON.stringify(formDataEvent.detail))}`,
+              `?${encodeURIComponent(JSON.stringify({
+                ...data,
+                [this.prefix]: formDataEvent.detail
+              }))}`,
               window.location.href
             ),
             {}

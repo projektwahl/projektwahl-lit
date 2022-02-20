@@ -39,6 +39,7 @@ class PwProjectUserCheckbox extends LitElement {
       disabled: { state: true },
       user: { attribute: false },
       projectId: { type: Number },
+      url: { type: String },
       name: { type: String },
     };
   }
@@ -57,6 +58,8 @@ class PwProjectUserCheckbox extends LitElement {
 
   form: import("lit/directives/ref").Ref<HTMLFormElement>;
 
+  url!: "/api/v1/users/create"|"/api/v1/users/update";
+
   constructor() {
     super();
 
@@ -66,7 +69,7 @@ class PwProjectUserCheckbox extends LitElement {
 
     this._task = new Task(this, async () => {
       const result = await myFetch<"/api/v1/users/create"|"/api/v1/users/update">(
-        "/api/v1/users/create"|"/api/v1/users/update",
+        this.url,
         {
           method: "POST",
           headers: {

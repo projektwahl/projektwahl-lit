@@ -28,13 +28,13 @@ import { msg } from "@lit/localize";
 import { PwEntityList } from "../../entity-list/pw-entitylist.js";
 import { pwOrder } from "../../entity-list/pw-order.js";
 import { pwInput } from "../../form/pw-input.js";
-import { routes } from "../../../lib/routes.js";
+import type { routes } from "../../../lib/routes.js";
 import { taskFunction } from "../../entity-list/pw-entitylist.js";
 import type { z } from "zod";
 
 export const pwUsers = async (url: URL) => {
-  const result = await taskFunction("/api/v1/users", url);
-  return html`<pw-users .initial=${result}></pw-users>`;
+  const result = await taskFunction("/api/v1/users", url, "users");
+  return html`<pw-users .initial=${result} prefix="users"></pw-users>`;
 };
 
 export class PwUsers extends PwEntityList<"/api/v1/users"> {
