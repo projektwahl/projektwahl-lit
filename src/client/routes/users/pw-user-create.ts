@@ -63,7 +63,7 @@ const taskFunction = async ([id]: [number]) => {
   return response;
 };
 
-class PwUserCreate extends PwForm<"/api/v1/users/create-or-update"> {
+class PwUserCreate extends PwForm<"/api/v1/users/create"|"/api/v1/users/update"> {
   static get properties() {
     return {
       ...super.properties,
@@ -97,7 +97,7 @@ class PwUserCreate extends PwForm<"/api/v1/users/create-or-update"> {
 
     this._task = new Task(this, async () => {
       const formDataEvent = new CustomEvent<
-        z.infer<typeof routes["/api/v1/users/create-or-update"]["request"]>
+        z.infer<typeof routes["/api/v1/users/create"|"/api/v1/users/update"]["request"]>
       >("myformdata", {
         bubbles: true,
         composed: true,
@@ -114,8 +114,8 @@ class PwUserCreate extends PwForm<"/api/v1/users/create-or-update"> {
         formDataEvent.detail.force_in_project_id = null;
       }
 
-      const result = await myFetch<"/api/v1/users/create-or-update">(
-        "/api/v1/users/create-or-update",
+      const result = await myFetch<"/api/v1/users/create"|"/api/v1/users/update">(
+        "/api/v1/users/create"|"/api/v1/users/update",
         {
           method: "POST",
           headers: {
@@ -158,7 +158,7 @@ class PwUserCreate extends PwForm<"/api/v1/users/create-or-update"> {
                   await this._task.run();
                 }}
               >
-                ${pwInput<"/api/v1/users/create-or-update", ["username"]>({
+                ${pwInput<"/api/v1/users/create"|"/api/v1/users/update", ["username"]>({
                   type: "text",
                   disabled: this.disabled,
                   label: msg("Username"),
@@ -166,7 +166,7 @@ class PwUserCreate extends PwForm<"/api/v1/users/create-or-update"> {
                   task: this._task,
                   initial: this.initial?.data,
                 })}
-                ${pwInput<"/api/v1/users/create-or-update", ["type"]>({
+                ${pwInput<"/api/v1/users/create"|"/api/v1/users/update", ["type"]>({
                   type: "select",
                   disabled: this.disabled,
                   onchange: (event: Event) =>
@@ -187,7 +187,7 @@ class PwUserCreate extends PwForm<"/api/v1/users/create-or-update"> {
                   },
                 })}
                 ${(this.type ?? this.initial?.data.type ?? "voter") === "voter"
-                  ? html`${pwInput<"/api/v1/users/create-or-update", ["group"]>(
+                  ? html`${pwInput<"/api/v1/users/create"|"/api/v1/users/update", ["group"]>(
                       {
                         type: "text",
                         disabled: this.disabled,
@@ -197,7 +197,7 @@ class PwUserCreate extends PwForm<"/api/v1/users/create-or-update"> {
                         initial: this.initial?.data,
                       }
                     )}
-                    ${pwInput<"/api/v1/users/create-or-update", ["age"]>({
+                    ${pwInput<"/api/v1/users/create"|"/api/v1/users/update", ["age"]>({
                       type: "number",
                       disabled: this.disabled,
                       label: msg("Age"),
@@ -208,7 +208,7 @@ class PwUserCreate extends PwForm<"/api/v1/users/create-or-update"> {
                   : undefined}
                 ${!this.disabled
                   ? html`
-                      ${pwInput<"/api/v1/users/create-or-update", ["password"]>(
+                      ${pwInput<"/api/v1/users/create"|"/api/v1/users/update", ["password"]>(
                         {
                           type: "password",
                           disabled: this.disabled,
@@ -221,7 +221,7 @@ class PwUserCreate extends PwForm<"/api/v1/users/create-or-update"> {
                       )}
                     `
                   : undefined}
-                ${pwInput<"/api/v1/users/create-or-update", ["away"]>({
+                ${pwInput<"/api/v1/users/create"|"/api/v1/users/update", ["away"]>({
                   type: "checkbox",
                   disabled: this.disabled,
                   label: msg("Away"),
@@ -229,7 +229,7 @@ class PwUserCreate extends PwForm<"/api/v1/users/create-or-update"> {
                   task: this._task,
                   initial: this.initial?.data,
                 })}
-                ${pwInput<"/api/v1/users/create-or-update", ["deleted"]>({
+                ${pwInput<"/api/v1/users/create"|"/api/v1/users/update", ["deleted"]>({
                   type: "checkbox",
                   disabled: this.disabled,
                   label: msg("Mark this user as deleted"),
