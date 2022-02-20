@@ -46,7 +46,7 @@ export const taskFunction = async <P extends keyof typeof entityRoutes>(
     )
   );
   const result = await myFetch<P>(`${apiUrl}?${encodeURIComponent(JSON.stringify(
-    data[prefix]
+    data[prefix] ?? {}
   ))}`, {
     method: "GET",
   });
