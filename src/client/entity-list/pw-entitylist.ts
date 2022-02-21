@@ -137,8 +137,7 @@ export class PwEntityList<
           const formDataEvent = new CustomEvent<
             z.infer<typeof entityRoutes[P]["request"]>
           >("myformdata", {
-            bubbles: true,
-            composed: true,
+            bubbles: false,
             detail: data[this.prefix] ?? {} as z.infer<typeof entityRoutes[P]["request"]>,
           });
           this.form.value?.dispatchEvent(formDataEvent);

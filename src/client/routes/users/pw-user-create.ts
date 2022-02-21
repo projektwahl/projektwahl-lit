@@ -102,8 +102,7 @@ class PwUserCreate extends PwForm<"/api/v1/users/create"|"/api/v1/users/update">
       const formDataEvent = new CustomEvent<
         z.infer<typeof routes["/api/v1/users/create"|"/api/v1/users/update"]["request"]>
       >("myformdata", {
-        bubbles: true,
-        composed: true,
+        bubbles: false,
         detail: {
           id: -1,
         },

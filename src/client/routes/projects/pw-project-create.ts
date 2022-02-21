@@ -117,8 +117,7 @@ export const PwProjectCreate = setupHmr(
         const formDataEvent = new CustomEvent<
           z.infer<typeof routes["/api/v1/projects/create"|"/api/v1/projects/update"]["request"]>
         >("myformdata", {
-          bubbles: true,
-          composed: true,
+          bubbles: false,
           detail: {
             id: -1,
           },
