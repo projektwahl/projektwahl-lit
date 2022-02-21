@@ -36,7 +36,7 @@ export const pwProjects = async (url: URL) => {
   return html`<pw-projects .initial=${result} prefix="projects"></pw-projects>`;
 };
 
-class PwProjects extends PwEntityList<"/api/v1/projects"> {
+class PwProjects<X extends string> extends PwEntityList<"/api/v1/projects", X> {
   constructor() {
     super();
   }
@@ -61,7 +61,9 @@ class PwProjects extends PwEntityList<"/api/v1/projects"> {
 
   override get head() {
     try {
-      const initial: z.infer<typeof routes["/api/v1/projects"]["request"]> =
+      const search: {
+        [key in X]: z.infer<typeof routes["/api/v1/projects"]["request"]>
+       } = 
         JSON.parse(
           decodeURIComponent(
             this.history.url.search == ""
@@ -69,6 +71,8 @@ class PwProjects extends PwEntityList<"/api/v1/projects"> {
               : this.history.url.search.substring(1)
           )
         );
+      const initial = search[this.prefix];
+
       return html`
         <tr>
           <th class="table-cell-hover p-0" scope="col">

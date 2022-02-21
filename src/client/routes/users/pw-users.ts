@@ -65,7 +65,10 @@ export class PwUsers<X extends string> extends PwEntityList<"/api/v1/users", X> 
 
   override get head() {
     try {
-      const initial: z.infer<typeof routes["/api/v1/users"]["request"]> =
+      // TODO FIXME deduplicate
+      const search: {
+        [key in X]: z.infer<typeof routes["/api/v1/users"]["request"]>
+       } = 
         JSON.parse(
           decodeURIComponent(
             this.history.url.search == ""
@@ -73,6 +76,8 @@ export class PwUsers<X extends string> extends PwEntityList<"/api/v1/users", X> 
               : this.history.url.search.substring(1)
           )
         );
+      const initial = search[this.prefix];
+
       return html`<tr>
           <th class="table-cell-hover p-0" scope="col">
             ${pwOrder<"/api/v1/users">({

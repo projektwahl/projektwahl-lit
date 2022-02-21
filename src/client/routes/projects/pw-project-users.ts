@@ -64,7 +64,7 @@ export const PwProjectUsers = setupHmr(
       try {
         // TODO FIXME this use of any / untyped makes lots of problems
         // We need some client-side routing that stores the query parameters 
-        const initial: {
+        const search: {
           [key in X]: z.infer<typeof routes["/api/v1/users"]["request"]>
          } = 
           JSON.parse(
@@ -74,6 +74,7 @@ export const PwProjectUsers = setupHmr(
                 : this.history.url.search.substring(1)
             )
           );
+        const initial = search[this.prefix];
 
         return html`<tr>
             <th class="table-cell-hover" scope="col">${msg(html`&#x2713;`)}</th>
@@ -118,7 +119,7 @@ export const PwProjectUsers = setupHmr(
                 type: "checkbox",
                 value: this.projectId,
                 defaultValue: undefined,
-                initial: initial[this.prefix],
+                initial: initial,
               })}
             </th>
 
