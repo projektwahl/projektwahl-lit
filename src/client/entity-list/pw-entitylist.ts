@@ -208,8 +208,7 @@ export class PwEntityList<
 
         <form
           ${ref(this.form)}
-          @input=${async () => {
-            // TODO FIXME this is not good - it runs at unexpected times (like checking a nested checkbox)
+          @refreshentitylist=${async () => {
             await this._task.run();
           }}
           @submit=${(e: Event) => e.preventDefault()}

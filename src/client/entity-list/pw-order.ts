@@ -137,6 +137,7 @@ export class PwOrder<
             ),
             {}
           );
+          // TODO FIXME use refreshentitylist / dont do this at all because we navigated anyways
           await this.refreshEntityList();
         }}
         name="${this.name.toString()}"

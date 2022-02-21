@@ -58,12 +58,16 @@ class PwProjectUserCheckbox extends LitElement {
 
   form: import("lit/directives/ref").Ref<HTMLFormElement>;
 
+  input: import("lit/directives/ref").Ref<HTMLElement>;  
+
   constructor() {
     super();
 
     this.disabled = false;
 
     this.form = createRef();
+
+    this.input = createRef();
 
     this._task = new Task(this, async () => {
       const result = await myFetch<"/api/v1/users/update">(
@@ -81,8 +85,11 @@ class PwProjectUserCheckbox extends LitElement {
         }
       );
 
-      // TODO FIXME this is probably a bad idea.
-      HistoryController.goto(new URL(window.location.href), {});
+      this.input.value?.dispatchEvent(
+      new CustomEvent("refreshentitylist", {
+        bubbles: true,
+        composed: true
+      }))
 
       return result;
     });
@@ -111,6 +118,7 @@ class PwProjectUserCheckbox extends LitElement {
         })}
 
         <input
+          ${ref(this.input)}
           @change=${async () => {
             await this._task.run();
           }}

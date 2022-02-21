@@ -232,6 +232,13 @@ export class PwInput<
         }
         <${this.type === "select" ? literal`select` : literal`input`}
           ${ref(this.input)}
+          @input=${() => {
+            this.input.value?.dispatchEvent(
+            new CustomEvent("refreshentitylist", {
+              bubbles: true,
+              composed: true
+            }))
+          }}
           type=${this.type}
           value=${ifDefined(get(this.initial, this.name as string[]))}
           ?checked=${get(this.initial, this.name as string[])}
