@@ -437,6 +437,13 @@ sudo ufw allow 9090
 168.119.156.152:9090
 
 
+sudo pacman -S grafana
+sudo systemctl enable --now grafana
+sudo ufw allow 3000
+
+168.119.156.152:3000
+
+# https://wiki.archlinux.org/title/Grafana
 
 
 
