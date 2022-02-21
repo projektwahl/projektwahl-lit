@@ -54,7 +54,8 @@ export const taskFunction = async <P extends keyof typeof entityRoutes>(
 };
 
 export class PwEntityList<
-  P extends keyof typeof entityRoutes
+  P extends keyof typeof entityRoutes,
+  X extends string,
 > extends PwForm<P> {
   static override get properties() {
     return {
@@ -104,12 +105,10 @@ export class PwEntityList<
 
   protected history;
 
-  prefix: string;
+  prefix!: X;
 
   constructor() {
     super();
-
-    this.prefix = "";
 
     this.history = new HistoryController(this, /.*/);
 

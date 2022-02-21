@@ -37,7 +37,7 @@ export const pwUsers = async (url: URL) => {
   return html`<pw-users .initial=${result} prefix="users"></pw-users>`;
 };
 
-export class PwUsers extends PwEntityList<"/api/v1/users"> {
+export class PwUsers<X extends string> extends PwEntityList<"/api/v1/users", X> {
   static override get properties() {
     return {
       ...super.properties,

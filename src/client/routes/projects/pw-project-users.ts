@@ -43,7 +43,7 @@ export const pwProjectUsers = async (url: URL, prefix: string) => {
 
 export const PwProjectUsers = setupHmr(
   "PwProjectUsers",
-  class PwProjectUsers extends PwUsers {
+  class PwProjectUsers<X extends string> extends PwUsers<X> {
     static override get properties() {
       return {
         ...super.properties,
@@ -62,7 +62,11 @@ export const PwProjectUsers = setupHmr(
 
     override get head() {
       try {
-        const initial: z.infer<typeof routes["/api/v1/users"]["request"]> = 
+        // TODO FIXME this use of any / untyped makes lots of problems
+        // We need some client-side routing that stores the query parameters 
+        const initial: {
+          [key in X]: z.infer<typeof routes["/api/v1/users"]["request"]>
+         } = 
           JSON.parse(
             decodeURIComponent(
               this.history.url.search == ""
@@ -70,7 +74,6 @@ export const PwProjectUsers = setupHmr(
                 : this.history.url.search.substring(1)
             )
           );
-        
 
         return html`<tr>
             <th class="table-cell-hover" scope="col">${msg(html`&#x2713;`)}</th>
@@ -115,7 +118,7 @@ export const PwProjectUsers = setupHmr(
                 type: "checkbox",
                 value: this.projectId,
                 defaultValue: undefined,
-                initial,
+                initial: initial[this.prefix],
               })}
             </th>
 
