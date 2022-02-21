@@ -81,6 +81,7 @@ class PwProjectUserCheckbox extends LitElement {
         }
       );
 
+      // TODO FIXME this is probably a bad idea.
       HistoryController.goto(new URL(window.location.href), {});
 
       return result;
@@ -88,6 +89,8 @@ class PwProjectUserCheckbox extends LitElement {
   }
 
   render() {
+    console.log(this.user.username)
+    console.log(this.user[this.name] === this.projectId)
     return html` ${bootstrapCss}
       <form ${ref(this.form)}>
         ${this._task.render({
