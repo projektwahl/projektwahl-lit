@@ -73,16 +73,13 @@ export const PwProjectUsers = setupHmr(
         
 
         return html`<tr>
-            <!--
-  do not support this without javascript because there is literally zero useful ways to do this useful.
-  the only nice way is probably submit buttons that do things like "oder_by_id_asc" and then redirect to the new state (because you need to remove the old state)
--->
             <th class="table-cell-hover" scope="col">${msg(html`&#x2713;`)}</th>
 
             <th class="table-cell-hover p-0" scope="col">
               ${pwOrder<"/api/v1/users">({
                 refreshEntityList: () => this._task.run(),
                 name: "id",
+                path: [this.prefix],
                 title: msg("ID"),
               })}
             </th>
@@ -91,6 +88,7 @@ export const PwProjectUsers = setupHmr(
               ${pwOrder<"/api/v1/users">({
                 refreshEntityList: () => this._task.run(),
                 name: "username",
+                path: [this.prefix],
                 title: msg("Name"),
               })}
             </th>
@@ -99,6 +97,7 @@ export const PwProjectUsers = setupHmr(
               ${pwOrder<"/api/v1/users">({
                 refreshEntityList: () => this._task.run(),
                 name: "type",
+                path: [this.prefix],
                 title: msg("Type"),
               })}
             </th>

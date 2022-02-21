@@ -26,16 +26,20 @@ import { HistoryController } from "../history-controller.js";
 import { msg, str } from "@lit/localize";
 import type { entityRoutes } from "../../lib/routes.js";
 import type { z } from "zod";
+import type { Path } from "../utils.js";
+import get from "lodash-es/get.js";
+import set from "lodash-es/set.js";
 
 // workaround see https://github.com/runem/lit-analyzer/issues/149#issuecomment-1006162839
 export function pwOrder<P extends keyof typeof entityRoutes>(
-  props: Pick<PwOrder<P>, "name" | "title" | "refreshEntityList">
+  props: Pick<PwOrder<P>, "name" | "path" | "title" | "refreshEntityList">
 ) {
-  const { name, title, refreshEntityList, ...rest } = props;
+  const { name, title, refreshEntityList, path, ...rest } = props;
   let _ = rest;
   _ = 1; // ensure no property is missed - Don't use `{}` as a type. `{}` actually means "any non-nullish value".
   return html`<pw-order
     .name=${name}
+    .path=${path}
     title=${title}
     .refreshEntityList=${refreshEntityList}
   ></pw-order>`;
@@ -43,11 +47,14 @@ export function pwOrder<P extends keyof typeof entityRoutes>(
 
 // TODO FIXME with prefix this doesnt work
 // TODO FIXME paginationLimit also doesnt work with this
-export class PwOrder<P extends keyof typeof entityRoutes> extends LitElement {
+export class PwOrder<
+        P extends keyof typeof entityRoutes,
+      > extends LitElement {
   static override get properties() {
     return {
       title: { type: String },
       name: { attribute: false },
+      path: { attribute: false },
       refreshEntityList: { attribute: false },
     };
   }
@@ -56,6 +63,8 @@ export class PwOrder<P extends keyof typeof entityRoutes> extends LitElement {
   protected override createRenderRoot() {
     return this;
   }
+
+  path!: string[]
 
   name!: keyof z.infer<typeof entityRoutes[P]["response"]>["entities"][number];
 
@@ -76,7 +85,7 @@ export class PwOrder<P extends keyof typeof entityRoutes> extends LitElement {
   }
 
   override render() {
-    if (this.title === undefined || this.name === undefined) {
+    if (this.title === undefined || this.name === undefined || this.path === undefined) {
       throw new Error(msg("component not fully initialized"));
     }
 
@@ -84,6 +93,7 @@ export class PwOrder<P extends keyof typeof entityRoutes> extends LitElement {
       ${bootstrapCss}
       <button
         @click=${async () => {
+          // TODO FIXME put this into the history implementation?
           const data = JSON.parse(
             decodeURIComponent(
               this.history.url.search == ""
@@ -91,18 +101,18 @@ export class PwOrder<P extends keyof typeof entityRoutes> extends LitElement {
                 : this.history.url.search.substring(1)
             )
           );
-          if (!data.sorting) {
-            data.sorting = [];
+          if (!get(data, [...this.path, "sorting"])) {
+            set(data, [...this.path, "sorting"], []);
           }
 
-          const oldElementIndex = data.sorting.findIndex(
+          const oldElementIndex = get(data, [...this.path, "sorting"]).findIndex(
             ([e, d]) => e === `${this.name as string}`
           );
           let oldElement;
           if (oldElementIndex == -1) {
             oldElement = [`${this.name as string}`, `downup`];
           } else {
-            oldElement = data.sorting.splice(oldElementIndex, 1)[0];
+            oldElement = get(data, [...this.path, "sorting"]).splice(oldElementIndex, 1)[0];
           }
           let newElement;
           switch (oldElement[1]) {
@@ -115,10 +125,10 @@ export class PwOrder<P extends keyof typeof entityRoutes> extends LitElement {
             default:
               newElement = null;
           }
-          data.sorting = [
-            ...data.sorting,
+          set(data, [...this.path, "sorting"], [
+            ...get(data, [...this.path, "sorting"]),
             ...(newElement !== null ? [[oldElement[0], newElement]] : []),
-          ];
+          ]);
 
           HistoryController.goto(
             new URL(
@@ -142,7 +152,7 @@ export class PwOrder<P extends keyof typeof entityRoutes> extends LitElement {
                 : this.history.url.search.substring(1)
             )
           );
-          const value = (data.sorting ?? []).find(
+          const value = (get(data, [...this.path, "sorting"]) ?? []).find(
             ([e, d]) => e === `${this.name as string}`
           )?.[1];
           return value === "ASC"

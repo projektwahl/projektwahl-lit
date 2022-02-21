@@ -78,6 +78,7 @@ export class PwUsers extends PwEntityList<"/api/v1/users"> {
             ${pwOrder<"/api/v1/users">({
               refreshEntityList: () => this._task.run(),
               name: "id",
+              path: [this.prefix],
               title: msg("ID"),
             })}
           </th>
@@ -86,6 +87,7 @@ export class PwUsers extends PwEntityList<"/api/v1/users"> {
             ${pwOrder<"/api/v1/users">({
               refreshEntityList: () => this._task.run(),
               name: "username",
+              path: [this.prefix],
               title: msg("Name"),
             })}
           </th>
@@ -94,6 +96,7 @@ export class PwUsers extends PwEntityList<"/api/v1/users"> {
             ${pwOrder<"/api/v1/users">({
               refreshEntityList: () => this._task.run(),
               name: "type",
+              path: [this.prefix],
               title: msg("Type"),
             })}
           </th>

@@ -34,6 +34,8 @@ import get from "lodash-es/get.js";
 import set from "lodash-es/set.js";
 import type { Task } from "@lit-labs/task";
 
+// MAYBE we could integrate pw-order into here. But this is already fairly complex.
+
 // workaround see https://github.com/runem/lit-analyzer/issues/149#issuecomment-1006162839
 export function pwInput<
   P extends keyof typeof routes = never,

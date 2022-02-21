@@ -75,6 +75,7 @@ class PwProjects extends PwEntityList<"/api/v1/projects"> {
             ${pwOrder<"/api/v1/projects">({
               refreshEntityList: () => this._task.run(),
               name: "id",
+              path: [this.prefix],
               title: msg("ID"),
             })}
           </th>
@@ -83,6 +84,7 @@ class PwProjects extends PwEntityList<"/api/v1/projects"> {
             ${pwOrder<"/api/v1/projects">({
               refreshEntityList: () => this._task.run(),
               name: "title",
+              path: [this.prefix],
               title: msg("Title"),
             })}
           </th>
@@ -91,6 +93,7 @@ class PwProjects extends PwEntityList<"/api/v1/projects"> {
             ${pwOrder<"/api/v1/projects">({
               refreshEntityList: () => this._task.run(),
               name: "info",
+              path: [this.prefix],
               title: msg("Info"),
             })}
           </th>
