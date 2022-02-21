@@ -416,3 +416,27 @@ sudo chmod 755 /opt/projektwahl-container/
 sudo chmod 755 /opt/projektwahl-container/opt/projektwahl-lit/
 sudo chmod 755 /opt/projektwahl-container/opt/projektwahl-lit/dist/
 sudo chmod 644 /opt/projektwahl-container/opt/projektwahl-lit/dist/*
+
+
+
+
+
+# https://wiki.archlinux.org/title/Prometheus
+sudo pacman -S prometheus prometheus-node-exporter
+sudo nano /etc/prometheus/prometheus.yml
+ scrape_configs:
+   - job_name: 'prometheus'
+     static_configs:
+       - targets: ['localhost:9090']
+   - job_name: 'localhost'
+     static_configs:
+       - targets: ['localhost:9100']
+sudo systemctl enable --now prometheus prometheus-node-exporter
+sudo ufw allow 9090
+
+168.119.156.152:9090
+
+
+
+
+
