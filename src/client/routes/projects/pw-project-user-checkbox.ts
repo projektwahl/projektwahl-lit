@@ -58,8 +58,6 @@ class PwProjectUserCheckbox extends LitElement {
 
   form: import("lit/directives/ref").Ref<HTMLFormElement>;
 
-  url!: "/api/v1/users/create"|"/api/v1/users/update";
-
   constructor() {
     super();
 
@@ -68,8 +66,8 @@ class PwProjectUserCheckbox extends LitElement {
     this.form = createRef();
 
     this._task = new Task(this, async () => {
-      const result = await myFetch<"/api/v1/users/create"|"/api/v1/users/update">(
-        this.url,
+      const result = await myFetch<"/api/v1/users/update">(
+        "/api/v1/users/update",
         {
           method: "POST",
           headers: {
