@@ -52,6 +52,7 @@ export function pwInput<
     | "options"
     | "task"
     | "defaultValue"
+    | "value"
   > &
     Partial<Pick<PwInput<P, Q>, "onchange">>
 ) {
@@ -66,6 +67,7 @@ export function pwInput<
     type,
     autocomplete,
     defaultValue,
+    value,
     ...rest
   } = props;
   let _ = rest;
@@ -81,6 +83,7 @@ export function pwInput<
     .task=${task}
     .initial=${initial}
     .defaultValue=${defaultValue}
+    .value=${value}
   ></pw-input>`;
 }
 
@@ -127,7 +130,7 @@ export class PwInput<
 
   initial?: z.infer<typeof routes[P]["request"]>;
 
-  value!: string;
+  value?: any;
 
   input: import("lit/directives/ref").Ref<HTMLElement>;
 
@@ -173,7 +176,7 @@ export class PwInput<
       set(
         event.detail,
         this.name as string[],
-        (this.input.value as HTMLInputElement).checked
+        (this.input.value as HTMLInputElement).checked ? this.value : this.defaultValue
       );
     } else if (this.type === "select") {
       set(

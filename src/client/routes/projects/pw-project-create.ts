@@ -246,6 +246,8 @@ export const PwProjectCreate = setupHmr(
                     ["random_assignments"]
                   >({
                     type: "checkbox",
+                    value: true,
+                    defaultValue: false,
                     disabled: this.disabled,
                     label: msg("Allow random assignments"),
                     name: ["random_assignments"],
@@ -254,6 +256,8 @@ export const PwProjectCreate = setupHmr(
                   })}
                   ${pwInput<"/api/v1/projects/create"|"/api/v1/projects/update", ["deleted"]>({
                     type: "checkbox",
+                    value: true,
+                    defaultValue: false,
                     disabled: this.disabled,
                     label: msg("Mark this project as deleted"),
                     name: ["deleted"],

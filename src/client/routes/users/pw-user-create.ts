@@ -225,6 +225,8 @@ class PwUserCreate extends PwForm<"/api/v1/users/create"|"/api/v1/users/update">
                   : undefined}
                 ${pwInput<"/api/v1/users/create"|"/api/v1/users/update", ["away"]>({
                   type: "checkbox",
+                  value: true,
+                  defaultValue: false,
                   disabled: this.disabled,
                   label: msg("Away"),
                   name: ["away"],
@@ -233,6 +235,8 @@ class PwUserCreate extends PwForm<"/api/v1/users/create"|"/api/v1/users/update">
                 })}
                 ${pwInput<"/api/v1/users/create"|"/api/v1/users/update", ["deleted"]>({
                   type: "checkbox",
+                  value: true,
+                  defaultValue: false,
                   disabled: this.disabled,
                   label: msg("Mark this user as deleted"),
                   name: ["deleted"],
