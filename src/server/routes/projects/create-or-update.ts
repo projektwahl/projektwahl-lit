@@ -166,15 +166,17 @@ export async function createOrUpdateProjectsHandler<
       }
 
       try {
-        const row = rawProjectSchema.pick({
-          id: true
-        }).parse(
-          (
-            await sql.begin("READ WRITE", async (sql) => {
-              return await dbquery(sql, project, loggedInUser);
-            })
-          )[0]
-        );
+        const row = rawProjectSchema
+          .pick({
+            id: true,
+          })
+          .parse(
+            (
+              await sql.begin("READ WRITE", async (sql) => {
+                return await dbquery(sql, project, loggedInUser);
+              })
+            )[0]
+          );
 
         if (!row) {
           // insufficient permissions

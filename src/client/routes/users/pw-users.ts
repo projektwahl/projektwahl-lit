@@ -37,7 +37,10 @@ export const pwUsers = async (url: URL) => {
   return html`<pw-users .initial=${result} prefix="users"></pw-users>`;
 };
 
-export class PwUsers<X extends string> extends PwEntityList<"/api/v1/users", X> {
+export class PwUsers<X extends string> extends PwEntityList<
+  "/api/v1/users",
+  X
+> {
   static override get properties() {
     return {
       ...super.properties,
@@ -67,15 +70,14 @@ export class PwUsers<X extends string> extends PwEntityList<"/api/v1/users", X> 
     try {
       // TODO FIXME deduplicate
       const search: {
-        [key in X]: z.infer<typeof routes["/api/v1/users"]["request"]>
-       } = 
-        JSON.parse(
-          decodeURIComponent(
-            this.history.url.search == ""
-              ? "{}"
-              : this.history.url.search.substring(1)
-          )
-        );
+        [key in X]: z.infer<typeof routes["/api/v1/users"]["request"]>;
+      } = JSON.parse(
+        decodeURIComponent(
+          this.history.url.search == ""
+            ? "{}"
+            : this.history.url.search.substring(1)
+        )
+      );
       const initial = search[this.prefix];
 
       return html`<tr>

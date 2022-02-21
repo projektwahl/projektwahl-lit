@@ -24,13 +24,21 @@ import { readdir, readFile, watch } from "node:fs/promises";
 import { join, resolve } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 import { loginHandler } from "./routes/login/index.js";
-import { createOrUpdateUsersHandler, createUsersHandler, updateUsersHandler } from "./routes/users/create-or-update.js";
+import {
+  createOrUpdateUsersHandler,
+  createUsersHandler,
+  updateUsersHandler,
+} from "./routes/users/create-or-update.js";
 import { usersHandler } from "./routes/users/index.js";
 import { openidLoginHandler } from "./routes/login/openid-login.js";
 import { openidRedirectHandler } from "./routes/login/redirect.js";
 import { extname, relative } from "path/posix";
 import { z } from "zod";
-import { createOrUpdateProjectsHandler, createProjectsHandler, updateProjectsHandler } from "./routes/projects/create-or-update.js";
+import {
+  createOrUpdateProjectsHandler,
+  createProjectsHandler,
+  updateProjectsHandler,
+} from "./routes/projects/create-or-update.js";
 import { cwd } from "node:process";
 import { projectsHandler } from "./routes/projects/index.js";
 import { logoutHandler } from "./routes/login/logout.js";

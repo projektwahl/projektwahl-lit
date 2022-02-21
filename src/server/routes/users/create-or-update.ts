@@ -59,8 +59,9 @@ export async function createUsersHandler(
       }, ${user.deleted ?? false}, ${
         loggedInUser.id
       }) RETURNING id, project_leader_id, force_in_project_id;`;
-    })
-  }
+    }
+  );
+}
 
 export async function updateUsersHandler(
   request: MyRequest,
@@ -76,13 +77,13 @@ export async function updateUsersHandler(
       loggedInUser: Exclude<z.infer<typeof userSchema>, undefined>
     ) => {
       const field = (name: keyof typeof user) =>
-      updateField("users_with_deleted", user, name);
+        updateField("users_with_deleted", user, name);
 
-    const finalQuery = sql2`UPDATE users_with_deleted SET
+      const finalQuery = sql2`UPDATE users_with_deleted SET
   ${field("username")},
   password_hash = CASE WHEN ${!!user.password} THEN ${
-      user.password ? await hashPassword(user.password) : null
-    } ELSE password_hash END,
+        user.password ? await hashPassword(user.password) : null
+      } ELSE password_hash END,
   ${field("type")},
   ${field("group")},
   ${field("age")},
@@ -91,15 +92,16 @@ export async function updateUsersHandler(
   ${field("force_in_project_id")},
   ${field("deleted")},
   last_updated_by = ${loggedInUser.id}
-  WHERE id = ${
-    user.id
-  } RETURNING id, project_leader_id, force_in_project_id;`;
-    // TODO FIXME (found using fuzzer) if this tries to update a nonexisting user we should return an error
-    return await sql(...finalQuery);
-    })
-  }
+  WHERE id = ${user.id} RETURNING id, project_leader_id, force_in_project_id;`;
+      // TODO FIXME (found using fuzzer) if this tries to update a nonexisting user we should return an error
+      return await sql(...finalQuery);
+    }
+  );
+}
 
-export async function createOrUpdateUsersHandler<P extends "/api/v1/users/create" | "/api/v1/users/update">(
+export async function createOrUpdateUsersHandler<
+  P extends "/api/v1/users/create" | "/api/v1/users/update"
+>(
   path: P,
   request: MyRequest,
   response: ServerResponse | Http2ServerResponse,
@@ -118,10 +120,7 @@ export async function createOrUpdateUsersHandler<P extends "/api/v1/users/create
       // voter is not allowed to do anything
 
       if (!(loggedInUser?.type === "admin")) {
-        const returnValue: [
-          OutgoingHttpHeaders,
-          ResponseType<P>
-        ] = [
+        const returnValue: [OutgoingHttpHeaders, ResponseType<P>] = [
           {
             "content-type": "text/json; charset=utf-8",
             ":status": 403,
@@ -151,19 +150,14 @@ export async function createOrUpdateUsersHandler<P extends "/api/v1/users/create
 
         console.log(row);
 
-        const returnValue: [
-          OutgoingHttpHeaders,
-          ResponseType<P>
-        ] = [
+        const returnValue: [OutgoingHttpHeaders, ResponseType<P>] = [
           {
             "content-type": "text/json; charset=utf-8",
             ":status": 200,
           },
           {
             success: true as const,
-            data: routes[path]["response"].parse(
-              row
-            ),
+            data: routes[path]["response"].parse(row),
           },
         ];
         return returnValue;
@@ -174,10 +168,7 @@ export async function createOrUpdateUsersHandler<P extends "/api/v1/users/create
             error.constraint_name === "users_with_deleted_username_key"
           ) {
             // unique violation
-            const returnValue: [
-              OutgoingHttpHeaders,
-              ResponseType<P>
-            ] = [
+            const returnValue: [OutgoingHttpHeaders, ResponseType<P>] = [
               {
                 "content-type": "text/json; charset=utf-8",
                 ":status": 200,
@@ -198,10 +189,7 @@ export async function createOrUpdateUsersHandler<P extends "/api/v1/users/create
             return returnValue;
           } else {
             // TODO FIXME do this everywhere else / unify
-            const returnValue: [
-              OutgoingHttpHeaders,
-              ResponseType<P>
-            ] = [
+            const returnValue: [OutgoingHttpHeaders, ResponseType<P>] = [
               {
                 "content-type": "text/json; charset=utf-8",
                 ":status": 200,
@@ -223,10 +211,7 @@ export async function createOrUpdateUsersHandler<P extends "/api/v1/users/create
           }
         }
         console.error(error);
-        const returnValue: [
-          OutgoingHttpHeaders,
-          ResponseType<P>
-        ] = [
+        const returnValue: [OutgoingHttpHeaders, ResponseType<P>] = [
           {
             "content-type": "text/json; charset=utf-8",
             ":status": 500,

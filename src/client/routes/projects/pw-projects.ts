@@ -62,15 +62,14 @@ class PwProjects<X extends string> extends PwEntityList<"/api/v1/projects", X> {
   override get head() {
     try {
       const search: {
-        [key in X]: z.infer<typeof routes["/api/v1/projects"]["request"]>
-       } = 
-        JSON.parse(
-          decodeURIComponent(
-            this.history.url.search == ""
-              ? "{}"
-              : this.history.url.search.substring(1)
-          )
-        );
+        [key in X]: z.infer<typeof routes["/api/v1/projects"]["request"]>;
+      } = JSON.parse(
+        decodeURIComponent(
+          this.history.url.search == ""
+            ? "{}"
+            : this.history.url.search.substring(1)
+        )
+      );
       const initial = search[this.prefix];
 
       return html`

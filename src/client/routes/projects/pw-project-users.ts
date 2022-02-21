@@ -38,7 +38,10 @@ import { taskFunction } from "../../entity-list/pw-entitylist.js";
 
 export const pwProjectUsers = async (url: URL, prefix: string) => {
   const result = await taskFunction("/api/v1/users", url, prefix);
-  return html`<pw-project-users .initial=${result} prefix=${prefix}></pw-project-users>`;
+  return html`<pw-project-users
+    .initial=${result}
+    prefix=${prefix}
+  ></pw-project-users>`;
 };
 
 export const PwProjectUsers = setupHmr(
@@ -63,17 +66,16 @@ export const PwProjectUsers = setupHmr(
     override get head() {
       try {
         // TODO FIXME this use of any / untyped makes lots of problems
-        // We need some client-side routing that stores the query parameters 
+        // We need some client-side routing that stores the query parameters
         const search: {
-          [key in X]: z.infer<typeof routes["/api/v1/users"]["request"]>
-         } = 
-          JSON.parse(
-            decodeURIComponent(
-              this.history.url.search == ""
-                ? "{}"
-                : this.history.url.search.substring(1)
-            )
-          );
+          [key in X]: z.infer<typeof routes["/api/v1/users"]["request"]>;
+        } = JSON.parse(
+          decodeURIComponent(
+            this.history.url.search == ""
+              ? "{}"
+              : this.history.url.search.substring(1)
+          )
+        );
         const initial = search[this.prefix];
 
         return html`<tr>

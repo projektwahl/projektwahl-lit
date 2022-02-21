@@ -176,7 +176,9 @@ export class PwInput<
       set(
         event.detail,
         this.name as string[],
-        (this.input.value as HTMLInputElement).checked ? this.value : this.defaultValue
+        (this.input.value as HTMLInputElement).checked
+          ? this.value
+          : this.defaultValue
       );
     } else if (this.type === "select") {
       set(
@@ -234,10 +236,11 @@ export class PwInput<
           ${ref(this.input)}
           @input=${() => {
             this.input.value?.dispatchEvent(
-            new CustomEvent("refreshentitylist", {
-              bubbles: true,
-              composed: true
-            }))
+              new CustomEvent("refreshentitylist", {
+                bubbles: true,
+                composed: true,
+              })
+            );
           }}
           type=${this.type}
           value=${ifDefined(get(this.initial, this.name as string[]))}

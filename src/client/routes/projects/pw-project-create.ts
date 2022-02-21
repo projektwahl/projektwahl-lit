@@ -70,7 +70,9 @@ const taskFunction = async ([id]: [number]) => {
 
 export const PwProjectCreate = setupHmr(
   "PwProjectCreate",
-  class PwProjectCreate extends PwForm<"/api/v1/projects/create"|"/api/v1/projects/update"> {
+  class PwProjectCreate extends PwForm<
+    "/api/v1/projects/create" | "/api/v1/projects/update"
+  > {
     static override get properties() {
       return {
         ...super.properties,
@@ -103,7 +105,7 @@ export const PwProjectCreate = setupHmr(
       | MinimalSafeParseError
       | undefined;
 
-    url!: "/api/v1/projects/create"|"/api/v1/projects/update"
+    url!: "/api/v1/projects/create" | "/api/v1/projects/update";
 
     constructor() {
       super();
@@ -115,7 +117,11 @@ export const PwProjectCreate = setupHmr(
        */
       this._task = new Task(this, async () => {
         const formDataEvent = new CustomEvent<
-          z.infer<typeof routes["/api/v1/projects/create"|"/api/v1/projects/update"]["request"]>
+          z.infer<
+            typeof routes[
+              | "/api/v1/projects/create"
+              | "/api/v1/projects/update"]["request"]
+          >
         >("myformdata", {
           bubbles: false,
           detail: {
@@ -127,16 +133,15 @@ export const PwProjectCreate = setupHmr(
           ? this.initial.data.id
           : undefined;
 
-        const result = await myFetch<"/api/v1/projects/create"|"/api/v1/projects/update">(
-          this.url,
-          {
-            method: "POST",
-            headers: {
-              "content-type": "text/json",
-            },
-            body: JSON.stringify(formDataEvent.detail),
-          }
-        );
+        const result = await myFetch<
+          "/api/v1/projects/create" | "/api/v1/projects/update"
+        >(this.url, {
+          method: "POST",
+          headers: {
+            "content-type": "text/json",
+          },
+          body: JSON.stringify(formDataEvent.detail),
+        });
 
         if (result.success) {
           HistoryController.goto(new URL("/", window.location.href), {});
@@ -171,7 +176,10 @@ export const PwProjectCreate = setupHmr(
                     await this._task.run();
                   }}
                 >
-                  ${pwInput<"/api/v1/projects/create"|"/api/v1/projects/update", ["title"]>({
+                  ${pwInput<
+                    "/api/v1/projects/create" | "/api/v1/projects/update",
+                    ["title"]
+                  >({
                     type: "text",
                     disabled: this.disabled,
                     label: msg("Title"),
@@ -179,7 +187,10 @@ export const PwProjectCreate = setupHmr(
                     task: this._task,
                     initial: this.initial?.data,
                   })}
-                  ${pwInput<"/api/v1/projects/create"|"/api/v1/projects/update", ["info"]>({
+                  ${pwInput<
+                    "/api/v1/projects/create" | "/api/v1/projects/update",
+                    ["info"]
+                  >({
                     type: "text",
                     disabled: this.disabled,
                     label: msg("Info"),
@@ -187,7 +198,10 @@ export const PwProjectCreate = setupHmr(
                     task: this._task,
                     initial: this.initial?.data,
                   })}
-                  ${pwInput<"/api/v1/projects/create"|"/api/v1/projects/update", ["place"]>({
+                  ${pwInput<
+                    "/api/v1/projects/create" | "/api/v1/projects/update",
+                    ["place"]
+                  >({
                     type: "text",
                     disabled: this.disabled,
                     label: msg("Place"),
@@ -195,7 +209,10 @@ export const PwProjectCreate = setupHmr(
                     task: this._task,
                     initial: this.initial?.data,
                   })}
-                  ${pwInput<"/api/v1/projects/create"|"/api/v1/projects/update", ["costs"]>({
+                  ${pwInput<
+                    "/api/v1/projects/create" | "/api/v1/projects/update",
+                    ["costs"]
+                  >({
                     type: "number",
                     disabled: this.disabled,
                     label: msg("Costs"),
@@ -203,7 +220,10 @@ export const PwProjectCreate = setupHmr(
                     task: this._task,
                     initial: this.initial?.data,
                   })}
-                  ${pwInput<"/api/v1/projects/create"|"/api/v1/projects/update", ["min_age"]>({
+                  ${pwInput<
+                    "/api/v1/projects/create" | "/api/v1/projects/update",
+                    ["min_age"]
+                  >({
                     type: "number",
                     disabled: this.disabled,
                     label: msg("Minimum age"),
@@ -211,7 +231,10 @@ export const PwProjectCreate = setupHmr(
                     task: this._task,
                     initial: this.initial?.data,
                   })}
-                  ${pwInput<"/api/v1/projects/create"|"/api/v1/projects/update", ["max_age"]>({
+                  ${pwInput<
+                    "/api/v1/projects/create" | "/api/v1/projects/update",
+                    ["max_age"]
+                  >({
                     type: "number",
                     disabled: this.disabled,
                     label: msg("Maximum age"),
@@ -220,7 +243,7 @@ export const PwProjectCreate = setupHmr(
                     initial: this.initial?.data,
                   })}
                   ${pwInput<
-                    "/api/v1/projects/create"|"/api/v1/projects/update",
+                    "/api/v1/projects/create" | "/api/v1/projects/update",
                     ["min_participants"]
                   >({
                     type: "number",
@@ -231,7 +254,7 @@ export const PwProjectCreate = setupHmr(
                     initial: this.initial?.data,
                   })}
                   ${pwInput<
-                    "/api/v1/projects/create"|"/api/v1/projects/update",
+                    "/api/v1/projects/create" | "/api/v1/projects/update",
                     ["max_participants"]
                   >({
                     type: "number",
@@ -242,7 +265,7 @@ export const PwProjectCreate = setupHmr(
                     initial: this.initial?.data,
                   })}
                   ${pwInput<
-                    "/api/v1/projects/create"|"/api/v1/projects/update",
+                    "/api/v1/projects/create" | "/api/v1/projects/update",
                     ["random_assignments"]
                   >({
                     type: "checkbox",
@@ -254,7 +277,10 @@ export const PwProjectCreate = setupHmr(
                     task: this._task,
                     initial: this.initial?.data,
                   })}
-                  ${pwInput<"/api/v1/projects/create"|"/api/v1/projects/update", ["deleted"]>({
+                  ${pwInput<
+                    "/api/v1/projects/create" | "/api/v1/projects/update",
+                    ["deleted"]
+                  >({
                     type: "checkbox",
                     value: true,
                     defaultValue: false,

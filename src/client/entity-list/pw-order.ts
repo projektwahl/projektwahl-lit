@@ -47,9 +47,7 @@ export function pwOrder<P extends keyof typeof entityRoutes>(
 
 // TODO FIXME with prefix this doesnt work
 // TODO FIXME paginationLimit also doesnt work with this
-export class PwOrder<
-        P extends keyof typeof entityRoutes,
-      > extends LitElement {
+export class PwOrder<P extends keyof typeof entityRoutes> extends LitElement {
   static override get properties() {
     return {
       title: { type: String },
@@ -64,7 +62,7 @@ export class PwOrder<
     return this;
   }
 
-  path!: string[]
+  path!: string[];
 
   name!: keyof z.infer<typeof entityRoutes[P]["response"]>["entities"][number];
 
@@ -85,7 +83,11 @@ export class PwOrder<
   }
 
   override render() {
-    if (this.title === undefined || this.name === undefined || this.path === undefined) {
+    if (
+      this.title === undefined ||
+      this.name === undefined ||
+      this.path === undefined
+    ) {
       throw new Error(msg("component not fully initialized"));
     }
 
@@ -105,14 +107,18 @@ export class PwOrder<
             set(data, [...this.path, "sorting"], []);
           }
 
-          const oldElementIndex = get(data, [...this.path, "sorting"]).findIndex(
-            ([e, d]) => e === `${this.name as string}`
-          );
+          const oldElementIndex = get(data, [
+            ...this.path,
+            "sorting",
+          ]).findIndex(([e, d]) => e === `${this.name as string}`);
           let oldElement;
           if (oldElementIndex == -1) {
             oldElement = [`${this.name as string}`, `downup`];
           } else {
-            oldElement = get(data, [...this.path, "sorting"]).splice(oldElementIndex, 1)[0];
+            oldElement = get(data, [...this.path, "sorting"]).splice(
+              oldElementIndex,
+              1
+            )[0];
           }
           let newElement;
           switch (oldElement[1]) {
@@ -125,10 +131,14 @@ export class PwOrder<
             default:
               newElement = null;
           }
-          set(data, [...this.path, "sorting"], [
-            ...get(data, [...this.path, "sorting"]),
-            ...(newElement !== null ? [[oldElement[0], newElement]] : []),
-          ]);
+          set(
+            data,
+            [...this.path, "sorting"],
+            [
+              ...get(data, [...this.path, "sorting"]),
+              ...(newElement !== null ? [[oldElement[0], newElement]] : []),
+            ]
+          );
 
           HistoryController.goto(
             new URL(

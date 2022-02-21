@@ -36,26 +36,23 @@ import { pwInput } from "../form/pw-input.js";
 export const taskFunction = async <P extends keyof typeof entityRoutes>(
   apiUrl: P,
   url: URL,
-  prefix: string,
+  prefix: string
 ) => {
   const data = JSON.parse(
-    decodeURIComponent(
-      url.search == ""
-        ? "{}"
-        : url.search.substring(1)
-    )
+    decodeURIComponent(url.search == "" ? "{}" : url.search.substring(1))
   );
-  const result = await myFetch<P>(`${apiUrl}?${encodeURIComponent(JSON.stringify(
-    data[prefix] ?? {}
-  ))}`, {
-    method: "GET",
-  });
+  const result = await myFetch<P>(
+    `${apiUrl}?${encodeURIComponent(JSON.stringify(data[prefix] ?? {}))}`,
+    {
+      method: "GET",
+    }
+  );
   return result;
 };
 
 export class PwEntityList<
   P extends keyof typeof entityRoutes,
-  X extends string,
+  X extends string
 > extends PwForm<P> {
   static override get properties() {
     return {
@@ -117,7 +114,7 @@ export class PwEntityList<
 
   override render() {
     if (this.prefix === undefined) {
-      throw new Error("prefix not set")
+      throw new Error("prefix not set");
     }
 
     if (this.initialRender) {
@@ -137,7 +134,9 @@ export class PwEntityList<
             z.infer<typeof entityRoutes[P]["request"]>
           >("myformdata", {
             bubbles: false,
-            detail: data[this.prefix] ?? {} as z.infer<typeof entityRoutes[P]["request"]>,
+            detail:
+              data[this.prefix] ??
+              ({} as z.infer<typeof entityRoutes[P]["request"]>),
           });
           this.form.value?.dispatchEvent(formDataEvent);
 
@@ -154,10 +153,12 @@ export class PwEntityList<
 
           HistoryController.goto(
             new URL(
-              `?${encodeURIComponent(JSON.stringify({
-                ...data,
-                [this.prefix]: formDataEvent.detail
-              }))}`,
+              `?${encodeURIComponent(
+                JSON.stringify({
+                  ...data,
+                  [this.prefix]: formDataEvent.detail,
+                })
+              )}`,
               window.location.href
             ),
             {}
