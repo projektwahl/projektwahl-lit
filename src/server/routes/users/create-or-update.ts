@@ -21,7 +21,7 @@ SPDX-License-Identifier: AGPL-3.0-or-later
 SPDX-FileCopyrightText: 2021 Moritz Hedtke <Moritz.Hedtke@t-online.de>
 */
 import postgres from "postgres";
-import { routes, ResponseType } from "../../../lib/routes.js";
+import { routes, ResponseType, userSchema } from "../../../lib/routes.js";
 import { sql } from "../../database.js";
 import { MyRequest, requestHandler } from "../../express.js";
 import { hashPassword } from "../../password.js";
@@ -29,29 +29,98 @@ import { sql2 } from "../../sql/index.js";
 import { updateField } from "../../entities.js";
 import type { OutgoingHttpHeaders, ServerResponse } from "node:http";
 import type { Http2ServerResponse } from "node:http2";
-import { ZodIssueCode } from "zod";
+import { z, ZodIssueCode } from "zod";
 
 // TODO FIXME somehow ensure all attributes are read here because this is an easy way to loose data
 // Also ensure create and update has the same attributes
 // TO IMPROVE this maybe return the full column and also read back that data at all places
 
-export async function createOrUpdateUsersHandler(
+export async function createUsersHandler(
   request: MyRequest,
   response: ServerResponse | Http2ServerResponse
+) {
+  return await createOrUpdateUsersHandler(
+    "/api/v1/users/create",
+    request,
+    response,
+    async (
+      sql,
+      user,
+      loggedInUser: Exclude<z.infer<typeof userSchema>, undefined>
+    ) => {
+      return await sql`INSERT INTO users_with_deleted (username, password_hash, type, "group", age, away, project_leader_id, force_in_project_id, deleted, last_updated_by) VALUES (${
+        user.username ?? null
+      }, ${user.password ? await hashPassword(user.password) : null}, ${
+        user.type ?? null
+      }, ${user.type === "voter" ? user.group ?? null : null}, ${
+        user.type === "voter" ? user.age ?? null : null
+      }, ${user.away ?? false}, ${user.project_leader_id ?? null}, ${
+        user.force_in_project_id ?? null
+      }, ${user.deleted ?? false}, ${
+        loggedInUser.id
+      }) RETURNING id, project_leader_id, force_in_project_id;`;
+    }
+  );
+}
+
+export async function updateUsersHandler(
+  request: MyRequest,
+  response: ServerResponse | Http2ServerResponse
+) {
+  return await createOrUpdateUsersHandler(
+    "/api/v1/users/update",
+    request,
+    response,
+    async (
+      sql,
+      user,
+      loggedInUser: Exclude<z.infer<typeof userSchema>, undefined>
+    ) => {
+      const field = (name: keyof typeof user) =>
+        updateField("users_with_deleted", user, name);
+
+      const finalQuery = sql2`UPDATE users_with_deleted SET
+  ${field("username")},
+  password_hash = CASE WHEN ${!!user.password} THEN ${
+        user.password ? await hashPassword(user.password) : null
+      } ELSE password_hash END,
+  ${field("type")},
+  ${field("group")},
+  ${field("age")},
+  ${field("away")},
+  ${field("project_leader_id")},
+  ${field("force_in_project_id")},
+  ${field("deleted")},
+  last_updated_by = ${loggedInUser.id}
+  WHERE id = ${user.id} RETURNING id, project_leader_id, force_in_project_id;`;
+      // TODO FIXME (found using fuzzer) if this tries to update a nonexisting user we should return an error
+      return await sql(...finalQuery);
+    }
+  );
+}
+
+export async function createOrUpdateUsersHandler<
+  P extends "/api/v1/users/create" | "/api/v1/users/update"
+>(
+  path: P,
+  request: MyRequest,
+  response: ServerResponse | Http2ServerResponse,
+  dbquery: (
+    sql: postgres.TransactionSql<{}>,
+    user: z.infer<typeof routes[P]["request"]>,
+    loggedInUser: Exclude<z.infer<typeof userSchema>, undefined>
+  ) => any
 ) {
   // TODO FIXME create or update multiple
   return await requestHandler(
     "POST",
-    "/api/v1/users/create-or-update",
+    path,
     async function (user, loggedInUser) {
       // helper is allowed to set voters as away (TODO implement)
       // voter is not allowed to do anything
 
       if (!(loggedInUser?.type === "admin")) {
-        const returnValue: [
-          OutgoingHttpHeaders,
-          ResponseType<"/api/v1/users/create-or-update">
-        ] = [
+        const returnValue: [OutgoingHttpHeaders, ResponseType<P>] = [
           {
             "content-type": "text/json; charset=utf-8",
             ":status": 403,
@@ -75,59 +144,20 @@ export async function createOrUpdateUsersHandler(
       try {
         const row = (
           await sql.begin("READ WRITE", async (sql) => {
-            if (user.id) {
-              const field = (name: keyof typeof user) =>
-                updateField("users_with_deleted", user, name);
-
-              const finalQuery = sql2`UPDATE users_with_deleted SET
-            ${field("username")},
-            password_hash = CASE WHEN ${!!user.password} THEN ${
-                user.password ? await hashPassword(user.password) : null
-              } ELSE password_hash END,
-            ${field("type")},
-            ${field("group")},
-            ${field("age")},
-            ${field("away")},
-            ${field("project_leader_id")},
-            ${field("force_in_project_id")},
-            ${field("deleted")},
-            last_updated_by = ${loggedInUser.id}
-            WHERE id = ${
-              user.id
-            } RETURNING id, project_leader_id, force_in_project_id;`;
-              // TODO FIXME (found using fuzzer) if this tries to update a nonexisting user we should return an error
-              return await sql(...finalQuery);
-            } else {
-              return await sql`INSERT INTO users_with_deleted (username, password_hash, type, "group", age, away, project_leader_id, force_in_project_id, deleted, last_updated_by) VALUES (${
-                user.username ?? null
-              }, ${user.password ? await hashPassword(user.password) : null}, ${
-                user.type ?? null
-              }, ${user.type === "voter" ? user.group ?? null : null}, ${
-                user.type === "voter" ? user.age ?? null : null
-              }, ${user.away ?? false}, ${user.project_leader_id ?? null}, ${
-                user.force_in_project_id ?? null
-              }, ${user.deleted ?? false}, ${
-                loggedInUser.id
-              }) RETURNING id, project_leader_id, force_in_project_id;`;
-            }
+            return await dbquery(sql, user, loggedInUser);
           })
         )[0];
 
         console.log(row);
 
-        const returnValue: [
-          OutgoingHttpHeaders,
-          ResponseType<"/api/v1/users/create-or-update">
-        ] = [
+        const returnValue: [OutgoingHttpHeaders, ResponseType<P>] = [
           {
             "content-type": "text/json; charset=utf-8",
             ":status": 200,
           },
           {
             success: true as const,
-            data: routes["/api/v1/users/create-or-update"]["response"].parse(
-              row
-            ),
+            data: routes[path]["response"].parse(row),
           },
         ];
         return returnValue;
@@ -138,10 +168,7 @@ export async function createOrUpdateUsersHandler(
             error.constraint_name === "users_with_deleted_username_key"
           ) {
             // unique violation
-            const returnValue: [
-              OutgoingHttpHeaders,
-              ResponseType<"/api/v1/users/create-or-update">
-            ] = [
+            const returnValue: [OutgoingHttpHeaders, ResponseType<P>] = [
               {
                 "content-type": "text/json; charset=utf-8",
                 ":status": 200,
@@ -162,10 +189,7 @@ export async function createOrUpdateUsersHandler(
             return returnValue;
           } else {
             // TODO FIXME do this everywhere else / unify
-            const returnValue: [
-              OutgoingHttpHeaders,
-              ResponseType<"/api/v1/users/create-or-update">
-            ] = [
+            const returnValue: [OutgoingHttpHeaders, ResponseType<P>] = [
               {
                 "content-type": "text/json; charset=utf-8",
                 ":status": 200,
@@ -187,10 +211,7 @@ export async function createOrUpdateUsersHandler(
           }
         }
         console.error(error);
-        const returnValue: [
-          OutgoingHttpHeaders,
-          ResponseType<"/api/v1/users/create-or-update">
-        ] = [
+        const returnValue: [OutgoingHttpHeaders, ResponseType<P>] = [
           {
             "content-type": "text/json; charset=utf-8",
             ":status": 500,

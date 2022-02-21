@@ -58,51 +58,6 @@ const shuffleArray = <T>(array: T[]) => {
 
     // take care to set this value to project_count * min_participants <= user_count <= project_count * max_participants
     for (let i = 0; i < 100; i++) {
-      // TODO FIXME add user to keycloak / import users from keycloak (probably easier)
-      // https://www.keycloak.org/documentation
-      // https://www.keycloak.org/docs-api/15.0/rest-api/index.html
-
-      // TODO compare our approach in general with https://github.com/keycloak/keycloak-quickstarts
-
-      // https://github.com/keycloak/keycloak-documentation/blob/master/server_admin/topics/admin-cli.adoc
-
-      // INTERESTING https://www.keycloak.org/docs/latest/server_admin/index.html#automatically-link-existing-first-login-flow
-      // https://github.com/keycloak/keycloak-documentation/blob/master/server_admin/topics/identity-broker/first-login-flow.adoc
-
-      // https://www.keycloak.org/docs-api/15.0/rest-api/index.html
-
-      // TODO we could use that admin URL
-      // Remove all user sessions associated with the user Also send notification to all clients that have an admin URL to invalidate the sessions for the particular user.
-      /*
-		const response = await myFetch(process.env['OPENID_ADMIN_URL']!, {
-			method: 'POST',
-			headers: {
-				Accept: 'application/json',
-				'Content-Type': 'application/json',
-				Authorization: `Bearer ${process.env['PROJEKTWAHL_ADMIN_ACCESS_TOKEN']}`
-			},
-			redirect: 'manual',
-			body: JSON.stringify({
-				username: `user${Math.random()}`,
-				//email: `user${i}@example.org`,
-				enabled: true
-			})
-		});
-		console.log(await response.text());
-		console.log(response.headers);
-		console.log(response.headers.get('location'));
-		const userResponse = await myFetch(response.headers.get('location')!, {
-			method: 'GET',
-			headers: {
-				Accept: 'application/json',
-				'Content-Type': 'application/json',
-				Authorization: `Bearer ${process.env['PROJEKTWAHL_ADMIN_ACCESS_TOKEN']}`
-			}
-		});
-		const keycloakUser = await userResponse.json();
-		console.log(keycloakUser)^;
-		*/
-
       const user = rawUserSchema
         .pick({
           id: true,
@@ -115,8 +70,7 @@ const shuffleArray = <T>(array: T[]) => {
           )[0]
         );
       shuffleArray(projects);
-      for (let j = 0; j < 5; j++) {
-        // TODO FIXME generate users who voted incorrectly (maybe increase/decrease iterations)
+      for (let j = 0; j < 5 + Math.random() * 3 - 1.5; j++) {
         // eslint-disable-next-line @typescript-eslint/await-thenable
         await sql`INSERT INTO choices (user_id, project_id, rank) VALUES (${
           user.id

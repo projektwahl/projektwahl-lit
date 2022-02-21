@@ -34,6 +34,8 @@ import get from "lodash-es/get.js";
 import set from "lodash-es/set.js";
 import type { Task } from "@lit-labs/task";
 
+// MAYBE we could integrate pw-order into here. But this is already fairly complex.
+
 // workaround see https://github.com/runem/lit-analyzer/issues/149#issuecomment-1006162839
 export function pwInput<
   P extends keyof typeof routes = never,
@@ -50,6 +52,7 @@ export function pwInput<
     | "options"
     | "task"
     | "defaultValue"
+    | "value"
   > &
     Partial<Pick<PwInput<P, Q>, "onchange">>
 ) {
@@ -64,6 +67,7 @@ export function pwInput<
     type,
     autocomplete,
     defaultValue,
+    value,
     ...rest
   } = props;
   let _ = rest;
@@ -79,6 +83,7 @@ export function pwInput<
     .task=${task}
     .initial=${initial}
     .defaultValue=${defaultValue}
+    .value=${value}
   ></pw-input>`;
 }
 
@@ -98,9 +103,10 @@ export class PwInput<
       defaultValue: { attribute: false },
       task: {
         attribute: false,
-        hasChanged: () => {
+        /*hasChanged: () => {
           return true; // TODO FIXME bug in @lit-labs/task
-        },
+          // I think the problem was that passing down a @lit-labs/task doesnt work as this doesnt trigger updates in the subcomponent
+        },*/
       },
       initial: {
         attribute: false,
@@ -114,7 +120,7 @@ export class PwInput<
 
   label!: string | null;
 
-  name!: Q;
+  name!: Q & string[];
 
   type: "text" | "password" | "number" | "checkbox" | "select";
 
@@ -124,7 +130,7 @@ export class PwInput<
 
   initial?: z.infer<typeof routes[P]["request"]>;
 
-  value!: string;
+  value?: any;
 
   input: import("lit/directives/ref").Ref<HTMLElement>;
 
@@ -171,6 +177,8 @@ export class PwInput<
         event.detail,
         this.name as string[],
         (this.input.value as HTMLInputElement).checked
+          ? this.value
+          : this.defaultValue
       );
     } else if (this.type === "select") {
       set(
@@ -226,6 +234,14 @@ export class PwInput<
         }
         <${this.type === "select" ? literal`select` : literal`input`}
           ${ref(this.input)}
+          @input=${() => {
+            this.input.value?.dispatchEvent(
+              new CustomEvent("refreshentitylist", {
+                bubbles: true,
+                composed: true,
+              })
+            );
+          }}
           type=${this.type}
           value=${ifDefined(get(this.initial, this.name as string[]))}
           ?checked=${get(this.initial, this.name as string[])}

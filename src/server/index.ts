@@ -23,7 +23,6 @@ SPDX-FileCopyrightText: 2021 Moritz Hedtke <Moritz.Hedtke@t-online.de>
 import { createSecureServer } from "node:http2";
 import { readFileSync } from "node:fs";
 import "./routes/login/openid-client.js";
-//import cluster from "cluster";
 import { getDirs, serverHandler } from "./server-handler.js";
 import net from "net";
 import cluster from "cluster";
@@ -40,7 +39,7 @@ if (!process.env["CREDENTIALS_DIRECTORY"]) {
   process.exit(1);
 }
 
-/*if (cluster.isPrimary) {
+if (process.env.NODE_ENV === "development" && cluster.isPrimary) {
   console.log(`Primary is running`);
 
   cluster.fork();
@@ -72,58 +71,60 @@ if (!process.env["CREDENTIALS_DIRECTORY"]) {
       }
     })();
   }
-} else {*/
-/*
+} else {
+  /*
   openssl req -x509 -newkey rsa:2048 -nodes -sha256 -subj '/CN=localhost' -keyout key.pem -out cert.pem
   */
 
-(async () => {
-  await setupClient();
+  (async () => {
+    await setupClient();
 
-  const server = createSecureServer(
-    {
-      key: readFileSync(process.env.CREDENTIALS_DIRECTORY + "/key.pem"),
-      cert: readFileSync(process.env.CREDENTIALS_DIRECTORY + "/cert.pem"),
-      allowHTTP1: true,
-    },
-    (request, response) => {
-      serverHandler(request, response).catch((error) => {
-        // TODO FIXME try sending a 500 in a try catch
-        console.error(error);
+    const server = createSecureServer(
+      {
+        key: readFileSync(process.env.CREDENTIALS_DIRECTORY + "/key.pem"),
+        cert: readFileSync(process.env.CREDENTIALS_DIRECTORY + "/cert.pem"),
+        allowHTTP1: true,
+      },
+      (request, response) => {
+        serverHandler(request, response).catch((error) => {
+          // TODO FIXME try sending a 500 in a try catch
+          console.error(error);
+        });
+      }
+    );
+
+    server.listen(
+      process.env.PORT
+        ? Number(process.env.PORT)
+        : process.env.SOCKET
+        ? { path: process.env.SOCKET }
+        : new net.Socket({ fd: 3 }), // this doesn't work with cluster
+      511,
+      () => {
+        console.log(
+          `[${cluster.worker?.id ?? "unknown"}] Server started at ${
+            process.env.BASE_URL as string
+          }`
+        );
+      }
+    );
+
+    if (process.env.NODE_ENV === "development") {
+      cluster.worker?.on("message", (message) => {
+        //let getConnections = promisify(server.getConnections).bind(server)
+        //console.log(await getConnections())
+
+        if (message === "shutdown") {
+          console.log(`[${cluster.worker?.id ?? "unknown"}] Shutting down`);
+          server.close();
+
+          cluster.worker?.removeAllListeners("message");
+          cluster.worker?.kill();
+        }
       });
     }
-  );
-
-  server.listen(
-    process.env.PORT
-      ? Number(process.env.PORT)
-      : process.env.SOCKET
-      ? { path: process.env.SOCKET }
-      : new net.Socket({ fd: 3 }), // this doesn't work with cluster
-    511,
-    () => {
-      console.log(
-        `[${cluster.worker?.id ?? "unknown"}] Server started at ${
-          process.env.BASE_URL as string
-        }`
-      );
-    }
-  );
-})();
-/*
-  cluster.worker?.on("message", (message) => {
-    //let getConnections = promisify(server.getConnections).bind(server)
-    //console.log(await getConnections())
-
-    if (message === "shutdown") {
-      console.log(`[${cluster.worker?.id ?? "unknown"}] Shutting down`);
-      server.close();
-
-      cluster.worker?.removeAllListeners("message");
-      cluster.worker?.kill();
-    }
-  });
-}*/
+  })();
+}
 
 //repl.start({})
 

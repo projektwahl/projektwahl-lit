@@ -28,6 +28,7 @@ import {
   routes,
   UnknownKeysParam,
   ResponseType,
+  userSchema,
 } from "../lib/routes.js";
 import { z, ZodIssueCode, ZodObject, ZodTypeAny } from "zod";
 import { retryableBegin } from "./database.js";
@@ -39,23 +40,6 @@ import type {
   Http2ServerResponse,
   OutgoingHttpHeaders,
 } from "http2";
-
-const userMapper = <
-  T extends { [k: string]: ZodTypeAny },
-  UnknownKeys extends UnknownKeysParam = "strip",
-  Catchall extends ZodTypeAny = ZodTypeAny
->(
-  s: ZodObject<T, UnknownKeys, Catchall>
-) =>
-  s.pick({
-    id: true,
-    type: true,
-    username: true,
-    group: true,
-    age: true,
-  });
-
-const userSchema = userMapper(rawUserSchema).optional();
 
 export type MyRequest = (IncomingMessage | Http2ServerRequest) &
   Required<Pick<IncomingMessage | Http2ServerRequest, "url" | "method">>;
@@ -97,11 +81,10 @@ export function requestHandler<P extends keyof typeof routes>(
         const cookies = request.headers.cookie
           ? cookie.parse(request.headers.cookie)
           : {};
+        // implementing https://datatracker.ietf.org/doc/html/draft-ietf-httpbis-rfc6265bis-02#section-8.8.2
         const session_id: string | undefined =
           request.method === "GET" ? cookies.lax_id : cookies.strict_id;
 
-        // implementing https://datatracker.ietf.org/doc/html/draft-ietf-httpbis-rfc6265bis-02#section-8.8.2
-        // TODO FIXME don't do all this for static resource requests
         if (session_id) {
           user = userSchema.parse(
             (
@@ -111,7 +94,6 @@ export function requestHandler<P extends keyof typeof routes>(
               })
             )[0]
           );
-          //console.log(user)
         }
 
         const body: unknown =
@@ -130,7 +112,7 @@ export function requestHandler<P extends keyof typeof routes>(
             user,
             session_id
           );
-          console.log("responseBody", responseBody);
+          //console.log("responseBody", responseBody);
           // TODO FIXME add schema for the result shit around that
           if (responseBody.success) {
             routes[path].response.parse(responseBody.data);
@@ -143,7 +125,7 @@ export function requestHandler<P extends keyof typeof routes>(
           response.end(JSON.stringify(responseBody));
         } else {
           // https://github.com/colinhacks/zod/blob/master/ERROR_HANDLING.md
-          console.log(requestBody.error.issues);
+          //console.log(requestBody.error.issues);
 
           response.writeHead(200, {
             ...defaultHeaders,

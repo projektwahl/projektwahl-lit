@@ -32,18 +32,21 @@ import { setupHmr } from "../../hmr.js";
 import { aClick } from "../../pw-a.js";
 import { pwOrder } from "../../entity-list/pw-order.js";
 import { pwInput } from "../../form/pw-input.js";
-import { routes } from "../../../lib/routes.js";
+import type { routes } from "../../../lib/routes.js";
+import type { z } from "zod";
+import { taskFunction } from "../../entity-list/pw-entitylist.js";
 
-// TODO FIXME
-export const pwProjectUsers = async (url: URL) => {
-  //const result = await taskFunction([url.searchParams]);
-  // .initial=${result}
-  return html`<pw-project-users></pw-project-users>`;
+export const pwProjectUsers = async (url: URL, prefix: string) => {
+  const result = await taskFunction("/api/v1/users", url, prefix);
+  return html`<pw-project-users
+    .initial=${result}
+    prefix=${prefix}
+  ></pw-project-users>`;
 };
 
 export const PwProjectUsers = setupHmr(
   "PwProjectUsers",
-  class PwProjectUsers extends PwUsers {
+  class PwProjectUsers<X extends string> extends PwUsers<X> {
     static override get properties() {
       return {
         ...super.properties,
@@ -62,27 +65,27 @@ export const PwProjectUsers = setupHmr(
 
     override get head() {
       try {
-        const initial = routes["/api/v1/users"]["request"].parse(
-          JSON.parse(
-            decodeURIComponent(
-              this.history.url.search == ""
-                ? "{}"
-                : this.history.url.search.substring(1)
-            )
+        // TODO FIXME this use of any / untyped makes lots of problems
+        // We need some client-side routing that stores the query parameters
+        const search: {
+          [key in X]: z.infer<typeof routes["/api/v1/users"]["request"]>;
+        } = JSON.parse(
+          decodeURIComponent(
+            this.history.url.search == ""
+              ? "{}"
+              : this.history.url.search.substring(1)
           )
         );
+        const initial = search[this.prefix];
 
         return html`<tr>
-            <!--
-  do not support this without javascript because there is literally zero useful ways to do this useful.
-  the only nice way is probably submit buttons that do things like "oder_by_id_asc" and then redirect to the new state (because you need to remove the old state)
--->
             <th class="table-cell-hover" scope="col">${msg(html`&#x2713;`)}</th>
 
             <th class="table-cell-hover p-0" scope="col">
               ${pwOrder<"/api/v1/users">({
                 refreshEntityList: () => this._task.run(),
                 name: "id",
+                path: [this.prefix],
                 title: msg("ID"),
               })}
             </th>
@@ -91,6 +94,7 @@ export const PwProjectUsers = setupHmr(
               ${pwOrder<"/api/v1/users">({
                 refreshEntityList: () => this._task.run(),
                 name: "username",
+                path: [this.prefix],
                 title: msg("Name"),
               })}
             </th>
@@ -99,6 +103,7 @@ export const PwProjectUsers = setupHmr(
               ${pwOrder<"/api/v1/users">({
                 refreshEntityList: () => this._task.run(),
                 name: "type",
+                path: [this.prefix],
                 title: msg("Type"),
               })}
             </th>
@@ -114,8 +119,9 @@ export const PwProjectUsers = setupHmr(
                 name: ["filters", this.name],
                 task: this._task,
                 type: "checkbox",
+                value: this.projectId,
                 defaultValue: undefined,
-                initial,
+                initial: initial,
               })}
             </th>
 

@@ -39,6 +39,7 @@ class PwProjectUserCheckbox extends LitElement {
       disabled: { state: true },
       user: { attribute: false },
       projectId: { type: Number },
+      url: { type: String },
       name: { type: String },
     };
   }
@@ -57,6 +58,8 @@ class PwProjectUserCheckbox extends LitElement {
 
   form: import("lit/directives/ref").Ref<HTMLFormElement>;
 
+  input: import("lit/directives/ref").Ref<HTMLElement>;
+
   constructor() {
     super();
 
@@ -64,9 +67,11 @@ class PwProjectUserCheckbox extends LitElement {
 
     this.form = createRef();
 
+    this.input = createRef();
+
     this._task = new Task(this, async () => {
-      const result = await myFetch<"/api/v1/users/create-or-update">(
-        "/api/v1/users/create-or-update",
+      const result = await myFetch<"/api/v1/users/update">(
+        "/api/v1/users/update",
         {
           method: "POST",
           headers: {
@@ -80,13 +85,20 @@ class PwProjectUserCheckbox extends LitElement {
         }
       );
 
-      HistoryController.goto(new URL(window.location.href), {});
+      this.input.value?.dispatchEvent(
+        new CustomEvent("refreshentitylist", {
+          bubbles: true,
+          composed: true,
+        })
+      );
 
       return result;
     });
   }
 
   render() {
+    console.log(this.user.username);
+    console.log(this.user[this.name] === this.projectId);
     return html` ${bootstrapCss}
       <form ${ref(this.form)}>
         ${this._task.render({
@@ -107,6 +119,7 @@ class PwProjectUserCheckbox extends LitElement {
         })}
 
         <input
+          ${ref(this.input)}
           @change=${async () => {
             await this._task.run();
           }}

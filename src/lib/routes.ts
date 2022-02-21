@@ -23,11 +23,6 @@ SPDX-FileCopyrightText: 2021 Moritz Hedtke <Moritz.Hedtke@t-online.de>
 import { z, ZodIssue, ZodObject, ZodTypeAny } from "zod";
 import { result } from "./result.js";
 
-if (!globalThis.Buffer) {
-  // @ts-expect-error hack for client
-  globalThis.Buffer = ArrayBuffer;
-}
-
 const rawUserCommon = {
   id: z.number(),
   username: z.string().min(1).max(100),
@@ -50,8 +45,6 @@ export const rawUserSchema = z
     ...rawUserCommon,
   })
   .strict();
-
-// setKey("id", z.number().nullable())
 
 export const rawProjectSchema = z
   .object({
@@ -84,10 +77,29 @@ export type keys =
   | "/api/v1/redirect"
   | "/api/v1/sleep"
   | "/api/v1/update"
-  | "/api/v1/users/create-or-update"
-  | "/api/v1/projects/create-or-update"
+  | "/api/v1/users/create"
+  | "/api/v1/users/update"
+  | "/api/v1/projects/create"
+  | "/api/v1/projects/update"
   | "/api/v1/users"
   | "/api/v1/projects";
+
+const userMapper = <
+  T extends { [k: string]: ZodTypeAny },
+  UnknownKeys extends UnknownKeysParam = "strip",
+  Catchall extends ZodTypeAny = ZodTypeAny
+>(
+  s: ZodObject<T, UnknownKeys, Catchall>
+) =>
+  s.pick({
+    id: true,
+    type: true,
+    username: true,
+    group: true,
+    age: true,
+  });
+
+export const userSchema = userMapper(rawUserSchema).optional();
 
 function identity<
   T extends {
@@ -123,20 +135,7 @@ const usersCreateOrUpdate = <
     })
     .extend({
       password: z.string(),
-    })
-    .partial();
-
-/*
-const jo = usersCreateOrUpdate(rawUserVoterSchema)
-let a: z.infer<typeof jo>;
-
-const jo2 = usersCreateOrUpdate(rawUserHelperOrAdminSchema)
-let a2: z.infer<typeof jo2>;
-*/
-
-//console.log(rawUserHelperOrAdminSchema.safeParse({}))
-// TODO FIXME report upstream (picking missing keys breaks)
-//console.log(usersCreateOrUpdate(rawUserHelperOrAdminSchema).safeParse({}))
+    });
 
 export const entities = <
   T extends { [k: string]: ZodTypeAny },
@@ -206,24 +205,30 @@ const baseQuery = <
 >(
   s: ZodObject<T, UnknownKeys, Catchall>
 ) =>
-  z.object({
-    paginationDirection: z.enum(["forwards", "backwards"]).default("forwards"),
-    paginationCursor: s.partial().nullish(), // if this is null the start is at start/end depending on paginationDirection
-    // @ts-expect-error why
-    filters: s.partial().default({}),
-    sorting: z
-      .array(
-        z.tuple([
-          z.enum(
-            // TODO FIXME keys
-            Object.keys(s.shape) as [keyof T & string, ...(keyof T & string)[]]
-          ),
-          z.enum(["ASC", "DESC"]),
-        ])
-      )
-      .default([]),
-    paginationLimit: z.number().default(100),
-  }).strict();
+  z
+    .object({
+      paginationDirection: z
+        .enum(["forwards", "backwards"])
+        .default("forwards"),
+      paginationCursor: s.partial().nullish(), // if this is null the start is at start/end depending on paginationDirection
+      // @ts-expect-error why
+      filters: s.partial().default({}),
+      sorting: z
+        .array(
+          z.tuple([
+            z.enum(
+              Object.keys(s.shape) as [
+                keyof T & string,
+                ...(keyof T & string)[]
+              ]
+            ),
+            z.enum(["ASC", "DESC"]),
+          ])
+        )
+        .default([]),
+      paginationLimit: z.number().default(100),
+    })
+    .strict();
 
 export const routes = identity({
   "/api/v1/logout": {
@@ -255,11 +260,19 @@ export const routes = identity({
     request: z.undefined(),
     response: z.object({}),
   },
-  "/api/v1/users/create-or-update": {
+  "/api/v1/users/create": {
     request: usersCreateOrUpdate(rawUserSchema),
     response: createOrUpdateUserResponse(rawUserSchema),
   },
-  "/api/v1/projects/create-or-update": {
+  "/api/v1/users/update": {
+    request: usersCreateOrUpdate(rawUserSchema).partial(),
+    response: createOrUpdateUserResponse(rawUserSchema),
+  },
+  "/api/v1/projects/create": {
+    request: rawProjectSchema,
+    response: z.object({}).extend({ id: z.number() }),
+  },
+  "/api/v1/projects/update": {
     request: rawProjectSchema.partial(),
     response: z.object({}).extend({ id: z.number() }),
   },
@@ -297,4 +310,4 @@ export declare type MinimalSafeParseError = {
 
 export type ResponseType<P extends keyof typeof routes> =
   | z.SafeParseSuccess<z.infer<typeof routes[P]["response"]>>
-  | MinimalSafeParseError; // <z.infer<typeof routes[P]["request"]>>
+  | MinimalSafeParseError;

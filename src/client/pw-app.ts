@@ -93,7 +93,9 @@ const pages = {
   },
   "^/users/create$": async () => {
     await import("./routes/users/pw-user-create.js");
-    return html`<pw-user-create></pw-user-create>`;
+    return html`<pw-user-create
+      .url=${"/api/v1/users/create"}
+    ></pw-user-create>`;
   },
   "^/users/edit/\\d+$": async (url: URL) => {
     const { pwUser } = await import("./routes/users/pw-user-create.js");
@@ -115,7 +117,9 @@ const pages = {
   "^/projects/create$": async () => {
     await import("./routes/projects/pw-project-create.js");
     await import("./routes/projects/pw-project-users.js");
-    return html`<pw-project-create></pw-project-create>`;
+    return html`<pw-project-create
+      .url=${"/api/v1/projects/create"}
+    ></pw-project-create>`;
   },
   "^/projects/edit/\\d+$": async (url: URL) => {
     const { pwProject } = await import(

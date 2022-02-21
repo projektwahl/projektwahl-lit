@@ -28,16 +28,19 @@ import { msg } from "@lit/localize";
 import { PwEntityList } from "../../entity-list/pw-entitylist.js";
 import { pwOrder } from "../../entity-list/pw-order.js";
 import { pwInput } from "../../form/pw-input.js";
-import { routes } from "../../../lib/routes.js";
+import type { routes } from "../../../lib/routes.js";
 import { taskFunction } from "../../entity-list/pw-entitylist.js";
 import type { z } from "zod";
 
 export const pwUsers = async (url: URL) => {
-  const result = await taskFunction("/api/v1/users", url);
-  return html`<pw-users .initial=${result}></pw-users>`;
+  const result = await taskFunction("/api/v1/users", url, "users");
+  return html`<pw-users .initial=${result} prefix="users"></pw-users>`;
 };
 
-export class PwUsers extends PwEntityList<"/api/v1/users"> {
+export class PwUsers<X extends string> extends PwEntityList<
+  "/api/v1/users",
+  X
+> {
   static override get properties() {
     return {
       ...super.properties,
@@ -65,19 +68,24 @@ export class PwUsers extends PwEntityList<"/api/v1/users"> {
 
   override get head() {
     try {
-      const initial: z.infer<typeof routes["/api/v1/users"]["request"]> =
-        JSON.parse(
-          decodeURIComponent(
-            this.history.url.search == ""
-              ? "{}"
-              : this.history.url.search.substring(1)
-          )
-        );
+      // TODO FIXME deduplicate
+      const search: {
+        [key in X]: z.infer<typeof routes["/api/v1/users"]["request"]>;
+      } = JSON.parse(
+        decodeURIComponent(
+          this.history.url.search == ""
+            ? "{}"
+            : this.history.url.search.substring(1)
+        )
+      );
+      const initial = search[this.prefix];
+
       return html`<tr>
           <th class="table-cell-hover p-0" scope="col">
             ${pwOrder<"/api/v1/users">({
               refreshEntityList: () => this._task.run(),
               name: "id",
+              path: [this.prefix],
               title: msg("ID"),
             })}
           </th>
@@ -86,6 +94,7 @@ export class PwUsers extends PwEntityList<"/api/v1/users"> {
             ${pwOrder<"/api/v1/users">({
               refreshEntityList: () => this._task.run(),
               name: "username",
+              path: [this.prefix],
               title: msg("Name"),
             })}
           </th>
@@ -94,6 +103,7 @@ export class PwUsers extends PwEntityList<"/api/v1/users"> {
             ${pwOrder<"/api/v1/users">({
               refreshEntityList: () => this._task.run(),
               name: "type",
+              path: [this.prefix],
               title: msg("Type"),
             })}
           </th>

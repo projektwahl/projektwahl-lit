@@ -23,7 +23,9 @@ SPDX-FileCopyrightText: 2021 Moritz Hedtke <Moritz.Hedtke@t-online.de>
 // https://github.com/porsager/postgres/
 // https://www.postgresql.org/docs/current/protocol.html
 
-import type { WritableTemplateStringsArray } from "../../lib/types";
+export interface WritableTemplateStringsArray extends Array<string> {
+  raw?: string[];
+}
 
 // postgres can "Extended Query" execute BEGIN; and COMMIT;? seems like yes
 // https://www.postgresql.org/docs/current/protocol-message-types.html
@@ -36,9 +38,7 @@ import type { WritableTemplateStringsArray } from "../../lib/types";
 export function unsafe2(
   string: null | string | number | symbol
 ): [TemplateStringsArray, ...(string | number | boolean | string[])[]] {
-  const r: import("../../lib/types").WritableTemplateStringsArray = [
-    String(string),
-  ];
+  const r: WritableTemplateStringsArray = [String(string)];
   r.raw = [String(string)];
   return [r as TemplateStringsArray];
 }
@@ -69,10 +69,10 @@ export function sql2(
   const keys = _keys;
   //console.log("sql", strings, keys)
 
-  const r: import("../../lib/types").WritableTemplateStringsArray = [""];
+  const r: WritableTemplateStringsArray = [""];
   r.raw = [""];
 
-  const rd: import("../../lib/types").WritableTemplateStringsArray = ["", ""];
+  const rd: WritableTemplateStringsArray = ["", ""];
   rd.raw = ["", ""];
 
   const stringsAsTemplates = strings.map(unsafe2);

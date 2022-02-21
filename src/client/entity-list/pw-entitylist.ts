@@ -35,16 +35,24 @@ import { pwInput } from "../form/pw-input.js";
 
 export const taskFunction = async <P extends keyof typeof entityRoutes>(
   apiUrl: P,
-  url: URL
+  url: URL,
+  prefix: string
 ) => {
-  const result = await myFetch<P>(`${apiUrl}${url.search}`, {
-    method: "GET",
-  });
+  const data = JSON.parse(
+    decodeURIComponent(url.search == "" ? "{}" : url.search.substring(1))
+  );
+  const result = await myFetch<P>(
+    `${apiUrl}?${encodeURIComponent(JSON.stringify(data[prefix] ?? {}))}`,
+    {
+      method: "GET",
+    }
+  );
   return result;
 };
 
 export class PwEntityList<
-  P extends keyof typeof entityRoutes
+  P extends keyof typeof entityRoutes,
+  X extends string
 > extends PwForm<P> {
   static override get properties() {
     return {
@@ -52,6 +60,7 @@ export class PwEntityList<
       initial: { attribute: false },
       initialRender: { state: true },
       debouncedUrl: { state: true },
+      prefix: { type: String },
       ...super.properties,
     };
   }
@@ -93,6 +102,8 @@ export class PwEntityList<
 
   protected history;
 
+  prefix!: X;
+
   constructor() {
     super();
 
@@ -102,6 +113,10 @@ export class PwEntityList<
   }
 
   override render() {
+    if (this.prefix === undefined) {
+      throw new Error("prefix not set");
+    }
+
     if (this.initialRender) {
       this.initialRender = false;
 
@@ -118,9 +133,10 @@ export class PwEntityList<
           const formDataEvent = new CustomEvent<
             z.infer<typeof entityRoutes[P]["request"]>
           >("myformdata", {
-            bubbles: true,
-            composed: true,
-            detail: data as z.infer<typeof entityRoutes[P]["request"]>,
+            bubbles: false,
+            detail:
+              data[this.prefix] ??
+              ({} as z.infer<typeof entityRoutes[P]["request"]>),
           });
           this.form.value?.dispatchEvent(formDataEvent);
 
@@ -137,7 +153,12 @@ export class PwEntityList<
 
           HistoryController.goto(
             new URL(
-              `?${encodeURIComponent(JSON.stringify(formDataEvent.detail))}`,
+              `?${encodeURIComponent(
+                JSON.stringify({
+                  ...data,
+                  [this.prefix]: formDataEvent.detail,
+                })
+              )}`,
               window.location.href
             ),
             {}
@@ -145,7 +166,7 @@ export class PwEntityList<
 
           return result;
         },
-        autoRun: false, // TODO FIXME this would be way simpler if there would be a no first run or so
+        autoRun: false,
         initialStatus:
           this.initial !== undefined ? TaskStatus.COMPLETE : TaskStatus.INITIAL,
         initialValue: this.initial,
@@ -188,7 +209,7 @@ export class PwEntityList<
 
         <form
           ${ref(this.form)}
-          @input=${async () => {
+          @refreshentitylist=${async () => {
             await this._task.run();
           }}
           @submit=${(e: Event) => e.preventDefault()}
