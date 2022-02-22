@@ -471,3 +471,6 @@ https://grafana.com/oss/prometheus/exporters/node-exporter/?tab=dashboards
   - job_name: 'node'
     static_configs:
       - targets: ['localhost:9100']
+
+
+https://grafana.com/grafana/dashboards/1860
