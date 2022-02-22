@@ -474,3 +474,9 @@ https://grafana.com/oss/prometheus/exporters/node-exporter/?tab=dashboards
 
 
 https://grafana.com/grafana/dashboards/1860
+
+sudo nano /etc/conf.d/prometheus-node-exporter
+NODE_EXPORTER_ARGS="--collector.systemd --collector.processes"
+sudo systemctl restart prometheus-node-exporter
+
+
