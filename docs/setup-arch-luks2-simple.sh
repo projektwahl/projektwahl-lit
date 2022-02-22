@@ -138,8 +138,9 @@ sudo lynis audit system
 
 sudo chmod 700 /boot
 
-sudo nano /etc/profile
-umask 077
+# don't do this this breaks lots of user workflows
+#sudo nano /etc/profile
+#umask 077
 
 # https://wiki.archlinux.org/title/Security
 sudo nano /etc/sysctl.d/42-my-hardenings.conf
@@ -271,23 +272,15 @@ git clone git@github.com:projektwahl/projektwahl-lit.git
 cd projektwahl-lit
 
 openssl req -x509 -newkey rsa:2048 -nodes -sha256 -subj '/CN=localhost' -keyout key.pem -out cert.pem
+
 npm ci --ignore-scripts --omit=optional
 npx node-gyp rebuild -C ./node_modules/@dev.mohe/argon2/
 npm run build
 
 # These lines need to be repeated all the time... We should probably use ACLs
-sudo chown -R moritz:projektwahl /opt/projektwahl-lit
-sudo chmod -R u=rwX,g=rX,o= /opt/projektwahl-lit/
+sudo chmod -R u=rwX,g=rX,o=rX /opt/projektwahl-lit/
 
 ps ax o user,group,gid,pid,%cpu,%mem,vsz,rss,tty,stat,start,time,comm
-
-# TODO FIXME we really should fix this
-
-#sudo setfacl --remove-all --recursive .
-#sudo setfacl --set=user::---,group::---,user:moritz:rwX,group:projektwahl:r-X,other::---,mask::--- --recursive --default .
-#sudo setfacl --modify=user:moritz:rwX,group:projektwahl:r-X --recursive --default .
-
-
 
 sudo -u projektwahl_admin psql --db projektwahl < src/server/setup.sql
 
