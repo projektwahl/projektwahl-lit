@@ -281,6 +281,34 @@ npm run build
 
 ps ax o user,group,gid,pid,%cpu,%mem,vsz,rss,tty,stat,start,time,comm
 
+
+
+# TODO FIXME do this here (and then in the build script don't create a content addressed path?)
+
+git worktree add $(git rev-parse HEAD) HEAD
+cd $(git rev-parse HEAD)
+npm ci --ignore-scripts --omit=optional
+npx node-gyp rebuild -C ./node_modules/@dev.mohe/argon2/
+npm run build
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 sudo -u projektwahl_admin psql --db projektwahl < src/server/setup.sql
 
 # maintenance:
