@@ -497,5 +497,16 @@ sudo systemctl enable --now systemd-timesyncd
 
 https://github.com/prometheus-community/postgres_exporter
 
+git clone https://github.com/prometheus-community/postgres_exporter.git
+sudo pacman -S which go
+make build
+sudo -u postgres DATA_SOURCE_NAME="user=postgres host=/var/run/postgresql/ sslmode=disable" ./postgres_exporter
+
+
+sudo nano /etc/prometheus/prometheus.yml 
+  - job_name: 'postgresql'
+    static_configs:
+      - targets: ['localhost:9187']
+
 
 https://www.observability.blog/nginx-monitoring-with-prometheus/
