@@ -490,3 +490,10 @@ http://168.119.156.152:9093/#/alerts
 
 
 sudo systemctl enable --now systemd-timesyncd
+
+
+
+https://github.com/prometheus-community/postgres_exporter
+
+
+https://www.observability.blog/nginx-monitoring-with-prometheus/
