@@ -479,4 +479,14 @@ sudo nano /etc/conf.d/prometheus-node-exporter
 NODE_EXPORTER_ARGS="--collector.systemd --collector.processes"
 sudo systemctl restart prometheus-node-exporter
 
+https://monitoring.mixins.dev/node-exporter/
+
+
+sudo pacman -S alertmanager
+sudo systemctl enable --now alertmanager
+ sudo ufw allow 9093
+
+http://168.119.156.152:9093/#/alerts
+
+
 
