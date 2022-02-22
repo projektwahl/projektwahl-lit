@@ -513,6 +513,8 @@ sudo nano /etc/prometheus/prometheus.yml
   - job_name: 'postgresql'
     static_configs:
       - targets: ['localhost:9187']
-
+      
+      
+https://grafana.com/grafana/dashboards/9628
 
 https://www.observability.blog/nginx-monitoring-with-prometheus/
