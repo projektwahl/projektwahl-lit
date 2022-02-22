@@ -504,8 +504,8 @@ git clone https://github.com/prometheus-community/postgres_exporter.git
 cd postgres_exporter/
 sudo pacman -S which go
 make build
-sudo chown -R postgres:postgres /opt/projektwahl-lit
-sudo chmod -R u=rX,g=rX,o= /opt/projektwahl-lit/
+sudo chown -R postgres:postgres /opt/postgres_exporter
+sudo chmod -R u=rX,g=rX,o= /opt/postgres_exporter
 sudo -u postgres DATA_SOURCE_NAME="user=postgres host=/var/run/postgresql/ sslmode=disable" ./postgres_exporter
 
 
