@@ -489,4 +489,4 @@ sudo systemctl enable --now alertmanager
 http://168.119.156.152:9093/#/alerts
 
 
-
+sudo systemctl enable --now systemd-timesyncd
