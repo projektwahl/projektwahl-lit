@@ -446,4 +446,16 @@ sudo ufw allow 3000
 # https://wiki.archlinux.org/title/Grafana
 
 
+curl -OL https://grafana.com/oss/prometheus/exporters/node-exporter/assets/node_rules.yaml
+sudo mv node_rules.yaml /etc/prometheus/
+sudo nano /etc/prometheus/prometheus.yml 
+sudo chown root:prometheus /etc/prometheus/node_rules.yaml
+sudo chmod 640 /etc/prometheus/node_rules.yaml
+sudo systemctl restart prometheus
 
+
+https://grafana.com/oss/prometheus/exporters/node-exporter/?tab=dashboards
+
+# 13978
+# 13971
+# 13977
