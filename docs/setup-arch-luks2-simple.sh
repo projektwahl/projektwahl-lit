@@ -277,8 +277,7 @@ npm ci --ignore-scripts --omit=optional
 npx node-gyp rebuild -C ./node_modules/@dev.mohe/argon2/
 npm run build
 
-# These lines need to be repeated all the time... We should probably use ACLs
-sudo chmod -R u=rwX,g=rX,o=rX /opt/projektwahl-lit/
+#sudo chmod -R u=rwX,g=rX,o=rX /opt/projektwahl-lit/
 
 ps ax o user,group,gid,pid,%cpu,%mem,vsz,rss,tty,stat,start,time,comm
 
