@@ -453,9 +453,21 @@ sudo chown root:prometheus /etc/prometheus/node_rules.yaml
 sudo chmod 640 /etc/prometheus/node_rules.yaml
 sudo systemctl restart prometheus
 
+curl -OL https://grafana.com/oss/prometheus/exporters/node-exporter/assets/node_alerts.yaml
+sudo mv node_alerts.yaml /etc/prometheus/
+sudo nano /etc/prometheus/prometheus.yml 
+sudo chown root:prometheus /etc/prometheus/node_alerts.yaml
+sudo chmod 640 /etc/prometheus/node_alerts.yaml
+sudo systemctl restart prometheus
 
 https://grafana.com/oss/prometheus/exporters/node-exporter/?tab=dashboards
 
 # 13978
 # 13971
 # 13977
+
+
+
+  - job_name: 'node'
+    static_configs:
+      - targets: ['localhost:9100']
