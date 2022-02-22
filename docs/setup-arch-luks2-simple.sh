@@ -481,6 +481,8 @@ sudo systemctl restart prometheus-node-exporter
 
 https://monitoring.mixins.dev/node-exporter/
 
+# SET THE TIME ZONE TO UTC because otherwise it's broken
+
 
 sudo pacman -S alertmanager
 sudo systemctl enable --now alertmanager
