@@ -405,6 +405,8 @@ https://freedesktop.org/wiki/Software/systemd/DaemonSocketActivation/
 
 # TODO FIXME source maps (also enable the command line arg)
 
+# probably don't do this - the benefits are marginal and the it's pretty annoying
+
 sudo rm -Rf /opt/projektwahl-container
 sudo mkdir /opt/projektwahl-container
 sudo pacstrap -c /opt/projektwahl-container nodejs
