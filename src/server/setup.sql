@@ -25,8 +25,9 @@ BEGIN READ WRITE;
 
 -- if you remove this you get a CVE for free - so don't. (because the triggers can have race conditions then)
 -- https://www.postgresql.org/docs/current/transaction-iso.html
-ALTER DATABASE projektwahl SET default_transaction_isolation = 'serializable';
-ALTER DATABASE projektwahl SET default_transaction_read_only = true;
+-- currently done in the setup instructions and not automatically here
+-- ALTER DATABASE projektwahl SET default_transaction_isolation = 'serializable';
+-- ALTER DATABASE projektwahl SET default_transaction_read_only = true;
 
 -- TODO FIXME at some point create the tables based on the zod definitions? so min/max etc. are checked correctly?
 CREATE TABLE IF NOT EXISTS projects_with_deleted (
@@ -394,14 +395,5 @@ FOR EACH ROW
 EXECUTE FUNCTION check_project_leader_choices();
 
 INSERT INTO settings (id, election_running) VALUES (1, false) ON CONFLICT DO NOTHING;
-
-
-GRANT SELECT,INSERT,UPDATE ON users_with_deleted TO projektwahl;
-GRANT SELECT,INSERT,UPDATE ON users TO projektwahl;
-GRANT SELECT,INSERT,UPDATE ON projects_with_deleted TO projektwahl;
-GRANT SELECT,INSERT,UPDATE ON projects TO projektwahl;
-GRANT SELECT,INSERT,UPDATE ON choices TO projektwahl;
-GRANT SELECT,INSERT,UPDATE,DELETE ON sessions TO projektwahl;
-
 
 COMMIT;
