@@ -248,10 +248,27 @@ sudo ufw allow http
 sudo ufw allow https
 
 
-sudo nano /etc/nginx/nginx.conf
+# TODO see hardening at https://wiki.archlinux.org/title/nginx
+sudo nano /etc/nginx/nginx.conf # replace with file in repo
+sudo mkdir /etc/nginx/sites-available
+sudo mkdir /etc/nginx/sites-enabled
+
+sudo nano /etc/nginx/sites-available/projektwahl-staging.conf
+# staging-aes.selfmade4u.de
+# /opt/projektwahl-lit-staging
+# https://localhost:7443;
+
+sudo nano /etc/nginx/sites-available/projektwahl-production.conf
+# aes.selfmade4u.de
+# /opt/projektwahl-lit-production
+
+sudo ln -s /etc/nginx/sites-available/projektwahl-staging.conf /etc/nginx/sites-enabled/
+sudo ln -s /etc/nginx/sites-available/projektwahl-production.conf /etc/nginx/sites-enabled/
+
+
 # edit server_name aes.selfmade4u.de
 sudo pacman -S certbot-nginx
-sudo certbot --nginx -d aes.selfmade4u.de -m Moritz.Hedtke@t-online.de --agree-tos -n
+sudo certbot --nginx -d aes.selfmade4u.de -d staging-aes.selfmade4u.de -m Moritz.Hedtke@t-online.de --agree-tos -n
 
 
 
