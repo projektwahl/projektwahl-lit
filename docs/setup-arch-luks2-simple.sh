@@ -169,8 +169,6 @@ proc	/proc	proc	nosuid,nodev,noexec,hidepid=2,gid=proc	0	0
 # TODO nginx A+ ssllabs
 
 
-# TODO backups
-
 
 
 # TODO https://wiki.archlinux.org/title/AppArmor
@@ -305,36 +303,16 @@ ssh -A moritz@aes.selfmade4u.de -p 2121
 sudo useradd -m projektwahl
 sudo useradd -m projektwahl_admin
 cd /opt
-sudo mkdir projektwahl-lit
-sudo chown moritz projektwahl-lit
-git clone git@github.com:projektwahl/projektwahl-lit.git
-cd projektwahl-lit
+sudo mkdir projektwahl-lit-staging
+sudo chown moritz projektwahl-lit-staging
+git clone git@github.com:projektwahl/projektwahl-lit.git projektwahl-lit-staging
+cd projektwahl-lit-staging
 
 openssl req -x509 -newkey rsa:2048 -nodes -sha256 -subj '/CN=localhost' -keyout key.pem -out cert.pem
 
 npm ci --ignore-scripts --omit=optional
 npx node-gyp rebuild -C ./node_modules/@dev.mohe/argon2/
 npm run build
-
-#sudo chmod -R u=rwX,g=rX,o=rX /opt/projektwahl-lit/
-
-ps ax o user,group,gid,pid,%cpu,%mem,vsz,rss,tty,stat,start,time,comm
-
-
-
-# TODO FIXME do this here (and then in the build script don't create a content addressed path?)
-
-git worktree add $(git rev-parse HEAD) HEAD
-cd $(git rev-parse HEAD)
-npm ci --ignore-scripts --omit=optional
-npx node-gyp rebuild -C ./node_modules/@dev.mohe/argon2/
-npm run build
-
-
-
-
-
-
 
 
 
