@@ -338,6 +338,11 @@ npm run build
 
 
 sudo -u projektwahl_staging_admin psql --db projektwahl < src/server/setup.sql
+
+# maintenance:
+sudo -u projektwahl_staging_admin psql --db projektwahl
+SET default_transaction_read_only = false;
+
 ALTER DATABASE projektwahl_staging SET default_transaction_isolation = 'serializable';
 ALTER DATABASE projektwahl_staging SET default_transaction_read_only = true;
 
@@ -349,12 +354,17 @@ GRANT SELECT,INSERT,UPDATE ON choices TO projektwahl_staging;
 GRANT SELECT,INSERT,UPDATE,DELETE ON sessions TO projektwahl_staging;
 
 
+# Backup
+set -C
+sudo pg_dump --no-acl --no-owner --username projektwahl_production_admin projektwahl > "dump_$(date +"%F %T").sql"
+
+# Recover
+sudo psql --username projektwahl_staging_admin --set ON_ERROR_STOP=on projektwahl_staging < dump.sql
+# TODO manually fixup ACLs with the above instructions
 
 
-# maintenance:
-sudo -u projektwahl_staging_admin psql --db projektwahl
-SET default_transaction_read_only = false;
-\dp
+
+
 
 
 sudo -u projektwahl -i
@@ -365,15 +375,6 @@ NODE_ENV=production DATABASE_URL=postgres://projektwahl:projektwahl@localhost/pr
 NODE_ENV=production PORT=8443 BASE_URL=https://localhost:8443 DATABASE_URL=postgres://projektwahl:projektwahl@projektwahl/projektwahl CREDENTIALS_DIRECTORY=$PWD node  --enable-source-maps dist/server.cjs
 
 
-
-
-# Backup
-set -C
-sudo pg_dump --no-acl --no-owner --username projektwahl_production_admin projektwahl > "dump_$(date +"%F %T").sql"
-
-# Recover
-sudo psql --username projektwahl_staging_admin --set ON_ERROR_STOP=on projektwahl_staging < dump.sql
-# TODO manually fixup ACLs
 
 
 sudo nano /etc/systemd/system/projektwahl.service
