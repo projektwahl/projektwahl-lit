@@ -65,6 +65,10 @@ class PwLogin extends PwForm<"/api/v1/login"> {
       });
 
       if (result.success) {
+        const bc = new BroadcastChannel('updateloginstate');
+        bc.postMessage('login');
+        bc.close()
+
         if (window.opener) {
           window.close();
         } else {

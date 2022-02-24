@@ -42,7 +42,9 @@ export const myFetch = async <P extends import("../lib/routes").keys>(
         jscookie.remove("lax_id")
         jscookie.remove("strict_id")
         jscookie.remove("username")
-        document.dispatchEvent(new CustomEvent("updateloginstate"))
+
+        const bc = new BroadcastChannel('updateloginstate');
+        bc.postMessage('logout');
       }
       try {
         const additionalInfo = await response.text();

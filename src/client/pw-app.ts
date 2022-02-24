@@ -146,6 +146,7 @@ export class PwApp extends LitElement {
       initial: { attribute: false },
       initialRender: { state: true },
       navbarOpen: { state: true },
+      username: { state: true },
     };
   }
 
@@ -166,18 +167,22 @@ export class PwApp extends LitElement {
     keyof typeof pages | undefined
   ]) => Promise<TemplateResult>;
 
-  username: string;
+  username: string | undefined;
+
+  bc!: BroadcastChannel;
 
   override connectedCallback(): void {
     super.connectedCallback();
     window.addEventListener("popstate", this.popstateListener);
-    document.addEventListener("updateloginstate", this.updateloginstate);
+    this.bc = new BroadcastChannel('updateloginstate');
+    this.bc.addEventListener("message", this.updateloginstate);
   }
 
   override disconnectedCallback(): void {
     super.disconnectedCallback();
     window.removeEventListener("popstate", this.popstateListener);
-    document.removeEventListener("updateloginstate", this.updateloginstate);
+    this.bc.removeEventListener("message", this.updateloginstate);
+    this.bc.close()
   }
 
   constructor() {
@@ -329,6 +334,10 @@ export class PwApp extends LitElement {
                               method: "POST",
                               body: "{}",
                             });
+
+                            const bc = new BroadcastChannel('updateloginstate');
+                            bc.postMessage('logout');
+
                             HistoryController.goto(
                               new URL("/login", window.location.href),
                               {}
