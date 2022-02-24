@@ -341,12 +341,13 @@ export class PwApp extends LitElement {
                       </li>`
                     : html` <li class="nav-item">
                         <a
-                          @click=${aClick}
                           class="nav-link ${this.history.url.pathname ===
                           "/login"
                             ? "active"
                             : ""}"
                           href="/login"
+                          target="_blank"
+                          rel="opener"
                           >${msg("Login")}</a
                         >
                       </li>`}
