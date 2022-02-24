@@ -310,6 +310,18 @@ npm run build
 
 
 sudo -u projektwahl_admin psql --db projektwahl < src/server/setup.sql
+ALTER DATABASE projektwahl SET default_transaction_isolation = 'serializable';
+ALTER DATABASE projektwahl SET default_transaction_read_only = true;
+
+GRANT SELECT,INSERT,UPDATE ON users_with_deleted TO projektwahl;
+GRANT SELECT,INSERT,UPDATE ON users TO projektwahl;
+GRANT SELECT,INSERT,UPDATE ON projects_with_deleted TO projektwahl;
+GRANT SELECT,INSERT,UPDATE ON projects TO projektwahl;
+GRANT SELECT,INSERT,UPDATE ON choices TO projektwahl;
+GRANT SELECT,INSERT,UPDATE,DELETE ON sessions TO projektwahl;
+
+
+
 
 # maintenance:
 sudo -u projektwahl_admin psql --db projektwahl
