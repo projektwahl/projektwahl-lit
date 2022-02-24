@@ -266,7 +266,29 @@ sudo ln -s /etc/nginx/sites-available/projektwahl-staging.conf /etc/nginx/sites-
 sudo ln -s /etc/nginx/sites-available/projektwahl-production.conf /etc/nginx/sites-enabled/
 
 
-# edit server_name aes.selfmade4u.de
+
+
+sudo systemctl edit nginx
+sudo systemd-analyze security nginx
+
+sudo useradd nginx
+sudo usermod -a -G projektwahl nginx
+sudo setfacl --modify=user:nginx:r-- /etc/letsencrypt/live/aes.selfmade4u.de/fullchain.pem
+sudo setfacl --modify=user:nginx:r-- /etc/letsencrypt/live/aes.selfmade4u.de/privkey.pem
+sudo setfacl --modify=user:nginx:r-X /etc/letsencrypt/archive
+sudo setfacl --modify=user:nginx:r-X /etc/letsencrypt/archive/aes.selfmade4u.de/
+sudo setfacl --modify=user:nginx:r-X /etc/letsencrypt/live
+sudo setfacl --modify=user:nginx:r-X /etc/letsencrypt/live/aes.selfmade4u.de/
+
+sudo chown -R nginx:nginx /var/log/nginx/
+
+
+sudo systemctl daemon-reload && sudo systemctl stop nginx && sudo systemctl start nginx
+sudo journalctl -xeu nginx.service
+
+
+
+
 sudo pacman -S certbot-nginx
 sudo certbot --nginx -d aes.selfmade4u.de -d staging-aes.selfmade4u.de -m Moritz.Hedtke@t-online.de --agree-tos -n
 
@@ -417,30 +439,6 @@ sudo systemctl daemon-reload && sudo systemctl restart projektwahl.socket && sud
 
 
 
-
-sudo systemctl edit nginx
-sudo systemd-analyze security nginx
-
-sudo useradd nginx
-sudo usermod -a -G projektwahl nginx
-sudo setfacl --modify=user:nginx:r-- /etc/letsencrypt/live/aes.selfmade4u.de/fullchain.pem
-sudo setfacl --modify=user:nginx:r-- /etc/letsencrypt/live/aes.selfmade4u.de/privkey.pem
-sudo setfacl --modify=user:nginx:r-X /etc/letsencrypt/archive
-sudo setfacl --modify=user:nginx:r-X /etc/letsencrypt/archive/aes.selfmade4u.de/
-sudo setfacl --modify=user:nginx:r-X /etc/letsencrypt/live
-sudo setfacl --modify=user:nginx:r-X /etc/letsencrypt/live/aes.selfmade4u.de/
-
-sudo chown -R nginx:nginx /var/log/nginx/
-
-
-sudo systemctl daemon-reload && sudo systemctl stop nginx && sudo systemctl start nginx
-sudo journalctl -xeu nginx.service
-
-
-
-error_log   /var/log/nginx/error.log;
-pid        /run/nginx/nginx.pid;
-access_log  /var/log/nginx/access.log  main;
 
 
 
