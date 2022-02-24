@@ -556,3 +556,27 @@ sudo nano /etc/prometheus/prometheus.yml
 https://grafana.com/grafana/dashboards/9628
 
 https://www.observability.blog/nginx-monitoring-with-prometheus/
+
+
+sudo nano /etc/nginx/sites-available/nginx-monitoring.conf
+server {
+  listen 8080;
+
+  stub_status;
+}
+
+sudo ln -s /etc/nginx/sites-available/nginx-monitoring.conf /etc/nginx/sites-enabled/
+
+
+sudo docker run -p 9113:9113 nginx/nginx-prometheus-exporter:0.10.0 -nginx.scrape-uri=http://aes.selfmade4u.de:8080/stub_status
+
+# https://github.com/nginxinc/nginx-prometheus-exporter/blob/master/grafana/README.md
+
+sudo nano /etc/prometheus/prometheus.yml
+  - job_name: 'nginx'
+    static_configs: 
+      - targets: ['localhost:9113']
+      
+      
+# https://github.com/nginxinc/nginx-prometheus-exporter/blob/master/grafana/dashboard.json
+      
