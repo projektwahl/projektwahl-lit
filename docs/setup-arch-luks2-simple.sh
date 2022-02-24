@@ -333,7 +333,7 @@ sudo pg_dump --username projektwahl_admin projektwahl > "dump_$(date +"%F %T").s
 
 # Recover
 sudo psql --username projektwahl_admin --set ON_ERROR_STOP=on projektwahl < dump.sql
-
+sudo pg_dump --no-acl --no-owner --username projektwahl_admin projektwahl > "dump_$(date +"%F %T").sql"
 
 
 sudo nano /etc/systemd/system/projektwahl.service
