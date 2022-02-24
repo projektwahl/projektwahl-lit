@@ -280,6 +280,8 @@ sudo setfacl --modify=user:nginx:r-X /etc/letsencrypt/live/aes.selfmade4u.de/
 
 sudo chown -R nginx:nginx /var/log/nginx/
 
+# TODO https://docs.nginx.com/nginx/admin-guide/dynamic-modules/brotli/
+sudo pacman -S nginx-mod-brotli nginx-mod-headers-more
 
 sudo systemctl daemon-reload && sudo systemctl stop nginx && sudo systemctl start nginx
 sudo journalctl -xeu nginx.service
@@ -292,24 +294,35 @@ sudo certbot --nginx -d aes.selfmade4u.de -d staging-aes.selfmade4u.de -m Moritz
 
 
 
-
 sudo -u postgres psql
-CREATE ROLE projektwahl LOGIN;
-CREATE ROLE projektwahl_admin LOGIN;
-CREATE DATABASE projektwahl OWNER projektwahl_admin;
+CREATE ROLE projektwahl_staging LOGIN;
+CREATE ROLE projektwahl_staging_admin LOGIN;
+CREATE ROLE projektwahl_production LOGIN;
+CREATE ROLE projektwahl_production_admin LOGIN;
+CREATE DATABASE projektwahl_staging OWNER projektwahl_staging_admin;
+CREATE DATABASE projektwahl_production OWNER projektwahl_production_admin;
 
 
 ssh -A moritz@aes.selfmade4u.de -p 2121
-sudo useradd -m projektwahl
-sudo useradd -m projektwahl_admin
+sudo useradd -m projektwahl_staging
+sudo useradd -m projektwahl_staging_admin
+sudo useradd -m projektwahl_production
+sudo useradd -m projektwahl_production_admin
 cd /opt
 sudo mkdir projektwahl-lit-staging
 sudo chown moritz projektwahl-lit-staging
 git clone git@github.com:projektwahl/projektwahl-lit.git projektwahl-lit-staging
 cd projektwahl-lit-staging
-
 openssl req -x509 -newkey rsa:2048 -nodes -sha256 -subj '/CN=localhost' -keyout key.pem -out cert.pem
+npm ci --ignore-scripts --omit=optional
+npx node-gyp rebuild -C ./node_modules/@dev.mohe/argon2/
+npm run build
 
+sudo mkdir projektwahl-lit-production
+sudo chown moritz projektwahl-lit-production
+git clone git@github.com:projektwahl/projektwahl-lit.git projektwahl-lit-production
+cd projektwahl-lit-production
+openssl req -x509 -newkey rsa:2048 -nodes -sha256 -subj '/CN=localhost' -keyout key.pem -out cert.pem
 npm ci --ignore-scripts --omit=optional
 npx node-gyp rebuild -C ./node_modules/@dev.mohe/argon2/
 npm run build
@@ -324,24 +337,22 @@ npm run build
 
 
 
+sudo -u projektwahl_staging_admin psql --db projektwahl < src/server/setup.sql
+ALTER DATABASE projektwahl_staging SET default_transaction_isolation = 'serializable';
+ALTER DATABASE projektwahl_staging SET default_transaction_read_only = true;
 
-
-sudo -u projektwahl_admin psql --db projektwahl < src/server/setup.sql
-ALTER DATABASE projektwahl SET default_transaction_isolation = 'serializable';
-ALTER DATABASE projektwahl SET default_transaction_read_only = true;
-
-GRANT SELECT,INSERT,UPDATE ON users_with_deleted TO projektwahl;
-GRANT SELECT,INSERT,UPDATE ON users TO projektwahl;
-GRANT SELECT,INSERT,UPDATE ON projects_with_deleted TO projektwahl;
-GRANT SELECT,INSERT,UPDATE ON projects TO projektwahl;
-GRANT SELECT,INSERT,UPDATE ON choices TO projektwahl;
-GRANT SELECT,INSERT,UPDATE,DELETE ON sessions TO projektwahl;
+GRANT SELECT,INSERT,UPDATE ON users_with_deleted TO projektwahl_staging;
+GRANT SELECT,INSERT,UPDATE ON users TO projektwahl_staging;
+GRANT SELECT,INSERT,UPDATE ON projects_with_deleted TO projektwahl_staging;
+GRANT SELECT,INSERT,UPDATE ON projects TO projektwahl_staging;
+GRANT SELECT,INSERT,UPDATE ON choices TO projektwahl_staging;
+GRANT SELECT,INSERT,UPDATE,DELETE ON sessions TO projektwahl_staging;
 
 
 
 
 # maintenance:
-sudo -u projektwahl_admin psql --db projektwahl
+sudo -u projektwahl_staging_admin psql --db projektwahl
 SET default_transaction_read_only = false;
 \dp
 
@@ -358,11 +369,11 @@ NODE_ENV=production PORT=8443 BASE_URL=https://localhost:8443 DATABASE_URL=postg
 
 # Backup
 set -C
-sudo pg_dump --username projektwahl_admin projektwahl > "dump_$(date +"%F %T").sql"
+sudo pg_dump --no-acl --no-owner --username projektwahl_production_admin projektwahl > "dump_$(date +"%F %T").sql"
 
 # Recover
-sudo psql --username projektwahl_admin --set ON_ERROR_STOP=on projektwahl < dump.sql
-sudo pg_dump --no-acl --no-owner --username projektwahl_admin projektwahl > "dump_$(date +"%F %T").sql"
+sudo psql --username projektwahl_staging_admin --set ON_ERROR_STOP=on projektwahl_staging < dump.sql
+# TODO manually fixup ACLs
 
 
 sudo nano /etc/systemd/system/projektwahl.service
