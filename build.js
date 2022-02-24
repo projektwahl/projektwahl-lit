@@ -59,6 +59,16 @@ const exec = promisify(unpromisifiedExec);
   console.log(stderr);
 }
 
+
+{
+  let { stdout, stderr } = await exec(
+    "cp node_modules/bootstrap/dist/css/bootstrap.css.map dist/"
+  );
+
+  console.log(stdout);
+  console.log(stderr);
+}
+
 {
   let { stdout, stderr } = await exec(
     "purgecss --css node_modules/bootstrap/dist/css/bootstrap.css --content dist/*.js --output dist/bootstrap.min.css --font-face --keyframes --variables"
