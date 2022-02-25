@@ -395,6 +395,22 @@ NODE_ENV=production PORT=8443 BASE_URL=https://localhost:8443 DATABASE_URL=postg
 sudo nano /etc/systemd/system/projektwahl.service
 # https://github.com/projektwahl/projektwahl-lit/blob/work/docs/projektwahl%40.service.conf
 
+sudo systemctl edit --full --force projektwahl@.service
+sudo systemctl enable projektwahl@staging.service
+sudo systemctl enable projektwahl@production.service
+
+
+sudo systemctl edit --full --force projektwahl@.socket
+sudo systemctl enable projektwahl@staging.service
+sudo systemctl enable projektwahl@production.service
+
+sudo systemctl edit projektwahl@staging.service
+[Socket]
+ListenStream=127.0.0.1:7443
+
+sudo systemctl edit projektwahl@production.service
+[Socket]
+ListenStream=127.0.0.1:8443
 
 sudo systemctl show projektwahl.service | grep --color Device
 
