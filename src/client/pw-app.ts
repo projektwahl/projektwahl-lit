@@ -174,7 +174,7 @@ export class PwApp extends LitElement {
   override connectedCallback(): void {
     super.connectedCallback();
     window.addEventListener("popstate", this.popstateListener);
-    this.bc = new BroadcastChannel('updateloginstate');
+    this.bc = new BroadcastChannel("updateloginstate");
     this.bc.addEventListener("message", this.updateloginstate);
   }
 
@@ -182,7 +182,7 @@ export class PwApp extends LitElement {
     super.disconnectedCallback();
     window.removeEventListener("popstate", this.popstateListener);
     this.bc.removeEventListener("message", this.updateloginstate);
-    this.bc.close()
+    this.bc.close();
   }
 
   constructor() {
@@ -212,11 +212,11 @@ export class PwApp extends LitElement {
       HistoryController.goto(url, state);
     };
 
-    this.username = jscookie.get("username")
+    this.username = jscookie.get("username");
 
     this.updateloginstate = () => {
-      this.username = jscookie.get("username")
-    }
+      this.username = jscookie.get("username");
+    };
 
     this.navbarOpen = false;
 
@@ -335,8 +335,8 @@ export class PwApp extends LitElement {
                               body: "{}",
                             });
 
-                            const bc = new BroadcastChannel('updateloginstate');
-                            bc.postMessage('logout');
+                            const bc = new BroadcastChannel("updateloginstate");
+                            bc.postMessage("logout");
 
                             HistoryController.goto(
                               new URL("/login", window.location.href),

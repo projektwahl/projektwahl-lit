@@ -55,7 +55,7 @@ export async function projectsHandler(
                 {
                   code: ZodIssueCode.custom,
                   path: ["unauthorized"],
-                  message: "Not logged in!"
+                  message: "Not logged in!",
                 },
               ],
             },

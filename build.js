@@ -59,7 +59,6 @@ const exec = promisify(unpromisifiedExec);
   console.log(stderr);
 }
 
-
 {
   let { stdout, stderr } = await exec(
     "cp node_modules/bootstrap/dist/css/bootstrap.css.map dist/"

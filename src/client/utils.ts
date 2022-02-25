@@ -23,7 +23,7 @@ SPDX-FileCopyrightText: 2021 Moritz Hedtke <Moritz.Hedtke@t-online.de>
 
 //import { ZodIssueCode } from "zod";
 import type { ResponseType } from "../lib/routes";
-import jscookie from 'js-cookie'
+import jscookie from "js-cookie";
 
 export const myFetch = async <P extends import("../lib/routes").keys>(
   url: `${P}${string}`,
@@ -38,13 +38,14 @@ export const myFetch = async <P extends import("../lib/routes").keys>(
       },
     });
     if (!response.ok) {
-      if (response.status == 401) { // unauthorized
-        jscookie.remove("lax_id")
-        jscookie.remove("strict_id")
-        jscookie.remove("username")
+      if (response.status == 401) {
+        // unauthorized
+        jscookie.remove("lax_id");
+        jscookie.remove("strict_id");
+        jscookie.remove("username");
 
-        const bc = new BroadcastChannel('updateloginstate');
-        bc.postMessage('logout');
+        const bc = new BroadcastChannel("updateloginstate");
+        bc.postMessage("logout");
       }
       try {
         const additionalInfo = await response.text();

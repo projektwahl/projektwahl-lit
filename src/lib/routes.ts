@@ -114,29 +114,6 @@ function identity<
 
 export type UnknownKeysParam = "passthrough" | "strict" | "strip";
 
-const usersCreateOrUpdate = <
-  T extends { [k: string]: ZodTypeAny },
-  UnknownKeys extends UnknownKeysParam = "strip",
-  Catchall extends ZodTypeAny = ZodTypeAny
->(
-  s: ZodObject<T, UnknownKeys, Catchall>
-) =>
-  s
-    .pick({
-      age: true,
-      away: true,
-      group: true,
-      id: true,
-      type: true,
-      username: true,
-      project_leader_id: true,
-      force_in_project_id: true,
-      deleted: true,
-    })
-    .extend({
-      password: z.string(),
-    });
-
 export const entities = <
   T extends { [k: string]: ZodTypeAny },
   UnknownKeys extends UnknownKeysParam = "strip",
@@ -261,11 +238,40 @@ export const routes = identity({
     response: z.object({}),
   },
   "/api/v1/users/create": {
-    request: usersCreateOrUpdate(rawUserSchema),
+    request: rawUserSchema
+      .pick({
+        age: true,
+        away: true,
+        group: true,
+        id: true,
+        type: true,
+        username: true,
+        project_leader_id: true,
+        force_in_project_id: true,
+        deleted: true,
+      })
+      .extend({
+        password: z.string(),
+      }),
     response: createOrUpdateUserResponse(rawUserSchema),
   },
   "/api/v1/users/update": {
-    request: usersCreateOrUpdate(rawUserSchema).partial(),
+    request: rawUserSchema
+      .pick({
+        age: true,
+        away: true,
+        group: true,
+        id: true,
+        type: true,
+        username: true,
+        project_leader_id: true,
+        force_in_project_id: true,
+        deleted: true,
+      })
+      .extend({
+        password: z.string(),
+      })
+      .partial(),
     response: createOrUpdateUserResponse(rawUserSchema),
   },
   "/api/v1/projects/create": {

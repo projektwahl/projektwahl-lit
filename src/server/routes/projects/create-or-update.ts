@@ -144,7 +144,7 @@ export async function createOrUpdateProjectsHandler<
       if (!loggedInUser) {
         const returnValue: [
           OutgoingHttpHeaders,
-          ResponseType<"/api/v1/projects/create"|"/api/v1/projects/update">
+          ResponseType<"/api/v1/projects/create" | "/api/v1/projects/update">
         ] = [
           {
             "content-type": "text/json; charset=utf-8",
@@ -157,7 +157,7 @@ export async function createOrUpdateProjectsHandler<
                 {
                   code: ZodIssueCode.custom,
                   path: ["unauthorized"],
-                  message: "Not logged in!"
+                  message: "Not logged in!",
                 },
               ],
             },

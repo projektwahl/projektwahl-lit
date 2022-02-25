@@ -122,7 +122,7 @@ export async function createOrUpdateUsersHandler<
       if (!loggedInUser) {
         const returnValue: [
           OutgoingHttpHeaders,
-          ResponseType<"/api/v1/users/create"|"/api/v1/users/update">
+          ResponseType<"/api/v1/users/create" | "/api/v1/users/update">
         ] = [
           {
             "content-type": "text/json; charset=utf-8",
@@ -135,7 +135,7 @@ export async function createOrUpdateUsersHandler<
                 {
                   code: ZodIssueCode.custom,
                   path: ["unauthorized"],
-                  message: "Not logged in!"
+                  message: "Not logged in!",
                 },
               ],
             },
