@@ -243,15 +243,12 @@ export const routes = identity({
         age: true,
         away: true,
         group: true,
-        id: true,
         type: true,
         username: true,
-        project_leader_id: true,
-        force_in_project_id: true,
         deleted: true,
       })
       .extend({
-        password: z.string(),
+        password: z.string().optional(),
       }),
     response: createOrUpdateUserResponse(rawUserSchema),
   },
@@ -261,7 +258,6 @@ export const routes = identity({
         age: true,
         away: true,
         group: true,
-        id: true,
         type: true,
         username: true,
         project_leader_id: true,
@@ -271,15 +267,45 @@ export const routes = identity({
       .extend({
         password: z.string(),
       })
-      .partial(),
+      .partial()
+      .extend({
+        id: z.number(),
+      }),
     response: createOrUpdateUserResponse(rawUserSchema),
   },
   "/api/v1/projects/create": {
-    request: rawProjectSchema,
+    request: rawProjectSchema.pick({
+      costs: true,
+      deleted: true,
+      info: true,
+      max_age: true,
+      max_participants: true,
+      min_age: true,
+      min_participants: true,
+      place: true,
+      random_assignments: true,
+      title: true,
+    }),
     response: z.object({}).extend({ id: z.number() }),
   },
   "/api/v1/projects/update": {
-    request: rawProjectSchema.partial(),
+    request: rawProjectSchema
+      .pick({
+        costs: true,
+        deleted: true,
+        info: true,
+        max_age: true,
+        max_participants: true,
+        min_age: true,
+        min_participants: true,
+        place: true,
+        random_assignments: true,
+        title: true,
+      })
+      .partial()
+      .extend({
+        id: z.number(),
+      }),
     response: z.object({}).extend({ id: z.number() }),
   },
   "/api/v1/users": {
