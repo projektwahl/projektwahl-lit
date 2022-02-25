@@ -337,21 +337,36 @@ npm run build
 
 
 
-sudo -u projektwahl_staging_admin psql --db projektwahl < src/server/setup.sql
+sudo -u projektwahl_staging_admin psql --db projektwahl_staging < src/server/setup.sql
+sudo -u projektwahl_production_admin psql --db projektwahl_production < src/server/setup.sql
+
+
 
 # maintenance:
-sudo -u projektwahl_staging_admin psql --db projektwahl
+sudo -u projektwahl_staging_admin psql --db projektwahl_staging
 SET default_transaction_read_only = false;
-
 ALTER DATABASE projektwahl_staging SET default_transaction_isolation = 'serializable';
 ALTER DATABASE projektwahl_staging SET default_transaction_read_only = true;
-
 GRANT SELECT,INSERT,UPDATE ON users_with_deleted TO projektwahl_staging;
 GRANT SELECT,INSERT,UPDATE ON users TO projektwahl_staging;
 GRANT SELECT,INSERT,UPDATE ON projects_with_deleted TO projektwahl_staging;
 GRANT SELECT,INSERT,UPDATE ON projects TO projektwahl_staging;
 GRANT SELECT,INSERT,UPDATE ON choices TO projektwahl_staging;
 GRANT SELECT,INSERT,UPDATE,DELETE ON sessions TO projektwahl_staging;
+
+
+
+sudo -u projektwahl_production_admin psql --db projektwahl_production
+SET default_transaction_read_only = false;
+ALTER DATABASE projektwahl_production SET default_transaction_isolation = 'serializable';
+ALTER DATABASE projektwahl_production SET default_transaction_read_only = true;
+GRANT SELECT,INSERT,UPDATE ON users_with_deleted TO projektwahl_production;
+GRANT SELECT,INSERT,UPDATE ON users TO projektwahl_production;
+GRANT SELECT,INSERT,UPDATE ON projects_with_deleted TO projektwahl_production;
+GRANT SELECT,INSERT,UPDATE ON projects TO projektwahl_production;
+GRANT SELECT,INSERT,UPDATE ON choices TO projektwahl_production;
+GRANT SELECT,INSERT,UPDATE,DELETE ON sessions TO projektwahl_production;
+
 
 
 # Backup
