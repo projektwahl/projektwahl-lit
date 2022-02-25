@@ -1,19 +1,19 @@
 [Unit]
-Description=projektwahl
+Description=projektwahl %i
 RefuseManualStart=true
 
 [Service]
 Type=simple
 Restart=on-failure
-WorkingDirectory=/opt/projektwahl-lit
+WorkingDirectory=/opt/projektwahl-lit-%i
 PrivateNetwork=true
 Environment=NODE_ENV=production
-Environment=DATABASE_URL=postgres://projektwahl:projektwahl@127.0.0.1/projektwahl
+Environment=DATABASE_URL=postgres://projektwahl_%i:projektwahl_%i@127.0.0.1/projektwahl_%i
 Environment=DATABASE_HOST=/run/postgresql
 Environment=BASE_URL=https://aes.selfmade4u.de/
-ExecStart=node /opt/projektwahl-lit/dist/server.js
-LoadCredential=cert.pem:/opt/projektwahl-lit/cert.pem
-LoadCredential=key.pem:/opt/projektwahl-lit/key.pem
+ExecStart=node /opt/projektwahl-lit-%i/dist/server.js
+LoadCredential=cert.pem:/opt/projektwahl-lit-%i/cert.pem
+LoadCredential=key.pem:/opt/projektwahl-lit-%i/key.pem
 DynamicUser=true
 CapabilityBoundingSet=
 NoNewPrivileges=true
