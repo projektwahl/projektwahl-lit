@@ -146,6 +146,7 @@ export class PwApp extends LitElement {
       initial: { attribute: false },
       initialRender: { state: true },
       navbarOpen: { state: true },
+      username: { state: true },
     };
   }
 
@@ -158,6 +159,7 @@ export class PwApp extends LitElement {
   navbarOpen: boolean;
 
   private popstateListener: (this: Window, ev: PopStateEvent) => void;
+  private updateloginstate: (this: Window, ev: Event) => void;
 
   protected _apiTask!: Task<[keyof typeof pages | undefined], TemplateResult>;
 
@@ -165,14 +167,22 @@ export class PwApp extends LitElement {
     keyof typeof pages | undefined
   ]) => Promise<TemplateResult>;
 
+  username: string | undefined;
+
+  bc!: BroadcastChannel;
+
   override connectedCallback(): void {
     super.connectedCallback();
     window.addEventListener("popstate", this.popstateListener);
+    this.bc = new BroadcastChannel("updateloginstate");
+    this.bc.addEventListener("message", this.updateloginstate);
   }
 
   override disconnectedCallback(): void {
     super.disconnectedCallback();
     window.removeEventListener("popstate", this.popstateListener);
+    this.bc.removeEventListener("message", this.updateloginstate);
+    this.bc.close();
   }
 
   constructor() {
@@ -200,6 +210,12 @@ export class PwApp extends LitElement {
       const url = new URL(window.location.href);
       const state = event.state as HistoryState;
       HistoryController.goto(url, state);
+    };
+
+    this.username = jscookie.get("username");
+
+    this.updateloginstate = () => {
+      this.username = jscookie.get("username");
     };
 
     this.navbarOpen = false;
@@ -310,7 +326,7 @@ export class PwApp extends LitElement {
                   </li>
                 </ul>
                 <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
-                  ${jscookie.get("username")
+                  ${this.username
                     ? html`<li class="nav-item">
                         <a
                           @click=${async () => {
@@ -318,6 +334,10 @@ export class PwApp extends LitElement {
                               method: "POST",
                               body: "{}",
                             });
+
+                            const bc = new BroadcastChannel("updateloginstate");
+                            bc.postMessage("logout");
+
                             HistoryController.goto(
                               new URL("/login", window.location.href),
                               {}
@@ -325,17 +345,18 @@ export class PwApp extends LitElement {
                           }}
                           class="nav-link"
                           href="#"
-                          >${msg(str`Logout ${jscookie.get("username")}`)}</a
+                          >${msg(str`Logout ${this.username}`)}</a
                         >
                       </li>`
                     : html` <li class="nav-item">
                         <a
-                          @click=${aClick}
                           class="nav-link ${this.history.url.pathname ===
                           "/login"
                             ? "active"
                             : ""}"
                           href="/login"
+                          target="_blank"
+                          rel="opener"
                           >${msg("Login")}</a
                         >
                       </li>`}

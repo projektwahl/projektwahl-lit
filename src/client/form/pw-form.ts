@@ -20,7 +20,7 @@ https://github.com/projektwahl/projektwahl-lit
 SPDX-License-Identifier: AGPL-3.0-or-later
 SPDX-FileCopyrightText: 2021 Moritz Hedtke <Moritz.Hedtke@t-online.de>
 */
-import { html, LitElement } from "lit";
+import { html, LitElement, noChange } from "lit";
 import { createRef } from "lit/directives/ref.js";
 import { msg } from "@lit/localize";
 import type { routes, ResponseType } from "../../lib/routes.js";
@@ -82,6 +82,7 @@ class PwForm<P extends keyof typeof routes> extends LitElement {
         }
         return html``;
       },
+      pending: () => noChange,
     });
   }
 }

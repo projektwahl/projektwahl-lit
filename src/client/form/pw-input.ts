@@ -248,7 +248,7 @@ export class PwInput<
           class="${
             this.type === "checkbox" ? "form-check-input" : "form-control"
           } ${this.task.render({
-      pending: () => "",
+      pending: () => noChange,
       complete: (v) =>
         !v.success &&
         v.error.issues.find(

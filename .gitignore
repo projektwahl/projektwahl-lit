@@ -8,3 +8,4 @@ bootstrap.min.css
 /zap*
 /chromedriver*
 /lit
+/*.sql

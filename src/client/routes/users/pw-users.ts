@@ -56,6 +56,10 @@ export class PwUsers<X extends string> extends PwEntityList<
     return "/api/v1/users" as const;
   }
 
+  override get title() {
+    return msg("Users");
+  }
+
   override get buttons() {
     return html` <a
       @click=${aClick}
@@ -137,7 +141,7 @@ export class PwUsers<X extends string> extends PwEntityList<
             ${pwInput<"/api/v1/users", ["filters", "type"]>({
               type: "select",
               disabled: this.disabled,
-              label: msg("Type"),
+              label: null,
               name: ["filters", "type"],
               options: [
                 { value: undefined, text: "Alle" },

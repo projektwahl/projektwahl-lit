@@ -138,8 +138,9 @@ sudo lynis audit system
 
 sudo chmod 700 /boot
 
-sudo nano /etc/profile
-umask 077
+# don't do this this breaks lots of user workflows
+#sudo nano /etc/profile
+#umask 077
 
 # https://wiki.archlinux.org/title/Security
 sudo nano /etc/sysctl.d/42-my-hardenings.conf
@@ -167,8 +168,6 @@ proc	/proc	proc	nosuid,nodev,noexec,hidepid=2,gid=proc	0	0
 # TODO DNSSEC
 # TODO nginx A+ ssllabs
 
-
-# TODO backups
 
 
 
@@ -247,59 +246,155 @@ sudo ufw allow http
 sudo ufw allow https
 
 
-sudo nano /etc/nginx/nginx.conf
-# edit server_name aes.selfmade4u.de
-sudo pacman -S certbot-nginx
-sudo certbot --nginx -d aes.selfmade4u.de -m Moritz.Hedtke@t-online.de --agree-tos -n
+# TODO see hardening at https://wiki.archlinux.org/title/nginx
+sudo nano /etc/nginx/nginx.conf # replace with file in repo
+sudo mkdir /etc/nginx/sites-available
+sudo mkdir /etc/nginx/sites-enabled
 
+sudo nano /etc/nginx/sites-available/projektwahl-staging.conf
+# staging-aes.selfmade4u.de
+# /opt/projektwahl-lit-staging
+# https://localhost:7443;
+
+sudo nano /etc/nginx/sites-available/projektwahl-production.conf
+# aes.selfmade4u.de
+# /opt/projektwahl-lit-production
+# https://localhost:8443;
+
+sudo ln -s /etc/nginx/sites-available/projektwahl-staging.conf /etc/nginx/sites-enabled/
+sudo ln -s /etc/nginx/sites-available/projektwahl-production.conf /etc/nginx/sites-enabled/
+
+
+
+
+sudo systemctl edit nginx
+sudo systemd-analyze security nginx
+
+sudo useradd nginx
+sudo usermod -a -G projektwahl nginx
+sudo setfacl --modify=user:nginx:r-- /etc/letsencrypt/live/aes.selfmade4u.de/fullchain.pem
+sudo setfacl --modify=user:nginx:r-- /etc/letsencrypt/live/aes.selfmade4u.de/privkey.pem
+sudo setfacl --modify=user:nginx:r-X /etc/letsencrypt/archive
+sudo setfacl --modify=user:nginx:r-X /etc/letsencrypt/archive/aes.selfmade4u.de/
+sudo setfacl --modify=user:nginx:r-X /etc/letsencrypt/live
+sudo setfacl --modify=user:nginx:r-X /etc/letsencrypt/live/aes.selfmade4u.de/
+
+sudo chown -R nginx:nginx /var/log/nginx/
+
+# TODO https://docs.nginx.com/nginx/admin-guide/dynamic-modules/brotli/
+sudo pacman -S nginx-mod-brotli nginx-mod-headers-more
+
+sudo systemctl daemon-reload && sudo systemctl stop nginx && sudo systemctl start nginx
+sudo journalctl -xeu nginx.service
+
+
+
+
+sudo pacman -S certbot-nginx
+sudo certbot --nginx -d aes.selfmade4u.de -d staging-aes.selfmade4u.de -m Moritz.Hedtke@t-online.de --agree-tos -n
 
 
 
 sudo -u postgres psql
-CREATE ROLE projektwahl LOGIN;
-CREATE ROLE projektwahl_admin LOGIN;
-CREATE DATABASE projektwahl OWNER projektwahl_admin;
+CREATE ROLE projektwahl_staging LOGIN;
+CREATE ROLE projektwahl_staging_admin LOGIN;
+CREATE ROLE projektwahl_production LOGIN;
+CREATE ROLE projektwahl_production_admin LOGIN;
+CREATE DATABASE projektwahl_staging OWNER projektwahl_staging_admin;
+CREATE DATABASE projektwahl_production OWNER projektwahl_production_admin;
 
 
 ssh -A moritz@aes.selfmade4u.de -p 2121
-sudo useradd -m projektwahl
-sudo useradd -m projektwahl_admin
+sudo useradd -m projektwahl_staging
+sudo useradd -m projektwahl_staging_admin
+sudo useradd -m projektwahl_production
+sudo useradd -m projektwahl_production_admin
 cd /opt
-sudo mkdir projektwahl-lit
-sudo chown moritz projektwahl-lit
-git clone git@github.com:projektwahl/projektwahl-lit.git
-cd projektwahl-lit
-
+sudo mkdir projektwahl-lit-staging
+sudo chown moritz projektwahl-lit-staging
+git clone git@github.com:projektwahl/projektwahl-lit.git projektwahl-lit-staging
+cd projektwahl-lit-staging
 openssl req -x509 -newkey rsa:2048 -nodes -sha256 -subj '/CN=localhost' -keyout key.pem -out cert.pem
 npm ci --ignore-scripts --omit=optional
 npx node-gyp rebuild -C ./node_modules/@dev.mohe/argon2/
 npm run build
 
-# These lines need to be repeated all the time... We should probably use ACLs
-sudo chown -R moritz:projektwahl /opt/projektwahl-lit
-sudo chmod -R u=rwX,g=rX,o= /opt/projektwahl-lit/
-
-ps ax o user,group,gid,pid,%cpu,%mem,vsz,rss,tty,stat,start,time,comm
-
-# TODO FIXME we really should fix this
-
-#sudo setfacl --remove-all --recursive .
-#sudo setfacl --set=user::---,group::---,user:moritz:rwX,group:projektwahl:r-X,other::---,mask::--- --recursive --default .
-#sudo setfacl --modify=user:moritz:rwX,group:projektwahl:r-X --recursive --default .
+sudo mkdir projektwahl-lit-production
+sudo chown moritz projektwahl-lit-production
+git clone git@github.com:projektwahl/projektwahl-lit.git projektwahl-lit-production
+cd projektwahl-lit-production
+openssl req -x509 -newkey rsa:2048 -nodes -sha256 -subj '/CN=localhost' -keyout key.pem -out cert.pem
+npm ci --ignore-scripts --omit=optional
+npx node-gyp rebuild -C ./node_modules/@dev.mohe/argon2/
+npm run build
 
 
 
-sudo -u projektwahl_admin psql --db projektwahl < src/server/setup.sql
+
+
+
+
+
+
+
+
+sudo -u projektwahl_staging_admin psql --db projektwahl_staging < src/server/setup.sql
+sudo -u projektwahl_production_admin psql --db projektwahl_production < src/server/setup.sql
+
+
 
 # maintenance:
-sudo -u projektwahl_admin psql --db projektwahl
+sudo -u projektwahl_staging_admin psql --db projektwahl_staging
 SET default_transaction_read_only = false;
-\dp
+ALTER DATABASE projektwahl_staging SET default_transaction_isolation = 'serializable';
+ALTER DATABASE projektwahl_staging SET default_transaction_read_only = true;
+GRANT SELECT,INSERT,UPDATE ON users_with_deleted TO projektwahl_staging;
+GRANT SELECT,INSERT,UPDATE ON users TO projektwahl_staging;
+GRANT SELECT,INSERT,UPDATE ON projects_with_deleted TO projektwahl_staging;
+GRANT SELECT,INSERT,UPDATE ON projects TO projektwahl_staging;
+GRANT SELECT,INSERT,UPDATE ON choices TO projektwahl_staging;
+GRANT SELECT,INSERT,UPDATE,DELETE ON sessions TO projektwahl_staging;
 
 
-sudo -u projektwahl -i
-cd /opt/projektwahl-lit
-NODE_ENV=production DATABASE_URL=postgres://projektwahl:projektwahl@localhost/projektwahl node --enable-source-maps dist/setup.cjs
+
+sudo -u projektwahl_production_admin psql --db projektwahl_production
+SET default_transaction_read_only = false;
+ALTER DATABASE projektwahl_production SET default_transaction_isolation = 'serializable';
+ALTER DATABASE projektwahl_production SET default_transaction_read_only = true;
+GRANT SELECT,INSERT,UPDATE ON users_with_deleted TO projektwahl_production;
+GRANT SELECT,INSERT,UPDATE ON users TO projektwahl_production;
+GRANT SELECT,INSERT,UPDATE ON projects_with_deleted TO projektwahl_production;
+GRANT SELECT,INSERT,UPDATE ON projects TO projektwahl_production;
+GRANT SELECT,INSERT,UPDATE ON choices TO projektwahl_production;
+GRANT SELECT,INSERT,UPDATE,DELETE ON sessions TO projektwahl_production;
+
+
+
+# Backup
+set -C
+sudo pg_dump --no-acl --no-owner --username projektwahl_production_admin projektwahl > "dump_$(date +"%F %T").sql"
+
+# Recover
+sudo psql --username projektwahl_staging_admin --set ON_ERROR_STOP=on projektwahl_staging < dump.sql
+# TODO manually fixup ACLs with the above instructions
+
+
+
+
+
+
+sudo -u projektwahl_staging -i
+cd /opt/projektwahl-lit-staging
+NODE_ENV=production DATABASE_HOST=/run/postgresql DATABASE_URL=postgres://projektwahl_staging:projektwahl_staging@localhost/projektwahl_staging node --enable-source-maps dist/setup.cjs
+
+
+
+sudo -u projektwahl_production -i
+cd /opt/projektwahl-lit-production
+NODE_ENV=production DATABASE_HOST=/run/postgresql DATABASE_URL=postgres://projektwahl_production:projektwahl_production@localhost/projektwahl_production node --enable-source-maps dist/setup.cjs
+
+
+
 
 
 NODE_ENV=production PORT=8443 BASE_URL=https://localhost:8443 DATABASE_URL=postgres://projektwahl:projektwahl@projektwahl/projektwahl CREDENTIALS_DIRECTORY=$PWD node  --enable-source-maps dist/server.cjs
@@ -307,17 +402,29 @@ NODE_ENV=production PORT=8443 BASE_URL=https://localhost:8443 DATABASE_URL=postg
 
 
 
-# Backup
-set -C
-sudo pg_dump --username projektwahl_admin projektwahl > "dump_$(date +"%F %T").sql"
-
-# Recover
-sudo psql --username projektwahl_admin --set ON_ERROR_STOP=on projektwahl < dump.sql
-
-
-
 sudo nano /etc/systemd/system/projektwahl.service
 # https://github.com/projektwahl/projektwahl-lit/blob/work/docs/projektwahl%40.service.conf
+
+sudo systemctl edit --full --force projektwahl@.service
+sudo systemctl enable projektwahl@staging.service
+sudo systemctl enable projektwahl@production.service
+
+
+sudo systemctl edit --full --force projektwahl@.socket
+sudo systemctl enable projektwahl@staging.socket
+sudo systemctl enable projektwahl@production.socket
+
+sudo systemctl edit projektwahl@staging.socket
+[Socket]
+ListenStream=127.0.0.1:7443
+
+sudo systemctl edit projektwahl@production.socket
+[Socket]
+ListenStream=127.0.0.1:8443
+
+sudo systemctl start projektwahl@production.socket
+sudo systemctl start projektwahl@staging.socket
+
 
 
 sudo systemctl show projektwahl.service | grep --color Device
@@ -369,30 +476,6 @@ sudo systemctl daemon-reload && sudo systemctl restart projektwahl.socket && sud
 
 
 
-sudo systemctl edit nginx
-sudo systemd-analyze security nginx
-
-sudo useradd nginx
-sudo usermod -a -G projektwahl nginx
-sudo setfacl --modify=user:nginx:r-- /etc/letsencrypt/live/aes.selfmade4u.de/fullchain.pem
-sudo setfacl --modify=user:nginx:r-- /etc/letsencrypt/live/aes.selfmade4u.de/privkey.pem
-sudo setfacl --modify=user:nginx:r-X /etc/letsencrypt/archive
-sudo setfacl --modify=user:nginx:r-X /etc/letsencrypt/archive/aes.selfmade4u.de/
-sudo setfacl --modify=user:nginx:r-X /etc/letsencrypt/live
-sudo setfacl --modify=user:nginx:r-X /etc/letsencrypt/live/aes.selfmade4u.de/
-
-sudo chown -R nginx:nginx /var/log/nginx/
-
-
-sudo systemctl daemon-reload && sudo systemctl stop nginx && sudo systemctl start nginx
-sudo journalctl -xeu nginx.service
-
-
-
-error_log   /var/log/nginx/error.log;
-pid        /run/nginx/nginx.pid;
-access_log  /var/log/nginx/access.log  main;
-
 
 
 https://freedesktop.org/wiki/Software/systemd/DaemonSocketActivation/
@@ -405,6 +488,8 @@ https://freedesktop.org/wiki/Software/systemd/DaemonSocketActivation/
 
 # TODO FIXME source maps (also enable the command line arg)
 
+# probably don't do this - the benefits are marginal and the it's pretty annoying
+
 sudo rm -Rf /opt/projektwahl-container
 sudo mkdir /opt/projektwahl-container
 sudo pacstrap -c /opt/projektwahl-container nodejs
@@ -416,3 +501,128 @@ sudo chmod 755 /opt/projektwahl-container/
 sudo chmod 755 /opt/projektwahl-container/opt/projektwahl-lit/
 sudo chmod 755 /opt/projektwahl-container/opt/projektwahl-lit/dist/
 sudo chmod 644 /opt/projektwahl-container/opt/projektwahl-lit/dist/*
+
+
+
+
+
+# https://wiki.archlinux.org/title/Prometheus
+sudo pacman -S prometheus prometheus-node-exporter
+sudo nano /etc/prometheus/prometheus.yml
+ scrape_configs:
+   - job_name: 'prometheus'
+     static_configs:
+       - targets: ['localhost:9090']
+   - job_name: 'localhost'
+     static_configs:
+       - targets: ['localhost:9100']
+sudo systemctl enable --now prometheus prometheus-node-exporter
+sudo ufw allow 9090
+
+168.119.156.152:9090
+
+
+sudo pacman -S grafana
+sudo systemctl enable --now grafana
+sudo ufw allow 3000
+
+168.119.156.152:3000
+
+# https://wiki.archlinux.org/title/Grafana
+
+
+curl -OL https://grafana.com/oss/prometheus/exporters/node-exporter/assets/node_rules.yaml
+sudo mv node_rules.yaml /etc/prometheus/
+sudo nano /etc/prometheus/prometheus.yml 
+sudo chown root:prometheus /etc/prometheus/node_rules.yaml
+sudo chmod 640 /etc/prometheus/node_rules.yaml
+sudo systemctl restart prometheus
+
+curl -OL https://grafana.com/oss/prometheus/exporters/node-exporter/assets/node_alerts.yaml
+sudo mv node_alerts.yaml /etc/prometheus/
+sudo nano /etc/prometheus/prometheus.yml 
+sudo chown root:prometheus /etc/prometheus/node_alerts.yaml
+sudo chmod 640 /etc/prometheus/node_alerts.yaml
+sudo systemctl restart prometheus
+
+https://grafana.com/oss/prometheus/exporters/node-exporter/?tab=dashboards
+
+# 13978
+# 13971
+# 13977
+
+
+
+  - job_name: 'node'
+    static_configs:
+      - targets: ['localhost:9100']
+
+
+https://grafana.com/grafana/dashboards/1860
+
+sudo nano /etc/conf.d/prometheus-node-exporter
+NODE_EXPORTER_ARGS="--collector.systemd --collector.processes"
+sudo systemctl restart prometheus-node-exporter
+
+https://monitoring.mixins.dev/node-exporter/
+
+# SET THE TIME ZONE TO UTC because otherwise it's broken
+
+
+sudo pacman -S alertmanager
+sudo systemctl enable --now alertmanager
+ sudo ufw allow 9093
+
+http://168.119.156.152:9093/#/alerts
+
+
+sudo systemctl enable --now systemd-timesyncd
+
+
+
+https://github.com/prometheus-community/postgres_exporter
+
+cd /opt
+sudo mkdir postgres_exporter
+chown moritz postgres_exporter/
+git clone https://github.com/prometheus-community/postgres_exporter.git
+cd postgres_exporter/
+sudo pacman -S which go
+make build
+sudo chown -R postgres:postgres /opt/postgres_exporter
+sudo chmod -R u=rX,g=rX,o= /opt/postgres_exporter
+sudo -u postgres DATA_SOURCE_NAME="user=postgres host=/var/run/postgresql/ sslmode=disable" /opt/postgres_exporter/postgres_exporter
+
+sudo nano /etc/prometheus/prometheus.yml 
+  - job_name: 'postgresql'
+    static_configs:
+      - targets: ['localhost:9187']
+      
+      
+https://grafana.com/grafana/dashboards/9628
+
+https://www.observability.blog/nginx-monitoring-with-prometheus/
+
+
+sudo nano /etc/nginx/sites-available/nginx-monitoring.conf
+server {
+  listen 8080;
+
+  stub_status;
+}
+
+sudo ln -s /etc/nginx/sites-available/nginx-monitoring.conf /etc/nginx/sites-enabled/
+
+
+sudo docker run -p 9113:9113 nginx/nginx-prometheus-exporter:0.10.0 -nginx.scrape-uri=http://aes.selfmade4u.de:8080/stub_status
+
+# https://github.com/nginxinc/nginx-prometheus-exporter/blob/master/grafana/README.md
+
+sudo nano /etc/prometheus/prometheus.yml
+  - job_name: 'nginx'
+    static_configs: 
+      - targets: ['localhost:9113']
+      
+      
+# https://github.com/nginxinc/nginx-prometheus-exporter/blob/master/grafana/dashboard.json
+      

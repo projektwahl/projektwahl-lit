@@ -39,6 +39,31 @@ export async function projectsHandler(
       // helper is allowed to read the normal data
       // voter is allowed to read the normal data
 
+      if (!loggedInUser) {
+        const returnValue: [
+          OutgoingHttpHeaders,
+          ResponseType<"/api/v1/projects">
+        ] = [
+          {
+            "content-type": "text/json; charset=utf-8",
+            ":status": 401,
+          },
+          {
+            success: false as const,
+            error: {
+              issues: [
+                {
+                  code: ZodIssueCode.custom,
+                  path: ["unauthorized"],
+                  message: "Not logged in!",
+                },
+              ],
+            },
+          },
+        ];
+        return returnValue;
+      }
+
       if (
         !(
           loggedInUser?.type === "admin" ||
@@ -92,7 +117,8 @@ export async function projectsHandler(
         (query) => {
           return sql2`(${!query.filters.id} OR id = ${
             query.filters.id ?? null
-          }) AND title LIKE ${"%" + (query.filters.title ?? "") + "%"}`;
+          }) AND title LIKE ${"%" + (query.filters.title ?? "") + "%"}
+             AND info  LIKE ${"%" + (query.filters.info ?? "") + "%"}`;
         }
       );
     }
