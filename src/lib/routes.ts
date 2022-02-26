@@ -351,7 +351,7 @@ export const routes = identity({
     }),
   },
   "/api/v1/choices": {
-    request: baseQuery(rawChoice.merge(rawProjectSchema)),
+    request: baseQuery(rawChoiceNullable.merge(rawProjectSchema)),
     response: z.object({
       entities: z.array(choices),
       previousCursor: choices.nullable(),
