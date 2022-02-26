@@ -259,6 +259,7 @@ sudo nano /etc/nginx/sites-available/projektwahl-staging.conf
 sudo nano /etc/nginx/sites-available/projektwahl-production.conf
 # aes.selfmade4u.de
 # /opt/projektwahl-lit-production
+# https://localhost:8443;
 
 sudo ln -s /etc/nginx/sites-available/projektwahl-staging.conf /etc/nginx/sites-enabled/
 sudo ln -s /etc/nginx/sites-available/projektwahl-production.conf /etc/nginx/sites-enabled/
@@ -401,16 +402,21 @@ sudo systemctl enable projektwahl@production.service
 
 
 sudo systemctl edit --full --force projektwahl@.socket
-sudo systemctl enable projektwahl@staging.service
-sudo systemctl enable projektwahl@production.service
+sudo systemctl enable projektwahl@staging.socket
+sudo systemctl enable projektwahl@production.socket
 
-sudo systemctl edit projektwahl@staging.service
+sudo systemctl edit projektwahl@staging.socket
 [Socket]
 ListenStream=127.0.0.1:7443
 
-sudo systemctl edit projektwahl@production.service
+sudo systemctl edit projektwahl@production.socket
 [Socket]
 ListenStream=127.0.0.1:8443
+
+sudo systemctl start projektwahl@production.socket
+sudo systemctl start projektwahl@staging.socket
+
+
 
 sudo systemctl show projektwahl.service | grep --color Device
 
