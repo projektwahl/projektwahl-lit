@@ -89,9 +89,9 @@ class PwChoices<X extends string> extends PwEntityList<"/api/v1/choices", X> {
           <th class="table-cell-hover p-0" scope="col">
             ${pwOrder<"/api/v1/choices">({
               refreshEntityList: () => this._task.run(),
-              name: "info",
+              name: "rank",
               path: [this.prefix],
-              title: msg("Info"),
+              title: msg("Rank"),
             })}
           </th>
 
@@ -121,11 +121,11 @@ class PwChoices<X extends string> extends PwEntityList<"/api/v1/choices", X> {
           </th>
 
           <th scope="col">
-            ${pwInput<"/api/v1/choices", ["filters", "info"]>({
+            ${pwInput<"/api/v1/choices", ["filters", "rank"]>({
               label: null,
-              name: ["filters", "info"],
+              name: ["filters", "rank"],
               task: this._task,
-              type: "text",
+              type: "number",
               defaultValue: undefined,
               initial,
             })}
@@ -166,7 +166,7 @@ class PwChoices<X extends string> extends PwEntityList<"/api/v1/choices", X> {
                     </p>
                   </td>
                   <td>
-                    <p>${value.info}</p>
+                    <p>${value.rank}</p>
                   </td>
                   <td>
                     <a
