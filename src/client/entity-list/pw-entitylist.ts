@@ -267,24 +267,36 @@ export class PwEntityList<
           </table>
         </form>
 
-        ${this._task.value?.success
+        ${this._task.state !== TaskStatus.COMPLETE || this._task.value?.success
           ? html`
               <nav aria-label="${msg("navigation of user list")}">
                 <ul class="pagination justify-content-center">
                   <li
-                    class="page-item ${this._task.value?.data.previousCursor ===
-                    null
-                      ? "disabled"
-                      : ""}"
+                    class="page-item ${this._task.render({
+                      pending: () => "disabled",
+                      complete: (result) => result.data?.previousCursor === null ? "disabled" : "",
+                    })}"
                   >
                     <a
                       @click=${async (e: Event) => {
                         e.preventDefault();
-                        if (this._task.value?.success) {
-                          data.paginationCursor =
-                            this._task.value?.data.previousCursor;
-                          data.paginationDirection = "backwards";
+
+                        const data = JSON.parse(
+                          decodeURIComponent(
+                            this.history.url.search == ""
+                              ? "{}"
+                              : this.history.url.search.substring(1)
+                          )
+                        );
+                        if (!data[this.prefix]) {
+                          data[this.prefix] = {};
                         }
+                        if (this._task.value?.success) {
+                          data[this.prefix].paginationCursor =
+                            this._task.value?.data.previousCursor;
+                          data[this.prefix].paginationDirection = "backwards";
+                        }
+                        console.log(data);
                         HistoryController.goto(
                           new URL(
                             `?${encodeURIComponent(JSON.stringify(data))}`,
@@ -298,30 +310,45 @@ export class PwEntityList<
                       href="/"
                       aria-label="${msg("previous page")}"
                       tabindex=${ifDefined(
-                        this._task.value?.data.previousCursor === null
-                          ? undefined
-                          : -1
+                        this._task.render({
+                          pending: () => undefined,
+                          complete: (result) => result.data?.previousCursor === null ? undefined : -1,
+                        })
                       )}
-                      aria-disabled=${this._task.value?.data.previousCursor ===
-                      null}
+                      aria-disabled=${this._task.render({
+                        pending: () => true,
+                        complete: (result) => result.data?.previousCursor === null,
+                      })}
                     >
                       <span aria-hidden="true">&laquo;</span>
                     </a>
                   </li>
                   <li
-                    class="page-item ${this._task.value?.data.nextCursor ===
-                    null
-                      ? "disabled"
-                      : ""}"
+                    class="page-item ${this._task.render({
+                      pending: () => "disabled",
+                      complete: (result) => result.data?.nextCursor === null ? "disabled" : "",
+                    })}"
                   >
                     <a
                       @click=${async (e: Event) => {
                         e.preventDefault();
-                        if (this._task.value?.success) {
-                          data.paginationCursor =
-                            this._task.value?.data.nextCursor;
-                          data.paginationDirection = "forwards";
+
+                        const data = JSON.parse(
+                          decodeURIComponent(
+                            this.history.url.search == ""
+                              ? "{}"
+                              : this.history.url.search.substring(1)
+                          )
+                        );
+                        if (!data[this.prefix]) {
+                          data[this.prefix] = {};
                         }
+                        if (this._task.value?.success) {
+                          data[this.prefix].paginationCursor =
+                            this._task.value?.data.nextCursor;
+                          data[this.prefix].paginationDirection = "forwards";
+                        }
+                        console.log(data);
                         HistoryController.goto(
                           new URL(
                             `?${encodeURIComponent(JSON.stringify(data))}`,
@@ -335,12 +362,15 @@ export class PwEntityList<
                       href="/"
                       aria-label="${msg("next page")}"
                       tabindex=${ifDefined(
-                        this._task.value?.data.nextCursor === null
-                          ? undefined
-                          : -1
+                        this._task.render({
+                          pending: () => undefined,
+                          complete: (result) => result.data?.nextCursor === null ? undefined : -1,
+                        })
                       )}
-                      aria-disabled=${this._task.value?.data.nextCursor ===
-                      null}
+                      aria-disabled=${this._task.render({
+                        pending: () => true,
+                        complete: (result) => result.data?.nextCursor === null,
+                      })}
                     >
                       <span aria-hidden="true">&raquo;</span>
                     </a>
