@@ -219,6 +219,20 @@ const baseQuery = <
     })
     .strict();
 
+const choices = rawChoiceNullable.merge(rawProjectSchema.pick({
+  id: true,
+  title: true,
+  info: true,
+  place: true,
+  costs: true,
+  min_age: true,
+  max_age: true,
+  min_participants: true,
+  max_participants: true,
+  random_assignments: true,
+  deleted: true,
+}))
+
 export const routes = identity({
   "/api/v1/logout": {
     request: z.any(),
@@ -339,21 +353,9 @@ export const routes = identity({
   "/api/v1/choices": {
     request: baseQuery(rawChoice.merge(rawProjectSchema)),
     response: z.object({
-      entities: z.array(rawChoiceNullable.merge(rawProjectSchema.pick({
-        id: true,
-        title: true,
-        info: true,
-        place: true,
-        costs: true,
-        min_age: true,
-        max_age: true,
-        min_participants: true,
-        max_participants: true,
-        random_assignments: true,
-        deleted: true,
-      }))),
-      previousCursor: rawChoice.merge(rawProjectSchema).nullable(),
-      nextCursor: rawChoice.merge(rawProjectSchema).nullable(),
+      entities: z.array(choices),
+      previousCursor: choices.nullable(),
+      nextCursor: choices.nullable(),
     }),
   },
 } as const);
