@@ -119,7 +119,7 @@ export async function choicesHandler(
              AND info  LIKE ${"%" + (query.filters.info ?? "") + "%"}`;
         },
         {
-          rank: "smallest"
+          rank: "largest"
         }
       );
     }
