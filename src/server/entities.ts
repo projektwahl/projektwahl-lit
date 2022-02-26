@@ -130,8 +130,12 @@ export async function fetchData<R extends keyof typeof entityRoutes>(
 
   const entitiesSchema = entitySchema["response"]["shape"]["entities"];
 
+  const sqlResult = await sql(...finalQuery);
+
+  console.log(sqlResult)
+
   let entities: z.infer<entitesType[R]["response"]>["entities"] =
-    entitiesSchema.parse(await sql(...finalQuery));
+    entitiesSchema.parse(sqlResult);
 
   // https://github.com/projektwahl/projektwahl-sveltekit/blob/work/src/lib/list-entities.ts#L30
 

@@ -27,7 +27,13 @@ const rawChoice = z.object({
   rank: z.number(),
   project_id: z.number(),
   user_id: z.number(),
-})
+}).strict()
+
+const rawChoiceNullable = z.object({
+  rank: z.number().nullable(),
+  project_id: z.number().nullable(),
+  user_id: z.number().nullable(),
+}).strict()
 
 const rawUserCommon = {
   id: z.number(),
@@ -333,7 +339,19 @@ export const routes = identity({
   "/api/v1/choices": {
     request: baseQuery(rawChoice.merge(rawProjectSchema)),
     response: z.object({
-      entities: z.array(rawChoice.merge(rawProjectSchema)),
+      entities: z.array(rawChoiceNullable.merge(rawProjectSchema.pick({
+        id: true,
+        title: true,
+        info: true,
+        place: true,
+        costs: true,
+        min_age: true,
+        max_age: true,
+        min_participants: true,
+        max_participants: true,
+        random_assignments: true,
+        deleted: true,
+      }))),
       previousCursor: rawChoice.merge(rawProjectSchema).nullable(),
       nextCursor: rawChoice.merge(rawProjectSchema).nullable(),
     }),

@@ -108,7 +108,12 @@ export async function choicesHandler(
           "max_participants",
           "random_assignments",
           "deleted",
-          "rank" from choices WHERE (${!query.filters.id} OR id = ${
+          "choices"."rank",
+          "choices"."project_id",
+          "choices"."user_id"
+          FROM projects LEFT OUTER JOIN choices ON (projects.id = choices.project_id AND choices.user_id = ${
+            loggedInUser.id
+          }) WHERE (${!query.filters.id} OR id = ${
             query.filters.id ?? null
           }) AND title LIKE ${"%" + (query.filters.title ?? "") + "%"}
              AND info  LIKE ${"%" + (query.filters.info ?? "") + "%"}`;
