@@ -117,6 +117,9 @@ export async function choicesHandler(
             query.filters.id ?? null
           }) AND title LIKE ${"%" + (query.filters.title ?? "") + "%"}
              AND info  LIKE ${"%" + (query.filters.info ?? "") + "%"}`;
+        },
+        {
+          rank: "smallest"
         }
       );
     }

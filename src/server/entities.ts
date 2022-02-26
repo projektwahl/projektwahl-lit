@@ -62,7 +62,16 @@ export async function fetchData<R extends keyof typeof entityRoutes>(
   ) => [
     TemplateStringsArray,
     ...(null | string | string[] | boolean | number | Buffer)[]
-  ]
+  ],
+  nullOrdering: {
+    [key: string]: "smallest"|"largest"
+  }
+  /*{
+          id: "nulls-first",
+          type: "nulls-first",
+          username: "nulls-first",
+          password_hash: "nulls-first",
+        },*/
 ): Promise<[OutgoingHttpHeaders, ResponseType<R>]> {
   const entitySchema: entitesType[R] = entityRoutes[path];
 
@@ -81,7 +90,10 @@ export async function fetchData<R extends keyof typeof entityRoutes>(
   }
 
   const orderByQuery = query.sorting
-    .flatMap((v) => [sql2`,`, sql2`${unsafe2(v[0])} ${unsafe2(v[1])}`])
+    .flatMap((v) => [sql2`,`, sql2`${unsafe2(v[0])} ${unsafe2(v[1])} ${unsafe2(
+      v[1] === "ASC" ? (nullOrdering[v[0]] === "smallest" ? "NULLS FIRST" : "NULLS LAST")
+      : (nullOrdering[v[0]] === "smallest" ? "NULLS LAST" : "NULLS FIRST")
+    )}`])
     .slice(1);
 
   const paginationCursor: entitesType0[R]["paginationCursor"] =

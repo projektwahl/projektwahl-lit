@@ -96,12 +96,6 @@ export async function usersHandler(
         await fetchData<"/api/v1/users">(
           "/api/v1/users" as const,
           query,
-          /*{
-          id: "nulls-first",
-          type: "nulls-first",
-          username: "nulls-first",
-          password_hash: "nulls-first",
-        },*/
           (query) => {
             return sql2`SELECT "id",
             "type",
@@ -124,7 +118,8 @@ export async function usersHandler(
             AND (${!query.filters.type} OR type = ${
               query.filters.type ?? null
             })`;
-          }
+          },
+          {}
         );
       return ret;
     }
