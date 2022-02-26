@@ -92,23 +92,9 @@ export async function usersHandler(
         return returnValue;
       }
 
-      const columns = [
-        "id",
-        "type",
-        "username",
-        "group",
-        "age",
-        "away",
-        "project_leader_id",
-        "force_in_project_id",
-        "deleted",
-      ] as const;
-
       const ret: [OutgoingHttpHeaders, ResponseType<"/api/v1/users">] =
         await fetchData<"/api/v1/users">(
           "/api/v1/users" as const,
-          "users_with_deleted",
-          columns,
           query,
           /*{
           id: "nulls-first",
@@ -117,7 +103,15 @@ export async function usersHandler(
           password_hash: "nulls-first",
         },*/
           (query) => {
-            return sql2`(${!query.filters.id} OR id = ${
+            return sql2`SELECT "id",
+            "type",
+            "username",
+            "group",
+            "age",
+            "away",
+            "project_leader_id",
+            "force_in_project_id",
+            "deleted" FROM users_with_deleted WHERE (${!query.filters.id} OR id = ${
               query.filters.id ?? null
             }) AND username LIKE ${"%" + (query.filters.username ?? "") + "%"}
            AND (${!query.filters.project_leader_id} OR project_leader_id = ${

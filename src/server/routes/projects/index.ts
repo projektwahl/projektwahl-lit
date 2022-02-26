@@ -95,27 +95,21 @@ export async function projectsHandler(
         return returnValue;
       }
 
-      const columns = [
-        "id",
-        "title",
-        "info",
-        "place",
-        "costs",
-        "min_age",
-        "max_age",
-        "min_participants",
-        "max_participants",
-        "random_assignments",
-        "deleted",
-      ] as const;
-
       return await fetchData<"/api/v1/projects">(
         "/api/v1/projects" as const,
-        "projects_with_deleted",
-        columns,
         query,
         (query) => {
-          return sql2`(${!query.filters.id} OR id = ${
+          return sql2`SELECT "id",
+          "title",
+          "info",
+          "place",
+          "costs",
+          "min_age",
+          "max_age",
+          "min_participants",
+          "max_participants",
+          "random_assignments",
+          "deleted" FROM projects_with_deleted WHERE (${!query.filters.id} OR id = ${
             query.filters.id ?? null
           }) AND title LIKE ${"%" + (query.filters.title ?? "") + "%"}
              AND info  LIKE ${"%" + (query.filters.info ?? "") + "%"}`;

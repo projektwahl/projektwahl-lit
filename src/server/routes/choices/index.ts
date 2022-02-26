@@ -93,28 +93,22 @@ export async function choicesHandler(
         return returnValue;
       }
 
-      const columns = [
-        "id",
-        "title",
-        "info",
-        "place",
-        "costs",
-        "min_age",
-        "max_age",
-        "min_participants",
-        "max_participants",
-        "random_assignments",
-        "deleted",
-        "rank"
-      ] as const;
-
       return await fetchData<"/api/v1/choices">(
         "/api/v1/choices" as const,
-        "choices",
-        columns,
         query,
         (query) => {
-          return sql2`(${!query.filters.id} OR id = ${
+          return sql2`SELECT "id",
+          "title",
+          "info",
+          "place",
+          "costs",
+          "min_age",
+          "max_age",
+          "min_participants",
+          "max_participants",
+          "random_assignments",
+          "deleted",
+          "rank" from choices WHERE (${!query.filters.id} OR id = ${
             query.filters.id ?? null
           }) AND title LIKE ${"%" + (query.filters.title ?? "") + "%"}
              AND info  LIKE ${"%" + (query.filters.info ?? "") + "%"}`;

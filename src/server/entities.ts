@@ -56,10 +56,8 @@ export function updateField<
 
 export async function fetchData<R extends keyof typeof entityRoutes>(
   path: R,
-  table: string,
-  columns: readonly [string, ...string[]],
   query: entitesType0[R],
-  customFilterQuery: (
+  sqlQuery: (
     query: entitesType0[R]
   ) => [
     TemplateStringsArray,
@@ -91,9 +89,7 @@ export async function fetchData<R extends keyof typeof entityRoutes>(
 
   let finalQuery;
   if (!paginationCursor) {
-    finalQuery = sql2`(SELECT ${unsafe2(
-      columns.map((c) => `"${c}"`).join(", ")
-    )} FROM ${unsafe2(table)} WHERE ${customFilterQuery(
+    finalQuery = sql2`(${sqlQuery(
       query
     )} ORDER BY ${orderByQuery} LIMIT ${query.paginationLimit + 1})`;
   } else {
@@ -116,9 +112,7 @@ export async function fetchData<R extends keyof typeof entityRoutes>(
         })
         .slice(1);
 
-      return sql2`(SELECT ${unsafe2(
-        columns.map((c) => `"${c}"`).join(", ")
-      )} FROM ${unsafe2(table)} WHERE ${customFilterQuery(
+      return sql2`(${sqlQuery(
         query
       )} AND (${parts}) ORDER BY ${orderByQuery} LIMIT ${
         query.paginationLimit + 1
