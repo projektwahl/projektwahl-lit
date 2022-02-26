@@ -74,6 +74,9 @@
   <source>sort by <x id="0" equiv-text="${this.title}"/></source>
   <target>Nach <x id="0" equiv-text="${this.title}"/> sortieren</target>
 </trans-unit>
+<trans-unit id="s586d6bd2eca2da93">
+  <source>Users</source>
+</trans-unit>
 <trans-unit id="s0c97387dc725a9e2">
   <source>Create account</source>
   <target>Account erstellen</target>
@@ -210,7 +213,7 @@
   <target>Wahl</target>
 </trans-unit>
 <trans-unit id="s2667d13ee670a19d">
-  <source>Logout <x id="0" equiv-text="${jscookie.get(&quot;username&quot;)}"/></source>
+  <source>Logout <x id="0" equiv-text="${this.username}"/></source>
   <target><x id="0" equiv-text="${jscookie.get(&quot;username&quot;)}"/> abmelden</target>
 </trans-unit>
 <trans-unit id="sfebb69bee8b5102d">
@@ -218,6 +221,9 @@
 </trans-unit>
 <trans-unit id="s17597a8bb4810524">
   <source>License</source>
+</trans-unit>
+<trans-unit id="s01a8d45397ec133b">
+  <source>Security</source>
 </trans-unit>
 <trans-unit id="s1f7e12b71164c5da">
   <source>Imprint</source>
