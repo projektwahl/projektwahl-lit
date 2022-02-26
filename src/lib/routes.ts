@@ -23,6 +23,12 @@ SPDX-FileCopyrightText: 2021 Moritz Hedtke <Moritz.Hedtke@t-online.de>
 import { z, ZodIssue, ZodObject, ZodTypeAny } from "zod";
 import { result } from "./result.js";
 
+const rawChoice = z.object({
+  rank: z.number(),
+  project_id: z.number(),
+  user_id: z.number(),
+})
+
 const rawUserCommon = {
   id: z.number(),
   username: z.string().min(1).max(100),
@@ -324,11 +330,20 @@ export const routes = identity({
       nextCursor: project.nullable(),
     }),
   },
+  "/api/v1/choices": {
+    request: baseQuery(rawChoice.merge(rawProjectSchema)),
+    response: z.object({
+      entities: z.array(rawChoice.merge(rawProjectSchema)),
+      previousCursor: rawChoice.merge(rawProjectSchema).nullable(),
+      nextCursor: rawChoice.merge(rawProjectSchema).nullable(),
+    }),
+  },
 } as const);
 
 export const entityRoutes = {
   "/api/v1/users": routes["/api/v1/users"],
   "/api/v1/projects": routes["/api/v1/projects"],
+  "/api/v1/choices": routes["/api/v1/choices"],
 };
 
 export declare class MinimalZodError {
