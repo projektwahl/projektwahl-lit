@@ -47,6 +47,7 @@ import { pipeline, Readable } from "node:stream";
 import type { ServerResponse } from "node:http";
 import type { Http2ServerResponse } from "node:http2";
 import type { MyRequest } from "./express.js";
+import { choicesHandler } from "./routes/choices/index.js";
 
 //const startTime = Date.now();
 
@@ -135,7 +136,8 @@ export async function serverHandler(
       (await createProjectsHandler(request, response)) ||
       (await updateProjectsHandler(request, response)) ||
       (await projectsHandler(request, response)) ||
-      (await usersHandler(request, response));
+      (await usersHandler(request, response)) ||
+      (await choicesHandler(request, response));
 
     if (!executed) {
       response.writeHead(404, {
