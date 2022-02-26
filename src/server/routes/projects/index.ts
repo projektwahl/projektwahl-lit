@@ -117,7 +117,8 @@ export async function projectsHandler(
         (query) => {
           return sql2`(${!query.filters.id} OR id = ${
             query.filters.id ?? null
-          }) AND title LIKE ${"%" + (query.filters.title ?? "") + "%"}`;
+          }) AND title LIKE ${"%" + (query.filters.title ?? "") + "%"}
+             AND info  LIKE ${"%" + (query.filters.info ?? "") + "%"}`;
         }
       );
     }

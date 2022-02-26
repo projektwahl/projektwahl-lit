@@ -51,7 +51,7 @@ if (process.env.NODE_ENV === "development" && cluster.isPrimary) {
 
         cluster.fork().on("listening", () => {
           for (const id in oldWorkers) {
-            oldWorkers[id]?.send("shutdown");
+            oldWorkers[id]?.send("shutdown", () => {});
           }
         });
       }
