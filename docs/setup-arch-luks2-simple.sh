@@ -383,9 +383,18 @@ sudo psql --username projektwahl_staging_admin --set ON_ERROR_STOP=on projektwah
 
 
 
-sudo -u projektwahl -i
-cd /opt/projektwahl-lit
-NODE_ENV=production DATABASE_URL=postgres://projektwahl:projektwahl@localhost/projektwahl node --enable-source-maps dist/setup.cjs
+sudo -u projektwahl_staging -i
+cd /opt/projektwahl-lit-staging
+NODE_ENV=production DATABASE_HOST=/run/postgresql DATABASE_URL=postgres://projektwahl_staging:projektwahl_staging@localhost/projektwahl_staging node --enable-source-maps dist/setup.cjs
+
+
+
+sudo -u projektwahl_production -i
+cd /opt/projektwahl-lit-production
+NODE_ENV=production DATABASE_HOST=/run/postgresql DATABASE_URL=postgres://projektwahl_production:projektwahl_production@localhost/projektwahl_production node --enable-source-maps dist/setup.cjs
+
+
+
 
 
 NODE_ENV=production PORT=8443 BASE_URL=https://localhost:8443 DATABASE_URL=postgres://projektwahl:projektwahl@projektwahl/projektwahl CREDENTIALS_DIRECTORY=$PWD node  --enable-source-maps dist/server.cjs
