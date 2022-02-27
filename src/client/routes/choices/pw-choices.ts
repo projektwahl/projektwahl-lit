@@ -31,6 +31,8 @@ import { pwOrder } from "../../entity-list/pw-order.js";
 import { pwInput } from "../../form/pw-input.js";
 import type { routes } from "../../../lib/routes.js";
 import type { z } from "zod";
+import {animate} from "@lit-labs/motion"
+import { repeat } from "lit/directives/repeat.js";
 
 export const pwChoices = async (url: URL) => {
   const result = await taskFunction("/api/v1/choices", url, "choices");
@@ -147,8 +149,10 @@ class PwChoices<X extends string> extends PwEntityList<"/api/v1/choices", X> {
         },
         complete: (result) => {
           return result.success
-            ? result.data.entities.map(
-                (value) => html`<tr>
+            ? repeat(
+                result.data.entities,
+                (value) => value.id,
+                (value) => html`<tr ${animate()}>
                   <th scope="row">
                     <p>
                       <a @click=${aClick} href="/choices/view/${value.id}"
