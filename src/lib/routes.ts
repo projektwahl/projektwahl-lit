@@ -369,7 +369,6 @@ export const routes = identity({
   "/api/v1/choices/update": {
     request: rawChoiceNullable.pick({
       project_id: true,
-      user_id: true,
       rank: true,
     }),
     response: z.object({}),

@@ -25,7 +25,7 @@ import { sql } from "../../database.js";
 import { MyRequest, requestHandler } from "../../express.js";
 import type { OutgoingHttpHeaders, ServerResponse } from "node:http";
 import type { Http2ServerResponse } from "node:http2";
-import { rawProjectSchema, ResponseType, routes } from "../../../lib/routes.js";
+import type { ResponseType, routes, userSchema } from "../../../lib/routes.js";
 import { z, ZodIssueCode } from "zod";
 
 export async function updateChoiceHandler(
@@ -36,11 +36,12 @@ export async function updateChoiceHandler(
     "/api/v1/choices/update",
     request,
     response,
-    async (sql, choice) => {
+    async (sql, choice, loggedInUser) => {
+      // Only allow updating your own choices. Later we could allow the admin to update somebody else's choices.
       if (choice.rank === null) {
-        return await sql`DELETE FROM choices WHERE user_id = ${choice.user_id} AND project_id = ${choice.project_id}`;
+        return await sql`DELETE FROM choices WHERE user_id = ${loggedInUser.id} AND project_id = ${choice.project_id}`;
       } else {
-        return await sql`INSERT INTO choices (user_id, project_id, rank) VALUES (${choice.user_id}, ${choice.project_id}, ${choice.rank}) ON CONFLICT (user_id, project_id) DO UPDATE SET rank = ${choice.rank};`;
+        return await sql`INSERT INTO choices (user_id, project_id, rank) VALUES (${loggedInUser.id}, ${choice.project_id}, ${choice.rank}) ON CONFLICT (user_id, project_id) DO UPDATE SET rank = ${choice.rank};`;
       }
     }
   );
@@ -54,10 +55,10 @@ export async function createOrUpdateChoiceHandler<
   response: ServerResponse | Http2ServerResponse,
   dbquery: (
     sql: postgres.TransactionSql<{}>,
-    choice: z.infer<typeof routes[P]["request"]>
+    choice: z.infer<typeof routes[P]["request"]>,
+    loggedInUser: Exclude<z.infer<typeof userSchema>, undefined>
   ) => any
 ) {
-  // TODO FIXME create or update multiple
   return await requestHandler(
     "POST",
     path,
@@ -113,40 +114,10 @@ export async function createOrUpdateChoiceHandler<
       }
 
       try {
-        const row = rawProjectSchema
-          .pick({
-            id: true,
-          })
-          .parse(
-            (
-              await sql.begin("READ WRITE", async (sql) => {
-                return await dbquery(sql, choice);
-              })
-            )[0]
-          );
+        await sql.begin("READ WRITE", async (sql) => {
+          return await dbquery(sql, choice, loggedInUser);
+        });
 
-        if (!row) {
-          // insufficient permissions
-          const returnValue: [OutgoingHttpHeaders, ResponseType<P>] = [
-            {
-              "content-type": "text/json; charset=utf-8",
-              ":status": 403,
-            },
-            {
-              success: false as const,
-              error: {
-                issues: [
-                  {
-                    code: ZodIssueCode.custom,
-                    path: ["forbidden"],
-                    message: "Insufficient permissions!",
-                  },
-                ],
-              },
-            },
-          ];
-          return returnValue;
-        }
         return [
           {
             "content-type": "text/json; charset=utf-8",
@@ -154,7 +125,7 @@ export async function createOrUpdateChoiceHandler<
           },
           {
             success: true as const,
-            data: row,
+            data: {},
           },
         ];
       } catch (error: unknown) {
