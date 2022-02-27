@@ -86,7 +86,9 @@ export const rawSessionType = z.object({
   user_id: z.number(),
 });
 
+// TODO FIXME can we remove this?
 export type keys =
+  | "/api/v1/choices/update"
   | "/api/v1/login"
   | "/api/v1/logout"
   | "/api/v1/openid-login"
@@ -363,6 +365,14 @@ export const routes = identity({
       previousCursor: choices.nullable(),
       nextCursor: choices.nullable(),
     }),
+  },
+  "/api/v1/choices/update": {
+    request: rawChoiceNullable.pick({
+      project_id: true,
+      user_id: true,
+      rank: true,
+    }),
+    response: z.object({}),
   },
 } as const);
 

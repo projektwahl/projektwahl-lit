@@ -60,8 +60,8 @@ class PwRankSelect extends LitElement {
     this.input = createRef();
 
     this._task = new Task(this, async () => {
-      const result = await myFetch<"/api/v1/users/update">(
-        "/api/v1/users/update",
+      const result = await myFetch<"/api/v1/choices/update">(
+        "/api/v1/choices/update",
         {
           method: "POST",
           headers: {
