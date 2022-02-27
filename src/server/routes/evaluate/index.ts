@@ -71,7 +71,7 @@ export const get = async () => {
 
 		// TODO FIXME filter aways and filter type=voter
         // RawChoiceType[]
-		const choices = await sql.file('src/lib/calculate.sql', [], {
+		const choices = await sql.file('src/server/routes/evaluate/calculate.sql', [], {
 			cache: false // TODO FIXME doesnt seem to work properly
 		});
 
@@ -97,7 +97,7 @@ export const get = async () => {
 			'glpsol',
 			[
 				'--math',
-				'src/lib/calculate.mod',
+				'src/server/routes/evaluate/calculate.mod',
 				'--data',
 				filePath,
 				'--output',
@@ -143,6 +143,8 @@ export const get = async () => {
 		};
 	}
 };
+
+get()
 
 /*
 https://hub.docker.com/r/coinor/coin-or-optimization-suite

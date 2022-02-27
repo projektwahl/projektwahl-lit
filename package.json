@@ -22,6 +22,7 @@
     "test": "SELENIUM_BROWSER=chrome node  --experimental-loader ./src/loader.js --enable-source-maps tests/e2e/welcome.js",
     "lint": "eslint .",
     "lint:fix": "eslint --fix .",
+    "evaluate": "node --experimental-loader ./src/loader.js --enable-source-maps ./src/server/routes/evaluate/index.js",
     "setup": "node --experimental-loader ./src/loader.js --enable-source-maps ./src/server/setup.js",
     "server": "node --experimental-loader ./src/loader.js --enable-source-maps --experimental-import-meta-resolve ./src/server/index.js",
     "localize-extract": "lit-localize extract",
