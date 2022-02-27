@@ -43,13 +43,14 @@ subject to notinprojectyoudidntvote{u in U, p in P}:
     if choices[u,p] == -1 then user_in_project[u,p] = 0;
 
 # this definitely needs to be the case
-subject to no_project_leader{u in U}: if project_leaders[u] == 'null' then user_is_project_leader[u] else 0 = 0;
+subject to no_project_leader{u in U}: if project_leaders[u] == 'null' then user_is_project_leader[u] = 0;
 
 # this definitely needs to be the case
 subject to either_project_leader_or_project_not_exists{u in U}:
-    if project_leaders[u] != 'null' then user_is_project_leader[u] + project_not_exists[project_leaders[u]] else 1 = 1;
+    if project_leaders[u] != 'null' then user_is_project_leader[u] + project_not_exists[project_leaders[u]] = 1;
 
 # this definitely needs to be the case
+# why if we remove this it works?
 subject to onlyinoneproject{u in U}: (sum {p in P} user_in_project[u,p]) + user_is_project_leader[u] = 1;
 
 
