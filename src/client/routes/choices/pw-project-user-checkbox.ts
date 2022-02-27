@@ -32,29 +32,21 @@ import type { routes } from "../../../lib/routes.js";
 import type { z } from "zod";
 import { live } from "lit/directives/live.js";
 
-class PwProjectUserCheckbox extends LitElement {
+class PwRankSelect extends LitElement {
   static override get properties() {
     return {
       _task: { state: true },
       disabled: { state: true },
-      user: { attribute: false },
-      projectId: { type: Number },
+      choice: { attribute: false },
       url: { type: String },
-      name: { type: String },
     };
   }
 
-  name!: "project_leader_id" | "force_in_project_id";
-
   _task;
 
-  user!: z.infer<
-    typeof routes["/api/v1/users"]["response"]
+  choice!: z.infer<
+    typeof routes["/api/v1/choices"]["response"]
   >["entities"][number];
-
-  projectId!: number;
-
-  disabled: boolean;
 
   form: import("lit/directives/ref").Ref<HTMLFormElement>;
 
@@ -62,8 +54,6 @@ class PwProjectUserCheckbox extends LitElement {
 
   constructor() {
     super();
-
-    this.disabled = false;
 
     this.form = createRef();
 
@@ -78,9 +68,7 @@ class PwProjectUserCheckbox extends LitElement {
             "content-type": "text/json",
           },
           body: JSON.stringify({
-            id: this.user.id,
-            [this.name]:
-              this.user[this.name] === this.projectId ? null : this.projectId,
+            id: this.choice.id,
           }),
         }
       );
@@ -97,8 +85,6 @@ class PwProjectUserCheckbox extends LitElement {
   }
 
   render() {
-    console.log(this.user.username);
-    console.log(this.user[this.name] === this.projectId);
     return html` ${bootstrapCss}
       <form ${ref(this.form)}>
         ${this._task.render({
@@ -118,18 +104,95 @@ class PwProjectUserCheckbox extends LitElement {
           },
         })}
 
-        <input
-          ${ref(this.input)}
-          @change=${async () => {
-            await this._task.run();
-          }}
-          type="checkbox"
-          ?disabled=${this._task.status === TaskStatus.PENDING}
-          .checked=${live(this.user[this.name] === this.projectId)}
-          class="form-check-input"
-        />
+        <div class="btn-group" role="group" aria-label="Basic example">
+          <!--TODO FIXME foreach?-->
+          <button
+            @click=${async () => {
+              await this._task.run();
+            }}
+            ?disabled=${this._task.status === TaskStatus.PENDING}
+            type="button"
+            class="btn ${this._task.status === TaskStatus.PENDING
+              ? "btn-secondary"
+              : this.choice.rank == 1
+              ? "btn-primary"
+              : "btn-outline-primary"}"
+          >
+            1
+          </button>
+          <button
+            @click=${async () => {
+              await this._task.run();
+            }}
+            ?disabled=${this._task.status === TaskStatus.PENDING}
+            type="button"
+            class="btn ${this._task.status === TaskStatus.PENDING
+              ? "btn-secondary"
+              : this.choice.rank == 2
+              ? "btn-primary"
+              : "btn-outline-primary"}"
+          >
+            2
+          </button>
+          <button
+            @click=${async () => {
+              await this._task.run();
+            }}
+            ?disabled=${this._task.status === TaskStatus.PENDING}
+            type="button"
+            class="btn ${this._task.status === TaskStatus.PENDING
+              ? "btn-secondary"
+              : this.choice.rank == 3
+              ? "btn-primary"
+              : "btn-outline-primary"}"
+          >
+            3
+          </button>
+          <button
+            @click=${async () => {
+              await this._task.run();
+            }}
+            ?disabled=${this._task.status === TaskStatus.PENDING}
+            type="button"
+            class="btn ${this._task.status === TaskStatus.PENDING
+              ? "btn-secondary"
+              : this.choice.rank == 4
+              ? "btn-primary"
+              : "btn-outline-primary"}"
+          >
+            4
+          </button>
+          <button
+            @click=${async () => {
+              await this._task.run();
+            }}
+            ?disabled=${this._task.status === TaskStatus.PENDING}
+            type="button"
+            class="btn ${this._task.status === TaskStatus.PENDING
+              ? "btn-secondary"
+              : this.choice.rank == 5
+              ? "btn-primary"
+              : "btn-outline-primary"}"
+          >
+            5
+          </button>
+          <button
+            @click=${async () => {
+              await this._task.run();
+            }}
+            ?disabled=${this._task.status === TaskStatus.PENDING}
+            type="button"
+            class="btn ${this._task.status === TaskStatus.PENDING
+              ? "btn-secondary"
+              : this.choice.rank == null
+              ? "btn-primary"
+              : "btn-outline-primary"}"
+          >
+            X
+          </button>
+        </div>
       </form>`;
   }
 }
 
-customElements.define("pw-project-user-checkbox", PwProjectUserCheckbox);
+customElements.define("pw-rank-select", PwRankSelect);

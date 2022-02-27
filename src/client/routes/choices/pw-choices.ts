@@ -20,6 +20,7 @@ https://github.com/projektwahl/projektwahl-lit
 SPDX-License-Identifier: AGPL-3.0-or-later
 SPDX-FileCopyrightText: 2021 Moritz Hedtke <Moritz.Hedtke@t-online.de>
 */
+import "./pw-project-user-checkbox.js";
 import "../../form/pw-form.js";
 import { html } from "lit";
 import { noChange } from "lit";
@@ -163,79 +164,7 @@ class PwChoices<X extends string> extends PwEntityList<"/api/v1/choices", X> {
                     </p>
                   </td>
                   <td>
-                    <div
-                      class="btn-group"
-                      role="group"
-                      aria-label="Basic example"
-                    >
-                      <!--TODO FIXME foreach?-->
-                      <button
-                        ?disabled=${disabled}
-                        type="button"
-                        class="btn ${disabled
-                          ? "btn-secondary"
-                          : value.rank == 1
-                          ? "btn-primary"
-                          : "btn-outline-primary"}"
-                      >
-                        1
-                      </button>
-                      <button
-                        ?disabled=${disabled}
-                        type="button"
-                        class="btn ${disabled
-                          ? "btn-secondary"
-                          : value.rank == 2
-                          ? "btn-primary"
-                          : "btn-outline-primary"}"
-                      >
-                        2
-                      </button>
-                      <button
-                        ?disabled=${disabled}
-                        type="button"
-                        class="btn ${disabled
-                          ? "btn-secondary"
-                          : value.rank == 3
-                          ? "btn-primary"
-                          : "btn-outline-primary"}"
-                      >
-                        3
-                      </button>
-                      <button
-                        ?disabled=${disabled}
-                        type="button"
-                        class="btn ${disabled
-                          ? "btn-secondary"
-                          : value.rank == 4
-                          ? "btn-primary"
-                          : "btn-outline-primary"}"
-                      >
-                        4
-                      </button>
-                      <button
-                        ?disabled=${disabled}
-                        type="button"
-                        class="btn ${disabled
-                          ? "btn-secondary"
-                          : value.rank == 5
-                          ? "btn-primary"
-                          : "btn-outline-primary"}"
-                      >
-                        5
-                      </button>
-                      <button
-                        ?disabled=${disabled}
-                        type="button"
-                        class="btn ${disabled
-                          ? "btn-secondary"
-                          : value.rank == null
-                          ? "btn-primary"
-                          : "btn-outline-primary"}"
-                      >
-                        X
-                      </button>
-                    </div>
+                    <pw-rank-select .choice=${value}></pw-rank-select>
                   </td>
                 </tr>`
               )
