@@ -56,15 +56,22 @@ export function updateField<
 
 export async function fetchData<R extends keyof typeof entityRoutes>(
   path: R,
-  table: string,
-  columns: readonly [string, ...string[]],
   query: entitesType0[R],
-  customFilterQuery: (
+  sqlQuery: (
     query: entitesType0[R]
   ) => [
     TemplateStringsArray,
     ...(null | string | string[] | boolean | number | Buffer)[]
-  ]
+  ],
+  nullOrdering: {
+    [key: string]: "smallest" | "largest";
+  }
+  /*{
+          id: "nulls-first",
+          type: "nulls-first",
+          username: "nulls-first",
+          password_hash: "nulls-first",
+        },*/
 ): Promise<[OutgoingHttpHeaders, ResponseType<R>]> {
   const entitySchema: entitesType[R] = entityRoutes[path];
 
@@ -83,7 +90,18 @@ export async function fetchData<R extends keyof typeof entityRoutes>(
   }
 
   const orderByQuery = query.sorting
-    .flatMap((v) => [sql2`,`, sql2`${unsafe2(v[0])} ${unsafe2(v[1])}`])
+    .flatMap((v) => [
+      sql2`,`,
+      sql2`${unsafe2(v[0])} ${unsafe2(v[1])} ${unsafe2(
+        v[1] === "ASC"
+          ? nullOrdering[v[0]] === "smallest"
+            ? "NULLS FIRST"
+            : "NULLS LAST"
+          : nullOrdering[v[0]] === "smallest"
+          ? "NULLS LAST"
+          : "NULLS FIRST"
+      )}`,
+    ])
     .slice(1);
 
   const paginationCursor: entitesType0[R]["paginationCursor"] =
@@ -91,11 +109,9 @@ export async function fetchData<R extends keyof typeof entityRoutes>(
 
   let finalQuery;
   if (!paginationCursor) {
-    finalQuery = sql2`(SELECT ${unsafe2(
-      columns.map((c) => `"${c}"`).join(", ")
-    )} FROM ${unsafe2(table)} WHERE ${customFilterQuery(
-      query
-    )} ORDER BY ${orderByQuery} LIMIT ${query.paginationLimit + 1})`;
+    finalQuery = sql2`(${sqlQuery(query)} ORDER BY ${orderByQuery} LIMIT ${
+      query.paginationLimit + 1
+    })`;
   } else {
     const queries = query.sorting.map((value, index) => {
       const part = query.sorting.slice(0, index + 1);
@@ -116,9 +132,7 @@ export async function fetchData<R extends keyof typeof entityRoutes>(
         })
         .slice(1);
 
-      return sql2`(SELECT ${unsafe2(
-        columns.map((c) => `"${c}"`).join(", ")
-      )} FROM ${unsafe2(table)} WHERE ${customFilterQuery(
+      return sql2`(${sqlQuery(
         query
       )} AND (${parts}) ORDER BY ${orderByQuery} LIMIT ${
         query.paginationLimit + 1
@@ -136,8 +150,12 @@ export async function fetchData<R extends keyof typeof entityRoutes>(
 
   const entitiesSchema = entitySchema["response"]["shape"]["entities"];
 
+  const sqlResult = await sql(...finalQuery);
+
+  console.log(sqlResult);
+
   let entities: z.infer<entitesType[R]["response"]>["entities"] =
-    entitiesSchema.parse(await sql(...finalQuery));
+    entitiesSchema.parse(sqlResult);
 
   // https://github.com/projektwahl/projektwahl-sveltekit/blob/work/src/lib/list-entities.ts#L30
 

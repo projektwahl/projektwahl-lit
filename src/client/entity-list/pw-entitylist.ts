@@ -274,7 +274,8 @@ export class PwEntityList<
                   <li
                     class="page-item ${this._task.render({
                       pending: () => "disabled",
-                      complete: (result) => result.data?.previousCursor === null ? "disabled" : "",
+                      complete: (result) =>
+                        result.data?.previousCursor === null ? "disabled" : "",
                     })}"
                   >
                     <a
@@ -312,12 +313,16 @@ export class PwEntityList<
                       tabindex=${ifDefined(
                         this._task.render({
                           pending: () => undefined,
-                          complete: (result) => result.data?.previousCursor === null ? undefined : -1,
+                          complete: (result) =>
+                            result.data?.previousCursor === null
+                              ? undefined
+                              : -1,
                         })
                       )}
                       aria-disabled=${this._task.render({
                         pending: () => true,
-                        complete: (result) => result.data?.previousCursor === null,
+                        complete: (result) =>
+                          result.data?.previousCursor === null,
                       })}
                     >
                       <span aria-hidden="true">&laquo;</span>
@@ -326,7 +331,8 @@ export class PwEntityList<
                   <li
                     class="page-item ${this._task.render({
                       pending: () => "disabled",
-                      complete: (result) => result.data?.nextCursor === null ? "disabled" : "",
+                      complete: (result) =>
+                        result.data?.nextCursor === null ? "disabled" : "",
                     })}"
                   >
                     <a
@@ -364,7 +370,8 @@ export class PwEntityList<
                       tabindex=${ifDefined(
                         this._task.render({
                           pending: () => undefined,
-                          complete: (result) => result.data?.nextCursor === null ? undefined : -1,
+                          complete: (result) =>
+                            result.data?.nextCursor === null ? undefined : -1,
                         })
                       )}
                       aria-disabled=${this._task.render({

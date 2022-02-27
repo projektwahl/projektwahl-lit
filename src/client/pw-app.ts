@@ -138,6 +138,10 @@ const pages = {
       true
     );
   },
+  "^/vote$": async (url: URL) => {
+    const { pwChoices } = await import("./routes/choices/pw-choices.js");
+    return await pwChoices(url);
+  },
 };
 
 export class PwApp extends LitElement {
@@ -316,12 +320,11 @@ export class PwApp extends LitElement {
                   <li>
                     <a
                       @click=${aClick}
-                      class="nav-link ${this.history.url.pathname ===
-                      "/election"
+                      class="nav-link ${this.history.url.pathname === "/vote"
                         ? "active"
                         : ""}"
-                      href="/election"
-                      >${msg("Election")}</a
+                      href="/vote"
+                      >${msg("Vote")}</a
                     >
                   </li>
                 </ul>

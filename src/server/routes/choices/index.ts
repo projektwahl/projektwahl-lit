@@ -20,31 +20,29 @@ https://github.com/projektwahl/projektwahl-lit
 SPDX-License-Identifier: AGPL-3.0-or-later
 SPDX-FileCopyrightText: 2021 Moritz Hedtke <Moritz.Hedtke@t-online.de>
 */
-import type { OutgoingHttpHeaders, ServerResponse } from "node:http";
 import { ZodIssueCode } from "zod";
 import type { ResponseType } from "../../../lib/routes.js";
 import { fetchData } from "../../entities.js";
 import { MyRequest, requestHandler } from "../../express.js";
 import { sql2 } from "../../sql/index.js";
+import type { OutgoingHttpHeaders, ServerResponse } from "node:http";
 import type { Http2ServerResponse } from "node:http2";
 
-export async function usersHandler(
+export async function choicesHandler(
   request: MyRequest,
   response: ServerResponse | Http2ServerResponse
 ) {
   return await requestHandler(
     "GET",
-    "/api/v1/users",
+    "/api/v1/choices",
     async function (query, loggedInUser) {
-      console.log(query);
-
       // helper is allowed to read the normal data
-      // voter is not allowed to do anything
+      // voter is allowed to read the normal data
 
       if (!loggedInUser) {
         const returnValue: [
           OutgoingHttpHeaders,
-          ResponseType<"/api/v1/users">
+          ResponseType<"/api/v1/choices">
         ] = [
           {
             "content-type": "text/json; charset=utf-8",
@@ -65,12 +63,11 @@ export async function usersHandler(
         ];
         return returnValue;
       }
-      if (
-        !(loggedInUser?.type === "admin" || loggedInUser?.type === "helper")
-      ) {
+
+      if (!(loggedInUser?.type === "voter")) {
         const returnValue: [
           OutgoingHttpHeaders,
-          ResponseType<"/api/v1/users">
+          ResponseType<"/api/v1/choices">
         ] = [
           {
             "content-type": "text/json; charset=utf-8",
@@ -92,37 +89,35 @@ export async function usersHandler(
         return returnValue;
       }
 
-      const ret: [OutgoingHttpHeaders, ResponseType<"/api/v1/users">] =
-        await fetchData<"/api/v1/users">(
-          "/api/v1/users" as const,
-          query,
-          (query) => {
-            return sql2`SELECT "id",
-            "type",
-            "username",
-            "group",
-            "age",
-            "away",
-            "project_leader_id",
-            "force_in_project_id",
-            "deleted" FROM users_with_deleted WHERE (${!query.filters
-              .id} OR id = ${query.filters.id ?? null}) AND username LIKE ${
-              "%" + (query.filters.username ?? "") + "%"
-            }
-           AND (${!query.filters.project_leader_id} OR project_leader_id = ${
-              query.filters.project_leader_id ?? null
-            })
-           AND (${!query.filters
-             .force_in_project_id} OR force_in_project_id = ${
-              query.filters.force_in_project_id ?? null
-            })
-            AND (${!query.filters.type} OR type = ${
-              query.filters.type ?? null
-            })`;
-          },
-          {}
-        );
-      return ret;
+      return await fetchData<"/api/v1/choices">(
+        "/api/v1/choices" as const,
+        query,
+        (query) => {
+          return sql2`SELECT "id",
+          "title",
+          "info",
+          "place",
+          "costs",
+          "min_age",
+          "max_age",
+          "min_participants",
+          "max_participants",
+          "random_assignments",
+          "deleted",
+          "choices"."rank",
+          "choices"."project_id",
+          "choices"."user_id"
+          FROM projects LEFT OUTER JOIN choices ON (projects.id = choices.project_id AND choices.user_id = ${
+            loggedInUser.id
+          }) WHERE (${!query.filters.id} OR id = ${
+            query.filters.id ?? null
+          }) AND title LIKE ${"%" + (query.filters.title ?? "") + "%"}
+             AND info  LIKE ${"%" + (query.filters.info ?? "") + "%"}`;
+        },
+        {
+          rank: "largest",
+        }
+      );
     }
   )(request, response);
 }

@@ -23,6 +23,22 @@ SPDX-FileCopyrightText: 2021 Moritz Hedtke <Moritz.Hedtke@t-online.de>
 import { z, ZodIssue, ZodObject, ZodTypeAny } from "zod";
 import { result } from "./result.js";
 
+const rawChoice = z
+  .object({
+    rank: z.number(),
+    project_id: z.number(),
+    user_id: z.number(),
+  })
+  .strict();
+
+const rawChoiceNullable = z
+  .object({
+    rank: z.number().nullable(),
+    project_id: z.number().nullable(),
+    user_id: z.number().nullable(),
+  })
+  .strict();
+
 const rawUserCommon = {
   id: z.number(),
   username: z.string().min(1).max(100),
@@ -70,7 +86,9 @@ export const rawSessionType = z.object({
   user_id: z.number(),
 });
 
+// TODO FIXME can we remove this?
 export type keys =
+  | "/api/v1/choices/update"
   | "/api/v1/login"
   | "/api/v1/logout"
   | "/api/v1/openid-login"
@@ -207,6 +225,22 @@ const baseQuery = <
     })
     .strict();
 
+const choices = rawChoiceNullable.merge(
+  rawProjectSchema.pick({
+    id: true,
+    title: true,
+    info: true,
+    place: true,
+    costs: true,
+    min_age: true,
+    max_age: true,
+    min_participants: true,
+    max_participants: true,
+    random_assignments: true,
+    deleted: true,
+  })
+);
+
 export const routes = identity({
   "/api/v1/logout": {
     request: z.any(),
@@ -324,11 +358,27 @@ export const routes = identity({
       nextCursor: project.nullable(),
     }),
   },
+  "/api/v1/choices": {
+    request: baseQuery(rawChoiceNullable.merge(rawProjectSchema)),
+    response: z.object({
+      entities: z.array(choices),
+      previousCursor: choices.nullable(),
+      nextCursor: choices.nullable(),
+    }),
+  },
+  "/api/v1/choices/update": {
+    request: rawChoiceNullable.pick({
+      project_id: true,
+      rank: true,
+    }),
+    response: z.object({}),
+  },
 } as const);
 
 export const entityRoutes = {
   "/api/v1/users": routes["/api/v1/users"],
   "/api/v1/projects": routes["/api/v1/projects"],
+  "/api/v1/choices": routes["/api/v1/choices"],
 };
 
 export declare class MinimalZodError {
