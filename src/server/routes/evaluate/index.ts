@@ -8,6 +8,8 @@ import { execFile } from 'child_process';
 import JSON5 from 'json5';
 import { sql } from '../../../server/database.js';
 
+// TODO FIXME properly isolate this in a separate systemd process (systemd-run?)
+
 // TODO FIXME if you're wondering why this doesn't give a solution it's because the min_participants is too high
 // or not
 
