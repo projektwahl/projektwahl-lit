@@ -94,8 +94,6 @@ class PwChoices<X extends string> extends PwEntityList<"/api/v1/choices", X> {
               title: msg("Rank"),
             })}
           </th>
-
-          <th class="table-cell-hover">${msg("Actions")}</th>
         </tr>
 
         <tr>
@@ -130,8 +128,6 @@ class PwChoices<X extends string> extends PwEntityList<"/api/v1/choices", X> {
               initial,
             })}
           </th>
-
-          <th scope="col"></th>
         </tr>
       `;
     } catch (error) {
@@ -142,6 +138,7 @@ class PwChoices<X extends string> extends PwEntityList<"/api/v1/choices", X> {
     }
   }
   override get body() {
+    const disabled = false;
     return html`
       ${this._task.render({
         pending: () => {
@@ -166,28 +163,79 @@ class PwChoices<X extends string> extends PwEntityList<"/api/v1/choices", X> {
                     </p>
                   </td>
                   <td>
-                    <p>${value.rank}</p>
-                  </td>
-                  <td>
-                    <a
-                      class="btn btn-secondary"
-                      @click=${aClick}
-                      href="/choices/edit/${value.id}"
-                      role="button"
+                    <div
+                      class="btn-group"
+                      role="group"
+                      aria-label="Basic example"
                     >
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        width="16"
-                        height="16"
-                        fill="currentColor"
-                        class="bi bi-pen"
-                        viewBox="0 0 16 16"
+                      <!--TODO FIXME foreach?-->
+                      <button
+                        ?disabled=${disabled}
+                        type="button"
+                        class="btn ${disabled
+                          ? "btn-secondary"
+                          : value.rank == 1
+                          ? "btn-primary"
+                          : "btn-outline-primary"}"
                       >
-                        <path
-                          d="m13.498.795.149-.149a1.207 1.207 0 1 1 1.707 1.708l-.149.148a1.5 1.5 0 0 1-.059 2.059L4.854 14.854a.5.5 0 0 1-.233.131l-4 1a.5.5 0 0 1-.606-.606l1-4a.5.5 0 0 1 .131-.232l9.642-9.642a.5.5 0 0 0-.642.056L6.854 4.854a.5.5 0 1 1-.708-.708L9.44.854A1.5 1.5 0 0 1 11.5.796a1.5 1.5 0 0 1 1.998-.001zm-.644.766a.5.5 0 0 0-.707 0L1.95 11.756l-.764 3.057 3.057-.764L14.44 3.854a.5.5 0 0 0 0-.708l-1.585-1.585z"
-                        />
-                      </svg>
-                    </a>
+                        1
+                      </button>
+                      <button
+                        ?disabled=${disabled}
+                        type="button"
+                        class="btn ${disabled
+                          ? "btn-secondary"
+                          : value.rank == 2
+                          ? "btn-primary"
+                          : "btn-outline-primary"}"
+                      >
+                        2
+                      </button>
+                      <button
+                        ?disabled=${disabled}
+                        type="button"
+                        class="btn ${disabled
+                          ? "btn-secondary"
+                          : value.rank == 3
+                          ? "btn-primary"
+                          : "btn-outline-primary"}"
+                      >
+                        3
+                      </button>
+                      <button
+                        ?disabled=${disabled}
+                        type="button"
+                        class="btn ${disabled
+                          ? "btn-secondary"
+                          : value.rank == 4
+                          ? "btn-primary"
+                          : "btn-outline-primary"}"
+                      >
+                        4
+                      </button>
+                      <button
+                        ?disabled=${disabled}
+                        type="button"
+                        class="btn ${disabled
+                          ? "btn-secondary"
+                          : value.rank == 5
+                          ? "btn-primary"
+                          : "btn-outline-primary"}"
+                      >
+                        5
+                      </button>
+                      <button
+                        ?disabled=${disabled}
+                        type="button"
+                        class="btn ${disabled
+                          ? "btn-secondary"
+                          : value.rank == null
+                          ? "btn-primary"
+                          : "btn-outline-primary"}"
+                      >
+                        X
+                      </button>
+                    </div>
                   </td>
                 </tr>`
               )

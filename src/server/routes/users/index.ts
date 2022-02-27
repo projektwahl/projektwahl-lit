@@ -105,9 +105,10 @@ export async function usersHandler(
             "away",
             "project_leader_id",
             "force_in_project_id",
-            "deleted" FROM users_with_deleted WHERE (${!query.filters.id} OR id = ${
-              query.filters.id ?? null
-            }) AND username LIKE ${"%" + (query.filters.username ?? "") + "%"}
+            "deleted" FROM users_with_deleted WHERE (${!query.filters
+              .id} OR id = ${query.filters.id ?? null}) AND username LIKE ${
+              "%" + (query.filters.username ?? "") + "%"
+            }
            AND (${!query.filters.project_leader_id} OR project_leader_id = ${
               query.filters.project_leader_id ?? null
             })

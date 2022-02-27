@@ -320,8 +320,7 @@ export class PwApp extends LitElement {
                   <li>
                     <a
                       @click=${aClick}
-                      class="nav-link ${this.history.url.pathname ===
-                      "/vote"
+                      class="nav-link ${this.history.url.pathname === "/vote"
                         ? "active"
                         : ""}"
                       href="/vote"

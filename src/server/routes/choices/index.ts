@@ -64,11 +64,7 @@ export async function choicesHandler(
         return returnValue;
       }
 
-      if (
-        !(
-          loggedInUser?.type === "voter"
-        )
-      ) {
+      if (!(loggedInUser?.type === "voter")) {
         const returnValue: [
           OutgoingHttpHeaders,
           ResponseType<"/api/v1/choices">
@@ -119,7 +115,7 @@ export async function choicesHandler(
              AND info  LIKE ${"%" + (query.filters.info ?? "") + "%"}`;
         },
         {
-          rank: "largest"
+          rank: "largest",
         }
       );
     }
