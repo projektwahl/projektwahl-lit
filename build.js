@@ -93,7 +93,7 @@ await rename(
 // rebuild with path to bootstrap.css
 {
   let { stdout, stderr } = await exec(
-    `esbuild --format=esm --bundle dist/de/client/pw-app.js --charset=utf8 --define:window.PRODUCTION=true --define:window.BOOTSTRAP_CSS=\\"/dist/bootstrap_${bootstrapHash}.min.css\\" --entry-names=[dir]/[name] --sourcemap --analyze --outdir=dist --minify-whitespace --minify-identifiers --minify-syntax --tree-shaking=true --minify`
+    `esbuild --format=esm --bundle dist/de/client/pw-app.js --charset=utf8 --define:window.PRODUCTION=true --define:window.BOOTSTRAP_CSS=\\"/dist/bootstrap_${bootstrapHash}.min.css\\" --entry-names=[dir]/[name] --sourcemap --analyze --outdir=dist --minify-whitespace --minify-syntax --tree-shaking=true`
   );
 
   console.log(stdout);
@@ -160,7 +160,7 @@ await writeFile("dist/index.html", index);
 
 {
   let { stdout, stderr } = await exec(
-    `esbuild --platform=node --format=cjs --bundle src/server/setup.ts --external:@dev.mohe/argon2 --define:process.env.NODE_ENV=\\"production\\"  --charset=utf8 --entry-names=[dir]/[name] --sourcemap --analyze --outfile=dist/setup.cjs --minify-whitespace --minify-identifiers --minify-syntax --tree-shaking=true --minify`
+    `esbuild --platform=node --format=cjs --bundle src/server/setup.ts --external:@dev.mohe/argon2 --define:process.env.NODE_ENV=\\"production\\"  --charset=utf8 --entry-names=[dir]/[name] --sourcemap --analyze --outfile=dist/setup.cjs --minify-whitespace --minify-syntax --tree-shaking=true`
   );
 
   console.log(stdout);
@@ -170,7 +170,7 @@ await writeFile("dist/index.html", index);
 {
   /*
   let { stdout, stderr } = await exec(
-    `esbuild --platform=node --format=esm --bundle src/server/index.ts --external:@dev.mohe/argon2/build/Release/argon2.node --define:process.env.NODE_ENV=\\"production\\" --charset=utf8 --entry-names=[dir]/[name] --sourcemap --analyze --outfile=dist/server.js --inject:./require-shim.js --minify-whitespace --minify-identifiers --minify-syntax --tree-shaking=true --minify --loader:.node=./esbuild-plugin-node-extension.js`
+    `esbuild --platform=node --format=esm --bundle src/server/index.ts --external:@dev.mohe/argon2/build/Release/argon2.node --define:process.env.NODE_ENV=\\"production\\" --charset=utf8 --entry-names=[dir]/[name] --sourcemap --analyze --outfile=dist/server.js --inject:./require-shim.js --minify-whitespace --minify-syntax --tree-shaking=true --loader:.node=./esbuild-plugin-node-extension.js`
   );
 
   console.log(stdout);
@@ -189,8 +189,6 @@ await writeFile("dist/index.html", index);
     sourcemap: true,
     outfile: "dist/server.js",
     inject: ["./require-shim.js"],
-    minify: true,
-    minifyIdentifiers: true,
     minifyWhitespace: true,
     minifySyntax: true,
     treeShaking: true,
