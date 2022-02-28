@@ -126,9 +126,9 @@ export class CPLEXLP {
 
     const problemFinal = problem.filter(l => l.startsWith("n j ")).map(l => l.split(" ")).map<[number, string]>(([_0, _1, index, name]) => [parseInt(index), name]).map<[string, number]>(([index, name]) => [name, solutionFinal[index]])
 
-    console.log(problemFinal.filter(([name]) => name.startsWith("choice_")).map(([name, value]) => {
+    return problemFinal.filter(([name]) => name.startsWith("choice_")).map(([name, value]) => {
         return [parseInt(name.split("_")[1]), parseInt(name.split("_")[2]), value]
-    }))
+    })
   };
 }
 
@@ -248,6 +248,14 @@ for (const project of projects) {
 
 await lp.endBinaryVariables();
 
-await lp.calculate();
+const results = await lp.calculate();
 
-console.log(lp.solutionPath)
+for (const result of results) {
+    // TODO FIXME optimize
+    const choice = choices.find(c => c.user_id == result[0] && c.project_id == result[1])!
+    if (result[2] == 1) {
+        console.log(`${choice.user_id} ${choice.project_id}: ${choice.rank}`)
+    }
+}
+
+await sql.end()
