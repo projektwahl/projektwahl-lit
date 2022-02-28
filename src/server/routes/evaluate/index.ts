@@ -28,7 +28,7 @@ export class CPLEXLP {
 
   maximize = async (factor: number, variable: string) => {
     if (factor !== 0) {
-        await this.fileHandle.write(` + ${factor} ${variable}`);
+      await this.fileHandle.write(` + ${factor} ${variable}`);
     }
   };
 
@@ -38,21 +38,29 @@ export class CPLEXLP {
     await this.fileHandle.write(`\nSubject To`);
   };
 
-  startConstraint = async (name: string) => {
-    await this.fileHandle.write(`\n${name}: `);
+  constraint = async (
+    name: string,
+    min: number | null,
+    constraints: [number, string][],
+    max: number | null
+  ) => {
+    if (min !== null) {
+      await this.fileHandle.write(`\nmin_${name}: `);
+      for (const constraint of constraints) {
+        await this.fileHandle.write(` + ${constraint[0]} ${constraint[1]}`);
+      }
+      await this.fileHandle.write(` >= ${min}`);
+    }
+    if (max !== null) {
+      await this.fileHandle.write(`\nmax_${name}: `);
+      for (const constraint of constraints) {
+        await this.fileHandle.write(` + ${constraint[0]} ${constraint[1]}`);
+      }
+      await this.fileHandle.write(` <= ${max}`);
+    }
   };
 
-  constraint = async (factor: number, variable: string) => {
-    await this.fileHandle.write(` + ${factor} ${variable}`);
-  }
-
-  endConstraint = async (indicator: "<"|"<="|"=<"|">"|">="|"=>"|"=", value: number) => {
-    await this.fileHandle.write(` ${indicator} ${value}`);
-  };
-
-  endConstraints = async () => {
-
-  };
+  endConstraints = async () => {};
 
   startVariables = async () => {
     await this.fileHandle.write(`\nGeneral\n`);
@@ -60,7 +68,7 @@ export class CPLEXLP {
 
   variable = async (name: string) => {
     await this.fileHandle.write(` ${name}`);
-  }
+  };
 
   endVariables = async () => {
     await this.fileHandle.write(`\nEnd\n`);
@@ -124,49 +132,40 @@ console.log(choices);
 await lp.startMaximize();
 
 for (const choice of choices) {
-  await lp.maximize(rank2points(choice.rank), `choice_${choice.user_id}_${choice.project_id}`);
+  await lp.maximize(
+    rank2points(choice.rank),
+    `choice_${choice.user_id}_${choice.project_id}`
+  );
 }
 
+await lp.endMaximize();
 
-await lp.endMaximize()
-
-
-
-await lp.startConstraints()
+await lp.startConstraints();
 
 for (const choice of choices) {
-    await lp.startConstraint(`min_choice_${choice.user_id}_${choice.project_id}`)
-    await lp.constraint(1, `choice_${choice.user_id}_${choice.project_id}`);
-    await lp.endConstraint(">=", 0)
-
-    await lp.startConstraint(`max_choice_${choice.user_id}_${choice.project_id}`)
-    await lp.constraint(1, `choice_${choice.user_id}_${choice.project_id}`);
-    await lp.endConstraint("<=", 1)
+  await lp.constraint(`choice_${choice.user_id}_${choice.project_id}`, 0, [[1, `choice_${choice.user_id}_${choice.project_id}`]], 1);
 }
 
-for (const groupedChoice of Object.entries(groupBy(choices, (c) => c.user_id))) {
-    await lp.startConstraint(`Min_only_in_one_project${groupedChoice[0]}`)
-    for (const choice of groupedChoice[1]) {
-        await lp.constraint(1, `choice_${choice.user_id}_${choice.project_id}`);
-    }
-    await lp.endConstraint(">=", 0)
+for (const groupedChoice of Object.entries(
+  groupBy(choices, (c) => c.user_id)
+)) {
+  await lp.constraint(
+    `min_only_in_one_project${groupedChoice[0]}`,
+    0,
+    groupedChoice[1].map((choice) => [
+      1,
+      `choice_${choice.user_id}_${choice.project_id}`,
+    ]),
+    1
+  );
 }
 
-// TODO FIXME remove duplication of >= and <=
-for (const groupedChoice of Object.entries(groupBy(choices, (c) => c.user_id))) {
-    await lp.startConstraint(`max_only_in_one_project${groupedChoice[0]}`)
-    for (const choice of groupedChoice[1]) {
-        await lp.constraint(1, `choice_${choice.user_id}_${choice.project_id}`);
-    }
-    await lp.endConstraint("<=", 1)
-}
-
-await lp.startVariables()
+await lp.startVariables();
 
 for (const choice of choices) {
-    await lp.variable(`choice_${choice.user_id}_${choice.project_id}`);
+  await lp.variable(`choice_${choice.user_id}_${choice.project_id}`);
 }
 
-await lp.endVariables()
+await lp.endVariables();
 
 await lp.calculate();
