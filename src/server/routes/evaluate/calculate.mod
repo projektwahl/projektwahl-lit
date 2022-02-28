@@ -35,15 +35,15 @@ var user_is_project_leader{u in U} binary;
 
 # TODO FIXME user not in project they are project leader in
 
-maximize total_benefits: sum {u in U, p in P} if choices[u,p] != -1 then choices[u,p] * user_in_project[u,p];
+#maximize total_benefits: sum {u in U, p in P} if choices[u,p] != -1 then choices[u,p] * user_in_project[u,p];
 
 # this definitely needs to be the case
 # why if we remove this it works?
-subject to notinprojectyoudidntvote{u in U, p in P}:
-    if choices[u,p] == -1 then user_in_project[u,p] = 0;
+#subject to notinprojectyoudidntvote{u in U, p in P}:
+#    if choices[u,p] == -1 then user_in_project[u,p] = 0;
 
 # this definitely needs to be the case
-subject to no_project_leader{u in U}: if project_leaders[u] == 'null' then user_is_project_leader[u] = 0;
+#subject to no_project_leader{u in U}: if project_leaders[u] == 'null' then user_is_project_leader[u] = 0;
 
 # this definitely needs to be the case
 subject to either_project_leader_or_project_not_exists{u in U}:
@@ -51,8 +51,10 @@ subject to either_project_leader_or_project_not_exists{u in U}:
 
 # this definitely needs to be the case
 # why if we remove this it works?
-subject to onlyinoneproject{u in U}: (sum {p in P} user_in_project[u,p]) + user_is_project_leader[u] = 1;
+#subject to onlyinoneproject{u in U}: (sum {p in P} user_in_project[u,p]) + user_is_project_leader[u] = 1;
 
+
+# TODO user only in project if it exists
 
 #subject to project_min_size{p in P}: (sum {u in U} user_in_project[u,p]) + projects[p,'min_participants'] * project_not_exists[p] >= projects[p,'min_participants'];
 #subject to project_max_size{p in P}: (sum {u in U} user_in_project[u,p]) + projects[p,'max_participants'] * project_not_exists[p] <= projects[p,'max_participants'];

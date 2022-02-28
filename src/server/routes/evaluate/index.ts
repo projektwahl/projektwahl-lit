@@ -71,10 +71,21 @@ export class CPLEXLP {
   };
 
   endVariables = async () => {
-    await this.fileHandle.write(`\nEnd\n`);
   };
 
+  startBinaryVariables = async () => {
+    await this.fileHandle.write(`\nBinary\n`);
+  }
+
+  binaryVariable = async (name: string) => {
+    await this.fileHandle.write(` ${name}`);
+  }
+
+  endBinaryVariables = async () => {
+  }
+
   calculate = async () => {
+    await this.fileHandle.write(`\nEnd\n`);
     await this.fileHandle.close();
 
     console.log(this.filePath);
@@ -142,15 +153,17 @@ await lp.endMaximize();
 
 await lp.startConstraints();
 
-for (const choice of choices) {
-  await lp.constraint(`choice_${choice.user_id}_${choice.project_id}`, 0, [[1, `choice_${choice.user_id}_${choice.project_id}`]], 1);
-}
+// TODO FIXME database transaction to ensure consistent view of data
+const projects = await sql
+`SELECT id, min_participants, max_participants FROM projects;`;
 
+// TODO FIXME project leader should add a fake 0 choice?
+// only in one project or project leader
 for (const groupedChoice of Object.entries(
   groupBy(choices, (c) => c.user_id)
 )) {
   await lp.constraint(
-    `min_only_in_one_project${groupedChoice[0]}`,
+    `only_in_one_project_${groupedChoice[0]}`,
     0,
     groupedChoice[1].map((choice) => [
       1,
@@ -160,12 +173,48 @@ for (const groupedChoice of Object.entries(
   );
 }
 
-await lp.startVariables();
-
+// only in project if it exists
 for (const choice of choices) {
-  await lp.variable(`choice_${choice.user_id}_${choice.project_id}`);
+    await lp.constraint(
+        `project_must_exist_${choice.user_id}_${choice.project_id}`,
+        0,
+        [[1, `choice_${choice.user_id}_${choice.project_id}`], [1, `project_not_exists_${choice.project_id}`]],
+        1
+      );
+  }
+
+const users =
+      await sql
+      `SELECT id, project_leader_id FROM present_voters;`;
+
+// either project leader or project does not exist
+for (const user of users) {
+    if (user.project_leader_id === null) continue;
+    await lp.constraint(
+        `either_project_leader_or_project_not_exists_${user.id}`,
+        0,
+        [[1, `project_leader_${user.id}`], [1, `project_not_exists_${user.project_leader_id}`]],
+        1
+      );
 }
 
+await lp.startVariables();
 await lp.endVariables();
+
+await lp.startBinaryVariables()
+
+for (const choice of choices) {
+  await lp.binaryVariable(`choice_${choice.user_id}_${choice.project_id}`);
+}
+
+for (const user of users) {
+    await lp.binaryVariable(`project_leader_${user.id}`);
+}
+
+for (const project of projects) {
+    await lp.binaryVariable(`project_not_exists_${project.id}`);
+}
+
+await lp.endBinaryVariables()
 
 await lp.calculate();
