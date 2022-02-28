@@ -8,12 +8,14 @@ import groupBy from "lodash-es/groupBy.js";
 import sortedIndexBy from "lodash-es/sortedIndexBy.js";
 
 export class CPLEXLP {
-  constructor() {}
+  constructor() {
+  }
 
   dir!: string;
   filePath!: string;
   fileHandle!: FileHandle;
   solutionPath!: string;
+  problemPath!: string;
 
   setup = async () => {
     this.dir = await mkdtemp(path.join(os.tmpdir(), "projektwahl-"));
@@ -92,8 +94,9 @@ export class CPLEXLP {
     console.log(this.filePath);
 
     this.solutionPath = path.join(this.dir, "solution.sol");
+    this.problemPath = path.join(this.dir, "problem.glp");
 
-    const childProcess = execFile("glpsol", ["--lp", this.filePath, "--write", this.solutionPath], {});
+    const childProcess = execFile("glpsol", ["--lp", this.filePath, "--write", this.solutionPath, "--wglp", this.problemPath], {});
 
     if (childProcess.stdout) {
       for await (const chunk of childProcess.stdout) {
@@ -115,7 +118,15 @@ export class CPLEXLP {
 
     const solution = (await readFile(this.solutionPath, {encoding: "utf8"})).split(/\r?\n/);
 
-    console.log(solution.filter(l => l.startsWith("i ")).map(l => l.split(" ")[2]).map(Number))
+    const solutionFinal = Object.fromEntries(solution.filter(l => l.startsWith("j ")).map(l => l.split(" ")).map(([_, index, value]) => [parseInt(index), parseInt(value)]));
+
+    console.log(solutionFinal)
+
+    const problem = (await readFile(this.problemPath, {encoding: "utf8"})).split(/\r?\n/);
+
+    const problemFinal = Object.entries(problem.filter(l => l.startsWith("n j ")).map(l => l.split(" ")).map(([_0, _1, index, name]) => [parseInt(index), name]).map(([index, name]) => [name, solutionFinal[index]]))
+
+    console.log(problemFinal)
   };
 }
 
