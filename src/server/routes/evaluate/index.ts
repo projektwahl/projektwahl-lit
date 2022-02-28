@@ -4,6 +4,7 @@ import os from "node:os";
 import { constants } from "node:fs";
 import { execFile } from "node:child_process";
 import { sql } from "../../database.js";
+import groupBy from "lodash-es/groupBy.js";
 
 export class CPLEXLP {
   constructor() {}
@@ -42,7 +43,7 @@ export class CPLEXLP {
   };
 
   constraint = async (factor: number, variable: string) => {
-    await this.fileHandle.write(` ${factor} ${variable}`);
+    await this.fileHandle.write(` + ${factor} ${variable}`);
   }
 
   endConstraint = async (indicator: "<"|"<="|"=<"|">"|">="|"=>"|"=", value: number) => {
@@ -141,8 +142,24 @@ for (const choice of choices) {
     await lp.startConstraint(`max_choice_${choice.user_id}_${choice.project_id}`)
     await lp.constraint(1, `choice_${choice.user_id}_${choice.project_id}`);
     await lp.endConstraint("<=", 1)
-  }
+}
 
+for (const groupedChoice of Object.entries(groupBy(choices, (c) => c.user_id))) {
+    await lp.startConstraint(`Min_only_in_one_project${groupedChoice[0]}`)
+    for (const choice of groupedChoice[1]) {
+        await lp.constraint(1, `choice_${choice.user_id}_${choice.project_id}`);
+    }
+    await lp.endConstraint(">=", 0)
+}
+
+// TODO FIXME remove duplication of >= and <=
+for (const groupedChoice of Object.entries(groupBy(choices, (c) => c.user_id))) {
+    await lp.startConstraint(`max_only_in_one_project${groupedChoice[0]}`)
+    for (const choice of groupedChoice[1]) {
+        await lp.constraint(1, `choice_${choice.user_id}_${choice.project_id}`);
+    }
+    await lp.endConstraint("<=", 1)
+}
 
 await lp.startVariables()
 
