@@ -22,22 +22,36 @@ export class CPLEXLP {
   };
 
   startMaximize = async () => {
-    await this.fileHandle.write(`Maximize:\n obj: test 0`);
+    await this.fileHandle.write(`Maximize\n obj: `);
   };
 
   maximize = async (factor: number, variable: string) => {
-    await this.fileHandle.write(` + ${factor} ${variable}`);
+    if (factor !== 0) {
+        await this.fileHandle.write(` + ${factor} ${variable}`);
+    }
   };
 
   endMaximize = async () => {};
 
-  startContraints = async () => {};
+  startConstraints = async () => {
+    await this.fileHandle.write(`\nSubject To`);
+  };
 
-  startConstraint = async (name: string, min: number, max: number) => {};
+  startConstraint = async (name: string) => {
+    await this.fileHandle.write(`\n${name}: `);
+  };
 
-  endConstraint = async () => {};
+  constraint = async (factor: number, variable: string) => {
+    await this.fileHandle.write(` ${factor} ${variable}`);
+  }
 
-  endConstraints = async () => {};
+  endConstraint = async (indicator: "<"|"<="|"=<"|">"|">="|"=>"|"=", value: number) => {
+    await this.fileHandle.write(` ${indicator} ${value}`);
+  };
+
+  endConstraints = async () => {
+
+  };
 
   startVariables = async () => {
     await this.fileHandle.write(`\nGeneral\n`);
@@ -109,7 +123,7 @@ console.log(choices);
 await lp.startMaximize();
 
 for (const choice of choices) {
-  lp.maximize(rank2points(choice.rank), `choice_${choice.user_id}_${choice.project_id}`);
+  await lp.maximize(rank2points(choice.rank), `choice_${choice.user_id}_${choice.project_id}`);
 }
 
 
@@ -117,14 +131,23 @@ await lp.endMaximize()
 
 
 
+await lp.startConstraints()
+
+for (const choice of choices) {
+    await lp.startConstraint(`min_choice_${choice.user_id}_${choice.project_id}`)
+    await lp.constraint(1, `choice_${choice.user_id}_${choice.project_id}`);
+    await lp.endConstraint(">=", 0)
+
+    await lp.startConstraint(`max_choice_${choice.user_id}_${choice.project_id}`)
+    await lp.constraint(1, `choice_${choice.user_id}_${choice.project_id}`);
+    await lp.endConstraint("<=", 1)
+  }
 
 
 await lp.startVariables()
 
-lp.variable(`test`);
-
 for (const choice of choices) {
-    lp.variable(`choice_${choice.user_id}_${choice.project_id}`);
+    await lp.variable(`choice_${choice.user_id}_${choice.project_id}`);
 }
 
 await lp.endVariables()
