@@ -40,7 +40,7 @@ export async function pwUser(id: number, viewOnly = false) {
   return html`<pw-user-create
     ?disabled=${viewOnly}
     .initial=${result}
-    .uri=${"/api/v1/users/update"}
+    uri="/api/v1/users/update"
   ></pw-user-create>`;
 }
 
@@ -70,8 +70,7 @@ class PwUserCreate extends PwForm<
   static get properties() {
     return {
       ...super.properties,
-      uri: { attribute: false },
-      actionText: { type: String },
+      uri: { type: String },
       _task: { state: true },
       type: { state: true },
       initial: { attribute: false },

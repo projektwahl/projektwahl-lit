@@ -17,7 +17,7 @@
     "esModuleInterop": true,
     "rootDir": "src/",
     "outDir": "dist/",
-    "disableSizeLimit": true
+    "disableSizeLimit": true,
   },
   "include": ["src/**/*.ts"]
 }
