@@ -124,9 +124,11 @@ export class CPLEXLP {
 
     const problem = (await readFile(this.problemPath, {encoding: "utf8"})).split(/\r?\n/);
 
-    const problemFinal = Object.entries(problem.filter(l => l.startsWith("n j ")).map(l => l.split(" ")).map(([_0, _1, index, name]) => [parseInt(index), name]).map(([index, name]) => [name, solutionFinal[index]]))
+    const problemFinal = problem.filter(l => l.startsWith("n j ")).map(l => l.split(" ")).map<[number, string]>(([_0, _1, index, name]) => [parseInt(index), name]).map<[string, number]>(([index, name]) => [name, solutionFinal[index]])
 
-    console.log(problemFinal)
+    console.log(problemFinal.filter(([name]) => name.startsWith("choice_")).map(([name, value]) => {
+        return [parseInt(name.split("_")[1]), parseInt(name.split("_")[2]), value]
+    }))
   };
 }
 
