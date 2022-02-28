@@ -1,7 +1,7 @@
 import { FileHandle, mkdtemp, open, readFile } from "node:fs/promises";
 import path from "node:path";
 import os from "node:os";
-import { constants } from "node:fs";
+import { constants, read } from "node:fs";
 import { execFile } from "node:child_process";
 import { sql } from "../../database.js";
 import groupBy from "lodash-es/groupBy.js";
@@ -10,12 +10,14 @@ import sortedIndexBy from "lodash-es/sortedIndexBy.js";
 export class CPLEXLP {
   constructor() {}
 
+  dir!: string;
   filePath!: string;
   fileHandle!: FileHandle;
+  solutionPath!: string;
 
   setup = async () => {
-    const dir = await mkdtemp(path.join(os.tmpdir(), "projektwahl-"));
-    this.filePath = path.join(dir, "cplex.lp");
+    this.dir = await mkdtemp(path.join(os.tmpdir(), "projektwahl-"));
+    this.filePath = path.join(this.dir, "cplex.lp");
     this.fileHandle = await open(
       this.filePath,
       constants.O_WRONLY | constants.O_CREAT | constants.O_EXCL,
@@ -89,7 +91,9 @@ export class CPLEXLP {
 
     console.log(this.filePath);
 
-    const childProcess = execFile("glpsol", ["--lp", this.filePath], {});
+    this.solutionPath = path.join(this.dir, "solution.sol");
+
+    const childProcess = execFile("glpsol", ["--lp", this.filePath, "--write", this.solutionPath], {});
 
     if (childProcess.stdout) {
       for await (const chunk of childProcess.stdout) {
@@ -108,6 +112,10 @@ export class CPLEXLP {
     });
 
     console.log(exitCode);
+
+    const solution = (await readFile(this.solutionPath, {encoding: "utf8"})).split(/\r?\n/);
+
+    console.log(solution.filter(l => l.startsWith("i ")).map(l => l.split(" ")[2]).map(Number))
   };
 }
 
@@ -228,3 +236,5 @@ for (const project of projects) {
 await lp.endBinaryVariables();
 
 await lp.calculate();
+
+console.log(lp.solutionPath)

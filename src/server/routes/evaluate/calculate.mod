@@ -46,8 +46,8 @@ var user_is_project_leader{u in U} binary;
 #subject to no_project_leader{u in U}: if project_leaders[u] == 'null' then user_is_project_leader[u] = 0;
 
 # this definitely needs to be the case
-subject to either_project_leader_or_project_not_exists{u in U}:
-    if project_leaders[u] != 'null' then user_is_project_leader[u] + project_not_exists[project_leaders[u]] = 1;
+#subject to either_project_leader_or_project_not_exists{u in U}:
+#    if project_leaders[u] != 'null' then user_is_project_leader[u] + project_not_exists[project_leaders[u]] = 1;
 
 # this definitely needs to be the case
 # why if we remove this it works?
