@@ -8,8 +8,7 @@ import groupBy from "lodash-es/groupBy.js";
 import sortedIndexBy from "lodash-es/sortedIndexBy.js";
 
 export class CPLEXLP {
-  constructor() {
-  }
+  constructor() {}
 
   dir!: string;
   filePath!: string;
@@ -33,7 +32,9 @@ export class CPLEXLP {
 
   maximize = async (factor: number, variable: string) => {
     if (factor !== 0) {
-      await this.fileHandle.write(`\n ${(factor<0?"":"+")}${factor} ${variable}`);
+      await this.fileHandle.write(
+        `\n ${factor < 0 ? "" : "+"}${factor} ${variable}`
+      );
     }
   };
 
@@ -52,14 +53,18 @@ export class CPLEXLP {
     if (min !== null) {
       await this.fileHandle.write(`\nmin_${name}: `);
       for (const constraint of constraints) {
-        await this.fileHandle.write(` ${(constraint[0]<0?"":"+")}${constraint[0]} ${constraint[1]}`);
+        await this.fileHandle.write(
+          ` ${constraint[0] < 0 ? "" : "+"}${constraint[0]} ${constraint[1]}`
+        );
       }
       await this.fileHandle.write(` >= ${min}`);
     }
     if (max !== null) {
       await this.fileHandle.write(`\nmax_${name}: `);
       for (const constraint of constraints) {
-        await this.fileHandle.write(` ${(constraint[0]<0?"":"+")}${constraint[0]} ${constraint[1]}`);
+        await this.fileHandle.write(
+          ` ${constraint[0] < 0 ? "" : "+"}${constraint[0]} ${constraint[1]}`
+        );
       }
       await this.fileHandle.write(` <= ${max}`);
     }
@@ -69,13 +74,9 @@ export class CPLEXLP {
 
   startBounds = async () => {
     await this.fileHandle.write(`\nBounds\n`);
-  }
+  };
 
-  bound = async (
-    min: number | null,
-    name: string,
-    max: number | null
-  ) => {
+  bound = async (min: number | null, name: string, max: number | null) => {
     await this.fileHandle.write(`\n`);
     if (min !== null) {
       await this.fileHandle.write(`${min} <= `);
@@ -86,9 +87,7 @@ export class CPLEXLP {
     }
   };
 
-  endBounds = async () => {
-
-  }
+  endBounds = async () => {};
 
   startVariables = async () => {
     await this.fileHandle.write(`\nGeneral\n`);
@@ -117,7 +116,18 @@ export class CPLEXLP {
     this.solutionPath = path.join(this.dir, "solution.sol");
     this.problemPath = path.join(this.dir, "problem.glp");
 
-    const childProcess = execFile("glpsol", ["--lp", this.filePath, "--write", this.solutionPath, "--wglp", this.problemPath], {});
+    const childProcess = execFile(
+      "glpsol",
+      [
+        "--lp",
+        this.filePath,
+        "--write",
+        this.solutionPath,
+        "--wglp",
+        this.problemPath,
+      ],
+      {}
+    );
 
     if (childProcess.stdout) {
       for await (const chunk of childProcess.stdout) {
@@ -135,20 +145,28 @@ export class CPLEXLP {
       childProcess.on("close", resolve);
     });
 
-    const solution = (await readFile(this.solutionPath, {encoding: "utf8"})).split(/\r?\n/);
+    const solution = (
+      await readFile(this.solutionPath, { encoding: "utf8" })
+    ).split(/\r?\n/);
 
-    const solutionFinal = Object.fromEntries(solution.filter(l => l.startsWith("j ")).map(l => l.split(" ")).map(([_, index, value]) => [parseInt(index), parseInt(value)]));
+    const solutionFinal = Object.fromEntries(
+      solution
+        .filter((l) => l.startsWith("j "))
+        .map((l) => l.split(" "))
+        .map(([_, index, value]) => [parseInt(index), parseInt(value)])
+    );
 
+    const problem = (
+      await readFile(this.problemPath, { encoding: "utf8" })
+    ).split(/\r?\n/);
 
-    const problem = (await readFile(this.problemPath, {encoding: "utf8"})).split(/\r?\n/);
+    const problemFinal = problem
+      .filter((l) => l.startsWith("n j "))
+      .map((l) => l.split(" "))
+      .map<[number, string]>(([_0, _1, index, name]) => [parseInt(index), name])
+      .map<[string, number]>(([index, name]) => [name, solutionFinal[index]]);
 
-    const problemFinal = problem.filter(l => l.startsWith("n j ")).map(l => l.split(" ")).map<[number, string]>(([_0, _1, index, name]) => [parseInt(index), name]).map<[string, number]>(([index, name]) => [name, solutionFinal[index]])
-
-    console.log(problemFinal) // jo
-
-    return problemFinal.filter(([name]) => name.startsWith("choice_")).map(([name, value]) => {
-        return [parseInt(name.split("_")[1]), parseInt(name.split("_")[2]), value]
-    })
+    return problemFinal;
   };
 }
 
@@ -185,9 +203,9 @@ const projects =
 const users =
   await sql`SELECT id, project_leader_id FROM present_voters ORDER BY id;`;
 
-const choicesGroupedByProject = groupBy(choices, (c) => c.project_id)
+const choicesGroupedByProject = groupBy(choices, (c) => c.project_id);
 
-const choicesGroupedByUser = groupBy(choices, (c) => c.user_id)
+const choicesGroupedByUser = groupBy(choices, (c) => c.user_id);
 
 await lp.startMaximize();
 
@@ -203,16 +221,9 @@ for (const choice of choices) {
 // then put overload in here. This *should* work (but probably doesn't)
 
 for (const project of projects) {
-  await lp.maximize(
-    -9000,
-    `project_overloaded_${project.id}`
-  );
-  await lp.maximize(
-    -9000,
-    `project_underloaded_${project.id}`
-  );
+  await lp.maximize(-9000, `project_overloaded_${project.id}`);
+  await lp.maximize(-9000, `project_underloaded_${project.id}`);
 }
-
 
 await lp.endMaximize();
 
@@ -269,44 +280,31 @@ for (const project of projects) {
     `project_max_size_${project.id}`,
     0,
     [
-      ...(choicesGroupedByProject[project.id] || []).map<[number, string]>(((choice) => [
-        1,
-        `choice_${choice.user_id}_${choice.project_id}`,
-      ])),
-      [-1, `project_overloaded_${project.id}`]
+      ...(choicesGroupedByProject[project.id] || []).map<[number, string]>(
+        (choice) => [1, `choice_${choice.user_id}_${choice.project_id}`]
+      ),
+      [-1, `project_overloaded_${project.id}`],
     ],
     project.max_participants
   );
 }
 
-await lp.endConstraints()
+await lp.endConstraints();
 
-await lp.startBounds()
+await lp.startBounds();
 
 for (const project of projects) {
-  await lp.bound(
-    0,
-    `project_overloaded_${project.id}`,
-    null
-  );
-  await lp.bound(
-    0,
-    `project_underloaded_${project.id}`,
-    null
-  );
+  await lp.bound(0, `project_overloaded_${project.id}`, null);
+  await lp.bound(0, `project_underloaded_${project.id}`, null);
 }
 
-await lp.endBounds()
+await lp.endBounds();
 
 await lp.startVariables();
 
 for (const project of projects) {
-  await lp.variable(
-    `project_overloaded_${project.id}`
-  );
-  await lp.variable(
-    `project_underloaded_${project.id}`
-  );
+  await lp.variable(`project_overloaded_${project.id}`);
+  await lp.variable(`project_underloaded_${project.id}`);
 }
 
 await lp.endVariables();
@@ -331,11 +329,21 @@ await lp.endBinaryVariables();
 const results = await lp.calculate();
 
 for (const result of results) {
-    // TODO FIXME optimize
-    const choice = choices.find(c => c.user_id == result[0] && c.project_id == result[1])!
-    if (result[2] == 1) {
-        console.log(`${choice.user_id} ${choice.project_id}: ${choice.rank}`)
-    }
+  console.log(result);
 }
 
-await sql.end()
+for (const result of results
+  .filter(([name]) => name.startsWith("choice_"))
+  .map(([name, value]) => {
+    return [parseInt(name.split("_")[1]), parseInt(name.split("_")[2]), value];
+  })) {
+  // TODO FIXME optimize
+  const choice = choices.find(
+    (c) => c.user_id == result[0] && c.project_id == result[1]
+  )!;
+  if (result[2] == 1) {
+    console.log(`${choice.user_id} ${choice.project_id}: ${choice.rank}`);
+  }
+}
+
+await sql.end();
