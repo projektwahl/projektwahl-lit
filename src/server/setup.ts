@@ -57,7 +57,7 @@ const shuffleArray = <T>(array: T[]) => {
     console.log(projects);
 
     // take care to set this value to project_count * min_participants <= user_count <= project_count * max_participants
-    for (let i = 0; i < 1000; i++) {
+    for (let i = 0; i < 10000; i++) {
       const user = rawUserSchema
         .pick({
           id: true,

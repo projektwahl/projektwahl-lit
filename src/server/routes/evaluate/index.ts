@@ -332,6 +332,7 @@ for (const result of results) {
   console.log(result);
 }
 
+/*
 for (const result of results
   .filter(([name]) => name.startsWith("choice_"))
   .map(([name, value]) => {
@@ -344,6 +345,6 @@ for (const result of results
   if (result[2] == 1) {
     console.log(`${choice.user_id} ${choice.project_id}: ${choice.rank}`);
   }
-}
+}*/
 
 await sql.end();
