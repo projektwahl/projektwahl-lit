@@ -114,8 +114,6 @@ export class CPLEXLP {
     await this.fileHandle.write(`\nEnd\n`);
     await this.fileHandle.close();
 
-    console.log(this.filePath);
-
     this.solutionPath = path.join(this.dir, "solution.sol");
     this.problemPath = path.join(this.dir, "problem.glp");
 
@@ -137,17 +135,16 @@ export class CPLEXLP {
       childProcess.on("close", resolve);
     });
 
-    console.log(exitCode);
-
     const solution = (await readFile(this.solutionPath, {encoding: "utf8"})).split(/\r?\n/);
 
     const solutionFinal = Object.fromEntries(solution.filter(l => l.startsWith("j ")).map(l => l.split(" ")).map(([_, index, value]) => [parseInt(index), parseInt(value)]));
 
-    console.log(solutionFinal)
 
     const problem = (await readFile(this.problemPath, {encoding: "utf8"})).split(/\r?\n/);
 
     const problemFinal = problem.filter(l => l.startsWith("n j ")).map(l => l.split(" ")).map<[number, string]>(([_0, _1, index, name]) => [parseInt(index), name]).map<[string, number]>(([index, name]) => [name, solutionFinal[index]])
+
+    console.log(problemFinal) // jo
 
     return problemFinal.filter(([name]) => name.startsWith("choice_")).map(([name, value]) => {
         return [parseInt(name.split("_")[1]), parseInt(name.split("_")[2]), value]
@@ -188,13 +185,9 @@ const projects =
 const users =
   await sql`SELECT id, project_leader_id FROM present_voters ORDER BY id;`;
 
-console.log(choices);
-
 const choicesGroupedByProject = groupBy(choices, (c) => c.project_id)
 
 const choicesGroupedByUser = groupBy(choices, (c) => c.user_id)
-
-console.log(choicesGroupedByProject)
 
 await lp.startMaximize();
 
