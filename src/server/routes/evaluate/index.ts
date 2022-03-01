@@ -33,7 +33,7 @@ export class CPLEXLP {
 
   maximize = async (factor: number, variable: string) => {
     if (factor !== 0) {
-      await this.fileHandle.write(` + ${factor} ${variable}`);
+      await this.fileHandle.write(`\n ${(factor<0?"":"+")}${factor} ${variable}`);
     }
   };
 
@@ -52,20 +52,43 @@ export class CPLEXLP {
     if (min !== null) {
       await this.fileHandle.write(`\nmin_${name}: `);
       for (const constraint of constraints) {
-        await this.fileHandle.write(` + ${constraint[0]} ${constraint[1]}`);
+        await this.fileHandle.write(` ${(constraint[0]<0?"":"+")}${constraint[0]} ${constraint[1]}`);
       }
       await this.fileHandle.write(` >= ${min}`);
     }
     if (max !== null) {
       await this.fileHandle.write(`\nmax_${name}: `);
       for (const constraint of constraints) {
-        await this.fileHandle.write(` + ${constraint[0]} ${constraint[1]}`);
+        await this.fileHandle.write(` ${(constraint[0]<0?"":"+")}${constraint[0]} ${constraint[1]}`);
       }
       await this.fileHandle.write(` <= ${max}`);
     }
   };
 
   endConstraints = async () => {};
+
+  startBounds = async () => {
+    await this.fileHandle.write(`\nBounds\n`);
+  }
+
+  bound = async (
+    min: number | null,
+    name: string,
+    max: number | null
+  ) => {
+    await this.fileHandle.write(`\n`);
+    if (min !== null) {
+      await this.fileHandle.write(`${min} <= `);
+    }
+    await this.fileHandle.write(`${name}`);
+    if (max !== null) {
+      await this.fileHandle.write(` <= ${max}`);
+    }
+  };
+
+  endBounds = async () => {
+
+  }
 
   startVariables = async () => {
     await this.fileHandle.write(`\nGeneral\n`);
@@ -167,6 +190,12 @@ const users =
 
 console.log(choices);
 
+const choicesGroupedByProject = groupBy(choices, (c) => c.project_id)
+
+const choicesGroupedByUser = groupBy(choices, (c) => c.user_id)
+
+console.log(choicesGroupedByProject)
+
 await lp.startMaximize();
 
 for (const choice of choices) {
@@ -176,15 +205,28 @@ for (const choice of choices) {
   );
 }
 
+// overloaded projects should make this way worse
+// maybe in the constraints to choice1 + choice2 + choice3 + overload <= max_participants
+// then put overload in here. This *should* work (but probably doesn't)
+
+for (const project of projects) {
+  await lp.maximize(
+    -9000,
+    `project_overloaded_${project.id}`
+  );
+  await lp.maximize(
+    -9000,
+    `project_underloaded_${project.id}`
+  );
+}
+
+
 await lp.endMaximize();
 
 await lp.startConstraints();
 
-// TODO FIXME project leader should add a fake 0 choice?
 // only in one project or project leader
-for (const groupedChoice of Object.entries(
-  groupBy(choices, (c) => c.user_id)
-)) {
+for (const groupedChoice of Object.entries(choicesGroupedByUser)) {
   await lp.constraint(
     `only_in_one_project_${groupedChoice[0]}`,
     0,
@@ -228,7 +270,52 @@ for (const user of users) {
   );
 }
 
+// project size matches
+for (const project of projects) {
+  await lp.constraint(
+    `project_max_size_${project.id}`,
+    0,
+    [
+      ...(choicesGroupedByProject[project.id] || []).map<[number, string]>(((choice) => [
+        1,
+        `choice_${choice.user_id}_${choice.project_id}`,
+      ])),
+      [-1, `project_overloaded_${project.id}`]
+    ],
+    project.max_participants
+  );
+}
+
+await lp.endConstraints()
+
+await lp.startBounds()
+
+for (const project of projects) {
+  await lp.bound(
+    0,
+    `project_overloaded_${project.id}`,
+    null
+  );
+  await lp.bound(
+    0,
+    `project_underloaded_${project.id}`,
+    null
+  );
+}
+
+await lp.endBounds()
+
 await lp.startVariables();
+
+for (const project of projects) {
+  await lp.variable(
+    `project_overloaded_${project.id}`
+  );
+  await lp.variable(
+    `project_underloaded_${project.id}`
+  );
+}
+
 await lp.endVariables();
 
 await lp.startBinaryVariables();
