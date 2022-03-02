@@ -109,17 +109,14 @@ class PwUserCreate extends PwForm<
       >("myformdata", {
         bubbles: false,
         detail: {
-          id: -1,
+          project_leader_id: null,
+          force_in_project_id: null,
+          ...(this.initial?.success
+          ? { id: this.initial.data.id }
+          : {id: -1}),
         },
       });
       this.form.value?.dispatchEvent(formDataEvent);
-      formDataEvent.detail.id = this.initial?.success
-        ? this.initial.data.id
-        : undefined;
-      if (this.initial?.success && !this.initial.data.id) {
-        formDataEvent.detail.project_leader_id = null;
-        formDataEvent.detail.force_in_project_id = null;
-      }
 
       const result = await myFetch<
         "/api/v1/users/create" | "/api/v1/users/update"
@@ -194,7 +191,8 @@ class PwUserCreate extends PwForm<
                     { value: "admin", text: "Admin" },
                   ],
                   task: this._task,
-                  initial: {
+                  initial: this.initial?.data === undefined ? undefined : {
+                    ...this.initial?.data,
                     type: this.type ?? this.initial?.data.type ?? "voter",
                   },
                 })}
