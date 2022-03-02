@@ -626,3 +626,8 @@ sudo nano /etc/prometheus/prometheus.yml
       
 # https://github.com/nginxinc/nginx-prometheus-exporter/blob/master/grafana/dashboard.json
       
+      
+      
+      
+      
+    DEBUGINFOD_URLS="https://debuginfod.archlinux.org/" sudo coredumpctl debug

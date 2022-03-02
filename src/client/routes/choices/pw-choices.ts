@@ -31,7 +31,7 @@ import { pwOrder } from "../../entity-list/pw-order.js";
 import { pwInput } from "../../form/pw-input.js";
 import type { routes } from "../../../lib/routes.js";
 import type { z } from "zod";
-import {animate} from "@lit-labs/motion"
+import { animate } from "@lit-labs/motion";
 import { repeat } from "lit/directives/repeat.js";
 
 export const pwChoices = async (url: URL) => {

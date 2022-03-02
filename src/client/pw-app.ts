@@ -93,9 +93,7 @@ const pages = {
   },
   "^/users/create$": async () => {
     await import("./routes/users/pw-user-create.js");
-    return html`<pw-user-create
-      .url=${"/api/v1/users/create"}
-    ></pw-user-create>`;
+    return html`<pw-user-create uri="/api/v1/users/create"></pw-user-create>`;
   },
   "^/users/edit/\\d+$": async (url: URL) => {
     const { pwUser } = await import("./routes/users/pw-user-create.js");
