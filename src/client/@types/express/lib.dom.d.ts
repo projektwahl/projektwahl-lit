@@ -36,6 +36,6 @@ declare global {
   }
 
   interface Window {
-    BOOTSTRAP_CSS: string | undefined
+    BOOTSTRAP_CSS: string | undefined;
   }
 }

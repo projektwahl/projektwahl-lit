@@ -268,7 +268,7 @@ export class PwEntityList<
           </table>
         </form>
 
-        ${this._task.state !== TaskStatus.COMPLETE || this._task.value?.success
+        ${this._task.status !== TaskStatus.COMPLETE || this._task.value?.success
           ? html`
               <nav aria-label="${msg("navigation of user list")}">
                 <ul class="pagination justify-content-center">
@@ -276,7 +276,9 @@ export class PwEntityList<
                     class="page-item ${this._task.render({
                       pending: () => "disabled",
                       complete: (result) =>
-                        result.data?.previousCursor === null ? "disabled" : "",
+                        result.success && result.data.previousCursor === null
+                          ? "disabled"
+                          : "",
                     })}"
                   >
                     <a
@@ -315,6 +317,7 @@ export class PwEntityList<
                         this._task.render({
                           pending: () => undefined,
                           complete: (result) =>
+                            result.success &&
                             result.data?.previousCursor === null
                               ? undefined
                               : -1,
@@ -323,6 +326,7 @@ export class PwEntityList<
                       aria-disabled=${this._task.render({
                         pending: () => true,
                         complete: (result) =>
+                          result.success &&
                           result.data?.previousCursor === null,
                       })}
                     >
@@ -333,7 +337,9 @@ export class PwEntityList<
                     class="page-item ${this._task.render({
                       pending: () => "disabled",
                       complete: (result) =>
-                        result.data?.nextCursor === null ? "disabled" : "",
+                        result.success && result.data?.nextCursor === null
+                          ? "disabled"
+                          : "",
                     })}"
                   >
                     <a
@@ -372,12 +378,15 @@ export class PwEntityList<
                         this._task.render({
                           pending: () => undefined,
                           complete: (result) =>
-                            result.data?.nextCursor === null ? undefined : -1,
+                            result.success && result.data?.nextCursor === null
+                              ? undefined
+                              : -1,
                         })
                       )}
                       aria-disabled=${this._task.render({
                         pending: () => true,
-                        complete: (result) => result.data?.nextCursor === null,
+                        complete: (result) =>
+                          result.success && result.data?.nextCursor === null,
                       })}
                     >
                       <span aria-hidden="true">&raquo;</span>

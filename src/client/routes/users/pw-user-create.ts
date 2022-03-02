@@ -112,8 +112,8 @@ class PwUserCreate extends PwForm<
           project_leader_id: null,
           force_in_project_id: null,
           ...(this.initial?.success
-          ? { id: this.initial.data.id }
-          : {id: -1}), // TODO FIXME
+            ? { id: this.initial.data.id }
+            : { id: -1 }), // TODO FIXME
         },
       });
       this.form.value?.dispatchEvent(formDataEvent);
@@ -191,10 +191,13 @@ class PwUserCreate extends PwForm<
                     { value: "admin", text: "Admin" },
                   ],
                   task: this._task,
-                  initial: this.initial?.data === undefined ? undefined : {
-                    ...this.initial?.data,
-                    type: this.type ?? this.initial?.data.type ?? "voter",
-                  },
+                  initial:
+                    this.initial?.data === undefined
+                      ? undefined
+                      : {
+                          ...this.initial?.data,
+                          type: this.type ?? this.initial?.data.type ?? "voter",
+                        },
                 })}
                 ${(this.type ?? this.initial?.data.type ?? "voter") === "voter"
                   ? html`${pwInput<
