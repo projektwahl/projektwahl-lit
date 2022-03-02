@@ -108,7 +108,6 @@ try {
   }
 
   {
-
     // login
     const pwApp = await driver.findElement(By.css("pw-app"));
 
@@ -326,7 +325,9 @@ try {
 
     await click(projectsLink);
 
-    const pwProjects = await (await shadow(pwApp)).findElement(By.css("pw-projects"));
+    const pwProjects = await (
+      await shadow(pwApp)
+    ).findElement(By.css("pw-projects"));
 
     const alert = await (
       await shadow(pwProjects)
