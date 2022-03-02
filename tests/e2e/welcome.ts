@@ -96,7 +96,6 @@ try {
   }
 
   {
-    // login
     const pwApp = await driver.findElement(By.css("pw-app"));
 
     const loginLink = await (
@@ -104,6 +103,14 @@ try {
     ).findElement(By.css('a[href="/login"]'));
 
     await click(loginLink);
+
+    await driver.switchTo().window((await driver.getAllWindowHandles())[1]);
+  }
+
+  {
+
+    // login
+    const pwApp = await driver.findElement(By.css("pw-app"));
 
     const pwLogin = await (await shadow(pwApp)).findElement(By.css("pw-login"));
 
@@ -122,6 +129,12 @@ try {
     ).findElement(By.css('button[type="submit"]'));
 
     await click(loginButton);
+  }
+
+  {
+    await driver.switchTo().window((await driver.getAllWindowHandles())[0]);
+
+    const pwApp = await driver.findElement(By.css("pw-app"));
 
     await (await shadow(pwApp)).findElement(By.css("pw-welcome"));
   }
@@ -289,9 +302,9 @@ try {
 
     const logoutButton = await (
       await shadow(pwApp)
-    ).findElement(By.partialLinkText("abmelden"));
+    ).findElement(By.partialLinkText("Logout"));
 
-    assert.equal(await logoutButton.getText(), "admin abmelden");
+    assert.equal(await logoutButton.getText(), "Logout admin");
 
     await logoutButton.click();
 
@@ -299,7 +312,7 @@ try {
       await shadow(pwApp)
     ).findElement(By.css('a[href="/login"]'));
 
-    assert.equal(await loginLink.getText(), "Anmelden");
+    assert.equal(await loginLink.getText(), "Login");
   }
 
   {
@@ -307,19 +320,19 @@ try {
 
     const pwApp = await driver.findElement(By.css("pw-app"));
 
-    const accountsLink = await (
+    const projectsLink = await (
       await shadow(pwApp)
-    ).findElement(By.css('a[href="/users"]'));
+    ).findElement(By.css('a[href="/projects"]'));
 
-    await click(accountsLink);
+    await click(projectsLink);
 
-    const pwUsers = await (await shadow(pwApp)).findElement(By.css("pw-users"));
+    const pwProjects = await (await shadow(pwApp)).findElement(By.css("pw-projects"));
 
     const alert = await (
-      await shadow(pwUsers)
+      await shadow(pwProjects)
     ).findElement(By.css('div[class="alert alert-danger"]'));
 
-    assert.match(await alert.getText(), /Insufficient permissions!/);
+    assert.match(await alert.getText(), /Not logged in!/);
   }
 
   await driver.quit();
