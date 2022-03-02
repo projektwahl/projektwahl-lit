@@ -184,6 +184,12 @@
 <trans-unit id="sea8d39886fdb9cf5">
   <source>Guaranteed project members</source>
 </trans-unit>
+<trans-unit id="s97dc2365368a965f">
+  <source>Choices</source>
+</trans-unit>
+<trans-unit id="s9841212bd35bac27">
+  <source>Rank</source>
+</trans-unit>
 <trans-unit id="hc66aaa662761137a">
   <source>Not Found</source>
   <target>Nicht gefunden</target>
@@ -208,9 +214,8 @@
   <source>Accounts</source>
   <target>Accounts</target>
 </trans-unit>
-<trans-unit id="s4fbcfb0cae19e35a">
+<trans-unit id="sb23eed07fcaf3095">
   <source>Vote</source>
-  <target>Wahl</target>
 </trans-unit>
 <trans-unit id="s2667d13ee670a19d">
   <source>Logout <x id="0" equiv-text="${this.username}"/></source>
