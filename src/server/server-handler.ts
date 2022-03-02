@@ -25,7 +25,6 @@ import { join, resolve } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 import { loginHandler } from "./routes/login/index.js";
 import {
-  createOrUpdateUsersHandler,
   createUsersHandler,
   updateUsersHandler,
 } from "./routes/users/create-or-update.js";
@@ -35,7 +34,6 @@ import { openidRedirectHandler } from "./routes/login/redirect.js";
 import { extname, relative } from "path/posix";
 import { z } from "zod";
 import {
-  createOrUpdateProjectsHandler,
   createProjectsHandler,
   updateProjectsHandler,
 } from "./routes/projects/create-or-update.js";
@@ -150,7 +148,7 @@ export async function serverHandler(
   } else if (process.env.NODE_ENV === "development") {
     // TODO FIXME AUDIT
     // curl --insecure --path-as-is -v `${process.env.BASE_URL}/../src/index.js`
-    let { resolve: loaderResolve, load: loaderLoad } = await import(
+    const { resolve: loaderResolve, load: loaderLoad } = await import(
       "../loader.js"
     );
 
