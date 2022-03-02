@@ -125,13 +125,12 @@ export const PwProjectCreate = setupHmr(
         >("myformdata", {
           bubbles: false,
           detail: {
-            id: -1,
+            ...(this.initial?.success
+              ? { id: this.initial.data.id }
+              : {id: -1}), // TODO FIXME
           },
         });
         this.form.value?.dispatchEvent(formDataEvent);
-        formDataEvent.detail.id = this.initial?.success
-          ? this.initial.data.id
-          : undefined;
 
         const result = await myFetch<
           "/api/v1/projects/create" | "/api/v1/projects/update"
