@@ -40,9 +40,7 @@ jobs:
           node-version: ${{ matrix.node-version }}
           cache: "npm"
       - run: npm ci
-      - run: npm run localize-build
       - run: npm run build
-      - run: npm run purgecss
       - run: openssl req -x509 -newkey rsa:2048 -nodes -sha256 -subj '/CN=localhost' -keyout key.pem -out cert.pem
       - run: psql postgres://projektwahl:projektwahl@localhost/projektwahl < src/server/setup.sql
       - run: DATABASE_URL=postgres://projektwahl:projektwahl@localhost/projektwahl npm run setup
