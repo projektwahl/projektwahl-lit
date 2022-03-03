@@ -55,7 +55,7 @@
   },
   "devDependencies": {
     "@lit/localize-tools": "^0.6.1",
-    "esbuild": "^0.14.23",
+    "esbuild": "^0.14.24",
     "esbuild-linux-64": "^0.14.23",
     "purgecss": "^4.1.3"
   },
