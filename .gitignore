@@ -10,3 +10,6 @@ bootstrap.min.css
 /lit
 /*.sql
 screenshot.png
+*.csv
+*.JPG
+*.rtf
