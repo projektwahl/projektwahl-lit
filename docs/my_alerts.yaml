@@ -500,7 +500,7 @@ groups:
           summary: Postgresql high rollback rate (instance {{ $labels.instance }})
           description: "Ratio of transactions being aborted compared to committed is > 2 %\n  VALUE = {{ $value }}\n  LABELS = {{ $labels }}"
       - alert: PostgresqlCommitRateLow
-        expr: rate(pg_stat_database_xact_commit[1m]) < 10
+        expr: rate(pg_stat_database_xact_commit{datname="projektwahl_production"}[1m]) < 10
         for: 2m
         labels:
           severity: critical
@@ -595,3 +595,27 @@ groups:
         annotations:
           summary: Postgresql configuration changed (instance {{ $labels.instance }})
           description: "Postgres Database configuration change has occurred\n  VALUE = {{ $value }}\n  LABELS = {{ $labels }}"
+      - alert: PostgresqlSslCompressionActive
+        expr: sum(pg_stat_ssl_compression) > 0
+        for: 0m
+        labels:
+          severity: critical
+        annotations:
+          summary: Postgresql SSL compression active (instance {{ $labels.instance }})
+          description: "Database connections with SSL compression enabled. This may add significant jitter in replication delay. Replicas should turn off SSL compression via `sslcompression=0` in `recovery.conf`.\n  VALUE = {{ $value }}\n  LABELS = {{ $labels }}"
+      - alert: PostgresqlTooManyLocksAcquired
+        expr: ((sum (pg_locks_count)) / (pg_settings_max_locks_per_transaction * pg_settings_max_connections)) > 0.20
+        for: 2m
+        labels:
+          severity: critical
+        annotations:
+          summary: Postgresql too many locks acquired (instance {{ $labels.instance }})
+          description: "Too many locks acquired on the database. If this alert happens frequently, we may need to increase the postgres setting max_locks_per_transaction.\n  VALUE = {{ $value }}\n  LABELS = {{ $labels }}"
+      - alert: NginxDown
+        expr: nginx_up == 0
+        for: 0m
+        labels:
+          severity: critical
+        annotations:
+          summary: NGINX down (instance {{ $labels.instance }})
+          description: "NGINX down.\n  VALUE = {{ $value }}\n  LABELS = {{ $labels }}"
