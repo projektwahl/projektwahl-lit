@@ -1,0 +1,44 @@
+[Service]
+Type=simple
+Restart=on-failure
+ExecStart=/opt/nginx-prometheus-exporter/nginx-prometheus-exporter -nginx.scrape-uri=http://aes.selfmade4u.de:8080/stub_status
+DynamicUser=true
+CapabilityBoundingSet=
+NoNewPrivileges=true
+PrivateUsers=true
+ProtectClock=true
+ProtectControlGroups=true
+ProtectHome=true
+ProtectKernelLogs=true
+ProtectKernelModules=true
+ProtectKernelTunables=true
+ProtectProc=invisible
+SystemCallFilter=@system-service
+SystemCallFilter=~@privileged @resources
+LockPersonality=true
+ProtectHostname=true
+UMask=0077
+ProcSubset=pid
+PrivateDevices=true
+RestrictAddressFamilies=AF_INET AF_INET6
+RestrictNamespaces=true
+RestrictRealtime=true
+SystemCallArchitectures=native
+DevicePolicy=closed
+ProtectSystem=strict
+PrivateTmp=yes
+PrivateIPC=true
+RestrictSUIDSGID=true
+RemoveIPC=true
+PrivateMounts=true
+CPUAccounting=true
+MemoryAccounting=true
+MemoryMax=1G
+TasksAccounting=true
+TasksMax=1024
+IOAccounting=true
+IPAccounting=true
+
+
+[Install]
+WantedBy=multi-user.target
