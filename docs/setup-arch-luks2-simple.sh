@@ -754,3 +754,4 @@ sudo nano /etc/prometheus/prometheus.yml
 /opt/projektwahl-lit-staging/docs/my_alerts.yaml
 
 
+sudo nano /opt/projektwahl-lit-staging/docs/my_alerts.yaml && sudo systemctl reload prometheus
