@@ -31,6 +31,7 @@ This software is licensed under the GNU Affero General Public License v3.0 or an
 
 ## Requirements
 
+- **Remove/Adapt https://github.com/projektwahl/projektwahl-lit/blob/main/src/client/routes/pw-privacy.ts and https://github.com/projektwahl/projektwahl-lit/blob/main/src/client/routes/pw-imprint.ts**
 - Node 16/17
 - npm
 - Postgresql database
