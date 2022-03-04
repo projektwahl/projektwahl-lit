@@ -631,3 +631,10 @@ sudo nano /etc/prometheus/prometheus.yml
       
       
     DEBUGINFOD_URLS="https://debuginfod.archlinux.org/" sudo coredumpctl debug
+
+
+
+
+sudo pacman -S dust
+
+
