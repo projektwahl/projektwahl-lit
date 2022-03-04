@@ -718,3 +718,12 @@ receivers:
 
 sudo pacman -S gdu
 gdu /
+
+# https://wiki.archlinux.org/title/pacman#Cleaning_the_package_cache
+sudo paccache --remove --keep 1
+sudo paccache --remove --uninstalled --keep 0
+
+sudo journalctl --vacuum-time=1days
+
+
+
