@@ -130,7 +130,6 @@ export class PwEntityList<
     if (this.initialRender) {
       this.initialRender = false;
 
-      // @ts-expect-error fork needed
       this._task = new Task(this, {
         task: async () => {
           const data = JSON.parse(

@@ -229,7 +229,6 @@ export class PwApp extends LitElement {
     if (this.initialRender) {
       this.initialRender = false;
 
-      // @ts-expect-error
       this._apiTask = new Task(this, {
         task: this.nextPage,
         args: () =>
