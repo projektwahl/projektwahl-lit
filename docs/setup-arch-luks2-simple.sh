@@ -731,3 +731,17 @@ sudo journalctl --vacuum-time=1days
 
 
 
+
+
+
+sudo nano /etc/alertmanager/alertmanager.yml
+route:
+  group_by: [ 'alertname' ]
+  group_wait: 1s
+  group_interval: 1s
+  repeat_interval: 10m
+  receiver: 'web.hook'
+receivers:
+- name: 'web.hook'
+  webhook_configs:
+  - url: 'http://localhost:4050/services/hooks/YWxlcnRtYW5hZ2VyLXNlcnZpY2U'
