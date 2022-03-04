@@ -88,14 +88,10 @@ try {
 
   await driver.get(process.env.BASE_URL);
 
-  await driver.sleep(5000);
+  await driver.sleep(2000);
 
   const screenshot = await driver.takeScreenshot()
   await writeFile("screenshot.png", screenshot, "base64")
-
-  await driver.quit();
-
-  return;
 
   {
     const pwApp = await driver.findElement(By.css("pw-app"));
