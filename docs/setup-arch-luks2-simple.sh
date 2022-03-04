@@ -406,13 +406,10 @@ sudo nano /etc/systemd/system/projektwahl.service
 # https://github.com/projektwahl/projektwahl-lit/blob/work/docs/projektwahl%40.service.conf
 
 sudo systemctl edit --full --force projektwahl@.service
-sudo systemctl enable projektwahl@staging.service
-sudo systemctl enable projektwahl@production.service
-
 
 sudo systemctl edit --full --force projektwahl@.socket
-sudo systemctl enable projektwahl@staging.socket
-sudo systemctl enable projektwahl@production.socket
+sudo systemctl enable --now projektwahl@staging.socket
+sudo systemctl enable --now projektwahl@production.socket
 
 sudo systemctl edit projektwahl@staging.socket
 [Socket]
