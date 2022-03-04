@@ -671,7 +671,10 @@ sudo pacman -S libolm
 go build github.com/matrix-org/go-neb
 
 # https://github.com/matrix-org/go-neb
-BIND_ADDRESS=:4050 DATABASE_TYPE=sqlite3 DATABASE_URL=go-neb.db?_busy_timeout=5000 BASE_URL=http://localhost:4050 ./go-neb
+
+sudo systemctl edit --full --force alertmanager-matrix
+sudo systemctl enable --now alertmanager-matrix
+
 curl -X POST --header 'Content-Type: application/json' -d '{
     "identifier": { "type": "m.id.user", "user": "moritz.hedtke-bot" },
     "password": "PASSWORD",
@@ -749,3 +752,5 @@ receivers:
 
 sudo nano /etc/prometheus/prometheus.yml
 /opt/projektwahl-lit-staging/docs/my_alerts.yaml
+
+
