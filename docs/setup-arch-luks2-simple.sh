@@ -652,3 +652,43 @@ sudo nano /etc/prometheus/prometheus.yml
 sudo pacman -S dust
 
 
+
+
+
+
+
+
+cd /opt
+sudo mkdir go-neb
+sudo chown moritz go-neb
+git clone https://github.com/matrix-org/go-neb
+cd go-neb
+sudo pacman -S libolm
+go build github.com/matrix-org/go-neb
+
+# https://github.com/matrix-org/go-neb
+BIND_ADDRESS=:4050 DATABASE_TYPE=sqlite3 DATABASE_URL=go-neb.db?_busy_timeout=5000 BASE_URL=http://localhost:4050 ./go-neb
+curl -X POST --header 'Content-Type: application/json' -d '{
+    "identifier": { "type": "m.id.user", "user": "moritz.hedtke-bot" },
+    "password": "PASSWORD",
+    "type": "m.login.password"
+}' 'https://matrix-federation.matrix.org:443/_matrix/client/r0/login'
+curl -X POST localhost:4050/admin/configureClient --data-binary '{
+    "UserID": "@moritz.hedtke-bot:matrix.org",
+    "HomeserverURL": "https://matrix-federation.matrix.org:443",
+    "AccessToken": "<access_token>",
+    "DeviceID": "<DEVICEID>",
+    "Sync": true,
+    "AutoJoinRooms": true,
+    "DisplayName": "moritz.hedtke bot"
+}'
+
+curl -X POST localhost:4050/admin/configureService --data-binary '{
+    "Type": "echo",
+    "Id": "echo-service",
+    "UserID": "@moritz.hedtke-bot:matrix.org",
+    "Config": {}
+}'
+
+
+
