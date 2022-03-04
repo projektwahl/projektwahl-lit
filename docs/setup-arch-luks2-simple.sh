@@ -715,3 +715,6 @@ receivers:
   - url: 'http://localhost:4050/services/hooks/YWxlcnRtYW5hZ2VyLXNlcnZpY2U'
 
 
+
+sudo pacman -S gdu
+gdu /
