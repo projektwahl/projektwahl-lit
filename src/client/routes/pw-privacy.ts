@@ -100,7 +100,7 @@ export class PwPrivacy extends LitElement {
         nicht bei Ihnen erhoben, sondern bei:
 
         <address>
-          Albert-Einstein-Schule, vertreten durch:
+          <br />Albert-Einstein-Schule, vertreten durch<br />
 
           Viktor Neufeld, StD<br />
           Komm. Leitung (i.V.) der Albert-Einstein-Schule<br />
