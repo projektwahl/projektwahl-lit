@@ -100,6 +100,8 @@ export class PwPrivacy extends LitElement {
         nicht bei Ihnen erhoben, sondern bei:
 
         <address>
+          Albert-Einstein-Schule, vertreten durch:
+
           Viktor Neufeld, StD<br />
           Komm. Leitung (i.V.) der Albert-Einstein-Schule<br />
           Albert-Einstein-Schule<br />
@@ -111,9 +113,7 @@ export class PwPrivacy extends LitElement {
           >
         </address>
 
-        Den Datenschutzbeauftragten erreichen Sie unter
-        <a href="mailto:schaal@aesgb.de">schaal@aesgb.de</a>
-        oder der Postadresse mit dem Zusatz „Datenschutzbeauftragter“. Die Daten
+        Die Daten
         werden in Einklang mit
         <a
           href="https://eur-lex.europa.eu/legal-content/DE/TXT/HTML/?uri=CELEX:32016R0679&from=DE#d1e2370-1-1"
