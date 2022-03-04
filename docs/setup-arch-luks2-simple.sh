@@ -543,6 +543,10 @@ sudo mv node_alerts.yaml /etc/prometheus/
 sudo nano /etc/prometheus/prometheus.yml 
 sudo chown root:prometheus /etc/prometheus/node_alerts.yaml
 sudo chmod 640 /etc/prometheus/node_alerts.yaml
+
+sudo nano /etc/prometheus/node_alerts.yaml
+# remove all for:
+
 sudo systemctl restart prometheus
 
 https://grafana.com/oss/prometheus/exporters/node-exporter/?tab=dashboards
@@ -584,14 +588,20 @@ https://github.com/prometheus-community/postgres_exporter
 
 cd /opt
 sudo mkdir postgres_exporter
-chown moritz postgres_exporter/
+sudo chown moritz postgres_exporter/
 git clone https://github.com/prometheus-community/postgres_exporter.git
 cd postgres_exporter/
 sudo pacman -S which go
 make build
 sudo chown -R postgres:postgres /opt/postgres_exporter
 sudo chmod -R u=rX,g=rX,o= /opt/postgres_exporter
-sudo -u postgres DATA_SOURCE_NAME="user=postgres host=/var/run/postgresql/ sslmode=disable" /opt/postgres_exporter/postgres_exporter
+
+sudo systemctl edit --full --force prometheus-postgresql-exporter
+sudo systemctl enable --now prometheus-postgresql-exporter
+
+
+
+
 
 sudo nano /etc/prometheus/prometheus.yml 
   - job_name: 'postgresql'
@@ -614,7 +624,15 @@ server {
 sudo ln -s /etc/nginx/sites-available/nginx-monitoring.conf /etc/nginx/sites-enabled/
 
 
-sudo docker run -p 9113:9113 nginx/nginx-prometheus-exporter:0.10.0 -nginx.scrape-uri=http://aes.selfmade4u.de:8080/stub_status
+# TODO package with arch / search in aur
+cd /opt
+sudo mkdir nginx-prometheus-exporter
+sudo chown moritz nginx-prometheus-exporter/
+git clone https://github.com/nginxinc/nginx-prometheus-exporter
+cd nginx-prometheus-exporter
+make
+sudo systemctl edit --full --force prometheus-nginx-exporter
+sudo systemctl enable --now prometheus-nginx-exporter
 
 # https://github.com/nginxinc/nginx-prometheus-exporter/blob/master/grafana/README.md
 
@@ -631,3 +649,109 @@ sudo nano /etc/prometheus/prometheus.yml
       
       
     DEBUGINFOD_URLS="https://debuginfod.archlinux.org/" sudo coredumpctl debug
+
+
+
+
+sudo pacman -S dust
+
+
+
+
+
+
+
+
+cd /opt
+sudo mkdir go-neb
+sudo chown moritz go-neb
+git clone https://github.com/matrix-org/go-neb
+cd go-neb
+sudo pacman -S libolm
+go build github.com/matrix-org/go-neb
+
+# https://github.com/matrix-org/go-neb
+
+sudo systemctl edit --full --force alertmanager-matrix
+sudo systemctl enable --now alertmanager-matrix
+
+curl -X POST --header 'Content-Type: application/json' -d '{
+    "identifier": { "type": "m.id.user", "user": "moritz.hedtke-bot" },
+    "password": "PASSWORD",
+    "type": "m.login.password"
+}' 'https://matrix-federation.matrix.org:443/_matrix/client/r0/login'
+curl -X POST localhost:4050/admin/configureClient --data-binary '{
+    "UserID": "@moritz.hedtke-bot:matrix.org",
+    "HomeserverURL": "https://matrix-federation.matrix.org:443",
+    "AccessToken": "<access_token>",
+    "DeviceID": "<DEVICEID>",
+    "Sync": true,
+    "AutoJoinRooms": true,
+    "DisplayName": "moritz.hedtke bot"
+}'
+
+curl -X POST localhost:4050/admin/configureService --data-binary '{
+    "Type": "echo",
+    "Id": "echo-service",
+    "UserID": "@moritz.hedtke-bot:matrix.org",
+    "Config": {}
+}'
+
+curl -X POST localhost:4050/admin/configureService --data-binary '{
+    "Type": "alertmanager",
+    "Id": "alertmanager-service",
+    "UserID": "@moritz.hedtke-bot:matrix.org",
+    "Config": {
+      "Rooms": {
+        "!BAfGIGsMNSLsWXypLP:matrix.org": {
+          "text_template": "{{range .Alerts -}} [{{ .Status }}] {{index .Labels \"alertname\" }}: {{index .Annotations \"description\"}} {{ end -}}",
+          "html_template": "{{range .Alerts -}}  {{ $severity := index .Labels \"severity\" }}    {{ if eq .Status \"firing\" }}      {{ if eq $severity \"critical\"}}        <font color='red'><b>[FIRING - CRITICAL]</b></font>      {{ else if eq $severity \"warning\"}}        <font color='orange'><b>[FIRING - WARNING]</b></font>      {{ else }}        <b>[FIRING - {{ $severity }}]</b>      {{ end }}    {{ else }}      <font color='green'><b>[RESOLVED]</b></font>    {{ end }}  {{ index .Labels \"alertname\"}} : {{ index .Annotations \"description\"}}   <a href=\"{{ .GeneratorURL }}\">source</a><br/>{{end -}}",
+          "msg_type": "m.text"
+        }
+      }
+    }
+}'
+
+
+# http://localhost:4050/services/hooks/YWxlcnRtYW5hZ2VyLXNlcnZpY2U
+
+sudo nano /etc/alertmanager/alertmanager.yml
+receivers:
+- name: 'web.hook'
+  webhook_configs:
+  - url: 'http://localhost:4050/services/hooks/YWxlcnRtYW5hZ2VyLXNlcnZpY2U'
+
+
+
+sudo pacman -S gdu
+gdu /
+
+# https://wiki.archlinux.org/title/pacman#Cleaning_the_package_cache
+sudo paccache --remove --keep 1
+sudo paccache --remove --uninstalled --keep 0
+
+sudo journalctl --vacuum-time=1days
+
+
+
+
+
+
+sudo nano /etc/alertmanager/alertmanager.yml
+route:
+  group_by: [ 'alertname' ]
+  group_wait: 1s
+  group_interval: 1s
+  repeat_interval: 10m
+  receiver: 'web.hook'
+receivers:
+- name: 'web.hook'
+  webhook_configs:
+  - url: 'http://localhost:4050/services/hooks/YWxlcnRtYW5hZ2VyLXNlcnZpY2U'
+
+
+sudo nano /etc/prometheus/prometheus.yml
+/opt/projektwahl-lit-staging/docs/my_alerts.yaml
+
+
+sudo nano /opt/projektwahl-lit-staging/docs/my_alerts.yaml && sudo systemctl reload prometheus

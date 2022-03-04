@@ -22,7 +22,7 @@ SPDX-FileCopyrightText: 2021 Moritz Hedtke <Moritz.Hedtke@t-online.de>
 */
 import { html } from "lit";
 import "../../form/pw-form.js";
-import { Task } from "@lit-labs/task";
+import { Task } from "@dev.mohe/task";
 import { myFetch } from "../../utils.js";
 import { PwForm } from "../../form/pw-form.js";
 import { HistoryController } from "../../history-controller.js";
@@ -125,13 +125,12 @@ export const PwProjectCreate = setupHmr(
         >("myformdata", {
           bubbles: false,
           detail: {
-            id: -1,
+            ...(this.initial?.success
+              ? { id: this.initial.data.id }
+              : { id: -1 }), // TODO FIXME
           },
         });
         this.form.value?.dispatchEvent(formDataEvent);
-        formDataEvent.detail.id = this.initial?.success
-          ? this.initial.data.id
-          : undefined;
 
         const result = await myFetch<
           "/api/v1/projects/create" | "/api/v1/projects/update"

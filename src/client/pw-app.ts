@@ -32,7 +32,7 @@ import { HistoryController, HistoryState } from "./history-controller.js";
 import { aClick } from "./pw-a.js";
 import jscookie from "js-cookie";
 import { myFetch } from "./utils.js";
-import { Task, TaskStatus } from "@lit-labs/task";
+import { Task, TaskStatus } from "@dev.mohe/task";
 import { msg, str } from "@lit/localize";
 
 // TODO FIXME show more details if possible (maybe error page)
@@ -229,10 +229,6 @@ export class PwApp extends LitElement {
     if (this.initialRender) {
       this.initialRender = false;
 
-      // TODO FIXME I think we should only update here if the PAGE changes.
-      // if the url changes but not the page I think this should be the responsibility of that page
-      // I think this makes sense as otherwise the page would potentially be unloaded and could not react to keyboard input
-      // this is especially a problem for the entity lists
       this._apiTask = new Task(this, {
         task: this.nextPage,
         args: () =>

@@ -24,7 +24,7 @@ import { html, LitElement, noChange } from "lit";
 import { createRef } from "lit/directives/ref.js";
 import { msg } from "@lit/localize";
 import type { routes, ResponseType } from "../../lib/routes.js";
-import type { Task } from "@lit-labs/task";
+import type { Task } from "@dev.mohe/task";
 
 class PwForm<P extends keyof typeof routes> extends LitElement {
   static get properties() {

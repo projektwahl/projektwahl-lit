@@ -74,8 +74,8 @@ Actually I didn't manage to achieve much with the following instructions.
 ````bash
 sudo apt install apache2-utils -y
 echo '{"username":"admin","password":"changeme"}' > post.txt
-ab -n 10000 -c 1000 -v 3 -p post.txt -T 'text/json' -m POST -k -H 'x-csrf-protection: projektwahl' http://116.203.125.40:8443/api/v1/login
-siege -c50 -t60S --header 'x-csrf-protection: projektwahl' --content-type "text/json" 'http://116.203.125.40:8443/api/v1/login POST {"username":"admin","password":"changeme"}'
+ab -n 10000 -c 1000 -v 3 -p post.txt -T 'text/json' -m POST -k -H 'x-csrf-protection: projektwahl' https://aes.selfmade4u.de/api/v1/login
+siege -c50 -t60S --header 'x-csrf-protection: projektwahl' --content-type "text/json" 'https://aes.selfmade4u.de/api/v1/login POST {"username":"admin","password":"changeme"}'
 
 # cpx11 server so we have more cpu
 
@@ -87,7 +87,7 @@ wrk.body   = '{"username":"admin","password":"changeme"}'
 wrk.headers["Content-Type"] = "text/json"
 wrk.headers["x-csrf-protection"] = "projektwahl"
 
-wrk -s wrk.lua --connections 10000 --threads 100 http://116.203.125.40:8443/api/v1/login```
+wrk -s wrk.lua --connections 10000 --threads 100 https://aes.selfmade4u.de/api/v1/login```
 
 
 ````

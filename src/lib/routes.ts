@@ -86,22 +86,6 @@ export const rawSessionType = z.object({
   user_id: z.number(),
 });
 
-// TODO FIXME can we remove this?
-export type keys =
-  | "/api/v1/choices/update"
-  | "/api/v1/login"
-  | "/api/v1/logout"
-  | "/api/v1/openid-login"
-  | "/api/v1/redirect"
-  | "/api/v1/sleep"
-  | "/api/v1/update"
-  | "/api/v1/users/create"
-  | "/api/v1/users/update"
-  | "/api/v1/projects/create"
-  | "/api/v1/projects/update"
-  | "/api/v1/users"
-  | "/api/v1/projects";
-
 const userMapper = <
   T extends { [k: string]: ZodTypeAny },
   UnknownKeys extends UnknownKeysParam = "strip",
@@ -118,17 +102,6 @@ const userMapper = <
   });
 
 export const userSchema = userMapper(rawUserSchema).optional();
-
-function identity<
-  T extends {
-    [r in keys]: {
-      request: z.ZodTypeAny;
-      response: z.ZodTypeAny;
-    };
-  }
->(v: T) {
-  return v;
-}
 
 export type UnknownKeysParam = "passthrough" | "strict" | "strip";
 
@@ -241,7 +214,7 @@ const choices = rawChoiceNullable.merge(
   })
 );
 
-export const routes = identity({
+export const routes = {
   "/api/v1/logout": {
     request: z.any(),
     response: z.object({}),
@@ -373,7 +346,7 @@ export const routes = identity({
     }),
     response: z.object({}),
   },
-} as const);
+} as const;
 
 export const entityRoutes = {
   "/api/v1/users": routes["/api/v1/users"],

@@ -48,15 +48,13 @@ export async function createUsersHandler(
       user,
       loggedInUser: Exclude<z.infer<typeof userSchema>, undefined>
     ) => {
-      return await sql`INSERT INTO users_with_deleted (username, password_hash, type, "group", age, away, project_leader_id, force_in_project_id, deleted, last_updated_by) VALUES (${
+      return await sql`INSERT INTO users_with_deleted (username, password_hash, type, "group", age, away, deleted, last_updated_by) VALUES (${
         user.username ?? null
       }, ${user.password ? await hashPassword(user.password) : null}, ${
         user.type ?? null
       }, ${user.type === "voter" ? user.group ?? null : null}, ${
         user.type === "voter" ? user.age ?? null : null
-      }, ${user.away ?? false}, ${user.project_leader_id ?? null}, ${
-        user.force_in_project_id ?? null
-      }, ${user.deleted ?? false}, ${
+      }, ${user.away ?? false}, ${user.deleted ?? false}, ${
         loggedInUser.id
       }) RETURNING id, project_leader_id, force_in_project_id;`;
     }

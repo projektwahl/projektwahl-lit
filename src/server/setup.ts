@@ -57,7 +57,7 @@ const shuffleArray = <T>(array: T[]) => {
     console.log(projects);
 
     // take care to set this value to project_count * min_participants <= user_count <= project_count * max_participants
-    for (let i = 0; i < 10000; i++) {
+    for (let i = 0; i < 1000; i++) {
       const user = rawUserSchema
         .pick({
           id: true,
@@ -69,7 +69,7 @@ const shuffleArray = <T>(array: T[]) => {
             }) ON CONFLICT DO NOTHING RETURNING users.id;`
           )[0]
         );
-      //shuffleArray(projects);
+      shuffleArray(projects);
       for (let j = 0; j < 5 + Math.random() * 3 - 1.5; j++) {
         // eslint-disable-next-line @typescript-eslint/await-thenable
         await sql`INSERT INTO choices (user_id, project_id, rank) VALUES (${

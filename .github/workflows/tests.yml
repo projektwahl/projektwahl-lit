@@ -40,12 +40,17 @@ jobs:
           node-version: ${{ matrix.node-version }}
           cache: "npm"
       - run: npm ci
-      - run: npm run localize-build
       - run: npm run build
-      - run: npm run purgecss
       - run: openssl req -x509 -newkey rsa:2048 -nodes -sha256 -subj '/CN=localhost' -keyout key.pem -out cert.pem
       - run: psql postgres://projektwahl:projektwahl@localhost/projektwahl < src/server/setup.sql
       - run: DATABASE_URL=postgres://projektwahl:projektwahl@localhost/projektwahl npm run setup
       - run: |
-          PORT=8443 BASE_URL=https://localhost:8443 DATABASE_URL=postgres://projektwahl:projektwahl@localhost/projektwahl CREDENTIALS_DIRECTORY=$PWD npm run server &
+          NODE_ENV=development PORT=8443 BASE_URL=https://localhost:8443 DATABASE_URL=postgres://projektwahl:projektwahl@localhost/projektwahl CREDENTIALS_DIRECTORY=$PWD npm run server &
           BASE_URL=https://localhost:8443 npm test
+      - name: Archive test screenshots
+        if: always()
+        uses: actions/upload-artifact@v3
+        with:
+          name: test-screenshots
+          path: screenshot.png
+          retention-days: 1

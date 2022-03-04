@@ -26,9 +26,8 @@ jobs:
           cache: "npm"
       - run: npm ci
       - run: npm run format:check
-      - run: npm run localize-build
+      - run: npm run build
       - run: npm run typecheck
-      - run: npm run lit-analyze
       - run: npm run localize-extract
       - run: git update-index --refresh
       - run: git diff-index --quiet HEAD --

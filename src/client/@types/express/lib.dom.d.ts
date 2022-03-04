@@ -34,4 +34,8 @@ declare global {
     myformdata: CustomEvent<Record<string, unknown>>;
     myformkeys: CustomEvent<string[][]>;
   }
+
+  interface Window {
+    BOOTSTRAP_CSS: string | undefined;
+  }
 }

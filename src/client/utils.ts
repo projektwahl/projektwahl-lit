@@ -22,10 +22,10 @@ SPDX-FileCopyrightText: 2021 Moritz Hedtke <Moritz.Hedtke@t-online.de>
 */
 
 //import { ZodIssueCode } from "zod";
-import type { ResponseType } from "../lib/routes";
+import type { ResponseType, routes } from "../lib/routes";
 import jscookie from "js-cookie";
 
-export const myFetch = async <P extends import("../lib/routes").keys>(
+export const myFetch = async <P extends keyof typeof routes>(
   url: `${P}${string}`,
   options: RequestInit | undefined
 ): Promise<ResponseType<P>> => {

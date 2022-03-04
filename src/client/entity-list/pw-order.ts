@@ -110,7 +110,9 @@ export class PwOrder<P extends keyof typeof entityRoutes> extends LitElement {
           const oldElementIndex = get(data, [
             ...this.path,
             "sorting",
-          ]).findIndex(([e, d]) => e === `${this.name as string}`);
+          ]).findIndex(
+            ([e, d]: [string, string]) => e === `${this.name as string}`
+          );
           let oldElement;
           if (oldElementIndex == -1) {
             oldElement = [`${this.name as string}`, `downup`];
@@ -164,7 +166,7 @@ export class PwOrder<P extends keyof typeof entityRoutes> extends LitElement {
             )
           );
           const value = (get(data, [...this.path, "sorting"]) ?? []).find(
-            ([e, d]) => e === `${this.name as string}`
+            ([e, d]: [string, string]) => e === `${this.name as string}`
           )?.[1];
           return value === "ASC"
             ? html`<svg

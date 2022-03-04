@@ -32,7 +32,7 @@ import type { z } from "zod";
 import type { Path } from "../utils.js";
 import get from "lodash-es/get.js";
 import set from "lodash-es/set.js";
-import type { Task } from "@lit-labs/task";
+import type { Task } from "@dev.mohe/task";
 
 // MAYBE we could integrate pw-order into here. But this is already fairly complex.
 
@@ -104,8 +104,8 @@ export class PwInput<
       task: {
         attribute: false,
         /*hasChanged: () => {
-          return true; // TODO FIXME bug in @lit-labs/task
-          // I think the problem was that passing down a @lit-labs/task doesnt work as this doesnt trigger updates in the subcomponent
+          return true; // TODO FIXME bug in @dev.mohe/task
+          // I think the problem was that passing down a @dev.mohe/task doesnt work as this doesnt trigger updates in the subcomponent
         },*/
       },
       initial: {

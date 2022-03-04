@@ -6,11 +6,13 @@ import {
   Capabilities,
   Capability,
   until,
+  WebDriver,
   WebElement,
 } from "selenium-webdriver";
 import chrome from "selenium-webdriver/chrome.js";
 //import repl from "repl";
 import crypto from "node:crypto";
+import { writeFile } from "fs/promises";
 const webcrypto = crypto.webcrypto as unknown as Crypto;
 
 if (!process.env["BASE_URL"]) {
@@ -37,7 +39,7 @@ export async function shadow(element: WebElement) {
   return (await element.getShadowRoot()) as WebElement; // eslint-disable-line @typescript-eslint/no-unsafe-call
 }
 
-export async function click(element: WebElement) {
+export async function click(driver: WebDriver, element: WebElement) {
   // currently this is just too buggy
 
   //await driver.executeScript(`arguments[0].scrollIntoView(true);`, element);
@@ -47,284 +49,312 @@ export async function click(element: WebElement) {
   await driver.executeScript(`arguments[0].click()`, element);
 }
 
-// SELENIUM_BROWSER=chrome node --experimental-loader ./src/loader.js --enable-source-maps tests/e2e/welcome.js
-const builder = new Builder()
-  .forBrowser("firefox")
-  .withCapabilities(Capabilities.firefox().set("acceptInsecureCerts", true))
-  .withCapabilities(
-    Capabilities.chrome().set(Capability.ACCEPT_INSECURE_TLS_CERTS, true)
-  );
+export async function main() {
+  // SELENIUM_BROWSER=chrome node --experimental-loader ./src/loader.js --enable-source-maps tests/e2e/welcome.js
+  const builder = new Builder()
+    .forBrowser("firefox")
+    .withCapabilities(Capabilities.firefox().set("acceptInsecureCerts", true))
+    .withCapabilities(
+      Capabilities.chrome().set(Capability.ACCEPT_INSECURE_TLS_CERTS, true)
+    );
 
-if (process.env.CI) {
-  builder.setChromeOptions(
-    new chrome.Options().addArguments(
-      "--headless",
-      "--no-sandbox",
-      "--disable-dev-shm-usage"
-    )
-  );
-}
-const driver = builder.build();
-await driver.manage().setTimeouts({
-  implicit: 5000,
-});
-await driver.manage().window().setRect({
-  width: 500,
-  height: 1000,
-});
-
-try {
-  // @ts-expect-error the typescript bindings are heavily outdated
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-call
-  await driver.setNetworkConditions({
-    offline: false,
-    latency: 100, // Additional latency (ms).
-    download_throughput: 50 * 1024, // Maximal aggregated download throughput.
-    upload_throughput: 50 * 1024, // Maximal aggregated upload throughput.
+  if (process.env.CI) {
+    builder.setChromeOptions(
+      new chrome.Options().addArguments(
+        "--headless",
+        "--no-sandbox",
+        "--disable-dev-shm-usage"
+      )
+    );
+  }
+  const driver = builder.build();
+  await driver.manage().setTimeouts({
+    implicit: 5000,
+  });
+  await driver.manage().window().setRect({
+    width: 500,
+    height: 1000,
   });
 
-  await driver.get(process.env.BASE_URL);
+  try {
+    // @ts-expect-error the typescript bindings are heavily outdated
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-call
+    await driver.setNetworkConditions({
+      offline: false,
+      latency: 100, // Additional latency (ms).
+      download_throughput: 50 * 1024, // Maximal aggregated download throughput.
+      upload_throughput: 50 * 1024, // Maximal aggregated upload throughput.
+    });
 
-  {
-    const pwApp = await driver.findElement(By.css("pw-app"));
+    await driver.get(process.env.BASE_URL);
 
-    const navbarButton = await (
-      await shadow(pwApp)
-    ).findElement(By.css("button.navbar-toggler"));
+    await driver.sleep(2000);
 
-    await click(navbarButton);
-  }
+    const screenshot = await driver.takeScreenshot();
+    await writeFile("screenshot.png", screenshot, "base64");
 
-  {
-    // login
-    const pwApp = await driver.findElement(By.css("pw-app"));
+    {
+      const pwApp = await driver.findElement(By.css("pw-app"));
 
-    const loginLink = await (
-      await shadow(pwApp)
-    ).findElement(By.css('a[href="/login"]'));
+      const navbarButton = await (
+        await shadow(pwApp)
+      ).findElement(By.css("button.navbar-toggler"));
 
-    await click(loginLink);
+      await click(driver, navbarButton);
+    }
 
-    const pwLogin = await (await shadow(pwApp)).findElement(By.css("pw-login"));
+    {
+      const pwApp = await driver.findElement(By.css("pw-app"));
 
-    const usernameField = await (
-      await shadow(pwLogin)
-    ).findElement(By.css('input[name="username"]'));
-    await usernameField.sendKeys("admin");
+      const loginLink = await (
+        await shadow(pwApp)
+      ).findElement(By.css('a[href="/login"]'));
 
-    const passwordField = await (
-      await shadow(pwLogin)
-    ).findElement(By.css('input[name="password"]'));
-    await passwordField.sendKeys("changeme");
+      await click(driver, loginLink);
 
-    const loginButton = await (
-      await shadow(pwLogin)
-    ).findElement(By.css('button[type="submit"]'));
+      await driver.switchTo().window((await driver.getAllWindowHandles())[1]);
+    }
 
-    await click(loginButton);
+    {
+      // login
+      const pwApp = await driver.findElement(By.css("pw-app"));
 
-    await (await shadow(pwApp)).findElement(By.css("pw-welcome"));
-  }
+      const pwLogin = await (
+        await shadow(pwApp)
+      ).findElement(By.css("pw-login"));
 
-  const groupName = [...webcrypto.getRandomValues(new Uint8Array(8))]
-    .map((b) => b.toString(16).padStart(2, "0"))
-    .join("");
+      const usernameField = await (
+        await shadow(pwLogin)
+      ).findElement(By.css('input[name="username"]'));
+      await usernameField.sendKeys("admin");
 
-  {
-    // edit user
+      const passwordField = await (
+        await shadow(pwLogin)
+      ).findElement(By.css('input[name="password"]'));
+      await passwordField.sendKeys("changeme");
 
-    const pwApp = await driver.findElement(By.css("pw-app"));
+      const loginButton = await (
+        await shadow(pwLogin)
+      ).findElement(By.css('button[type="submit"]'));
 
-    const accountsLink = await (
-      await shadow(pwApp)
-    ).findElement(By.css('a[href="/users"]'));
+      await click(driver, loginButton);
+    }
 
-    await click(accountsLink);
+    {
+      await driver.switchTo().window((await driver.getAllWindowHandles())[0]);
 
-    const pwUsers = await (await shadow(pwApp)).findElement(By.css("pw-users"));
+      const pwApp = await driver.findElement(By.css("pw-app"));
 
-    const user2 = await (
-      await shadow(pwUsers)
-    ).findElement(By.css('a[href="/users/edit/7"]'));
+      await (await shadow(pwApp)).findElement(By.css("pw-welcome"));
+    }
 
-    await click(user2);
+    const groupName = [...webcrypto.getRandomValues(new Uint8Array(8))]
+      .map((b) => b.toString(16).padStart(2, "0"))
+      .join("");
 
-    const pwUserCreate = await (
-      await shadow(pwApp)
-    ).findElement(By.css("pw-user-create"));
+    {
+      // edit user
 
-    const pwUserGroup = await (
-      await shadow(pwUserCreate)
-    ).findElement(By.css('input[name="group"]'));
+      const pwApp = await driver.findElement(By.css("pw-app"));
 
-    await pwUserGroup.clear();
-    await pwUserGroup.sendKeys(groupName);
+      const accountsLink = await (
+        await shadow(pwApp)
+      ).findElement(By.css('a[href="/users"]'));
 
-    const submitButton = await (
-      await shadow(pwUserCreate)
-    ).findElement(By.css('button[type="submit"]'));
+      await click(driver, accountsLink);
 
-    await click(submitButton);
+      const pwUsers = await (
+        await shadow(pwApp)
+      ).findElement(By.css("pw-users"));
 
-    await (await shadow(pwApp)).findElement(By.css("pw-welcome"));
-  }
+      const user2 = await (
+        await shadow(pwUsers)
+      ).findElement(By.css('a[href="/users/edit/7"]'));
 
-  {
-    // view user
+      await click(driver, user2);
 
-    const pwApp = await driver.findElement(By.css("pw-app"));
+      const pwUserCreate = await (
+        await shadow(pwApp)
+      ).findElement(By.css("pw-user-create"));
 
-    const accountsLink = await (
-      await shadow(pwApp)
-    ).findElement(By.css('a[href="/users"]'));
+      const pwUserGroup = await (
+        await shadow(pwUserCreate)
+      ).findElement(By.css('input[name="group"]'));
 
-    await click(accountsLink);
+      await pwUserGroup.clear();
+      await pwUserGroup.sendKeys(groupName);
 
-    const pwUsers = await (await shadow(pwApp)).findElement(By.css("pw-users"));
+      const submitButton = await (
+        await shadow(pwUserCreate)
+      ).findElement(By.css('button[type="submit"]'));
 
-    const user = await (
-      await shadow(pwUsers)
-    ).findElement(By.css('a[href="/users/view/7"]'));
+      await click(driver, submitButton);
 
-    await click(user);
+      await (await shadow(pwApp)).findElement(By.css("pw-welcome"));
+    }
 
-    const pwUserCreate = await (
-      await shadow(pwApp)
-    ).findElement(By.css("pw-user-create"));
+    {
+      // view user
 
-    const pwUserGroup = await (
-      await shadow(pwUserCreate)
-    ).findElement(By.css('input[name="group"]'));
+      const pwApp = await driver.findElement(By.css("pw-app"));
 
-    assert.equal(await pwUserGroup.getAttribute("value"), groupName);
+      const accountsLink = await (
+        await shadow(pwApp)
+      ).findElement(By.css('a[href="/users"]'));
 
-    await driver.navigate().back();
-  }
+      await click(driver, accountsLink);
 
-  {
-    // imprint
+      const pwUsers = await (
+        await shadow(pwApp)
+      ).findElement(By.css("pw-users"));
 
-    const pwApp = await driver.findElement(By.css("pw-app"));
+      const user = await (
+        await shadow(pwUsers)
+      ).findElement(By.css('a[href="/users/view/7"]'));
 
-    const imprintLink = await (
-      await shadow(pwApp)
-    ).findElement(By.css('a[href="/imprint"]'));
+      await click(driver, user);
 
-    await click(imprintLink);
+      const pwUserCreate = await (
+        await shadow(pwApp)
+      ).findElement(By.css("pw-user-create"));
 
-    await driver.switchTo().window((await driver.getAllWindowHandles())[1]);
-    const pwApp2 = await driver.findElement(By.css("pw-app"));
+      const pwUserGroup = await (
+        await shadow(pwUserCreate)
+      ).findElement(By.css('input[name="group"]'));
 
-    const pwImprint = await (
-      await shadow(pwApp2)
-    ).findElement(By.css("pw-imprint"));
+      assert.equal(await pwUserGroup.getAttribute("value"), groupName);
 
-    assert.match(await pwImprint.getText(), /Angaben gemäß § 5 TMG/);
+      await driver.navigate().back();
+    }
 
-    await driver.close();
+    {
+      // imprint
 
-    await driver.switchTo().window((await driver.getAllWindowHandles())[0]);
-  }
+      const pwApp = await driver.findElement(By.css("pw-app"));
 
-  {
-    // privacy
+      const imprintLink = await (
+        await shadow(pwApp)
+      ).findElement(By.css('a[href="/imprint"]'));
 
-    const pwApp = await driver.findElement(By.css("pw-app"));
+      await click(driver, imprintLink);
 
-    const privacyLink = await (
-      await shadow(pwApp)
-    ).findElement(By.css('a[href="/privacy"]'));
+      await driver.switchTo().window((await driver.getAllWindowHandles())[1]);
+      const pwApp2 = await driver.findElement(By.css("pw-app"));
 
-    await click(privacyLink);
+      const pwImprint = await (
+        await shadow(pwApp2)
+      ).findElement(By.css("pw-imprint"));
 
-    await driver.switchTo().window((await driver.getAllWindowHandles())[1]);
-    const pwApp2 = await driver.findElement(By.css("pw-app"));
+      assert.match(await pwImprint.getText(), /Angaben gemäß § 5 TMG/);
 
-    const pwPrivacy = await (
-      await shadow(pwApp2)
-    ).findElement(By.css("pw-privacy"));
+      await driver.close();
 
-    assert.match(await pwPrivacy.getText(), /Verantwortlicher/);
+      await driver.switchTo().window((await driver.getAllWindowHandles())[0]);
+    }
 
-    await driver.close();
+    {
+      // privacy
 
-    await driver.switchTo().window((await driver.getAllWindowHandles())[0]);
-  }
+      const pwApp = await driver.findElement(By.css("pw-app"));
 
-  {
-    // filtering
+      const privacyLink = await (
+        await shadow(pwApp)
+      ).findElement(By.css('a[href="/privacy"]'));
 
-    const pwApp = await driver.findElement(By.css("pw-app"));
+      await click(driver, privacyLink);
 
-    const accountsLink = await (
-      await shadow(pwApp)
-    ).findElement(By.css('a[href="/users"]'));
+      await driver.switchTo().window((await driver.getAllWindowHandles())[1]);
+      const pwApp2 = await driver.findElement(By.css("pw-app"));
 
-    await click(accountsLink);
+      const pwPrivacy = await (
+        await shadow(pwApp2)
+      ).findElement(By.css("pw-privacy"));
 
-    const pwUsers = await (await shadow(pwApp)).findElement(By.css("pw-users"));
+      assert.match(await pwPrivacy.getText(), /Verantwortlicher/);
 
-    const filterUsername = await (
-      await shadow(pwUsers)
-    ).findElement(By.css('input[name="filters,username"]'));
+      await driver.close();
 
-    await filterUsername.sendKeys("admin");
+      await driver.switchTo().window((await driver.getAllWindowHandles())[0]);
+    }
 
-    const loadingSpinner = await (
-      await shadow(pwUsers)
-    ).findElement(By.css(".spinner-grow"));
+    {
+      // filtering
 
-    assert.ok(loadingSpinner.isDisplayed());
+      const pwApp = await driver.findElement(By.css("pw-app"));
 
-    console.log(new Date());
+      const accountsLink = await (
+        await shadow(pwApp)
+      ).findElement(By.css('a[href="/users"]'));
 
-    await driver.wait(until.stalenessOf(loadingSpinner));
+      await click(driver, accountsLink);
 
-    console.log(new Date());
-  }
+      const pwUsers = await (
+        await shadow(pwApp)
+      ).findElement(By.css("pw-users"));
 
-  {
-    // logout
-    const pwApp = await driver.findElement(By.css("pw-app"));
+      const filterUsername = await (
+        await shadow(pwUsers)
+      ).findElement(By.css('input[name="filters,username"]'));
 
-    const logoutButton = await (
-      await shadow(pwApp)
-    ).findElement(By.partialLinkText("abmelden"));
+      await filterUsername.sendKeys("admin");
 
-    assert.equal(await logoutButton.getText(), "admin abmelden");
+      const loadingSpinner = await (
+        await shadow(pwUsers)
+      ).findElement(By.css(".spinner-grow"));
 
-    await logoutButton.click();
+      assert.ok(loadingSpinner.isDisplayed());
 
-    const loginLink = await (
-      await shadow(pwApp)
-    ).findElement(By.css('a[href="/login"]'));
+      console.log(new Date());
 
-    assert.equal(await loginLink.getText(), "Anmelden");
-  }
+      await driver.wait(until.stalenessOf(loadingSpinner));
 
-  {
-    // check logged out by checking no permissions
+      console.log(new Date());
+    }
 
-    const pwApp = await driver.findElement(By.css("pw-app"));
+    {
+      // logout
+      const pwApp = await driver.findElement(By.css("pw-app"));
 
-    const accountsLink = await (
-      await shadow(pwApp)
-    ).findElement(By.css('a[href="/users"]'));
+      const logoutButton = await (
+        await shadow(pwApp)
+      ).findElement(By.partialLinkText("Logout"));
 
-    await click(accountsLink);
+      assert.equal(await logoutButton.getText(), "Logout admin");
 
-    const pwUsers = await (await shadow(pwApp)).findElement(By.css("pw-users"));
+      await logoutButton.click();
 
-    const alert = await (
-      await shadow(pwUsers)
-    ).findElement(By.css('div[class="alert alert-danger"]'));
+      const loginLink = await (
+        await shadow(pwApp)
+      ).findElement(By.css('a[href="/login"]'));
 
-    assert.match(await alert.getText(), /Insufficient permissions!/);
-  }
+      assert.equal(await loginLink.getText(), "Login");
+    }
 
-  await driver.quit();
+    {
+      // check logged out by checking no permissions
 
-  /*
+      const pwApp = await driver.findElement(By.css("pw-app"));
+
+      const projectsLink = await (
+        await shadow(pwApp)
+      ).findElement(By.css('a[href="/projects"]'));
+
+      await click(driver, projectsLink);
+
+      const pwProjects = await (
+        await shadow(pwApp)
+      ).findElement(By.css("pw-projects"));
+
+      const alert = await (
+        await shadow(pwProjects)
+      ).findElement(By.css('div[class="alert alert-danger"]'));
+
+      assert.match(await alert.getText(), /Not logged in!/);
+    }
+
+    await driver.quit();
+
+    /*
   const theRepl = repl.start();
   theRepl.context.driver = driver;
   theRepl.context.shadow = shadow;
@@ -335,9 +365,12 @@ try {
     void driver.quit();
   });
 */
-} catch (error) {
-  console.error(error);
-  //await driver.quit();
+  } catch (error) {
+    console.error(error);
+    //await driver.quit();
 
-  throw error;
+    throw error;
+  }
 }
+
+main();
