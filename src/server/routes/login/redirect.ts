@@ -119,15 +119,17 @@ export async function openidRedirectHandler(
       }
 
       /** @type {[Pick<import("../../../lib/types").RawSessionType, "session_id">]} */
-      const session = rawSessionType.pick({
-        session_id: true
-      }).parse(
-        (
-          await sql.begin("READ WRITE", async (sql) => {
-            return await sql`INSERT INTO sessions (user_id) VALUES (${dbUser.id}) RETURNING session_id`;
-          })
-        )[0]
-      );
+      const session = rawSessionType
+        .pick({
+          session_id: true,
+        })
+        .parse(
+          (
+            await sql.begin("READ WRITE", async (sql) => {
+              return await sql`INSERT INTO sessions (user_id) VALUES (${dbUser.id}) RETURNING session_id`;
+            })
+          )[0]
+        );
 
       /** @type {import("node:http2").OutgoingHttpHeaders} */
       const responseHeaders: import("node:http2").OutgoingHttpHeaders = {
@@ -155,7 +157,7 @@ export async function openidRedirectHandler(
         },
       ];
     } catch (error) {
-      console.error(error)
+      console.error(error);
       const returnValue: [
         OutgoingHttpHeaders,
         ResponseType<"/api/v1/redirect">
