@@ -47,3 +47,8 @@ jobs:
       - run: |
           PORT=8443 BASE_URL=https://localhost:8443 DATABASE_URL=postgres://projektwahl:projektwahl@localhost/projektwahl CREDENTIALS_DIRECTORY=$PWD npm run server &
           BASE_URL=https://localhost:8443 npm test
+      - name: Archive test screenshots
+        uses: actions/upload-artifact@v3
+        with:
+          name: test-screenshots
+          path: screenshot.png

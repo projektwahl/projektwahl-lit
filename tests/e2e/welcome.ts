@@ -6,11 +6,13 @@ import {
   Capabilities,
   Capability,
   until,
+  WebDriver,
   WebElement,
 } from "selenium-webdriver";
 import chrome from "selenium-webdriver/chrome.js";
 //import repl from "repl";
 import crypto from "node:crypto";
+import { writeFile } from "fs/promises";
 const webcrypto = crypto.webcrypto as unknown as Crypto;
 
 if (!process.env["BASE_URL"]) {
@@ -37,7 +39,7 @@ export async function shadow(element: WebElement) {
   return (await element.getShadowRoot()) as WebElement; // eslint-disable-line @typescript-eslint/no-unsafe-call
 }
 
-export async function click(element: WebElement) {
+export async function click(driver: WebDriver, element: WebElement) {
   // currently this is just too buggy
 
   //await driver.executeScript(`arguments[0].scrollIntoView(true);`, element);
@@ -47,6 +49,7 @@ export async function click(element: WebElement) {
   await driver.executeScript(`arguments[0].click()`, element);
 }
 
+export async function main() {
 // SELENIUM_BROWSER=chrome node --experimental-loader ./src/loader.js --enable-source-maps tests/e2e/welcome.js
 const builder = new Builder()
   .forBrowser("firefox")
@@ -85,6 +88,15 @@ try {
 
   await driver.get(process.env.BASE_URL);
 
+  await driver.sleep(5000);
+
+  const screenshot = await driver.takeScreenshot()
+  await writeFile("screenshot.png", screenshot, "base64")
+
+  await driver.quit();
+
+  return;
+
   {
     const pwApp = await driver.findElement(By.css("pw-app"));
 
@@ -92,7 +104,7 @@ try {
       await shadow(pwApp)
     ).findElement(By.css("button.navbar-toggler"));
 
-    await click(navbarButton);
+    await click(driver, navbarButton);
   }
 
   {
@@ -102,7 +114,7 @@ try {
       await shadow(pwApp)
     ).findElement(By.css('a[href="/login"]'));
 
-    await click(loginLink);
+    await click(driver, loginLink);
 
     await driver.switchTo().window((await driver.getAllWindowHandles())[1]);
   }
@@ -127,7 +139,7 @@ try {
       await shadow(pwLogin)
     ).findElement(By.css('button[type="submit"]'));
 
-    await click(loginButton);
+    await click(driver, loginButton);
   }
 
   {
@@ -151,7 +163,7 @@ try {
       await shadow(pwApp)
     ).findElement(By.css('a[href="/users"]'));
 
-    await click(accountsLink);
+    await click(driver, accountsLink);
 
     const pwUsers = await (await shadow(pwApp)).findElement(By.css("pw-users"));
 
@@ -159,7 +171,7 @@ try {
       await shadow(pwUsers)
     ).findElement(By.css('a[href="/users/edit/7"]'));
 
-    await click(user2);
+    await click(driver, user2);
 
     const pwUserCreate = await (
       await shadow(pwApp)
@@ -176,7 +188,7 @@ try {
       await shadow(pwUserCreate)
     ).findElement(By.css('button[type="submit"]'));
 
-    await click(submitButton);
+    await click(driver, submitButton);
 
     await (await shadow(pwApp)).findElement(By.css("pw-welcome"));
   }
@@ -190,7 +202,7 @@ try {
       await shadow(pwApp)
     ).findElement(By.css('a[href="/users"]'));
 
-    await click(accountsLink);
+    await click(driver, accountsLink);
 
     const pwUsers = await (await shadow(pwApp)).findElement(By.css("pw-users"));
 
@@ -198,7 +210,7 @@ try {
       await shadow(pwUsers)
     ).findElement(By.css('a[href="/users/view/7"]'));
 
-    await click(user);
+    await click(driver, user);
 
     const pwUserCreate = await (
       await shadow(pwApp)
@@ -222,7 +234,7 @@ try {
       await shadow(pwApp)
     ).findElement(By.css('a[href="/imprint"]'));
 
-    await click(imprintLink);
+    await click(driver, imprintLink);
 
     await driver.switchTo().window((await driver.getAllWindowHandles())[1]);
     const pwApp2 = await driver.findElement(By.css("pw-app"));
@@ -247,7 +259,7 @@ try {
       await shadow(pwApp)
     ).findElement(By.css('a[href="/privacy"]'));
 
-    await click(privacyLink);
+    await click(driver, privacyLink);
 
     await driver.switchTo().window((await driver.getAllWindowHandles())[1]);
     const pwApp2 = await driver.findElement(By.css("pw-app"));
@@ -272,7 +284,7 @@ try {
       await shadow(pwApp)
     ).findElement(By.css('a[href="/users"]'));
 
-    await click(accountsLink);
+    await click(driver, accountsLink);
 
     const pwUsers = await (await shadow(pwApp)).findElement(By.css("pw-users"));
 
@@ -323,7 +335,7 @@ try {
       await shadow(pwApp)
     ).findElement(By.css('a[href="/projects"]'));
 
-    await click(projectsLink);
+    await click(driver, projectsLink);
 
     const pwProjects = await (
       await shadow(pwApp)
@@ -355,3 +367,7 @@ try {
 
   throw error;
 }
+
+}
+
+main()
