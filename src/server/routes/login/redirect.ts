@@ -66,7 +66,7 @@ export async function openidRedirectHandler(
 
     try {
       const result = await client.callback(
-        `${process.env.BASE_URL as string}/api/v1/redirect`,
+        `${process.env.BASE_URL as string}/redirect`,
         searchParams
       );
 
@@ -140,7 +140,7 @@ export async function openidRedirectHandler(
           };`,
           `lax_id=${
             session.session_id
-          }; Secure; SameSite=Lax;  Path=/; HttpOnly; Max-Age=${48 * 60 * 60};`,
+          }; Secure; SameSite=Lax; Path=/; HttpOnly; Max-Age=${48 * 60 * 60};`,
           `username=${
             dbUser.username
           }; Secure; SameSite=Strict; Path=/; Max-Age=${48 * 60 * 60};`,
