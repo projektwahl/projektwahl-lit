@@ -3,8 +3,9 @@ Type=simple
 Restart=on-failure
 Environment=BIND_ADDRESS=:4050
 Environment=DATABASE_TYPE=sqlite3
-Environment=DATABASE_URL=go-neb.db?_busy_timeout=5000
+Environment=DATABASE_URL=/var/lib/go-neb/go-neb.db?_busy_timeout=5000
 Environment=BASE_URL=http://localhost:4050
+StateDirectory=go-neb
 ExecStart=/opt/go-neb/go-neb
 DynamicUser=true
 CapabilityBoundingSet=
