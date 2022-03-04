@@ -78,17 +78,20 @@ export async function openidRedirectHandler(
 
       //console.log(userinfo)
 
-      const dbUser = rawUserSchema.pick({
-        id: true,
-        username: true,
-        password_hash: true,
-      }).optional().parse(
-        (
-          await sql`SELECT id, username, type FROM users WHERE openid_id = ${
-            result.claims().sub
-          } LIMIT 1`
-        )[0]
-      );
+      const dbUser = rawUserSchema
+        .pick({
+          id: true,
+          username: true,
+          password_hash: true,
+        })
+        .optional()
+        .parse(
+          (
+            await sql`SELECT id, username, type FROM users WHERE openid_id = ${
+              result.claims().sub
+            } LIMIT 1`
+          )[0]
+        );
 
       if (dbUser === undefined) {
         const returnValue: [

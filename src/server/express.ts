@@ -97,9 +97,9 @@ export function requestHandler<P extends keyof typeof routes>(
         }
 
         let body;
-        
+
         if (request.method === "POST") {
-            body = await json(request)
+          body = await json(request);
         } else if (url.pathname !== "/api/v1/redirect") {
           body = JSON.parse(
             decodeURIComponent(

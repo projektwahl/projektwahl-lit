@@ -39,7 +39,12 @@ async function setupClient() {
       process.exit(1);
     }
 
-    const client_secret = (await readFile(process.env.CREDENTIALS_DIRECTORY + "/openid_client_secret", "utf8")).trim()
+    const client_secret = (
+      await readFile(
+        process.env.CREDENTIALS_DIRECTORY + "/openid_client_secret",
+        "utf8"
+      )
+    ).trim();
 
     try {
       const issuer = await Issuer.discover(process.env["OPENID_URL"]);

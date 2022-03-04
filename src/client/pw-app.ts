@@ -83,6 +83,10 @@ const pages = {
     await import("./routes/pw-welcome.js");
     return html`<pw-welcome></pw-welcome>`;
   },
+  "^/redirect$": async () => {
+    await import("./routes/login/pw-redirect.js");
+    return html`<pw-redirect></pw-redirect>`;
+  },
   "^/login$": async () => {
     const { pwLogin } = await import("./routes/login/pw-login.js");
     return await pwLogin();
