@@ -174,6 +174,17 @@ class PwUserCreate extends PwForm<
                 })}
                 ${pwInput<
                   "/api/v1/users/create" | "/api/v1/users/update",
+                  ["openid_id"]
+                >({
+                  type: "text",
+                  disabled: this.disabled,
+                  label: msg("Third-party email address"),
+                  name: ["openid_id"],
+                  task: this._task,
+                  initial: this.initial?.data,
+                })}
+                ${pwInput<
+                  "/api/v1/users/create" | "/api/v1/users/update",
                   ["type"]
                 >({
                   type: "select",

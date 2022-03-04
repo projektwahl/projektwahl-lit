@@ -100,6 +100,7 @@ export async function usersHandler(
             return sql2`SELECT "id",
             "type",
             "username",
+            "openid_id",
             "group",
             "age",
             "away",
