@@ -316,7 +316,7 @@ git clone git@github.com:projektwahl/projektwahl-lit.git projektwahl-lit-staging
 cd projektwahl-lit-staging
 openssl req -x509 -newkey rsa:2048 -nodes -sha256 -subj '/CN=localhost' -keyout key.pem -out cert.pem
 npm ci --ignore-scripts --omit=optional
-npx node-gyp rebuild -C ./node_modules/@dev.mohe/argon2/
+node-gyp rebuild -C ./node_modules/@dev.mohe/argon2/
 npm run build
 
 sudo mkdir projektwahl-lit-production
@@ -325,7 +325,7 @@ git clone git@github.com:projektwahl/projektwahl-lit.git projektwahl-lit-product
 cd projektwahl-lit-production
 openssl req -x509 -newkey rsa:2048 -nodes -sha256 -subj '/CN=localhost' -keyout key.pem -out cert.pem
 npm ci --ignore-scripts --omit=optional
-npx node-gyp rebuild -C ./node_modules/@dev.mohe/argon2/
+node-gyp rebuild -C ./node_modules/@dev.mohe/argon2/
 npm run build
 
 
@@ -406,13 +406,10 @@ sudo nano /etc/systemd/system/projektwahl.service
 # https://github.com/projektwahl/projektwahl-lit/blob/work/docs/projektwahl%40.service.conf
 
 sudo systemctl edit --full --force projektwahl@.service
-sudo systemctl enable projektwahl@staging.service
-sudo systemctl enable projektwahl@production.service
-
 
 sudo systemctl edit --full --force projektwahl@.socket
-sudo systemctl enable projektwahl@staging.socket
-sudo systemctl enable projektwahl@production.socket
+sudo systemctl enable --now projektwahl@staging.socket
+sudo systemctl enable --now projektwahl@production.socket
 
 sudo systemctl edit projektwahl@staging.socket
 [Socket]
