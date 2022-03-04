@@ -591,7 +591,13 @@ sudo pacman -S which go
 make build
 sudo chown -R postgres:postgres /opt/postgres_exporter
 sudo chmod -R u=rX,g=rX,o= /opt/postgres_exporter
-sudo -u postgres DATA_SOURCE_NAME="user=postgres host=/var/run/postgresql/ sslmode=disable" /opt/postgres_exporter/postgres_exporter
+
+sudo systemctl edit --full --force prometheus-postgresql-exporter
+sudo systemctl enable --now prometheus-postgresql-exporter
+
+
+
+
 
 sudo nano /etc/prometheus/prometheus.yml 
   - job_name: 'postgresql'
