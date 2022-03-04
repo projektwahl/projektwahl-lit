@@ -543,6 +543,10 @@ sudo mv node_alerts.yaml /etc/prometheus/
 sudo nano /etc/prometheus/prometheus.yml 
 sudo chown root:prometheus /etc/prometheus/node_alerts.yaml
 sudo chmod 640 /etc/prometheus/node_alerts.yaml
+
+sudo nano /etc/prometheus/node_alerts.yaml
+# remove all for:
+
 sudo systemctl restart prometheus
 
 https://grafana.com/oss/prometheus/exporters/node-exporter/?tab=dashboards
