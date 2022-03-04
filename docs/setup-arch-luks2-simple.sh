@@ -745,3 +745,7 @@ receivers:
 - name: 'web.hook'
   webhook_configs:
   - url: 'http://localhost:4050/services/hooks/YWxlcnRtYW5hZ2VyLXNlcnZpY2U'
+
+
+sudo nano /etc/prometheus/prometheus.yml
+/opt/projektwahl-lit-staging/docs/my_alerts.yaml
