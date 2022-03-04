@@ -584,7 +584,7 @@ https://github.com/prometheus-community/postgres_exporter
 
 cd /opt
 sudo mkdir postgres_exporter
-chown moritz postgres_exporter/
+sudo chown moritz postgres_exporter/
 git clone https://github.com/prometheus-community/postgres_exporter.git
 cd postgres_exporter/
 sudo pacman -S which go
@@ -620,7 +620,15 @@ server {
 sudo ln -s /etc/nginx/sites-available/nginx-monitoring.conf /etc/nginx/sites-enabled/
 
 
-sudo docker run -p 9113:9113 nginx/nginx-prometheus-exporter:0.10.0 -nginx.scrape-uri=http://aes.selfmade4u.de:8080/stub_status
+# TODO package with arch / search in aur
+cd /opt
+sudo mkdir nginx-prometheus-exporter
+sudo chown moritz nginx-prometheus-exporter/
+git clone https://github.com/nginxinc/nginx-prometheus-exporter
+cd nginx-prometheus-exporter
+make
+sudo systemctl edit --full --force prometheus-nginx-exporter
+sudo systemctl enable --now prometheus-nginx-exporter
 
 # https://github.com/nginxinc/nginx-prometheus-exporter/blob/master/grafana/README.md
 
