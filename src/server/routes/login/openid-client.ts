@@ -20,6 +20,7 @@ https://github.com/projektwahl/projektwahl-lit
 SPDX-License-Identifier: AGPL-3.0-or-later
 SPDX-FileCopyrightText: 2021 Moritz Hedtke <Moritz.Hedtke@t-online.de>
 */
+import { readFile } from "node:fs/promises";
 import { Client, Issuer } from "openid-client";
 
 // OPENID_URL=https://login.microsoftonline.com/e92856e2-3074-46ed-a008-cf3da07639d1/v2.0 CLIENT_ID=639d156d-bda7-4b80-9ef6-7f3017367631
@@ -33,17 +34,19 @@ async function setupClient() {
       process.exit(1);
     }
 
-    if (!process.env["CLIENT_SECRET"]) {
-      console.error("CLIENT_SECRET not set!");
+    if (!process.env["CREDENTIALS_DIRECTORY"]) {
+      console.error("CREDENTIALS_DIRECTORY not set!");
       process.exit(1);
     }
+
+    const client_secret = (await readFile(process.env.CREDENTIALS_DIRECTORY + "/openid_client_secret", "utf8")).trim()
 
     try {
       const issuer = await Issuer.discover(process.env["OPENID_URL"]);
       const Client = issuer.Client;
       client = new Client({
         client_id: process.env["CLIENT_ID"],
-        client_secret: process.env["CLIENT_SECRET"],
+        client_secret,
         redirect_uris: [`${process.env.BASE_URL as string}/api/v1/redirect`],
         response_types: ["code"],
         // id_token_signed_response_alg (default "RS256")

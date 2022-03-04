@@ -78,20 +78,11 @@ export async function openidRedirectHandler(
 
       //console.log(userinfo)
 
-      const pickFn = <
-        T extends { [k: string]: ZodTypeAny },
-        UnknownKeys extends UnknownKeysParam = "strip",
-        Catchall extends ZodTypeAny = ZodTypeAny
-      >(
-        s: ZodObject<T, UnknownKeys, Catchall>
-      ) =>
-        s.pick({
-          id: true,
-          username: true,
-          password_hash: true,
-        });
-
-      const dbUser = pickFn(rawUserSchema).parse(
+      const dbUser = rawUserSchema.pick({
+        id: true,
+        username: true,
+        password_hash: true,
+      }).optional().parse(
         (
           await sql`SELECT id, username, type FROM users WHERE openid_id = ${
             result.claims().sub
