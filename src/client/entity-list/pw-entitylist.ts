@@ -23,7 +23,7 @@ SPDX-FileCopyrightText: 2021 Moritz Hedtke <Moritz.Hedtke@t-online.de>
 import { css, html, TemplateResult } from "lit";
 import { HistoryController } from "../history-controller.js";
 import { ref } from "lit/directives/ref.js";
-import { Task, TaskStatus } from "@lit-labs/task";
+import { Task, TaskStatus } from "@dev.mohe/task";
 import type { entityRoutes, ResponseType } from "../../lib/routes.js";
 import type { z } from "zod";
 import { PwForm } from "../form/pw-form.js";
