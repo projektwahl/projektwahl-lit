@@ -690,5 +690,28 @@ curl -X POST localhost:4050/admin/configureService --data-binary '{
     "Config": {}
 }'
 
+curl -X POST localhost:4050/admin/configureService --data-binary '{
+    "Type": "alertmanager",
+    "Id": "alertmanager-service",
+    "UserID": "@moritz.hedtke-bot:matrix.org",
+    "Config": {
+      "Rooms": {
+        "!BAfGIGsMNSLsWXypLP:matrix.org": {
+          "text_template": "{{range .Alerts -}} [{{ .Status }}] {{index .Labels \"alertname\" }}: {{index .Annotations \"description\"}} {{ end -}}",
+          "html_template": "{{range .Alerts -}}  {{ $severity := index .Labels \"severity\" }}    {{ if eq .Status \"firing\" }}      {{ if eq $severity \"critical\"}}        <font color='red'><b>[FIRING - CRITICAL]</b></font>      {{ else if eq $severity \"warning\"}}        <font color='orange'><b>[FIRING - WARNING]</b></font>      {{ else }}        <b>[FIRING - {{ $severity }}]</b>      {{ end }}    {{ else }}      <font color='green'><b>[RESOLVED]</b></font>    {{ end }}  {{ index .Labels \"alertname\"}} : {{ index .Annotations \"description\"}}   <a href=\"{{ .GeneratorURL }}\">source</a><br/>{{end -}}",
+          "msg_type": "m.text"
+        }
+      }
+    }
+}'
+
+
+# http://localhost:4050/services/hooks/YWxlcnRtYW5hZ2VyLXNlcnZpY2U
+
+sudo nano /etc/alertmanager/alertmanager.yml
+receivers:
+- name: 'web.hook'
+  webhook_configs:
+  - url: 'http://localhost:4050/services/hooks/YWxlcnRtYW5hZ2VyLXNlcnZpY2U'
 
 
