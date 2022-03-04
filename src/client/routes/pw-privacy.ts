@@ -113,8 +113,7 @@ export class PwPrivacy extends LitElement {
           >
         </address>
 
-        Die Daten
-        werden in Einklang mit
+        Die Daten werden in Einklang mit
         <a
           href="https://eur-lex.europa.eu/legal-content/DE/TXT/HTML/?uri=CELEX:32016R0679&from=DE#d1e2370-1-1"
           >Artikel 14 Absatz 2a DSGVO</a
