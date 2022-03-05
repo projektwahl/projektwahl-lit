@@ -49,13 +49,17 @@ const taskFunction = async ([id]: [number]) => {
   const [_, response] = await Promise.all([
     import("../projects/pw-project-users.js"),
     await myFetch<"/api/v1/projects">(
-      `/api/v1/projects/?${JSON.stringify({
+      "GET",
+      `/api/v1/projects`,
+      {
         filters: {
           id,
         },
         paginationCursor: null,
+        paginationDirection: "forwards",
+        paginationLimit: 100,
         sorting: [],
-      })}`,
+      },
       {}
     ),
   ]);
@@ -134,12 +138,8 @@ export const PwProjectCreate = setupHmr(
 
         const result = await myFetch<
           "/api/v1/projects/create" | "/api/v1/projects/update"
-        >(this.url, {
-          method: "POST",
-          headers: {
-            "content-type": "text/json",
-          },
-          body: JSON.stringify(formDataEvent.detail),
+        >("POST", this.url, formDataEvent.detail, {
+          
         });
 
         if (result.success) {

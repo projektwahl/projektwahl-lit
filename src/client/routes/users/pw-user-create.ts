@@ -46,13 +46,17 @@ export async function pwUser(id: number, viewOnly = false) {
 
 const taskFunction = async ([id]: [number]) => {
   const response = await myFetch<"/api/v1/users">(
-    `/api/v1/users/?${JSON.stringify({
+    "GET",
+    `/api/v1/users`,
+    {
       filters: {
         id,
       },
       paginationCursor: null,
+      paginationDirection: "forwards",
+      paginationLimit: 100,
       sorting: [],
-    })}`,
+    },
     {}
   );
   if (response.success) {
@@ -120,12 +124,8 @@ class PwUserCreate extends PwForm<
 
       const result = await myFetch<
         "/api/v1/users/create" | "/api/v1/users/update"
-      >(this.uri, {
-        method: "POST",
-        headers: {
-          "content-type": "text/json",
-        },
-        body: JSON.stringify(formDataEvent.detail),
+      >("POST", this.uri,formDataEvent.detail, {
+      
       });
 
       if (result.success) {
