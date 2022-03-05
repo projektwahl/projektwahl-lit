@@ -83,6 +83,10 @@ export async function main() {
       upload_throughput: 50 * 1024, // Maximal aggregated upload throughput.
     });*/
 
+    if (!process.env.BASE_URL) {
+      throw new Error("BASE_URL not set!")
+    }
+
     await driver.get(process.env.BASE_URL);
 
     await driver.sleep(2000);

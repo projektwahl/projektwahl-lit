@@ -24,8 +24,8 @@ import { css, html, TemplateResult } from "lit";
 import { HistoryController } from "../history-controller.js";
 import { ref } from "lit/directives/ref.js";
 import { Task, TaskStatus } from "@dev.mohe/task";
-import type { entityRoutes, ResponseType } from "../../lib/routes.js";
-import type { z } from "zod";
+import { entityRoutes, ResponseType } from "../../lib/routes.js";
+import { z } from "zod";
 import { PwForm } from "../form/pw-form.js";
 import { bootstrapCss } from "../index.js";
 import { msg, str } from "@lit/localize";
@@ -33,16 +33,20 @@ import { ifDefined } from "lit/directives/if-defined.js";
 import { myFetch } from "../utils.js";
 import { pwInput } from "../form/pw-input.js";
 
-export const taskFunction = async <P extends keyof typeof entityRoutes>(
+export const taskFunction = async <P extends keyof typeof entityRoutes, PREFIX extends string>(
   apiUrl: P,
   url: URL,
-  prefix: string
+  prefix: PREFIX
 ) => {
-  const data = JSON.parse(
+  // TODO FIXME the type of this does not contain PREFIX
+  const data = z.object({
+    [prefix]: entityRoutes[apiUrl].request
+  }).parse(JSON.parse(
     decodeURIComponent(url.search == "" ? "{}" : url.search.substring(1))
-  );
+  ));
   const result = await myFetch<P>(
-    `${apiUrl}?${encodeURIComponent(JSON.stringify(data[prefix] ?? {}))}`,
+    apiUrl,
+    data[prefix] ?? {},
     {
       method: "GET",
     }

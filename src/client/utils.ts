@@ -24,9 +24,11 @@ SPDX-FileCopyrightText: 2021 Moritz Hedtke <Moritz.Hedtke@t-online.de>
 //import { ZodIssueCode } from "zod";
 import type { ResponseType, routes } from "../lib/routes";
 import jscookie from "js-cookie";
+import type { z } from "zod";
 
 export const myFetch = async <P extends keyof typeof routes>(
-  url: `${P}${string}`,
+  url: P,
+  data: z.infer<typeof routes[P]["request"]>,
   options: RequestInit | undefined
 ): Promise<ResponseType<P>> => {
   try {
