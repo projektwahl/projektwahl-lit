@@ -88,9 +88,7 @@ See [SECURITY.md](SECURITY.md)
 
 ## Translation
 
-<a href="https://weblate.selfmade4u.de/engage/projektwahl/">
-<img src="https://weblate.selfmade4u.de/widgets/projektwahl/-/open-graph.png" alt="Translation status" />
-</a>
+
 
 ## Browser support
 
