@@ -230,7 +230,10 @@ export const routes = {
     response: z.object({}),
   },
   "/api/v1/redirect": {
-    request: z.any(),
+    request: z.object({
+      session_state: z.string(),
+      code: z.string(),
+    }),
     response: z.object({}),
   },
   "/api/v1/sleep": {

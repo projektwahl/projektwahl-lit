@@ -45,11 +45,10 @@ export const taskFunction = async <P extends keyof typeof entityRoutes, PREFIX e
     decodeURIComponent(url.search == "" ? "{}" : url.search.substring(1))
   ));
   const result = await myFetch<P>(
+    "GET",
     apiUrl,
     data[prefix] ?? {},
-    {
-      method: "GET",
-    }
+    {}
   );
   return result;
 };
@@ -157,10 +156,10 @@ export class PwEntityList<
           console.log(JSON.stringify(formDataEvent.detail));
 
           const result = await myFetch<P>(
+            "GET",
             this.url,
             formDataEvent.detail,
             {
-              method: "GET",
             }
           );
 
