@@ -41,9 +41,11 @@ export const taskFunction = async <
   url: URL,
   prefix: PREFIX
 ) => {
-  const schema: z.ZodObject<{[k in PREFIX]: typeof entityRoutes[P]["request"]}, "strip", z.ZodTypeAny, {}, {}> = z
+  const schema: z.ZodObject<{[k in PREFIX]: typeof entityRoutes[P]["request"]}, "strip", z.ZodTypeAny, {[k in PREFIX]: typeof entityRoutes[P]["request"]}, {}> = z
     .object({
     }).setKey(prefix, entityRoutes[apiUrl].request);
+  const d = schema._output[prefix];
+  d.shape
   const data: z.infer<z.ZodObject<{[k in PREFIX]: typeof entityRoutes[P]["request"]}, "strip", z.ZodTypeAny, {}, {}>> = schema.parse(
       JSON.parse(
         decodeURIComponent(url.search == "" ? "{}" : url.search.substring(1))
