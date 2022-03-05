@@ -88,7 +88,9 @@ See [SECURITY.md](SECURITY.md)
 
 ## Translation
 
+Currently https://github.com/vslavik/poedit.
 
+Maybe https://github.com/mozilla/pontoon/ at some point.
 
 ## Browser support
 
