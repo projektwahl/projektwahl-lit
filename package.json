@@ -31,7 +31,7 @@
     "build": "node build.js"
   },
   "dependencies": {
-    "@dev.mohe/argon2": "^0.29.0",
+    "@dev.mohe/argon2": "^0.29.1",
     "@lit-labs/motion": "^1.0.2",
     "@dev.mohe/task": "^1.1.1",
     "@lit/localize": "^0.11.2",
