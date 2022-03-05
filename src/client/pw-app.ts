@@ -214,7 +214,7 @@ export class PwApp extends LitElement {
 
     this.popstateListener = (event: PopStateEvent) => {
       const url = new URL(window.location.href);
-      const state = event.state as HistoryState;
+      const state = event.state;
       HistoryController.goto(url, state);
     };
 
