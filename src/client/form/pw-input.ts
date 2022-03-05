@@ -202,7 +202,7 @@ export class PwInput<
 
   override connectedCallback() {
     super.connectedCallback();
-    this.form = this.closest("form") as HTMLFormElement;
+    this.form = this.closest("form");
     this.form.addEventListener("myformdata", this.myformdataEventListener);
     this.form.addEventListener("myformkeys", this.myformkeysEventListener);
   }
@@ -268,16 +268,13 @@ export class PwInput<
               complete: () => false,
               pending: () => true,
               initial: () => false,
-            }) as boolean)
+            }))
           }
         >
           ${
             this.type === "select"
               ? repeat(
-                  this.options as {
-                    value: any; //z.infer<typeof routes[P]["request"]>[Q];
-                    text: string;
-                  }[],
+                  this.options,
                   (o) => o.value,
                   (o) =>
                     html`<option

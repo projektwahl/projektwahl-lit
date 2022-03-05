@@ -180,16 +180,12 @@ const baseQuery = <
         .enum(["forwards", "backwards"])
         .default("forwards"),
       paginationCursor: s.partial().nullish(), // if this is null the start is at start/end depending on paginationDirection
-      // @ts-expect-error why
-      filters: s.partial().default({}),
+      filters: s.partial(),
       sorting: z
         .array(
           z.tuple([
             z.enum(
-              Object.keys(s.shape) as [
-                keyof T & string,
-                ...(keyof T & string)[]
-              ]
+              Object.keys(s.shape)
             ),
             z.enum(["ASC", "DESC"]),
           ])

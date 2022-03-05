@@ -134,7 +134,7 @@ class PwLogin extends PwForm<"/api/v1/login"> {
                         pending: () => true,
                         complete: () => false,
                         initial: () => false,
-                      }) as boolean}
+                      })}
                       class="btn btn-primary"
                     >
                       ${this.actionText}
@@ -151,7 +151,6 @@ class PwLogin extends PwForm<"/api/v1/login"> {
 
 customElements.define("pw-login", PwLogin);
 
-// eslint-disable-next-line @typescript-eslint/require-await
 export const pwLogin = async (): Promise<import("lit").TemplateResult> => {
   return html`<pw-login></pw-login>`;
 };

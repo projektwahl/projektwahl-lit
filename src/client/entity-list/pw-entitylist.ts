@@ -146,7 +146,7 @@ export class PwEntityList<
             bubbles: false,
             detail:
               data[this.prefix] ??
-              ({} as z.infer<typeof entityRoutes[P]["request"]>),
+              ({}),
           });
           this.form.value?.dispatchEvent(formDataEvent);
 

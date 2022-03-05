@@ -316,7 +316,7 @@ export const PwProjectCreate = setupHmr(
                             pending: () => true,
                             complete: () => false,
                             initial: () => false,
-                          }) as boolean}
+                          })}
                           class="btn btn-primary"
                         >
                           ${this.actionText}

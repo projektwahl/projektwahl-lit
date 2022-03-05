@@ -48,7 +48,7 @@ export async function openidRedirectHandler(
       })
       .parse(
         Object.fromEntries(
-          url.searchParams as unknown as Iterable<readonly [string, string]>
+          url.searchParams
         )
       );
 
@@ -66,7 +66,7 @@ export async function openidRedirectHandler(
 
     try {
       const result = await client.callback(
-        `${process.env.BASE_URL as string}/redirect`,
+        `${process.env.BASE_URL}/redirect`,
         searchParams
       );
 

@@ -190,10 +190,7 @@ class PwUserCreate extends PwForm<
                   type: "select",
                   disabled: this.disabled,
                   onchange: (event: Event) =>
-                    (this.type = (event.target as HTMLSelectElement).value as
-                      | "helper"
-                      | "admin"
-                      | "voter"),
+                    (this.type = (event.target).value),
                   label: msg("User type"),
                   name: ["type"],
                   options: [
@@ -284,7 +281,7 @@ class PwUserCreate extends PwForm<
                           pending: () => true,
                           complete: () => false,
                           initial: () => false,
-                        }) as boolean}
+                        })}
                         class="btn btn-primary"
                       >
                         ${this.actionText}

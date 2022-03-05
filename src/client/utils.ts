@@ -77,7 +77,7 @@ export const myFetch = async <P extends keyof typeof routes>(
         return r;
       }
     }
-    const result = (await response.json()) as ResponseType<P>;
+    const result = (await response.json());
     return result;
   } catch (error) {
     console.error(error);

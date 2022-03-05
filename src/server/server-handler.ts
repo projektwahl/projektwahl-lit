@@ -170,12 +170,12 @@ async function replaceAsync(
 ): Promise<string> {
   const promises: Promise<string>[] = [];
   str.replaceAll(regex, (match, ...args) => {
-    const promise = asyncFn(match, args as string[]);
+    const promise = asyncFn(match, args);
     promises.push(promise);
     return "";
   });
   const data = await Promise.all(promises);
-  return str.replaceAll(regex, () => data.shift() as string);
+  return str.replaceAll(regex, () => data.shift());
 }
 
 export const defaultHeaders = {
@@ -352,7 +352,7 @@ export async function serverHandler(
         raw.push(contents); // the string you want
         raw.push(null); // indicates end-of-file basically - the end of the stream
 
-        let acceptEncoding = request.headers["accept-encoding"] as string;
+        let acceptEncoding = request.headers["accept-encoding"];
         if (!acceptEncoding) {
           acceptEncoding = "";
         }

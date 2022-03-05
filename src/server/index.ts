@@ -103,7 +103,7 @@ if (process.env.NODE_ENV === "development" && cluster.isPrimary) {
       () => {
         console.log(
           `[${cluster.worker?.id ?? "unknown"}] Server started at ${
-            process.env.BASE_URL as string
+            process.env.BASE_URL
           }`
         );
       }

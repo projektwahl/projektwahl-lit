@@ -240,7 +240,7 @@ export class PwApp extends LitElement {
             Object.keys(pages).find((k) =>
               new RegExp(k).test(this.history.url.pathname)
             ),
-          ] as [keyof typeof pages],
+          ],
         initialStatus:
           this.initial !== undefined ? TaskStatus.COMPLETE : TaskStatus.INITIAL,
         initialValue: this.initial,

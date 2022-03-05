@@ -13,7 +13,7 @@ import chrome from "selenium-webdriver/chrome.js";
 //import repl from "repl";
 import crypto from "node:crypto";
 import { writeFile } from "fs/promises";
-const webcrypto = crypto.webcrypto as unknown as Crypto;
+const webcrypto = crypto.webcrypto;
 
 if (!process.env["BASE_URL"]) {
   console.error("BASE_URL not set!");
@@ -35,8 +35,7 @@ if (!process.env["BASE_URL"]) {
 // https://w3c.github.io/webdriver/#get-element-shadow-root
 
 export async function shadow(element: WebElement) {
-  // @ts-expect-error wrong typings
-  return (await element.getShadowRoot()) as WebElement; // eslint-disable-line @typescript-eslint/no-unsafe-call
+  return (await element.getShadowRoot());
 }
 
 export async function click(driver: WebDriver, element: WebElement) {
@@ -77,8 +76,6 @@ export async function main() {
   });
 
   try {
-    // @ts-expect-error the typescript bindings are heavily outdated
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-call
     await driver.setNetworkConditions({
       offline: false,
       latency: 100, // Additional latency (ms).

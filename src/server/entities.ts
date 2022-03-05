@@ -75,14 +75,12 @@ export async function fetchData<R extends keyof typeof entityRoutes>(
 ): Promise<[OutgoingHttpHeaders, ResponseType<R>]> {
   const entitySchema: entitesType[R] = entityRoutes[path];
 
-  // @ts-expect-error bruh
   if (!query.sorting.find((e) => e[0] == "id")) {
     query.sorting.push(["id", "ASC"]);
   }
 
   // orderBy needs to be reversed for backwards pagination
   if (query.paginationDirection === "backwards") {
-    // @ts-expect-error bruh
     query.sorting = query.sorting.map((v) => [
       v[0],
       v[1] === "ASC" ? "DESC" : "ASC",
@@ -120,7 +118,6 @@ export async function fetchData<R extends keyof typeof entityRoutes>(
         .flatMap((value, index) => {
           return [
             sql2` AND `,
-            // @ts-expect-error bruh
             sql2`${paginationCursor ? paginationCursor[value[0]] : null} ${
               index === part.length - 1
                 ? value[1] === "ASC"
@@ -186,12 +183,12 @@ export async function fetchData<R extends keyof typeof entityRoutes>(
     entities: entities,
     nextCursor: nextCursor,
     previousCursor: previousCursor,
-  } as mappedInfer1<R>;
+  };
 
   const a = {
     success: true as const,
     data: y,
-  } as ResponseType<R>;
+  };
 
   return [
     {
