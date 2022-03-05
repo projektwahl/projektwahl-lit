@@ -99,22 +99,23 @@ const myErrorMap: z.ZodErrorMap = (
       message = `Ungültiges Datum`;
       break;
     case ZodIssueCode.invalid_string:
-      if (issue.validation !== "regex") message = `Ungültig ${issue.validation}`;
+      if (issue.validation !== "regex")
+        message = `Ungültig ${issue.validation}`;
       else message = "Ungültig";
       break;
     case ZodIssueCode.too_small:
       if (issue.type === "array")
-        message = `Liste muss ${
-          issue.inclusive ? `mindestens` : `mehr als`
-        } ${issue.minimum} Element enthalten`;
+        message = `Liste muss ${issue.inclusive ? `mindestens` : `mehr als`} ${
+          issue.minimum
+        } Element enthalten`;
       else if (issue.type === "string")
-        message = `Text muss ${
-          issue.inclusive ? `mindestens` : `mehr als`
-        } ${issue.minimum} Zeichen haben`;
+        message = `Text muss ${issue.inclusive ? `mindestens` : `mehr als`} ${
+          issue.minimum
+        } Zeichen haben`;
       else if (issue.type === "number")
-        message = `Zahl muss größer ${
-          issue.inclusive ? ` gleich` : ``
-        }${issue.minimum} sein`;
+        message = `Zahl muss größer ${issue.inclusive ? ` gleich` : ``}${
+          issue.minimum
+        } sein`;
       else message = "Ungültige Eingabe";
       break;
     case ZodIssueCode.too_big:
@@ -123,13 +124,13 @@ const myErrorMap: z.ZodErrorMap = (
           issue.inclusive ? `höchstens` : `weniger als`
         } ${issue.maximum} Elemente enthalten`;
       else if (issue.type === "string")
-        message = `Text muss ${
-          issue.inclusive ? `höchstens` : `weniger als`
-        } ${issue.maximum} Zeichen haben`;
+        message = `Text muss ${issue.inclusive ? `höchstens` : `weniger als`} ${
+          issue.maximum
+        } Zeichen haben`;
       else if (issue.type === "number")
-        message = `Zahl muss kleiner ${
-          issue.inclusive ? ` gleich` : ``
-        }${issue.maximum} sein`;
+        message = `Zahl muss kleiner ${issue.inclusive ? ` gleich` : ``}${
+          issue.maximum
+        } sein`;
       else message = "Ungültige Eingabe";
       break;
     case ZodIssueCode.custom:
