@@ -25,7 +25,7 @@ import { HistoryController } from "../history-controller.js";
 import { ref } from "lit/directives/ref.js";
 import { Task, TaskStatus } from "@dev.mohe/task";
 import { entityRoutes, ResponseType } from "../../lib/routes.js";
-import { z } from "zod";
+import { z, ZodObject, ZodTypeAny } from "zod";
 import { PwForm } from "../form/pw-form.js";
 import { bootstrapCss } from "../index.js";
 import { msg, str } from "@lit/localize";
@@ -41,17 +41,16 @@ export const taskFunction = async <
   url: URL,
   prefix: PREFIX
 ) => {
-  // TODO FIXME the type of this does not contain PREFIX
-  const data = z
+  const schema: z.ZodObject<{[k in PREFIX]: typeof entityRoutes[P]["request"]}, "strip", z.ZodTypeAny, {}, {}> = z
     .object({
-      [prefix]: entityRoutes[apiUrl].request,
-    })
-    .parse(
+    }).setKey(prefix, entityRoutes[apiUrl].request);
+  const data: z.infer<z.ZodObject<{[k in PREFIX]: typeof entityRoutes[P]["request"]}, "strip", z.ZodTypeAny, {}, {}>> = schema.parse(
       JSON.parse(
         decodeURIComponent(url.search == "" ? "{}" : url.search.substring(1))
       )
     );
-  const result = await myFetch<P>("GET", apiUrl, data[prefix] ?? {}, {});
+  const a: z.infer<z.ZodObject<{[k in PREFIX]: typeof entityRoutes[P]["request"]}, "strip", z.ZodTypeAny, {}, {}>>[PREFIX] = data[prefix];
+  const result = await myFetch<P>("GET", apiUrl, a, {});
   return result;
 };
 
@@ -75,7 +74,7 @@ export class PwEntityList<
     const bc = new BroadcastChannel("updateloginstate");
     bc.onmessage = (event) => {
       if (event.data === "login") {
-        this._task.run();
+        void this._task.run();
       }
     };
   }
