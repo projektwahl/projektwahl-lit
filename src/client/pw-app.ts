@@ -331,7 +331,7 @@ export class PwApp extends LitElement {
                     ? html`<li class="nav-item">
                         <a
                           @click=${async () => {
-                            await myFetch<"/api/v1/logout">("/api/v1/logout", {
+                            await myFetch<"/api/v1/logout">("/api/v1/logout", {}, {
                               method: "POST",
                               body: "{}",
                             });

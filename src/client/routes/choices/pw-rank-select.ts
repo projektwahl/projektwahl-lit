@@ -57,17 +57,13 @@ class PwRankSelect extends LitElement {
 
     this._task = new Task(this, async (args) => {
       const result = await myFetch<"/api/v1/choices/update">(
+        "POST",
         "/api/v1/choices/update",
         {
-          method: "POST",
-          headers: {
-            "content-type": "text/json",
-          },
-          body: JSON.stringify({
-            project_id: this.choice.id, // project id
-            rank: args === 0 ? null : args,
-          }),
-        }
+          project_id: this.choice.id, // project id
+          rank: args === 0 ? null : args,
+        },
+        {}
       );
 
       this.form.value?.dispatchEvent(

@@ -27,18 +27,29 @@ import jscookie from "js-cookie";
 import type { z } from "zod";
 
 export const myFetch = async <P extends keyof typeof routes>(
+  method: "GET"|"POST",
   url: P,
-  data: z.infer<typeof routes[P]["request"]>,
-  options: RequestInit | undefined
+  body: z.infer<typeof routes[P]["request"]>,
+  options: RequestInit
 ): Promise<ResponseType<P>> => {
   try {
-    const response = await fetch(`${url}?${encodeURIComponent(JSON.stringify(data))}`, {
+    const response = method === "GET" ? await fetch(`${url}?${encodeURIComponent(JSON.stringify(body))}`, {
       ...options,
       headers: {
-        ...options?.headers,
+        ...options.headers,
         "x-csrf-protection": "projektwahl",
       },
-    });
+      method,
+    }) : await fetch(url, {
+      ...options,
+      headers: {
+        ...options.headers,
+        "x-csrf-protection": "projektwahl",
+        "content-type": "text/json",
+      },
+      method,
+      body: JSON.stringify(body)
+    }) ;
     if (!response.ok) {
       if (response.status == 401) {
         // unauthorized

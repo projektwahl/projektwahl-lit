@@ -157,9 +157,8 @@ export class PwEntityList<
           console.log(JSON.stringify(formDataEvent.detail));
 
           const result = await myFetch<P>(
-            `${this.url}?${encodeURIComponent(
-              JSON.stringify(formDataEvent.detail)
-            )}`,
+            this.url,
+            formDataEvent.detail,
             {
               method: "GET",
             }
