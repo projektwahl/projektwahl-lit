@@ -41,6 +41,7 @@ export const taskFunction = async <
   url: URL,
   prefix: PREFIX
 ) => {
+  // TODO try https://github.com/colinhacks/zod/issues/153#issuecomment-863569536
   const schema: z.ZodObject<{[k in PREFIX]: typeof entityRoutes[P]["request"]}, "strip", z.ZodTypeAny, {[k in PREFIX]: z.infer<typeof entityRoutes[P]["request"]>}, {}> = z
     .object({
     }).setKey(prefix, entityRoutes[apiUrl].request);
