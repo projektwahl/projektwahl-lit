@@ -172,19 +172,19 @@
 </trans-unit>
 <trans-unit id="see65a67b4c57946c">
   <source>Minimum age</source>
-  <target>minimale Jahrgangsstufe</target>
+  <target state="translated">minimale Jahrgangsstufe</target>
 </trans-unit>
 <trans-unit id="s59417c8662ddc5f2">
   <source>Maximum age</source>
-  <target>maximale Jahrgangsstufe</target>
+  <target state="translated">maximale Jahrgangsstufe</target>
 </trans-unit>
 <trans-unit id="sa2b8f32796bda377">
   <source>Minimum participants</source>
-  <target>minimale Teilnehmer</target>
+  <target state="translated">mindestens teilnehmend</target>
 </trans-unit>
 <trans-unit id="s63fd8c3d71e20415">
   <source>Maximum participants</source>
-  <target>maximale Teilnehmer</target>
+  <target state="translated">höchstens teilnehmend</target>
 </trans-unit>
 <trans-unit id="s840d9c93fd926ecb">
   <source>Allow random assignments</source>
@@ -196,7 +196,7 @@
 </trans-unit>
 <trans-unit id="s7e3a936c4f113dd4">
   <source>Project leaders</source>
-  <target state="translated">Projektleitende</target>
+  <target state="translated">Projektleitung</target>
 </trans-unit>
 <trans-unit id="sea8d39886fdb9cf5">
   <source>Guaranteed project members</source>
