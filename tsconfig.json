@@ -15,7 +15,7 @@
     "strictNullChecks": true,
     "isolatedModules": true,
     "esModuleInterop": true,
-    "rootDir": "src/",
+    "rootDir": ".",
     "outDir": "dist/",
     "disableSizeLimit": true
   },
