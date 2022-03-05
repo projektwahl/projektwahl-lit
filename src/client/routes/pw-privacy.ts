@@ -123,7 +123,13 @@ export class PwPrivacy extends LitElement {
           href="https://eur-lex.europa.eu/legal-content/DE/TXT/HTML/?uri=CELEX:32016R0679&from=DE#d1e2370-1-1"
           >Artikel 14 Absatz 2f</a
         >
-        von der oben genannten Quelle aus dem Schülerstammverzeichnis.
+        von der oben genannten Quelle aus dem Schülerstammverzeichnis. Diese
+        werden in Einklang mit
+        <a
+          href="https://eur-lex.europa.eu/legal-content/DE/TXT/HTML/?uri=CELEX:32016R0679&from=DE#d1e2370-1-1"
+          >Artikel 14 Absatz 2a DSGVO</a
+        >
+        bis zum Ende der Projektwoche gespeichert.
 
         <h2 class="text-center">Weitere Daten</h2>
 
@@ -135,7 +141,8 @@ export class PwPrivacy extends LitElement {
         zu nennenden Zweck der Erstellung und Wahl von Projekten für die
         Projektwoche und die anschließende automatisierte Zuweisung zu Projekten
         verarbeitet:<br />
-        welches Projekt man ggf. leitet, gewählte Projekte, Daten in
+        welches Projekt man ggf. leitet, in welchem Projekt man ist, gewählte
+        Projekte (inklusive vergangene Änderungen), Daten in
         erstellten/geänderten Projekten (inklusive vergangene Änderungen), Daten
         in erstellten/geänderten Nutzern (inklusive vergangene Änderungen),
         Abwesenheit in Projektwoche, optionales
@@ -255,7 +262,9 @@ export class PwPrivacy extends LitElement {
           haben Sie das Recht, jederzeit gegen die Verarbeitung Sie betreffender
           personenbezogener Daten zu widersprechen.</strong
         ><br />
-        Mit Hetzner wurde ein Auftragsverarbeitungsvertrag nach
+        Mit dem Serverhoster
+        <a href="https://www.hetzner.com/de/">Hetzner</a> wurde ein
+        Auftragsverarbeitungsvertrag nach
         <a
           href="https://eur-lex.europa.eu/legal-content/DE/TXT/HTML/?uri=CELEX:32016R0679&from=DE#d1e3162-1-1"
           >Artikel 28 DSGVO</a
@@ -293,6 +302,10 @@ export class PwPrivacy extends LitElement {
               </li>
 
               <li>Die Festplatte des Servers ist verschlüsselt.</li>
+
+              <li>
+                Es werden regelmäßig Sicherheitskopien der Daten erstellt.
+              </li>
 
               <li>
                 Der Quellcode ist unter

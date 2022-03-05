@@ -129,6 +129,7 @@ const users = <
 ) =>
   s.pick({
     id: true,
+    openid_id: true,
     type: true,
     username: true,
     group: true,
@@ -247,6 +248,7 @@ export const routes = {
   "/api/v1/users/create": {
     request: rawUserSchema
       .pick({
+        openid_id: true,
         age: true,
         away: true,
         group: true,
@@ -262,6 +264,7 @@ export const routes = {
   "/api/v1/users/update": {
     request: rawUserSchema
       .pick({
+        openid_id: true,
         age: true,
         away: true,
         group: true,

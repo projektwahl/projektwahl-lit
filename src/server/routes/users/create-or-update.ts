@@ -48,13 +48,15 @@ export async function createUsersHandler(
       user,
       loggedInUser: Exclude<z.infer<typeof userSchema>, undefined>
     ) => {
-      return await sql`INSERT INTO users_with_deleted (username, password_hash, type, "group", age, away, deleted, last_updated_by) VALUES (${
+      return await sql`INSERT INTO users_with_deleted (username, openid_id, password_hash, type, "group", age, away, deleted, last_updated_by) VALUES (${
         user.username ?? null
-      }, ${user.password ? await hashPassword(user.password) : null}, ${
-        user.type ?? null
-      }, ${user.type === "voter" ? user.group ?? null : null}, ${
-        user.type === "voter" ? user.age ?? null : null
-      }, ${user.away ?? false}, ${user.deleted ?? false}, ${
+      }, ${user.openid_id ?? null}, ${
+        user.password ? await hashPassword(user.password) : null
+      }, ${user.type ?? null}, ${
+        user.type === "voter" ? user.group ?? null : null
+      }, ${user.type === "voter" ? user.age ?? null : null}, ${
+        user.away ?? false
+      }, ${user.deleted ?? false}, ${
         loggedInUser.id
       }) RETURNING id, project_leader_id, force_in_project_id;`;
     }
@@ -79,6 +81,7 @@ export async function updateUsersHandler(
 
       const finalQuery = sql2`UPDATE users_with_deleted SET
   ${field("username")},
+  ${field("openid_id")},
   password_hash = CASE WHEN ${!!user.password} THEN ${
         user.password ? await hashPassword(user.password) : null
       } ELSE password_hash END,

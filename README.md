@@ -63,7 +63,9 @@ NODE_ENV=development DATABASE_URL=postgres://projektwahl:projektwahl@projektwahl
 
 NODE_ENV=development DATABASE_URL=postgres://projektwahl:projektwahl@projektwahl/projektwahl DATABASE_HOST=projektwahl npm run evaluate
 
-NODE_ENV=development PORT=8443 BASE_URL=https://localhost:8443 DATABASE_URL=postgres://projektwahl:projektwahl@projektwahl/projektwahl DATABASE_HOST=projektwahl OPENID_URL=openid_url CLIENT_ID=client_id CLIENT_SECRET=secret CREDENTIALS_DIRECTORY=$PWD npm run server
+nano $CREDENTIALS_DIRECTORY/openid_client_secret
+
+NODE_ENV=development PORT=8443 BASE_URL=https://localhost:8443 DATABASE_URL=postgres://projektwahl:projektwahl@projektwahl/projektwahl DATABASE_HOST=projektwahl OPENID_URL=openid_url CLIENT_ID=client_id  CREDENTIALS_DIRECTORY=$PWD npm run server
 # or
 NODE_ENV=development PORT=8443 BASE_URL=https://localhost:8443 DATABASE_URL=postgres://projektwahl:projektwahl@projektwahl/projektwahl DATABASE_HOST=projektwahl CREDENTIALS_DIRECTORY=$PWD npm run server
 
@@ -86,9 +88,9 @@ See [SECURITY.md](SECURITY.md)
 
 ## Translation
 
-<a href="https://weblate.selfmade4u.de/engage/projektwahl/">
-<img src="https://weblate.selfmade4u.de/widgets/projektwahl/-/open-graph.png" alt="Translation status" />
-</a>
+Currently https://github.com/vslavik/poedit.
+
+Maybe https://github.com/mozilla/pontoon/ at some point.
 
 ## Browser support
 

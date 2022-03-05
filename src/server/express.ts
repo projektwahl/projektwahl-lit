@@ -96,14 +96,17 @@ export function requestHandler<P extends keyof typeof routes>(
           );
         }
 
-        const body: unknown =
-          request.method === "POST"
-            ? await json(request)
-            : JSON.parse(
-                decodeURIComponent(
-                  url.search == "" ? "{}" : url.search.substring(1)
-                )
-              ); // TODO FIXME if this throws
+        let body;
+
+        if (request.method === "POST") {
+          body = await json(request);
+        } else if (url.pathname !== "/api/v1/redirect") {
+          body = JSON.parse(
+            decodeURIComponent(
+              url.search == "" ? "{}" : url.search.substring(1)
+            )
+          ); // TODO FIXME if this throws
+        }
         const requestBody: ResponseType<P> =
           routes[path].request.safeParse(body);
         if (requestBody.success) {

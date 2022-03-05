@@ -66,7 +66,7 @@ export async function openidRedirectHandler(
 
     try {
       const result = await client.callback(
-        `${process.env.BASE_URL as string}/api/v1/redirect`,
+        `${process.env.BASE_URL as string}/redirect`,
         searchParams
       );
 
@@ -78,26 +78,20 @@ export async function openidRedirectHandler(
 
       //console.log(userinfo)
 
-      const pickFn = <
-        T extends { [k: string]: ZodTypeAny },
-        UnknownKeys extends UnknownKeysParam = "strip",
-        Catchall extends ZodTypeAny = ZodTypeAny
-      >(
-        s: ZodObject<T, UnknownKeys, Catchall>
-      ) =>
-        s.pick({
+      const dbUser = rawUserSchema
+        .pick({
           id: true,
           username: true,
-          password_hash: true,
-        });
-
-      const dbUser = pickFn(rawUserSchema).parse(
-        (
-          await sql`SELECT id, username, type FROM users WHERE openid_id = ${
-            result.claims().sub
-          } LIMIT 1`
-        )[0]
-      );
+          type: true,
+        })
+        .optional()
+        .parse(
+          (
+            await sql`SELECT id, username, type FROM users WHERE openid_id = ${
+              result.claims().email ?? null
+            } LIMIT 1`
+          )[0]
+        );
 
       if (dbUser === undefined) {
         const returnValue: [
@@ -125,19 +119,21 @@ export async function openidRedirectHandler(
       }
 
       /** @type {[Pick<import("../../../lib/types").RawSessionType, "session_id">]} */
-      const session = rawSessionType.parse(
-        (
-          await sql.begin("READ WRITE", async (sql) => {
-            return await sql`INSERT INTO sessions (user_id) VALUES (${dbUser.id}) RETURNING session_id`;
-          })
-        )[0]
-      );
+      const session = rawSessionType
+        .pick({
+          session_id: true,
+        })
+        .parse(
+          (
+            await sql.begin("READ WRITE", async (sql) => {
+              return await sql`INSERT INTO sessions (user_id) VALUES (${dbUser.id}) RETURNING session_id`;
+            })
+          )[0]
+        );
 
       /** @type {import("node:http2").OutgoingHttpHeaders} */
       const responseHeaders: import("node:http2").OutgoingHttpHeaders = {
         "content-type": "text/json; charset=utf-8",
-        ":status": 302,
-        location: "/",
         "set-cookie": [
           `strict_id=${
             session.session_id
@@ -146,7 +142,7 @@ export async function openidRedirectHandler(
           };`,
           `lax_id=${
             session.session_id
-          }; Secure; SameSite=Lax;  Path=/; HttpOnly; Max-Age=${48 * 60 * 60};`,
+          }; Secure; SameSite=Lax; Path=/; HttpOnly; Max-Age=${48 * 60 * 60};`,
           `username=${
             dbUser.username
           }; Secure; SameSite=Strict; Path=/; Max-Age=${48 * 60 * 60};`,
@@ -161,6 +157,7 @@ export async function openidRedirectHandler(
         },
       ];
     } catch (error) {
+      console.error(error);
       const returnValue: [
         OutgoingHttpHeaders,
         ResponseType<"/api/v1/redirect">

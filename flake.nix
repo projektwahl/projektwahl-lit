@@ -56,6 +56,8 @@ SPDX-FileCopyrightText: 2021 Moritz Hedtke <Moritz.Hedtke@t-online.de>
               pkgs.brotli
               pkgs.openssl
 
+              pkgs.poedit
+
               pkgs.geckodriver
               pkgs.chromedriver
 
