@@ -44,14 +44,12 @@ export const taskFunction = async <
   const schema: z.ZodObject<{[k in PREFIX]: typeof entityRoutes[P]["request"]}, "strip", z.ZodTypeAny, {[k in PREFIX]: typeof entityRoutes[P]["request"]}, {}> = z
     .object({
     }).setKey(prefix, entityRoutes[apiUrl].request);
-  const d = schema._output[prefix];
-  d.shape
-  const data: z.infer<z.ZodObject<{[k in PREFIX]: typeof entityRoutes[P]["request"]}, "strip", z.ZodTypeAny, {}, {}>> = schema.parse(
+  const data: z.infer<z.ZodObject<{[k in PREFIX]: typeof entityRoutes[P]["request"]}, "strip", z.ZodTypeAny, {[k in PREFIX]: typeof entityRoutes[P]["request"]}, {}>> = schema.parse(
       JSON.parse(
         decodeURIComponent(url.search == "" ? "{}" : url.search.substring(1))
       )
     );
-  const a: z.infer<z.ZodObject<{[k in PREFIX]: typeof entityRoutes[P]["request"]}, "strip", z.ZodTypeAny, {}, {}>>[PREFIX] = data[prefix];
+  const a: z.infer<z.ZodObject<{[k in PREFIX]: typeof entityRoutes[P]["request"]}, "strip", z.ZodTypeAny, {[k in PREFIX]: typeof entityRoutes[P]["request"]}, {}>>[PREFIX] = data[prefix];
   const result = await myFetch<P>("GET", apiUrl, a, {});
   return result;
 };
