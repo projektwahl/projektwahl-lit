@@ -32,7 +32,6 @@ import { usersHandler } from "./routes/users/index.js";
 import { openidLoginHandler } from "./routes/login/openid-login.js";
 import { openidRedirectHandler } from "./routes/login/redirect.js";
 import { extname, relative } from "path/posix";
-import { z } from "zod";
 import {
   createProjectsHandler,
   updateProjectsHandler,
@@ -47,6 +46,108 @@ import type { Http2ServerResponse } from "node:http2";
 import type { MyRequest } from "./express.js";
 import { choicesHandler } from "./routes/choices/index.js";
 import { updateChoiceHandler } from "./routes/choices/create-or-update.js";
+import { z, ZodIssueCode, ZodIssueOptionalMessage } from "zod";
+
+// https://github.com/colinhacks/zod/blob/master/src/ZodError.ts
+type ErrorMapCtx = {
+  defaultError: string;
+  data: any;
+};
+
+export function assertNever(_x: never): never {
+  throw new Error();
+}
+
+const myErrorMap: z.ZodErrorMap = (
+  issue: ZodIssueOptionalMessage,
+  _ctx: ErrorMapCtx
+): { message: string } => {
+  let message: string;
+  switch (issue.code) {
+    case ZodIssueCode.invalid_type:
+      if (issue.received === "undefined") {
+        message = "Pflichtfeld";
+      } else {
+        message = `Erwarte ${issue.expected}, aber ${issue.received} bekommen`;
+      }
+      break;
+    case ZodIssueCode.unrecognized_keys:
+      message = `Unbekannte Schlüssel: ${issue.keys
+        .map((k) => `'${k}'`)
+        .join(", ")}`;
+      break;
+    case ZodIssueCode.invalid_union:
+      message = `Ungültige Eingabe`;
+      break;
+    case ZodIssueCode.invalid_union_discriminator:
+      message = `Ungültiger Unterscheidungswert. Erwarte ${issue.options
+        .map((val) => (typeof val === "string" ? `'${val}'` : val))
+        .join(" | ")}`;
+      break;
+    case ZodIssueCode.invalid_enum_value:
+      message = `Ungültiger Auswahlwert. Erwarte ${issue.options
+        .map((val) => (typeof val === "string" ? `'${val}'` : val))
+        .join(" | ")}`;
+      break;
+    case ZodIssueCode.invalid_arguments:
+      message = `Ungültige Funktionargumente`;
+      break;
+    case ZodIssueCode.invalid_return_type:
+      message = `Ungültiger Funktionsrückgabewert`;
+      break;
+    case ZodIssueCode.invalid_date:
+      message = `Ungültiges Datum`;
+      break;
+    case ZodIssueCode.invalid_string:
+      if (issue.validation !== "regex") message = `Ungültig ${issue.validation}`;
+      else message = "Ungültig";
+      break;
+    case ZodIssueCode.too_small:
+      if (issue.type === "array")
+        message = `Liste muss ${
+          issue.inclusive ? `mindestens` : `mehr als`
+        } ${issue.minimum} Element enthalten`;
+      else if (issue.type === "string")
+        message = `Text muss ${
+          issue.inclusive ? `mindestens` : `mehr als`
+        } ${issue.minimum} Zeichen haben`;
+      else if (issue.type === "number")
+        message = `Zahl muss größer ${
+          issue.inclusive ? ` gleich` : ``
+        }${issue.minimum} sein`;
+      else message = "Ungültige Eingabe";
+      break;
+    case ZodIssueCode.too_big:
+      if (issue.type === "array")
+        message = `Liste muss ${
+          issue.inclusive ? `höchstens` : `weniger als`
+        } ${issue.maximum} Elemente enthalten`;
+      else if (issue.type === "string")
+        message = `Text muss ${
+          issue.inclusive ? `höchstens` : `weniger als`
+        } ${issue.maximum} Zeichen haben`;
+      else if (issue.type === "number")
+        message = `Zahl muss kleiner ${
+          issue.inclusive ? ` gleich` : ``
+        }${issue.maximum} sein`;
+      else message = "Ungültige Eingabe";
+      break;
+    case ZodIssueCode.custom:
+      message = `Ungültige Eingabe`;
+      break;
+    case ZodIssueCode.invalid_intersection_types:
+      message = `Werte konnten nicht kombiniert werden`;
+      break;
+    case ZodIssueCode.not_multiple_of:
+      message = `Zahl muss ein Vielfaches von ${issue.multipleOf} sein`;
+      break;
+    default:
+      message = _ctx.defaultError;
+      assertNever(issue);
+  }
+  return { message };
+};
+z.setErrorMap(myErrorMap);
 
 //const startTime = Date.now();
 
