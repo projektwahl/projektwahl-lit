@@ -124,9 +124,7 @@ class PwUserCreate extends PwForm<
 
       const result = await myFetch<
         "/api/v1/users/create" | "/api/v1/users/update"
-      >("POST", this.uri,formDataEvent.detail, {
-      
-      });
+      >("POST", this.uri, formDataEvent.detail, {});
 
       if (result.success) {
         HistoryController.goto(new URL("/", window.location.href), {});
@@ -189,8 +187,7 @@ class PwUserCreate extends PwForm<
                 >({
                   type: "select",
                   disabled: this.disabled,
-                  onchange: (event: Event) =>
-                    (this.type = (event.target).value),
+                  onchange: (event: Event) => (this.type = event.target.value),
                   label: msg("User type"),
                   name: ["type"],
                   options: [

@@ -78,9 +78,7 @@ class PwProjectUserCheckbox extends LitElement {
           [this.name]:
             this.user[this.name] === this.projectId ? null : this.projectId,
         },
-        {
-          
-        }
+        {}
       );
 
       this.input.value?.dispatchEvent(

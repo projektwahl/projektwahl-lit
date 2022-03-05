@@ -138,9 +138,7 @@ export const PwProjectCreate = setupHmr(
 
         const result = await myFetch<
           "/api/v1/projects/create" | "/api/v1/projects/update"
-        >("POST", this.url, formDataEvent.detail, {
-          
-        });
+        >("POST", this.url, formDataEvent.detail, {});
 
         if (result.success) {
           HistoryController.goto(new URL("/", window.location.href), {});

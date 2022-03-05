@@ -182,14 +182,7 @@ const baseQuery = <
       paginationCursor: s.partial().nullish(), // if this is null the start is at start/end depending on paginationDirection
       filters: s.partial(),
       sorting: z
-        .array(
-          z.tuple([
-            z.enum(
-              Object.keys(s.shape)
-            ),
-            z.enum(["ASC", "DESC"]),
-          ])
-        )
+        .array(z.tuple([z.enum(Object.keys(s.shape)), z.enum(["ASC", "DESC"])]))
         .default([]),
       paginationLimit: z.number().default(100),
     })

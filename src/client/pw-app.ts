@@ -235,12 +235,11 @@ export class PwApp extends LitElement {
 
       this._apiTask = new Task(this, {
         task: this.nextPage,
-        args: () =>
-          [
-            Object.keys(pages).find((k) =>
-              new RegExp(k).test(this.history.url.pathname)
-            ),
-          ],
+        args: () => [
+          Object.keys(pages).find((k) =>
+            new RegExp(k).test(this.history.url.pathname)
+          ),
+        ],
         initialStatus:
           this.initial !== undefined ? TaskStatus.COMPLETE : TaskStatus.INITIAL,
         initialValue: this.initial,
@@ -331,8 +330,12 @@ export class PwApp extends LitElement {
                     ? html`<li class="nav-item">
                         <a
                           @click=${async () => {
-                            await myFetch<"/api/v1/logout">("POST", "/api/v1/logout", {}, {
-                            });
+                            await myFetch<"/api/v1/logout">(
+                              "POST",
+                              "/api/v1/logout",
+                              {},
+                              {}
+                            );
 
                             const bc = new BroadcastChannel("updateloginstate");
                             bc.postMessage("logout");

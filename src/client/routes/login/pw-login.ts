@@ -56,9 +56,12 @@ class PwLogin extends PwForm<"/api/v1/login"> {
       });
       this.form.value?.dispatchEvent(formDataEvent);
 
-      const result = await myFetch<"/api/v1/login">("POST", "/api/v1/login", formDataEvent.detail, {
-       
-      });
+      const result = await myFetch<"/api/v1/login">(
+        "POST",
+        "/api/v1/login",
+        formDataEvent.detail,
+        {}
+      );
 
       if (result.success) {
         const bc = new BroadcastChannel("updateloginstate");

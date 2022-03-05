@@ -54,20 +54,17 @@ class PwRedirect extends PwForm<"/api/v1/redirect"> {
       this.form.value?.dispatchEvent(formDataEvent);
 
       const searchParams = z
-      .object({
-        session_state: z.string(),
-        code: z.string(),
-      })
-      .parse(
-        Object.fromEntries(
-          new URL(window.location.href).searchParams
-        )
-      );
+        .object({
+          session_state: z.string(),
+          code: z.string(),
+        })
+        .parse(Object.fromEntries(new URL(window.location.href).searchParams));
 
-      const result = await myFetch<"/api/v1/redirect">("GET",
-        `/api/v1/redirect`, searchParams,
-        {
-        }
+      const result = await myFetch<"/api/v1/redirect">(
+        "GET",
+        `/api/v1/redirect`,
+        searchParams,
+        {}
       );
 
       if (result.success) {

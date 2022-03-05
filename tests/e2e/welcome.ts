@@ -84,7 +84,7 @@ export async function main() {
     });*/
 
     if (!process.env.BASE_URL) {
-      throw new Error("BASE_URL not set!")
+      throw new Error("BASE_URL not set!");
     }
 
     await driver.get(process.env.BASE_URL);

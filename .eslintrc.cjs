@@ -36,8 +36,11 @@ module.exports = {
   },
   rules: {
     "@typescript-eslint/no-unused-vars": ["error", { varsIgnorePattern: "^_" }],
-    "@typescript-eslint/consistent-type-assertions": ["error", { assertionStyle: "never" }],
-    "@typescript-eslint/no-non-null-assertion": "error"
+    "@typescript-eslint/consistent-type-assertions": [
+      "error",
+      { assertionStyle: "never" },
+    ],
+    "@typescript-eslint/no-non-null-assertion": "error",
   },
   extends: [
     "eslint:recommended",

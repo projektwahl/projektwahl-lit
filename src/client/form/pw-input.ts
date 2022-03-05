@@ -168,35 +168,27 @@ export class PwInput<
       set(
         event.detail,
         this.name,
-        (this.input.value).value === ""
+        this.input.value.value === ""
           ? this.defaultValue
-          : (this.input.value).valueAsNumber
+          : this.input.value.valueAsNumber
       );
     } else if (this.type === "checkbox") {
       set(
         event.detail,
         this.name,
-        (this.input.value).checked
-          ? this.value
-          : this.defaultValue
+        this.input.value.checked ? this.value : this.defaultValue
       );
     } else if (this.type === "select") {
       set(
         event.detail,
         this.name,
-        (this.input.value).selectedIndex == -1
+        this.input.value.selectedIndex == -1
           ? this.defaultValue
-          : this.options?.find(
-              (v) => v.value == (this.input.value).value
-            )?.value // To make numbers work
+          : this.options?.find((v) => v.value == this.input.value.value)?.value // To make numbers work
       );
     } else {
-      const val = (this.input.value).value;
-      set(
-        event.detail,
-        this.name,
-        val === "" ? this.defaultValue : val
-      );
+      const val = this.input.value.value;
+      set(event.detail, this.name, val === "" ? this.defaultValue : val);
     }
   };
 
@@ -264,11 +256,11 @@ export class PwInput<
           autocomplete=${ifDefined(this.autocomplete)}
           ?disabled=${
             this.disabled ||
-            (this.task.render({
+            this.task.render({
               complete: () => false,
               pending: () => true,
               initial: () => false,
-            }))
+            })
           }
         >
           ${
@@ -278,8 +270,7 @@ export class PwInput<
                   (o) => o.value,
                   (o) =>
                     html`<option
-                      ?selected=${get(this.initial, this.name) ===
-                      o.value}
+                      ?selected=${get(this.initial, this.name) === o.value}
                       value=${o.value}
                     >
                       ${o.text}

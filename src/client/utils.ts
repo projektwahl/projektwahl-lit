@@ -27,29 +27,32 @@ import jscookie from "js-cookie";
 import type { z } from "zod";
 
 export const myFetch = async <P extends keyof typeof routes>(
-  method: "GET"|"POST",
+  method: "GET" | "POST",
   url: P,
   body: z.infer<typeof routes[P]["request"]>,
   options: RequestInit
 ): Promise<ResponseType<P>> => {
   try {
-    const response = method === "GET" ? await fetch(`${url}?${encodeURIComponent(JSON.stringify(body))}`, {
-      ...options,
-      headers: {
-        ...options.headers,
-        "x-csrf-protection": "projektwahl",
-      },
-      method,
-    }) : await fetch(url, {
-      ...options,
-      headers: {
-        ...options.headers,
-        "x-csrf-protection": "projektwahl",
-        "content-type": "text/json",
-      },
-      method,
-      body: JSON.stringify(body)
-    }) ;
+    const response =
+      method === "GET"
+        ? await fetch(`${url}?${encodeURIComponent(JSON.stringify(body))}`, {
+            ...options,
+            headers: {
+              ...options.headers,
+              "x-csrf-protection": "projektwahl",
+            },
+            method,
+          })
+        : await fetch(url, {
+            ...options,
+            headers: {
+              ...options.headers,
+              "x-csrf-protection": "projektwahl",
+              "content-type": "text/json",
+            },
+            method,
+            body: JSON.stringify(body),
+          });
     if (!response.ok) {
       if (response.status == 401) {
         // unauthorized
@@ -90,9 +93,11 @@ export const myFetch = async <P extends keyof typeof routes>(
         return r;
       }
     }
-    const a: typeof routes[P] = routes[url]
+    const a: typeof routes[P] = routes[url];
     const b: typeof routes[P]["response"] = a.response;
-    const c: z.SafeParseSuccess<z.infer<typeof routes[P]["response"]>> | MinimalSafeParseError = b.safeParse(await response.json());
+    const c:
+      | z.SafeParseSuccess<z.infer<typeof routes[P]["response"]>>
+      | MinimalSafeParseError = b.safeParse(await response.json());
     return c;
   } catch (error) {
     console.error(error);

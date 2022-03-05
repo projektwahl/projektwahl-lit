@@ -33,23 +33,25 @@ import { ifDefined } from "lit/directives/if-defined.js";
 import { myFetch } from "../utils.js";
 import { pwInput } from "../form/pw-input.js";
 
-export const taskFunction = async <P extends keyof typeof entityRoutes, PREFIX extends string>(
+export const taskFunction = async <
+  P extends keyof typeof entityRoutes,
+  PREFIX extends string
+>(
   apiUrl: P,
   url: URL,
   prefix: PREFIX
 ) => {
   // TODO FIXME the type of this does not contain PREFIX
-  const data = z.object({
-    [prefix]: entityRoutes[apiUrl].request
-  }).parse(JSON.parse(
-    decodeURIComponent(url.search == "" ? "{}" : url.search.substring(1))
-  ));
-  const result = await myFetch<P>(
-    "GET",
-    apiUrl,
-    data[prefix] ?? {},
-    {}
-  );
+  const data = z
+    .object({
+      [prefix]: entityRoutes[apiUrl].request,
+    })
+    .parse(
+      JSON.parse(
+        decodeURIComponent(url.search == "" ? "{}" : url.search.substring(1))
+      )
+    );
+  const result = await myFetch<P>("GET", apiUrl, data[prefix] ?? {}, {});
   return result;
 };
 
@@ -147,9 +149,7 @@ export class PwEntityList<
             z.infer<typeof entityRoutes[P]["request"]>
           >("myformdata", {
             bubbles: false,
-            detail:
-              data[this.prefix] ??
-              ({}),
+            detail: data[this.prefix] ?? {},
           });
           this.form.value?.dispatchEvent(formDataEvent);
 
@@ -159,8 +159,7 @@ export class PwEntityList<
             "GET",
             this.url,
             formDataEvent.detail,
-            {
-            }
+            {}
           );
 
           HistoryController.goto(

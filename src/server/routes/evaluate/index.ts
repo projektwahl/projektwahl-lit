@@ -240,7 +240,7 @@ for (const groupedChoice of Object.entries(choicesGroupedByUser)) {
         `choice_${choice.user_id}_${choice.project_id}`,
       ]),
       ...(sortedIndexBy(users, { id: groupedChoice[0] }, (u) => u.id)
-        ? ([[1, `project_leader_${groupedChoice[0]}`]])
+        ? [[1, `project_leader_${groupedChoice[0]}`]]
         : []),
     ],
     1

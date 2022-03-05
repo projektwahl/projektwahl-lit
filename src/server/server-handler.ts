@@ -216,9 +216,7 @@ export async function serverHandler(
 
           const url = relative(baseUrl, join(f, event.filename));
 
-          (
-            response.write
-          )(`data: ${url}\n\n`);
+          response.write(`data: ${url}\n\n`);
         }
       })();
     }

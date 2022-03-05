@@ -116,11 +116,7 @@ export function sql2(
         previous[0].raw.slice(-1)[0] + current[0].raw[0],
         ...current[0].raw.slice(1),
       ];
-      return [
-        templateStrings,
-        ...previous.slice(1),
-        ...current.slice(1),
-      ];
+      return [templateStrings, ...previous.slice(1), ...current.slice(1)];
     },
     [r]
   );
