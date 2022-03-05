@@ -22,7 +22,7 @@ SPDX-FileCopyrightText: 2021 Moritz Hedtke <Moritz.Hedtke@t-online.de>
 */
 
 //import { ZodIssueCode } from "zod";
-import type { ResponseType, routes } from "../lib/routes";
+import { MinimalSafeParseError, ResponseType, routes } from "../lib/routes";
 import jscookie from "js-cookie";
 import type { z } from "zod";
 
@@ -32,7 +32,7 @@ export const myFetch = async <P extends keyof typeof routes>(
   options: RequestInit | undefined
 ): Promise<ResponseType<P>> => {
   try {
-    const response = await fetch(url.toString(), {
+    const response = await fetch(`${url}?${encodeURIComponent(JSON.stringify(data))}`, {
       ...options,
       headers: {
         ...options?.headers,
@@ -79,8 +79,10 @@ export const myFetch = async <P extends keyof typeof routes>(
         return r;
       }
     }
-    const result = (await response.json());
-    return result;
+    const a: typeof routes[P] = routes[url]
+    const b: typeof routes[P]["response"] = a.response;
+    const c: z.SafeParseSuccess<z.infer<typeof routes[P]["response"]>> | MinimalSafeParseError = b.safeParse(await response.json());
+    return c;
   } catch (error) {
     console.error(error);
     if (error instanceof TypeError) {
