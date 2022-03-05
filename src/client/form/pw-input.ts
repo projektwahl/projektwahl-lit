@@ -167,34 +167,34 @@ export class PwInput<
     if (this.type === "number") {
       set(
         event.detail,
-        this.name as string[],
-        (this.input.value as HTMLInputElement).value === ""
+        this.name,
+        (this.input.value).value === ""
           ? this.defaultValue
-          : (this.input.value as HTMLInputElement).valueAsNumber
+          : (this.input.value).valueAsNumber
       );
     } else if (this.type === "checkbox") {
       set(
         event.detail,
-        this.name as string[],
-        (this.input.value as HTMLInputElement).checked
+        this.name,
+        (this.input.value).checked
           ? this.value
           : this.defaultValue
       );
     } else if (this.type === "select") {
       set(
         event.detail,
-        this.name as string[],
-        (this.input.value as HTMLSelectElement).selectedIndex == -1
+        this.name,
+        (this.input.value).selectedIndex == -1
           ? this.defaultValue
           : this.options?.find(
-              (v) => v.value == (this.input.value as HTMLInputElement).value
+              (v) => v.value == (this.input.value).value
             )?.value // To make numbers work
       );
     } else {
-      const val = (this.input.value as HTMLInputElement).value;
+      const val = (this.input.value).value;
       set(
         event.detail,
-        this.name as string[],
+        this.name,
         val === "" ? this.defaultValue : val
       );
     }
@@ -243,8 +243,8 @@ export class PwInput<
             );
           }}
           type=${this.type}
-          value=${ifDefined(get(this.initial, this.name as string[]))}
-          ?checked=${get(this.initial, this.name as string[])}
+          value=${ifDefined(get(this.initial, this.name))}
+          ?checked=${get(this.initial, this.name)}
           class="${
             this.type === "checkbox" ? "form-check-input" : "form-control"
           } ${this.task.render({
@@ -278,7 +278,7 @@ export class PwInput<
                   (o) => o.value,
                   (o) =>
                     html`<option
-                      ?selected=${get(this.initial, this.name as string[]) ===
+                      ?selected=${get(this.initial, this.name) ===
                       o.value}
                       value=${o.value}
                     >

@@ -117,7 +117,7 @@ export function sql2(
         ...current[0].raw.slice(1),
       ];
       return [
-        templateStrings as TemplateStringsArray,
+        templateStrings,
         ...previous.slice(1),
         ...current.slice(1),
       ];

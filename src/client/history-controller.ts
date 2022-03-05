@@ -45,7 +45,7 @@ export class HistoryController implements ReactiveController {
 
     this.url = new URL(window.location.href);
 
-    this.state = window.history?.state as HistoryState;
+    this.state = window.history?.state;
 
     this.navigateListener = (event) => {
       this.url = event.detail.url;
@@ -57,7 +57,7 @@ export class HistoryController implements ReactiveController {
   }
   hostConnected() {
     this.url = new URL(window.location.href);
-    this.state = window.history.state as HistoryState;
+    this.state = window.history.state;
 
     window.addEventListener("navigate", this.navigateListener);
   }
