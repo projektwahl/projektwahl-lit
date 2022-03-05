@@ -217,10 +217,7 @@ export async function serverHandler(
           const url = relative(baseUrl, join(f, event.filename));
 
           (
-            response.write as (
-              chunk: string | Uint8Array,
-              callback?: ((err: Error) => void) | undefined
-            ) => boolean
+            response.write
           )(`data: ${url}\n\n`);
         }
       })();
