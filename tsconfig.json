@@ -19,5 +19,5 @@
     "outDir": "dist/",
     "disableSizeLimit": true
   },
-  "include": ["src/**/*.ts"]
+  "include": ["src/**/*.ts", "tests/**/*.ts", "stacktrace-source-map.js"]
 }
