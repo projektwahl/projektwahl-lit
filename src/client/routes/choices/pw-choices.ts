@@ -26,11 +26,9 @@ import { html } from "lit";
 import { noChange } from "lit";
 import { aClick } from "../../pw-a.js";
 import { msg } from "@lit/localize";
-import { PwEntityList, taskFunction } from "../../entity-list/pw-entitylist.js";
+import { parseRequestWithPrefix, PwEntityList, taskFunction } from "../../entity-list/pw-entitylist.js";
 import { pwOrder } from "../../entity-list/pw-order.js";
 import { pwInput } from "../../form/pw-input.js";
-import type { routes } from "../../../lib/routes.js";
-import type { z } from "zod";
 import { animate } from "@lit-labs/motion";
 import { repeat } from "lit/directives/repeat.js";
 
@@ -58,16 +56,9 @@ class PwChoices<X extends string> extends PwEntityList<"/api/v1/choices", X> {
 
   override get head() {
     try {
-      const search: {
-        [key in X]: z.infer<typeof routes["/api/v1/choices"]["request"]>;
-      } = JSON.parse(
-        decodeURIComponent(
-          this.history.url.search == ""
-            ? "{}"
-            : this.history.url.search.substring(1)
-        )
-      );
-      const initial = search[this.prefix];
+      const data = parseRequestWithPrefix(this.url, this.prefix, this.history.url)
+
+      const initial = data[this.prefix];
 
       return html`
         <tr>
@@ -144,7 +135,6 @@ class PwChoices<X extends string> extends PwEntityList<"/api/v1/choices", X> {
     }
   }
   override get body() {
-    const disabled = false;
     return html`
       ${this._task.render({
         pending: () => {

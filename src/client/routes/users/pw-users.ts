@@ -25,12 +25,10 @@ import { html } from "lit";
 import { noChange } from "lit";
 import { aClick } from "../../pw-a.js";
 import { msg } from "@lit/localize";
-import { PwEntityList } from "../../entity-list/pw-entitylist.js";
+import { parseRequestWithPrefix, PwEntityList } from "../../entity-list/pw-entitylist.js";
 import { pwOrder } from "../../entity-list/pw-order.js";
 import { pwInput } from "../../form/pw-input.js";
-import type { routes } from "../../../lib/routes.js";
 import { taskFunction } from "../../entity-list/pw-entitylist.js";
-import type { z } from "zod";
 
 export const pwUsers = async (url: URL) => {
   const result = await taskFunction("/api/v1/users", url, "users");
@@ -72,17 +70,9 @@ export class PwUsers<X extends string> extends PwEntityList<
 
   override get head() {
     try {
-      // TODO FIXME deduplicate
-      const search: {
-        [key in X]: z.infer<typeof routes["/api/v1/users"]["request"]>;
-      } = JSON.parse(
-        decodeURIComponent(
-          this.history.url.search == ""
-            ? "{}"
-            : this.history.url.search.substring(1)
-        )
-      );
-      const initial = search[this.prefix];
+      const data = parseRequestWithPrefix(this.url, this.prefix, this.history.url)
+
+      const initial = data[this.prefix];
 
       return html`<tr>
           <th class="table-cell-hover p-0" scope="col">

@@ -32,9 +32,7 @@ import { setupHmr } from "../../hmr.js";
 import { aClick } from "../../pw-a.js";
 import { pwOrder } from "../../entity-list/pw-order.js";
 import { pwInput } from "../../form/pw-input.js";
-import type { routes } from "../../../lib/routes.js";
-import type { z } from "zod";
-import { taskFunction } from "../../entity-list/pw-entitylist.js";
+import { parseRequestWithPrefix, taskFunction } from "../../entity-list/pw-entitylist.js";
 
 export const pwProjectUsers = async (url: URL, prefix: string) => {
   const result = await taskFunction("/api/v1/users", url, prefix);
@@ -65,18 +63,9 @@ export const PwProjectUsers = setupHmr(
 
     override get head() {
       try {
-        // TODO FIXME this use of any / untyped makes lots of problems
-        // We need some client-side routing that stores the query parameters
-        const search: {
-          [key in X]: z.infer<typeof routes["/api/v1/users"]["request"]>;
-        } = JSON.parse(
-          decodeURIComponent(
-            this.history.url.search == ""
-              ? "{}"
-              : this.history.url.search.substring(1)
-          )
-        );
-        const initial = search[this.prefix];
+        const data = parseRequestWithPrefix(this.url, this.prefix, this.history.url)
+
+        const initial = data[this.prefix];
 
         return html`<tr>
             <th class="table-cell-hover" scope="col">${msg(html`&#x2713;`)}</th>
