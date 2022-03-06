@@ -173,14 +173,14 @@ export const PwProjectCreate = setupHmr(
                     await this._task.run();
                   }}
                 >
-                  ${pwInput<
-                    "/api/v1/projects/create" | "/api/v1/projects/update",
-                    ["title"]
-                  >({
+                  ${pwInput({
+                    url: this.url,
                     type: "text",
                     disabled: this.disabled,
                     label: msg("Title"),
                     name: ["title"],
+                    get: o => o.title,
+                    set: (o, v) => o.title = v,
                     task: this._task,
                     initial: this.initial?.data,
                   })}
@@ -195,95 +195,95 @@ export const PwProjectCreate = setupHmr(
                     task: this._task,
                     initial: this.initial?.data,
                   })}
-                  ${pwInput<
-                    "/api/v1/projects/create" | "/api/v1/projects/update",
-                    ["place"]
-                  >({
+                  ${pwInput({
+                    url: this.url,
                     type: "text",
                     disabled: this.disabled,
                     label: msg("Place"),
                     name: ["place"],
+                    get: o => o.place,
+                    set: (o, v) => o.place = v,
                     task: this._task,
                     initial: this.initial?.data,
                   })}
-                  ${pwInput<
-                    "/api/v1/projects/create" | "/api/v1/projects/update",
-                    ["costs"]
-                  >({
+                  ${pwInput({
+                    url: this.url,
                     type: "number",
                     disabled: this.disabled,
                     label: msg("Costs"),
                     name: ["costs"],
+                    get: o => o.costs,
+                    set: (o, v) => o.costs = v,
                     task: this._task,
                     initial: this.initial?.data,
                   })}
-                  ${pwInput<
-                    "/api/v1/projects/create" | "/api/v1/projects/update",
-                    ["min_age"]
-                  >({
+                  ${pwInput({
+                    url: this.url,
                     type: "number",
                     disabled: this.disabled,
                     label: msg("Minimum age"),
                     name: ["min_age"],
+                    get: o => o.min_age,
+                    set: (o, v) => o.min_age = v,
                     task: this._task,
                     initial: this.initial?.data,
                   })}
-                  ${pwInput<
-                    "/api/v1/projects/create" | "/api/v1/projects/update",
-                    ["max_age"]
-                  >({
+                  ${pwInput({
+                    url: this.url,
                     type: "number",
                     disabled: this.disabled,
                     label: msg("Maximum age"),
                     name: ["max_age"],
+                    get: o => o.max_age,
+                    set: (o, v) => o.max_age = v,
                     task: this._task,
                     initial: this.initial?.data,
                   })}
-                  ${pwInput<
-                    "/api/v1/projects/create" | "/api/v1/projects/update",
-                    ["min_participants"]
-                  >({
+                  ${pwInput({
+                    url: this.url,
                     type: "number",
                     disabled: this.disabled,
                     label: msg("Minimum participants"),
                     name: ["min_participants"],
+                    get: o => o.min_participants,
+                    set: (o, v) => o.min_participants = v,
                     task: this._task,
                     initial: this.initial?.data,
                   })}
-                  ${pwInput<
-                    "/api/v1/projects/create" | "/api/v1/projects/update",
-                    ["max_participants"]
-                  >({
+                  ${pwInput({
+                    url: this.url,
                     type: "number",
                     disabled: this.disabled,
                     label: msg("Maximum participants"),
                     name: ["max_participants"],
+                    get: o => o.max_participants,
+                    set: (o, v) => o.max_participants = v,
                     task: this._task,
                     initial: this.initial?.data,
                   })}
-                  ${pwInput<
-                    "/api/v1/projects/create" | "/api/v1/projects/update",
-                    ["random_assignments"]
-                  >({
+                  ${pwInput({
+                    url: this.url,
                     type: "checkbox",
                     value: true,
                     defaultValue: false,
                     disabled: this.disabled,
                     label: msg("Allow random assignments"),
                     name: ["random_assignments"],
+                    get: o => o.random_assignments,
+                    set: (o, v) => o.random_assignments = v,
                     task: this._task,
                     initial: this.initial?.data,
                   })}
-                  ${pwInput<
-                    "/api/v1/projects/create" | "/api/v1/projects/update",
-                    ["deleted"]
-                  >({
+                  ${pwInput({
+                    url: this.url,
                     type: "checkbox",
                     value: true,
                     defaultValue: false,
                     disabled: this.disabled,
                     label: msg("Mark this project as deleted"),
                     name: ["deleted"],
+                    get: o => o.deleted,
+                    set: (o, v) => o.deleted = v,
                     task: this._task,
                     initial: this.initial?.data,
                   })}

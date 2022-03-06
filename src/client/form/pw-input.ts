@@ -34,11 +34,9 @@ import type { Task } from "@dev.mohe/task";
 // workaround see https://github.com/runem/lit-analyzer/issues/149#issuecomment-1006162839
 export function pwInput<
   P extends keyof typeof routes,
-  R,
-  G extends (o: z.infer<typeof routes[P]["request"]>) => R,
 >(
   props: Pick<
-    PwInput<P, G>,
+    PwInput<P>,
     | "type"
     | "autocomplete"
     | "disabled"
@@ -92,9 +90,7 @@ export function pwInput<
 }
 
 export class PwInput<
-  P extends keyof typeof routes,
-  R,
-  G extends (o: z.infer<typeof routes[P]["request"]>) => R,
+P extends keyof typeof routes,
 > extends LitElement {
   static override get properties() {
     return {
@@ -125,9 +121,9 @@ export class PwInput<
   // these three here are just plain-up terrible but the typings for paths are equally bad
   name!: string[];
 
-  get!: G;
+  get!: (o: z.infer<typeof routes[P]["request"]>) => number|string|undefined;
 
-  set!: (o: z.infer<typeof routes[P]["request"]>, v: R) => void;
+  set!: (o: z.infer<typeof routes[P]["request"]>, v: any) => void;
 
   disabled?: boolean = false;
 
@@ -143,16 +139,16 @@ export class PwInput<
 
   initial?: z.infer<typeof routes[P]["request"]>;
 
-  value?: V;
+  value?: number|string;
 
   input: import("lit/directives/ref").Ref<HTMLElement>;
 
   form!: HTMLFormElement;
 
   // z.infer<typeof routes[P]["request"]>[Q]
-  options?: { value: V; text: string }[];
+  options?: { value: number|string; text: string }[];
 
-  defaultValue?: V;
+  defaultValue?: number|string;
 
   constructor() {
     super();
@@ -161,8 +157,6 @@ export class PwInput<
     this.type = "text";
 
     this.input = createRef();
-
-    this.defaultValue = null;
   }
 
   // because forms in shadow root are garbage
