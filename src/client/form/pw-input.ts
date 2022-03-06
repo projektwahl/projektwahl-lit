@@ -29,16 +29,16 @@ import { createRef, ref } from "lit/directives/ref.js";
 import { repeat } from "lit/directives/repeat.js";
 import type { routes, ResponseType } from "../../lib/routes.js";
 import type { z } from "zod";
-import type { Path } from "../utils.js";
 import type { Task } from "@dev.mohe/task";
 
 // workaround see https://github.com/runem/lit-analyzer/issues/149#issuecomment-1006162839
 export function pwInput<
   P extends keyof typeof routes,
-  V,
+  R,
+  G extends (o: z.infer<typeof routes[P]["request"]>) => R,
 >(
   props: Pick<
-    PwInput<P, V>,
+    PwInput<P, G>,
     | "type"
     | "autocomplete"
     | "disabled"
@@ -52,8 +52,7 @@ export function pwInput<
     | "task"
     | "defaultValue"
     | "value"
-  > &
-    Partial<Pick<PwInput<P, V>, "onchange">>
+  >
 ) {
   const {
     onchange,
@@ -94,7 +93,8 @@ export function pwInput<
 
 export class PwInput<
   P extends keyof typeof routes,
-  V,
+  R,
+  G extends (o: z.infer<typeof routes[P]["request"]>) => R,
 > extends LitElement {
   static override get properties() {
     return {
@@ -125,9 +125,9 @@ export class PwInput<
   // these three here are just plain-up terrible but the typings for paths are equally bad
   name!: string[];
 
-  get!: (o: z.infer<typeof routes[P]["request"]>) => V;
+  get!: G;
 
-  set!: (o: z.infer<typeof routes[P]["request"]>, v: V) => void;
+  set!: (o: z.infer<typeof routes[P]["request"]>, v: R) => void;
 
   disabled?: boolean = false;
 
