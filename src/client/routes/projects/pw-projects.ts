@@ -75,28 +75,31 @@ class PwProjects<X extends string> extends PwEntityList<"/api/v1/projects", X> {
       return html`
         <tr>
           <th class="table-cell-hover p-0" scope="col">
-            ${pwOrder<"/api/v1/projects">({
+            ${pwOrder({
+              url: "/api/v1/projects",
               refreshEntityList: () => this._task.run(),
               name: "id",
-              path: [this.prefix],
+              prefix: this.prefix,
               title: msg("ID"),
             })}
           </th>
 
           <th class="table-cell-hover p-0" scope="col">
-            ${pwOrder<"/api/v1/projects">({
+            ${pwOrder({
+              url: "/api/v1/projects",
               refreshEntityList: () => this._task.run(),
               name: "title",
-              path: [this.prefix],
+              prefix: this.prefix,
               title: msg("Title"),
             })}
           </th>
 
           <th class="table-cell-hover p-0" scope="col">
-            ${pwOrder<"/api/v1/projects">({
+            ${pwOrder({
+              url: "/api/v1/projects",
               refreshEntityList: () => this._task.run(),
               name: "info",
-              path: [this.prefix],
+              prefix: this.prefix,
               title: msg("Info"),
             })}
           </th>

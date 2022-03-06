@@ -30,13 +30,14 @@ import { parseRequestWithPrefix } from "./pw-entitylist.js";
 
 // workaround see https://github.com/runem/lit-analyzer/issues/149#issuecomment-1006162839
 export function pwOrder<P extends keyof typeof entityRoutes, X extends string>(
-  props: Pick<PwOrder<P, X>, "name" | "prefix" | "title" | "refreshEntityList">
+  props: Pick<PwOrder<P, X>, "url" | "name" | "prefix" | "title" | "refreshEntityList">
 ) {
-  const { name, title, refreshEntityList, prefix, ...rest } = props;
+  const { url, name, title, refreshEntityList, prefix, ...rest } = props;
   let _ = rest;
   _ = 1; // ensure no property is missed - Don't use `{}` as a type. `{}` actually means "any non-nullish value".
   return html`<pw-order
     .name=${name}
+    .url=${url}
     .prefix=${prefix}
     title=${title}
     .refreshEntityList=${refreshEntityList}
