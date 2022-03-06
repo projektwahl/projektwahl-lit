@@ -10,8 +10,8 @@ import {
   rawProjectSchema,
   rawUserSchema,
 } from "../../../lib/routes.js";
-import groupBy from "lodash.groupby";
-import { chain } from "lodash";
+import { z } from "zod";
+import groupBy from "lodash-es/groupBy.js";
 
 export class CPLEXLP {
   dir!: string;
@@ -196,22 +196,23 @@ export const rank2points = (rank: number) => {
 const lp = new CPLEXLP();
 await lp.setup();
 
-const choices = rawChoiceNullable.parse(
+const choices = z.array(rawChoiceNullable).parse(
   await sql.file("src/server/routes/evaluate/calculate.sql", [], {
     cache: false,
   })
 );
 
 // TODO FIXME database transaction to ensure consistent view of data
-const projects = rawProjectSchema.parse(
+const projects = z.array(rawProjectSchema).parse(
   await sql`SELECT id, min_participants, max_participants FROM projects;`
 );
 
-const users = rawUserSchema.parse(
+const users = z.array(rawUserSchema).parse(
   await sql`SELECT id, project_leader_id FROM present_voters ORDER BY id;`
 );
 
-const choicesGroupedByProject = chain(choices).groupBy('project_id');
+// lodash types are just trash do this yourself
+const choicesGroupedByProject = groupBy(choices, 'project_id');
 
 const choicesGroupedByUser = groupBy(choices, 'user_id');
 
