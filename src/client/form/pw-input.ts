@@ -30,11 +30,7 @@ import { repeat } from "lit/directives/repeat.js";
 import type { routes, ResponseType } from "../../lib/routes.js";
 import type { z } from "zod";
 import type { Path } from "../utils.js";
-import get from "lodash-es/get.js";
-import set from "lodash-es/set.js";
 import type { Task } from "@dev.mohe/task";
-
-// MAYBE we could integrate pw-order into here. But this is already fairly complex.
 
 // workaround see https://github.com/runem/lit-analyzer/issues/149#issuecomment-1006162839
 export function pwInput<
@@ -48,7 +44,8 @@ export function pwInput<
     | "disabled"
     | "initial"
     | "label"
-    | "name"
+    | "get"
+    | "set"
     | "options"
     | "task"
     | "defaultValue"
@@ -61,8 +58,9 @@ export function pwInput<
     disabled,
     initial,
     label,
-    name,
     options,
+    get,
+    set,
     task,
     type,
     autocomplete,
@@ -77,7 +75,8 @@ export function pwInput<
     ?disabled=${disabled}
     @change=${onchange}
     .label=${label}
-    .name=${name}
+    .get=${get}
+    .set=${set}
     .options=${options}
     autocomplete=${ifDefined(autocomplete)}
     .task=${task}
@@ -89,7 +88,7 @@ export function pwInput<
 
 export class PwInput<
   P extends keyof typeof routes,
-  Q extends Path<z.infer<typeof routes[P]["request"]>> = never
+  V
 > extends LitElement {
   static override get properties() {
     return {
@@ -114,13 +113,17 @@ export class PwInput<
     };
   }
 
+  name!: string[];
+
+  get!: (o: z.infer<typeof routes[P]["request"]>) => V;
+
+  set!: (o: z.infer<typeof routes[P]["request"]>, v: V) => void;
+
   disabled?: boolean = false;
 
   randomId;
 
   label!: string | null;
-
-  name!: Q & string[];
 
   type: "text" | "password" | "number" | "checkbox" | "select";
 
@@ -139,7 +142,7 @@ export class PwInput<
   // z.infer<typeof routes[P]["request"]>[Q]
   options?: { value: any; text: string }[];
 
-  defaultValue?: any;
+  defaultValue: V;
 
   constructor() {
     super();
@@ -165,30 +168,27 @@ export class PwInput<
     event: CustomEvent<z.infer<typeof routes[P]["request"]>>
   ) => {
     if (this.type === "number") {
-      set(
+      this.set(
         event.detail,
-        this.name,
         this.input.value.value === ""
           ? this.defaultValue
           : this.input.value.valueAsNumber
       );
     } else if (this.type === "checkbox") {
-      set(
+      this.set(
         event.detail,
-        this.name,
         this.input.value.checked ? this.value : this.defaultValue
       );
     } else if (this.type === "select") {
-      set(
+      this.set(
         event.detail,
-        this.name,
         this.input.value.selectedIndex == -1
           ? this.defaultValue
           : this.options?.find((v) => v.value == this.input.value.value)?.value // To make numbers work
       );
     } else {
       const val = this.input.value.value;
-      set(event.detail, this.name, val === "" ? this.defaultValue : val);
+      this.set(event.detail, val === "" ? this.defaultValue : val);
     }
   };
 
@@ -208,7 +208,6 @@ export class PwInput<
   override render() {
     if (
       this.label === undefined ||
-      this.name === undefined ||
       this.task === undefined
     ) {
       throw new Error(msg("component not fully initialized"));
@@ -235,8 +234,8 @@ export class PwInput<
             );
           }}
           type=${this.type}
-          value=${ifDefined(get(this.initial, this.name))}
-          ?checked=${get(this.initial, this.name)}
+          value=${ifDefined(this.get(this.initial))}
+          ?checked=${this.get(this.initial)}
           class="${
             this.type === "checkbox" ? "form-check-input" : "form-control"
           } ${this.task.render({
@@ -250,7 +249,6 @@ export class PwInput<
           : "is-valid",
       initial: () => "",
     })}"
-          name=${this.name.toString()}
           id=${this.randomId}
           aria-describedby="${this.randomId}-feedback"
           autocomplete=${ifDefined(this.autocomplete)}
@@ -270,7 +268,7 @@ export class PwInput<
                   (o) => o.value,
                   (o) =>
                     html`<option
-                      ?selected=${get(this.initial, this.name) === o.value}
+                      ?selected=${this.get(this.initial) === o.value}
                       value=${o.value}
                     >
                       ${o.text}

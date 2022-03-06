@@ -192,6 +192,8 @@ export const PwProjectCreate = setupHmr(
                     disabled: this.disabled,
                     label: msg("Info"),
                     name: ["info"],
+                    //get: o => o.info,
+                    //set: (o, v) => o.info = v,
                     task: this._task,
                     initial: this.initial?.data,
                   })}
