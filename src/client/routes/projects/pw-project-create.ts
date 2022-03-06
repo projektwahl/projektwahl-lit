@@ -184,16 +184,14 @@ export const PwProjectCreate = setupHmr(
                     task: this._task,
                     initial: this.initial?.data,
                   })}
-                  ${pwInput<
-                    "/api/v1/projects/create" | "/api/v1/projects/update",
-                    ["info"]
-                  >({
+                  ${pwInput({
+                    url: this.url,
                     type: "text",
                     disabled: this.disabled,
                     label: msg("Info"),
                     name: ["info"],
-                    //get: o => o.info,
-                    //set: (o, v) => o.info = v,
+                    get: o => o.info,
+                    set: (o, v) => o.info = v,
                     task: this._task,
                     initial: this.initial?.data,
                   })}

@@ -34,16 +34,18 @@ import type { Task } from "@dev.mohe/task";
 
 // workaround see https://github.com/runem/lit-analyzer/issues/149#issuecomment-1006162839
 export function pwInput<
-  P extends keyof typeof routes = never,
-  Q extends Path<z.infer<typeof routes[P]["request"]>> = never
+  P extends keyof typeof routes,
+  V,
 >(
   props: Pick<
-    PwInput<P, Q>,
+    PwInput<P, V>,
     | "type"
     | "autocomplete"
     | "disabled"
     | "initial"
     | "label"
+    | "name"
+    | "url"
     | "get"
     | "set"
     | "options"
@@ -51,7 +53,7 @@ export function pwInput<
     | "defaultValue"
     | "value"
   > &
-    Partial<Pick<PwInput<P, Q>, "onchange">>
+    Partial<Pick<PwInput<P, V>, "onchange">>
 ) {
   const {
     onchange,
@@ -59,8 +61,10 @@ export function pwInput<
     initial,
     label,
     options,
+    name,
     get,
     set,
+    url,
     task,
     type,
     autocomplete,
@@ -77,6 +81,8 @@ export function pwInput<
     .label=${label}
     .get=${get}
     .set=${set}
+    .url=${url}
+    .name=${name}
     .options=${options}
     autocomplete=${ifDefined(autocomplete)}
     .task=${task}
@@ -88,7 +94,7 @@ export function pwInput<
 
 export class PwInput<
   P extends keyof typeof routes,
-  V
+  V,
 > extends LitElement {
   static override get properties() {
     return {
@@ -100,6 +106,7 @@ export class PwInput<
       disabled: { type: Boolean },
       randomId: { state: true },
       defaultValue: { attribute: false },
+      url: { attribute: false },
       task: {
         attribute: false,
         /*hasChanged: () => {
@@ -113,6 +120,9 @@ export class PwInput<
     };
   }
 
+  url!: P
+
+  // these three here are just plain-up terrible but the typings for paths are equally bad
   name!: string[];
 
   get!: (o: z.infer<typeof routes[P]["request"]>) => V;
@@ -133,16 +143,16 @@ export class PwInput<
 
   initial?: z.infer<typeof routes[P]["request"]>;
 
-  value?: any;
+  value?: V;
 
   input: import("lit/directives/ref").Ref<HTMLElement>;
 
   form!: HTMLFormElement;
 
   // z.infer<typeof routes[P]["request"]>[Q]
-  options?: { value: any; text: string }[];
+  options?: { value: V; text: string }[];
 
-  defaultValue: V;
+  defaultValue?: V;
 
   constructor() {
     super();
