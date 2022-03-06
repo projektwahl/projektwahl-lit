@@ -4,8 +4,14 @@ import os from "node:os";
 import { constants } from "node:fs";
 import { execFile } from "node:child_process";
 import { sql } from "../../database.js";
-import groupBy from "lodash-es/groupBy.js";
 import sortedIndexBy from "lodash-es/sortedIndexBy.js";
+import {
+  rawChoiceNullable,
+  rawProjectSchema,
+  rawUserSchema,
+} from "../../../lib/routes.js";
+import groupBy from "lodash.groupby";
+import { chain } from "lodash";
 
 export class CPLEXLP {
   dir!: string;
@@ -190,20 +196,24 @@ export const rank2points = (rank: number) => {
 const lp = new CPLEXLP();
 await lp.setup();
 
-const choices = await sql.file("src/server/routes/evaluate/calculate.sql", [], {
-  cache: false,
-});
+const choices = rawChoiceNullable.parse(
+  await sql.file("src/server/routes/evaluate/calculate.sql", [], {
+    cache: false,
+  })
+);
 
 // TODO FIXME database transaction to ensure consistent view of data
-const projects =
-  await sql`SELECT id, min_participants, max_participants FROM projects;`;
+const projects = rawProjectSchema.parse(
+  await sql`SELECT id, min_participants, max_participants FROM projects;`
+);
 
-const users =
-  await sql`SELECT id, project_leader_id FROM present_voters ORDER BY id;`;
+const users = rawUserSchema.parse(
+  await sql`SELECT id, project_leader_id FROM present_voters ORDER BY id;`
+);
 
-const choicesGroupedByProject = groupBy(choices, (c) => c.project_id);
+const choicesGroupedByProject = chain(choices).groupBy('project_id');
 
-const choicesGroupedByUser = groupBy(choices, (c) => c.user_id);
+const choicesGroupedByUser = groupBy(choices, 'user_id');
 
 await lp.startMaximize();
 

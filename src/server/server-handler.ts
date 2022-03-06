@@ -371,13 +371,13 @@ export async function serverHandler(
           });
           pipeline(raw, zlib.createBrotliCompress(), response, onError);
         } else {*/
-          response.writeHead(200, {
-            ...defaultHeaders,
-            "content-type": `${contentType}; charset=utf-8`,
-            //"cache-control": "public, max-age=604800, immutable",
-            vary: "accept-encoding",
-          });
-          pipeline(raw, response, onError);
+        response.writeHead(200, {
+          ...defaultHeaders,
+          "content-type": `${contentType}; charset=utf-8`,
+          //"cache-control": "public, max-age=604800, immutable",
+          vary: "accept-encoding",
+        });
+        pipeline(raw, response, onError);
         //}
       } catch (error) {
         console.error(error);

@@ -23,7 +23,7 @@ SPDX-FileCopyrightText: 2021 Moritz Hedtke <Moritz.Hedtke@t-online.de>
 import { z, ZodIssue, ZodObject, ZodTypeAny } from "zod";
 import { result } from "./result.js";
 
-const rawChoice = z
+export const rawChoice = z
   .object({
     rank: z.number(),
     project_id: z.number(),
@@ -31,7 +31,7 @@ const rawChoice = z
   })
   .strict();
 
-const rawChoiceNullable = z
+export const rawChoiceNullable = z
   .object({
     rank: z.number().nullable(),
     project_id: z.number().nullable(),
