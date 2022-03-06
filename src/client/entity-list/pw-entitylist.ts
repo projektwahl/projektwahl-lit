@@ -41,22 +41,17 @@ export const taskFunction = async <
   url: URL,
   prefix: PREFIX
 ) => {
-  const _q: z.ZodObject<{[k in PREFIX]: ZodNumber}, "strict", z.ZodTypeAny, {[k in PREFIX]: z.infer<ZodNumber>}, {}> = z
+  // @ts-expect-error https://github.com/colinhacks/zod/issues/153#issuecomment-863569536
+  const schema: z.ZodObject<{[k in PREFIX]: typeof entityRoutes[P]["request"]}, "strict", z.ZodTypeAny, {[k in PREFIX]: z.infer<typeof entityRoutes[P]["request"]>}, Record<string, unknown>> = z
     .object({
-    }).setKey(prefix, z.number()).strict();
-  const _R = _q.parse({})[prefix]
-  
-  
-  // TODO try https://github.com/colinhacks/zod/issues/153#issuecomment-863569536
-  const schema: z.ZodObject<{[k in PREFIX]: typeof entityRoutes[P]["request"]}, "strip", z.ZodTypeAny, {[k in PREFIX]: z.infer<typeof entityRoutes[P]["request"]>}, Record<string, unknown>> = z
-    .object({
-    }).setKey(prefix, entityRoutes[apiUrl]["request"]);
-  const data: z.infer<z.ZodObject<{[k in PREFIX]: typeof entityRoutes[P]["request"]}, "strip", z.ZodTypeAny, {[k in PREFIX]: z.infer<typeof entityRoutes[P]["request"]>}, {}>> = schema.parse(
+    }).strict().setKey(prefix, entityRoutes[apiUrl]["request"]).strict();
+  const data: z.infer<z.ZodObject<{[k in PREFIX]: typeof entityRoutes[P]["request"]}, "strict", z.ZodTypeAny, {[k in PREFIX]: z.infer<typeof entityRoutes[P]["request"]>}, Record<string, unknown>>> = schema.parse(
       JSON.parse(
         decodeURIComponent(url.search == "" ? "{}" : url.search.substring(1))
       )
     );
-  const a: z.infer<z.ZodObject<{[k in PREFIX]: typeof entityRoutes[P]["request"]}, "strip", z.ZodTypeAny, {[k in PREFIX]:  z.infer<typeof entityRoutes[P]["request"]>}, {}>>[PREFIX] = data[prefix];
+  const a: z.infer<z.ZodObject<{[k in PREFIX]: typeof entityRoutes[P]["request"]}, "strict", z.ZodTypeAny, {[k in PREFIX]:  z.infer<typeof entityRoutes[P]["request"]>}, Record<string, unknown>>>[PREFIX] = data[prefix];
+  const _b: z.infer<typeof entityRoutes[P]["request"]> = a;
   const result = await myFetch<P>("GET", apiUrl, a, {});
   return result;
 };
