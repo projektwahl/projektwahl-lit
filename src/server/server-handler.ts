@@ -54,10 +54,6 @@ type ErrorMapCtx = {
   data: any;
 };
 
-export function assertNever(_x: never): never {
-  throw new Error();
-}
-
 const myErrorMap: z.ZodErrorMap = (
   issue: ZodIssueOptionalMessage,
   _ctx: ErrorMapCtx
@@ -144,7 +140,6 @@ const myErrorMap: z.ZodErrorMap = (
       break;
     default:
       message = _ctx.defaultError;
-      assertNever(issue);
   }
   return { message };
 };
@@ -175,7 +170,7 @@ async function replaceAsync(
     return "";
   });
   const data = await Promise.all(promises);
-  return str.replaceAll(regex, () => data.shift());
+  return str.replaceAll(regex, () => data.shift()!);
 }
 
 export const defaultHeaders = {
@@ -186,7 +181,7 @@ export const defaultHeaders = {
 
 export async function serverHandler(
   request: MyRequest,
-  response: ServerResponse | Http2ServerResponse
+  response: /*ServerResponse |*/ Http2ServerResponse
 ) {
   const path = z.string().parse(request.url);
 
@@ -366,7 +361,7 @@ export async function serverHandler(
 
         // Note: This is not a conformant accept-encoding parser.
         // See https://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.3
-        if (/\bbr\b/.test(acceptEncoding)) {
+        /*if (/\bbr\b/.test(acceptEncoding)) {
           response.writeHead(200, {
             ...defaultHeaders,
             "content-type": `${contentType}; charset=utf-8`,
@@ -375,7 +370,7 @@ export async function serverHandler(
             "content-encoding": "br",
           });
           pipeline(raw, zlib.createBrotliCompress(), response, onError);
-        } else {
+        } else {*/
           response.writeHead(200, {
             ...defaultHeaders,
             "content-type": `${contentType}; charset=utf-8`,
@@ -383,7 +378,7 @@ export async function serverHandler(
             vary: "accept-encoding",
           });
           pipeline(raw, response, onError);
-        }
+        //}
       } catch (error) {
         console.error(error);
         response.writeHead(404, {

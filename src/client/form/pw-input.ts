@@ -117,6 +117,7 @@ export class PwInput<P extends keyof typeof routes> extends LitElement {
   // these three here are just plain-up terrible but the typings for paths are equally bad
   name!: string[];
 
+  // TODO FIXME maybe switch this back to Path and lodash-es (but not remove then for now so we could switch back)
   get!: (
     o: z.infer<typeof routes[P]["request"]>
   ) => number | string | boolean | null | undefined;
