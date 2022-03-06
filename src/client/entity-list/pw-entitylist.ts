@@ -25,7 +25,7 @@ import { HistoryController } from "../history-controller.js";
 import { ref } from "lit/directives/ref.js";
 import { Task, TaskStatus } from "@dev.mohe/task";
 import { entityRoutes, ResponseType } from "../../lib/routes.js";
-import { AnyZodObject, z, ZodNumber, ZodObject, ZodTypeAny } from "zod";
+import { z } from "zod";
 import { PwForm } from "../form/pw-form.js";
 import { bootstrapCss } from "../index.js";
 import { msg, str } from "@lit/localize";
@@ -51,8 +51,8 @@ export const taskFunction = async <
       )
     );
   const a: z.infer<z.ZodObject<{[k in PREFIX]: typeof entityRoutes[P]["request"]}, "strict", z.ZodTypeAny, {[k in PREFIX]:  z.infer<typeof entityRoutes[P]["request"]>}, Record<string, unknown>>>[PREFIX] = data[prefix];
-  const _b: z.infer<typeof entityRoutes[P]["request"]> = a;
-  const result = await myFetch<P>("GET", apiUrl, a, {});
+  const b: z.infer<typeof entityRoutes[P]["request"]> = a;
+  const result = await myFetch<P>("GET", apiUrl, b, {});
   return result;
 };
 
