@@ -121,7 +121,7 @@ P extends keyof typeof routes,
   // these three here are just plain-up terrible but the typings for paths are equally bad
   name!: string[];
 
-  get!: (o: z.infer<typeof routes[P]["request"]>) => number|string|undefined;
+  get!: (o: z.infer<typeof routes[P]["request"]>) => number|string|boolean|null|undefined;
 
   set!: (o: z.infer<typeof routes[P]["request"]>, v: any) => void;
 

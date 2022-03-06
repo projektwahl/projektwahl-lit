@@ -221,9 +221,12 @@ export class PwEntityList<
           <div class="row justify-content-between">
             <div class="col-auto">${this.buttons}</div>
             <div class="col-3">
-              ${pwInput<P, ["paginationLimit"]>({
+              ${pwInput({
+                url: this.url,
                 label: "Elemente pro Seite",
                 name: ["paginationLimit"],
+                get: o => o.paginationLimit,
+                set: (o, v) => o.paginationLimit = v,
                 task: this._task,
                 type: "select",
                 initial: data[this.prefix],

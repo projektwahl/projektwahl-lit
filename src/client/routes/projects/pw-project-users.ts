@@ -103,12 +103,12 @@ export const PwProjectUsers = setupHmr(
 
           <tr>
             <th scope="col">
-              ${pwInput<
-                "/api/v1/users",
-                ["filters", "project_leader_id" | "force_in_project_id"]
-              >({
+              ${pwInput({
+                url: this.url,
                 label: null,
                 name: ["filters", this.name],
+                get: o => o.filters[this.name],
+                set: (o, v) => o.filters[this.name] = v,
                 task: this._task,
                 type: "checkbox",
                 value: this.projectId,
@@ -118,9 +118,12 @@ export const PwProjectUsers = setupHmr(
             </th>
 
             <th scope="col">
-              ${pwInput<"/api/v1/users", ["filters", "id"]>({
+              ${pwInput({
+                url: this.url,
                 label: null,
                 name: ["filters", "id"],
+                get: o => o.filters.id,
+                set: (o, v) => o.filters.id= v,
                 task: this._task,
                 type: "number",
                 defaultValue: undefined,
@@ -129,9 +132,12 @@ export const PwProjectUsers = setupHmr(
             </th>
 
             <th scope="col">
-              ${pwInput<"/api/v1/users", ["filters", "username"]>({
+              ${pwInput({
+                url: this.url,
                 label: null,
                 name: ["filters", "username"],
+                get: o => o.filters.username,
+                set: (o, v) => o.filters.username = v,
                 task: this._task,
                 type: "text",
                 initial,
@@ -139,9 +145,12 @@ export const PwProjectUsers = setupHmr(
             </th>
 
             <th scope="col">
-              ${pwInput<"/api/v1/users", ["filters", "type"]>({
+              ${pwInput({
+                url: this.url,
                 label: null,
                 name: ["filters", "type"],
+                get: o => o.filters.type,
+                set: (o, v) => o.filters.type = v,
                 task: this._task,
                 type: "text",
                 defaultValue: undefined,

@@ -95,9 +95,12 @@ class PwChoices<X extends string> extends PwEntityList<"/api/v1/choices", X> {
 
         <tr>
           <th scope="col">
-            ${pwInput<"/api/v1/choices", ["filters", "id"]>({
+            ${pwInput({
+              url: this.url,
               label: null,
               name: ["filters", "id"],
+              get: o => o.filters.id,
+              set: (o, v) => o.filters.id = v,
               task: this._task,
               type: "number",
               defaultValue: undefined,
@@ -106,9 +109,12 @@ class PwChoices<X extends string> extends PwEntityList<"/api/v1/choices", X> {
           </th>
 
           <th scope="col">
-            ${pwInput<"/api/v1/choices", ["filters", "title"]>({
+            ${pwInput({
+              url: this.url,
               label: null,
               name: ["filters", "title"],
+              get: o => o.filters.title,
+              set: (o, v) => o.filters.title = v,
               task: this._task,
               type: "text",
               initial,
@@ -116,9 +122,12 @@ class PwChoices<X extends string> extends PwEntityList<"/api/v1/choices", X> {
           </th>
 
           <th scope="col">
-            ${pwInput<"/api/v1/choices", ["filters", "rank"]>({
+            ${pwInput({
+              url: this.url,
               label: null,
               name: ["filters", "rank"],
+              get: o => o.filters.rank,
+              set: (o, v) => o.filters.rank = v,
               task: this._task,
               type: "number",
               defaultValue: undefined,
