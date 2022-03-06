@@ -6,6 +6,7 @@ import { execFile } from "node:child_process";
 import { sql } from "../../database.js";
 import sortedIndexBy from "lodash-es/sortedIndexBy.js";
 import {
+  rawChoice,
   rawChoiceNullable,
   rawProjectSchema,
   rawUserSchema,
@@ -196,7 +197,7 @@ export const rank2points = (rank: number) => {
 const lp = new CPLEXLP();
 await lp.setup();
 
-const choices = z.array(rawChoiceNullable).parse(
+const choices = z.array(rawChoice).parse(
   await sql.file("src/server/routes/evaluate/calculate.sql", [], {
     cache: false,
   })
