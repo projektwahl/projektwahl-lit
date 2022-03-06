@@ -25,7 +25,7 @@ import { HistoryController } from "../history-controller.js";
 import { ref } from "lit/directives/ref.js";
 import { Task, TaskStatus } from "@dev.mohe/task";
 import { entityRoutes, ResponseType } from "../../lib/routes.js";
-import { z, ZodObject, ZodTypeAny } from "zod";
+import { AnyZodObject, z, ZodObject, ZodTypeAny } from "zod";
 import { PwForm } from "../form/pw-form.js";
 import { bootstrapCss } from "../index.js";
 import { msg, str } from "@lit/localize";
@@ -41,8 +41,13 @@ export const taskFunction = async <
   url: URL,
   prefix: PREFIX
 ) => {
+  const _q: z.ZodObject<{[k in PREFIX]: ZodTypeAny}, "strip", z.ZodTypeAny, {[k in PREFIX]: z.infer<ZodTypeAny>}, Record<string, unknown>> = z
+    .object({
+    }).setKey(prefix, z.any());
+  const _R = _q.parse({})[prefix]
+
   // TODO try https://github.com/colinhacks/zod/issues/153#issuecomment-863569536
-  const schema: z.ZodObject<{[k in PREFIX]: typeof entityRoutes[P]["request"]}, "strip", z.ZodTypeAny, {[k in PREFIX]: z.infer<typeof entityRoutes[P]["request"]>}, {}> = z
+  const schema: z.ZodObject<{[k in PREFIX]: typeof entityRoutes[P]["request"]}, "strip", z.ZodTypeAny, {[k in PREFIX]: z.infer<typeof entityRoutes[P]["request"]>}, Record<string, unknown>> = z
     .object({
     }).setKey(prefix, entityRoutes[apiUrl].request);
   const data: z.infer<z.ZodObject<{[k in PREFIX]: typeof entityRoutes[P]["request"]}, "strip", z.ZodTypeAny, {[k in PREFIX]: z.infer<typeof entityRoutes[P]["request"]>}, {}>> = schema.parse(
