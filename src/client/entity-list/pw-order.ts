@@ -30,7 +30,10 @@ import { parseRequestWithPrefix } from "./pw-entitylist.js";
 
 // workaround see https://github.com/runem/lit-analyzer/issues/149#issuecomment-1006162839
 export function pwOrder<P extends keyof typeof entityRoutes, X extends string>(
-  props: Pick<PwOrder<P, X>, "url" | "name" | "prefix" | "title" | "refreshEntityList">
+  props: Pick<
+    PwOrder<P, X>,
+    "url" | "name" | "prefix" | "title" | "refreshEntityList"
+  >
 ) {
   const { url, name, title, refreshEntityList, prefix, ...rest } = props;
   let _ = rest;
@@ -46,7 +49,10 @@ export function pwOrder<P extends keyof typeof entityRoutes, X extends string>(
 
 // TODO FIXME with prefix this doesnt work
 // TODO FIXME paginationLimit also doesnt work with this
-export class PwOrder<P extends keyof typeof entityRoutes, X extends string> extends LitElement {
+export class PwOrder<
+  P extends keyof typeof entityRoutes,
+  X extends string
+> extends LitElement {
   static override get properties() {
     return {
       title: { type: String },
@@ -98,16 +104,19 @@ export class PwOrder<P extends keyof typeof entityRoutes, X extends string> exte
       <button
         @click=${async () => {
           // TODO FIXME put this into the history implementation?
-          const data = parseRequestWithPrefix(this.url, this.prefix, this.history.url)
+          const data = parseRequestWithPrefix(
+            this.url,
+            this.prefix,
+            this.history.url
+          );
 
           if (!data[this.prefix]["sorting"]) {
             data[this.prefix]["sorting"] = [];
           }
 
-          const oldElementIndex = data[
-            this.prefix][
-            "sorting"
-          ].findIndex(([e, d]: [string, string]) => e === `${this.name}`);
+          const oldElementIndex = data[this.prefix]["sorting"].findIndex(
+            ([e, d]: [string, string]) => e === `${this.name}`
+          );
           let oldElement;
           if (oldElementIndex == -1) {
             oldElement = [`${this.name}`, `downup`];
@@ -128,13 +137,12 @@ export class PwOrder<P extends keyof typeof entityRoutes, X extends string> exte
             default:
               newElement = null;
           }
-          
-            data[this.prefix]["sorting"] =
-            [
-              ...data[this.prefix]["sorting"],
-              ...(newElement !== null ? [[oldElement[0], newElement]] : []),
-            ]
-        
+
+          data[this.prefix]["sorting"] = [
+            ...data[this.prefix]["sorting"],
+            ...(newElement !== null ? [[oldElement[0], newElement]] : []),
+          ];
+
           HistoryController.goto(
             new URL(
               `?${encodeURIComponent(JSON.stringify(data))}`,
@@ -151,7 +159,11 @@ export class PwOrder<P extends keyof typeof entityRoutes, X extends string> exte
         id=${this.randomId}
       >
         ${(() => {
-          const data = parseRequestWithPrefix(this.url, this.prefix, this.history.url)
+          const data = parseRequestWithPrefix(
+            this.url,
+            this.prefix,
+            this.history.url
+          );
 
           const value = (data[this.prefix]["sorting"] ?? []).find(
             ([e, d]: [string, string]) => e === `${this.name}`

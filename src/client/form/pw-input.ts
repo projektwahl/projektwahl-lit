@@ -32,9 +32,7 @@ import type { z } from "zod";
 import type { Task } from "@dev.mohe/task";
 
 // workaround see https://github.com/runem/lit-analyzer/issues/149#issuecomment-1006162839
-export function pwInput<
-  P extends keyof typeof routes,
->(
+export function pwInput<P extends keyof typeof routes>(
   props: Pick<
     PwInput<P>,
     | "type"
@@ -89,9 +87,7 @@ export function pwInput<
   ></pw-input>`;
 }
 
-export class PwInput<
-P extends keyof typeof routes,
-> extends LitElement {
+export class PwInput<P extends keyof typeof routes> extends LitElement {
   static override get properties() {
     return {
       label: { attribute: false },
@@ -116,12 +112,14 @@ P extends keyof typeof routes,
     };
   }
 
-  url!: P
+  url!: P;
 
   // these three here are just plain-up terrible but the typings for paths are equally bad
   name!: string[];
 
-  get!: (o: z.infer<typeof routes[P]["request"]>) => number|string|boolean|null|undefined;
+  get!: (
+    o: z.infer<typeof routes[P]["request"]>
+  ) => number | string | boolean | null | undefined;
 
   set!: (o: z.infer<typeof routes[P]["request"]>, v: any) => void;
 
@@ -139,16 +137,16 @@ P extends keyof typeof routes,
 
   initial?: z.infer<typeof routes[P]["request"]>;
 
-  value?: number|string;
+  value?: number | string;
 
   input: import("lit/directives/ref").Ref<HTMLElement>;
 
   form!: HTMLFormElement;
 
   // z.infer<typeof routes[P]["request"]>[Q]
-  options?: { value: number|string; text: string }[];
+  options?: { value: number | string; text: string }[];
 
-  defaultValue?: number|string;
+  defaultValue?: number | string;
 
   constructor() {
     super();
@@ -210,10 +208,7 @@ P extends keyof typeof routes,
   }
 
   override render() {
-    if (
-      this.label === undefined ||
-      this.task === undefined
-    ) {
+    if (this.label === undefined || this.task === undefined) {
       throw new Error(msg("component not fully initialized"));
     }
 

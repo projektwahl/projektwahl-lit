@@ -1,7 +1,7 @@
 import { FileHandle, mkdtemp, open, readFile } from "node:fs/promises";
 import path from "node:path";
 import os from "node:os";
-import { constants} from "node:fs";
+import { constants } from "node:fs";
 import { execFile } from "node:child_process";
 import { sql } from "../../database.js";
 import groupBy from "lodash-es/groupBy.js";

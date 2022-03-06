@@ -117,8 +117,8 @@ class PwLogin extends PwForm<"/api/v1/login"> {
                 autocomplete: "username",
                 label: msg("Username"),
                 name: ["username"],
-                get: o => o.username,
-                set: (o, v) => o.username = v,
+                get: (o) => o.username,
+                set: (o, v) => (o.username = v),
                 task: this._task,
               })}
               ${pwInput({
@@ -126,8 +126,8 @@ class PwLogin extends PwForm<"/api/v1/login"> {
                 type: "password",
                 label: msg("Password"),
                 name: ["password"],
-                get: o => o.password,
-                set: (o, v) => o.password = v,
+                get: (o) => o.password,
+                set: (o, v) => (o.password = v),
                 autocomplete: "current-password",
                 task: this._task,
               })}

@@ -165,8 +165,8 @@ class PwUserCreate extends PwForm<
                   disabled: this.disabled,
                   label: msg("Username"),
                   name: ["username"],
-                  get: o => o.username,
-                  set: (o, v) => o.username = v,
+                  get: (o) => o.username,
+                  set: (o, v) => (o.username = v),
                   task: this._task,
                   initial: this.initial?.data,
                 })}
@@ -176,8 +176,8 @@ class PwUserCreate extends PwForm<
                   disabled: this.disabled,
                   label: msg("Third-party email address"),
                   name: ["openid_id"],
-                  get: o => o.openid_id,
-                  set: (o, v) => o.openid_id = v,
+                  get: (o) => o.openid_id,
+                  set: (o, v) => (o.openid_id = v),
                   task: this._task,
                   initial: this.initial?.data,
                 })}
@@ -188,8 +188,8 @@ class PwUserCreate extends PwForm<
                   onchange: (event: Event) => (this.type = event.target.value),
                   label: msg("User type"),
                   name: ["type"],
-                  get: o => o.type,
-                  set: (o, v) => o.type = v,
+                  get: (o) => o.type,
+                  set: (o, v) => (o.type = v),
                   options: [
                     { value: "voter", text: "Schüler" },
                     { value: "helper", text: "Helfer" },
@@ -206,13 +206,13 @@ class PwUserCreate extends PwForm<
                 })}
                 ${(this.type ?? this.initial?.data.type ?? "voter") === "voter"
                   ? html`${pwInput({
-                    url: this.url,
+                      url: this.url,
                       type: "text",
                       disabled: this.disabled,
                       label: msg("Group"),
                       name: ["group"],
-                      get: o => o.group,
-                  set: (o, v) => o.group = v,
+                      get: (o) => o.group,
+                      set: (o, v) => (o.group = v),
                       task: this._task,
                       initial: this.initial?.data,
                     })}
@@ -222,8 +222,8 @@ class PwUserCreate extends PwForm<
                       disabled: this.disabled,
                       label: msg("Age"),
                       name: ["age"],
-                      get: o => o.age,
-                  set: (o, v) => o.age = v,
+                      get: (o) => o.age,
+                      set: (o, v) => (o.age = v),
                       task: this._task,
                       initial: this.initial?.data,
                     })}`
@@ -236,8 +236,8 @@ class PwUserCreate extends PwForm<
                         disabled: this.disabled,
                         label: msg("Password"),
                         name: ["password"],
-                        get: o => o.password,
-                  set: (o, v) => o.password = v,
+                        get: (o) => o.password,
+                        set: (o, v) => (o.password = v),
                         task: this._task,
                         autocomplete: "new-password",
                         initial: this.initial?.data,
@@ -252,8 +252,8 @@ class PwUserCreate extends PwForm<
                   disabled: this.disabled,
                   label: msg("Away"),
                   name: ["away"],
-                  get: o => o.away,
-                  set: (o, v) => o.away = v,
+                  get: (o) => o.away,
+                  set: (o, v) => (o.away = v),
                   task: this._task,
                   initial: this.initial?.data,
                 })}
@@ -265,8 +265,8 @@ class PwUserCreate extends PwForm<
                   disabled: this.disabled,
                   label: msg("Mark this user as deleted"),
                   name: ["deleted"],
-                  get: o => o.deleted,
-                  set: (o, v) => o.deleted = v,
+                  get: (o) => o.deleted,
+                  set: (o, v) => (o.deleted = v),
                   task: this._task,
                   initial: this.initial?.data,
                 })}

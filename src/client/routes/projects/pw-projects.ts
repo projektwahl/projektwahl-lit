@@ -25,7 +25,11 @@ import { html } from "lit";
 import { noChange } from "lit";
 import { aClick } from "../../pw-a.js";
 import { msg } from "@lit/localize";
-import { parseRequestWithPrefix, PwEntityList, taskFunction } from "../../entity-list/pw-entitylist.js";
+import {
+  parseRequestWithPrefix,
+  PwEntityList,
+  taskFunction,
+} from "../../entity-list/pw-entitylist.js";
 import { pwOrder } from "../../entity-list/pw-order.js";
 import { pwInput } from "../../form/pw-input.js";
 
@@ -59,7 +63,11 @@ class PwProjects<X extends string> extends PwEntityList<"/api/v1/projects", X> {
 
   override get head() {
     try {
-      const data = parseRequestWithPrefix(this.url, this.prefix, this.history.url)
+      const data = parseRequestWithPrefix(
+        this.url,
+        this.prefix,
+        this.history.url
+      );
 
       const initial = data[this.prefix];
 
@@ -104,8 +112,8 @@ class PwProjects<X extends string> extends PwEntityList<"/api/v1/projects", X> {
               url: this.url,
               label: null,
               name: ["filters", "id"],
-              get: o => o.filters.id,
-              set: (o, v) => o.filters.id = v,
+              get: (o) => o.filters.id,
+              set: (o, v) => (o.filters.id = v),
               task: this._task,
               type: "number",
               defaultValue: undefined,
@@ -118,8 +126,8 @@ class PwProjects<X extends string> extends PwEntityList<"/api/v1/projects", X> {
               url: this.url,
               label: null,
               name: ["filters", "title"],
-              get: o => o.filters.title,
-              set: (o, v) => o.filters.title = v,
+              get: (o) => o.filters.title,
+              set: (o, v) => (o.filters.title = v),
               task: this._task,
               type: "text",
               initial,
@@ -131,8 +139,8 @@ class PwProjects<X extends string> extends PwEntityList<"/api/v1/projects", X> {
               url: this.url,
               label: null,
               name: ["filters", "info"],
-              get: o => o.filters.info,
-                set: (o, v) => o.filters.info = v,
+              get: (o) => o.filters.info,
+              set: (o, v) => (o.filters.info = v),
               task: this._task,
               type: "text",
               defaultValue: undefined,

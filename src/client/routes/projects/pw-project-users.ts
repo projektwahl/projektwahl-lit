@@ -32,7 +32,10 @@ import { setupHmr } from "../../hmr.js";
 import { aClick } from "../../pw-a.js";
 import { pwOrder } from "../../entity-list/pw-order.js";
 import { pwInput } from "../../form/pw-input.js";
-import { parseRequestWithPrefix, taskFunction } from "../../entity-list/pw-entitylist.js";
+import {
+  parseRequestWithPrefix,
+  taskFunction,
+} from "../../entity-list/pw-entitylist.js";
 
 export const pwProjectUsers = async (url: URL, prefix: string) => {
   const result = await taskFunction("/api/v1/users", url, prefix);
@@ -63,7 +66,11 @@ export const PwProjectUsers = setupHmr(
 
     override get head() {
       try {
-        const data = parseRequestWithPrefix(this.url, this.prefix, this.history.url)
+        const data = parseRequestWithPrefix(
+          this.url,
+          this.prefix,
+          this.history.url
+        );
 
         const initial = data[this.prefix];
 
@@ -107,8 +114,8 @@ export const PwProjectUsers = setupHmr(
                 url: this.url,
                 label: null,
                 name: ["filters", this.name],
-                get: o => o.filters[this.name],
-                set: (o, v) => o.filters[this.name] = v,
+                get: (o) => o.filters[this.name],
+                set: (o, v) => (o.filters[this.name] = v),
                 task: this._task,
                 type: "checkbox",
                 value: this.projectId,
@@ -122,8 +129,8 @@ export const PwProjectUsers = setupHmr(
                 url: this.url,
                 label: null,
                 name: ["filters", "id"],
-                get: o => o.filters.id,
-                set: (o, v) => o.filters.id= v,
+                get: (o) => o.filters.id,
+                set: (o, v) => (o.filters.id = v),
                 task: this._task,
                 type: "number",
                 defaultValue: undefined,
@@ -136,8 +143,8 @@ export const PwProjectUsers = setupHmr(
                 url: this.url,
                 label: null,
                 name: ["filters", "username"],
-                get: o => o.filters.username,
-                set: (o, v) => o.filters.username = v,
+                get: (o) => o.filters.username,
+                set: (o, v) => (o.filters.username = v),
                 task: this._task,
                 type: "text",
                 initial,
@@ -149,8 +156,8 @@ export const PwProjectUsers = setupHmr(
                 url: this.url,
                 label: null,
                 name: ["filters", "type"],
-                get: o => o.filters.type,
-                set: (o, v) => o.filters.type = v,
+                get: (o) => o.filters.type,
+                set: (o, v) => (o.filters.type = v),
                 task: this._task,
                 type: "text",
                 defaultValue: undefined,

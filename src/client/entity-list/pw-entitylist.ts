@@ -33,20 +33,43 @@ import { ifDefined } from "lit/directives/if-defined.js";
 import { myFetch } from "../utils.js";
 import { pwInput } from "../form/pw-input.js";
 
-export const parseRequestWithPrefix = <P extends keyof typeof entityRoutes,PREFIX extends string>(apiUrl: P, prefix: PREFIX, url: URL) => {
-    // @ts-expect-error https://github.com/colinhacks/zod/issues/153#issuecomment-863569536
-  const schema: z.ZodObject<{[k in PREFIX]: typeof entityRoutes[P]["request"]}, "strict", z.ZodTypeAny, {[k in PREFIX]: z.infer<typeof entityRoutes[P]["request"]>}, Record<string, unknown>> = z
-    .object({
-    }).strict().setKey(prefix, entityRoutes[apiUrl]["request"]).strict();
-  const data: z.infer<z.ZodObject<{[k in PREFIX]: typeof entityRoutes[P]["request"]}, "strict", z.ZodTypeAny, {[k in PREFIX]: z.infer<typeof entityRoutes[P]["request"]>}, Record<string, unknown>>> = schema.parse(
-      JSON.parse(
-        decodeURIComponent(url.search == "" ? "{}" : url.search.substring(1))
-      )
-    );
+export const parseRequestWithPrefix = <
+  P extends keyof typeof entityRoutes,
+  PREFIX extends string
+>(
+  apiUrl: P,
+  prefix: PREFIX,
+  url: URL
+) => {
+  // @ts-expect-error https://github.com/colinhacks/zod/issues/153#issuecomment-863569536
+  const schema: z.ZodObject<
+    { [k in PREFIX]: typeof entityRoutes[P]["request"] },
+    "strict",
+    z.ZodTypeAny,
+    { [k in PREFIX]: z.infer<typeof entityRoutes[P]["request"]> },
+    Record<string, unknown>
+  > = z
+    .object({})
+    .strict()
+    .setKey(prefix, entityRoutes[apiUrl]["request"])
+    .strict();
+  const data: z.infer<
+    z.ZodObject<
+      { [k in PREFIX]: typeof entityRoutes[P]["request"] },
+      "strict",
+      z.ZodTypeAny,
+      { [k in PREFIX]: z.infer<typeof entityRoutes[P]["request"]> },
+      Record<string, unknown>
+    >
+  > = schema.parse(
+    JSON.parse(
+      decodeURIComponent(url.search == "" ? "{}" : url.search.substring(1))
+    )
+  );
   /*const a: z.infer<z.ZodObject<{[k in PREFIX]: typeof entityRoutes[P]["request"]}, "strict", z.ZodTypeAny, {[k in PREFIX]:  z.infer<typeof entityRoutes[P]["request"]>}, Record<string, unknown>>>[PREFIX] = data[prefix];
   const b: z.infer<typeof entityRoutes[P]["request"]> = a;*/
   return data;
-}
+};
 
 export const taskFunction = async <
   P extends keyof typeof entityRoutes,
@@ -56,7 +79,12 @@ export const taskFunction = async <
   url: URL,
   prefix: PREFIX
 ) => {
-  const result = await myFetch<P>("GET", apiUrl, parseRequestWithPrefix(apiUrl, prefix, url)[prefix], {});
+  const result = await myFetch<P>(
+    "GET",
+    apiUrl,
+    parseRequestWithPrefix(apiUrl, prefix, url)[prefix],
+    {}
+  );
   return result;
 };
 
@@ -142,7 +170,11 @@ export class PwEntityList<
 
       this._task = new Task(this, {
         task: async () => {
-          const data = parseRequestWithPrefix(this.url, this.prefix, this.history.url)
+          const data = parseRequestWithPrefix(
+            this.url,
+            this.prefix,
+            this.history.url
+          );
 
           const formDataEvent = new CustomEvent<
             z.infer<typeof entityRoutes[P]["request"]>
@@ -191,7 +223,11 @@ export class PwEntityList<
       throw new Error(msg("component not fully initialized"));
     }
 
-    const data = parseRequestWithPrefix(this.url, this.prefix, this.history.url)
+    const data = parseRequestWithPrefix(
+      this.url,
+      this.prefix,
+      this.history.url
+    );
 
     return html`
       ${bootstrapCss}
@@ -225,8 +261,8 @@ export class PwEntityList<
                 url: this.url,
                 label: "Elemente pro Seite",
                 name: ["paginationLimit"],
-                get: o => o.paginationLimit,
-                set: (o, v) => o.paginationLimit = v,
+                get: (o) => o.paginationLimit,
+                set: (o, v) => (o.paginationLimit = v),
                 task: this._task,
                 type: "select",
                 initial: data[this.prefix],
@@ -281,7 +317,11 @@ export class PwEntityList<
                       @click=${async (e: Event) => {
                         e.preventDefault();
 
-                        const data = parseRequestWithPrefix(this.url, this.prefix, this.history.url)
+                        const data = parseRequestWithPrefix(
+                          this.url,
+                          this.prefix,
+                          this.history.url
+                        );
 
                         if (!data[this.prefix]) {
                           data[this.prefix] = {};
@@ -337,7 +377,11 @@ export class PwEntityList<
                       @click=${async (e: Event) => {
                         e.preventDefault();
 
-                        const data = parseRequestWithPrefix(this.url, this.prefix, this.history.url)
+                        const data = parseRequestWithPrefix(
+                          this.url,
+                          this.prefix,
+                          this.history.url
+                        );
 
                         if (!data[this.prefix]) {
                           data[this.prefix] = {};

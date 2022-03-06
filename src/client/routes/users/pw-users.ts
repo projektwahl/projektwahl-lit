@@ -25,7 +25,10 @@ import { html } from "lit";
 import { noChange } from "lit";
 import { aClick } from "../../pw-a.js";
 import { msg } from "@lit/localize";
-import { parseRequestWithPrefix, PwEntityList } from "../../entity-list/pw-entitylist.js";
+import {
+  parseRequestWithPrefix,
+  PwEntityList,
+} from "../../entity-list/pw-entitylist.js";
 import { pwOrder } from "../../entity-list/pw-order.js";
 import { pwInput } from "../../form/pw-input.js";
 import { taskFunction } from "../../entity-list/pw-entitylist.js";
@@ -70,7 +73,11 @@ export class PwUsers<X extends string> extends PwEntityList<
 
   override get head() {
     try {
-      const data = parseRequestWithPrefix(this.url, this.prefix, this.history.url)
+      const data = parseRequestWithPrefix(
+        this.url,
+        this.prefix,
+        this.history.url
+      );
 
       const initial = data[this.prefix];
 
@@ -114,8 +121,8 @@ export class PwUsers<X extends string> extends PwEntityList<
               url: this.url,
               label: null,
               name: ["filters", "id"],
-              get: o => o.filters.id,
-                set: (o, v) => o.filters.id = v,
+              get: (o) => o.filters.id,
+              set: (o, v) => (o.filters.id = v),
               task: this._task,
               type: "number",
               defaultValue: undefined,
@@ -128,8 +135,8 @@ export class PwUsers<X extends string> extends PwEntityList<
               url: this.url,
               label: null,
               name: ["filters", "username"],
-              get: o => o.filters.username,
-                set: (o, v) => o.filters.username = v,
+              get: (o) => o.filters.username,
+              set: (o, v) => (o.filters.username = v),
               task: this._task,
               type: "text",
               initial,
@@ -143,8 +150,8 @@ export class PwUsers<X extends string> extends PwEntityList<
               disabled: this.disabled,
               label: null,
               name: ["filters", "type"],
-              get: o => o.filters.type,
-                  set: (o, v) => o.filters.type = v,
+              get: (o) => o.filters.type,
+              set: (o, v) => (o.filters.type = v),
               options: [
                 { value: undefined, text: "Alle" },
                 { value: "voter", text: "Schüler" },
