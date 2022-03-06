@@ -226,7 +226,7 @@ export class PwEntityList<
                 name: ["paginationLimit"],
                 task: this._task,
                 type: "select",
-                initial: data,
+                initial: data[this.prefix],
                 options: [
                   {
                     text: ((count: number) => msg(str`${count} per page`))(10),

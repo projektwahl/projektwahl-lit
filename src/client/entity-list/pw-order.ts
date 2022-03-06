@@ -26,9 +26,8 @@ import { HistoryController } from "../history-controller.js";
 import { msg, str } from "@lit/localize";
 import type { entityRoutes } from "../../lib/routes.js";
 import type { z } from "zod";
-import type { Path } from "../utils.js";
-import get from "lodash-es/get.js";
 import set from "lodash-es/set.js";
+import { parseRequestWithPrefix } from "./pw-entitylist.js";
 
 // workaround see https://github.com/runem/lit-analyzer/issues/149#issuecomment-1006162839
 export function pwOrder<P extends keyof typeof entityRoutes>(
@@ -96,13 +95,8 @@ export class PwOrder<P extends keyof typeof entityRoutes> extends LitElement {
       <button
         @click=${async () => {
           // TODO FIXME put this into the history implementation?
-          const data = JSON.parse(
-            decodeURIComponent(
-              this.history.url.search == ""
-                ? "{}"
-                : this.history.url.search.substring(1)
-            )
-          );
+          const data = parseRequestWithPrefix(this.url, this.prefix, this.history.url)
+
           if (!get(data, [...this.path, "sorting"])) {
             set(data, [...this.path, "sorting"], []);
           }
