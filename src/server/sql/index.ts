@@ -49,15 +49,15 @@ export function sql2(
   ...keys: readonly (
     | null // value
     | string // value
-    | [
+    | ([
       TemplateStringsArray,
         ...(null | string | string[] | boolean | number | Buffer)[]
-      ] // single nested sql2
-    | [
+      ]) // single nested sql2
+    | ([
       TemplateStringsArray,
         ...(null | string | string[] | boolean | number | Buffer)[]
-      ][] // array of nested sql2
-    | string[] // pass array value in prepared statement
+      ][]) // array of nested sql2
+    | (string[]) // pass array value in prepared statement
     | boolean // value
     | number // value
     | Buffer // value
@@ -109,8 +109,12 @@ export function sql2(
           isArr // && typeof p[0] === "object"
         )
       ) {
+
+        val2
         // dammit we can differentiate these as far as I can tell - we need the raw back...
         const val3: [TemplateStringsArray, ...(string | number | boolean | string[] | Buffer | null)[]][] | string[][] | readonly string[][] = val2;
+
+        
 
         if (val3.every(isTemplateString2)) {
           const returnValue: [
