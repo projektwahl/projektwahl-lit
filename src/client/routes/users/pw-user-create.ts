@@ -185,11 +185,10 @@ class PwUserCreate extends PwForm<
                   url: this.url,
                   type: "select",
                   disabled: this.disabled,
-                  onchange: (event: Event) => (this.type = event.target.value),
                   label: msg("User type"),
                   name: ["type"],
                   get: (o) => o.type,
-                  set: (o, v) => (o.type = v),
+                  set: (o, v) => { o.type = v; this.type = v; },
                   options: [
                     { value: "voter", text: "Schüler" },
                     { value: "helper", text: "Helfer" },

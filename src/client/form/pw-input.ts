@@ -31,6 +31,8 @@ import type { routes, ResponseType } from "../../lib/routes.js";
 import type { z } from "zod";
 import type { Task } from "@dev.mohe/task";
 
+// TODO FIXME split this into multiple again so we can type this properly
+
 // workaround see https://github.com/runem/lit-analyzer/issues/149#issuecomment-1006162839
 export function pwInput<P extends keyof typeof routes>(
   props: Pick<
@@ -51,7 +53,6 @@ export function pwInput<P extends keyof typeof routes>(
   >
 ) {
   const {
-    onchange,
     disabled,
     initial,
     label,
@@ -72,7 +73,6 @@ export function pwInput<P extends keyof typeof routes>(
   return html`<pw-input
     type=${type}
     ?disabled=${disabled}
-    @change=${onchange}
     .label=${label}
     .get=${get}
     .set=${set}
