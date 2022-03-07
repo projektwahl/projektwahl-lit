@@ -130,6 +130,7 @@ class PwProjects<X extends string> extends PwEntityList<"/api/v1/projects", X> {
               task: this._task,
               type: "text",
               initial,
+              defaultValue: "",
             })}
           </th>
 

@@ -172,6 +172,7 @@ class PwUserCreate extends PwForm<
                   set: (o, v) => (o.username = v),
                   task: this._task,
                   initial: this.initial?.data,
+                  defaultValue: "",
                 })}
                 ${pwInputText({
                   url: this.url,
@@ -183,6 +184,7 @@ class PwUserCreate extends PwForm<
                   set: (o, v) => (o.openid_id = v),
                   task: this._task,
                   initial: this.initial?.data,
+                  defaultValue: "",
                 })}
                 ${pwInputSelect({
                   url: this.url,
@@ -220,6 +222,7 @@ class PwUserCreate extends PwForm<
                       set: (o, v) => (o.group = v),
                       task: this._task,
                       initial: this.initial?.data,
+                      defaultValue: "",
                     })}
                     ${pwInputNumber({
                       url: this.url,
@@ -246,6 +249,7 @@ class PwUserCreate extends PwForm<
                         task: this._task,
                         autocomplete: "new-password",
                         initial: this.initial?.data,
+                        defaultValue: "",
                       })}
                     `
                   : undefined}

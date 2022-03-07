@@ -93,7 +93,7 @@ export abstract class PwInput<
   // TODO FIXME
   options?: { value: T; text: string }[];
 
-  defaultValue?: T;
+  defaultValue!: T;
 
   constructor() {
     super();

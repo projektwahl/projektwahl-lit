@@ -125,6 +125,7 @@ class PwChoices<X extends string> extends PwEntityList<"/api/v1/choices", X> {
               task: this._task,
               type: "text",
               initial,
+              defaultValue: "",
             })}
           </th>
 

@@ -5,9 +5,9 @@ import type { routes } from "../../lib/routes.js";
 import { PwInput } from "./pw-input.js";
 
 // workaround see https://github.com/runem/lit-analyzer/issues/149#issuecomment-1006162839
-export function pwInputText<P extends keyof typeof routes>(
+export function pwInputText<P extends keyof typeof routes, T extends string>(
   props: Pick<
-    PwInputText<P>,
+    PwInputText<P, T>,
     | "type"
     | "autocomplete"
     | "disabled"
@@ -58,9 +58,9 @@ export function pwInputText<P extends keyof typeof routes>(
   ></pw-input-text>`;
 }
 
-export class PwInputText<P extends keyof typeof routes> extends PwInput<
+export class PwInputText<P extends keyof typeof routes, T extends string> extends PwInput<
   P,
-  string,
+  T,
   HTMLInputElement
 > {
   myformdataEventListener = (
@@ -72,8 +72,9 @@ export class PwInputText<P extends keyof typeof routes> extends PwInput<
     if (!this.input.value) {
       throw new Error()
     }
-    const val = this.input.value.value;
-    this.set(event.detail, val === "" ? (this.defaultValue ?? "") : val);
+    // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
+    const val = this.input.value.value as T;
+    this.set(event.detail, val === "" ? this.defaultValue : val);
   };
 }
 

@@ -184,6 +184,7 @@ export const PwProjectCreate = setupHmr(
                     set: (o, v) => (o.title = v),
                     task: this._task,
                     initial: this.initial?.data,
+                    defaultValue: "",
                   })}
                   ${pwInputText({
                     url: this.url,
@@ -195,6 +196,7 @@ export const PwProjectCreate = setupHmr(
                     set: (o, v) => (o.info = v),
                     task: this._task,
                     initial: this.initial?.data,
+                    defaultValue: "",
                   })}
                   ${pwInputText({
                     url: this.url,
@@ -206,6 +208,7 @@ export const PwProjectCreate = setupHmr(
                     set: (o, v) => (o.place = v),
                     task: this._task,
                     initial: this.initial?.data,
+                    defaultValue: "",
                   })}
                   ${pwInputNumber({
                     url: this.url,
