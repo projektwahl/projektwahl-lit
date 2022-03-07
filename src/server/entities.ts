@@ -83,6 +83,7 @@ export async function fetchData<R extends keyof typeof entityRoutes>(
   // orderBy needs to be reversed for backwards pagination
   if (query.paginationDirection === "backwards") {
     let s: z.infer<typeof entityRoutes[R]["request"]>["sorting"] = query.sorting;
+    // @ts-expect-error mapped types?
     s = s.map<z.infer<typeof entityRoutes[R]["request"]>["sorting"][number]>((v: z.infer<typeof entityRoutes[R]["request"]>["sorting"][number]) => [
       v[0],
       v[1] === "ASC" ? "DESC" : "ASC",
@@ -114,13 +115,15 @@ export async function fetchData<R extends keyof typeof entityRoutes>(
       query.paginationLimit + 1
     })`;
   } else {
-    const queries = query.sorting.map((value, index) => {
+    const s: Array<z.infer<typeof entityRoutes[R]["request"]>["sorting"][number]> = query.sorting;
+    const queries = s.map((value: entitesType0[R]["sorting"][number], index) => {
       const part = query.sorting.slice(0, index + 1);
 
       const parts = part
         .flatMap((value, index) => {
           return [
             sql2` AND `,
+            // @ts-expect-error this seems impossible to type - we probably need to unify this to the indexed type before
             sql2`${paginationCursor ? paginationCursor[value[0]] : null} ${
               index === part.length - 1
                 ? value[1] === "ASC"
@@ -198,6 +201,7 @@ export async function fetchData<R extends keyof typeof entityRoutes>(
       "content-type": "text/json; charset=utf-8",
       ":status": 200,
     },
+    // @ts-expect-error TODO FIXME
     a,
   ];
 }
