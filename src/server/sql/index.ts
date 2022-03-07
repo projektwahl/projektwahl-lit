@@ -96,6 +96,11 @@ export function sql2(
 
       const isArr: (arg: (typeof val2)[number]) => arg is (typeof val2)[number] & any[] = Array.isArray;
 
+      // @ts-expect-error wrong isArray types
+      const isTemplateString1: (r: TemplateStringsArray | string) => r is TemplateStringsArray = Array.isArray
+
+      const isTemplateString2: (r: [TemplateStringsArray, ...(string | number | boolean | string[] | Buffer | null)[]] | string[] | readonly string[]) => r is [TemplateStringsArray, ...(string | number | boolean | string[] | Buffer | null)[]] = (r): r is [TemplateStringsArray, ...(string | number | boolean | string[] | Buffer | null)[]] => isTemplateString1(r[0])
+
       // array of flat template strings.
       if (
         // https://github.com/microsoft/TypeScript/issues/17002
@@ -107,7 +112,7 @@ export function sql2(
         // dammit we can differentiate these as far as I can tell - we need the raw back...
         const val3: [TemplateStringsArray, ...(string | number | boolean | string[] | Buffer | null)[]][] | string[][] | readonly string[][] = val2;
 
-        if (val3.every(r => typeof r[0] === "object" && "raw" in r[0])) {
+        if (val3.every(isTemplateString2)) {
           const returnValue: [
             TemplateStringsArray,
             ...(null | string | string[] | boolean | number | Buffer)[]
