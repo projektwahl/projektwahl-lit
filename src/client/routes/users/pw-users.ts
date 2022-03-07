@@ -119,7 +119,7 @@ export class PwUsers<X extends string> extends PwEntityList<
 
         <tr>
           <th scope="col">
-            ${pwInputNumber({
+            ${pwInputNumber<"/api/v1/users", number|undefined>({
               url: this.url,
               label: null,
               name: ["filters", "id"],
@@ -133,7 +133,7 @@ export class PwUsers<X extends string> extends PwEntityList<
           </th>
 
           <th scope="col">
-            ${pwInputText({
+            ${pwInputText<"/api/v1/users", string|undefined>({
               url: this.url,
               label: null,
               name: ["filters", "username"],
@@ -163,6 +163,7 @@ export class PwUsers<X extends string> extends PwEntityList<
               ],
               task: this._task,
               initial,
+              defaultValue: undefined
             })}
           </th>
 

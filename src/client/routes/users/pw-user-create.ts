@@ -162,7 +162,7 @@ class PwUserCreate extends PwForm<
                   await this._task.run();
                 }}
               >
-                ${pwInputText({
+                ${pwInputText<"/api/v1/users/create" | "/api/v1/users/update", string|undefined>({
                   url: this.url,
                   type: "text",
                   disabled: this.disabled,
@@ -174,7 +174,7 @@ class PwUserCreate extends PwForm<
                   initial: this.initial?.data,
                   defaultValue: "",
                 })}
-                ${pwInputText({
+                ${pwInputText<"/api/v1/users/create" | "/api/v1/users/update", string|undefined>({
                   url: this.url,
                   type: "text",
                   disabled: this.disabled,
@@ -186,7 +186,7 @@ class PwUserCreate extends PwForm<
                   initial: this.initial?.data,
                   defaultValue: "",
                 })}
-                ${pwInputSelect({
+                ${pwInputSelect<"/api/v1/users/create" | "/api/v1/users/update", "voter" | "helper" | "admin" | undefined>({
                   url: this.url,
                   type: "select",
                   disabled: this.disabled,
@@ -210,9 +210,10 @@ class PwUserCreate extends PwForm<
                           ...this.initial?.data,
                           type: this.type ?? this.initial?.data.type ?? "voter",
                         },
+                    defaultValue: undefined
                 })}
                 ${(this.type ?? this.initial?.data.type ?? "voter") === "voter"
-                  ? html`${pwInputText({
+                  ? html`${pwInputText<"/api/v1/users/create" | "/api/v1/users/update", string|null|undefined>({
                       url: this.url,
                       type: "text",
                       disabled: this.disabled,
@@ -224,7 +225,7 @@ class PwUserCreate extends PwForm<
                       initial: this.initial?.data,
                       defaultValue: "",
                     })}
-                    ${pwInputNumber({
+                    ${pwInputNumber<"/api/v1/users/create" | "/api/v1/users/update", number|undefined|null>({
                       url: this.url,
                       type: "number",
                       disabled: this.disabled,
@@ -234,11 +235,12 @@ class PwUserCreate extends PwForm<
                       set: (o, v) => (o.age = v),
                       task: this._task,
                       initial: this.initial?.data,
+                      defaultValue: undefined,
                     })}`
                   : undefined}
                 ${!this.disabled
                   ? html`
-                      ${pwInputText({
+                      ${pwInputText<"/api/v1/users/create" | "/api/v1/users/update", string|undefined>({
                         url: this.url,
                         type: "password",
                         disabled: this.disabled,
@@ -253,7 +255,7 @@ class PwUserCreate extends PwForm<
                       })}
                     `
                   : undefined}
-                ${pwInputCheckbox({
+                ${pwInputCheckbox<"/api/v1/users/create" | "/api/v1/users/update", boolean|undefined>({
                   url: this.url,
                   type: "checkbox",
                   value: true,
@@ -266,7 +268,7 @@ class PwUserCreate extends PwForm<
                   task: this._task,
                   initial: this.initial?.data,
                 })}
-                ${pwInputCheckbox({
+                ${pwInputCheckbox<"/api/v1/users/create" | "/api/v1/users/update", boolean|undefined>({
                   url: this.url,
                   type: "checkbox",
                   value: true,

@@ -112,7 +112,7 @@ export const PwProjectUsers = setupHmr(
 
           <tr>
             <th scope="col">
-              ${pwInputCheckbox({
+              ${pwInputCheckbox<"/api/v1/users", boolean|undefined>({
                 url: this.url,
                 label: null,
                 name: ["filters", this.name],
@@ -126,7 +126,7 @@ export const PwProjectUsers = setupHmr(
             </th>
 
             <th scope="col">
-              ${pwInputNumber({
+              ${pwInputNumber<"/api/v1/users", number|undefined>({
                 url: this.url,
                 label: null,
                 name: ["filters", "id"],
@@ -140,7 +140,7 @@ export const PwProjectUsers = setupHmr(
             </th>
 
             <th scope="col">
-              ${pwInputText({
+              ${pwInputText<"/api/v1/users", string|undefined>({
                 url: this.url,
                 label: null,
                 name: ["filters", "username"],
@@ -154,7 +154,7 @@ export const PwProjectUsers = setupHmr(
             </th>
 
             <th scope="col">
-              ${pwInputText({
+              ${/*TODO FIXME use zod to verify the actual value? also change this to select*/pwInputText<"/api/v1/users", "voter" | "helper" | "admin" | undefined>({
                 url: this.url,
                 label: null,
                 name: ["filters", "type"],

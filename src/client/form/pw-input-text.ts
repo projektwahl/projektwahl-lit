@@ -5,7 +5,7 @@ import type { routes } from "../../lib/routes.js";
 import { PwInput } from "./pw-input.js";
 
 // workaround see https://github.com/runem/lit-analyzer/issues/149#issuecomment-1006162839
-export function pwInputText<P extends keyof typeof routes, T extends string|undefined>(
+export function pwInputText<P extends keyof typeof routes, T extends string|undefined|null>(
   props: Pick<
     PwInputText<P, T>,
     | "type"
@@ -58,7 +58,7 @@ export function pwInputText<P extends keyof typeof routes, T extends string|unde
   ></pw-input-text>`;
 }
 
-export class PwInputText<P extends keyof typeof routes, T extends string|undefined> extends PwInput<
+export class PwInputText<P extends keyof typeof routes, T extends string|undefined|null> extends PwInput<
   P,
   T,
   HTMLInputElement

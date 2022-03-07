@@ -107,7 +107,7 @@ class PwProjects<X extends string> extends PwEntityList<"/api/v1/projects", X> {
 
         <tr>
           <th scope="col">
-            ${pwInputNumber({
+            ${pwInputNumber<"/api/v1/projects", number|undefined>({
               url: this.url,
               label: null,
               name: ["filters", "id"],
@@ -121,7 +121,7 @@ class PwProjects<X extends string> extends PwEntityList<"/api/v1/projects", X> {
           </th>
 
           <th scope="col">
-            ${pwInputText({
+            ${pwInputText<"/api/v1/projects", string|undefined>({
               url: this.url,
               label: null,
               name: ["filters", "title"],
@@ -135,7 +135,7 @@ class PwProjects<X extends string> extends PwEntityList<"/api/v1/projects", X> {
           </th>
 
           <th scope="col">
-            ${pwInputText({
+            ${pwInputText<"/api/v1/projects", string|undefined>({
               url: this.url,
               label: null,
               name: ["filters", "info"],

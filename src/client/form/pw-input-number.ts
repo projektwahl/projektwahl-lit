@@ -73,7 +73,7 @@ export class PwInputNumber<P extends keyof typeof routes, T extends number|undef
       event.detail,
       this.input.value.value === ""
         ? this.defaultValue
-        : this.input.value.valueAsNumber
+        : this.input.value.valueAsNumber as T
     );
   };
 }
