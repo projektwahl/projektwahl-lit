@@ -94,7 +94,27 @@ export function sql2(
     if (Array.isArray(val)) {
       const val2 = [...val];
 
-      const isArr: (arg: (typeof val2)[number]) => arg is (typeof val2)[number] & any[] = Array.isArray;
+      const isTemplateOrStringArr: (arg: null // value
+      | string // value
+      | ([
+        TemplateStringsArray,
+          ...(null | string | string[] | boolean | number | Buffer)[]
+        ]) // single nested sql2
+      | ([
+        TemplateStringsArray,
+          ...(null | string | string[] | boolean | number | Buffer)[]
+        ][]) // array of nested sql2
+      | (string[]) // pass array value in prepared statement
+      | boolean // value
+      | number // value
+      | Buffer // value
+      ) => arg is
+      ([
+        TemplateStringsArray,
+          ...(null | string | string[] | boolean | number | Buffer)[]
+        ][]) // array of nested sql2
+      | (string[]) // pass array value in prepared statement
+       = Array.isArray;
 
       // @ts-expect-error wrong isArray types
       const isTemplateString1: (r: TemplateStringsArray | string) => r is TemplateStringsArray = Array.isArray
@@ -106,7 +126,7 @@ export function sql2(
         // https://github.com/microsoft/TypeScript/issues/17002
         // https://github.com/micros^oft/TypeScript/pull/42316
         val2.every(
-          isArr // && typeof p[0] === "object"
+          isTemplateOrStringArr // && typeof p[0] === "object"
         )
       ) {
 
