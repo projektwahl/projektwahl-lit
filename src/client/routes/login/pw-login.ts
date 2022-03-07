@@ -59,6 +59,7 @@ class PwLogin extends PwForm<"/api/v1/login"> {
       const result = await myFetch<"/api/v1/login">(
         "POST",
         "/api/v1/login",
+        // @ts-expect-error TODO FIXME design change needed
         formDataEvent.detail,
         {}
       );

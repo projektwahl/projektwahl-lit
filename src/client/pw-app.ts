@@ -235,11 +235,12 @@ export class PwApp extends LitElement {
 
       this._apiTask = new Task(this, {
         task: this.nextPage,
+        // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
         args: () => [
           Object.keys(pages).find((k) =>
             new RegExp(k).test(this.history.url.pathname)
           ),
-        ],
+        ] as [keyof typeof pages | undefined],
         initialStatus:
           this.initial !== undefined ? TaskStatus.COMPLETE : TaskStatus.INITIAL,
         initialValue: this.initial,
