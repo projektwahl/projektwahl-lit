@@ -7,12 +7,25 @@ import { sql } from "../../database.js";
 import sortedIndexBy from "lodash-es/sortedIndexBy.js";
 import {
   rawChoice,
-  rawChoiceNullable,
   rawProjectSchema,
   rawUserSchema,
 } from "../../../lib/routes.js";
 import { z } from "zod";
-import groupBy from "lodash-es/groupBy.js";
+
+const groupByNumber = <T>(data: T[], keySelector: ((k: T) => number)): Record<number, T[]> => {
+  const result: Record<number, T[]> = {}
+
+  for (const datum of data) {
+    const key = keySelector(datum)
+    if (!(key in result)) {
+      result[key] = [datum]
+    } else {
+      result[key].push(datum)
+    }
+  }
+
+  return result
+}
 
 export class CPLEXLP {
   dir!: string;
@@ -213,9 +226,9 @@ const users = z.array(rawUserSchema).parse(
 );
 
 // lodash types are just trash do this yourself
-const choicesGroupedByProject = groupBy(choices, 'project_id');
+const choicesGroupedByProject = groupByNumber(choices, v => v.project_id);
 
-const choicesGroupedByUser = groupBy(choices, 'user_id');
+const choicesGroupedByUser = groupByNumber(choices, v => v.user_id);
 
 await lp.startMaximize();
 
@@ -241,17 +254,21 @@ await lp.startConstraints();
 
 // only in one project or project leader
 for (const groupedChoice of Object.entries(choicesGroupedByUser)) {
+  const a = groupedChoice[1].map<[number, string]>((choice) => [
+    1,
+    `choice_${choice.user_id}_${choice.project_id}`,
+  ])
+  const user = users.find(u => u.id == Number(groupedChoice[0]));
+  
+  const b: [number, string][] = user?.project_leader_id
+  ? [[1, `project_leader_${user.project_leader_id}`]]
+  : [];
   await lp.constraint(
     `only_in_one_project_${groupedChoice[0]}`,
     0,
     [
-      ...groupedChoice[1].map<[number, string]>((choice) => [
-        1,
-        `choice_${choice.user_id}_${choice.project_id}`,
-      ]),
-      ...(sortedIndexBy(users, { id: groupedChoice[0] }, (u) => u.id)
-        ? [[1, `project_leader_${groupedChoice[0]}`]]
-        : []),
+      ...a,
+      ...b,
     ],
     1
   );
