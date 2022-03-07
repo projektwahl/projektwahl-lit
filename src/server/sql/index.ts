@@ -93,7 +93,7 @@ export function sql2(
           isArr // && typeof p[0] === "object"
         )
       ) {
-
+        // dammit we can differentiate these as far as I can tell - we need the raw back...
         const val3: [readonly string[], ...(string | number | boolean | string[] | Buffer | null)[]][] | string[][] | readonly string[][] = val2;
 
         const returnValue: [
