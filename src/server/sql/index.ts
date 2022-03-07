@@ -31,12 +31,21 @@ SPDX-FileCopyrightText: 2021 Moritz Hedtke <Moritz.Hedtke@t-online.de>
 
 // https://github.com/porsager/postgres-benchmarks
 
-// TODO FIXME maybe implement without the .raw stuff because I don't think we need it?
+export interface WritableTemplateStringsArray extends Array<string> {
+  raw?: readonly string[];
+}
 
 export function unsafe2(
   string: null | string | number | symbol
-): [ReadonlyArray<string>] {
-  return [[String(string)]];
+): [TemplateStringsArray] {
+  const r: string[] & {raw?: string[]} = [String(string)];
+  r.raw = [String(string)];
+  const s: Readonly<string[] & {raw?: string[]}> = r;
+  if (s.raw) {
+    const t: Readonly<string[] & {raw: string[]}> = s
+    return [t];
+  }
+  throw new Error()
 }
 
 export function sql2(
