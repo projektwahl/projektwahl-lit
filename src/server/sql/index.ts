@@ -79,26 +79,29 @@ export function sql2(
       return returnValue
     }
     const val = keys[i];
-    // array of flat template strings.
-    if (
-      Array.isArray(val) &&
-      [...val].every(
-        (p) => Array.isArray(p) && typeof p[0] === "object"
-      )
-    ) {
-      const returnValue: [
-        ReadonlyArray<string>,
-        ...(null | string | string[] | boolean | number | Buffer)[]
-      ][] = [unsafe2(m), ...val];
-      return returnValue
-    }
-    // flat template string
-    if (Array.isArray(val) && typeof val[0] === "object") {
-      const returnValue: [
-        ReadonlyArray<string>,
-        ...(null | string | string[] | boolean | number | Buffer)[]
-      ][] = [unsafe2(m), val];
-      return returnValue
+
+    if (Array.isArray(val)) {
+      const val2 = [...val];
+      // array of flat template strings.
+      if (
+        val2.every(
+          Array.isArray// && typeof p[0] === "object"
+        )
+      ) {
+        const returnValue: [
+          ReadonlyArray<string>,
+          ...(null | string | string[] | boolean | number | Buffer)[]
+        ][] = [unsafe2(m), ...val2];
+        return returnValue
+      }
+      // flat template string
+      if (typeof val[0] === "object") {
+        const returnValue: [
+          ReadonlyArray<string>,
+          ...(null | string | string[] | boolean | number | Buffer)[]
+        ][] = [unsafe2(m), val];
+        return returnValue
+      }
     }
     // primitive
     return [unsafe2(m), [["", ""], val]];
