@@ -27,6 +27,10 @@ export interface WritableTemplateStringsArray extends Array<string> {
   raw?: string[];
 }
 
+export interface ReadonlyTemplateStringsArray extends Array<string> {
+  raw?: readonly string[];
+}
+
 // postgres can "Extended Query" execute BEGIN; and COMMIT;? seems like yes
 // https://www.postgresql.org/docs/current/protocol-message-types.html
 // https://www.postgresql.org/docs/current/protocol-message-formats.html
@@ -40,7 +44,17 @@ export function unsafe2(
 ): [TemplateStringsArray, ...(string | number | boolean | string[])[]] {
   const r: WritableTemplateStringsArray = [String(string)];
   r.raw = [String(string)];
-  return [r];
+  const q: Array<string> & {
+    raw?: readonly string[];
+  } = r;
+  if (q.raw !== undefined) {
+    // @ts-expect-error well typescript seems to be stupid
+    const s: Array<string> & {
+      raw: readonly string[];
+    } = q;
+    return [s];
+  }
+  throw new Error("unexpected")
 }
 
 export function sql2(
