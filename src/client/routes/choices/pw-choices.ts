@@ -45,7 +45,7 @@ class PwChoices<X extends string> extends PwEntityList<"/api/v1/choices", X> {
   constructor() {
     super();
 
-    this.url = "/api/v1/choices"
+    this.url = "/api/v1/choices";
   }
 
   override get title() {

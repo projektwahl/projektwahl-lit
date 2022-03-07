@@ -76,18 +76,23 @@ export async function fetchData<R extends keyof typeof entityRoutes>(
   const entitySchema: entitesType[R] = entityRoutes[path];
 
   // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
-  if (!(query.sorting as [string, "ASC"|"DESC"][]).find((e) => e[0] == "id")) {
+  if (
+    !(query.sorting as [string, "ASC" | "DESC"][]).find((e) => e[0] == "id")
+  ) {
     query.sorting.push(["id", "ASC"]);
   }
 
   // orderBy needs to be reversed for backwards pagination
   if (query.paginationDirection === "backwards") {
-    let s: z.infer<typeof entityRoutes[R]["request"]>["sorting"] = query.sorting;
+    let s: z.infer<typeof entityRoutes[R]["request"]>["sorting"] =
+      query.sorting;
     // @ts-expect-error mapped types?
-    s = s.map<z.infer<typeof entityRoutes[R]["request"]>["sorting"][number]>((v: z.infer<typeof entityRoutes[R]["request"]>["sorting"][number]) => [
-      v[0],
-      v[1] === "ASC" ? "DESC" : "ASC",
-    ]);
+    s = s.map<z.infer<typeof entityRoutes[R]["request"]>["sorting"][number]>(
+      (v: z.infer<typeof entityRoutes[R]["request"]>["sorting"][number]) => [
+        v[0],
+        v[1] === "ASC" ? "DESC" : "ASC",
+      ]
+    );
     query.sorting = s;
   }
 
@@ -115,32 +120,36 @@ export async function fetchData<R extends keyof typeof entityRoutes>(
       query.paginationLimit + 1
     })`;
   } else {
-    const s: Array<z.infer<typeof entityRoutes[R]["request"]>["sorting"][number]> = query.sorting;
-    const queries = s.map((value: entitesType0[R]["sorting"][number], index) => {
-      const part = query.sorting.slice(0, index + 1);
+    const s: Array<
+      z.infer<typeof entityRoutes[R]["request"]>["sorting"][number]
+    > = query.sorting;
+    const queries = s.map(
+      (value: entitesType0[R]["sorting"][number], index) => {
+        const part = query.sorting.slice(0, index + 1);
 
-      const parts = part
-        .flatMap((value, index) => {
-          return [
-            sql2` AND `,
-            // @ts-expect-error this seems impossible to type - we probably need to unify this to the indexed type before
-            sql2`${paginationCursor ? paginationCursor[value[0]] : null} ${
-              index === part.length - 1
-                ? value[1] === "ASC"
-                  ? sql2`<`
-                  : sql2`>`
-                : sql2`IS NOT DISTINCT FROM`
-            } ${unsafe2(value[0] ?? null)}`,
-          ];
-        })
-        .slice(1);
+        const parts = part
+          .flatMap((value, index) => {
+            return [
+              sql2` AND `,
+              // @ts-expect-error this seems impossible to type - we probably need to unify this to the indexed type before
+              sql2`${paginationCursor ? paginationCursor[value[0]] : null} ${
+                index === part.length - 1
+                  ? value[1] === "ASC"
+                    ? sql2`<`
+                    : sql2`>`
+                  : sql2`IS NOT DISTINCT FROM`
+              } ${unsafe2(value[0] ?? null)}`,
+            ];
+          })
+          .slice(1);
 
-      return sql2`(${sqlQuery(
-        query
-      )} AND (${parts}) ORDER BY ${orderByQuery} LIMIT ${
-        query.paginationLimit + 1
-      })`;
-    });
+        return sql2`(${sqlQuery(
+          query
+        )} AND (${parts}) ORDER BY ${orderByQuery} LIMIT ${
+          query.paginationLimit + 1
+        })`;
+      }
+    );
 
     if (queries.length == 1) {
       finalQuery = queries[0];

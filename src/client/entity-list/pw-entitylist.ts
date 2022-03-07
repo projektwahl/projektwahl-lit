@@ -325,7 +325,7 @@ export class PwEntityList<
                             paginationDirection: "forwards",
                             paginationLimit: 100,
                             sorting: [],
-                            paginationCursor: null
+                            paginationCursor: null,
                           };
                         }
                         if (this._task.value?.success) {
@@ -391,7 +391,7 @@ export class PwEntityList<
                             paginationDirection: "forwards",
                             paginationLimit: 100,
                             sorting: [],
-                            paginationCursor: null
+                            paginationCursor: null,
                           };
                         }
                         if (this._task.value?.success) {

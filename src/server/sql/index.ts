@@ -39,6 +39,8 @@ export interface ReadonlyTemplateStringsArray extends Array<string> {
 
 // https://github.com/porsager/postgres-benchmarks
 
+// TODO FIXME maybe implement without the .raw stuff because I don't think we need it?
+
 export function unsafe2(
   string: null | string | number | symbol
 ): [TemplateStringsArray, ...(string | number | boolean | string[])[]] {
@@ -54,7 +56,7 @@ export function unsafe2(
     } = q;
     return [s];
   }
-  throw new Error("unexpected")
+  throw new Error("unexpected");
 }
 
 export function sql2(

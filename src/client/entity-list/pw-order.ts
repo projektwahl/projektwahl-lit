@@ -117,7 +117,10 @@ export class PwOrder<
           const oldElementIndex = data[this.prefix]["sorting"].findIndex(
             ([e, d]: [string, string]) => e === this.name
           );
-          let oldElement: [z.infer<typeof entityRoutes[P]["request"]>["sorting"][number][0], "ASC"|"DESC"|"downup"];
+          let oldElement: [
+            z.infer<typeof entityRoutes[P]["request"]>["sorting"][number][0],
+            "ASC" | "DESC" | "downup"
+          ];
           if (oldElementIndex == -1) {
             oldElement = [this.name, `downup`];
           } else {
@@ -139,7 +142,8 @@ export class PwOrder<
           }
 
           // @ts-expect-error mapped types probably needed
-          const a: z.infer<typeof entityRoutes[P]["request"]>["sorting"] = (newElement !== null ? [[oldElement[0], newElement]] : [])
+          const a: z.infer<typeof entityRoutes[P]["request"]>["sorting"] =
+            newElement !== null ? [[oldElement[0], newElement]] : [];
 
           // @ts-expect-error mapped types probably needed
           data[this.prefix]["sorting"] = [

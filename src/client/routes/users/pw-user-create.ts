@@ -188,7 +188,10 @@ class PwUserCreate extends PwForm<
                   label: msg("User type"),
                   name: ["type"],
                   get: (o) => o.type,
-                  set: (o, v) => { o.type = v; this.type = v; },
+                  set: (o, v) => {
+                    o.type = v;
+                    this.type = v;
+                  },
                   options: [
                     { value: "voter", text: "Schüler" },
                     { value: "helper", text: "Helfer" },

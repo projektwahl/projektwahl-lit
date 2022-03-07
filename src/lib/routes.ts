@@ -184,7 +184,17 @@ const baseQuery = <
       sorting: z
         // Object.keys not typed correctly
         // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
-        .array(z.tuple([z.enum(Object.keys(s.shape) as [keyof T & string, ...(keyof T & string)[]]), z.enum(["ASC", "DESC"])]))
+        .array(
+          z.tuple([
+            z.enum(
+              Object.keys(s.shape) as [
+                keyof T & string,
+                ...(keyof T & string)[]
+              ]
+            ),
+            z.enum(["ASC", "DESC"]),
+          ])
+        )
         .default([]),
       paginationLimit: z.number().default(100),
     })

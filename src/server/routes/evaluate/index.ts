@@ -12,20 +12,23 @@ import {
 } from "../../../lib/routes.js";
 import { z } from "zod";
 
-const groupByNumber = <T>(data: T[], keySelector: ((k: T) => number)): Record<number, T[]> => {
-  const result: Record<number, T[]> = {}
+const groupByNumber = <T>(
+  data: T[],
+  keySelector: (k: T) => number
+): Record<number, T[]> => {
+  const result: Record<number, T[]> = {};
 
   for (const datum of data) {
-    const key = keySelector(datum)
+    const key = keySelector(datum);
     if (!(key in result)) {
-      result[key] = [datum]
+      result[key] = [datum];
     } else {
-      result[key].push(datum)
+      result[key].push(datum);
     }
   }
 
-  return result
-}
+  return result;
+};
 
 export class CPLEXLP {
   dir!: string;
@@ -217,18 +220,22 @@ const choices = z.array(rawChoice).parse(
 );
 
 // TODO FIXME database transaction to ensure consistent view of data
-const projects = z.array(rawProjectSchema).parse(
-  await sql`SELECT id, min_participants, max_participants FROM projects;`
-);
+const projects = z
+  .array(rawProjectSchema)
+  .parse(
+    await sql`SELECT id, min_participants, max_participants FROM projects;`
+  );
 
-const users = z.array(rawUserSchema).parse(
-  await sql`SELECT id, project_leader_id FROM present_voters ORDER BY id;`
-);
+const users = z
+  .array(rawUserSchema)
+  .parse(
+    await sql`SELECT id, project_leader_id FROM present_voters ORDER BY id;`
+  );
 
 // lodash types are just trash do this yourself
-const choicesGroupedByProject = groupByNumber(choices, v => v.project_id);
+const choicesGroupedByProject = groupByNumber(choices, (v) => v.project_id);
 
-const choicesGroupedByUser = groupByNumber(choices, v => v.user_id);
+const choicesGroupedByUser = groupByNumber(choices, (v) => v.user_id);
 
 await lp.startMaximize();
 
@@ -257,19 +264,16 @@ for (const groupedChoice of Object.entries(choicesGroupedByUser)) {
   const a = groupedChoice[1].map<[number, string]>((choice) => [
     1,
     `choice_${choice.user_id}_${choice.project_id}`,
-  ])
-  const user = users.find(u => u.id == Number(groupedChoice[0]));
-  
+  ]);
+  const user = users.find((u) => u.id == Number(groupedChoice[0]));
+
   const b: [number, string][] = user?.project_leader_id
-  ? [[1, `project_leader_${user.project_leader_id}`]]
-  : [];
+    ? [[1, `project_leader_${user.project_leader_id}`]]
+    : [];
   await lp.constraint(
     `only_in_one_project_${groupedChoice[0]}`,
     0,
-    [
-      ...a,
-      ...b,
-    ],
+    [...a, ...b],
     1
   );
 }
