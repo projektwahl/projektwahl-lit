@@ -92,7 +92,21 @@ export function sql2(
     const val = keys[i];
 
     if (Array.isArray(val)) {
-      const val2 = [...val];
+      const val2: Array<null // value
+      | string // value
+      | ([
+        TemplateStringsArray,
+          ...(null | string | string[] | boolean | number | Buffer)[]
+        ]) // single nested sql2
+      | ([
+        TemplateStringsArray,
+          ...(null | string | string[] | boolean | number | Buffer)[]
+        ][]) // array of nested sql2
+      | (string[]) // pass array value in prepared statement
+      | boolean // value
+      | number // value
+      | Buffer // value
+      > = [...val];
 
       const isTemplateOrStringArr: (arg: null // value
       | string // value
@@ -108,13 +122,10 @@ export function sql2(
       | boolean // value
       | number // value
       | Buffer // value
-      ) => arg is
-      ([
+      ) => arg is (([
         TemplateStringsArray,
           ...(null | string | string[] | boolean | number | Buffer)[]
-        ][]) // array of nested sql2
-      | (string[]) // pass array value in prepared statement
-       = Array.isArray;
+        ][]) | (string[])) = Array.isArray;
 
       // @ts-expect-error wrong isArray types
       const isTemplateString1: (r: TemplateStringsArray | string) => r is TemplateStringsArray = Array.isArray
@@ -125,8 +136,11 @@ export function sql2(
       if (
         // https://github.com/microsoft/TypeScript/issues/17002
         // https://github.com/micros^oft/TypeScript/pull/42316
-        val2.every(
-          isTemplateOrStringArr // && typeof p[0] === "object"
+        val2.every<(([
+          TemplateStringsArray,
+            ...(null | string | string[] | boolean | number | Buffer)[]
+          ][]) | (string[]))>(
+          isTemplateOrStringArr
         )
       ) {
 
