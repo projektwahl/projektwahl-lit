@@ -52,7 +52,7 @@ export function sql2(
       ReadonlyArray<string>,
         ...(null | string | string[] | boolean | number | Buffer)[]
       ][] // array of nested sql2
-    | string[]
+    | string[] // pass array value in prepared statement
     | boolean // value
     | number // value
     | Buffer // value
@@ -82,16 +82,24 @@ export function sql2(
 
     if (Array.isArray(val)) {
       const val2 = [...val];
+
+      const isArr: (arg: (typeof val2)[number]) => arg is (typeof val2)[number] & any[] = Array.isArray;
+
       // array of flat template strings.
       if (
+        // https://github.com/microsoft/TypeScript/issues/17002
+        // https://github.com/micros^oft/TypeScript/pull/42316
         val2.every(
-          Array.isArray// && typeof p[0] === "object"
+          isArr // && typeof p[0] === "object"
         )
       ) {
+
+        const val3: [readonly string[], ...(string | number | boolean | string[] | Buffer | null)[]][] | string[][] | readonly string[][] = val2;
+
         const returnValue: [
           ReadonlyArray<string>,
           ...(null | string | string[] | boolean | number | Buffer)[]
-        ][] = [unsafe2(m), ...val2];
+        ][] = [unsafe2(m), ...val3];
         return returnValue
       }
       // flat template string
