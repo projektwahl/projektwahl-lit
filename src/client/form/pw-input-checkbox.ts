@@ -5,9 +5,9 @@ import type { routes } from "../../lib/routes.js";
 import { PwInput } from "./pw-input.js";
 
 // workaround see https://github.com/runem/lit-analyzer/issues/149#issuecomment-1006162839
-export function pwInputCheckbox<P extends keyof typeof routes>(
+export function pwInputCheckbox<P extends keyof typeof routes, T extends boolean>(
   props: Pick<
-    PwInputCheckbox<P>,
+    PwInputCheckbox<P, T>,
     | "type"
     | "autocomplete"
     | "disabled"
@@ -58,11 +58,20 @@ export function pwInputCheckbox<P extends keyof typeof routes>(
   ></pw-input-checkbox>`;
 }
 
-export class PwInputCheckbox<P extends keyof typeof routes> extends PwInput<
+export class PwInputCheckbox<P extends keyof typeof routes, T extends boolean> extends PwInput<
   P,
-  boolean,
+  T,
   HTMLInputElement
 > {
+  static override get properties() {
+    return {
+      trueValue: { attribute: false },
+      ...super.properties,
+    };
+  }
+
+  trueValue!: T;
+
   myformdataEventListener = (
     event: CustomEvent<z.infer<typeof routes[P]["request"]>>
   ) => {
@@ -71,7 +80,7 @@ export class PwInputCheckbox<P extends keyof typeof routes> extends PwInput<
     }
     this.set(
       event.detail,
-      this.input.value.checked ? this.value : this.defaultValue
+      this.input.value.checked ? this.trueValue : this.defaultValue
     );
   };
 }
