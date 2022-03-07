@@ -119,7 +119,7 @@ export class PwUsers<X extends string> extends PwEntityList<
 
         <tr>
           <th scope="col">
-            ${pwInputNumber<"/api/v1/users", number|undefined>({
+            ${pwInputNumber<"/api/v1/users", number | undefined>({
               url: this.url,
               label: null,
               name: ["filters", "id"],
@@ -133,7 +133,7 @@ export class PwUsers<X extends string> extends PwEntityList<
           </th>
 
           <th scope="col">
-            ${pwInputText<"/api/v1/users", string|undefined>({
+            ${pwInputText<"/api/v1/users", string | undefined>({
               url: this.url,
               label: null,
               name: ["filters", "username"],
@@ -147,7 +147,12 @@ export class PwUsers<X extends string> extends PwEntityList<
           </th>
 
           <th scope="col">
-            ${pwInputSelect<"/api/v1/users", z.infer<typeof routes["/api/v1/users"]["request"]>["filters"]["type"]>({
+            ${pwInputSelect<
+              "/api/v1/users",
+              z.infer<
+                typeof routes["/api/v1/users"]["request"]
+              >["filters"]["type"]
+            >({
               url: this.url,
               type: "select",
               disabled: this.disabled,
@@ -163,7 +168,7 @@ export class PwUsers<X extends string> extends PwEntityList<
               ],
               task: this._task,
               initial,
-              defaultValue: undefined
+              defaultValue: undefined,
             })}
           </th>
 

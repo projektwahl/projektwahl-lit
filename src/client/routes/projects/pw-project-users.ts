@@ -112,12 +112,13 @@ export const PwProjectUsers = setupHmr(
 
           <tr>
             <th scope="col">
-              ${pwInputCheckbox<"/api/v1/users", boolean|undefined>({
+              ${pwInputCheckbox<"/api/v1/users", boolean | undefined>({
                 url: this.url,
                 label: null,
                 name: ["filters", this.name],
                 get: (o) => o.filters[this.name] == this.projectId,
-                set: (o, v) => (o.filters[this.name] = v ? this.projectId : null),
+                set: (o, v) =>
+                  (o.filters[this.name] = v ? this.projectId : null),
                 task: this._task,
                 type: "checkbox",
                 defaultValue: undefined,
@@ -126,7 +127,7 @@ export const PwProjectUsers = setupHmr(
             </th>
 
             <th scope="col">
-              ${pwInputNumber<"/api/v1/users", number|undefined>({
+              ${pwInputNumber<"/api/v1/users", number | undefined>({
                 url: this.url,
                 label: null,
                 name: ["filters", "id"],
@@ -140,7 +141,7 @@ export const PwProjectUsers = setupHmr(
             </th>
 
             <th scope="col">
-              ${pwInputText<"/api/v1/users", string|undefined>({
+              ${pwInputText<"/api/v1/users", string | undefined>({
                 url: this.url,
                 label: null,
                 name: ["filters", "username"],
@@ -154,17 +155,22 @@ export const PwProjectUsers = setupHmr(
             </th>
 
             <th scope="col">
-              ${/*TODO FIXME use zod to verify the actual value? also change this to select*/pwInputText<"/api/v1/users", "voter" | "helper" | "admin" | undefined>({
-                url: this.url,
-                label: null,
-                name: ["filters", "type"],
-                get: (o) => o.filters.type,
-                set: (o, v) => (o.filters.type = v),
-                task: this._task,
-                type: "text",
-                defaultValue: undefined,
-                initial,
-              })}
+              ${
+                /*TODO FIXME use zod to verify the actual value? also change this to select*/ pwInputText<
+                  "/api/v1/users",
+                  "voter" | "helper" | "admin" | undefined
+                >({
+                  url: this.url,
+                  label: null,
+                  name: ["filters", "type"],
+                  get: (o) => o.filters.type,
+                  set: (o, v) => (o.filters.type = v),
+                  task: this._task,
+                  type: "text",
+                  defaultValue: undefined,
+                  initial,
+                })
+              }
             </th>
 
             <th scope="col"></th>

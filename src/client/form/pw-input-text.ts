@@ -5,7 +5,10 @@ import type { routes } from "../../lib/routes.js";
 import { PwInput } from "./pw-input.js";
 
 // workaround see https://github.com/runem/lit-analyzer/issues/149#issuecomment-1006162839
-export function pwInputText<P extends keyof typeof routes, T extends string|undefined|null>(
+export function pwInputText<
+  P extends keyof typeof routes,
+  T extends string | undefined | null
+>(
   props: Pick<
     PwInputText<P, T>,
     | "type"
@@ -58,19 +61,18 @@ export function pwInputText<P extends keyof typeof routes, T extends string|unde
   ></pw-input-text>`;
 }
 
-export class PwInputText<P extends keyof typeof routes, T extends string|undefined|null> extends PwInput<
-  P,
-  T,
-  HTMLInputElement
-> {
+export class PwInputText<
+  P extends keyof typeof routes,
+  T extends string | undefined | null
+> extends PwInput<P, T, HTMLInputElement> {
   myformdataEventListener = (
     event: CustomEvent<z.infer<typeof routes[P]["request"]>>
   ) => {
     if (!this.input.value) {
-        throw new Error()
+      throw new Error();
     }
     if (!this.input.value) {
-      throw new Error()
+      throw new Error();
     }
     // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
     const val = this.input.value.value as T;

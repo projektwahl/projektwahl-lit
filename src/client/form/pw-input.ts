@@ -115,13 +115,13 @@ export abstract class PwInput<
 
   abstract myformdataEventListener: (
     event: CustomEvent<z.infer<typeof routes[P]["request"]>>
-  ) => void
+  ) => void;
 
   override connectedCallback() {
     super.connectedCallback();
-    const form = this.closest("form"); 
+    const form = this.closest("form");
     if (!form) {
-      throw new Error()
+      throw new Error();
     }
     this.form = form;
     this.form.addEventListener("myformdata", this.myformdataEventListener);

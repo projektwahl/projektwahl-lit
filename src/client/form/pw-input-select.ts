@@ -5,7 +5,10 @@ import type { routes } from "../../lib/routes.js";
 import { PwInput } from "./pw-input.js";
 
 // workaround see https://github.com/runem/lit-analyzer/issues/149#issuecomment-1006162839
-export function pwInputSelect<P extends keyof typeof routes, T extends string|number|undefined>(
+export function pwInputSelect<
+  P extends keyof typeof routes,
+  T extends string | number | undefined
+>(
   props: Pick<
     PwInputSelect<P, T>,
     | "type"
@@ -58,23 +61,23 @@ export function pwInputSelect<P extends keyof typeof routes, T extends string|nu
   ></pw-input-select>`;
 }
 
-export class PwInputSelect<P extends keyof typeof routes, T extends string|number|undefined> extends PwInput<
-  P,
-  T,
-  HTMLSelectElement
-> {
+export class PwInputSelect<
+  P extends keyof typeof routes,
+  T extends string | number | undefined
+> extends PwInput<P, T, HTMLSelectElement> {
   myformdataEventListener = (
     event: CustomEvent<z.infer<typeof routes[P]["request"]>>
   ) => {
     if (!this.input.value) {
-        throw new Error()
+      throw new Error();
     }
     const v = this.input.value;
     this.set(
       event.detail,
       v.selectedIndex == -1
         ? this.defaultValue
-        : (this.options?.find((v) => v.value == v.value)?.value ?? this.defaultValue) // To make numbers work
+        : this.options?.find((v) => v.value == v.value)?.value ??
+            this.defaultValue // To make numbers work
     );
   };
 }
