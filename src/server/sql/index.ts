@@ -52,7 +52,7 @@ export function sql2(
       ReadonlyArray<string>,
         ...(null | string | string[] | boolean | number | Buffer)[]
       ][] // array of nested sql2
-  //  | string[]
+    | string[]
     | boolean // value
     | number // value
     | Buffer // value
@@ -65,11 +65,18 @@ export function sql2(
   // into an array of templates
   const flattened: [
     ReadonlyArray<string>,
-    ...(string | string[] | boolean | number)[]
-  ][] = strings.flatMap((m, i) => {
+    ...(null | string | string[] | boolean | number | Buffer)[]
+  ][] = strings.flatMap<[
+    ReadonlyArray<string>,
+    ...(null | string | string[] | boolean | number | Buffer)[]
+  ][]>((m: string, i: number) => {
     // the last value has nothing interpolated left so just add it directly
     if (i == keys.length) {
-      return [unsafe2(m)];
+      const returnValue: [
+        ReadonlyArray<string>,
+        ...(null | string | string[] | boolean | number | Buffer)[]
+      ][] = [unsafe2(m)];
+      return returnValue
     }
     const val = keys[i];
     // array of flat template strings.
@@ -79,11 +86,19 @@ export function sql2(
         (p) => Array.isArray(p) && typeof p[0] === "object"
       )
     ) {
-      return [unsafe2(m), ...val];
+      const returnValue: [
+        ReadonlyArray<string>,
+        ...(null | string | string[] | boolean | number | Buffer)[]
+      ][] = [unsafe2(m), ...val];
+      return returnValue
     }
     // flat template string
     if (Array.isArray(val) && typeof val[0] === "object") {
-      return [unsafe2(m), val];
+      const returnValue: [
+        ReadonlyArray<string>,
+        ...(null | string | string[] | boolean | number | Buffer)[]
+      ][] = [unsafe2(m), val];
+      return returnValue
     }
     // primitive
     return [unsafe2(m), [["", ""], val]];
@@ -93,11 +108,15 @@ export function sql2(
   const result = flattened.reduce(
     (previous, current) => {
       const templateStrings: ReadonlyArray<string> = [
-        ...previous[0].slice(0, -1),
-        previous[0].slice(-1)[0] + current[0][0],
-        ...current[0].slice(1),
+        ...previous[0].slice(0, -1), // previous except last
+        previous[0].slice(-1)[0] + current[0][0], // previous last + current first 
+        ...current[0].slice(1), // current except first
       ];
-      return [templateStrings, ...previous.slice(1), ...current.slice(1)];
+      return [
+        templateStrings,
+         ...previous.slice(1), // except template strings
+          ...current.slice(1) // except template strings
+        ];
     },
     [[""]]
   );
