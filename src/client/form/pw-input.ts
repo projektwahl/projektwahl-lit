@@ -31,63 +31,9 @@ import type { routes, ResponseType } from "../../lib/routes.js";
 import type { z } from "zod";
 import type { Task } from "@dev.mohe/task";
 
-// TODO FIXME split this into multiple again so we can type this properly
-
-// workaround see https://github.com/runem/lit-analyzer/issues/149#issuecomment-1006162839
-export function pwInput<P extends keyof typeof routes>(
-  props: Pick<
-    PwInput<P>,
-    | "type"
-    | "autocomplete"
-    | "disabled"
-    | "initial"
-    | "label"
-    | "name"
-    | "url"
-    | "get"
-    | "set"
-    | "options"
-    | "task"
-    | "defaultValue"
-    | "value"
-  >
-) {
-  const {
-    disabled,
-    initial,
-    label,
-    options,
-    name,
-    get,
-    set,
-    url,
-    task,
-    type,
-    autocomplete,
-    defaultValue,
-    value,
-    ...rest
-  } = props;
-  let _ = rest;
-  _ = 1; // ensure no property is missed - Don't use `{}` as a type. `{}` actually means "any non-nullish value".
-  return html`<pw-input
-    type=${type}
-    ?disabled=${disabled}
-    .label=${label}
-    .get=${get}
-    .set=${set}
-    .url=${url}
-    .name=${name}
-    .options=${options}
-    autocomplete=${ifDefined(autocomplete)}
-    .task=${task}
-    .initial=${initial}
-    .defaultValue=${defaultValue}
-    .value=${value}
-  ></pw-input>`;
-}
-
-export class PwInput<P extends keyof typeof routes> extends LitElement {
+export abstract class PwInput<
+  P extends keyof typeof routes, T
+> extends LitElement {
   static override get properties() {
     return {
       label: { attribute: false },
@@ -120,9 +66,9 @@ export class PwInput<P extends keyof typeof routes> extends LitElement {
   // TODO FIXME maybe switch this back to Path and lodash-es (but not remove then for now so we could switch back)
   get!: (
     o: z.infer<typeof routes[P]["request"]>
-  ) => number | string | boolean | null | undefined;
+  ) => T;
 
-  set!: (o: z.infer<typeof routes[P]["request"]>, v: any) => void;
+  set!: (o: z.infer<typeof routes[P]["request"]>, v: T) => void;
 
   disabled?: boolean = false;
 
@@ -138,16 +84,16 @@ export class PwInput<P extends keyof typeof routes> extends LitElement {
 
   initial?: z.infer<typeof routes[P]["request"]>;
 
-  value?: number | boolean | string;
+  value?: T;
 
-  input: import("lit/directives/ref").Ref<HTMLElement>;
+  input: import("lit/directives/ref").Ref<HTMLInputElement>;
 
   form!: HTMLFormElement;
 
   // z.infer<typeof routes[P]["request"]>[Q]
-  options?: { value: number | string | undefined; text: string }[];
+  options?: { value: T; text: string }[];
 
-  defaultValue?: number | boolean | string;
+  defaultValue!: T;
 
   constructor() {
     super();
@@ -334,4 +280,3 @@ export class PwInput<P extends keyof typeof routes> extends LitElement {
     `;
   }
 }
-customElements.define("pw-input", PwInput);
