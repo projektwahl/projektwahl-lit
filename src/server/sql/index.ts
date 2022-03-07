@@ -38,27 +38,23 @@ export interface WritableTemplateStringsArray extends Array<string> {
 export function unsafe2(
   string: null | string | number | symbol
 ): [TemplateStringsArray] {
-  const r: string[] & {raw?: string[]} = [String(string)];
+  const r: WritableTemplateStringsArray = [];
   r.raw = [String(string)];
-  const s: Readonly<string[] & {raw?: string[]}> = r;
-  if (s.raw) {
-    const t: Readonly<string[] & {raw: string[]}> = s
-    return [t];
-  }
-  throw new Error()
+  // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
+  return [r as TemplateStringsArray]
 }
 
 export function sql2(
-  strings: ReadonlyArray<string>, // template strings
+  strings: TemplateStringsArray, // template strings
   ...keys: readonly (
     | null // value
     | string // value
     | [
-      ReadonlyArray<string>,
+      TemplateStringsArray,
         ...(null | string | string[] | boolean | number | Buffer)[]
       ] // single nested sql2
     | [
-      ReadonlyArray<string>,
+      TemplateStringsArray,
         ...(null | string | string[] | boolean | number | Buffer)[]
       ][] // array of nested sql2
     | string[] // pass array value in prepared statement
@@ -67,22 +63,22 @@ export function sql2(
     | Buffer // value
   )[]
 ): [
-  ReadonlyArray<string>,
+  TemplateStringsArray,
   ...(null | string | string[] | boolean | number | Buffer)[]
 ] {
   // join the strings and the interpolated values
   // into an array of templates
   const flattened: [
-    ReadonlyArray<string>,
+    TemplateStringsArray,
     ...(null | string | string[] | boolean | number | Buffer)[]
   ][] = strings.flatMap<[
-    ReadonlyArray<string>,
+    TemplateStringsArray,
     ...(null | string | string[] | boolean | number | Buffer)[]
   ][]>((m: string, i: number) => {
     // the last value has nothing interpolated left so just add it directly
     if (i == keys.length) {
       const returnValue: [
-        ReadonlyArray<string>,
+        TemplateStringsArray,
         ...(null | string | string[] | boolean | number | Buffer)[]
       ][] = [unsafe2(m)];
       return returnValue
@@ -106,7 +102,7 @@ export function sql2(
         const val3: [readonly string[], ...(string | number | boolean | string[] | Buffer | null)[]][] | string[][] | readonly string[][] = val2;
 
         const returnValue: [
-          ReadonlyArray<string>,
+          TemplateStringsArray,
           ...(null | string | string[] | boolean | number | Buffer)[]
         ][] = [unsafe2(m), ...val3];
         return returnValue
@@ -114,7 +110,7 @@ export function sql2(
       // flat template string
       if (typeof val[0] === "object") {
         const returnValue: [
-          ReadonlyArray<string>,
+          TemplateStringsArray,
           ...(null | string | string[] | boolean | number | Buffer)[]
         ][] = [unsafe2(m), val];
         return returnValue
@@ -127,7 +123,7 @@ export function sql2(
   // convert this array of flat templates into a template
   const result = flattened.reduce(
     (previous, current) => {
-      const templateStrings: ReadonlyArray<string> = [
+      const templateStrings: TemplateStringsArray = [
         ...previous[0].slice(0, -1), // previous except last
         previous[0].slice(-1)[0] + current[0][0], // previous last + current first 
         ...current[0].slice(1), // current except first
