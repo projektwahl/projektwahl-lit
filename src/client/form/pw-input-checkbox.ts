@@ -5,9 +5,9 @@ import type { routes } from "../../lib/routes.js";
 import { PwInput } from "./pw-input.js";
 
 // workaround see https://github.com/runem/lit-analyzer/issues/149#issuecomment-1006162839
-export function pwInputNumber<P extends keyof typeof routes>(
+export function pwInputCheckbox<P extends keyof typeof routes>(
   props: Pick<
-    PwInputNumber<P>,
+    PwInputCheckbox<P>,
     | "type"
     | "autocomplete"
     | "disabled"
@@ -41,7 +41,7 @@ export function pwInputNumber<P extends keyof typeof routes>(
   } = props;
   let _ = rest;
   _ = 1; // ensure no property is missed - Don't use `{}` as a type. `{}` actually means "any non-nullish value".
-  return html`<pw-input-number
+  return html`<pw-input-checkbox
     type=${type}
     ?disabled=${disabled}
     .label=${label}
@@ -55,12 +55,12 @@ export function pwInputNumber<P extends keyof typeof routes>(
     .initial=${initial}
     .defaultValue=${defaultValue}
     .value=${value}
-  ></pw-input-number>`;
+  ></pw-input-checkbox>`;
 }
 
-export class PwInputNumber<P extends keyof typeof routes> extends PwInput<
+export class PwInputCheckbox<P extends keyof typeof routes> extends PwInput<
   P,
-  number
+  boolean
 > {
   myformdataEventListener = (
     event: CustomEvent<z.infer<typeof routes[P]["request"]>>
@@ -70,11 +70,9 @@ export class PwInputNumber<P extends keyof typeof routes> extends PwInput<
     }
     this.set(
       event.detail,
-      this.input.value.value === ""
-        ? this.defaultValue
-        : this.input.value.valueAsNumber
+      this.input.value.checked ? this.value : this.defaultValue
     );
   };
 }
 
-customElements.define("pw-input-number", PwInputNumber);
+customElements.define("pw-input-checkbox", PwInputCheckbox);

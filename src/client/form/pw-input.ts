@@ -25,14 +25,15 @@ import { LitElement, noChange } from "lit";
 import { bootstrapCss } from "../index.js";
 import { ifDefined } from "lit/directives/if-defined.js";
 import { msg } from "@lit/localize";
-import { createRef, ref } from "lit/directives/ref.js";
+import { createRef, Ref, ref } from "lit/directives/ref.js";
 import { repeat } from "lit/directives/repeat.js";
 import type { routes, ResponseType } from "../../lib/routes.js";
 import type { z } from "zod";
 import type { Task } from "@dev.mohe/task";
 
 export abstract class PwInput<
-  P extends keyof typeof routes, T
+  P extends keyof typeof routes,
+  T
 > extends LitElement {
   static override get properties() {
     return {
@@ -64,9 +65,7 @@ export abstract class PwInput<
   name!: string[];
 
   // TODO FIXME maybe switch this back to Path and lodash-es (but not remove then for now so we could switch back)
-  get!: (
-    o: z.infer<typeof routes[P]["request"]>
-  ) => T;
+  get!: (o: z.infer<typeof routes[P]["request"]>) => T;
 
   set!: (o: z.infer<typeof routes[P]["request"]>, v: T) => void;
 
@@ -84,9 +83,9 @@ export abstract class PwInput<
 
   initial?: z.infer<typeof routes[P]["request"]>;
 
-  value?: T;
+  value!: T;
 
-  input: import("lit/directives/ref").Ref<HTMLInputElement>;
+  input: Ref<HTMLInputElement>;
 
   form!: HTMLFormElement;
 
@@ -116,19 +115,7 @@ export abstract class PwInput<
   myformdataEventListener = (
     event: CustomEvent<z.infer<typeof routes[P]["request"]>>
   ) => {
-    if (this.type === "number") {
-      this.set(
-        event.detail,
-        this.input.value.value === ""
-          ? this.defaultValue
-          : this.input.value.valueAsNumber
-      );
-    } else if (this.type === "checkbox") {
-      this.set(
-        event.detail,
-        this.input.value.checked ? this.value : this.defaultValue
-      );
-    } else if (this.type === "select") {
+    if (this.type === "select") {
       this.set(
         event.detail,
         this.input.value.selectedIndex == -1
@@ -143,7 +130,11 @@ export abstract class PwInput<
 
   override connectedCallback() {
     super.connectedCallback();
-    this.form = this.closest("form");
+    const form = this.closest("form"); 
+    if (!form) {
+      throw new Error()
+    }
+    this.form = form;
     this.form.addEventListener("myformdata", this.myformdataEventListener);
     this.form.addEventListener("myformkeys", this.myformkeysEventListener);
   }
