@@ -41,7 +41,7 @@ export function unsafe2(
 
 export function sql2(
   strings: ReadonlyArray<string>, // template strings
-  ..._keys: (
+  ...keys: readonly (
     | null // value
     | string // value
     | [
@@ -61,12 +61,6 @@ export function sql2(
   ReadonlyArray<string>,
   ...(null | string | string[] | boolean | number | Buffer)[]
 ] {
-  const keys = _keys;
-
-  const r: ReadonlyArray<string> = [""];
-
-  const rd: ReadonlyArray<string> = ["", ""];
-
   // join the strings and the interpolated values
   // into an array of templates
   const flattened: [
@@ -92,10 +86,10 @@ export function sql2(
       return [unsafe2(m), val];
     }
     // primitive
-    return [unsafe2(m), [rd, val]];
+    return [unsafe2(m), [["", ""], val]];
   });
-  //console.log("flattened", flattened)
 
+  // convert this array of flat templates into a template
   const result = flattened.reduce(
     (previous, current) => {
       const templateStrings: ReadonlyArray<string> = [
@@ -105,10 +99,8 @@ export function sql2(
       ];
       return [templateStrings, ...previous.slice(1), ...current.slice(1)];
     },
-    [r]
+    [[""]]
   );
-
-  //console.log("result", result)
 
   return result;
 }
