@@ -140,10 +140,6 @@ export class PwEntityList<
     return "blub";
   }
 
-  get url(): P {
-    throw new Error("not implemented");
-  }
-
   initialRender: boolean;
 
   initial: ResponseType<P> | undefined;
@@ -324,7 +320,13 @@ export class PwEntityList<
                         );
 
                         if (!data[this.prefix]) {
-                          data[this.prefix] = {};
+                          data[this.prefix] = {
+                            filters: {},
+                            paginationDirection: "forwards",
+                            paginationLimit: 100,
+                            sorting: [],
+                            paginationCursor: null
+                          };
                         }
                         if (this._task.value?.success) {
                           data[this.prefix].paginationCursor =
@@ -384,7 +386,13 @@ export class PwEntityList<
                         );
 
                         if (!data[this.prefix]) {
-                          data[this.prefix] = {};
+                          data[this.prefix] = {
+                            filters: {},
+                            paginationDirection: "forwards",
+                            paginationLimit: 100,
+                            sorting: [],
+                            paginationCursor: null
+                          };
                         }
                         if (this._task.value?.success) {
                           data[this.prefix].paginationCursor =
