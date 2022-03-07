@@ -182,7 +182,9 @@ const baseQuery = <
       paginationCursor: s.partial().nullish(), // if this is null the start is at start/end depending on paginationDirection
       filters: s.partial(),
       sorting: z
-        .array(z.tuple([z.enum(Object.keys(s.shape)), z.enum(["ASC", "DESC"])]))
+        // Object.keys not typed correctly
+        // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
+        .array(z.tuple([z.enum(Object.keys(s.shape) as [keyof T & string, ...(keyof T & string)[]]), z.enum(["ASC", "DESC"])]))
         .default([]),
       paginationLimit: z.number().default(100),
     })
