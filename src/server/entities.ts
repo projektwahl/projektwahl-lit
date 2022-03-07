@@ -88,6 +88,7 @@ export async function fetchData<R extends keyof typeof entityRoutes>(
       query.sorting;
     // @ts-expect-error mapped types?
     s = s.map<z.infer<typeof entityRoutes[R]["request"]>["sorting"][number]>(
+      // @ts-expect-error mapped types?
       (v: z.infer<typeof entityRoutes[R]["request"]>["sorting"][number]) => [
         v[0],
         v[1] === "ASC" ? "DESC" : "ASC",
