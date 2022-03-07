@@ -35,6 +35,7 @@ import { pwOrder } from "../../entity-list/pw-order.js";
 import { pwInput } from "../../form/pw-input.js";
 import { animate } from "@lit-labs/motion";
 import { repeat } from "lit/directives/repeat.js";
+import { pwInputNumber } from "../../form/pw-input-number.js";
 
 export const pwChoices = async (url: URL) => {
   const result = await taskFunction("/api/v1/choices", url, "choices");
@@ -101,7 +102,7 @@ class PwChoices<X extends string> extends PwEntityList<"/api/v1/choices", X> {
 
         <tr>
           <th scope="col">
-            ${pwInput({
+            ${pwInputNumber({
               url: this.url,
               label: null,
               name: ["filters", "id"],

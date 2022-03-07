@@ -32,6 +32,7 @@ import { msg, str } from "@lit/localize";
 import { ifDefined } from "lit/directives/if-defined.js";
 import { myFetch } from "../utils.js";
 import { pwInput } from "../form/pw-input.js";
+import { pwInputSelect } from "../form/pw-input-select.js";
 
 export const parseRequestWithPrefix = <
   P extends keyof typeof entityRoutes,
@@ -253,7 +254,7 @@ export class PwEntityList<
           <div class="row justify-content-between">
             <div class="col-auto">${this.buttons}</div>
             <div class="col-3">
-              ${pwInput({
+              ${pwInputSelect({
                 url: this.url,
                 label: "Elemente pro Seite",
                 name: ["paginationLimit"],

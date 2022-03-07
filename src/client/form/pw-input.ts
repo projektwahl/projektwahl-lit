@@ -34,7 +34,7 @@ import type { Task } from "@dev.mohe/task";
 export abstract class PwInput<
   P extends keyof typeof routes,
   T,
-  I
+  I extends Element
 > extends LitElement {
   static override get properties() {
     return {
@@ -84,7 +84,7 @@ export abstract class PwInput<
 
   initial?: z.infer<typeof routes[P]["request"]>;
 
-  value!: T;
+  value?: T;
 
   input: Ref<I>;
 
@@ -93,7 +93,7 @@ export abstract class PwInput<
   // z.infer<typeof routes[P]["request"]>[Q]
   options!: { value: T; text: string }[];
 
-  defaultValue!: T;
+  defaultValue?: T;
 
   constructor() {
     super();
@@ -113,15 +113,9 @@ export abstract class PwInput<
     event.detail.push(this.name);
   };
 
-  myformdataEventListener = (
+  abstract myformdataEventListener: (
     event: CustomEvent<z.infer<typeof routes[P]["request"]>>
-  ) => {
-    if (!this.input.value) {
-      throw new Error()
-    }
-    const val = this.input.value.value;
-    this.set(event.detail, val === "" ? this.defaultValue : val);
-  };
+  ) => void
 
   override connectedCallback() {
     super.connectedCallback();
