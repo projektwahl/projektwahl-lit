@@ -23,14 +23,6 @@ SPDX-FileCopyrightText: 2021 Moritz Hedtke <Moritz.Hedtke@t-online.de>
 // https://github.com/porsager/postgres/
 // https://www.postgresql.org/docs/current/protocol.html
 
-export interface WritableTemplateStringsArray extends Array<string> {
-  raw?: string[];
-}
-
-export interface ReadonlyTemplateStringsArray extends Array<string> {
-  raw?: readonly string[];
-}
-
 // postgres can "Extended Query" execute BEGIN; and COMMIT;? seems like yes
 // https://www.postgresql.org/docs/current/protocol-message-types.html
 // https://www.postgresql.org/docs/current/protocol-message-formats.html
@@ -43,94 +35,73 @@ export interface ReadonlyTemplateStringsArray extends Array<string> {
 
 export function unsafe2(
   string: null | string | number | symbol
-): [TemplateStringsArray, ...(string | number | boolean | string[])[]] {
-  const r: WritableTemplateStringsArray = [String(string)];
-  r.raw = [String(string)];
-  const q: Array<string> & {
-    raw?: readonly string[];
-  } = r;
-  if (q.raw !== undefined) {
-    // @ts-expect-error well typescript seems to be stupid
-    const s: Array<string> & {
-      raw: readonly string[];
-    } = q;
-    return [s];
-  }
-  throw new Error("unexpected");
+): [ReadonlyArray<string>] {
+  return [[String(string)]];
 }
 
 export function sql2(
-  _strings: TemplateStringsArray,
+  strings: ReadonlyArray<string>, // template strings
   ..._keys: (
-    | null
-    | string
+    | null // value
+    | string // value
     | [
-        TemplateStringsArray,
+      ReadonlyArray<string>,
         ...(null | string | string[] | boolean | number | Buffer)[]
-      ]
+      ] // single nested sql2
     | [
-        TemplateStringsArray,
+      ReadonlyArray<string>,
         ...(null | string | string[] | boolean | number | Buffer)[]
-      ][]
-    | string[]
-    | boolean
-    | number
-    | Buffer
+      ][] // array of nested sql2
+  //  | string[]
+    | boolean // value
+    | number // value
+    | Buffer // value
   )[]
 ): [
-  TemplateStringsArray,
+  ReadonlyArray<string>,
   ...(null | string | string[] | boolean | number | Buffer)[]
 ] {
-  const strings = _strings;
   const keys = _keys;
-  //console.log("sql", strings, keys)
 
-  const r: WritableTemplateStringsArray = [""];
-  r.raw = [""];
+  const r: ReadonlyArray<string> = [""];
 
-  const rd: WritableTemplateStringsArray = ["", ""];
-  rd.raw = ["", ""];
+  const rd: ReadonlyArray<string> = ["", ""];
 
-  const stringsAsTemplates = strings.map(unsafe2);
-
-  // array of templates
+  // join the strings and the interpolated values
+  // into an array of templates
   const flattened: [
-    TemplateStringsArray,
+    ReadonlyArray<string>,
     ...(string | string[] | boolean | number)[]
-  ][] = stringsAsTemplates.flatMap((m, i) => {
+  ][] = strings.flatMap((m, i) => {
+    // the last value has nothing interpolated left so just add it directly
     if (i == keys.length) {
-      return [m];
+      return [unsafe2(m)];
     }
-    // array of flat template strings.
     const val = keys[i];
+    // array of flat template strings.
     if (
       Array.isArray(val) &&
       [...val].every(
-        (p) => Array.isArray(p) && typeof p[0] === "object" && "raw" in p[0]
+        (p) => Array.isArray(p) && typeof p[0] === "object"
       )
     ) {
-      return [m, ...val];
+      return [unsafe2(m), ...val];
     }
     // flat template string
-    if (Array.isArray(val) && typeof val[0] === "object" && "raw" in val[0]) {
-      return [m, keys[i]];
+    if (Array.isArray(val) && typeof val[0] === "object") {
+      return [unsafe2(m), val];
     }
     // primitive
-    return [m, [rd, keys[i]]];
+    return [unsafe2(m), [rd, val]];
   });
   //console.log("flattened", flattened)
 
   const result = flattened.reduce(
     (previous, current) => {
-      const templateStrings: WritableTemplateStringsArray = [
+      const templateStrings: ReadonlyArray<string> = [
         ...previous[0].slice(0, -1),
         previous[0].slice(-1)[0] + current[0][0],
         ...current[0].slice(1),
-      ];
-      templateStrings.raw = [
-        ...previous[0].raw.slice(0, -1),
-        previous[0].raw.slice(-1)[0] + current[0].raw[0],
-        ...current[0].raw.slice(1),
       ];
       return [templateStrings, ...previous.slice(1), ...current.slice(1)];
     },
@@ -143,7 +114,7 @@ export function sql2(
 }
 
 export function sql2ToString(
-  sql: [TemplateStringsArray, ...(string | string[] | boolean | number)[]]
+  sql: [ReadonlyArray<string>, ...(string | string[] | boolean | number)[]]
 ) {
   return sql[0]
     .map((s, i) => {
@@ -155,12 +126,12 @@ export function sql2ToString(
     .join("");
 }
 
-/*
+
 console.log(sql2`SELECT * FROM test`)
 console.log(sql2`SELECT ${"hill"}`)
 console.log(sql2`SELECT ${sql2`* FROM test`} WHERE ${1}`)
 /** @type {any[]} */
-/*
+
 let list = ["id", "title", "info"];
 
 console.log(sql2`SELECT "id", "title", "info", "place" FROM projects WHERE 1${list.map(
@@ -168,4 +139,3 @@ console.log(sql2`SELECT "id", "title", "info", "place" FROM projects WHERE 1${li
 )} OR NOT ... params() ORDER BY ${list.map(
   (v) => sql2`${unsafe2(v)} ASC, `
 )} LIMIT 1337`);
-*/
