@@ -90,7 +90,7 @@ export abstract class PwInput<
   form!: HTMLFormElement;
 
   // z.infer<typeof routes[P]["request"]>[Q]
-  options?: { value: T; text: string }[];
+  options!: { value: T; text: string }[];
 
   defaultValue!: T;
 
@@ -115,17 +115,11 @@ export abstract class PwInput<
   myformdataEventListener = (
     event: CustomEvent<z.infer<typeof routes[P]["request"]>>
   ) => {
-    if (this.type === "select") {
-      this.set(
-        event.detail,
-        this.input.value.selectedIndex == -1
-          ? this.defaultValue
-          : this.options?.find((v) => v.value == this.input.value.value)?.value // To make numbers work
-      );
-    } else {
-      const val = this.input.value.value;
-      this.set(event.detail, val === "" ? this.defaultValue : val);
+    if (!this.input.value) {
+      throw new Error()
     }
+    const val = this.input.value.value;
+    this.set(event.detail, val === "" ? this.defaultValue : val);
   };
 
   override connectedCallback() {
