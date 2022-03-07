@@ -75,16 +75,19 @@ export async function fetchData<R extends keyof typeof entityRoutes>(
 ): Promise<[OutgoingHttpHeaders, ResponseType<R>]> {
   const entitySchema: entitesType[R] = entityRoutes[path];
 
-  if (!query.sorting.find((e) => e[0] == "id")) {
+  // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
+  if (!(query.sorting as [string, "ASC"|"DESC"][]).find((e) => e[0] == "id")) {
     query.sorting.push(["id", "ASC"]);
   }
 
   // orderBy needs to be reversed for backwards pagination
   if (query.paginationDirection === "backwards") {
-    query.sorting = query.sorting.map((v) => [
+    let s: z.infer<typeof entityRoutes[R]["request"]>["sorting"] = query.sorting;
+    s = s.map<z.infer<typeof entityRoutes[R]["request"]>["sorting"][number]>((v: z.infer<typeof entityRoutes[R]["request"]>["sorting"][number]) => [
       v[0],
       v[1] === "ASC" ? "DESC" : "ASC",
     ]);
+    query.sorting = s;
   }
 
   const orderByQuery = query.sorting
