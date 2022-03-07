@@ -34,6 +34,8 @@ import { taskFunction } from "../../entity-list/pw-entitylist.js";
 import { pwInputNumber } from "../../form/pw-input-number.js";
 import { pwInputText } from "../../form/pw-input-text.js";
 import { pwInputSelect } from "../../form/pw-input-select.js";
+import type { z } from "zod";
+import type { routes } from "../../../lib/routes.js";
 
 export const pwUsers = async (url: URL) => {
   const result = await taskFunction("/api/v1/users", url, "users");
@@ -144,7 +146,7 @@ export class PwUsers<X extends string> extends PwEntityList<
           </th>
 
           <th scope="col">
-            ${pwInputSelect({
+            ${pwInputSelect<"/api/v1/users", z.infer<typeof routes["/api/v1/users"]["request"]>["filters"]["type"]>({
               url: this.url,
               type: "select",
               disabled: this.disabled,

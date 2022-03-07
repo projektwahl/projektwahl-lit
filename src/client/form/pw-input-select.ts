@@ -5,9 +5,9 @@ import type { routes } from "../../lib/routes.js";
 import { PwInput } from "./pw-input.js";
 
 // workaround see https://github.com/runem/lit-analyzer/issues/149#issuecomment-1006162839
-export function pwInputSelect<P extends keyof typeof routes>(
+export function pwInputSelect<P extends keyof typeof routes, T extends string|number|undefined>(
   props: Pick<
-    PwInputSelect<P>,
+    PwInputSelect<P, T>,
     | "type"
     | "autocomplete"
     | "disabled"
@@ -58,9 +58,9 @@ export function pwInputSelect<P extends keyof typeof routes>(
   ></pw-input-select>`;
 }
 
-export class PwInputSelect<P extends keyof typeof routes> extends PwInput<
+export class PwInputSelect<P extends keyof typeof routes, T extends string|number|undefined> extends PwInput<
   P,
-  string|number,
+  T,
   HTMLSelectElement
 > {
   myformdataEventListener = (
