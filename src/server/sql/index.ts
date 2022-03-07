@@ -92,40 +92,18 @@ export function sql2(
     const val = keys[i];
 
     if (Array.isArray(val)) {
-      const val2: Array<null // value
-      | string // value
-      | ([
-        TemplateStringsArray,
-          ...(null | string | string[] | boolean | number | Buffer)[]
-        ]) // single nested sql2
-      | ([
-        TemplateStringsArray,
-          ...(null | string | string[] | boolean | number | Buffer)[]
-        ][]) // array of nested sql2
-      | (string[]) // pass array value in prepared statement
-      | boolean // value
-      | number // value
-      | Buffer // value
-      > = [...val];
+      const val2: ([TemplateStringsArray, ...(string | number | boolean | string[] | Buffer | null)[]] 
+      
+      | [TemplateStringsArray, ...(string | number | boolean | string[] | Buffer | null)[]][] 
 
-      const isTemplateOrStringArr: (arg: null // value
-      | string // value
-      | ([
-        TemplateStringsArray,
-          ...(null | string | string[] | boolean | number | Buffer)[]
-        ]) // single nested sql2
-      | ([
-        TemplateStringsArray,
-          ...(null | string | string[] | boolean | number | Buffer)[]
-        ][]) // array of nested sql2
-      | (string[]) // pass array value in prepared statement
-      | boolean // value
-      | number // value
-      | Buffer // value
-      ) => arg is (([
-        TemplateStringsArray,
-          ...(null | string | string[] | boolean | number | Buffer)[]
-        ][]) | (string[])) = Array.isArray;
+      | string[]) = [...val];
+
+      // TODO FIXME do this all again I fucked up at the start
+
+      const isTemplateOrStringArr: (arg: string | [TemplateStringsArray, ...(string | number | boolean | string[] | Buffer | null)[]]
+      | [TemplateStringsArray, ...(string | number | boolean | string[] | Buffer | null)[]][number]
+      ) => arg is ([TemplateStringsArray, ...(string | number | boolean | string[] | Buffer | null)[]]
+      | [TemplateStringsArray, ...(string | number | boolean | string[] | Buffer | null)[]][number]) = Array.isArray;
 
       // @ts-expect-error wrong isArray types
       const isTemplateString1: (r: TemplateStringsArray | string) => r is TemplateStringsArray = Array.isArray
@@ -136,10 +114,7 @@ export function sql2(
       if (
         // https://github.com/microsoft/TypeScript/issues/17002
         // https://github.com/micros^oft/TypeScript/pull/42316
-        val2.every<(([
-          TemplateStringsArray,
-            ...(null | string | string[] | boolean | number | Buffer)[]
-          ][]) | (string[]))>(
+        val2.every(
           isTemplateOrStringArr
         )
       ) {
