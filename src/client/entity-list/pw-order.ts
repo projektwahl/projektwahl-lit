@@ -70,7 +70,7 @@ export class PwOrder<
 
   prefix!: X;
 
-  name!: keyof z.infer<typeof entityRoutes[P]["response"]>["entities"][number];
+  name!: z.infer<typeof entityRoutes[P]["request"]>["sorting"][number][0];
 
   title!: string;
 
@@ -115,11 +115,11 @@ export class PwOrder<
           }
 
           const oldElementIndex = data[this.prefix]["sorting"].findIndex(
-            ([e, d]: [string, string]) => e === `${this.name}`
+            ([e, d]: [string, string]) => e === this.name
           );
-          let oldElement;
+          let oldElement: [z.infer<typeof entityRoutes[P]["request"]>["sorting"][number][0], "ASC"|"DESC"|"downup"];
           if (oldElementIndex == -1) {
-            oldElement = [`${this.name}`, `downup`];
+            oldElement = [this.name, `downup`];
           } else {
             oldElement = data[this.prefix]["sorting"].splice(
               oldElementIndex,
@@ -138,9 +138,13 @@ export class PwOrder<
               newElement = null;
           }
 
+          // @ts-expect-error mapped types probably needed
+          const a: z.infer<typeof entityRoutes[P]["request"]>["sorting"] = (newElement !== null ? [[oldElement[0], newElement]] : [])
+
+          // @ts-expect-error mapped types probably needed
           data[this.prefix]["sorting"] = [
             ...data[this.prefix]["sorting"],
-            ...(newElement !== null ? [[oldElement[0], newElement]] : []),
+            ...a,
           ];
 
           HistoryController.goto(
@@ -165,6 +169,7 @@ export class PwOrder<
             this.history.url
           );
 
+          // @ts-expect-error mapped types probably needed
           const value = (data[this.prefix]["sorting"] ?? []).find(
             ([e, d]: [string, string]) => e === `${this.name}`
           )?.[1];
