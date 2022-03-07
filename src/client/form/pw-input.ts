@@ -138,16 +138,16 @@ export class PwInput<P extends keyof typeof routes> extends LitElement {
 
   initial?: z.infer<typeof routes[P]["request"]>;
 
-  value?: number | string;
+  value?: number | boolean | string;
 
   input: import("lit/directives/ref").Ref<HTMLElement>;
 
   form!: HTMLFormElement;
 
   // z.infer<typeof routes[P]["request"]>[Q]
-  options?: { value: number | string; text: string }[];
+  options?: { value: number | string | undefined; text: string }[];
 
-  defaultValue?: number | string;
+  defaultValue?: number | boolean | string;
 
   constructor() {
     super();
