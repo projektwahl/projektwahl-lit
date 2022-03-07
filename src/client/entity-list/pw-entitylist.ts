@@ -280,6 +280,7 @@ export class PwEntityList<
                     value: 100,
                   },
                 ],
+                defaultValue: 100,
               })}
             </div>
           </div>
