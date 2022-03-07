@@ -30,10 +30,11 @@ import { msg } from "@lit/localize";
 import type { z } from "zod";
 import type { routes, MinimalSafeParseError } from "../../../lib/routes.js";
 import { setupHmr } from "../../hmr.js";
-import { pwInput } from "../../form/pw-input.js";
-import { result } from "../../../lib/result.js";
 import { bootstrapCss } from "../../index.js";
 import { ref } from "lit/directives/ref.js";
+import { pwInputText } from "../../form/pw-input-text.js";
+import { pwInputNumber } from "../../form/pw-input-number.js";
+import { pwInputCheckbox } from "../../form/pw-input-checkbox.js";
 
 export async function pwProject(id: number, viewOnly = false) {
   const result = await taskFunction([id]);
@@ -173,7 +174,7 @@ export const PwProjectCreate = setupHmr(
                     await this._task.run();
                   }}
                 >
-                  ${pwInput({
+                  ${pwInputText({
                     url: this.url,
                     type: "text",
                     disabled: this.disabled,
@@ -184,7 +185,7 @@ export const PwProjectCreate = setupHmr(
                     task: this._task,
                     initial: this.initial?.data,
                   })}
-                  ${pwInput({
+                  ${pwInputText({
                     url: this.url,
                     type: "text",
                     disabled: this.disabled,
@@ -195,7 +196,7 @@ export const PwProjectCreate = setupHmr(
                     task: this._task,
                     initial: this.initial?.data,
                   })}
-                  ${pwInput({
+                  ${pwInputText({
                     url: this.url,
                     type: "text",
                     disabled: this.disabled,
@@ -206,7 +207,7 @@ export const PwProjectCreate = setupHmr(
                     task: this._task,
                     initial: this.initial?.data,
                   })}
-                  ${pwInput({
+                  ${pwInputNumber({
                     url: this.url,
                     type: "number",
                     disabled: this.disabled,
@@ -217,7 +218,7 @@ export const PwProjectCreate = setupHmr(
                     task: this._task,
                     initial: this.initial?.data,
                   })}
-                  ${pwInput({
+                  ${pwInputNumber({
                     url: this.url,
                     type: "number",
                     disabled: this.disabled,
@@ -228,7 +229,7 @@ export const PwProjectCreate = setupHmr(
                     task: this._task,
                     initial: this.initial?.data,
                   })}
-                  ${pwInput({
+                  ${pwInputNumber({
                     url: this.url,
                     type: "number",
                     disabled: this.disabled,
@@ -239,7 +240,7 @@ export const PwProjectCreate = setupHmr(
                     task: this._task,
                     initial: this.initial?.data,
                   })}
-                  ${pwInput({
+                  ${pwInputNumber({
                     url: this.url,
                     type: "number",
                     disabled: this.disabled,
@@ -250,7 +251,7 @@ export const PwProjectCreate = setupHmr(
                     task: this._task,
                     initial: this.initial?.data,
                   })}
-                  ${pwInput({
+                  ${pwInputNumber({
                     url: this.url,
                     type: "number",
                     disabled: this.disabled,
@@ -261,7 +262,7 @@ export const PwProjectCreate = setupHmr(
                     task: this._task,
                     initial: this.initial?.data,
                   })}
-                  ${pwInput({
+                  ${pwInputCheckbox({
                     url: this.url,
                     type: "checkbox",
                     value: true,
@@ -274,7 +275,7 @@ export const PwProjectCreate = setupHmr(
                     task: this._task,
                     initial: this.initial?.data,
                   })}
-                  ${pwInput({
+                  ${pwInputCheckbox({
                     url: this.url,
                     type: "checkbox",
                     value: true,

@@ -30,8 +30,10 @@ import {
   PwEntityList,
 } from "../../entity-list/pw-entitylist.js";
 import { pwOrder } from "../../entity-list/pw-order.js";
-import { pwInput } from "../../form/pw-input.js";
 import { taskFunction } from "../../entity-list/pw-entitylist.js";
+import { pwInputNumber } from "../../form/pw-input-number.js";
+import { pwInputText } from "../../form/pw-input-text.js";
+import { pwInputSelect } from "../../form/pw-input-select.js";
 
 export const pwUsers = async (url: URL) => {
   const result = await taskFunction("/api/v1/users", url, "users");
@@ -115,7 +117,7 @@ export class PwUsers<X extends string> extends PwEntityList<
 
         <tr>
           <th scope="col">
-            ${pwInput({
+            ${pwInputNumber({
               url: this.url,
               label: null,
               name: ["filters", "id"],
@@ -129,7 +131,7 @@ export class PwUsers<X extends string> extends PwEntityList<
           </th>
 
           <th scope="col">
-            ${pwInput({
+            ${pwInputText({
               url: this.url,
               label: null,
               name: ["filters", "username"],
@@ -142,7 +144,7 @@ export class PwUsers<X extends string> extends PwEntityList<
           </th>
 
           <th scope="col">
-            ${pwInput({
+            ${pwInputSelect({
               url: this.url,
               type: "select",
               disabled: this.disabled,

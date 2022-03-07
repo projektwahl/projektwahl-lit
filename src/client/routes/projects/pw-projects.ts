@@ -31,7 +31,8 @@ import {
   taskFunction,
 } from "../../entity-list/pw-entitylist.js";
 import { pwOrder } from "../../entity-list/pw-order.js";
-import { pwInput } from "../../form/pw-input.js";
+import { pwInputNumber } from "../../form/pw-input-number.js";
+import { pwInputText } from "../../form/pw-input-text.js";
 
 export const pwProjects = async (url: URL) => {
   const result = await taskFunction("/api/v1/projects", url, "projects");
@@ -106,7 +107,7 @@ class PwProjects<X extends string> extends PwEntityList<"/api/v1/projects", X> {
 
         <tr>
           <th scope="col">
-            ${pwInput({
+            ${pwInputNumber({
               url: this.url,
               label: null,
               name: ["filters", "id"],
@@ -120,7 +121,7 @@ class PwProjects<X extends string> extends PwEntityList<"/api/v1/projects", X> {
           </th>
 
           <th scope="col">
-            ${pwInput({
+            ${pwInputText({
               url: this.url,
               label: null,
               name: ["filters", "title"],
@@ -133,7 +134,7 @@ class PwProjects<X extends string> extends PwEntityList<"/api/v1/projects", X> {
           </th>
 
           <th scope="col">
-            ${pwInput({
+            ${pwInputText({
               url: this.url,
               label: null,
               name: ["filters", "info"],

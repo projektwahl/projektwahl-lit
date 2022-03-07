@@ -31,11 +31,13 @@ import "../../form/pw-input.js";
 import { setupHmr } from "../../hmr.js";
 import { aClick } from "../../pw-a.js";
 import { pwOrder } from "../../entity-list/pw-order.js";
-import { pwInput } from "../../form/pw-input.js";
 import {
   parseRequestWithPrefix,
   taskFunction,
 } from "../../entity-list/pw-entitylist.js";
+import { pwInputCheckbox } from "../../form/pw-input-checkbox.js";
+import { pwInputNumber } from "../../form/pw-input-number.js";
+import { pwInputText } from "../../form/pw-input-text.js";
 
 export const pwProjectUsers = async (url: URL, prefix: string) => {
   const result = await taskFunction("/api/v1/users", url, prefix);
@@ -110,22 +112,21 @@ export const PwProjectUsers = setupHmr(
 
           <tr>
             <th scope="col">
-              ${pwInput({
+              ${pwInputCheckbox({
                 url: this.url,
                 label: null,
                 name: ["filters", this.name],
-                get: (o) => o.filters[this.name],
-                set: (o, v) => (o.filters[this.name] = v),
+                get: (o) => o.filters[this.name] == this.projectId,
+                set: (o, v) => (o.filters[this.name] = v ? this.projectId : null),
                 task: this._task,
                 type: "checkbox",
-                value: this.projectId,
                 defaultValue: undefined,
                 initial: initial,
               })}
             </th>
 
             <th scope="col">
-              ${pwInput({
+              ${pwInputNumber({
                 url: this.url,
                 label: null,
                 name: ["filters", "id"],
@@ -139,7 +140,7 @@ export const PwProjectUsers = setupHmr(
             </th>
 
             <th scope="col">
-              ${pwInput({
+              ${pwInputText({
                 url: this.url,
                 label: null,
                 name: ["filters", "username"],
@@ -152,7 +153,7 @@ export const PwProjectUsers = setupHmr(
             </th>
 
             <th scope="col">
-              ${pwInput({
+              ${pwInputText({
                 url: this.url,
                 label: null,
                 name: ["filters", "type"],

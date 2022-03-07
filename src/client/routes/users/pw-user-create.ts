@@ -30,9 +30,12 @@ import { msg } from "@lit/localize";
 import "../../form/pw-input.js";
 import type { routes, MinimalSafeParseError } from "../../../lib/routes.js";
 import type { z } from "zod";
-import { pwInput } from "../../form/pw-input.js";
 import { bootstrapCss } from "../../index.js";
 import { ref } from "lit/directives/ref.js";
+import { pwInputText } from "../../form/pw-input-text.js";
+import { pwInputSelect } from "../../form/pw-input-select.js";
+import { pwInputNumber } from "../../form/pw-input-number.js";
+import { pwInputCheckbox } from "../../form/pw-input-checkbox.js";
 
 export async function pwUser(id: number, viewOnly = false) {
   const result = await taskFunction([id]);
@@ -159,7 +162,7 @@ class PwUserCreate extends PwForm<
                   await this._task.run();
                 }}
               >
-                ${pwInput({
+                ${pwInputText({
                   url: this.url,
                   type: "text",
                   disabled: this.disabled,
@@ -170,7 +173,7 @@ class PwUserCreate extends PwForm<
                   task: this._task,
                   initial: this.initial?.data,
                 })}
-                ${pwInput({
+                ${pwInputText({
                   url: this.url,
                   type: "text",
                   disabled: this.disabled,
@@ -181,7 +184,7 @@ class PwUserCreate extends PwForm<
                   task: this._task,
                   initial: this.initial?.data,
                 })}
-                ${pwInput({
+                ${pwInputSelect({
                   url: this.url,
                   type: "select",
                   disabled: this.disabled,
@@ -207,7 +210,7 @@ class PwUserCreate extends PwForm<
                         },
                 })}
                 ${(this.type ?? this.initial?.data.type ?? "voter") === "voter"
-                  ? html`${pwInput({
+                  ? html`${pwInputText({
                       url: this.url,
                       type: "text",
                       disabled: this.disabled,
@@ -218,7 +221,7 @@ class PwUserCreate extends PwForm<
                       task: this._task,
                       initial: this.initial?.data,
                     })}
-                    ${pwInput({
+                    ${pwInputNumber({
                       url: this.url,
                       type: "number",
                       disabled: this.disabled,
@@ -232,7 +235,7 @@ class PwUserCreate extends PwForm<
                   : undefined}
                 ${!this.disabled
                   ? html`
-                      ${pwInput({
+                      ${pwInputText({
                         url: this.url,
                         type: "password",
                         disabled: this.disabled,
@@ -246,7 +249,7 @@ class PwUserCreate extends PwForm<
                       })}
                     `
                   : undefined}
-                ${pwInput({
+                ${pwInputCheckbox({
                   url: this.url,
                   type: "checkbox",
                   value: true,
@@ -259,7 +262,7 @@ class PwUserCreate extends PwForm<
                   task: this._task,
                   initial: this.initial?.data,
                 })}
-                ${pwInput({
+                ${pwInputCheckbox({
                   url: this.url,
                   type: "checkbox",
                   value: true,

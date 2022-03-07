@@ -66,7 +66,7 @@ export abstract class PwInput<
   name!: string[];
 
   // TODO FIXME maybe switch this back to Path and lodash-es (but not remove then for now so we could switch back)
-  get!: (o: z.infer<typeof routes[P]["request"]>) => T;
+  get!: (o: z.infer<typeof routes[P]["request"]>) => T | undefined;
 
   set!: (o: z.infer<typeof routes[P]["request"]>, v: T) => void;
 
@@ -91,7 +91,7 @@ export abstract class PwInput<
   form!: HTMLFormElement;
 
   // z.infer<typeof routes[P]["request"]>[Q]
-  options!: { value: T; text: string }[];
+  options?: { value: T; text: string }[];
 
   defaultValue?: T;
 
@@ -190,7 +190,7 @@ export abstract class PwInput<
           ${
             this.type === "select"
               ? repeat(
-                  this.options,
+                  this.options!,
                   (o) => o.value,
                   (o) =>
                     html`<option

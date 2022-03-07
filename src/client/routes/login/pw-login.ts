@@ -28,9 +28,9 @@ import { PwForm } from "../../form/pw-form.js";
 import { HistoryController } from "../../history-controller.js";
 import { msg } from "@lit/localize";
 import "../../form/pw-input.js";
-import { pwInput } from "../../form/pw-input.js";
 import { bootstrapCss } from "../../index.js";
 import { ref } from "lit/directives/ref.js";
+import { pwInputText } from "../../form/pw-input-text.js";
 
 class PwLogin extends PwForm<"/api/v1/login"> {
   static override get properties() {
@@ -112,7 +112,7 @@ class PwLogin extends PwForm<"/api/v1/login"> {
               >
               <h3 class="text-center">${msg("Login as guest")}</h3>
 
-              ${pwInput({
+              ${pwInputText({
                 url: this.url,
                 type: "text",
                 autocomplete: "username",
@@ -122,7 +122,7 @@ class PwLogin extends PwForm<"/api/v1/login"> {
                 set: (o, v) => (o.username = v),
                 task: this._task,
               })}
-              ${pwInput({
+              ${pwInputText({
                 url: this.url,
                 type: "password",
                 label: msg("Password"),
