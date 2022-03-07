@@ -66,6 +66,12 @@ export function sql2(
   TemplateStringsArray,
   ...(null | string | string[] | boolean | number | Buffer)[]
 ] {
+  const r: WritableTemplateStringsArray = [""];
+  r.raw = [""];
+
+  const rd: WritableTemplateStringsArray = ["", ""];
+  rd.raw = ["", ""];
+
   // join the strings and the interpolated values
   // into an array of templates
   const flattened: [
@@ -99,13 +105,15 @@ export function sql2(
         )
       ) {
         // dammit we can differentiate these as far as I can tell - we need the raw back...
-        const val3: [readonly string[], ...(string | number | boolean | string[] | Buffer | null)[]][] | string[][] | readonly string[][] = val2;
+        const val3: [TemplateStringsArray, ...(string | number | boolean | string[] | Buffer | null)[]][] | string[][] | readonly string[][] = val2;
 
-        const returnValue: [
-          TemplateStringsArray,
-          ...(null | string | string[] | boolean | number | Buffer)[]
-        ][] = [unsafe2(m), ...val3];
-        return returnValue
+        if (val3.every(r => typeof r[0] === "object" && "raw" in r[0])) {
+          const returnValue: [
+            TemplateStringsArray,
+            ...(null | string | string[] | boolean | number | Buffer)[]
+          ][] = [unsafe2(m), ...val3];
+          return returnValue
+        }
       }
       // flat template string
       if (typeof val[0] === "object") {
@@ -117,7 +125,7 @@ export function sql2(
       }
     }
     // primitive
-    return [unsafe2(m), [["", ""], val]];
+    return [unsafe2(m), [rd, val]];
   });
 
   // convert this array of flat templates into a template
@@ -134,7 +142,7 @@ export function sql2(
           ...current.slice(1) // except template strings
         ];
     },
-    [[""]]
+    [r]
   );
 
   return result;
