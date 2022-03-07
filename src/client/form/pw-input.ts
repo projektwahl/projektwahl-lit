@@ -33,7 +33,8 @@ import type { Task } from "@dev.mohe/task";
 
 export abstract class PwInput<
   P extends keyof typeof routes,
-  T
+  T,
+  I
 > extends LitElement {
   static override get properties() {
     return {
@@ -85,7 +86,7 @@ export abstract class PwInput<
 
   value!: T;
 
-  input: Ref<HTMLInputElement>;
+  input: Ref<I>;
 
   form!: HTMLFormElement;
 

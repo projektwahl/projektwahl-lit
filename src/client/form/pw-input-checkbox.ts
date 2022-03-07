@@ -60,7 +60,8 @@ export function pwInputCheckbox<P extends keyof typeof routes>(
 
 export class PwInputCheckbox<P extends keyof typeof routes> extends PwInput<
   P,
-  boolean
+  boolean,
+  HTMLInputElement
 > {
   myformdataEventListener = (
     event: CustomEvent<z.infer<typeof routes[P]["request"]>>

@@ -60,7 +60,8 @@ export function pwInputSelect<P extends keyof typeof routes>(
 
 export class PwInputSelect<P extends keyof typeof routes> extends PwInput<
   P,
-  string|number
+  string|number,
+  HTMLSelectElement
 > {
   myformdataEventListener = (
     event: CustomEvent<z.infer<typeof routes[P]["request"]>>
