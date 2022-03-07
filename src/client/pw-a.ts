@@ -27,6 +27,9 @@ import { HistoryController } from "./history-controller.js";
 // TODO FIXME or maybe make this a Lit Element Directive
 export const aClick = (event: MouseEvent) => {
   event.preventDefault();
+  if (!(event.target instanceof Element)) {
+    throw new Error("link not found")
+  }
   const target = event.target.closest("a");
   if (!target) {
     throw new Error("link not found")
