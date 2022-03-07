@@ -5,7 +5,7 @@ import type { routes } from "../../lib/routes.js";
 import { PwInput } from "./pw-input.js";
 
 // workaround see https://github.com/runem/lit-analyzer/issues/149#issuecomment-1006162839
-export function pwInputCheckbox<P extends keyof typeof routes, T extends boolean>(
+export function pwInputCheckbox<P extends keyof typeof routes, T extends boolean|undefined>(
   props: Pick<
     PwInputCheckbox<P, T>,
     | "type"
@@ -58,7 +58,7 @@ export function pwInputCheckbox<P extends keyof typeof routes, T extends boolean
   ></pw-input-checkbox>`;
 }
 
-export class PwInputCheckbox<P extends keyof typeof routes, T extends boolean> extends PwInput<
+export class PwInputCheckbox<P extends keyof typeof routes, T extends boolean|undefined> extends PwInput<
   P,
   T,
   HTMLInputElement

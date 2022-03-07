@@ -174,7 +174,7 @@ export const PwProjectCreate = setupHmr(
                     await this._task.run();
                   }}
                 >
-                  ${pwInputText({
+                  ${pwInputText<"/api/v1/projects/create" | "/api/v1/projects/update", string|undefined>({
                     url: this.url,
                     type: "text",
                     disabled: this.disabled,
@@ -186,7 +186,7 @@ export const PwProjectCreate = setupHmr(
                     initial: this.initial?.data,
                     defaultValue: "",
                   })}
-                  ${pwInputText({
+                  ${pwInputText<"/api/v1/projects/create" | "/api/v1/projects/update", string|undefined>({
                     url: this.url,
                     type: "text",
                     disabled: this.disabled,
@@ -198,7 +198,7 @@ export const PwProjectCreate = setupHmr(
                     initial: this.initial?.data,
                     defaultValue: "",
                   })}
-                  ${pwInputText({
+                  ${pwInputText<"/api/v1/projects/create" | "/api/v1/projects/update", string|undefined>({
                     url: this.url,
                     type: "text",
                     disabled: this.disabled,
@@ -210,7 +210,7 @@ export const PwProjectCreate = setupHmr(
                     initial: this.initial?.data,
                     defaultValue: "",
                   })}
-                  ${pwInputNumber({
+                  ${pwInputNumber<"/api/v1/projects/create" | "/api/v1/projects/update", number|undefined>({
                     url: this.url,
                     type: "number",
                     disabled: this.disabled,
@@ -220,8 +220,9 @@ export const PwProjectCreate = setupHmr(
                     set: (o, v) => (o.costs = v),
                     task: this._task,
                     initial: this.initial?.data,
+                    defaultValue: undefined,
                   })}
-                  ${pwInputNumber({
+                  ${pwInputNumber<"/api/v1/projects/create" | "/api/v1/projects/update", number|undefined>({
                     url: this.url,
                     type: "number",
                     disabled: this.disabled,
@@ -231,8 +232,9 @@ export const PwProjectCreate = setupHmr(
                     set: (o, v) => (o.min_age = v),
                     task: this._task,
                     initial: this.initial?.data,
+                    defaultValue: undefined,
                   })}
-                  ${pwInputNumber({
+                  ${pwInputNumber<"/api/v1/projects/create" | "/api/v1/projects/update", number|undefined>({
                     url: this.url,
                     type: "number",
                     disabled: this.disabled,
@@ -242,8 +244,9 @@ export const PwProjectCreate = setupHmr(
                     set: (o, v) => (o.max_age = v),
                     task: this._task,
                     initial: this.initial?.data,
+                    defaultValue: undefined,
                   })}
-                  ${pwInputNumber({
+                  ${pwInputNumber<"/api/v1/projects/create" | "/api/v1/projects/update", number|undefined>({
                     url: this.url,
                     type: "number",
                     disabled: this.disabled,
@@ -253,8 +256,9 @@ export const PwProjectCreate = setupHmr(
                     set: (o, v) => (o.min_participants = v),
                     task: this._task,
                     initial: this.initial?.data,
+                    defaultValue: undefined,
                   })}
-                  ${pwInputNumber({
+                  ${pwInputNumber<"/api/v1/projects/create" | "/api/v1/projects/update", number|undefined>({
                     url: this.url,
                     type: "number",
                     disabled: this.disabled,
@@ -264,8 +268,9 @@ export const PwProjectCreate = setupHmr(
                     set: (o, v) => (o.max_participants = v),
                     task: this._task,
                     initial: this.initial?.data,
+                    defaultValue: undefined,
                   })}
-                  ${pwInputCheckbox({
+                  ${pwInputCheckbox<"/api/v1/projects/create" | "/api/v1/projects/update", boolean|undefined>({
                     url: this.url,
                     type: "checkbox",
                     value: true,
@@ -278,7 +283,7 @@ export const PwProjectCreate = setupHmr(
                     task: this._task,
                     initial: this.initial?.data,
                   })}
-                  ${pwInputCheckbox({
+                  ${pwInputCheckbox<"/api/v1/projects/create" | "/api/v1/projects/update", boolean|undefined>({
                     url: this.url,
                     type: "checkbox",
                     value: true,
