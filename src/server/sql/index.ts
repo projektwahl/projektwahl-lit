@@ -66,18 +66,19 @@ export function sql2(
   TemplateStringsArray,
   ...(null | string | string[] | boolean | number | Buffer)[]
 ] {
-  const r: WritableTemplateStringsArray = [""];
-  r.raw = [""];
+  const rtmp: WritableTemplateStringsArray = [""];
+  rtmp.raw = [""];
+  // @ts-expect-error this seems to be impossible to type
+  const r: TemplateStringsArray = rtmp;
 
-  const rd: WritableTemplateStringsArray = ["", ""];
-  rd.raw = ["", ""];
+  const rdtmp: WritableTemplateStringsArray = ["", ""];
+  rdtmp.raw = ["", ""];
+  // @ts-expect-error this seems to be impossible to type
+  const rd: TemplateStringsArray = rdtmp;
 
   // join the strings and the interpolated values
   // into an array of templates
-  const flattened: [
-    TemplateStringsArray,
-    ...(null | string | string[] | boolean | number | Buffer)[]
-  ][] = strings.flatMap<[
+  const flattened = strings.flatMap<[
     TemplateStringsArray,
     ...(null | string | string[] | boolean | number | Buffer)[]
   ][]>((m: string, i: number) => {
@@ -133,7 +134,11 @@ export function sql2(
       }
     }
     // primitive
-    return [unsafe2(m), [rd, val]];
+    const returnValue: [
+      TemplateStringsArray,
+      ...(null | string | string[] | boolean | number | Buffer)[]
+    ][] = [unsafe2(m), [rd, val]];
+    return returnValue
   });
 
   // convert this array of flat templates into a template
