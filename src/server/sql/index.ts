@@ -104,41 +104,25 @@ export function sql2(
 
       | string[])) => r is [TemplateStringsArray, ...(string | number | boolean | string[] | Buffer | null)[]] = (r): r is [TemplateStringsArray, ...(string | number | boolean | string[] | Buffer | null)[]] => typeof r[0] === "object" && "raw" in r[0];
 
-      // TODO FIXME do this all again I fucked up at the start
-/*
-      const isTemplateOrStringArr: (arg: string | [TemplateStringsArray, ...(string | number | boolean | string[] | Buffer | null)[]]
-      | [TemplateStringsArray, ...(string | number | boolean | string[] | Buffer | null)[]][number]
-      ) => arg is ([TemplateStringsArray, ...(string | number | boolean | string[] | Buffer | null)[]]
-      | [TemplateStringsArray, ...(string | number | boolean | string[] | Buffer | null)[]][number]) = Array.isArray;
+      // this is not actually checked (obviously - how should it)
+      const isTemplateStringArray: (r: ([TemplateStringsArray, ...(string | number | boolean | string[] | Buffer | null)[]]
 
-      // @ts-expect-error wrong isArray types
-      const isTemplateString1: (r: TemplateStringsArray | string) => r is TemplateStringsArray = Array.isArray
+      | [TemplateStringsArray, ...(string | number | boolean | string[] | Buffer | null)[]][] 
 
-      const isTemplateString2: (r: [TemplateStringsArray, ...(string | number | boolean | string[] | Buffer | null)[]] | string[] | readonly string[]) => r is [TemplateStringsArray, ...(string | number | boolean | string[] | Buffer | null)[]] = (r): r is [TemplateStringsArray, ...(string | number | boolean | string[] | Buffer | null)[]] => isTemplateString1(r[0])*/
-/*
+      | string[])) => r is [TemplateStringsArray, ...(string | number | boolean | string[] | Buffer | null)[]][] = (r): r is [TemplateStringsArray, ...(string | number | boolean | string[] | Buffer | null)[]][] => typeof r[0][0] === "object" && "raw" in r[0][0];
+     
       // array of flat template strings.
       if (
         // https://github.com/microsoft/TypeScript/issues/17002
         // https://github.com/micros^oft/TypeScript/pull/42316
-        val2.every(
-          isTemplateOrStringArr
-        )
+        isTemplateStringArray(val2)
       ) {
-
-        val2
-        // dammit we can differentiate these as far as I can tell - we need the raw back...
-        const val3: [TemplateStringsArray, ...(string | number | boolean | string[] | Buffer | null)[]][] | string[][] | readonly string[][] = val2;
-
-        
-
-        if (val3.every(isTemplateString2)) {
-          const returnValue: [
-            TemplateStringsArray,
-            ...(null | string | string[] | boolean | number | Buffer)[]
-          ][] = [unsafe2(m), ...val3];
-          return returnValue
-        }
-      }*/
+        const returnValue: [
+          TemplateStringsArray,
+          ...(null | string | string[] | boolean | number | Buffer)[]
+        ][] = [unsafe2(m), ...val2];
+        return returnValue
+      }
       // flat template string
       if (isTemplateString(val2)) {
         const returnValue: [
