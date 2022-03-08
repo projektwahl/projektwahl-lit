@@ -166,11 +166,17 @@ export function sql2(
       // @ts-expect-error probably not typeable
       const templateStrings: TemplateStringsArray = writableTemplateStrings;
 
-      return [
+      const [_1, ...a] = previous
+      const [_2, ...b] = current
+      const returnValue: [
+        TemplateStringsArray,
+        ...(null | string | string[] | boolean | number | Buffer)[]
+      ] = [
         templateStrings,
-         ...previous.slice(1), // except template strings
-          ...current.slice(1) // except template strings
+         ...a, // except template strings
+          ...b // except template strings
         ];
+      return returnValue
     },
     [r]
   );
