@@ -125,20 +125,29 @@ export function sql2(
         return returnValue
       }
       // flat template string
-      if (isTemplateString(val2)) {
+      else if (isTemplateString(val2)) {
         const returnValue: [
           TemplateStringsArray,
           ...(null | string | string[] | boolean | number | Buffer)[]
         ][] = [unsafe2(m), val2];
         return returnValue
+      } else {
+        // string array, same as primitive
+        // primitive
+        const returnValue: [
+          TemplateStringsArray,
+          ...(null | string | string[] | boolean | number | Buffer)[]
+        ][] = [unsafe2(m), [rd, val2]];
+        return returnValue
       }
+    } else {
+      // primitive
+      const returnValue: [
+        TemplateStringsArray,
+        ...(null | string | string[] | boolean | number | Buffer)[]
+      ][] = [unsafe2(m), [rd, val]];
+      return returnValue
     }
-    // primitive
-    const returnValue: [
-      TemplateStringsArray,
-      ...(null | string | string[] | boolean | number | Buffer)[]
-    ][] = [unsafe2(m), [rd, val]];
-    return returnValue
   });
 
   // convert this array of flat templates into a template
