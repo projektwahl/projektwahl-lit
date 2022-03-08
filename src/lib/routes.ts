@@ -216,10 +216,11 @@ const choices = rawChoiceNullable.merge(
   })
 );
 
+// TODO FIXME possible strict by default?
 export const routes = {
   "/api/v1/logout": {
     request: z.any(),
-    response: z.object({}),
+    response: z.object({}).strict(),
   },
   "/api/v1/login": {
     request: z
@@ -228,26 +229,26 @@ export const routes = {
         password: z.string(),
       })
       .strict(),
-    response: z.object({}),
+    response: z.object({}).strict(),
   },
   "/api/v1/openid-login": {
     request: z.any(),
-    response: z.object({}),
+    response: z.object({}).strict(),
   },
   "/api/v1/redirect": {
     request: z.object({
       session_state: z.string(),
       code: z.string(),
-    }),
-    response: z.object({}),
+    }).strict(),
+    response: z.object({}).strict(),
   },
   "/api/v1/sleep": {
     request: z.undefined(),
-    response: z.object({}),
+    response: z.object({}).strict(),
   },
   "/api/v1/update": {
     request: z.undefined(),
-    response: z.object({}),
+    response: z.object({}).strict(),
   },
   "/api/v1/users/create": {
     request: rawUserSchema
@@ -262,8 +263,8 @@ export const routes = {
       })
       .extend({
         password: z.string().optional(),
-      }),
-    response: createOrUpdateUserResponse(rawUserSchema),
+      }).strict(),
+    response: createOrUpdateUserResponse(rawUserSchema).strict(),
   },
   "/api/v1/users/update": {
     request: rawUserSchema
@@ -284,8 +285,8 @@ export const routes = {
       .partial()
       .extend({
         id: z.number(),
-      }),
-    response: createOrUpdateUserResponse(rawUserSchema),
+      }).strict(),
+    response: createOrUpdateUserResponse(rawUserSchema).strict(),
   },
   "/api/v1/projects/create": {
     request: rawProjectSchema.pick({
@@ -299,8 +300,8 @@ export const routes = {
       place: true,
       random_assignments: true,
       title: true,
-    }),
-    response: z.object({}).extend({ id: z.number() }),
+    }).strict(),
+    response: z.object({}).extend({ id: z.number() }).strict(),
   },
   "/api/v1/projects/update": {
     request: rawProjectSchema
@@ -319,8 +320,8 @@ export const routes = {
       .partial()
       .extend({
         id: z.number(),
-      }),
-    response: z.object({}).extend({ id: z.number() }),
+      }).strict(),
+    response: z.object({}).extend({ id: z.number() }).strict(),
   },
   "/api/v1/users": {
     request: baseQuery(rawUserSchema),
@@ -328,7 +329,7 @@ export const routes = {
       entities: z.array(users(rawUserSchema)),
       previousCursor: users(rawUserSchema).nullable(),
       nextCursor: users(rawUserSchema).nullable(),
-    }),
+    }).strict(),
   },
   "/api/v1/projects": {
     request: baseQuery(rawProjectSchema),
@@ -336,7 +337,7 @@ export const routes = {
       entities: z.array(project),
       previousCursor: project.nullable(),
       nextCursor: project.nullable(),
-    }),
+    }).strict(),
   },
   "/api/v1/choices": {
     request: baseQuery(rawChoiceNullable.merge(rawProjectSchema)),
@@ -344,14 +345,14 @@ export const routes = {
       entities: z.array(choices),
       previousCursor: choices.nullable(),
       nextCursor: choices.nullable(),
-    }),
+    }).strict(),
   },
   "/api/v1/choices/update": {
     request: rawChoiceNullable.pick({
       project_id: true,
       rank: true,
-    }),
-    response: z.object({}),
+    }).strict(),
+    response: z.object({}).strict(),
   },
 } as const;
 

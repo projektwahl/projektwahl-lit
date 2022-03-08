@@ -160,8 +160,8 @@ export abstract class PwInput<
             );
           }}
           type=${this.type}
-          value=${ifDefined(this.get(this.initial))}
-          ?checked=${this.get(this.initial)}
+          value=${ifDefined(this.initial !== undefined ? this.get(this.initial) : undefined)}
+          ?checked=${this.initial !== undefined ? this.get(this.initial) : false}
           class="${
             this.type === "checkbox" ? "form-check-input" : "form-control"
           } ${this.task.render({
@@ -194,7 +194,7 @@ export abstract class PwInput<
                   (o) => o.value,
                   (o) =>
                     html`<option
-                      ?selected=${this.get(this.initial) === o.value}
+                      ?selected=${this.initial !== undefined ? this.get(this.initial) === o.value : false}
                       value=${o.value}
                     >
                       ${o.text}

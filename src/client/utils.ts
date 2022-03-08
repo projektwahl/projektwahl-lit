@@ -98,7 +98,8 @@ export const myFetch = async <P extends keyof typeof routes>(
     const c:
       | z.SafeParseSuccess<z.infer<typeof routes[P]["response"]>>
       | MinimalSafeParseError = b.safeParse(await response.json());
-    return c;
+    console.log(c)
+    return c
   } catch (error) {
     console.error(error);
     if (error instanceof TypeError) {
