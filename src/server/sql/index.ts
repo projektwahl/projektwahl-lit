@@ -93,13 +93,19 @@ export function sql2(
 
     if (Array.isArray(val)) {
       const val2: ([TemplateStringsArray, ...(string | number | boolean | string[] | Buffer | null)[]] 
-      
+
       | [TemplateStringsArray, ...(string | number | boolean | string[] | Buffer | null)[]][] 
 
       | string[]) = [...val];
 
-      // TODO FIXME do this all again I fucked up at the start
+      const isTemplateString: (r: ([TemplateStringsArray, ...(string | number | boolean | string[] | Buffer | null)[]]
 
+      | [TemplateStringsArray, ...(string | number | boolean | string[] | Buffer | null)[]][] 
+
+      | string[])) => r is [TemplateStringsArray, ...(string | number | boolean | string[] | Buffer | null)[]] = (r): r is [TemplateStringsArray, ...(string | number | boolean | string[] | Buffer | null)[]] => typeof r[0] === "object" && "raw" in r[0];
+
+      // TODO FIXME do this all again I fucked up at the start
+/*
       const isTemplateOrStringArr: (arg: string | [TemplateStringsArray, ...(string | number | boolean | string[] | Buffer | null)[]]
       | [TemplateStringsArray, ...(string | number | boolean | string[] | Buffer | null)[]][number]
       ) => arg is ([TemplateStringsArray, ...(string | number | boolean | string[] | Buffer | null)[]]
@@ -108,8 +114,8 @@ export function sql2(
       // @ts-expect-error wrong isArray types
       const isTemplateString1: (r: TemplateStringsArray | string) => r is TemplateStringsArray = Array.isArray
 
-      const isTemplateString2: (r: [TemplateStringsArray, ...(string | number | boolean | string[] | Buffer | null)[]] | string[] | readonly string[]) => r is [TemplateStringsArray, ...(string | number | boolean | string[] | Buffer | null)[]] = (r): r is [TemplateStringsArray, ...(string | number | boolean | string[] | Buffer | null)[]] => isTemplateString1(r[0])
-
+      const isTemplateString2: (r: [TemplateStringsArray, ...(string | number | boolean | string[] | Buffer | null)[]] | string[] | readonly string[]) => r is [TemplateStringsArray, ...(string | number | boolean | string[] | Buffer | null)[]] = (r): r is [TemplateStringsArray, ...(string | number | boolean | string[] | Buffer | null)[]] => isTemplateString1(r[0])*/
+/*
       // array of flat template strings.
       if (
         // https://github.com/microsoft/TypeScript/issues/17002
@@ -132,13 +138,13 @@ export function sql2(
           ][] = [unsafe2(m), ...val3];
           return returnValue
         }
-      }
+      }*/
       // flat template string
-      if (typeof val[0] === "object") {
+      if (isTemplateString(val2)) {
         const returnValue: [
           TemplateStringsArray,
           ...(null | string | string[] | boolean | number | Buffer)[]
-        ][] = [unsafe2(m), val];
+        ][] = [unsafe2(m), val2];
         return returnValue
       }
     }
