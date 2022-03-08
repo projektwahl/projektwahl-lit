@@ -38,7 +38,7 @@ export interface WritableTemplateStringsArray extends Array<string> {
 export function unsafe2(
   string: null | string | number | symbol
 ): [TemplateStringsArray] {
-  const r: WritableTemplateStringsArray = [];
+  const r: WritableTemplateStringsArray = [String(string)];
   r.raw = [String(string)];
   // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
   return [r as TemplateStringsArray]
@@ -203,10 +203,10 @@ console.log(sql2`SELECT ${"hill"}`)
 console.log(sql2`SELECT ${sql2`* FROM test`} WHERE ${1}`)
 /** @type {any[]} */
 
-let list = ["id", "title", "info"];
+const list = ["id", "title", "info"];
 
 console.log(sql2`SELECT "id", "title", "info", "place" FROM projects WHERE 1${list.map(
   (v) => sql2` AND (${unsafe2(v)} < ${1})`
 )} OR NOT ... params() ORDER BY ${list.map(
   (v) => sql2`${unsafe2(v)} ASC, `
-)} LIMIT 1337`);
+)}LIMIT 1337`);
