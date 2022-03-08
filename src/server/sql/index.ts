@@ -81,7 +81,7 @@ export function sql2(
   const flattened = strings.flatMap<[
     TemplateStringsArray,
     ...(null | string | string[] | boolean | number | Buffer)[]
-  ][]>((m: string, i: number) => {
+  ]>((m: string, i: number) => {
     // the last value has nothing interpolated left so just add it directly
     if (i == keys.length) {
       const returnValue: [
@@ -153,11 +153,19 @@ export function sql2(
   // convert this array of flat templates into a template
   const result = flattened.reduce(
     (previous, current) => {
-      const templateStrings: TemplateStringsArray = [
+      const writableTemplateStrings: WritableTemplateStringsArray = [
         ...previous[0].slice(0, -1), // previous except last
         previous[0].slice(-1)[0] + current[0][0], // previous last + current first 
         ...current[0].slice(1), // current except first
       ];
+      writableTemplateStrings.raw = [
+        ...previous[0].raw.slice(0, -1),
+        previous[0].raw.slice(-1)[0] + current[0].raw[0],
+        ...current[0].raw.slice(1),
+      ];
+      // @ts-expect-error probably not typeable
+      const templateStrings: TemplateStringsArray = writableTemplateStrings;
+
       return [
         templateStrings,
          ...previous.slice(1), // except template strings
