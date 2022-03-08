@@ -93,13 +93,21 @@ export const myFetch = async <P extends keyof typeof routes>(
         return r;
       }
     }
-    const a: typeof routes[P] = routes[url];
-    const b: typeof routes[P]["response"] = a.response;
-    const c:
-      | z.SafeParseSuccess<z.infer<typeof routes[P]["response"]>>
-      | MinimalSafeParseError = b.safeParse(await response.json());
-    console.log(c)
-    return c
+    // TODO FIXME maybe include the result shit in the typings directly
+    const json = await response.json()
+    if (json.success) {
+      const a: typeof routes[P] = routes[url];
+      const b: typeof routes[P]["response"] = a.response;
+      const c:
+        | z.SafeParseSuccess<z.infer<typeof routes[P]["response"]>>
+        | MinimalSafeParseError = b.safeParse(json.data);
+      console.log(c)
+      return c
+    } else {
+      // TODO FIXME
+      // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
+      return json as MinimalSafeParseError
+    }
   } catch (error) {
     console.error(error);
     if (error instanceof TypeError) {
