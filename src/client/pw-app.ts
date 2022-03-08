@@ -28,7 +28,7 @@ import {
   TemplateResult,
 } from "lit";
 import { bootstrapCss } from "./index.js";
-import { HistoryController, HistoryState } from "./history-controller.js";
+import { HistoryController } from "./history-controller.js";
 import { aClick } from "./pw-a.js";
 import jscookie from "js-cookie";
 import { myFetch } from "./utils.js";

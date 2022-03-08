@@ -22,7 +22,7 @@ SPDX-FileCopyrightText: 2021 Moritz Hedtke <Moritz.Hedtke@t-online.de>
 */
 
 //import { ZodIssueCode } from "zod";
-import { MinimalSafeParseError, ResponseType, routes } from "../lib/routes";
+import { MinimalSafeParseError, ResponseType, routes } from "../lib/routes.js";
 import jscookie from "js-cookie";
 import type { z } from "zod";
 
