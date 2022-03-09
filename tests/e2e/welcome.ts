@@ -23,6 +23,7 @@ if (!process.env["BASE_URL"]) {
 
 // https://bugzilla.mozilla.org/show_bug.cgi?id=1489490
 // Firefox 96, geckodriver 0.31.0 required
+// https://github.com/mozilla/geckodriver/issues/1994
 
 // https://github.com/mozilla/geckodriver/issues/776
 // https://github.com/w3c/webdriver/issues/1005
@@ -76,15 +77,6 @@ export async function main() {
   });
 
   try {
-    // @ts-expect-error wrong typings
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-call
-    await driver.setNetworkConditions({
-      offline: false,
-      latency: 100, // Additional latency (ms).
-      download_throughput: 50 * 1024, // Maximal aggregated download throughput.
-      upload_throughput: 50 * 1024, // Maximal aggregated upload throughput.
-    });
-
     if (!process.env.BASE_URL) {
       throw new Error("BASE_URL not set!");
     }
@@ -97,6 +89,7 @@ export async function main() {
     await writeFile("screenshot.png", screenshot, "base64");
 
     {
+      // open navbar
       const pwApp = await driver.findElement(By.css("pw-app"));
 
       const navbarButton = await (
@@ -107,6 +100,7 @@ export async function main() {
     }
 
     {
+      // go to login page
       const pwApp = await driver.findElement(By.css("pw-app"));
 
       const loginLink = await (
@@ -154,8 +148,7 @@ export async function main() {
     const groupName = `${Math.random()}`.substring(0, 10);
 
     {
-      // edit user
-
+      // go to users page
       const pwApp = await driver.findElement(By.css("pw-app"));
 
       const accountsLink = await (
@@ -163,6 +156,86 @@ export async function main() {
       ).findElement(By.css('a[href="/users"]'));
 
       await click(driver, accountsLink);
+    }
+
+    {
+      // create user
+      const pwApp = await driver.findElement(By.css("pw-app"));
+
+      const pwUsers = await (
+        await shadow(pwApp)
+      ).findElement(By.css("pw-users"));
+
+      const user2 = await (
+        await shadow(pwUsers)
+      ).findElement(By.css('a[href="/users/create"]'));
+
+      await click(driver, user2);
+
+      const pwUserCreate = await (
+        await shadow(pwApp)
+      ).findElement(By.css("pw-user-create"));
+
+      {
+        const pwUserGroup = await (
+          await shadow(pwUserCreate)
+        ).findElement(By.css('input[name="group"]'));
+
+        await pwUserGroup.clear();
+        await pwUserGroup.sendKeys(groupName);
+      }
+
+      {
+        const submitButton = await (
+          await shadow(pwUserCreate)
+        ).findElement(By.css('button[type="submit"]'));
+
+        await click(driver, submitButton);
+      }
+
+      const alert = await (
+        await shadow(pwUserCreate)
+      ).findElement(By.css('div[class="alert alert-danger"]'));
+
+      assert.match(await alert.getText(), /Some errors occurred./);
+
+      const feedbacks = await (
+        await shadow(pwUserCreate)
+      ).findElements(By.css('div[class="invalid-feedback"]'));
+
+      assert.equal(feedbacks.length, 2);
+
+      {
+        const pwUserUsername = await (
+          await shadow(pwUserCreate)
+        ).findElement(By.css('input[name="username"]'));
+
+        await pwUserUsername.clear();
+        await pwUserUsername.sendKeys(`awesomeuser${groupName}`);
+      }
+
+      {
+        const pwUserAge = await (
+          await shadow(pwUserCreate)
+        ).findElement(By.css('input[name="age"]'));
+
+        await pwUserAge.clear();
+        await pwUserAge.sendKeys("10");
+      }
+      {
+        const submitButton = await (
+          await shadow(pwUserCreate)
+        ).findElement(By.css('button[type="submit"]'));
+
+        await click(driver, submitButton);
+      }
+
+      await (await shadow(pwApp)).findElement(By.css("pw-welcome"));
+    }
+
+    {
+      // edit user
+      const pwApp = await driver.findElement(By.css("pw-app"));
 
       const pwUsers = await (
         await shadow(pwApp)
@@ -297,6 +370,15 @@ export async function main() {
         await shadow(pwUsers)
       ).findElement(By.css('input[name="filters,username"]'));
 
+      // @ts-expect-error wrong typings
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-call
+      await driver.setNetworkConditions({
+        offline: false,
+        latency: 100, // Additional latency (ms).
+        download_throughput: 50 * 1024, // Maximal aggregated download throughput.
+        upload_throughput: 50 * 1024, // Maximal aggregated upload throughput.
+      });
+
       await filterUsername.sendKeys("admin");
 
       const loadingSpinner = await (
@@ -310,6 +392,10 @@ export async function main() {
       await driver.wait(until.stalenessOf(loadingSpinner));
 
       console.log(new Date());
+
+      // @ts-expect-error wrong typings
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-call
+      await driver.setNetworkConditions(null);
     }
 
     {
@@ -355,6 +441,12 @@ export async function main() {
         /Nicht angemeldet! Klicke rechts oben auf Anmelden./
       );
     }
+
+    // TODO FIXME create/edit/view project
+    // TODO FIXME create user
+    // TODO FIXME list/filter project
+
+    // TODO FIXME voting
 
     await driver.quit();
 
