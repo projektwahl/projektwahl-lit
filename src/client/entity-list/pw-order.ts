@@ -26,20 +26,22 @@ import { HistoryController } from "../history-controller.js";
 import { msg, str } from "@lit/localize";
 import type { entityRoutes } from "../../lib/routes.js";
 import type { z } from "zod";
-import type { Path } from "../utils.js";
-import get from "lodash-es/get.js";
-import set from "lodash-es/set.js";
+import { parseRequestWithPrefix } from "./pw-entitylist.js";
 
 // workaround see https://github.com/runem/lit-analyzer/issues/149#issuecomment-1006162839
-export function pwOrder<P extends keyof typeof entityRoutes>(
-  props: Pick<PwOrder<P>, "name" | "path" | "title" | "refreshEntityList">
+export function pwOrder<P extends keyof typeof entityRoutes, X extends string>(
+  props: Pick<
+    PwOrder<P, X>,
+    "url" | "name" | "prefix" | "title" | "refreshEntityList"
+  >
 ) {
-  const { name, title, refreshEntityList, path, ...rest } = props;
+  const { url, name, title, refreshEntityList, prefix, ...rest } = props;
   let _ = rest;
   _ = 1; // ensure no property is missed - Don't use `{}` as a type. `{}` actually means "any non-nullish value".
   return html`<pw-order
     .name=${name}
-    .path=${path}
+    .url=${url}
+    prefix=${prefix}
     title=${title}
     .refreshEntityList=${refreshEntityList}
   ></pw-order>`;
@@ -47,13 +49,18 @@ export function pwOrder<P extends keyof typeof entityRoutes>(
 
 // TODO FIXME with prefix this doesnt work
 // TODO FIXME paginationLimit also doesnt work with this
-export class PwOrder<P extends keyof typeof entityRoutes> extends LitElement {
+export class PwOrder<
+  P extends keyof typeof entityRoutes,
+  X extends string
+> extends LitElement {
   static override get properties() {
     return {
       title: { type: String },
       name: { attribute: false },
       path: { attribute: false },
       refreshEntityList: { attribute: false },
+      url: { attribute: false },
+      prefix: { type: String },
     };
   }
 
@@ -62,9 +69,9 @@ export class PwOrder<P extends keyof typeof entityRoutes> extends LitElement {
     return this;
   }
 
-  path!: string[];
+  prefix!: X;
 
-  name!: keyof z.infer<typeof entityRoutes[P]["response"]>["entities"][number];
+  name!: z.infer<typeof entityRoutes[P]["request"]>["sorting"][number][0];
 
   title!: string;
 
@@ -73,6 +80,8 @@ export class PwOrder<P extends keyof typeof entityRoutes> extends LitElement {
   history;
 
   refreshEntityList!: () => Promise<void>;
+
+  url!: P;
 
   constructor() {
     super();
@@ -86,7 +95,7 @@ export class PwOrder<P extends keyof typeof entityRoutes> extends LitElement {
     if (
       this.title === undefined ||
       this.name === undefined ||
-      this.path === undefined
+      this.prefix === undefined
     ) {
       throw new Error(msg("component not fully initialized"));
     }
@@ -96,33 +105,32 @@ export class PwOrder<P extends keyof typeof entityRoutes> extends LitElement {
       <button
         @click=${async () => {
           // TODO FIXME put this into the history implementation?
-          const data = JSON.parse(
-            decodeURIComponent(
-              this.history.url.search == ""
-                ? "{}"
-                : this.history.url.search.substring(1)
-            )
+          const data = parseRequestWithPrefix(
+            this.url,
+            this.prefix,
+            this.history.url
           );
-          if (!get(data, [...this.path, "sorting"])) {
-            set(data, [...this.path, "sorting"], []);
+
+          if (!data[this.prefix]["sorting"]) {
+            data[this.prefix]["sorting"] = [];
           }
 
-          const oldElementIndex = get(data, [
-            ...this.path,
-            "sorting",
-          ]).findIndex(
-            ([e, d]: [string, string]) => e === `${this.name as string}`
+          const oldElementIndex = data[this.prefix]["sorting"].findIndex(
+            ([e, d]: [string, string]) => e === this.name
           );
-          let oldElement;
+          let oldElement: [
+            z.infer<typeof entityRoutes[P]["request"]>["sorting"][number][0],
+            "ASC" | "DESC" | "downup"
+          ];
           if (oldElementIndex == -1) {
-            oldElement = [`${this.name as string}`, `downup`];
+            oldElement = [this.name, `downup`];
           } else {
-            oldElement = get(data, [...this.path, "sorting"]).splice(
+            oldElement = data[this.prefix]["sorting"].splice(
               oldElementIndex,
               1
             )[0];
           }
-          let newElement;
+          let newElement: "ASC" | "DESC" | null;
           switch (oldElement[1]) {
             case "downup":
               newElement = "ASC";
@@ -133,14 +141,16 @@ export class PwOrder<P extends keyof typeof entityRoutes> extends LitElement {
             default:
               newElement = null;
           }
-          set(
-            data,
-            [...this.path, "sorting"],
-            [
-              ...get(data, [...this.path, "sorting"]),
-              ...(newElement !== null ? [[oldElement[0], newElement]] : []),
-            ]
-          );
+
+          // @ts-expect-error mapped types probably needed
+          const a: z.infer<typeof entityRoutes[P]["request"]>["sorting"] =
+            newElement !== null ? [[oldElement[0], newElement]] : [];
+
+          // @ts-expect-error mapped types probably needed
+          data[this.prefix]["sorting"] = [
+            ...data[this.prefix]["sorting"],
+            ...a,
+          ];
 
           HistoryController.goto(
             new URL(
@@ -158,15 +168,15 @@ export class PwOrder<P extends keyof typeof entityRoutes> extends LitElement {
         id=${this.randomId}
       >
         ${(() => {
-          const data = JSON.parse(
-            decodeURIComponent(
-              this.history.url.search == ""
-                ? "{}"
-                : this.history.url.search.substring(1)
-            )
+          const data = parseRequestWithPrefix(
+            this.url,
+            this.prefix,
+            this.history.url
           );
-          const value = (get(data, [...this.path, "sorting"]) ?? []).find(
-            ([e, d]: [string, string]) => e === `${this.name as string}`
+
+          // @ts-expect-error mapped types probably needed
+          const value = (data[this.prefix]["sorting"] ?? []).find(
+            ([e, d]: [string, string]) => e === `${this.name}`
           )?.[1];
           return value === "ASC"
             ? html`<svg

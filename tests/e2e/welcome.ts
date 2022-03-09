@@ -11,9 +11,7 @@ import {
 } from "selenium-webdriver";
 import chrome from "selenium-webdriver/chrome.js";
 //import repl from "repl";
-import crypto from "node:crypto";
 import { writeFile } from "fs/promises";
-const webcrypto = crypto.webcrypto as unknown as Crypto;
 
 if (!process.env["BASE_URL"]) {
   console.error("BASE_URL not set!");
@@ -35,8 +33,9 @@ if (!process.env["BASE_URL"]) {
 // https://w3c.github.io/webdriver/#get-element-shadow-root
 
 export async function shadow(element: WebElement) {
-  // @ts-expect-error wrong typings
-  return (await element.getShadowRoot()) as WebElement; // eslint-disable-line @typescript-eslint/no-unsafe-call
+  // @ts-expect-error types are wrong
+  // eslint-disable-next-line @typescript-eslint/consistent-type-assertions,@typescript-eslint/no-unsafe-call
+  return (await element.getShadowRoot()) as WebElement;
 }
 
 export async function click(driver: WebDriver, element: WebElement) {
@@ -77,14 +76,16 @@ export async function main() {
   });
 
   try {
-    // @ts-expect-error the typescript bindings are heavily outdated
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-call
-    await driver.setNetworkConditions({
+    /*await driver.setNetworkConditions({
       offline: false,
       latency: 100, // Additional latency (ms).
       download_throughput: 50 * 1024, // Maximal aggregated download throughput.
       upload_throughput: 50 * 1024, // Maximal aggregated upload throughput.
-    });
+    });*/
+
+    if (!process.env.BASE_URL) {
+      throw new Error("BASE_URL not set!");
+    }
 
     await driver.get(process.env.BASE_URL);
 
@@ -148,9 +149,7 @@ export async function main() {
       await (await shadow(pwApp)).findElement(By.css("pw-welcome"));
     }
 
-    const groupName = [...webcrypto.getRandomValues(new Uint8Array(8))]
-      .map((b) => b.toString(16).padStart(2, "0"))
-      .join("");
+    const groupName = Math.random();
 
     {
       // edit user
@@ -373,4 +372,4 @@ export async function main() {
   }
 }
 
-main();
+await main();

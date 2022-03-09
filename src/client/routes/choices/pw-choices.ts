@@ -26,13 +26,16 @@ import { html } from "lit";
 import { noChange } from "lit";
 import { aClick } from "../../pw-a.js";
 import { msg } from "@lit/localize";
-import { PwEntityList, taskFunction } from "../../entity-list/pw-entitylist.js";
+import {
+  parseRequestWithPrefix,
+  PwEntityList,
+  taskFunction,
+} from "../../entity-list/pw-entitylist.js";
 import { pwOrder } from "../../entity-list/pw-order.js";
-import { pwInput } from "../../form/pw-input.js";
-import type { routes } from "../../../lib/routes.js";
-import type { z } from "zod";
 import { animate } from "@lit-labs/motion";
 import { repeat } from "lit/directives/repeat.js";
+import { pwInputNumber } from "../../form/pw-input-number.js";
+import { pwInputText } from "../../form/pw-input-text.js";
 
 export const pwChoices = async (url: URL) => {
   const result = await taskFunction("/api/v1/choices", url, "choices");
@@ -42,10 +45,8 @@ export const pwChoices = async (url: URL) => {
 class PwChoices<X extends string> extends PwEntityList<"/api/v1/choices", X> {
   constructor() {
     super();
-  }
 
-  override get url() {
-    return "/api/v1/choices" as const;
+    this.url = "/api/v1/choices";
   }
 
   override get title() {
@@ -58,42 +59,42 @@ class PwChoices<X extends string> extends PwEntityList<"/api/v1/choices", X> {
 
   override get head() {
     try {
-      const search: {
-        [key in X]: z.infer<typeof routes["/api/v1/choices"]["request"]>;
-      } = JSON.parse(
-        decodeURIComponent(
-          this.history.url.search == ""
-            ? "{}"
-            : this.history.url.search.substring(1)
-        )
+      const data = parseRequestWithPrefix(
+        this.url,
+        this.prefix,
+        this.history.url
       );
-      const initial = search[this.prefix];
+
+      const initial = data[this.prefix];
 
       return html`
         <tr>
           <th class="table-cell-hover p-0" scope="col">
-            ${pwOrder<"/api/v1/choices">({
+            ${pwOrder({
+              url: "/api/v1/choices",
               refreshEntityList: () => this._task.run(),
               name: "id",
-              path: [this.prefix],
+              prefix: this.prefix,
               title: msg("ID"),
             })}
           </th>
 
           <th class="table-cell-hover p-0" scope="col">
-            ${pwOrder<"/api/v1/choices">({
+            ${pwOrder({
+              url: "/api/v1/choices",
               refreshEntityList: () => this._task.run(),
               name: "title",
-              path: [this.prefix],
+              prefix: this.prefix,
               title: msg("Title"),
             })}
           </th>
 
           <th class="table-cell-hover p-0" scope="col">
-            ${pwOrder<"/api/v1/choices">({
+            ${pwOrder({
+              url: "/api/v1/choices",
               refreshEntityList: () => this._task.run(),
               name: "rank",
-              path: [this.prefix],
+              prefix: this.prefix,
               title: msg("Rank"),
             })}
           </th>
@@ -101,9 +102,12 @@ class PwChoices<X extends string> extends PwEntityList<"/api/v1/choices", X> {
 
         <tr>
           <th scope="col">
-            ${pwInput<"/api/v1/choices", ["filters", "id"]>({
+            ${pwInputNumber<"/api/v1/choices", number | undefined>({
+              url: this.url,
               label: null,
               name: ["filters", "id"],
+              get: (o) => o.filters.id,
+              set: (o, v) => (o.filters.id = v),
               task: this._task,
               type: "number",
               defaultValue: undefined,
@@ -112,19 +116,26 @@ class PwChoices<X extends string> extends PwEntityList<"/api/v1/choices", X> {
           </th>
 
           <th scope="col">
-            ${pwInput<"/api/v1/choices", ["filters", "title"]>({
+            ${pwInputText<"/api/v1/choices", string | undefined>({
+              url: this.url,
               label: null,
               name: ["filters", "title"],
+              get: (o) => o.filters.title,
+              set: (o, v) => (o.filters.title = v),
               task: this._task,
               type: "text",
               initial,
+              defaultValue: "",
             })}
           </th>
 
           <th scope="col">
-            ${pwInput<"/api/v1/choices", ["filters", "rank"]>({
+            ${pwInputNumber<"/api/v1/choices", number | undefined | null>({
+              url: this.url,
               label: null,
               name: ["filters", "rank"],
+              get: (o) => o.filters.rank,
+              set: (o, v) => (o.filters.rank = v),
               task: this._task,
               type: "number",
               defaultValue: undefined,
@@ -141,7 +152,6 @@ class PwChoices<X extends string> extends PwEntityList<"/api/v1/choices", X> {
     }
   }
   override get body() {
-    const disabled = false;
     return html`
       ${this._task.render({
         pending: () => {

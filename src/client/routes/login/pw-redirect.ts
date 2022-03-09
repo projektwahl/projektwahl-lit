@@ -28,9 +28,8 @@ import { PwForm } from "../../form/pw-form.js";
 import { HistoryController } from "../../history-controller.js";
 import { msg } from "@lit/localize";
 import "../../form/pw-input.js";
-import { pwInput } from "../../form/pw-input.js";
 import { bootstrapCss } from "../../index.js";
-import { ref } from "lit/directives/ref.js";
+import { z } from "zod";
 
 class PwRedirect extends PwForm<"/api/v1/redirect"> {
   static override get properties() {
@@ -54,11 +53,18 @@ class PwRedirect extends PwForm<"/api/v1/redirect"> {
       });
       this.form.value?.dispatchEvent(formDataEvent);
 
+      const searchParams = z
+        .object({
+          session_state: z.string(),
+          code: z.string(),
+        })
+        .parse(Object.fromEntries(new URL(window.location.href).searchParams));
+
       const result = await myFetch<"/api/v1/redirect">(
-        `/api/v1/redirect${window.location.search}`,
-        {
-          method: "GET", // TODO FIXME?
-        }
+        "GET",
+        `/api/v1/redirect`,
+        searchParams,
+        {}
       );
 
       if (result.success) {

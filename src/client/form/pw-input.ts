@@ -25,71 +25,16 @@ import { LitElement, noChange } from "lit";
 import { bootstrapCss } from "../index.js";
 import { ifDefined } from "lit/directives/if-defined.js";
 import { msg } from "@lit/localize";
-import { createRef, ref } from "lit/directives/ref.js";
+import { createRef, Ref, ref } from "lit/directives/ref.js";
 import { repeat } from "lit/directives/repeat.js";
 import type { routes, ResponseType } from "../../lib/routes.js";
 import type { z } from "zod";
-import type { Path } from "../utils.js";
-import get from "lodash-es/get.js";
-import set from "lodash-es/set.js";
 import type { Task } from "@dev.mohe/task";
 
-// MAYBE we could integrate pw-order into here. But this is already fairly complex.
-
-// workaround see https://github.com/runem/lit-analyzer/issues/149#issuecomment-1006162839
-export function pwInput<
-  P extends keyof typeof routes = never,
-  Q extends Path<z.infer<typeof routes[P]["request"]>> = never
->(
-  props: Pick<
-    PwInput<P, Q>,
-    | "type"
-    | "autocomplete"
-    | "disabled"
-    | "initial"
-    | "label"
-    | "name"
-    | "options"
-    | "task"
-    | "defaultValue"
-    | "value"
-  > &
-    Partial<Pick<PwInput<P, Q>, "onchange">>
-) {
-  const {
-    onchange,
-    disabled,
-    initial,
-    label,
-    name,
-    options,
-    task,
-    type,
-    autocomplete,
-    defaultValue,
-    value,
-    ...rest
-  } = props;
-  let _ = rest;
-  _ = 1; // ensure no property is missed - Don't use `{}` as a type. `{}` actually means "any non-nullish value".
-  return html`<pw-input
-    type=${type}
-    ?disabled=${disabled}
-    @change=${onchange}
-    .label=${label}
-    .name=${name}
-    .options=${options}
-    autocomplete=${ifDefined(autocomplete)}
-    .task=${task}
-    .initial=${initial}
-    .defaultValue=${defaultValue}
-    .value=${value}
-  ></pw-input>`;
-}
-
-export class PwInput<
+export abstract class PwInput<
   P extends keyof typeof routes,
-  Q extends Path<z.infer<typeof routes[P]["request"]>> = never
+  T,
+  I extends Element
 > extends LitElement {
   static override get properties() {
     return {
@@ -101,6 +46,7 @@ export class PwInput<
       disabled: { type: Boolean },
       randomId: { state: true },
       defaultValue: { attribute: false },
+      url: { attribute: false },
       task: {
         attribute: false,
         /*hasChanged: () => {
@@ -114,13 +60,21 @@ export class PwInput<
     };
   }
 
+  url!: P;
+
+  // these three here are just plain-up terrible but the typings for paths are equally bad
+  name!: string[];
+
+  // TODO FIXME maybe switch this back to Path and lodash-es (but not remove then for now so we could switch back)
+  get!: (o: z.infer<typeof routes[P]["request"]>) => T;
+
+  set!: (o: z.infer<typeof routes[P]["request"]>, v: T) => void;
+
   disabled?: boolean = false;
 
   randomId;
 
   label!: string | null;
-
-  name!: Q & string[];
 
   type: "text" | "password" | "number" | "checkbox" | "select";
 
@@ -130,16 +84,16 @@ export class PwInput<
 
   initial?: z.infer<typeof routes[P]["request"]>;
 
-  value?: any;
+  value?: T;
 
-  input: import("lit/directives/ref").Ref<HTMLElement>;
+  input: Ref<I>;
 
   form!: HTMLFormElement;
 
-  // z.infer<typeof routes[P]["request"]>[Q]
-  options?: { value: any; text: string }[];
+  // TODO FIXME
+  options?: { value: T; text: string }[];
 
-  defaultValue?: any;
+  defaultValue!: T;
 
   constructor() {
     super();
@@ -148,8 +102,6 @@ export class PwInput<
     this.type = "text";
 
     this.input = createRef();
-
-    this.defaultValue = null;
   }
 
   // because forms in shadow root are garbage
@@ -161,48 +113,17 @@ export class PwInput<
     event.detail.push(this.name);
   };
 
-  myformdataEventListener = (
+  abstract myformdataEventListener: (
     event: CustomEvent<z.infer<typeof routes[P]["request"]>>
-  ) => {
-    if (this.type === "number") {
-      set(
-        event.detail,
-        this.name as string[],
-        (this.input.value as HTMLInputElement).value === ""
-          ? this.defaultValue
-          : (this.input.value as HTMLInputElement).valueAsNumber
-      );
-    } else if (this.type === "checkbox") {
-      set(
-        event.detail,
-        this.name as string[],
-        (this.input.value as HTMLInputElement).checked
-          ? this.value
-          : this.defaultValue
-      );
-    } else if (this.type === "select") {
-      set(
-        event.detail,
-        this.name as string[],
-        (this.input.value as HTMLSelectElement).selectedIndex == -1
-          ? this.defaultValue
-          : this.options?.find(
-              (v) => v.value == (this.input.value as HTMLInputElement).value
-            )?.value // To make numbers work
-      );
-    } else {
-      const val = (this.input.value as HTMLInputElement).value;
-      set(
-        event.detail,
-        this.name as string[],
-        val === "" ? this.defaultValue : val
-      );
-    }
-  };
+  ) => void;
 
   override connectedCallback() {
     super.connectedCallback();
-    this.form = this.closest("form") as HTMLFormElement;
+    const form = this.closest("form");
+    if (!form) {
+      throw new Error();
+    }
+    this.form = form;
     this.form.addEventListener("myformdata", this.myformdataEventListener);
     this.form.addEventListener("myformkeys", this.myformkeysEventListener);
   }
@@ -214,11 +135,7 @@ export class PwInput<
   }
 
   override render() {
-    if (
-      this.label === undefined ||
-      this.name === undefined ||
-      this.task === undefined
-    ) {
+    if (this.label === undefined || this.task === undefined) {
       throw new Error(msg("component not fully initialized"));
     }
 
@@ -243,8 +160,8 @@ export class PwInput<
             );
           }}
           type=${this.type}
-          value=${ifDefined(get(this.initial, this.name as string[]))}
-          ?checked=${get(this.initial, this.name as string[])}
+          value=${ifDefined(this.initial !== undefined ? this.get(this.initial) : undefined)}
+          ?checked=${this.initial !== undefined ? this.get(this.initial) : false}
           class="${
             this.type === "checkbox" ? "form-check-input" : "form-control"
           } ${this.task.render({
@@ -258,31 +175,26 @@ export class PwInput<
           : "is-valid",
       initial: () => "",
     })}"
-          name=${this.name.toString()}
           id=${this.randomId}
           aria-describedby="${this.randomId}-feedback"
           autocomplete=${ifDefined(this.autocomplete)}
           ?disabled=${
             this.disabled ||
-            (this.task.render({
+            this.task.render({
               complete: () => false,
               pending: () => true,
               initial: () => false,
-            }) as boolean)
+            })
           }
         >
           ${
             this.type === "select"
               ? repeat(
-                  this.options as {
-                    value: any; //z.infer<typeof routes[P]["request"]>[Q];
-                    text: string;
-                  }[],
+                  this.options!,
                   (o) => o.value,
                   (o) =>
                     html`<option
-                      ?selected=${get(this.initial, this.name as string[]) ===
-                      o.value}
+                      ?selected=${this.initial !== undefined ? this.get(this.initial) === o.value : false}
                       value=${o.value}
                     >
                       ${o.text}
@@ -348,4 +260,3 @@ export class PwInput<
     `;
   }
 }
-customElements.define("pw-input", PwInput);

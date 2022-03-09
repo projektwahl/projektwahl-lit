@@ -28,9 +28,9 @@ import { PwForm } from "../../form/pw-form.js";
 import { HistoryController } from "../../history-controller.js";
 import { msg } from "@lit/localize";
 import "../../form/pw-input.js";
-import { pwInput } from "../../form/pw-input.js";
 import { bootstrapCss } from "../../index.js";
 import { ref } from "lit/directives/ref.js";
+import { pwInputText } from "../../form/pw-input-text.js";
 
 class PwLogin extends PwForm<"/api/v1/login"> {
   static override get properties() {
@@ -56,13 +56,13 @@ class PwLogin extends PwForm<"/api/v1/login"> {
       });
       this.form.value?.dispatchEvent(formDataEvent);
 
-      const result = await myFetch<"/api/v1/login">("/api/v1/login", {
-        method: "POST",
-        headers: {
-          "content-type": "text/json",
-        },
-        body: JSON.stringify(formDataEvent.detail),
-      });
+      const result = await myFetch<"/api/v1/login">(
+        "POST",
+        "/api/v1/login",
+        // @ts-expect-error TODO FIXME design change needed
+        formDataEvent.detail,
+        {}
+      );
 
       if (result.success) {
         const bc = new BroadcastChannel("updateloginstate");
@@ -112,19 +112,27 @@ class PwLogin extends PwForm<"/api/v1/login"> {
               >
               <h3 class="text-center">${msg("Login as guest")}</h3>
 
-              ${pwInput<"/api/v1/login", ["username"]>({
+              ${pwInputText<"/api/v1/login", string>({
+                url: this.url,
                 type: "text",
                 autocomplete: "username",
                 label: msg("Username"),
                 name: ["username"],
+                get: (o) => o.username,
+                set: (o, v) => (o.username = v),
                 task: this._task,
+                defaultValue: "",
               })}
-              ${pwInput<"/api/v1/login", ["password"]>({
+              ${pwInputText<"/api/v1/login", string>({
+                url: this.url,
                 type: "password",
                 label: msg("Password"),
                 name: ["password"],
+                get: (o) => o.password,
+                set: (o, v) => (o.password = v),
                 autocomplete: "current-password",
                 task: this._task,
+                defaultValue: "",
               })}
               ${!this.disabled
                 ? html`
@@ -134,7 +142,7 @@ class PwLogin extends PwForm<"/api/v1/login"> {
                         pending: () => true,
                         complete: () => false,
                         initial: () => false,
-                      }) as boolean}
+                      })}
                       class="btn btn-primary"
                     >
                       ${this.actionText}
@@ -151,7 +159,6 @@ class PwLogin extends PwForm<"/api/v1/login"> {
 
 customElements.define("pw-login", PwLogin);
 
-// eslint-disable-next-line @typescript-eslint/require-await
 export const pwLogin = async (): Promise<import("lit").TemplateResult> => {
   return html`<pw-login></pw-login>`;
 };

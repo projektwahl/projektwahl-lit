@@ -23,14 +23,12 @@ SPDX-FileCopyrightText: 2021 Moritz Hedtke <Moritz.Hedtke@t-online.de>
 import "../../form/pw-input.js";
 import { Task, TaskStatus } from "@dev.mohe/task";
 import { html, LitElement } from "lit";
-import { HistoryController } from "../../history-controller.js";
 import { myFetch } from "../../utils.js";
 import { createRef, ref } from "lit/directives/ref.js";
 import { msg } from "@lit/localize";
 import { bootstrapCss } from "../../index.js";
 import type { routes } from "../../../lib/routes.js";
 import type { z } from "zod";
-import { live } from "lit/directives/live.js";
 
 class PwRankSelect extends LitElement {
   static override get properties() {
@@ -57,17 +55,13 @@ class PwRankSelect extends LitElement {
 
     this._task = new Task(this, async (args) => {
       const result = await myFetch<"/api/v1/choices/update">(
+        "POST",
         "/api/v1/choices/update",
         {
-          method: "POST",
-          headers: {
-            "content-type": "text/json",
-          },
-          body: JSON.stringify({
-            project_id: this.choice.id, // project id
-            rank: args === 0 ? null : args,
-          }),
-        }
+          project_id: this.choice.id, // project id
+          rank: args === 0 ? null : args,
+        },
+        {}
       );
 
       this.form.value?.dispatchEvent(

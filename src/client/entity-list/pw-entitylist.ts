@@ -24,28 +24,65 @@ import { css, html, TemplateResult } from "lit";
 import { HistoryController } from "../history-controller.js";
 import { ref } from "lit/directives/ref.js";
 import { Task, TaskStatus } from "@dev.mohe/task";
-import type { entityRoutes, ResponseType } from "../../lib/routes.js";
-import type { z } from "zod";
+import { entityRoutes, ResponseType } from "../../lib/routes.js";
+import { z } from "zod";
 import { PwForm } from "../form/pw-form.js";
 import { bootstrapCss } from "../index.js";
 import { msg, str } from "@lit/localize";
 import { ifDefined } from "lit/directives/if-defined.js";
 import { myFetch } from "../utils.js";
-import { pwInput } from "../form/pw-input.js";
+import { pwInputSelect } from "../form/pw-input-select.js";
 
-export const taskFunction = async <P extends keyof typeof entityRoutes>(
+export const parseRequestWithPrefix = <
+  P extends keyof typeof entityRoutes,
+  PREFIX extends string
+>(
+  apiUrl: P,
+  prefix: PREFIX,
+  url: URL
+) => {
+  // @ts-expect-error https://github.com/colinhacks/zod/issues/153#issuecomment-863569536
+  const schema: z.ZodObject<
+    { [k in PREFIX]: typeof entityRoutes[P]["request"] },
+    "passthrough",
+    z.ZodTypeAny,
+    { [k in PREFIX]: z.infer<typeof entityRoutes[P]["request"]> },
+    Record<string, unknown>
+  > = z
+    .object({})
+    .setKey(prefix, entityRoutes[apiUrl]["request"].default({filters:{}}))
+    .passthrough();
+  const data: z.infer<
+    z.ZodObject<
+      { [k in PREFIX]: typeof entityRoutes[P]["request"] },
+      "passthrough",
+      z.ZodTypeAny,
+      { [k in PREFIX]: z.infer<typeof entityRoutes[P]["request"]> },
+      Record<string, unknown>
+    >
+  > = schema.parse(
+    JSON.parse(
+      decodeURIComponent(url.search == "" ? "{}" : url.search.substring(1))
+    )
+  );
+  /*const a: z.infer<z.ZodObject<{[k in PREFIX]: typeof entityRoutes[P]["request"]}, "strict", z.ZodTypeAny, {[k in PREFIX]:  z.infer<typeof entityRoutes[P]["request"]>}, Record<string, unknown>>>[PREFIX] = data[prefix];
+  const b: z.infer<typeof entityRoutes[P]["request"]> = a;*/
+  return data;
+};
+
+export const taskFunction = async <
+  P extends keyof typeof entityRoutes,
+  PREFIX extends string
+>(
   apiUrl: P,
   url: URL,
-  prefix: string
+  prefix: PREFIX
 ) => {
-  const data = JSON.parse(
-    decodeURIComponent(url.search == "" ? "{}" : url.search.substring(1))
-  );
   const result = await myFetch<P>(
-    `${apiUrl}?${encodeURIComponent(JSON.stringify(data[prefix] ?? {}))}`,
-    {
-      method: "GET",
-    }
+    "GET",
+    apiUrl,
+    parseRequestWithPrefix(apiUrl, prefix, url)[prefix],
+    {}
   );
   return result;
 };
@@ -61,7 +98,7 @@ export class PwEntityList<
       initialRender: { state: true },
       debouncedUrl: { state: true },
       prefix: { type: String },
-      ...super.properties,
+      ...super.properties, // TODO FIXME remove this everywhere? https://lit.dev/docs/components/properties/#accessors-noaccessor
     };
   }
 
@@ -70,7 +107,7 @@ export class PwEntityList<
     const bc = new BroadcastChannel("updateloginstate");
     bc.onmessage = (event) => {
       if (event.data === "login") {
-        this._task.run();
+        void this._task.run();
       }
     };
   }
@@ -102,10 +139,6 @@ export class PwEntityList<
     return "blub";
   }
 
-  get url(): P {
-    throw new Error("not implemented");
-  }
-
   initialRender: boolean;
 
   initial: ResponseType<P> | undefined;
@@ -132,33 +165,27 @@ export class PwEntityList<
 
       this._task = new Task(this, {
         task: async () => {
-          const data = JSON.parse(
-            decodeURIComponent(
-              this.history.url.search == ""
-                ? "{}"
-                : this.history.url.search.substring(1)
-            )
+          const data = parseRequestWithPrefix(
+            this.url,
+            this.prefix,
+            this.history.url
           );
 
           const formDataEvent = new CustomEvent<
             z.infer<typeof entityRoutes[P]["request"]>
           >("myformdata", {
             bubbles: false,
-            detail:
-              data[this.prefix] ??
-              ({} as z.infer<typeof entityRoutes[P]["request"]>),
+            detail: data[this.prefix] ?? {},
           });
           this.form.value?.dispatchEvent(formDataEvent);
 
           console.log(JSON.stringify(formDataEvent.detail));
 
           const result = await myFetch<P>(
-            `${this.url}?${encodeURIComponent(
-              JSON.stringify(formDataEvent.detail)
-            )}`,
-            {
-              method: "GET",
-            }
+            "GET",
+            this.url,
+            formDataEvent.detail,
+            {}
           );
 
           HistoryController.goto(
@@ -191,12 +218,10 @@ export class PwEntityList<
       throw new Error(msg("component not fully initialized"));
     }
 
-    const data = JSON.parse(
-      decodeURIComponent(
-        this.history.url.search == ""
-          ? "{}"
-          : this.history.url.search.substring(1)
-      )
+    const data = parseRequestWithPrefix(
+      this.url,
+      this.prefix,
+      this.history.url
     );
 
     return html`
@@ -227,12 +252,15 @@ export class PwEntityList<
           <div class="row justify-content-between">
             <div class="col-auto">${this.buttons}</div>
             <div class="col-3">
-              ${pwInput<P, ["paginationLimit"]>({
+              ${pwInputSelect<P, number>({
+                url: this.url,
                 label: "Elemente pro Seite",
                 name: ["paginationLimit"],
+                get: (o) => o.paginationLimit,
+                set: (o, v) => (o.paginationLimit = v),
                 task: this._task,
                 type: "select",
-                initial: data,
+                initial: data[this.prefix],
                 options: [
                   {
                     text: ((count: number) => msg(str`${count} per page`))(10),
@@ -251,6 +279,7 @@ export class PwEntityList<
                     value: 100,
                   },
                 ],
+                defaultValue: 100,
               })}
             </div>
           </div>
@@ -284,15 +313,20 @@ export class PwEntityList<
                       @click=${async (e: Event) => {
                         e.preventDefault();
 
-                        const data = JSON.parse(
-                          decodeURIComponent(
-                            this.history.url.search == ""
-                              ? "{}"
-                              : this.history.url.search.substring(1)
-                          )
+                        const data = parseRequestWithPrefix(
+                          this.url,
+                          this.prefix,
+                          this.history.url
                         );
+
                         if (!data[this.prefix]) {
-                          data[this.prefix] = {};
+                          data[this.prefix] = {
+                            filters: {},
+                            paginationDirection: "forwards",
+                            paginationLimit: 100,
+                            sorting: [],
+                            paginationCursor: null,
+                          };
                         }
                         if (this._task.value?.success) {
                           data[this.prefix].paginationCursor =
@@ -345,15 +379,20 @@ export class PwEntityList<
                       @click=${async (e: Event) => {
                         e.preventDefault();
 
-                        const data = JSON.parse(
-                          decodeURIComponent(
-                            this.history.url.search == ""
-                              ? "{}"
-                              : this.history.url.search.substring(1)
-                          )
+                        const data = parseRequestWithPrefix(
+                          this.url,
+                          this.prefix,
+                          this.history.url
                         );
+
                         if (!data[this.prefix]) {
-                          data[this.prefix] = {};
+                          data[this.prefix] = {
+                            filters: {},
+                            paginationDirection: "forwards",
+                            paginationLimit: 100,
+                            sorting: [],
+                            paginationCursor: null,
+                          };
                         }
                         if (this._task.value?.success) {
                           data[this.prefix].paginationCursor =

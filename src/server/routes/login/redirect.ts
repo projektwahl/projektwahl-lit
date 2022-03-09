@@ -38,20 +38,7 @@ export async function openidRedirectHandler(
   request: MyRequest,
   response: ServerResponse | Http2ServerResponse
 ) {
-  return await requestHandler("GET", "/api/v1/redirect", async function () {
-    const url = new URL(request.url, process.env.BASE_URL);
-
-    const searchParams = z
-      .object({
-        session_state: z.string(),
-        code: z.string(),
-      })
-      .parse(
-        Object.fromEntries(
-          url.searchParams as unknown as Iterable<readonly [string, string]>
-        )
-      );
-
+  return await requestHandler("GET", "/api/v1/redirect", async function (data) {
     // https://github.com/AzureAD/microsoft-authentication-library-for-js/tree/dev/lib/msal-browser
     // https://docs.microsoft.com/en-us/azure/active-directory/develop/scenario-spa-app-registration
     // USE single tenant as for all others we need permissions
@@ -66,8 +53,8 @@ export async function openidRedirectHandler(
 
     try {
       const result = await client.callback(
-        `${process.env.BASE_URL as string}/redirect`,
-        searchParams
+        `${process.env.BASE_URL}/redirect`,
+        data
       );
 
       console.log(result);

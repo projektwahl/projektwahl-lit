@@ -38,4 +38,9 @@ declare global {
   interface Window {
     BOOTSTRAP_CSS: string | undefined;
   }
+
+  /*// https://github.com/microsoft/TypeScript/issues/17002
+  interface ArrayConstructor {
+    isArray<T>(arg: T[] | any): arg is T[];
+  }*/
 }

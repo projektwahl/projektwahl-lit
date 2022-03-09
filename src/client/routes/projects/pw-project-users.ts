@@ -31,10 +31,13 @@ import "../../form/pw-input.js";
 import { setupHmr } from "../../hmr.js";
 import { aClick } from "../../pw-a.js";
 import { pwOrder } from "../../entity-list/pw-order.js";
-import { pwInput } from "../../form/pw-input.js";
-import type { routes } from "../../../lib/routes.js";
-import type { z } from "zod";
-import { taskFunction } from "../../entity-list/pw-entitylist.js";
+import {
+  parseRequestWithPrefix,
+  taskFunction,
+} from "../../entity-list/pw-entitylist.js";
+import { pwInputCheckbox } from "../../form/pw-input-checkbox.js";
+import { pwInputNumber } from "../../form/pw-input-number.js";
+import { pwInputText } from "../../form/pw-input-text.js";
 
 export const pwProjectUsers = async (url: URL, prefix: string) => {
   const result = await taskFunction("/api/v1/users", url, prefix);
@@ -65,45 +68,43 @@ export const PwProjectUsers = setupHmr(
 
     override get head() {
       try {
-        // TODO FIXME this use of any / untyped makes lots of problems
-        // We need some client-side routing that stores the query parameters
-        const search: {
-          [key in X]: z.infer<typeof routes["/api/v1/users"]["request"]>;
-        } = JSON.parse(
-          decodeURIComponent(
-            this.history.url.search == ""
-              ? "{}"
-              : this.history.url.search.substring(1)
-          )
+        const data = parseRequestWithPrefix(
+          this.url,
+          this.prefix,
+          this.history.url
         );
-        const initial = search[this.prefix];
+
+        const initial = data[this.prefix];
 
         return html`<tr>
             <th class="table-cell-hover" scope="col">${msg(html`&#x2713;`)}</th>
 
             <th class="table-cell-hover p-0" scope="col">
-              ${pwOrder<"/api/v1/users">({
+              ${pwOrder({
+                url: "/api/v1/users",
                 refreshEntityList: () => this._task.run(),
                 name: "id",
-                path: [this.prefix],
+                prefix: this.prefix,
                 title: msg("ID"),
               })}
             </th>
 
             <th class="table-cell-hover p-0" scope="col">
-              ${pwOrder<"/api/v1/users">({
+              ${pwOrder({
+                url: "/api/v1/users",
                 refreshEntityList: () => this._task.run(),
                 name: "username",
-                path: [this.prefix],
+                prefix: this.prefix,
                 title: msg("Name"),
               })}
             </th>
 
             <th class="table-cell-hover p-0" scope="col">
-              ${pwOrder<"/api/v1/users">({
+              ${pwOrder({
+                url: "/api/v1/users",
                 refreshEntityList: () => this._task.run(),
                 name: "type",
-                path: [this.prefix],
+                prefix: this.prefix,
                 title: msg("Type"),
               })}
             </th>
@@ -111,24 +112,27 @@ export const PwProjectUsers = setupHmr(
 
           <tr>
             <th scope="col">
-              ${pwInput<
-                "/api/v1/users",
-                ["filters", "project_leader_id" | "force_in_project_id"]
-              >({
+              ${pwInputCheckbox<"/api/v1/users", boolean | undefined>({
+                url: this.url,
                 label: null,
                 name: ["filters", this.name],
+                get: (o) => o.filters[this.name] == this.projectId,
+                set: (o, v) =>
+                  (o.filters[this.name] = v ? this.projectId : null),
                 task: this._task,
                 type: "checkbox",
-                value: this.projectId,
                 defaultValue: undefined,
                 initial: initial,
               })}
             </th>
 
             <th scope="col">
-              ${pwInput<"/api/v1/users", ["filters", "id"]>({
+              ${pwInputNumber<"/api/v1/users", number | undefined>({
+                url: this.url,
                 label: null,
                 name: ["filters", "id"],
+                get: (o) => o.filters.id,
+                set: (o, v) => (o.filters.id = v),
                 task: this._task,
                 type: "number",
                 defaultValue: undefined,
@@ -137,24 +141,36 @@ export const PwProjectUsers = setupHmr(
             </th>
 
             <th scope="col">
-              ${pwInput<"/api/v1/users", ["filters", "username"]>({
+              ${pwInputText<"/api/v1/users", string | undefined>({
+                url: this.url,
                 label: null,
                 name: ["filters", "username"],
+                get: (o) => o.filters.username,
+                set: (o, v) => (o.filters.username = v),
                 task: this._task,
                 type: "text",
                 initial,
+                defaultValue: undefined,
               })}
             </th>
 
             <th scope="col">
-              ${pwInput<"/api/v1/users", ["filters", "type"]>({
-                label: null,
-                name: ["filters", "type"],
-                task: this._task,
-                type: "text",
-                defaultValue: undefined,
-                initial,
-              })}
+              ${
+                /*TODO FIXME use zod to verify the actual value? also change this to select*/ pwInputText<
+                  "/api/v1/users",
+                  "voter" | "helper" | "admin" | undefined
+                >({
+                  url: this.url,
+                  label: null,
+                  name: ["filters", "type"],
+                  get: (o) => o.filters.type,
+                  set: (o, v) => (o.filters.type = v),
+                  task: this._task,
+                  type: "text",
+                  defaultValue: undefined,
+                  initial,
+                })
+              }
             </th>
 
             <th scope="col"></th>

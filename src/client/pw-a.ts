@@ -23,10 +23,16 @@ SPDX-FileCopyrightText: 2021 Moritz Hedtke <Moritz.Hedtke@t-online.de>
 import { HistoryController } from "./history-controller.js";
 
 // TODO FIXME https://lit.dev/docs/components/events/#shadowdom-retargeting just use the approach shown there
+
+// TODO FIXME or maybe make this a Lit Element Directive
 export const aClick = (event: MouseEvent) => {
   event.preventDefault();
-  const target = (event.target as HTMLElement).closest(
-    "a"
-  ) as HTMLAnchorElement;
+  if (!(event.target instanceof Element)) {
+    throw new Error("link not found");
+  }
+  const target = event.target.closest("a");
+  if (!target) {
+    throw new Error("link not found");
+  }
   HistoryController.goto(new URL(target.href, window.location.href), {});
 };

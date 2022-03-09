@@ -34,7 +34,7 @@ export const sql = postgres(process.env["DATABASE_URL"], {
   },*/ // this seems to be a performance issue
 });
 
-type UnwrapPromiseArray<T> = T extends any[] // eslint-disable-line @typescript-eslint/no-explicit-any
+type UnwrapPromiseArray<T> = T extends any[]
   ? {
       [k in keyof T]: T[k] extends Promise<infer R> ? R : T[k];
     }

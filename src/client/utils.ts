@@ -22,21 +22,37 @@ SPDX-FileCopyrightText: 2021 Moritz Hedtke <Moritz.Hedtke@t-online.de>
 */
 
 //import { ZodIssueCode } from "zod";
-import type { ResponseType, routes } from "../lib/routes";
+import { MinimalSafeParseError, ResponseType, routes } from "../lib/routes.js";
 import jscookie from "js-cookie";
+import type { z } from "zod";
 
 export const myFetch = async <P extends keyof typeof routes>(
-  url: `${P}${string}`,
-  options: RequestInit | undefined
+  method: "GET" | "POST",
+  url: P,
+  body: z.infer<typeof routes[P]["request"]>,
+  options: RequestInit
 ): Promise<ResponseType<P>> => {
   try {
-    const response = await fetch(url.toString(), {
-      ...options,
-      headers: {
-        ...options?.headers,
-        "x-csrf-protection": "projektwahl",
-      },
-    });
+    const response =
+      method === "GET"
+        ? await fetch(`${url}?${encodeURIComponent(JSON.stringify(body))}`, {
+            ...options,
+            headers: {
+              ...options.headers,
+              "x-csrf-protection": "projektwahl",
+            },
+            method,
+          })
+        : await fetch(url, {
+            ...options,
+            headers: {
+              ...options.headers,
+              "x-csrf-protection": "projektwahl",
+              "content-type": "text/json",
+            },
+            method,
+            body: JSON.stringify(body),
+          });
     if (!response.ok) {
       if (response.status == 401) {
         // unauthorized
@@ -77,8 +93,21 @@ export const myFetch = async <P extends keyof typeof routes>(
         return r;
       }
     }
-    const result = (await response.json()) as ResponseType<P>;
-    return result;
+    // TODO FIXME maybe include the result shit in the typings directly
+    const json = await response.json()
+    if (json.success) {
+      const a: typeof routes[P] = routes[url];
+      const b: typeof routes[P]["response"] = a.response;
+      const c:
+        | z.SafeParseSuccess<z.infer<typeof routes[P]["response"]>>
+        | MinimalSafeParseError = b.safeParse(json.data);
+      console.log(c)
+      return c
+    } else {
+      // TODO FIXME
+      // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
+      return json as MinimalSafeParseError
+    }
   } catch (error) {
     console.error(error);
     if (error instanceof TypeError) {

@@ -30,9 +30,12 @@ import { msg } from "@lit/localize";
 import "../../form/pw-input.js";
 import type { routes, MinimalSafeParseError } from "../../../lib/routes.js";
 import type { z } from "zod";
-import { pwInput } from "../../form/pw-input.js";
 import { bootstrapCss } from "../../index.js";
 import { ref } from "lit/directives/ref.js";
+import { pwInputText } from "../../form/pw-input-text.js";
+import { pwInputSelect } from "../../form/pw-input-select.js";
+import { pwInputNumber } from "../../form/pw-input-number.js";
+import { pwInputCheckbox } from "../../form/pw-input-checkbox.js";
 
 export async function pwUser(id: number, viewOnly = false) {
   const result = await taskFunction([id]);
@@ -46,13 +49,17 @@ export async function pwUser(id: number, viewOnly = false) {
 
 const taskFunction = async ([id]: [number]) => {
   const response = await myFetch<"/api/v1/users">(
-    `/api/v1/users/?${JSON.stringify({
+    "GET",
+    `/api/v1/users`,
+    {
       filters: {
         id,
       },
       paginationCursor: null,
+      paginationDirection: "forwards",
+      paginationLimit: 100,
       sorting: [],
-    })}`,
+    },
     {}
   );
   if (response.success) {
@@ -109,24 +116,18 @@ class PwUserCreate extends PwForm<
       >("myformdata", {
         bubbles: false,
         detail: {
-          project_leader_id: null,
-          force_in_project_id: null,
+          project_leader_id: undefined,
+          force_in_project_id: undefined,
           ...(this.initial?.success
             ? { id: this.initial.data.id }
-            : { id: -1 }), // TODO FIXME
+            : { id: undefined }), // TODO FIXME
         },
       });
       this.form.value?.dispatchEvent(formDataEvent);
 
       const result = await myFetch<
         "/api/v1/users/create" | "/api/v1/users/update"
-      >(this.uri, {
-        method: "POST",
-        headers: {
-          "content-type": "text/json",
-        },
-        body: JSON.stringify(formDataEvent.detail),
-      });
+      >("POST", this.uri, formDataEvent.detail, {});
 
       if (result.success) {
         HistoryController.goto(new URL("/", window.location.href), {});
@@ -161,41 +162,50 @@ class PwUserCreate extends PwForm<
                   await this._task.run();
                 }}
               >
-                ${pwInput<
+                ${pwInputText<
                   "/api/v1/users/create" | "/api/v1/users/update",
-                  ["username"]
+                  string | undefined
                 >({
+                  url: this.url,
                   type: "text",
                   disabled: this.disabled,
                   label: msg("Username"),
                   name: ["username"],
+                  get: (o) => o.username,
+                  set: (o, v) => (o.username = v),
                   task: this._task,
                   initial: this.initial?.data,
+                  defaultValue: "",
                 })}
-                ${pwInput<
+                ${pwInputText<
                   "/api/v1/users/create" | "/api/v1/users/update",
-                  ["openid_id"]
+                  string | undefined
                 >({
+                  url: this.url,
                   type: "text",
                   disabled: this.disabled,
                   label: msg("Third-party email address"),
                   name: ["openid_id"],
+                  get: (o) => o.openid_id,
+                  set: (o, v) => (o.openid_id = v),
                   task: this._task,
                   initial: this.initial?.data,
+                  defaultValue: "",
                 })}
-                ${pwInput<
+                ${pwInputSelect<
                   "/api/v1/users/create" | "/api/v1/users/update",
-                  ["type"]
+                  "voter" | "helper" | "admin" | undefined
                 >({
+                  url: this.url,
                   type: "select",
                   disabled: this.disabled,
-                  onchange: (event: Event) =>
-                    (this.type = (event.target as HTMLSelectElement).value as
-                      | "helper"
-                      | "admin"
-                      | "voter"),
                   label: msg("User type"),
                   name: ["type"],
+                  get: (o) => o.type,
+                  set: (o, v) => {
+                    o.type = v;
+                    this.type = v;
+                  },
                   options: [
                     { value: "voter", text: "Schüler" },
                     { value: "helper", text: "Helfer" },
@@ -209,70 +219,89 @@ class PwUserCreate extends PwForm<
                           ...this.initial?.data,
                           type: this.type ?? this.initial?.data.type ?? "voter",
                         },
+                  defaultValue: undefined,
                 })}
                 ${(this.type ?? this.initial?.data.type ?? "voter") === "voter"
-                  ? html`${pwInput<
+                  ? html`${pwInputText<
                       "/api/v1/users/create" | "/api/v1/users/update",
-                      ["group"]
+                      string | null | undefined
                     >({
+                      url: this.url,
                       type: "text",
                       disabled: this.disabled,
                       label: msg("Group"),
                       name: ["group"],
+                      get: (o) => o.group,
+                      set: (o, v) => (o.group = v),
                       task: this._task,
                       initial: this.initial?.data,
+                      defaultValue: "",
                     })}
-                    ${pwInput<
+                    ${pwInputNumber<
                       "/api/v1/users/create" | "/api/v1/users/update",
-                      ["age"]
+                      number | undefined | null
                     >({
+                      url: this.url,
                       type: "number",
                       disabled: this.disabled,
                       label: msg("Age"),
                       name: ["age"],
+                      get: (o) => o.age,
+                      set: (o, v) => (o.age = v),
                       task: this._task,
                       initial: this.initial?.data,
+                      defaultValue: undefined,
                     })}`
                   : undefined}
                 ${!this.disabled
                   ? html`
-                      ${pwInput<
+                      ${pwInputText<
                         "/api/v1/users/create" | "/api/v1/users/update",
-                        ["password"]
+                        string | undefined
                       >({
+                        url: this.url,
                         type: "password",
                         disabled: this.disabled,
                         label: msg("Password"),
                         name: ["password"],
+                        get: (o) => o.password,
+                        set: (o, v) => (o.password = v),
                         task: this._task,
                         autocomplete: "new-password",
                         initial: this.initial?.data,
+                        defaultValue: "",
                       })}
                     `
                   : undefined}
-                ${pwInput<
+                ${pwInputCheckbox<
                   "/api/v1/users/create" | "/api/v1/users/update",
-                  ["away"]
+                  boolean | undefined
                 >({
+                  url: this.url,
                   type: "checkbox",
                   value: true,
                   defaultValue: false,
                   disabled: this.disabled,
                   label: msg("Away"),
                   name: ["away"],
+                  get: (o) => o.away,
+                  set: (o, v) => (o.away = v),
                   task: this._task,
                   initial: this.initial?.data,
                 })}
-                ${pwInput<
+                ${pwInputCheckbox<
                   "/api/v1/users/create" | "/api/v1/users/update",
-                  ["deleted"]
+                  boolean | undefined
                 >({
+                  url: this.url,
                   type: "checkbox",
                   value: true,
                   defaultValue: false,
                   disabled: this.disabled,
                   label: msg("Mark this user as deleted"),
                   name: ["deleted"],
+                  get: (o) => o.deleted,
+                  set: (o, v) => (o.deleted = v),
                   task: this._task,
                   initial: this.initial?.data,
                 })}
@@ -284,7 +313,7 @@ class PwUserCreate extends PwForm<
                           pending: () => true,
                           complete: () => false,
                           initial: () => false,
-                        }) as boolean}
+                        })}
                         class="btn btn-primary"
                       >
                         ${this.actionText}

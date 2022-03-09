@@ -25,11 +25,14 @@ import { html } from "lit";
 import { noChange } from "lit";
 import { aClick } from "../../pw-a.js";
 import { msg } from "@lit/localize";
-import { PwEntityList, taskFunction } from "../../entity-list/pw-entitylist.js";
+import {
+  parseRequestWithPrefix,
+  PwEntityList,
+  taskFunction,
+} from "../../entity-list/pw-entitylist.js";
 import { pwOrder } from "../../entity-list/pw-order.js";
-import { pwInput } from "../../form/pw-input.js";
-import type { routes } from "../../../lib/routes.js";
-import type { z } from "zod";
+import { pwInputNumber } from "../../form/pw-input-number.js";
+import { pwInputText } from "../../form/pw-input-text.js";
 
 export const pwProjects = async (url: URL) => {
   const result = await taskFunction("/api/v1/projects", url, "projects");
@@ -39,10 +42,8 @@ export const pwProjects = async (url: URL) => {
 class PwProjects<X extends string> extends PwEntityList<"/api/v1/projects", X> {
   constructor() {
     super();
-  }
 
-  override get url() {
-    return "/api/v1/projects" as const;
+    this.url = "/api/v1/projects";
   }
 
   override get title() {
@@ -61,42 +62,42 @@ class PwProjects<X extends string> extends PwEntityList<"/api/v1/projects", X> {
 
   override get head() {
     try {
-      const search: {
-        [key in X]: z.infer<typeof routes["/api/v1/projects"]["request"]>;
-      } = JSON.parse(
-        decodeURIComponent(
-          this.history.url.search == ""
-            ? "{}"
-            : this.history.url.search.substring(1)
-        )
+      const data = parseRequestWithPrefix(
+        this.url,
+        this.prefix,
+        this.history.url
       );
-      const initial = search[this.prefix];
+
+      const initial = data[this.prefix];
 
       return html`
         <tr>
           <th class="table-cell-hover p-0" scope="col">
-            ${pwOrder<"/api/v1/projects">({
+            ${pwOrder({
+              url: "/api/v1/projects",
               refreshEntityList: () => this._task.run(),
               name: "id",
-              path: [this.prefix],
+              prefix: this.prefix,
               title: msg("ID"),
             })}
           </th>
 
           <th class="table-cell-hover p-0" scope="col">
-            ${pwOrder<"/api/v1/projects">({
+            ${pwOrder({
+              url: "/api/v1/projects",
               refreshEntityList: () => this._task.run(),
               name: "title",
-              path: [this.prefix],
+              prefix: this.prefix,
               title: msg("Title"),
             })}
           </th>
 
           <th class="table-cell-hover p-0" scope="col">
-            ${pwOrder<"/api/v1/projects">({
+            ${pwOrder({
+              url: "/api/v1/projects",
               refreshEntityList: () => this._task.run(),
               name: "info",
-              path: [this.prefix],
+              prefix: this.prefix,
               title: msg("Info"),
             })}
           </th>
@@ -106,9 +107,12 @@ class PwProjects<X extends string> extends PwEntityList<"/api/v1/projects", X> {
 
         <tr>
           <th scope="col">
-            ${pwInput<"/api/v1/projects", ["filters", "id"]>({
+            ${pwInputNumber<"/api/v1/projects", number | undefined>({
+              url: this.url,
               label: null,
               name: ["filters", "id"],
+              get: (o) => o.filters.id,
+              set: (o, v) => (o.filters.id = v),
               task: this._task,
               type: "number",
               defaultValue: undefined,
@@ -117,19 +121,26 @@ class PwProjects<X extends string> extends PwEntityList<"/api/v1/projects", X> {
           </th>
 
           <th scope="col">
-            ${pwInput<"/api/v1/projects", ["filters", "title"]>({
+            ${pwInputText<"/api/v1/projects", string | undefined>({
+              url: this.url,
               label: null,
               name: ["filters", "title"],
+              get: (o) => o.filters.title,
+              set: (o, v) => (o.filters.title = v),
               task: this._task,
               type: "text",
               initial,
+              defaultValue: "",
             })}
           </th>
 
           <th scope="col">
-            ${pwInput<"/api/v1/projects", ["filters", "info"]>({
+            ${pwInputText<"/api/v1/projects", string | undefined>({
+              url: this.url,
               label: null,
               name: ["filters", "info"],
+              get: (o) => o.filters.info,
+              set: (o, v) => (o.filters.info = v),
               task: this._task,
               type: "text",
               defaultValue: undefined,

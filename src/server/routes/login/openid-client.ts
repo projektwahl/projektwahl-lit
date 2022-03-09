@@ -52,7 +52,7 @@ async function setupClient() {
       client = new Client({
         client_id: process.env["CLIENT_ID"],
         client_secret,
-        redirect_uris: [`${process.env.BASE_URL as string}/redirect`],
+        redirect_uris: [`${process.env.BASE_URL}/redirect`],
         response_types: ["code"],
         // id_token_signed_response_alg (default "RS256")
         // token_endpoint_auth_method (default "client_secret_basic")

@@ -41,7 +41,7 @@ const argon2Options = {
 /*
 import crypto from "node:crypto";
 
-const webcrypto = crypto.webcrypto as unknown as Crypto;
+const webcrypto = crypto.webcrypto;
 
 async function getKeyMaterial(password: string): Promise<CryptoKey> {
   let enc = new TextEncoder();

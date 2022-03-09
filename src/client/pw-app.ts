@@ -28,7 +28,7 @@ import {
   TemplateResult,
 } from "lit";
 import { bootstrapCss } from "./index.js";
-import { HistoryController, HistoryState } from "./history-controller.js";
+import { HistoryController } from "./history-controller.js";
 import { aClick } from "./pw-a.js";
 import jscookie from "js-cookie";
 import { myFetch } from "./utils.js";
@@ -214,7 +214,7 @@ export class PwApp extends LitElement {
 
     this.popstateListener = (event: PopStateEvent) => {
       const url = new URL(window.location.href);
-      const state = event.state as HistoryState;
+      const state = event.state;
       HistoryController.goto(url, state);
     };
 
@@ -235,12 +235,13 @@ export class PwApp extends LitElement {
 
       this._apiTask = new Task(this, {
         task: this.nextPage,
+        // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
         args: () =>
           [
             Object.keys(pages).find((k) =>
               new RegExp(k).test(this.history.url.pathname)
             ),
-          ] as [keyof typeof pages],
+          ] as [keyof typeof pages | undefined],
         initialStatus:
           this.initial !== undefined ? TaskStatus.COMPLETE : TaskStatus.INITIAL,
         initialValue: this.initial,
@@ -331,10 +332,12 @@ export class PwApp extends LitElement {
                     ? html`<li class="nav-item">
                         <a
                           @click=${async () => {
-                            await myFetch<"/api/v1/logout">("/api/v1/logout", {
-                              method: "POST",
-                              body: "{}",
-                            });
+                            await myFetch<"/api/v1/logout">(
+                              "POST",
+                              "/api/v1/logout",
+                              {},
+                              {}
+                            );
 
                             const bc = new BroadcastChannel("updateloginstate");
                             bc.postMessage("logout");

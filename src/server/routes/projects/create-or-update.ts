@@ -70,9 +70,7 @@ export async function createProjectsHandler(
 
       // TODO FIXME make this in sql directly
       if (loggedInUser.type === "helper") {
-        await sql`UPDATE users_with_deleted SET project_leader_id = ${
-          res[0].id as number
-        } WHERE project_leader_id IS NULL AND id = ${loggedInUser.id}`;
+        await sql`UPDATE users_with_deleted SET project_leader_id = ${res[0].id} WHERE project_leader_id IS NULL AND id = ${loggedInUser.id}`;
       }
 
       return res;

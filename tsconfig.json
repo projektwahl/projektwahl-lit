@@ -15,9 +15,9 @@
     "strictNullChecks": true,
     "isolatedModules": true,
     "esModuleInterop": true,
-    "rootDir": "src/",
+    "rootDir": ".",
     "outDir": "dist/",
     "disableSizeLimit": true
   },
-  "include": ["src/**/*.ts"]
+  "include": ["src/**/*.ts", "tests/**/*.ts", "stacktrace-source-map.js"]
 }

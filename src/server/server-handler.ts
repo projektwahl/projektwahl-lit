@@ -54,10 +54,6 @@ type ErrorMapCtx = {
   data: any;
 };
 
-export function assertNever(_x: never): never {
-  throw new Error();
-}
-
 const myErrorMap: z.ZodErrorMap = (
   issue: ZodIssueOptionalMessage,
   _ctx: ErrorMapCtx
@@ -99,22 +95,23 @@ const myErrorMap: z.ZodErrorMap = (
       message = `Ungültiges Datum`;
       break;
     case ZodIssueCode.invalid_string:
-      if (issue.validation !== "regex") message = `Ungültig ${issue.validation}`;
+      if (issue.validation !== "regex")
+        message = `Ungültig ${issue.validation}`;
       else message = "Ungültig";
       break;
     case ZodIssueCode.too_small:
       if (issue.type === "array")
-        message = `Liste muss ${
-          issue.inclusive ? `mindestens` : `mehr als`
-        } ${issue.minimum} Element enthalten`;
+        message = `Liste muss ${issue.inclusive ? `mindestens` : `mehr als`} ${
+          issue.minimum
+        } Element enthalten`;
       else if (issue.type === "string")
-        message = `Text muss ${
-          issue.inclusive ? `mindestens` : `mehr als`
-        } ${issue.minimum} Zeichen haben`;
+        message = `Text muss ${issue.inclusive ? `mindestens` : `mehr als`} ${
+          issue.minimum
+        } Zeichen haben`;
       else if (issue.type === "number")
-        message = `Zahl muss größer ${
-          issue.inclusive ? ` gleich` : ``
-        }${issue.minimum} sein`;
+        message = `Zahl muss größer ${issue.inclusive ? ` gleich` : ``}${
+          issue.minimum
+        } sein`;
       else message = "Ungültige Eingabe";
       break;
     case ZodIssueCode.too_big:
@@ -123,13 +120,13 @@ const myErrorMap: z.ZodErrorMap = (
           issue.inclusive ? `höchstens` : `weniger als`
         } ${issue.maximum} Elemente enthalten`;
       else if (issue.type === "string")
-        message = `Text muss ${
-          issue.inclusive ? `höchstens` : `weniger als`
-        } ${issue.maximum} Zeichen haben`;
+        message = `Text muss ${issue.inclusive ? `höchstens` : `weniger als`} ${
+          issue.maximum
+        } Zeichen haben`;
       else if (issue.type === "number")
-        message = `Zahl muss kleiner ${
-          issue.inclusive ? ` gleich` : ``
-        }${issue.maximum} sein`;
+        message = `Zahl muss kleiner ${issue.inclusive ? ` gleich` : ``}${
+          issue.maximum
+        } sein`;
       else message = "Ungültige Eingabe";
       break;
     case ZodIssueCode.custom:
@@ -143,7 +140,6 @@ const myErrorMap: z.ZodErrorMap = (
       break;
     default:
       message = _ctx.defaultError;
-      assertNever(issue);
   }
   return { message };
 };
@@ -169,12 +165,12 @@ async function replaceAsync(
 ): Promise<string> {
   const promises: Promise<string>[] = [];
   str.replaceAll(regex, (match, ...args) => {
-    const promise = asyncFn(match, args as string[]);
+    const promise = asyncFn(match, args);
     promises.push(promise);
     return "";
   });
   const data = await Promise.all(promises);
-  return str.replaceAll(regex, () => data.shift() as string);
+  return str.replaceAll(regex, () => data.shift()!);
 }
 
 export const defaultHeaders = {
@@ -185,7 +181,7 @@ export const defaultHeaders = {
 
 export async function serverHandler(
   request: MyRequest,
-  response: ServerResponse | Http2ServerResponse
+  response: /*ServerResponse |*/ Http2ServerResponse
 ) {
   const path = z.string().parse(request.url);
 
@@ -215,12 +211,7 @@ export async function serverHandler(
 
           const url = relative(baseUrl, join(f, event.filename));
 
-          (
-            response.write as (
-              chunk: string | Uint8Array,
-              callback?: ((err: Error) => void) | undefined
-            ) => boolean
-          )(`data: ${url}\n\n`);
+          response.write(`data: ${url}\n\n`);
         }
       })();
     }
@@ -351,7 +342,7 @@ export async function serverHandler(
         raw.push(contents); // the string you want
         raw.push(null); // indicates end-of-file basically - the end of the stream
 
-        let acceptEncoding = request.headers["accept-encoding"] as string;
+        let acceptEncoding = request.headers["accept-encoding"];
         if (!acceptEncoding) {
           acceptEncoding = "";
         }
@@ -370,7 +361,7 @@ export async function serverHandler(
 
         // Note: This is not a conformant accept-encoding parser.
         // See https://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.3
-        if (/\bbr\b/.test(acceptEncoding)) {
+        /*if (/\bbr\b/.test(acceptEncoding)) {
           response.writeHead(200, {
             ...defaultHeaders,
             "content-type": `${contentType}; charset=utf-8`,
@@ -379,15 +370,15 @@ export async function serverHandler(
             "content-encoding": "br",
           });
           pipeline(raw, zlib.createBrotliCompress(), response, onError);
-        } else {
-          response.writeHead(200, {
-            ...defaultHeaders,
-            "content-type": `${contentType}; charset=utf-8`,
-            //"cache-control": "public, max-age=604800, immutable",
-            vary: "accept-encoding",
-          });
-          pipeline(raw, response, onError);
-        }
+        } else {*/
+        response.writeHead(200, {
+          ...defaultHeaders,
+          "content-type": `${contentType}; charset=utf-8`,
+          //"cache-control": "public, max-age=604800, immutable",
+          vary: "accept-encoding",
+        });
+        pipeline(raw, response, onError);
+        //}
       } catch (error) {
         console.error(error);
         response.writeHead(404, {
