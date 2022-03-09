@@ -132,7 +132,7 @@ export const PwProjectCreate = setupHmr(
           detail: {
             ...(this.initial?.success
               ? { id: this.initial.data.id }
-              : { id: -1 }), // TODO FIXME
+              : { id: undefined }), // TODO FIXME
           },
         });
         this.form.value?.dispatchEvent(formDataEvent);

@@ -116,11 +116,11 @@ class PwUserCreate extends PwForm<
       >("myformdata", {
         bubbles: false,
         detail: {
-          project_leader_id: null,
-          force_in_project_id: null,
+          project_leader_id: undefined,
+          force_in_project_id: undefined,
           ...(this.initial?.success
             ? { id: this.initial.data.id }
-            : { id: -1 }), // TODO FIXME
+            : { id: undefined }), // TODO FIXME
         },
       });
       this.form.value?.dispatchEvent(formDataEvent);
