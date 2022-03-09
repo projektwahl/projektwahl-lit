@@ -35,7 +35,7 @@ module.exports = {
     node: true,
   },
   rules: {
-    "@typescript-eslint/no-unused-vars": ["error", { varsIgnorePattern: "^_" }],
+    "@typescript-eslint/no-unused-vars": ["error", { varsIgnorePattern: "^_", argsIgnorePattern: "^_" }],
     "@typescript-eslint/consistent-type-assertions": [
       "error",
       { assertionStyle: "never" },
