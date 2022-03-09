@@ -109,7 +109,7 @@ export async function fetchData<R extends keyof typeof entityRoutes>(
           : "NULLS FIRST"
       )}`,
     ])
-    .slice(1);
+    .slice(1).reduce((prev, curr) => sql`${prev}${curr}`);
 
   const paginationCursor: entitesType0[R]["paginationCursor"] =
     query.paginationCursor;
