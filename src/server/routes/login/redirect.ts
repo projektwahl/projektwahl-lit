@@ -109,13 +109,10 @@ export async function openidRedirectHandler(
       const session_id_unhashed = Buffer.from(crypto.getRandomValues(new Uint8Array(32))).toString('hex');
       const session_id = new Uint8Array(await crypto.subtle.digest("SHA-512", new TextEncoder().encode(session_id_unhashed)));  
 
-      const session = rawSessionType.pick({ }).parse(
-        (
           await sql.begin("READ WRITE", async (tsql) => {
             return await tsql`INSERT INTO sessions (user_id, session_id) VALUES (${dbUser.id}, ${session_id})`;
           })
-        )[0]
-      );  
+       
 
       /** @type {import("node:http2").OutgoingHttpHeaders} */
       const responseHeaders: import("node:http2").OutgoingHttpHeaders = {
