@@ -160,6 +160,7 @@ export abstract class PwInput<
             );
           }}
           type=${this.type}
+          name=${this.name}
           value=${ifDefined(
             this.initial !== undefined ? this.get(this.initial) : undefined
           )}
