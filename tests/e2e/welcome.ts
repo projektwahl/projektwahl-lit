@@ -539,7 +539,7 @@ export async function main() {
     }
 
     {
-      // filtering
+      // filtering users
 
       const pwApp = await driver.findElement(By.css("pw-app"));
 
@@ -588,7 +588,65 @@ export async function main() {
         download_throughput: 0, // Maximal aggregated download throughput.
         upload_throughput: 0, // Maximal aggregated upload throughput.
       });
+
+      // TODO FIXME verify results
     }
+
+    {
+      // filtering projects
+
+      const pwApp = await driver.findElement(By.css("pw-app"));
+
+      const accountsLink = await (
+        await shadow(pwApp)
+      ).findElement(By.css('a[href="/projects"]'));
+
+      await click(driver, accountsLink);
+
+      const pwUsers = await (
+        await shadow(pwApp)
+      ).findElement(By.css("pw-projects"));
+
+      const filterUsername = await (
+        await shadow(pwUsers)
+      ).findElement(By.css('input[name="filters,title"]'));
+
+      // @ts-expect-error wrong typings
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-call
+      await driver.setNetworkConditions({
+        offline: false,
+        latency: 100, // Additional latency (ms).
+        download_throughput: 50 * 1024, // Maximal aggregated download throughput.
+        upload_throughput: 50 * 1024, // Maximal aggregated upload throughput.
+      });
+
+      await filterUsername.sendKeys("randomproject");
+
+      const loadingSpinner = await (
+        await shadow(pwUsers)
+      ).findElement(By.css(".spinner-grow"));
+
+      assert.ok(loadingSpinner.isDisplayed());
+
+      console.log(new Date());
+
+      await driver.wait(until.stalenessOf(loadingSpinner));
+
+      console.log(new Date());
+
+      // @ts-expect-error wrong typings
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-call
+      await driver.setNetworkConditions({
+        offline: false,
+        latency: 0, // Additional latency (ms).
+        download_throughput: 0, // Maximal aggregated download throughput.
+        upload_throughput: 0, // Maximal aggregated upload throughput.
+      });
+    }
+
+    // TODO filtering with error
+
+    // TODO filtering with empty result
 
     {
       // logout
@@ -634,9 +692,9 @@ export async function main() {
       );
     }
 
-    // TODO FIXME list/filter project
-
     // TODO FIXME voting
+
+    // TODO FIXME editing the project leaders + members
 
     await driver.quit();
 
