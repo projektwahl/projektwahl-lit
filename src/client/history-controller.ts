@@ -45,6 +45,7 @@ export class HistoryController implements ReactiveController {
 
     this.url = new URL(window.location.href);
 
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
     this.state = window.history?.state;
 
     this.navigateListener = (event) => {
@@ -57,6 +58,7 @@ export class HistoryController implements ReactiveController {
   }
   hostConnected() {
     this.url = new URL(window.location.href);
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
     this.state = window.history.state;
 
     window.addEventListener("navigate", this.navigateListener);

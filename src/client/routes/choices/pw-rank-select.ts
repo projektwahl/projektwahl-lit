@@ -53,26 +53,29 @@ class PwRankSelect extends LitElement {
 
     this.form = createRef();
 
-    this._task = new Task<[number], ResponseType<"/api/v1/choices/update">>(this, async (args: [number]) => {
-      const result = await myFetch<"/api/v1/choices/update">(
-        "POST",
-        "/api/v1/choices/update",
-        {
-          project_id: this.choice.id, // project id
-          rank: args[0] === 0 ? null : args[0],
-        },
-        {}
-      );
+    this._task = new Task<[number], ResponseType<"/api/v1/choices/update">>(
+      this,
+      async (args: [number]) => {
+        const result = await myFetch<"/api/v1/choices/update">(
+          "POST",
+          "/api/v1/choices/update",
+          {
+            project_id: this.choice.id, // project id
+            rank: args[0] === 0 ? null : args[0],
+          },
+          {}
+        );
 
-      this.form.value?.dispatchEvent(
-        new CustomEvent("refreshentitylist", {
-          bubbles: true,
-          composed: true,
-        })
-      );
+        this.form.value?.dispatchEvent(
+          new CustomEvent("refreshentitylist", {
+            bubbles: true,
+            composed: true,
+          })
+        );
 
-      return result;
-    });
+        return result;
+      }
+    );
   }
 
   render() {

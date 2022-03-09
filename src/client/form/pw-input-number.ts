@@ -75,8 +75,8 @@ export class PwInputNumber<
       event.detail,
       this.input.value.value === ""
         ? this.defaultValue
-        // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
-        : (this.input.value.valueAsNumber as T)
+        : // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
+          (this.input.value.valueAsNumber as T)
     );
   };
 }

@@ -214,7 +214,9 @@ export class PwApp extends LitElement {
 
     this.popstateListener = (event: PopStateEvent) => {
       const url = new URL(window.location.href);
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
       const state = event.state;
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
       HistoryController.goto(url, state);
     };
 
@@ -236,13 +238,11 @@ export class PwApp extends LitElement {
       this._apiTask = new Task(this, {
         task: this.nextPage,
         args: () => {
-          const _a: keyof typeof pages | undefined = Object.keys(pages).find((k) =>
-            new RegExp(k).test(this.history.url.pathname)
-          )
-          const _b:  [keyof typeof pages | undefined] = [
-            _a
-          ] 
-          return _b
+          const _a: keyof typeof pages | undefined = Object.keys(pages).find(
+            (k) => new RegExp(k).test(this.history.url.pathname)
+          );
+          const _b: [keyof typeof pages | undefined] = [_a];
+          return _b;
         },
         initialStatus:
           this.initial !== undefined ? TaskStatus.COMPLETE : TaskStatus.INITIAL,
