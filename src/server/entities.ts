@@ -21,10 +21,11 @@ SPDX-License-Identifier: AGPL-3.0-or-later
 SPDX-FileCopyrightText: 2021 Moritz Hedtke <Moritz.Hedtke@t-online.de>
 */
 import type { OutgoingHttpHeaders } from "node:http2";
+import type { PendingQuery, Row } from "postgres";
 import type { z } from "zod";
 import { entityRoutes, ResponseType } from "../lib/routes.js";
 import { sql } from "./database.js";
-import { sql2, unsafe2 } from "./sql/index.js";
+import { unsafe2 } from "./sql/index.js";
 
 // Mapped Types
 // https://www.typescriptlang.org/docs/handbook/2/mapped-types.html
@@ -47,7 +48,7 @@ export function updateField<
   E extends { [name: string]: boolean | string | number | null },
   K extends keyof E
 >(table: string, entity: E, name: K) {
-  return sql2`"${unsafe2(name)}" = CASE WHEN ${
+  return sql`"${unsafe2(name)}" = CASE WHEN ${
     entity[name] !== undefined
   } THEN ${entity[name] ?? null} ELSE "${unsafe2(table)}"."${unsafe2(
     name
@@ -57,12 +58,7 @@ export function updateField<
 export async function fetchData<R extends keyof typeof entityRoutes>(
   path: R,
   query: entitesType0[R],
-  sqlQuery: (
-    query: entitesType0[R]
-  ) => [
-    TemplateStringsArray,
-    ...(null | string | string[] | boolean | number | Buffer)[]
-  ],
+  sqlQuery: (query: entitesType0[R]) => PendingQuery<Row[]>,
   nullOrdering: {
     [key: string]: "smallest" | "largest";
   }
@@ -99,8 +95,8 @@ export async function fetchData<R extends keyof typeof entityRoutes>(
 
   const orderByQuery = query.sorting
     .flatMap((v) => [
-      sql2`,`,
-      sql2`${unsafe2(v[0])} ${unsafe2(v[1])} ${unsafe2(
+      sql`,`,
+      sql`${unsafe2(v[0])} ${unsafe2(v[1])} ${unsafe2(
         v[1] === "ASC"
           ? nullOrdering[v[0]] === "smallest"
             ? "NULLS FIRST"
@@ -110,14 +106,15 @@ export async function fetchData<R extends keyof typeof entityRoutes>(
           : "NULLS FIRST"
       )}`,
     ])
-    .slice(1);
+    .slice(1)
+    .reduce((prev, curr) => sql`${prev}${curr}`);
 
   const paginationCursor: entitesType0[R]["paginationCursor"] =
     query.paginationCursor;
 
   let finalQuery;
   if (!paginationCursor) {
-    finalQuery = sql2`(${sqlQuery(query)} ORDER BY ${orderByQuery} LIMIT ${
+    finalQuery = sql`(${sqlQuery(query)} ORDER BY ${orderByQuery} LIMIT ${
       query.paginationLimit + 1
     })`;
   } else {
@@ -131,20 +128,21 @@ export async function fetchData<R extends keyof typeof entityRoutes>(
         const parts = part
           .flatMap((value, index) => {
             return [
-              sql2` AND `,
+              sql` AND `,
               // @ts-expect-error this seems impossible to type - we probably need to unify this to the indexed type before
-              sql2`${paginationCursor ? paginationCursor[value[0]] : null} ${
+              sql`${paginationCursor ? paginationCursor[value[0]] : null} ${
                 index === part.length - 1
                   ? value[1] === "ASC"
-                    ? sql2`<`
-                    : sql2`>`
-                  : sql2`IS NOT DISTINCT FROM`
+                    ? sql`<`
+                    : sql`>`
+                  : sql`IS NOT DISTINCT FROM`
               } ${unsafe2(value[0] ?? null)}`,
             ];
           })
-          .slice(1);
+          .slice(1)
+          .reduce((prev, curr) => sql`${prev}${curr}`);
 
-        return sql2`(${sqlQuery(
+        return sql`(${sqlQuery(
           query
         )} AND (${parts}) ORDER BY ${orderByQuery} LIMIT ${
           query.paginationLimit + 1
@@ -155,15 +153,18 @@ export async function fetchData<R extends keyof typeof entityRoutes>(
     if (queries.length == 1) {
       finalQuery = queries[0];
     } else {
-      finalQuery = sql2`${queries
-        .flatMap((v) => [sql2`\nUNION ALL\n`, v])
-        .slice(1)} LIMIT ${query.paginationLimit + 1}`;
+      finalQuery = sql`${queries
+        .flatMap((v) => [sql`\nUNION ALL\n`, v])
+        .slice(1)
+        .reduce((prev, curr) => sql`${prev}${curr}`)} LIMIT ${
+        query.paginationLimit + 1
+      }`;
     }
   }
 
   const entitiesSchema = entitySchema["response"]["shape"]["entities"];
 
-  const sqlResult = await sql(...finalQuery);
+  const sqlResult = await finalQuery;
 
   console.log(sqlResult);
 

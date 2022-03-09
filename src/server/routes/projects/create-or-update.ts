@@ -24,7 +24,6 @@ import postgres from "postgres";
 import { sql } from "../../database.js";
 import { updateField } from "../../entities.js";
 import { MyRequest, requestHandler } from "../../express.js";
-import { sql2 } from "../../sql/index.js";
 import type { OutgoingHttpHeaders, ServerResponse } from "node:http";
 import type { Http2ServerResponse } from "node:http2";
 import {
@@ -93,7 +92,7 @@ export async function updateProjectsHandler(
       const field = (name: keyof typeof project) =>
         updateField("projects_with_deleted", project, name);
 
-      const finalQuery = sql2`UPDATE projects_with_deleted SET
+      const finalQuery = sql`UPDATE projects_with_deleted SET
 ${field("title")},
 ${field("info")},
 ${field("place")},
@@ -113,9 +112,9 @@ FROM users_with_deleted WHERE projects_with_deleted.id = ${
         project.id
       } AND users_with_deleted.type = 'helper' OR users_with_deleted.type = 'admin') RETURNING projects_with_deleted.id;`;
 
-      // TODO FIXME it seems like eslint doesnt detect this any return - which is bad
-      // oh actually it seems like porsager/postgres is at "fault"
-      return await sql(...finalQuery);
+      return z
+        .array(rawProjectSchema.pick({ id: true }))
+        .parse(await finalQuery);
     }
   );
 }

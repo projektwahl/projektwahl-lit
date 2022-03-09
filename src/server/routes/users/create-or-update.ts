@@ -21,11 +21,15 @@ SPDX-License-Identifier: AGPL-3.0-or-later
 SPDX-FileCopyrightText: 2021 Moritz Hedtke <Moritz.Hedtke@t-online.de>
 */
 import postgres from "postgres";
-import { routes, ResponseType, userSchema } from "../../../lib/routes.js";
+import {
+  routes,
+  ResponseType,
+  userSchema,
+  rawUserSchema,
+} from "../../../lib/routes.js";
 import { sql } from "../../database.js";
 import { MyRequest, requestHandler } from "../../express.js";
 import { hashPassword } from "../../password.js";
-import { sql2 } from "../../sql/index.js";
 import { updateField } from "../../entities.js";
 import type { OutgoingHttpHeaders, ServerResponse } from "node:http";
 import type { Http2ServerResponse } from "node:http2";
@@ -79,7 +83,7 @@ export async function updateUsersHandler(
       const field = (name: keyof typeof user) =>
         updateField("users_with_deleted", user, name);
 
-      const finalQuery = sql2`UPDATE users_with_deleted SET
+      const finalQuery = sql`UPDATE users_with_deleted SET
   ${field("username")},
   ${field("openid_id")},
   password_hash = CASE WHEN ${!!user.password} THEN ${
@@ -95,7 +99,15 @@ export async function updateUsersHandler(
   last_updated_by = ${loggedInUser.id}
   WHERE id = ${user.id} RETURNING id, project_leader_id, force_in_project_id;`;
       // TODO FIXME (found using fuzzer) if this tries to update a nonexisting user we should return an error
-      return await sql(...finalQuery);
+      return z
+        .array(
+          rawUserSchema.pick({
+            id: true,
+            project_leader_id: true,
+            force_in_project_id: true,
+          })
+        )
+        .parse(await finalQuery);
     }
   );
 }
