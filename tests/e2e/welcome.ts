@@ -422,7 +422,7 @@ export async function main() {
 
     await driver.get(process.env.BASE_URL);
 
-    await driver.sleep(2000);
+    await driver.sleep(1000);
 
     const screenshot = await driver.takeScreenshot();
     await writeFile("screenshot.png", screenshot, "base64");
