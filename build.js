@@ -5,6 +5,7 @@ import { promisify } from "util";
 import "./require-shim.js";
 import { build } from "esbuild";
 
+/** @type import("esbuild").Plugin */
 const nativeNodeModulesPlugin = {
   name: "native-node-modules",
   setup(build) {
@@ -45,7 +46,9 @@ const exec = promisify(unpromisifiedExec);
 
 try {
   await rm("dist", { recursive: true });
-} catch (e) {}
+} catch (e) {
+  // empty
+}
 
 {
   let { stdout, stderr } = await exec("lit-localize build");

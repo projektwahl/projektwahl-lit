@@ -193,9 +193,9 @@ export abstract class PwInput<
           }
         >
           ${
-            this.type === "select"
+            this.type === "select" && this.options
               ? repeat(
-                  this.options!,
+                  this.options,
                   (o) => o.value,
                   (o) =>
                     html`<option
