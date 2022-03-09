@@ -57,7 +57,7 @@ export async function usersHandler(
                 {
                   code: ZodIssueCode.custom,
                   path: ["unauthorized"],
-                  message: "Not logged in!",
+                  message: "Nicht angemeldet! Klicke rechts oben auf Anmelden.",
                 },
               ],
             },
@@ -83,7 +83,7 @@ export async function usersHandler(
                 {
                   code: ZodIssueCode.custom,
                   path: ["forbidden"],
-                  message: "Insufficient permissions!",
+                  message: "Unzureichende Berechtigung!",
                 },
               ],
             },

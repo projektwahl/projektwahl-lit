@@ -64,19 +64,8 @@ export const myFetch = async <P extends keyof typeof routes>(
         bc.postMessage("logout");
       }
       try {
-        const additionalInfo = await response.text();
-        return {
-          success: false,
-          error: {
-            issues: [
-              {
-                code: "custom", // ZodIssueCode.custom,
-                path: ["network"],
-                message: `Failed to request ${url}: ${response.status} ${response.statusText}\nAdditional information: ${additionalInfo}`,
-              },
-            ],
-          },
-        };
+        const additionalInfo = await response.json();
+        return additionalInfo
       } catch (error) {
         const r: ResponseType<P> = {
           success: false,
