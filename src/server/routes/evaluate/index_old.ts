@@ -1,5 +1,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // SPDX-FileCopyrightText: 2021 Moritz Hedtke <Moritz.Hedtke@t-online.de>
+export {}
+/*
 import { mkdtemp, open, readFile } from "fs/promises";
 import { constants } from "fs";
 import path from "path";
@@ -93,7 +95,7 @@ export const get = async () => {
     for (const c of choices) {
       await fileHandle.write(
         ` [user${c.user_id}, project${c.project_id}] ${
-          5 - c.rank /* FIXME improve this */
+          5 - c.rank // FIXME improve this 
         }`
       );
     }
@@ -163,7 +165,7 @@ export const get = async () => {
 };
 
 get();
-
+*/
 /*
 https://hub.docker.com/r/coinor/coin-or-optimization-suite
 docker start coin-or

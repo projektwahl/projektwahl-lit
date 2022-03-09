@@ -48,7 +48,7 @@ export function requestHandler<P extends keyof typeof routes>(
     r: z.infer<typeof routes[P]["request"]>,
     user: z.infer<typeof userSchema>,
     session_id: Uint8Array | undefined
-  ) => PromiseLike<[OutgoingHttpHeaders, ResponseType<P>]>
+  ) => PromiseLike<[OutgoingHttpHeaders, ResponseType<P>]> | [OutgoingHttpHeaders, ResponseType<P>]
 ): (
   request: MyRequest,
   response: ServerResponse | Http2ServerResponse
@@ -85,7 +85,6 @@ export function requestHandler<P extends keyof typeof routes>(
         if (session_id) {
           // if the hashed session id gets leaked in the log files / database dump or so you still are not able to login with it.
           session_id = new Uint8Array(
-            // @ts-expect-error wrong typings
             await crypto.subtle.digest(
               "SHA-512",
               new TextEncoder().encode(session_id)
