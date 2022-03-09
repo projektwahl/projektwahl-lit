@@ -76,12 +76,14 @@ export async function main() {
   });
 
   try {
-    /*await driver.setNetworkConditions({
+    // @ts-expect-error wrong typings
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-call
+    await driver.setNetworkConditions({
       offline: false,
       latency: 100, // Additional latency (ms).
       download_throughput: 50 * 1024, // Maximal aggregated download throughput.
       upload_throughput: 50 * 1024, // Maximal aggregated upload throughput.
-    });*/
+    });
 
     if (!process.env.BASE_URL) {
       throw new Error("BASE_URL not set!");
@@ -149,7 +151,7 @@ export async function main() {
       await (await shadow(pwApp)).findElement(By.css("pw-welcome"));
     }
 
-    const groupName = Math.random();
+    const groupName = `${Math.random()}`.substring(0, 10);
 
     {
       // edit user
@@ -348,7 +350,10 @@ export async function main() {
         await shadow(pwProjects)
       ).findElement(By.css('div[class="alert alert-danger"]'));
 
-      assert.match(await alert.getText(), /Not logged in!/);
+      assert.match(
+        await alert.getText(),
+        /Nicht angemeldet! Klicke rechts oben auf Anmelden./
+      );
     }
 
     await driver.quit();

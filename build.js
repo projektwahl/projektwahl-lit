@@ -1,10 +1,11 @@
 import { exec as unpromisifiedExec } from "child_process";
 import { createHash } from "crypto";
-import { readFile, rename, writeFile } from "fs/promises";
+import { readFile, rename, writeFile, rm } from "fs/promises";
 import { promisify } from "util";
 import "./require-shim.js";
 import { build } from "esbuild";
 
+/** @type import("esbuild").Plugin */
 const nativeNodeModulesPlugin = {
   name: "native-node-modules",
   setup(build) {
@@ -43,6 +44,12 @@ const nativeNodeModulesPlugin = {
 
 const exec = promisify(unpromisifiedExec);
 
+try {
+  await rm("dist", { recursive: true });
+} catch (e) {
+  // empty
+}
+
 {
   let { stdout, stderr } = await exec("lit-localize build");
 
@@ -52,7 +59,7 @@ const exec = promisify(unpromisifiedExec);
 
 {
   let { stdout, stderr } = await exec(
-    "esbuild --format=esm --bundle dist/de/client/pw-app.js --charset=utf8 --define:window.PRODUCTION=true --entry-names=[dir]/[name] --sourcemap  --analyze --outdir=dist --minify-whitespace --minify-identifiers --minify-syntax --tree-shaking=true --minify"
+    "esbuild --format=esm --bundle dist/de/src/client/pw-app.js --charset=utf8 --define:window.PRODUCTION=true --entry-names=[dir]/[name] --sourcemap  --analyze --outdir=dist --minify-whitespace --minify-identifiers --minify-syntax --tree-shaking=true --minify"
   );
 
   console.log(stdout);
@@ -93,7 +100,7 @@ await rename(
 // rebuild with path to bootstrap.css
 {
   let { stdout, stderr } = await exec(
-    `esbuild --format=esm --bundle dist/de/client/pw-app.js --charset=utf8 --define:window.PRODUCTION=true --define:window.BOOTSTRAP_CSS=\\"/dist/bootstrap_${bootstrapHash}.min.css\\" --entry-names=[dir]/[name] --sourcemap --analyze --outdir=dist --minify-whitespace --minify-syntax --tree-shaking=true`
+    `esbuild --format=esm --bundle dist/de/src/client/pw-app.js --charset=utf8 --define:window.PRODUCTION=true --define:window.BOOTSTRAP_CSS=\\"/dist/bootstrap_${bootstrapHash}.min.css\\" --entry-names=[dir]/[name] --sourcemap --analyze --outdir=dist --minify-whitespace --minify-syntax --tree-shaking=true`
   );
 
   console.log(stdout);

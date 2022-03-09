@@ -159,7 +159,7 @@ class PwLogin extends PwForm<"/api/v1/login"> {
 
 customElements.define("pw-login", PwLogin);
 
-export const pwLogin = async (): Promise<import("lit").TemplateResult> => {
+export const pwLogin = (): import("lit").TemplateResult => {
   return html`<pw-login></pw-login>`;
 };
 

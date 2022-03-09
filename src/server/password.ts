@@ -39,9 +39,9 @@ const argon2Options = {
 };
 
 /*
-import crypto from "node:crypto";
-
-const webcrypto = crypto.webcrypto;
+import nodeCrypto from "node:crypto";
+// @ts-expect-error wrong typings
+const { webcrypto: crypto }: { webcrypto: Crypto } = nodeCrypto;
 
 async function getKeyMaterial(password: string): Promise<CryptoKey> {
   let enc = new TextEncoder();

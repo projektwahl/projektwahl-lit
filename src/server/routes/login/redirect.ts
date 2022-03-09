@@ -21,18 +21,16 @@ SPDX-License-Identifier: AGPL-3.0-or-later
 SPDX-FileCopyrightText: 2021 Moritz Hedtke <Moritz.Hedtke@t-online.de>
 */
 import { sensitiveHeaders } from "node:http2";
-import { z, ZodIssueCode, ZodObject, ZodTypeAny } from "zod";
-import {
-  rawSessionType,
-  rawUserSchema,
-  UnknownKeysParam,
-  ResponseType,
-} from "../../../lib/routes.js";
+import { ZodIssueCode } from "zod";
+import { rawUserSchema, ResponseType } from "../../../lib/routes.js";
 import { sql } from "../../database.js";
 import { MyRequest, requestHandler } from "../../express.js";
 import { client } from "./openid-client.js";
 import type { OutgoingHttpHeaders, ServerResponse } from "node:http";
 import type { Http2ServerResponse } from "node:http2";
+import nodeCrypto from "node:crypto";
+// @ts-expect-error wrong typings
+const { webcrypto: crypto }: { webcrypto: Crypto } = nodeCrypto;
 
 export async function openidRedirectHandler(
   request: MyRequest,
@@ -46,6 +44,10 @@ export async function openidRedirectHandler(
 
     // https://github.com/projektwahl/projektwahl-sveltekit/blob/work/src/routes/login/index.json.ts
     // https://github.com/projektwahl/projektwahl-sveltekit/blob/work/src/routes/redirect/index.ts_old
+
+    if (!process.env.BASE_URL) {
+      throw new Error("BASE_URL not set");
+    }
 
     if (!client) {
       throw new Error("OpenID not configured!");
@@ -105,31 +107,30 @@ export async function openidRedirectHandler(
         return returnValue;
       }
 
-      /** @type {[Pick<import("../../../lib/types").RawSessionType, "session_id">]} */
-      const session = rawSessionType
-        .pick({
-          session_id: true,
-        })
-        .parse(
-          (
-            await sql.begin("READ WRITE", async (sql) => {
-              return await sql`INSERT INTO sessions (user_id) VALUES (${dbUser.id}) RETURNING session_id`;
-            })
-          )[0]
-        );
+      const session_id_unhashed = Buffer.from(
+        crypto.getRandomValues(new Uint8Array(32))
+      ).toString("hex");
+      const session_id = new Uint8Array(
+        await crypto.subtle.digest(
+          "SHA-512",
+          new TextEncoder().encode(session_id_unhashed)
+        )
+      );
+
+      await sql.begin("READ WRITE", async (tsql) => {
+        return await tsql`INSERT INTO sessions (user_id, session_id) VALUES (${dbUser.id}, ${session_id})`;
+      });
 
       /** @type {import("node:http2").OutgoingHttpHeaders} */
       const responseHeaders: import("node:http2").OutgoingHttpHeaders = {
         "content-type": "text/json; charset=utf-8",
         "set-cookie": [
-          `strict_id=${
-            session.session_id
-          }; Secure; SameSite=Strict; Path=/; HttpOnly; Max-Age=${
+          `strict_id=${session_id_unhashed}; Secure; SameSite=Strict; Path=/; HttpOnly; Max-Age=${
             48 * 60 * 60
           };`,
-          `lax_id=${
-            session.session_id
-          }; Secure; SameSite=Lax; Path=/; HttpOnly; Max-Age=${48 * 60 * 60};`,
+          `lax_id=${session_id_unhashed}; Secure; SameSite=Lax; Path=/; HttpOnly; Max-Age=${
+            48 * 60 * 60
+          };`,
           `username=${
             dbUser.username
           }; Secure; SameSite=Strict; Path=/; Max-Age=${48 * 60 * 60};`,

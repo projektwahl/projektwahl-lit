@@ -48,9 +48,7 @@ export async function createProjectsHandler(
       project,
       loggedInUser: Exclude<z.infer<typeof userSchema>, undefined>
     ) => {
-      // TODO FIXME we can use our nice query building here
-      // or postgres also has builtin features for insert and update
-      const res =
+      const res = z.array(rawProjectSchema.pick({ id: true })).parse(
         await sql`INSERT INTO projects_with_deleted (title, info, place, costs, min_age, max_age, min_participants, max_participants, random_assignments, deleted, last_updated_by)
             (SELECT 
     ${project.title ?? null},
@@ -66,7 +64,8 @@ export async function createProjectsHandler(
         } FROM users_with_deleted WHERE users_with_deleted.id = ${
           loggedInUser.id
         } AND (users_with_deleted.type = 'helper' OR users_with_deleted.type = 'admin'))
-    RETURNING id;`;
+    RETURNING id;`
+      );
 
       // TODO FIXME make this in sql directly
       if (loggedInUser.type === "helper") {
@@ -114,6 +113,8 @@ FROM users_with_deleted WHERE projects_with_deleted.id = ${
         project.id
       } AND users_with_deleted.type = 'helper' OR users_with_deleted.type = 'admin') RETURNING projects_with_deleted.id;`;
 
+      // TODO FIXME it seems like eslint doesnt detect this any return - which is bad
+      // oh actually it seems like porsager/postgres is at "fault"
       return await sql(...finalQuery);
     }
   );
@@ -126,10 +127,10 @@ export async function createOrUpdateProjectsHandler<
   request: MyRequest,
   response: ServerResponse | Http2ServerResponse,
   dbquery: (
-    sql: postgres.TransactionSql<{}>,
+    sql: postgres.TransactionSql<Record<string, never>>,
     project: z.infer<typeof routes[P]["request"]>,
     loggedInUser: Exclude<z.infer<typeof userSchema>, undefined>
-  ) => any
+  ) => Promise<z.infer<typeof routes[P]["response"]>[]>
 ) {
   // TODO FIXME create or update multiple
   return await requestHandler(
@@ -155,7 +156,7 @@ export async function createOrUpdateProjectsHandler<
                 {
                   code: ZodIssueCode.custom,
                   path: ["unauthorized"],
-                  message: "Not logged in!",
+                  message: "Nicht angemeldet! Klicke rechts oben auf Anmelden.",
                 },
               ],
             },
@@ -179,7 +180,7 @@ export async function createOrUpdateProjectsHandler<
                 {
                   code: ZodIssueCode.custom,
                   path: ["forbidden"],
-                  message: "Insufficient permissions!",
+                  message: "Unzureichende Berechtigung!",
                 },
               ],
             },
@@ -215,7 +216,7 @@ export async function createOrUpdateProjectsHandler<
                   {
                     code: ZodIssueCode.custom,
                     path: ["forbidden"],
-                    message: "Insufficient permissions!",
+                    message: "Unzureichende Berechtigung!",
                   },
                 ],
               },

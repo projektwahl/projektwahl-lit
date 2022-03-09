@@ -116,7 +116,7 @@ export class PwOrder<
           }
 
           const oldElementIndex = data[this.prefix]["sorting"].findIndex(
-            ([e, d]: [string, string]) => e === this.name
+            ([e]: [string, string]) => e === this.name
           );
           let oldElement: [
             z.infer<typeof entityRoutes[P]["request"]>["sorting"][number][0],
@@ -175,8 +175,9 @@ export class PwOrder<
           );
 
           // @ts-expect-error mapped types probably needed
+          // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment,@typescript-eslint/no-unsafe-member-access
           const value = (data[this.prefix]["sorting"] ?? []).find(
-            ([e, d]: [string, string]) => e === `${this.name}`
+            ([e]: [string, string]) => e === `${this.name}`
           )?.[1];
           return value === "ASC"
             ? html`<svg

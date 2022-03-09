@@ -32,9 +32,9 @@ SPDX-FileCopyrightText: 2021 Moritz Hedtke <Moritz.Hedtke@t-online.de>
         let pkgs = import nixpkgs {
           inherit system;
           config.permittedInsecurePackages = [
-            "openssl-1.0.2u"
-            "openssl-1.0.2e"
-            "openssl-1.1.1h"
+#            "openssl-1.0.2u"
+#            "openssl-1.0.2e"
+#            "openssl-1.1.1h"
           ];
         };
         in
@@ -48,6 +48,7 @@ SPDX-FileCopyrightText: 2021 Moritz Hedtke <Moritz.Hedtke@t-online.de>
               pkgs.reuse
               pkgs.nixpkgs-fmt
               #pkgs.nodePackages.npm-check-updates
+              #pkgs.nodePackages.node-gyp
               #pkgs.cbc
               pkgs.glpk
               #pkgs.lp_solve

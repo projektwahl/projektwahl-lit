@@ -39,6 +39,10 @@ declare global {
     BOOTSTRAP_CSS: string | undefined;
   }
 
+  interface ObjectConstructor {
+    keys<T>(o: T): (keyof T)[];
+  }
+
   /*// https://github.com/microsoft/TypeScript/issues/17002
   interface ArrayConstructor {
     isArray<T>(arg: T[] | any): arg is T[];

@@ -4,7 +4,6 @@ import os from "node:os";
 import { constants } from "node:fs";
 import { execFile } from "node:child_process";
 import { sql } from "../../database.js";
-import sortedIndexBy from "lodash-es/sortedIndexBy.js";
 import {
   rawChoice,
   rawProjectSchema,
@@ -59,8 +58,6 @@ export class CPLEXLP {
     }
   };
 
-  endMaximize = async () => {};
-
   startConstraints = async () => {
     await this.fileHandle.write(`\nSubject To`);
   };
@@ -91,8 +88,6 @@ export class CPLEXLP {
     }
   };
 
-  endConstraints = async () => {};
-
   startBounds = async () => {
     await this.fileHandle.write(`\nBounds\n`);
   };
@@ -108,8 +103,6 @@ export class CPLEXLP {
     }
   };
 
-  endBounds = async () => {};
-
   startVariables = async () => {
     await this.fileHandle.write(`\nGeneral\n`);
   };
@@ -118,8 +111,6 @@ export class CPLEXLP {
     await this.fileHandle.write(` ${name}`);
   };
 
-  endVariables = async () => {};
-
   startBinaryVariables = async () => {
     await this.fileHandle.write(`\nBinary\n`);
   };
@@ -127,8 +118,6 @@ export class CPLEXLP {
   binaryVariable = async (name: string) => {
     await this.fileHandle.write(` ${name}`);
   };
-
-  endBinaryVariables = async () => {};
 
   calculate = async () => {
     await this.fileHandle.write(`\nEnd\n`);
@@ -162,10 +151,6 @@ export class CPLEXLP {
       }
     }
 
-    const exitCode = await new Promise((resolve, _reject) => {
-      childProcess.on("close", resolve);
-    });
-
     const solution = (
       await readFile(this.solutionPath, { encoding: "utf8" })
     ).split(/\r?\n/);
@@ -174,7 +159,7 @@ export class CPLEXLP {
       solution
         .filter((l) => l.startsWith("j "))
         .map((l) => l.split(" "))
-        .map(([_, index, value]) => [parseInt(index), parseInt(value)])
+        .map(([_j, index, value]) => [parseInt(index), parseInt(value)])
     );
 
     const problem = (
@@ -255,8 +240,6 @@ for (const project of projects) {
   await lp.maximize(-9000, `project_underloaded_${project.id}`);
 }
 
-await lp.endMaximize();
-
 await lp.startConstraints();
 
 // only in one project or project leader
@@ -320,8 +303,6 @@ for (const project of projects) {
   );
 }
 
-await lp.endConstraints();
-
 await lp.startBounds();
 
 for (const project of projects) {
@@ -329,16 +310,12 @@ for (const project of projects) {
   await lp.bound(0, `project_underloaded_${project.id}`, null);
 }
 
-await lp.endBounds();
-
 await lp.startVariables();
 
 for (const project of projects) {
   await lp.variable(`project_overloaded_${project.id}`);
   await lp.variable(`project_underloaded_${project.id}`);
 }
-
-await lp.endVariables();
 
 await lp.startBinaryVariables();
 
@@ -354,8 +331,6 @@ for (const user of users) {
 for (const project of projects) {
   await lp.binaryVariable(`project_not_exists_${project.id}`);
 }
-
-await lp.endBinaryVariables();
 
 const results = await lp.calculate();
 

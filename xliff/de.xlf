@@ -4,15 +4,15 @@
 <body>
 <trans-unit id="scdb1bac161852c73">
   <source>Welcome</source>
-  <target state="translated">Willkommen</target>
+  <target>Willkommen</target>
 </trans-unit>
 <trans-unit id="se478d5906376d65e">
   <source>This is some boilerplate welcome text that can be adapted by changing the translation.</source>
-  <target state="translated">Dieser Text kann angepasst werden.</target>
+  <target>Dieser Text kann angepasst werden.</target>
 </trans-unit>
 <trans-unit id="s7a391ae3182a86b5">
   <source>Credits</source>
-  <target state="translated">Danksagung</target>
+  <target>Danksagung</target>
 </trans-unit>
 <trans-unit id="s494268b948a317a2">
   <source>Some errors occurred!</source>
@@ -24,19 +24,26 @@
 </trans-unit>
 <trans-unit id="s05ca1d6cf0a89899">
   <source>Denk dran: Lange Passwörter sind viel sicherer als welche mit vielen Sonderzeichen.</source>
-  <target state="translated">Denk dran: Lange Passwörter sind viel sicherer als welche mit vielen Sonderzeichen.</target>
+  <target>Denk dran: Lange Passwörter sind viel sicherer als welche mit vielen Sonderzeichen.</target>
 </trans-unit>
 <trans-unit id="he49e57357d4caee2">
   <source> Also lieber "Ich mag fliegende Autos." anstatt
                   "Moritz1234!".<x id="0" equiv-text="&lt;br>"/>Du kannst auch einen Passwort-Manager
                   verwenden, z.B.</source>
-  <target state="translated">Also lieber "Ich mag fliegende Autos." anstatt
+  <target>Also lieber "Ich mag fliegende Autos." anstatt
  "Moritz1234!".<x id="0" equiv-text="&lt;br>"/>Du kannst auch einen Passwort-Manager
  verwenden, z.B.</target>
 </trans-unit>
 <trans-unit id="s1dc79c57a4bab199">
   <source>Bitwarden</source>
-  <target state="translated">Bitwarden</target>
+  <target>Bitwarden</target>
+</trans-unit>
+<trans-unit id="s0a8c18046fb2a0f6">
+  <source>Third-party login</source>
+</trans-unit>
+<trans-unit id="s49730f3d5751a433">
+  <source>Loading...</source>
+  <target>Wird geladen...</target>
 </trans-unit>
 <trans-unit id="sc8da3cc71de63832">
   <source>Login</source>
@@ -57,10 +64,6 @@
 <trans-unit id="sf6e1665c7022a1f8">
   <source>Password</source>
   <target>Passwort</target>
-</trans-unit>
-<trans-unit id="s49730f3d5751a433">
-  <source>Loading...</source>
-  <target>Wird geladen...</target>
 </trans-unit>
 <trans-unit id="s7dc552fda8bc803d">
   <source><x id="0" equiv-text="${count}"/> per page</source>
@@ -84,7 +87,7 @@
 </trans-unit>
 <trans-unit id="s586d6bd2eca2da93">
   <source>Users</source>
-  <target state="translated">Accounts</target>
+  <target>Accounts</target>
 </trans-unit>
 <trans-unit id="s0c97387dc725a9e2">
   <source>Create account</source>
@@ -108,11 +111,14 @@
 </trans-unit>
 <trans-unit id="s88608c78750c1b37">
   <source>View account</source>
-  <target state="translated">Account anzeigen</target>
+  <target>Account anzeigen</target>
 </trans-unit>
 <trans-unit id="sa86d79c867c8f453">
   <source>Update account</source>
-  <target state="translated">Account aktualisieren</target>
+  <target>Account aktualisieren</target>
+</trans-unit>
+<trans-unit id="s7039d8b5b12742f7">
+  <source>Third-party email address</source>
 </trans-unit>
 <trans-unit id="s9f9492d30a96b9c6">
   <source>User type</source>
@@ -132,7 +138,7 @@
 </trans-unit>
 <trans-unit id="s83efd873c2040478">
   <source>Mark this user as deleted</source>
-  <target state="translated">Accounts als gelöscht markieren</target>
+  <target>Accounts als gelöscht markieren</target>
 </trans-unit>
 <trans-unit id="s199f5853f4e718f7">
   <source>Projects</source>
@@ -152,15 +158,15 @@
 </trans-unit>
 <trans-unit id="hd684a0e714c0d252">
   <source>✓</source>
-  <target state="translated">✓</target>
+  <target>✓</target>
 </trans-unit>
 <trans-unit id="s3e9c025477abb23d">
   <source>View project</source>
-  <target state="translated">Projekt anzeigen</target>
+  <target>Projekt anzeigen</target>
 </trans-unit>
 <trans-unit id="s7bef03c295945331">
   <source>Update project</source>
-  <target state="translated">Projekt aktualisieren</target>
+  <target>Projekt aktualisieren</target>
 </trans-unit>
 <trans-unit id="s13b3f5afa0862d1c">
   <source>Place</source>
@@ -172,19 +178,19 @@
 </trans-unit>
 <trans-unit id="see65a67b4c57946c">
   <source>Minimum age</source>
-  <target state="translated">minimale Jahrgangsstufe</target>
+  <target>minimale Jahrgangsstufe</target>
 </trans-unit>
 <trans-unit id="s59417c8662ddc5f2">
   <source>Maximum age</source>
-  <target state="translated">maximale Jahrgangsstufe</target>
+  <target>maximale Jahrgangsstufe</target>
 </trans-unit>
 <trans-unit id="sa2b8f32796bda377">
   <source>Minimum participants</source>
-  <target state="translated">mindestens teilnehmend</target>
+  <target>mindestens teilnehmend</target>
 </trans-unit>
 <trans-unit id="s63fd8c3d71e20415">
   <source>Maximum participants</source>
-  <target state="translated">höchstens teilnehmend</target>
+  <target>höchstens teilnehmend</target>
 </trans-unit>
 <trans-unit id="s840d9c93fd926ecb">
   <source>Allow random assignments</source>
@@ -192,23 +198,23 @@
 </trans-unit>
 <trans-unit id="sd0a19e0b6e7d20e2">
   <source>Mark this project as deleted</source>
-  <target state="translated">Projekt als gelöscht markieren</target>
+  <target>Projekt als gelöscht markieren</target>
 </trans-unit>
 <trans-unit id="s7e3a936c4f113dd4">
   <source>Project leaders</source>
-  <target state="translated">Projektleitung</target>
+  <target>Projektleitung</target>
 </trans-unit>
 <trans-unit id="sea8d39886fdb9cf5">
   <source>Guaranteed project members</source>
-  <target state="translated">Garantierte Projektmitglieder</target>
+  <target>Garantierte Projektmitglieder</target>
 </trans-unit>
 <trans-unit id="s97dc2365368a965f">
   <source>Choices</source>
-  <target state="translated">Wahl</target>
+  <target>Wahl</target>
 </trans-unit>
 <trans-unit id="s9841212bd35bac27">
   <source>Rank</source>
-  <target state="translated">Priorität</target>
+  <target>Priorität</target>
 </trans-unit>
 <trans-unit id="hc66aaa662761137a">
   <source>Not Found</source>
@@ -236,7 +242,7 @@
 </trans-unit>
 <trans-unit id="sb23eed07fcaf3095">
   <source>Vote</source>
-  <target state="translated">Wahl</target>
+  <target>Wahl</target>
 </trans-unit>
 <trans-unit id="s2667d13ee670a19d">
   <source>Logout <x id="0" equiv-text="${this.username}"/></source>
@@ -244,23 +250,23 @@
 </trans-unit>
 <trans-unit id="sfebb69bee8b5102d">
   <source>Source code</source>
-  <target state="translated">Quellcode</target>
+  <target>Quellcode</target>
 </trans-unit>
 <trans-unit id="s17597a8bb4810524">
   <source>License</source>
-  <target state="translated">Lizenz</target>
+  <target>Lizenz</target>
 </trans-unit>
 <trans-unit id="s01a8d45397ec133b">
   <source>Security</source>
-  <target state="translated">Sicherheit</target>
+  <target>Sicherheit</target>
 </trans-unit>
 <trans-unit id="s1f7e12b71164c5da">
   <source>Imprint</source>
-  <target state="translated">Impressum</target>
+  <target>Impressum</target>
 </trans-unit>
 <trans-unit id="sab07cf2bfae8483f">
   <source>Privacy Policy</source>
-  <target state="translated">Datenschutzerklärung</target>
+  <target>Datenschutzerklärung</target>
 </trans-unit>
 </body>
 </file>

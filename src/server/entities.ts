@@ -32,13 +32,13 @@ import { sql2, unsafe2 } from "./sql/index.js";
 type entitesType = {
   [K in keyof typeof entityRoutes]: typeof entityRoutes[K];
 };
-
+/*
 type mappedInfer1<R extends keyof typeof entityRoutes> = {
   [K in keyof z.infer<entitesType[R]["response"]>]: z.infer<
     entitesType[R]["response"]
   >[K];
 };
-
+*/
 type entitesType0 = {
   [K in keyof typeof entityRoutes]: z.infer<typeof entityRoutes[K]["request"]>;
 };
@@ -75,8 +75,8 @@ export async function fetchData<R extends keyof typeof entityRoutes>(
 ): Promise<[OutgoingHttpHeaders, ResponseType<R>]> {
   const entitySchema: entitesType[R] = entityRoutes[path];
 
-  // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
   if (
+    // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
     !(query.sorting as [string, "ASC" | "DESC"][]).find((e) => e[0] == "id")
   ) {
     query.sorting.push(["id", "ASC"]);

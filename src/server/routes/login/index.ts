@@ -23,7 +23,6 @@ SPDX-FileCopyrightText: 2021 Moritz Hedtke <Moritz.Hedtke@t-online.de>
 import type { Http2ServerResponse } from "node:http2";
 import { ZodIssueCode, ZodObject, ZodTypeAny } from "zod";
 import {
-  rawSessionType,
   rawUserSchema,
   UnknownKeysParam,
   ResponseType,
@@ -32,6 +31,9 @@ import { sql } from "../../database.js";
 import { MyRequest, requestHandler } from "../../express.js";
 import { checkPassword } from "../../password.js";
 import type { OutgoingHttpHeaders, ServerResponse } from "node:http";
+import nodeCrypto from "node:crypto";
+// @ts-expect-error wrong typings
+const { webcrypto: crypto }: { webcrypto: Crypto } = nodeCrypto;
 
 const users = <
   T extends { [k: string]: ZodTypeAny },
@@ -139,25 +141,31 @@ export async function loginHandler(
       });
     }
 
-    const session = rawSessionType.pick({ session_id: true }).parse(
-      (
-        await sql.begin("READ WRITE", async (tsql) => {
-          return await tsql`INSERT INTO sessions (user_id) VALUES (${dbUser.id}) RETURNING session_id`;
-        })
-      )[0]
+    const session_id_unhashed = Buffer.from(
+      crypto.getRandomValues(new Uint8Array(32))
+    ).toString("hex");
+    const session_id = new Uint8Array(
+      await crypto.subtle.digest(
+        "SHA-512",
+        new TextEncoder().encode(session_id_unhashed)
+      )
     );
+
+    await sql.begin("READ WRITE", async (tsql) => {
+      return await tsql`INSERT INTO sessions (user_id, session_id) VALUES (${dbUser.id}, ${session_id})`;
+    });
 
     /** @type {import("node:http2").OutgoingHttpHeaders} */
     const headers: import("node:http2").OutgoingHttpHeaders = {
       "content-type": "text/json; charset=utf-8",
       ":status": 200,
       "set-cookie": [
-        `strict_id=${
-          session.session_id
-        }; Secure; Path=/; SameSite=Strict; HttpOnly; Max-Age=${48 * 60 * 60};`,
-        `lax_id=${
-          session.session_id
-        }; Secure; Path=/; SameSite=Lax; HttpOnly; Max-Age=${48 * 60 * 60};`,
+        `strict_id=${session_id_unhashed}; Secure; Path=/; SameSite=Strict; HttpOnly; Max-Age=${
+          48 * 60 * 60
+        };`,
+        `lax_id=${session_id_unhashed}; Secure; Path=/; SameSite=Lax; HttpOnly; Max-Age=${
+          48 * 60 * 60
+        };`,
         `username=${dbUser.username}; Secure; Path=/; SameSite=Lax; Max-Age=${
           48 * 60 * 60
         };`,

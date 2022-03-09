@@ -32,7 +32,7 @@ BEGIN READ WRITE;
 -- TODO FIXME at some point create the tables based on the zod definitions? so min/max etc. are checked correctly?
 CREATE TABLE IF NOT EXISTS projects_with_deleted (
   id INT GENERATED ALWAYS AS IDENTITY PRIMARY KEY NOT NULL,
-  title VARCHAR(255) NOT NULL,
+  title VARCHAR(255) UNIQUE NOT NULL,
   info VARCHAR(4096) NOT NULL,
   place VARCHAR(256) NOT NULL,
   costs FLOAT NOT NULL,
@@ -111,7 +111,7 @@ CREATE TABLE IF NOT EXISTS users_with_deleted (
   password_hash VARCHAR(256),
   type user_type NOT NULL,
   project_leader_id INTEGER, -- TODO FIXME maybe m:n as somebody could theoretically be leader in multiple projects?
-  "group" VARCHAR(16),
+  "group" VARCHAR(64),
   age INTEGER,
   away BOOLEAN NOT NULL DEFAULT FALSE,
   password_changed BOOLEAN NOT NULL DEFAULT FALSE,
@@ -295,7 +295,7 @@ AFTER UPDATE ON choices FOR EACH ROW
 EXECUTE PROCEDURE log_history_choices();
 
 CREATE TABLE IF NOT EXISTS sessions (
-  session_id UUID PRIMARY KEY NOT NULL DEFAULT gen_random_uuid(),
+  session_id BYTEA PRIMARY KEY NOT NULL,
   created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
   user_id INTEGER NOT NULL,

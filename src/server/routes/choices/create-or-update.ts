@@ -54,10 +54,10 @@ export async function createOrUpdateChoiceHandler<
   request: MyRequest,
   response: ServerResponse | Http2ServerResponse,
   dbquery: (
-    sql: postgres.TransactionSql<{}>,
+    sql: postgres.TransactionSql<Record<string, never>>,
     choice: z.infer<typeof routes[P]["request"]>,
     loggedInUser: Exclude<z.infer<typeof userSchema>, undefined>
-  ) => any
+  ) => Promise<z.infer<typeof routes[P]["response"]>[]>
 ) {
   return await requestHandler(
     "POST",
@@ -82,7 +82,7 @@ export async function createOrUpdateChoiceHandler<
                 {
                   code: ZodIssueCode.custom,
                   path: ["unauthorized"],
-                  message: "Not logged in!",
+                  message: "Nicht angemeldet! Klicke rechts oben auf Anmelden.",
                 },
               ],
             },
@@ -104,7 +104,7 @@ export async function createOrUpdateChoiceHandler<
                 {
                   code: ZodIssueCode.custom,
                   path: ["forbidden"],
-                  message: "Insufficient permissions!",
+                  message: "Unzureichende Berechtigung!",
                 },
               ],
             },
