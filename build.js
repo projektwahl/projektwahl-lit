@@ -1,6 +1,6 @@
 import { exec as unpromisifiedExec } from "child_process";
 import { createHash } from "crypto";
-import { readFile, rename, writeFile, rmdir } from "fs/promises";
+import { readFile, rename, writeFile, rm } from "fs/promises";
 import { promisify } from "util";
 import "./require-shim.js";
 import { build } from "esbuild";
@@ -43,7 +43,9 @@ const nativeNodeModulesPlugin = {
 
 const exec = promisify(unpromisifiedExec);
 
-await rmdir("dist", { recursive: true });
+try {
+  await rm("dist", { recursive: true });
+} catch (e) {}
 
 {
   let { stdout, stderr } = await exec("lit-localize build");
