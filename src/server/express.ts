@@ -79,27 +79,31 @@ export function requestHandler<P extends keyof typeof routes>(
           ? cookie.parse(request.headers.cookie)
           : {};
         // implementing https://datatracker.ietf.org/doc/html/draft-ietf-httpbis-rfc6265bis-02#section-8.8.2
-        let session_id: string | Uint8Array | undefined =
+        const session_id_unhashed: string | Uint8Array | undefined =
           request.method === "GET" ? cookies.lax_id : cookies.strict_id;
 
-        if (session_id) {
+        let session_id: Uint8Array | undefined;
+        
+        if (session_id_unhashed) {
           // if the hashed session id gets leaked in the log files / database dump or so you still are not able to login with it.
           session_id = new Uint8Array(
             await crypto.subtle.digest(
               "SHA-512",
-              new TextEncoder().encode(session_id)
+              new TextEncoder().encode(session_id_unhashed)
             )
           );
+          const session_id_ = session_id;
           user = userSchema.parse(
             (
               await retryableBegin("READ WRITE", async (sql) => {
                 //await sql`DELETE FROM sessions WHERE CURRENT_TIMESTAMP >= updated_at + interval '24 hours' AND session_id != ${session_id} `
                 return await sql`UPDATE sessions SET updated_at = CURRENT_TIMESTAMP FROM users WHERE users.id = sessions.user_id AND session_id = ${
-                  session_id as Uint8Array
+                  session_id_
                 } AND CURRENT_TIMESTAMP < updated_at + interval '24 hours' RETURNING users.id, users.type, users.username, users.group, users.age`;
               })
             )[0]
           );
+            
         }
 
         let body;
@@ -107,19 +111,19 @@ export function requestHandler<P extends keyof typeof routes>(
         if (request.method === "POST") {
           body = await json(request);
         } else if (url.pathname !== "/api/v1/redirect") {
-          body = JSON.parse(
+          body =; // TODO FIXME if this throws
+        }
+        const requestBody: ResponseType<P> =
+          routes[path].request.safeParse( JSON.parse(
             decodeURIComponent(
               url.search == "" ? "{}" : url.search.substring(1)
             )
-          ); // TODO FIXME if this throws
-        }
-        const requestBody: ResponseType<P> =
-          routes[path].request.safeParse(body);
+          ));
         if (requestBody.success) {
           const [new_headers, responseBody] = await handler(
             requestBody.data,
             user,
-            session_id as Uint8Array
+            session_id
           );
           //console.log("responseBody", responseBody);
           // TODO FIXME add schema for the result shit around that
