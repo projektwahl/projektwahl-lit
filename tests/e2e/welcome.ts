@@ -644,7 +644,7 @@ export async function main() {
       });
     }
 
-    // TODO filtering with error
+    // TODO filtering with error (this alerts currently afaik (if the error is detected client-side))
 
     // TODO filtering with empty result
 
@@ -692,13 +692,17 @@ export async function main() {
       );
     }
 
-    // TODO FIXME voting
+    // important
 
     // TODO FIXME editing the project leaders + members
 
-    // TODO test openid
-
     // TODO test pagination
+
+
+
+    // TODO FIXME voting
+
+    // TODO test openid
 
     await driver.quit();
 
