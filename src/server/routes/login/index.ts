@@ -23,7 +23,6 @@ SPDX-FileCopyrightText: 2021 Moritz Hedtke <Moritz.Hedtke@t-online.de>
 import type { Http2ServerResponse } from "node:http2";
 import { ZodIssueCode, ZodObject, ZodTypeAny } from "zod";
 import {
-  rawSessionType,
   rawUserSchema,
   UnknownKeysParam,
   ResponseType,

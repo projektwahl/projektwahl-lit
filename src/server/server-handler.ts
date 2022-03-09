@@ -39,9 +39,7 @@ import {
 import { cwd } from "node:process";
 import { projectsHandler } from "./routes/projects/index.js";
 import { logoutHandler } from "./routes/login/logout.js";
-import zlib from "node:zlib";
 import { pipeline, Readable } from "node:stream";
-import type { ServerResponse } from "node:http";
 import type { Http2ServerResponse } from "node:http2";
 import type { MyRequest } from "./express.js";
 import { choicesHandler } from "./routes/choices/index.js";

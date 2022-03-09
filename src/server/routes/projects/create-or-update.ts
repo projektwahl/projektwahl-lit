@@ -48,9 +48,7 @@ export async function createProjectsHandler(
       project,
       loggedInUser: Exclude<z.infer<typeof userSchema>, undefined>
     ) => {
-      // TODO FIXME we can use our nice query building here
-      // or postgres also has builtin features for insert and update
-      const res =
+      const res = z.array(rawProjectSchema.pick({ id: true })).parse(
         await sql`INSERT INTO projects_with_deleted (title, info, place, costs, min_age, max_age, min_participants, max_participants, random_assignments, deleted, last_updated_by)
             (SELECT 
     ${project.title ?? null},
@@ -66,7 +64,8 @@ export async function createProjectsHandler(
         } FROM users_with_deleted WHERE users_with_deleted.id = ${
           loggedInUser.id
         } AND (users_with_deleted.type = 'helper' OR users_with_deleted.type = 'admin'))
-    RETURNING id;`;
+    RETURNING id;`
+      );
 
       // TODO FIXME make this in sql directly
       if (loggedInUser.type === "helper") {

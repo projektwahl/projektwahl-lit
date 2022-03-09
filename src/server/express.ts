@@ -23,14 +23,8 @@ SPDX-FileCopyrightText: 2021 Moritz Hedtke <Moritz.Hedtke@t-online.de>
 
 import { json } from "node:stream/consumers";
 import { URL } from "url";
-import {
-  rawUserSchema,
-  routes,
-  UnknownKeysParam,
-  ResponseType,
-  userSchema,
-} from "../lib/routes.js";
-import { z, ZodIssueCode, ZodObject, ZodTypeAny } from "zod";
+import { routes, ResponseType, userSchema } from "../lib/routes.js";
+import { z, ZodIssueCode } from "zod";
 import { retryableBegin } from "./database.js";
 import cookie from "cookie";
 import type { IncomingMessage, ServerResponse } from "node:http";

@@ -21,13 +21,8 @@ SPDX-License-Identifier: AGPL-3.0-or-later
 SPDX-FileCopyrightText: 2021 Moritz Hedtke <Moritz.Hedtke@t-online.de>
 */
 import { sensitiveHeaders } from "node:http2";
-import { z, ZodIssueCode, ZodObject, ZodTypeAny } from "zod";
-import {
-  rawSessionType,
-  rawUserSchema,
-  UnknownKeysParam,
-  ResponseType,
-} from "../../../lib/routes.js";
+import { ZodIssueCode } from "zod";
+import { rawUserSchema, ResponseType } from "../../../lib/routes.js";
 import { sql } from "../../database.js";
 import { MyRequest, requestHandler } from "../../express.js";
 import { client } from "./openid-client.js";

@@ -81,7 +81,7 @@ class PwRedirect extends PwForm<"/api/v1/redirect"> {
 
       return result;
     });
-    this._task.run();
+    void this._task.run();
   }
 
   override render() {

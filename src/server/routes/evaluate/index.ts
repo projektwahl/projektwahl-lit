@@ -4,7 +4,6 @@ import os from "node:os";
 import { constants } from "node:fs";
 import { execFile } from "node:child_process";
 import { sql } from "../../database.js";
-import sortedIndexBy from "lodash-es/sortedIndexBy.js";
 import {
   rawChoice,
   rawProjectSchema,
