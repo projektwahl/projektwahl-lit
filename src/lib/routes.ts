@@ -173,8 +173,8 @@ const baseQuery = <
   Catchall extends ZodTypeAny = ZodTypeAny
 >(
   s: ZodObject<T, UnknownKeys, Catchall>
-) =>
-  z
+) => {
+  return z
     .object({
       paginationDirection: z
         .enum(["forwards", "backwards"])
@@ -182,11 +182,11 @@ const baseQuery = <
       paginationCursor: s.partial().nullish(), // if this is null the start is at start/end depending on paginationDirection
       filters: s.partial(),
       sorting: z
-        // Object.keys not typed correctly
-        // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
         .array(
           z.tuple([
             z.enum(
+              // As we can't guarantee at least one element this probably will never be possible
+              // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
               Object.keys(s.shape) as [
                 keyof T & string,
                 ...(keyof T & string)[]
@@ -198,7 +198,8 @@ const baseQuery = <
         .default([]),
       paginationLimit: z.number().default(100),
     })
-    .strict();
+    .strict()
+  };
 
 const choices = rawChoiceNullable.merge(
   rawProjectSchema.pick({
@@ -236,12 +237,10 @@ export const routes = {
     response: z.object({}).strict(),
   },
   "/api/v1/redirect": {
-    request: z
-      .object({
-        session_state: z.string(),
-        code: z.string(),
-      })
-      .strict(),
+    request: z.object({
+      session_state: z.string(),
+      code: z.string(),
+    }).strict(),
     response: z.object({}).strict(),
   },
   "/api/v1/sleep": {
@@ -265,8 +264,7 @@ export const routes = {
       })
       .extend({
         password: z.string().optional(),
-      })
-      .strict(),
+      }).strict(),
     response: createOrUpdateUserResponse(rawUserSchema).strict(),
   },
   "/api/v1/users/update": {
@@ -288,25 +286,22 @@ export const routes = {
       .partial()
       .extend({
         id: z.number(),
-      })
-      .strict(),
+      }).strict(),
     response: createOrUpdateUserResponse(rawUserSchema).strict(),
   },
   "/api/v1/projects/create": {
-    request: rawProjectSchema
-      .pick({
-        costs: true,
-        deleted: true,
-        info: true,
-        max_age: true,
-        max_participants: true,
-        min_age: true,
-        min_participants: true,
-        place: true,
-        random_assignments: true,
-        title: true,
-      })
-      .strict(),
+    request: rawProjectSchema.pick({
+      costs: true,
+      deleted: true,
+      info: true,
+      max_age: true,
+      max_participants: true,
+      min_age: true,
+      min_participants: true,
+      place: true,
+      random_assignments: true,
+      title: true,
+    }).strict(),
     response: z.object({}).extend({ id: z.number() }).strict(),
   },
   "/api/v1/projects/update": {
@@ -326,47 +321,38 @@ export const routes = {
       .partial()
       .extend({
         id: z.number(),
-      })
-      .strict(),
+      }).strict(),
     response: z.object({}).extend({ id: z.number() }).strict(),
   },
   "/api/v1/users": {
     request: baseQuery(rawUserSchema),
-    response: z
-      .object({
-        entities: z.array(users(rawUserSchema)),
-        previousCursor: users(rawUserSchema).nullable(),
-        nextCursor: users(rawUserSchema).nullable(),
-      })
-      .strict(),
+    response: z.object({
+      entities: z.array(users(rawUserSchema)),
+      previousCursor: users(rawUserSchema).nullable(),
+      nextCursor: users(rawUserSchema).nullable(),
+    }).strict(),
   },
   "/api/v1/projects": {
     request: baseQuery(rawProjectSchema),
-    response: z
-      .object({
-        entities: z.array(project),
-        previousCursor: project.nullable(),
-        nextCursor: project.nullable(),
-      })
-      .strict(),
+    response: z.object({
+      entities: z.array(project),
+      previousCursor: project.nullable(),
+      nextCursor: project.nullable(),
+    }).strict(),
   },
   "/api/v1/choices": {
     request: baseQuery(rawChoiceNullable.merge(rawProjectSchema)),
-    response: z
-      .object({
-        entities: z.array(choices),
-        previousCursor: choices.nullable(),
-        nextCursor: choices.nullable(),
-      })
-      .strict(),
+    response: z.object({
+      entities: z.array(choices),
+      previousCursor: choices.nullable(),
+      nextCursor: choices.nullable(),
+    }).strict(),
   },
   "/api/v1/choices/update": {
-    request: rawChoiceNullable
-      .pick({
-        project_id: true,
-        rank: true,
-      })
-      .strict(),
+    request: rawChoiceNullable.pick({
+      project_id: true,
+      rank: true,
+    }).strict(),
     response: z.object({}).strict(),
   },
 } as const;

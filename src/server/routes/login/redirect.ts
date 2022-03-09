@@ -46,7 +46,7 @@ export async function openidRedirectHandler(
     // https://github.com/projektwahl/projektwahl-sveltekit/blob/work/src/routes/redirect/index.ts_old
 
     if (!process.env.BASE_URL) {
-      throw new Error("BASE_URL not set")
+      throw new Error("BASE_URL not set");
     }
 
     if (!client) {

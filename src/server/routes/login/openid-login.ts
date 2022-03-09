@@ -35,7 +35,7 @@ export async function openidLoginHandler(
     // USE single tenant as for all others we need permissions
 
     if (!process.env.BASE_URL) {
-      throw new Error("BASE_URL not set!")
+      throw new Error("BASE_URL not set!");
     }
 
     if (!client) {

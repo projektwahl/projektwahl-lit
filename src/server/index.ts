@@ -84,7 +84,7 @@ if (process.env.NODE_ENV === "development" && cluster.isPrimary) {
     await setupClient();
 
     if (!process.env.CREDENTIALS_DIRECTORY) {
-      throw new Error("CREDENTIALS_DIRECTORY not set!")
+      throw new Error("CREDENTIALS_DIRECTORY not set!");
     }
 
     const server = createSecureServer(
@@ -110,7 +110,7 @@ if (process.env.NODE_ENV === "development" && cluster.isPrimary) {
       511,
       () => {
         if (!process.env.BASE_URL) {
-          throw new Error("BASE_URL not set!")
+          throw new Error("BASE_URL not set!");
         }
         console.log(
           `[${cluster.worker?.id ?? "unknown"}] Server started at ${

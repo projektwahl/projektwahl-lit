@@ -19,5 +19,12 @@
     "outDir": "dist/",
     "disableSizeLimit": true
   },
-  "include": ["src/**/*.ts", "tests/**/*.ts", "stacktrace-source-map.js", "build.js", "require-shim.js", "src/loader.js"]
+  "include": [
+    "src/**/*.ts",
+    "tests/**/*.ts",
+    "stacktrace-source-map.js",
+    "build.js",
+    "require-shim.js",
+    "src/loader.js"
+  ]
 }

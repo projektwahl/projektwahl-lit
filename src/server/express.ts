@@ -48,7 +48,9 @@ export function requestHandler<P extends keyof typeof routes>(
     r: z.infer<typeof routes[P]["request"]>,
     user: z.infer<typeof userSchema>,
     session_id: Uint8Array | undefined
-  ) => PromiseLike<[OutgoingHttpHeaders, ResponseType<P>]> | [OutgoingHttpHeaders, ResponseType<P>]
+  ) =>
+    | PromiseLike<[OutgoingHttpHeaders, ResponseType<P>]>
+    | [OutgoingHttpHeaders, ResponseType<P>]
 ): (
   request: MyRequest,
   response: ServerResponse | Http2ServerResponse
@@ -83,7 +85,7 @@ export function requestHandler<P extends keyof typeof routes>(
           request.method === "GET" ? cookies.lax_id : cookies.strict_id;
 
         let session_id: Uint8Array | undefined;
-        
+
         if (session_id_unhashed) {
           // if the hashed session id gets leaked in the log files / database dump or so you still are not able to login with it.
           session_id = new Uint8Array(
@@ -97,13 +99,10 @@ export function requestHandler<P extends keyof typeof routes>(
             (
               await retryableBegin("READ WRITE", async (sql) => {
                 //await sql`DELETE FROM sessions WHERE CURRENT_TIMESTAMP >= updated_at + interval '24 hours' AND session_id != ${session_id} `
-                return await sql`UPDATE sessions SET updated_at = CURRENT_TIMESTAMP FROM users WHERE users.id = sessions.user_id AND session_id = ${
-                  session_id_
-                } AND CURRENT_TIMESTAMP < updated_at + interval '24 hours' RETURNING users.id, users.type, users.username, users.group, users.age`;
+                return await sql`UPDATE sessions SET updated_at = CURRENT_TIMESTAMP FROM users WHERE users.id = sessions.user_id AND session_id = ${session_id_} AND CURRENT_TIMESTAMP < updated_at + interval '24 hours' RETURNING users.id, users.type, users.username, users.group, users.age`;
               })
             )[0]
           );
-            
         }
 
         let body: ResponseType<P>;
@@ -111,16 +110,17 @@ export function requestHandler<P extends keyof typeof routes>(
         if (request.method === "POST") {
           body = routes[path].request.safeParse(await json(request));
         } else if (url.pathname !== "/api/v1/redirect") {
-          body = routes[path].request.safeParse(JSON.parse(
-            decodeURIComponent(
-              url.search == "" ? "{}" : url.search.substring(1)
+          body = routes[path].request.safeParse(
+            JSON.parse(
+              decodeURIComponent(
+                url.search == "" ? "{}" : url.search.substring(1)
+              )
             )
-          )); // TODO FIXME if this throws
+          ); // TODO FIXME if this throws
         } else {
-          body = routes[path].request.safeParse({})
+          body = routes[path].request.safeParse({});
         }
-        const requestBody: ResponseType<P> =
-          body;
+        const requestBody: ResponseType<P> = body;
         if (requestBody.success) {
           const [new_headers, responseBody] = await handler(
             requestBody.data,

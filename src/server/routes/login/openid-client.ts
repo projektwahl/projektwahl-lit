@@ -30,9 +30,9 @@ let client: Client | null = null;
 async function setupClient() {
   if (process.env["OPENID_URL"]) {
     if (!process.env.BASE_URL) {
-      throw new Error("BASE_URL not set!")
+      throw new Error("BASE_URL not set!");
     }
-    
+
     if (!process.env["CLIENT_ID"]) {
       console.error("CLIENT_ID not set!");
       process.exit(1);

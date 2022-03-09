@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // SPDX-FileCopyrightText: 2021 Moritz Hedtke <Moritz.Hedtke@t-online.de>
-export {}
+export {};
 /*
 import { mkdtemp, open, readFile } from "fs/promises";
 import { constants } from "fs";

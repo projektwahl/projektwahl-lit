@@ -27,7 +27,7 @@ import { myFetch } from "../../utils.js";
 import { createRef, ref } from "lit/directives/ref.js";
 import { msg } from "@lit/localize";
 import { bootstrapCss } from "../../index.js";
-import type { routes } from "../../../lib/routes.js";
+import type { routes, ResponseType } from "../../../lib/routes.js";
 import type { z } from "zod";
 
 class PwRankSelect extends LitElement {
@@ -53,13 +53,13 @@ class PwRankSelect extends LitElement {
 
     this.form = createRef();
 
-    this._task = new Task(this, async (args) => {
+    this._task = new Task<[number], ResponseType<"/api/v1/choices/update">>(this, async (args: [number]) => {
       const result = await myFetch<"/api/v1/choices/update">(
         "POST",
         "/api/v1/choices/update",
         {
           project_id: this.choice.id, // project id
-          rank: args === 0 ? null : args,
+          rank: args[0] === 0 ? null : args[0],
         },
         {}
       );
@@ -99,7 +99,7 @@ class PwRankSelect extends LitElement {
           <!--TODO FIXME foreach?-->
           <button
             @click=${async () => {
-              await this._task.run(1);
+              await this._task.run([1]);
             }}
             ?disabled=${this._task.status === TaskStatus.PENDING}
             type="button"
@@ -113,7 +113,7 @@ class PwRankSelect extends LitElement {
           </button>
           <button
             @click=${async () => {
-              await this._task.run(2);
+              await this._task.run([2]);
             }}
             ?disabled=${this._task.status === TaskStatus.PENDING}
             type="button"
@@ -127,7 +127,7 @@ class PwRankSelect extends LitElement {
           </button>
           <button
             @click=${async () => {
-              await this._task.run(3);
+              await this._task.run([3]);
             }}
             ?disabled=${this._task.status === TaskStatus.PENDING}
             type="button"
@@ -141,7 +141,7 @@ class PwRankSelect extends LitElement {
           </button>
           <button
             @click=${async () => {
-              await this._task.run(4);
+              await this._task.run([4]);
             }}
             ?disabled=${this._task.status === TaskStatus.PENDING}
             type="button"
@@ -155,7 +155,7 @@ class PwRankSelect extends LitElement {
           </button>
           <button
             @click=${async () => {
-              await this._task.run(5);
+              await this._task.run([5]);
             }}
             ?disabled=${this._task.status === TaskStatus.PENDING}
             type="button"
@@ -169,7 +169,7 @@ class PwRankSelect extends LitElement {
           </button>
           <button
             @click=${async () => {
-              await this._task.run(0);
+              await this._task.run([0]);
             }}
             ?disabled=${this._task.status === TaskStatus.PENDING}
             type="button"
