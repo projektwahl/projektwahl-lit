@@ -203,7 +203,7 @@ export class PwEntityList<
 
           return result;
         },
-        autoRun: false,
+        autoRun: false, // TODO FIXME this breaks if you navigate to the same page (as it doesnt cause an update) - maybe we should autorun on url change?
         initialStatus:
           this.initial !== undefined ? TaskStatus.COMPLETE : TaskStatus.INITIAL,
         initialValue: this.initial,

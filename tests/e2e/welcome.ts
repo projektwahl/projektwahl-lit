@@ -696,6 +696,10 @@ export async function main() {
 
     // TODO FIXME editing the project leaders + members
 
+    // TODO test openid
+
+    // TODO test pagination
+
     await driver.quit();
 
     /*
