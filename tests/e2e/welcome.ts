@@ -77,6 +77,7 @@ export async function main() {
 
   try {
     // @ts-expect-error wrong typings
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-call
     await driver.setNetworkConditions({
       offline: false,
       latency: 100, // Additional latency (ms).

@@ -107,10 +107,10 @@ export async function createOrUpdateUsersHandler<
   request: MyRequest,
   response: ServerResponse | Http2ServerResponse,
   dbquery: (
-    sql: postgres.TransactionSql<{}>,
+    sql: postgres.TransactionSql<Record<string, never>>,
     user: z.infer<typeof routes[P]["request"]>,
     loggedInUser: Exclude<z.infer<typeof userSchema>, undefined>
-  ) => any
+  ) => Promise<z.infer<typeof routes[P]["response"]>[]>
 ) {
   // TODO FIXME create or update multiple
   return await requestHandler(

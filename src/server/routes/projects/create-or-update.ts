@@ -113,6 +113,8 @@ FROM users_with_deleted WHERE projects_with_deleted.id = ${
         project.id
       } AND users_with_deleted.type = 'helper' OR users_with_deleted.type = 'admin') RETURNING projects_with_deleted.id;`;
 
+      // TODO FIXME it seems like eslint doesnt detect this any return - which is bad
+      // oh actually it seems like porsager/postgres is at "fault"
       return await sql(...finalQuery);
     }
   );
@@ -125,10 +127,10 @@ export async function createOrUpdateProjectsHandler<
   request: MyRequest,
   response: ServerResponse | Http2ServerResponse,
   dbquery: (
-    sql: postgres.TransactionSql<{}>,
+    sql: postgres.TransactionSql<Record<string, never>>,
     project: z.infer<typeof routes[P]["request"]>,
     loggedInUser: Exclude<z.infer<typeof userSchema>, undefined>
-  ) => any
+  ) => Promise<z.infer<typeof routes[P]["response"]>[]>
 ) {
   // TODO FIXME create or update multiple
   return await requestHandler(

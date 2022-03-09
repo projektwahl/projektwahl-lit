@@ -49,7 +49,6 @@ import { z, ZodIssueCode, ZodIssueOptionalMessage } from "zod";
 // https://github.com/colinhacks/zod/blob/master/src/ZodError.ts
 type ErrorMapCtx = {
   defaultError: string;
-  data: any;
 };
 
 const myErrorMap: z.ZodErrorMap = (
@@ -163,11 +162,14 @@ async function replaceAsync(
 ): Promise<string> {
   const promises: Promise<string>[] = [];
   str.replaceAll(regex, (match, ...args) => {
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
     const promise = asyncFn(match, args);
     promises.push(promise);
     return "";
   });
   const data = await Promise.all(promises);
+  // this is fine as the length is equal
+  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   return str.replaceAll(regex, () => data.shift()!);
 }
 
