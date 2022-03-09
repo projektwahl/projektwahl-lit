@@ -51,7 +51,7 @@ export const parseRequestWithPrefix = <
   > = z
     .object({})
     .strict()
-    .setKey(prefix, entityRoutes[apiUrl]["request"])
+    .setKey(prefix, entityRoutes[apiUrl]["request"].default({filters:{}}))
     .strict();
   const data: z.infer<
     z.ZodObject<
@@ -99,7 +99,7 @@ export class PwEntityList<
       initialRender: { state: true },
       debouncedUrl: { state: true },
       prefix: { type: String },
-      ...super.properties,
+      ...super.properties, // TODO FIXME remove this everywhere? https://lit.dev/docs/components/properties/#accessors-noaccessor
     };
   }
 

@@ -41,7 +41,7 @@ export function pwOrder<P extends keyof typeof entityRoutes, X extends string>(
   return html`<pw-order
     .name=${name}
     .url=${url}
-    .prefix=${prefix}
+    prefix=${prefix}
     title=${title}
     .refreshEntityList=${refreshEntityList}
   ></pw-order>`;
@@ -60,6 +60,7 @@ export class PwOrder<
       path: { attribute: false },
       refreshEntityList: { attribute: false },
       url: { attribute: false },
+      prefix: { type: String },
     };
   }
 
