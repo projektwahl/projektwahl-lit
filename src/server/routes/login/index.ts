@@ -32,6 +32,7 @@ import { sql } from "../../database.js";
 import { MyRequest, requestHandler } from "../../express.js";
 import { checkPassword } from "../../password.js";
 import type { OutgoingHttpHeaders, ServerResponse } from "node:http";
+import { webcrypto as crypto } from 'node:crypto'
 
 const users = <
   T extends { [k: string]: ZodTypeAny },
@@ -139,10 +140,13 @@ export async function loginHandler(
       });
     }
 
-    const session = rawSessionType.pick({ session_id: true }).parse(
+    const session_id_unhashed = Buffer.from(crypto.getRandomValues(new Uint8Array(32))).toString('hex');
+    const session_id = new Uint8Array(await crypto.subtle.digest("SHA-512", new TextEncoder().encode(session_id_unhashed)));
+
+    const session = rawSessionType.pick({ }).parse(
       (
         await sql.begin("READ WRITE", async (tsql) => {
-          return await tsql`INSERT INTO sessions (user_id) VALUES (${dbUser.id}) RETURNING session_id`;
+          return await tsql`INSERT INTO sessions (user_id, session_id) VALUES (${dbUser.id}, ${session_id})`;
         })
       )[0]
     );
@@ -153,10 +157,10 @@ export async function loginHandler(
       ":status": 200,
       "set-cookie": [
         `strict_id=${
-          session.session_id
+          session_id_unhashed
         }; Secure; Path=/; SameSite=Strict; HttpOnly; Max-Age=${48 * 60 * 60};`,
         `lax_id=${
-          session.session_id
+          session_id_unhashed
         }; Secure; Path=/; SameSite=Lax; HttpOnly; Max-Age=${48 * 60 * 60};`,
         `username=${dbUser.username}; Secure; Path=/; SameSite=Lax; Max-Age=${
           48 * 60 * 60

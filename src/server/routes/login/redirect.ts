@@ -33,6 +33,7 @@ import { MyRequest, requestHandler } from "../../express.js";
 import { client } from "./openid-client.js";
 import type { OutgoingHttpHeaders, ServerResponse } from "node:http";
 import type { Http2ServerResponse } from "node:http2";
+import { webcrypto as crypto } from 'node:crypto'
 
 export async function openidRedirectHandler(
   request: MyRequest,
@@ -105,18 +106,16 @@ export async function openidRedirectHandler(
         return returnValue;
       }
 
-      /** @type {[Pick<import("../../../lib/types").RawSessionType, "session_id">]} */
-      const session = rawSessionType
-        .pick({
-          session_id: true,
-        })
-        .parse(
-          (
-            await sql.begin("READ WRITE", async (sql) => {
-              return await sql`INSERT INTO sessions (user_id) VALUES (${dbUser.id}) RETURNING session_id`;
-            })
-          )[0]
-        );
+      const session_id_unhashed = Buffer.from(crypto.getRandomValues(new Uint8Array(32))).toString('hex');
+      const session_id = new Uint8Array(await crypto.subtle.digest("SHA-512", new TextEncoder().encode(session_id_unhashed)));  
+
+      const session = rawSessionType.pick({ }).parse(
+        (
+          await sql.begin("READ WRITE", async (tsql) => {
+            return await tsql`INSERT INTO sessions (user_id, session_id) VALUES (${dbUser.id}, ${session_id})`;
+          })
+        )[0]
+      );  
 
       /** @type {import("node:http2").OutgoingHttpHeaders} */
       const responseHeaders: import("node:http2").OutgoingHttpHeaders = {
