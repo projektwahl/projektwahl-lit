@@ -43,7 +43,7 @@ const nativeNodeModulesPlugin = {
 
 const exec = promisify(unpromisifiedExec);
 
-await rmdir("dist", { recursive: true })
+await rmdir("dist", { recursive: true });
 
 {
   let { stdout, stderr } = await exec("lit-localize build");
