@@ -51,7 +51,9 @@ if (process.env.NODE_ENV === "development" && cluster.isPrimary) {
 
         cluster.fork().on("listening", () => {
           for (const id in oldWorkers) {
-            oldWorkers[id]?.send("shutdown", () => {});
+            oldWorkers[id]?.send("shutdown", () => {
+              // do nothing.
+            });
           }
         });
       }
@@ -65,7 +67,9 @@ if (process.env.NODE_ENV === "development" && cluster.isPrimary) {
 
         cluster.fork().on("listening", () => {
           for (const id in oldWorkers) {
-            oldWorkers[id]?.send("shutdown", () => {});
+            oldWorkers[id]?.send("shutdown", () => {
+              // do nothing.
+            });
           }
         });
       }
@@ -76,8 +80,12 @@ if (process.env.NODE_ENV === "development" && cluster.isPrimary) {
   openssl req -x509 -newkey rsa:2048 -nodes -sha256 -subj '/CN=localhost' -keyout key.pem -out cert.pem
   */
 
-  (async () => {
+  void (async () => {
     await setupClient();
+
+    if (!process.env.CREDENTIALS_DIRECTORY) {
+      throw new Error("CREDENTIALS_DIRECTORY not set!")
+    }
 
     const server = createSecureServer(
       {
@@ -101,6 +109,9 @@ if (process.env.NODE_ENV === "development" && cluster.isPrimary) {
         : new net.Socket({ fd: 3 }), // this doesn't work with cluster
       511,
       () => {
+        if (!process.env.BASE_URL) {
+          throw new Error("BASE_URL not set!")
+        }
         console.log(
           `[${cluster.worker?.id ?? "unknown"}] Server started at ${
             process.env.BASE_URL
