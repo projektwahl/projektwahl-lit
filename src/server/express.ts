@@ -51,7 +51,7 @@ export function requestHandler<P extends keyof typeof routes>(
   handler: (
     r: z.infer<typeof routes[P]["request"]>,
     user: z.infer<typeof userSchema>,
-    session_id: string | undefined
+    session_id: Uint8Array | undefined
   ) => PromiseLike<[OutgoingHttpHeaders, ResponseType<P>]>
 ): (
   request: MyRequest,
@@ -89,6 +89,7 @@ export function requestHandler<P extends keyof typeof routes>(
         if (session_id) {
           // if the hashed session id gets leaked in the log files / database dump or so you still are not able to login with it.
           session_id = new Uint8Array(
+            // @ts-expect-error wrong typings
             await crypto.subtle.digest(
               "SHA-512",
               new TextEncoder().encode(session_id)
@@ -123,7 +124,7 @@ export function requestHandler<P extends keyof typeof routes>(
           const [new_headers, responseBody] = await handler(
             requestBody.data,
             user,
-            session_id
+            session_id as Uint8Array
           );
           //console.log("responseBody", responseBody);
           // TODO FIXME add schema for the result shit around that

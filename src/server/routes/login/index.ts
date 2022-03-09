@@ -141,9 +141,11 @@ export async function loginHandler(
     }
 
     const session_id_unhashed = Buffer.from(
+      // @ts-expect-error wrong typings
       crypto.getRandomValues(new Uint8Array(32))
     ).toString("hex");
     const session_id = new Uint8Array(
+      // @ts-expect-error wrong typings
       await crypto.subtle.digest(
         "SHA-512",
         new TextEncoder().encode(session_id_unhashed)

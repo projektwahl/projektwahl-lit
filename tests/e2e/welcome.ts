@@ -76,6 +76,7 @@ export async function main() {
   });
 
   try {
+    // @ts-expect-error wrong typings
     await driver.setNetworkConditions({
       offline: false,
       latency: 100, // Additional latency (ms).

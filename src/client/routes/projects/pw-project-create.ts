@@ -129,6 +129,7 @@ export const PwProjectCreate = setupHmr(
           >
         >("myformdata", {
           bubbles: false,
+          // @ts-expect-error not typecheckable with current design
           detail: {
             ...(this.initial?.success
               ? { id: this.initial.data.id }

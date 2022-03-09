@@ -107,9 +107,11 @@ export async function openidRedirectHandler(
       }
 
       const session_id_unhashed = Buffer.from(
+        // @ts-expect-error wrong typings
         crypto.getRandomValues(new Uint8Array(32))
       ).toString("hex");
       const session_id = new Uint8Array(
+        // @ts-expect-error wrong typings
         await crypto.subtle.digest(
           "SHA-512",
           new TextEncoder().encode(session_id_unhashed)
@@ -124,14 +126,12 @@ export async function openidRedirectHandler(
       const responseHeaders: import("node:http2").OutgoingHttpHeaders = {
         "content-type": "text/json; charset=utf-8",
         "set-cookie": [
-          `strict_id=${
-            session.session_id
-          }; Secure; SameSite=Strict; Path=/; HttpOnly; Max-Age=${
+          `strict_id=${session_id_unhashed}; Secure; SameSite=Strict; Path=/; HttpOnly; Max-Age=${
             48 * 60 * 60
           };`,
-          `lax_id=${
-            session.session_id
-          }; Secure; SameSite=Lax; Path=/; HttpOnly; Max-Age=${48 * 60 * 60};`,
+          `lax_id=${session_id_unhashed}; Secure; SameSite=Lax; Path=/; HttpOnly; Max-Age=${
+            48 * 60 * 60
+          };`,
           `username=${
             dbUser.username
           }; Secure; SameSite=Strict; Path=/; Max-Age=${48 * 60 * 60};`,

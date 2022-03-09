@@ -115,6 +115,7 @@ class PwUserCreate extends PwForm<
         >
       >("myformdata", {
         bubbles: false,
+        // @ts-expect-error not typecheckable with current design
         detail: {
           project_leader_id: undefined,
           force_in_project_id: undefined,
@@ -179,7 +180,7 @@ class PwUserCreate extends PwForm<
                 })}
                 ${pwInputText<
                   "/api/v1/users/create" | "/api/v1/users/update",
-                  string | undefined
+                  string | null | undefined
                 >({
                   url: this.url,
                   type: "text",
