@@ -41,7 +41,7 @@ export function unsafe2(
   const r: WritableTemplateStringsArray = [String(string)];
   r.raw = [String(string)];
   // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
-  return [r as TemplateStringsArray]
+  return [r as TemplateStringsArray];
 }
 
 export function sql2(
@@ -49,19 +49,19 @@ export function sql2(
   ...keys: readonly (
     | null // value
     | string // value
-    | ([
-      TemplateStringsArray,
+    | [
+        TemplateStringsArray,
         ...(null | string | string[] | boolean | number | Buffer)[]
-      ]) // single nested sql2
-    | ([
-      TemplateStringsArray,
+      ] // single nested sql2
+    | [
+        TemplateStringsArray,
         ...(null | string | string[] | boolean | number | Buffer)[]
-      ][]) // array of nested sql2
-    | (string[]) // pass array value in prepared statement
+      ][] // array of nested sql2
+    | string[] // pass array value in prepared statement
     | boolean // value
     | number // value
-    | Buffer // value
-  )[]
+    | Buffer
+  )[] // value
 ): [
   TemplateStringsArray,
   ...(null | string | string[] | boolean | number | Buffer)[]
@@ -78,40 +78,77 @@ export function sql2(
 
   // join the strings and the interpolated values
   // into an array of templates
-  const flattened = strings.flatMap<[
-    TemplateStringsArray,
-    ...(null | string | string[] | boolean | number | Buffer)[]
-  ]>((m: string, i: number) => {
+  const flattened = strings.flatMap<
+    [
+      TemplateStringsArray,
+      ...(null | string | string[] | boolean | number | Buffer)[]
+    ]
+  >((m: string, i: number) => {
     // the last value has nothing interpolated left so just add it directly
     if (i == keys.length) {
       const returnValue: [
         TemplateStringsArray,
         ...(null | string | string[] | boolean | number | Buffer)[]
       ][] = [unsafe2(m)];
-      return returnValue
+      return returnValue;
     }
     const val = keys[i];
 
     if (Array.isArray(val)) {
-      const val2: ([TemplateStringsArray, ...(string | number | boolean | string[] | Buffer | null)[]] 
+      const val2:
+        | [
+            TemplateStringsArray,
+            ...(string | number | boolean | string[] | Buffer | null)[]
+          ]
+        | [
+            TemplateStringsArray,
+            ...(string | number | boolean | string[] | Buffer | null)[]
+          ][]
+        | string[] = [...val];
 
-      | [TemplateStringsArray, ...(string | number | boolean | string[] | Buffer | null)[]][] 
-
-      | string[]) = [...val];
-
-      const isTemplateString: (r: ([TemplateStringsArray, ...(string | number | boolean | string[] | Buffer | null)[]]
-
-      | [TemplateStringsArray, ...(string | number | boolean | string[] | Buffer | null)[]][] 
-
-      | string[])) => r is [TemplateStringsArray, ...(string | number | boolean | string[] | Buffer | null)[]] = (r): r is [TemplateStringsArray, ...(string | number | boolean | string[] | Buffer | null)[]] => typeof r[0] === "object" && "raw" in r[0];
+      const isTemplateString: (
+        r:
+          | [
+              TemplateStringsArray,
+              ...(string | number | boolean | string[] | Buffer | null)[]
+            ]
+          | [
+              TemplateStringsArray,
+              ...(string | number | boolean | string[] | Buffer | null)[]
+            ][]
+          | string[]
+      ) => r is [
+        TemplateStringsArray,
+        ...(string | number | boolean | string[] | Buffer | null)[]
+      ] = (
+        r
+      ): r is [
+        TemplateStringsArray,
+        ...(string | number | boolean | string[] | Buffer | null)[]
+      ] => typeof r[0] === "object" && "raw" in r[0];
 
       // this is not actually checked (obviously - how should it)
-      const isTemplateStringArray: (r: ([TemplateStringsArray, ...(string | number | boolean | string[] | Buffer | null)[]]
+      const isTemplateStringArray: (
+        r:
+          | [
+              TemplateStringsArray,
+              ...(string | number | boolean | string[] | Buffer | null)[]
+            ]
+          | [
+              TemplateStringsArray,
+              ...(string | number | boolean | string[] | Buffer | null)[]
+            ][]
+          | string[]
+      ) => r is [
+        TemplateStringsArray,
+        ...(string | number | boolean | string[] | Buffer | null)[]
+      ][] = (
+        r
+      ): r is [
+        TemplateStringsArray,
+        ...(string | number | boolean | string[] | Buffer | null)[]
+      ][] => typeof r[0][0] === "object" && "raw" in r[0][0];
 
-      | [TemplateStringsArray, ...(string | number | boolean | string[] | Buffer | null)[]][] 
-
-      | string[])) => r is [TemplateStringsArray, ...(string | number | boolean | string[] | Buffer | null)[]][] = (r): r is [TemplateStringsArray, ...(string | number | boolean | string[] | Buffer | null)[]][] => typeof r[0][0] === "object" && "raw" in r[0][0];
-     
       // array of flat template strings.
       if (
         // https://github.com/microsoft/TypeScript/issues/17002
@@ -122,7 +159,7 @@ export function sql2(
           TemplateStringsArray,
           ...(null | string | string[] | boolean | number | Buffer)[]
         ][] = [unsafe2(m), ...val2];
-        return returnValue
+        return returnValue;
       }
       // flat template string
       else if (isTemplateString(val2)) {
@@ -130,7 +167,7 @@ export function sql2(
           TemplateStringsArray,
           ...(null | string | string[] | boolean | number | Buffer)[]
         ][] = [unsafe2(m), val2];
-        return returnValue
+        return returnValue;
       } else {
         // string array, same as primitive
         // primitive
@@ -138,7 +175,7 @@ export function sql2(
           TemplateStringsArray,
           ...(null | string | string[] | boolean | number | Buffer)[]
         ][] = [unsafe2(m), [rd, val2]];
-        return returnValue
+        return returnValue;
       }
     } else {
       // primitive
@@ -146,7 +183,7 @@ export function sql2(
         TemplateStringsArray,
         ...(null | string | string[] | boolean | number | Buffer)[]
       ][] = [unsafe2(m), [rd, val]];
-      return returnValue
+      return returnValue;
     }
   });
 
@@ -155,7 +192,7 @@ export function sql2(
     (previous, current) => {
       const writableTemplateStrings: WritableTemplateStringsArray = [
         ...previous[0].slice(0, -1), // previous except last
-        previous[0].slice(-1)[0] + current[0][0], // previous last + current first 
+        previous[0].slice(-1)[0] + current[0][0], // previous last + current first
         ...current[0].slice(1), // current except first
       ];
       writableTemplateStrings.raw = [
@@ -166,17 +203,17 @@ export function sql2(
       // @ts-expect-error probably not typeable
       const templateStrings: TemplateStringsArray = writableTemplateStrings;
 
-      const [_1, ...a] = previous
-      const [_2, ...b] = current
+      const [_1, ...a] = previous;
+      const [_2, ...b] = current;
       const returnValue: [
         TemplateStringsArray,
         ...(null | string | string[] | boolean | number | Buffer)[]
       ] = [
         templateStrings,
-         ...a, // except template strings
-          ...b // except template strings
-        ];
-      return returnValue
+        ...a, // except template strings
+        ...b, // except template strings
+      ];
+      return returnValue;
     },
     [r]
   );
@@ -197,16 +234,17 @@ export function sql2ToString(
     .join("");
 }
 
-
-console.log(sql2`SELECT * FROM test`)
-console.log(sql2`SELECT ${"hill"}`)
-console.log(sql2`SELECT ${sql2`* FROM test`} WHERE ${1}`)
+console.log(sql2`SELECT * FROM test`);
+console.log(sql2`SELECT ${"hill"}`);
+console.log(sql2`SELECT ${sql2`* FROM test`} WHERE ${1}`);
 /** @type {any[]} */
 
 const list = ["id", "title", "info"];
 
-console.log(sql2`SELECT "id", "title", "info", "place" FROM projects WHERE 1${list.map(
-  (v) => sql2` AND (${unsafe2(v)} < ${1})`
-)} OR NOT ... params() ORDER BY ${list.map(
-  (v) => sql2`${unsafe2(v)} ASC, `
-)}LIMIT 1337`);
+console.log(
+  sql2`SELECT "id", "title", "info", "place" FROM projects WHERE 1${list.map(
+    (v) => sql2` AND (${unsafe2(v)} < ${1})`
+  )} OR NOT ... params() ORDER BY ${list.map(
+    (v) => sql2`${unsafe2(v)} ASC, `
+  )}LIMIT 1337`
+);

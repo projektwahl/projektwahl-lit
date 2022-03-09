@@ -40,7 +40,7 @@ import type {
   Http2ServerResponse,
   OutgoingHttpHeaders,
 } from "http2";
-import { webcrypto as crypto } from 'node:crypto'
+import { webcrypto as crypto } from "node:crypto";
 
 export type MyRequest = (IncomingMessage | Http2ServerRequest) &
   Required<Pick<IncomingMessage | Http2ServerRequest, "url" | "method">>;
@@ -88,12 +88,19 @@ export function requestHandler<P extends keyof typeof routes>(
 
         if (session_id) {
           // if the hashed session id gets leaked in the log files / database dump or so you still are not able to login with it.
-          session_id = new Uint8Array(await crypto.subtle.digest("SHA-512", new TextEncoder().encode(session_id)));
+          session_id = new Uint8Array(
+            await crypto.subtle.digest(
+              "SHA-512",
+              new TextEncoder().encode(session_id)
+            )
+          );
           user = userSchema.parse(
             (
               await retryableBegin("READ WRITE", async (sql) => {
                 //await sql`DELETE FROM sessions WHERE CURRENT_TIMESTAMP >= updated_at + interval '24 hours' AND session_id != ${session_id} `
-                return await sql`UPDATE sessions SET updated_at = CURRENT_TIMESTAMP FROM users WHERE users.id = sessions.user_id AND session_id = ${session_id as Uint8Array} AND CURRENT_TIMESTAMP < updated_at + interval '24 hours' RETURNING users.id, users.type, users.username, users.group, users.age`;
+                return await sql`UPDATE sessions SET updated_at = CURRENT_TIMESTAMP FROM users WHERE users.id = sessions.user_id AND session_id = ${
+                  session_id as Uint8Array
+                } AND CURRENT_TIMESTAMP < updated_at + interval '24 hours' RETURNING users.id, users.type, users.username, users.group, users.age`;
               })
             )[0]
           );

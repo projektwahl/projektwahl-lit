@@ -59,7 +59,7 @@ PORT=8443 BASE_URL=https://localhost:8443 DATABASE_URL=postgres://projektwahl:pr
 ```bash
 ln -s $PWD/pre-commit .git/hooks/pre-commit
 
-psql --username=projektwahl --host=projektwahl < src/server/setup.sql 
+psql --username=projektwahl --host=projektwahl < src/server/setup.sql
 
 NODE_ENV=development DATABASE_URL=postgres://projektwahl:projektwahl@projektwahl/projektwahl DATABASE_HOST=projektwahl npm run setup
 

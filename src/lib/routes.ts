@@ -236,10 +236,12 @@ export const routes = {
     response: z.object({}).strict(),
   },
   "/api/v1/redirect": {
-    request: z.object({
-      session_state: z.string(),
-      code: z.string(),
-    }).strict(),
+    request: z
+      .object({
+        session_state: z.string(),
+        code: z.string(),
+      })
+      .strict(),
     response: z.object({}).strict(),
   },
   "/api/v1/sleep": {
@@ -263,7 +265,8 @@ export const routes = {
       })
       .extend({
         password: z.string().optional(),
-      }).strict(),
+      })
+      .strict(),
     response: createOrUpdateUserResponse(rawUserSchema).strict(),
   },
   "/api/v1/users/update": {
@@ -285,22 +288,25 @@ export const routes = {
       .partial()
       .extend({
         id: z.number(),
-      }).strict(),
+      })
+      .strict(),
     response: createOrUpdateUserResponse(rawUserSchema).strict(),
   },
   "/api/v1/projects/create": {
-    request: rawProjectSchema.pick({
-      costs: true,
-      deleted: true,
-      info: true,
-      max_age: true,
-      max_participants: true,
-      min_age: true,
-      min_participants: true,
-      place: true,
-      random_assignments: true,
-      title: true,
-    }).strict(),
+    request: rawProjectSchema
+      .pick({
+        costs: true,
+        deleted: true,
+        info: true,
+        max_age: true,
+        max_participants: true,
+        min_age: true,
+        min_participants: true,
+        place: true,
+        random_assignments: true,
+        title: true,
+      })
+      .strict(),
     response: z.object({}).extend({ id: z.number() }).strict(),
   },
   "/api/v1/projects/update": {
@@ -320,38 +326,47 @@ export const routes = {
       .partial()
       .extend({
         id: z.number(),
-      }).strict(),
+      })
+      .strict(),
     response: z.object({}).extend({ id: z.number() }).strict(),
   },
   "/api/v1/users": {
     request: baseQuery(rawUserSchema),
-    response: z.object({
-      entities: z.array(users(rawUserSchema)),
-      previousCursor: users(rawUserSchema).nullable(),
-      nextCursor: users(rawUserSchema).nullable(),
-    }).strict(),
+    response: z
+      .object({
+        entities: z.array(users(rawUserSchema)),
+        previousCursor: users(rawUserSchema).nullable(),
+        nextCursor: users(rawUserSchema).nullable(),
+      })
+      .strict(),
   },
   "/api/v1/projects": {
     request: baseQuery(rawProjectSchema),
-    response: z.object({
-      entities: z.array(project),
-      previousCursor: project.nullable(),
-      nextCursor: project.nullable(),
-    }).strict(),
+    response: z
+      .object({
+        entities: z.array(project),
+        previousCursor: project.nullable(),
+        nextCursor: project.nullable(),
+      })
+      .strict(),
   },
   "/api/v1/choices": {
     request: baseQuery(rawChoiceNullable.merge(rawProjectSchema)),
-    response: z.object({
-      entities: z.array(choices),
-      previousCursor: choices.nullable(),
-      nextCursor: choices.nullable(),
-    }).strict(),
+    response: z
+      .object({
+        entities: z.array(choices),
+        previousCursor: choices.nullable(),
+        nextCursor: choices.nullable(),
+      })
+      .strict(),
   },
   "/api/v1/choices/update": {
-    request: rawChoiceNullable.pick({
-      project_id: true,
-      rank: true,
-    }).strict(),
+    request: rawChoiceNullable
+      .pick({
+        project_id: true,
+        rank: true,
+      })
+      .strict(),
     response: z.object({}).strict(),
   },
 } as const;

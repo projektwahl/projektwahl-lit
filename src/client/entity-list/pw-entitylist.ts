@@ -50,7 +50,7 @@ export const parseRequestWithPrefix = <
     Record<string, unknown>
   > = z
     .object({})
-    .setKey(prefix, entityRoutes[apiUrl]["request"].default({filters:{}}))
+    .setKey(prefix, entityRoutes[apiUrl]["request"].default({ filters: {} }))
     .passthrough();
   const data: z.infer<
     z.ZodObject<

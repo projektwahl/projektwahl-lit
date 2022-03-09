@@ -348,7 +348,10 @@ export async function main() {
         await shadow(pwProjects)
       ).findElement(By.css('div[class="alert alert-danger"]'));
 
-      assert.match(await alert.getText(), /Nicht angemeldet! Klicke rechts oben auf Anmelden./);
+      assert.match(
+        await alert.getText(),
+        /Nicht angemeldet! Klicke rechts oben auf Anmelden./
+      );
     }
 
     await driver.quit();
