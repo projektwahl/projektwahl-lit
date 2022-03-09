@@ -150,7 +150,7 @@ export const PwProjectUsers = setupHmr(
                 task: this._task,
                 type: "text",
                 initial,
-                defaultValue: "",
+                defaultValue: undefined,
               })}
             </th>
 

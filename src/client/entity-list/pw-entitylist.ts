@@ -44,19 +44,18 @@ export const parseRequestWithPrefix = <
   // @ts-expect-error https://github.com/colinhacks/zod/issues/153#issuecomment-863569536
   const schema: z.ZodObject<
     { [k in PREFIX]: typeof entityRoutes[P]["request"] },
-    "strict",
+    "passthrough",
     z.ZodTypeAny,
     { [k in PREFIX]: z.infer<typeof entityRoutes[P]["request"]> },
     Record<string, unknown>
   > = z
     .object({})
-    .strict()
     .setKey(prefix, entityRoutes[apiUrl]["request"].default({filters:{}}))
-    .strict();
+    .passthrough();
   const data: z.infer<
     z.ZodObject<
       { [k in PREFIX]: typeof entityRoutes[P]["request"] },
-      "strict",
+      "passthrough",
       z.ZodTypeAny,
       { [k in PREFIX]: z.infer<typeof entityRoutes[P]["request"]> },
       Record<string, unknown>
