@@ -141,7 +141,7 @@ export async function fetchData<R extends keyof typeof entityRoutes>(
               } ${unsafe2(value[0] ?? null)}`,
             ];
           })
-          .slice(1);
+          .slice(1).reduce((prev, curr) => sql`${prev}${curr}`);;
 
         return sql`(${sqlQuery(
           query
@@ -156,7 +156,7 @@ export async function fetchData<R extends keyof typeof entityRoutes>(
     } else {
       finalQuery = sql`${queries
         .flatMap((v) => [sql`\nUNION ALL\n`, v])
-        .slice(1)} LIMIT ${query.paginationLimit + 1}`;
+        .slice(1).reduce((prev, curr) => sql`${prev}${curr}`)} LIMIT ${query.paginationLimit + 1}`;
     }
   }
 
