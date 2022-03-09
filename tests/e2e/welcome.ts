@@ -49,6 +49,164 @@ export async function click(driver: WebDriver, element: WebElement) {
   await driver.executeScript(`arguments[0].click()`, element);
 }
 
+export async function testUser(driver: WebDriver) {
+  const groupName = `${Math.random()}`.substring(0, 10);
+
+  {
+    // go to users page
+    const pwApp = await driver.findElement(By.css("pw-app"));
+
+    const accountsLink = await (
+      await shadow(pwApp)
+    ).findElement(By.css('a[href="/users"]'));
+
+    await click(driver, accountsLink);
+  }
+
+  {
+    // create user
+    const pwApp = await driver.findElement(By.css("pw-app"));
+
+    const pwUsers = await (
+      await shadow(pwApp)
+    ).findElement(By.css("pw-users"));
+
+    const user2 = await (
+      await shadow(pwUsers)
+    ).findElement(By.css('a[href="/users/create"]'));
+
+    await click(driver, user2);
+
+    const pwUserCreate = await (
+      await shadow(pwApp)
+    ).findElement(By.css("pw-user-create"));
+
+    {
+      const pwUserGroup = await (
+        await shadow(pwUserCreate)
+      ).findElement(By.css('input[name="group"]'));
+
+      await pwUserGroup.clear();
+      await pwUserGroup.sendKeys(groupName);
+    }
+
+    {
+      const submitButton = await (
+        await shadow(pwUserCreate)
+      ).findElement(By.css('button[type="submit"]'));
+
+      await click(driver, submitButton);
+    }
+
+    const alert = await (
+      await shadow(pwUserCreate)
+    ).findElement(By.css('div[class="alert alert-danger"]'));
+
+    assert.match(await alert.getText(), /Some errors occurred./);
+
+    const feedbacks = await (
+      await shadow(pwUserCreate)
+    ).findElements(By.css('div[class="invalid-feedback"]'));
+
+    assert.equal(feedbacks.length, 2);
+
+    {
+      const pwUserUsername = await (
+        await shadow(pwUserCreate)
+      ).findElement(By.css('input[name="username"]'));
+
+      await pwUserUsername.clear();
+      await pwUserUsername.sendKeys(`awesomeuser${groupName}`);
+    }
+
+    {
+      const pwUserAge = await (
+        await shadow(pwUserCreate)
+      ).findElement(By.css('input[name="age"]'));
+
+      await pwUserAge.clear();
+      await pwUserAge.sendKeys("10");
+    }
+    {
+      const submitButton = await (
+        await shadow(pwUserCreate)
+      ).findElement(By.css('button[type="submit"]'));
+
+      await click(driver, submitButton);
+    }
+
+    await (await shadow(pwApp)).findElement(By.css("pw-welcome"));
+  }
+
+  {
+    // edit user
+    const pwApp = await driver.findElement(By.css("pw-app"));
+
+    const pwUsers = await (
+      await shadow(pwApp)
+    ).findElement(By.css("pw-users"));
+
+    const user2 = await (
+      await shadow(pwUsers)
+    ).findElement(By.css('a[href="/users/edit/7"]'));
+
+    await click(driver, user2);
+
+    const pwUserCreate = await (
+      await shadow(pwApp)
+    ).findElement(By.css("pw-user-create"));
+
+    const pwUserGroup = await (
+      await shadow(pwUserCreate)
+    ).findElement(By.css('input[name="group"]'));
+
+    await pwUserGroup.clear();
+    await pwUserGroup.sendKeys(groupName);
+
+    const submitButton = await (
+      await shadow(pwUserCreate)
+    ).findElement(By.css('button[type="submit"]'));
+
+    await click(driver, submitButton);
+
+    await (await shadow(pwApp)).findElement(By.css("pw-welcome"));
+  }
+
+  {
+    // view user
+
+    const pwApp = await driver.findElement(By.css("pw-app"));
+
+    const accountsLink = await (
+      await shadow(pwApp)
+    ).findElement(By.css('a[href="/users"]'));
+
+    await click(driver, accountsLink);
+
+    const pwUsers = await (
+      await shadow(pwApp)
+    ).findElement(By.css("pw-users"));
+
+    const user = await (
+      await shadow(pwUsers)
+    ).findElement(By.css('a[href="/users/view/7"]'));
+
+    await click(driver, user);
+
+    const pwUserCreate = await (
+      await shadow(pwApp)
+    ).findElement(By.css("pw-user-create"));
+
+    const pwUserGroup = await (
+      await shadow(pwUserCreate)
+    ).findElement(By.css('input[name="group"]'));
+
+    assert.equal(await pwUserGroup.getAttribute("value"), groupName);
+
+    await driver.navigate().back();
+  }
+}
+
 export async function main() {
   // SELENIUM_BROWSER=chrome node --experimental-loader ./src/loader.js --enable-source-maps tests/e2e/welcome.js
   const builder = new Builder()
@@ -145,161 +303,7 @@ export async function main() {
       await (await shadow(pwApp)).findElement(By.css("pw-welcome"));
     }
 
-    const groupName = `${Math.random()}`.substring(0, 10);
-
-    {
-      // go to users page
-      const pwApp = await driver.findElement(By.css("pw-app"));
-
-      const accountsLink = await (
-        await shadow(pwApp)
-      ).findElement(By.css('a[href="/users"]'));
-
-      await click(driver, accountsLink);
-    }
-
-    {
-      // create user
-      const pwApp = await driver.findElement(By.css("pw-app"));
-
-      const pwUsers = await (
-        await shadow(pwApp)
-      ).findElement(By.css("pw-users"));
-
-      const user2 = await (
-        await shadow(pwUsers)
-      ).findElement(By.css('a[href="/users/create"]'));
-
-      await click(driver, user2);
-
-      const pwUserCreate = await (
-        await shadow(pwApp)
-      ).findElement(By.css("pw-user-create"));
-
-      {
-        const pwUserGroup = await (
-          await shadow(pwUserCreate)
-        ).findElement(By.css('input[name="group"]'));
-
-        await pwUserGroup.clear();
-        await pwUserGroup.sendKeys(groupName);
-      }
-
-      {
-        const submitButton = await (
-          await shadow(pwUserCreate)
-        ).findElement(By.css('button[type="submit"]'));
-
-        await click(driver, submitButton);
-      }
-
-      const alert = await (
-        await shadow(pwUserCreate)
-      ).findElement(By.css('div[class="alert alert-danger"]'));
-
-      assert.match(await alert.getText(), /Some errors occurred./);
-
-      const feedbacks = await (
-        await shadow(pwUserCreate)
-      ).findElements(By.css('div[class="invalid-feedback"]'));
-
-      assert.equal(feedbacks.length, 2);
-
-      {
-        const pwUserUsername = await (
-          await shadow(pwUserCreate)
-        ).findElement(By.css('input[name="username"]'));
-
-        await pwUserUsername.clear();
-        await pwUserUsername.sendKeys(`awesomeuser${groupName}`);
-      }
-
-      {
-        const pwUserAge = await (
-          await shadow(pwUserCreate)
-        ).findElement(By.css('input[name="age"]'));
-
-        await pwUserAge.clear();
-        await pwUserAge.sendKeys("10");
-      }
-      {
-        const submitButton = await (
-          await shadow(pwUserCreate)
-        ).findElement(By.css('button[type="submit"]'));
-
-        await click(driver, submitButton);
-      }
-
-      await (await shadow(pwApp)).findElement(By.css("pw-welcome"));
-    }
-
-    {
-      // edit user
-      const pwApp = await driver.findElement(By.css("pw-app"));
-
-      const pwUsers = await (
-        await shadow(pwApp)
-      ).findElement(By.css("pw-users"));
-
-      const user2 = await (
-        await shadow(pwUsers)
-      ).findElement(By.css('a[href="/users/edit/7"]'));
-
-      await click(driver, user2);
-
-      const pwUserCreate = await (
-        await shadow(pwApp)
-      ).findElement(By.css("pw-user-create"));
-
-      const pwUserGroup = await (
-        await shadow(pwUserCreate)
-      ).findElement(By.css('input[name="group"]'));
-
-      await pwUserGroup.clear();
-      await pwUserGroup.sendKeys(groupName);
-
-      const submitButton = await (
-        await shadow(pwUserCreate)
-      ).findElement(By.css('button[type="submit"]'));
-
-      await click(driver, submitButton);
-
-      await (await shadow(pwApp)).findElement(By.css("pw-welcome"));
-    }
-
-    {
-      // view user
-
-      const pwApp = await driver.findElement(By.css("pw-app"));
-
-      const accountsLink = await (
-        await shadow(pwApp)
-      ).findElement(By.css('a[href="/users"]'));
-
-      await click(driver, accountsLink);
-
-      const pwUsers = await (
-        await shadow(pwApp)
-      ).findElement(By.css("pw-users"));
-
-      const user = await (
-        await shadow(pwUsers)
-      ).findElement(By.css('a[href="/users/view/7"]'));
-
-      await click(driver, user);
-
-      const pwUserCreate = await (
-        await shadow(pwApp)
-      ).findElement(By.css("pw-user-create"));
-
-      const pwUserGroup = await (
-        await shadow(pwUserCreate)
-      ).findElement(By.css('input[name="group"]'));
-
-      assert.equal(await pwUserGroup.getAttribute("value"), groupName);
-
-      await driver.navigate().back();
-    }
+    await testUser(driver)
 
     {
       // imprint
@@ -443,7 +447,6 @@ export async function main() {
     }
 
     // TODO FIXME create/edit/view project
-    // TODO FIXME create user
     // TODO FIXME list/filter project
 
     // TODO FIXME voting
