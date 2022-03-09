@@ -71,12 +71,12 @@ export class PwInputSelect<
     if (!this.input.value) {
       throw new Error();
     }
-    const v = this.input.value;
+    const input = this.input.value;
     this.set(
       event.detail,
-      v.selectedIndex == -1
+      input.selectedIndex == -1
         ? this.defaultValue
-        : this.options?.find((v) => v.value == v.value)?.value ??
+        : this.options?.find((v) => v.value == input.value)?.value ??
             this.defaultValue // To make numbers work
     );
   };

@@ -131,7 +131,7 @@ class PwUserCreate extends PwForm<
       >("POST", this.uri, formDataEvent.detail, {});
 
       if (result.success) {
-        HistoryController.goto(new URL("/", window.location.href), {});
+        HistoryController.goto(new URL("/", window.location.href), {}, false);
       }
 
       return result;
@@ -191,7 +191,7 @@ class PwUserCreate extends PwForm<
                   set: (o, v) => (o.openid_id = v),
                   task: this._task,
                   initial: this.initial?.data,
-                  defaultValue: "",
+                  defaultValue: undefined,
                 })}
                 ${pwInputSelect<
                   "/api/v1/users/create" | "/api/v1/users/update",

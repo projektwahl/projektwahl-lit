@@ -23,6 +23,7 @@ if (!process.env["BASE_URL"]) {
 
 // https://bugzilla.mozilla.org/show_bug.cgi?id=1489490
 // Firefox 96, geckodriver 0.31.0 required
+// https://github.com/mozilla/geckodriver/issues/1994
 
 // https://github.com/mozilla/geckodriver/issues/776
 // https://github.com/w3c/webdriver/issues/1005
@@ -46,6 +47,345 @@ export async function click(driver: WebDriver, element: WebElement) {
   //await driver.sleep(250);
 
   await driver.executeScript(`arguments[0].click()`, element);
+}
+
+export async function testUser(driver: WebDriver) {
+  const groupName = `${Math.random()}`.substring(0, 10);
+
+  {
+    // create user
+    const pwApp = await driver.findElement(By.css("pw-app"));
+
+    const accountsLink = await (
+      await shadow(pwApp)
+    ).findElement(By.css('a[href="/users"]'));
+
+    await click(driver, accountsLink);
+
+    const pwUsers = await (await shadow(pwApp)).findElement(By.css("pw-users"));
+
+    const user2 = await (
+      await shadow(pwUsers)
+    ).findElement(By.css('a[href="/users/create"]'));
+
+    await click(driver, user2);
+
+    const pwUserCreate = await (
+      await shadow(pwApp)
+    ).findElement(By.css("pw-user-create"));
+
+    {
+      const pwUserGroup = await (
+        await shadow(pwUserCreate)
+      ).findElement(By.css('input[name="group"]'));
+
+      await pwUserGroup.clear();
+      await pwUserGroup.sendKeys(groupName);
+    }
+
+    {
+      const submitButton = await (
+        await shadow(pwUserCreate)
+      ).findElement(By.css('button[type="submit"]'));
+
+      await click(driver, submitButton);
+    }
+
+    const alert = await (
+      await shadow(pwUserCreate)
+    ).findElement(By.css('div[class="alert alert-danger"]'));
+
+    assert.match(await alert.getText(), /Some errors occurred./);
+
+    const feedbacks = await (
+      await shadow(pwUserCreate)
+    ).findElements(By.css('div[class="invalid-feedback"]'));
+
+    assert.equal(feedbacks.length, 2);
+
+    {
+      const pwUserUsername = await (
+        await shadow(pwUserCreate)
+      ).findElement(By.css('input[name="username"]'));
+
+      await pwUserUsername.clear();
+      await pwUserUsername.sendKeys(`awesomeuser${groupName}`);
+    }
+
+    {
+      const pwUserAge = await (
+        await shadow(pwUserCreate)
+      ).findElement(By.css('input[name="age"]'));
+
+      await pwUserAge.clear();
+      await pwUserAge.sendKeys("10");
+    }
+    {
+      const submitButton = await (
+        await shadow(pwUserCreate)
+      ).findElement(By.css('button[type="submit"]'));
+
+      await click(driver, submitButton);
+    }
+
+    await (await shadow(pwApp)).findElement(By.css("pw-welcome"));
+  }
+
+  {
+    // edit user
+    const pwApp = await driver.findElement(By.css("pw-app"));
+
+    const accountsLink = await (
+      await shadow(pwApp)
+    ).findElement(By.css('a[href="/users"]'));
+
+    await click(driver, accountsLink);
+
+    const pwUsers = await (await shadow(pwApp)).findElement(By.css("pw-users"));
+
+    const user2 = await (
+      await shadow(pwUsers)
+    ).findElement(By.css('a[href="/users/edit/7"]'));
+
+    await click(driver, user2);
+
+    const pwUserCreate = await (
+      await shadow(pwApp)
+    ).findElement(By.css("pw-user-create"));
+
+    const pwUserGroup = await (
+      await shadow(pwUserCreate)
+    ).findElement(By.css('input[name="group"]'));
+
+    await pwUserGroup.clear();
+    await pwUserGroup.sendKeys(groupName);
+
+    const submitButton = await (
+      await shadow(pwUserCreate)
+    ).findElement(By.css('button[type="submit"]'));
+
+    await click(driver, submitButton);
+
+    await (await shadow(pwApp)).findElement(By.css("pw-welcome"));
+  }
+
+  {
+    // view user
+
+    const pwApp = await driver.findElement(By.css("pw-app"));
+
+    const accountsLink = await (
+      await shadow(pwApp)
+    ).findElement(By.css('a[href="/users"]'));
+
+    await click(driver, accountsLink);
+
+    const pwUsers = await (await shadow(pwApp)).findElement(By.css("pw-users"));
+
+    const user = await (
+      await shadow(pwUsers)
+    ).findElement(By.css('a[href="/users/view/7"]'));
+
+    await click(driver, user);
+
+    const pwUserCreate = await (
+      await shadow(pwApp)
+    ).findElement(By.css("pw-user-create"));
+
+    const pwUserGroup = await (
+      await shadow(pwUserCreate)
+    ).findElement(By.css('input[name="group"]'));
+
+    assert.equal(await pwUserGroup.getAttribute("value"), groupName);
+
+    await driver.navigate().back();
+  }
+}
+
+export async function testProject(driver: WebDriver) {
+  const randomValue = `${Math.random()}`.substring(0, 10);
+
+  {
+    // create project
+    const pwApp = await driver.findElement(By.css("pw-app"));
+
+    const accountsLink = await (
+      await shadow(pwApp)
+    ).findElement(By.css('a[href="/projects"]'));
+
+    await click(driver, accountsLink);
+
+    const pwProjects = await (
+      await shadow(pwApp)
+    ).findElement(By.css("pw-projects"));
+
+    const projectCreate = await (
+      await shadow(pwProjects)
+    ).findElement(By.css('a[href="/projects/create"]'));
+
+    await click(driver, projectCreate);
+
+    const pwProjectCreate = await (
+      await shadow(pwApp)
+    ).findElement(By.css("pw-project-create"));
+
+    {
+      const submitButton = await (
+        await shadow(pwProjectCreate)
+      ).findElement(By.css('button[type="submit"]'));
+
+      await click(driver, submitButton);
+    }
+
+    const alert = await (
+      await shadow(pwProjectCreate)
+    ).findElement(By.css('div[class="alert alert-danger"]'));
+
+    assert.match(await alert.getText(), /Some errors occurred./);
+
+    const feedbacks = await (
+      await shadow(pwProjectCreate)
+    ).findElements(By.css('div[class="invalid-feedback"]'));
+
+    assert.equal(feedbacks.length, 5);
+
+    {
+      const pwUserUsername = await (
+        await shadow(pwProjectCreate)
+      ).findElement(By.css('input[name="title"]'));
+
+      await pwUserUsername.clear();
+      await pwUserUsername.sendKeys(`randomproject${randomValue}`);
+    }
+
+    {
+      const pwInput = await (
+        await shadow(pwProjectCreate)
+      ).findElement(By.css('input[name="costs"]'));
+
+      await pwInput.clear();
+      await pwInput.sendKeys("10");
+    }
+
+    {
+      const pwInput = await (
+        await shadow(pwProjectCreate)
+      ).findElement(By.css('input[name="min_age"]'));
+
+      await pwInput.clear();
+      await pwInput.sendKeys("10");
+    }
+
+    {
+      const pwInput = await (
+        await shadow(pwProjectCreate)
+      ).findElement(By.css('input[name="max_age"]'));
+
+      await pwInput.clear();
+      await pwInput.sendKeys("10");
+    }
+
+    {
+      const pwInput = await (
+        await shadow(pwProjectCreate)
+      ).findElement(By.css('input[name="min_participants"]'));
+
+      await pwInput.clear();
+      await pwInput.sendKeys("10");
+    }
+
+    {
+      const pwInput = await (
+        await shadow(pwProjectCreate)
+      ).findElement(By.css('input[name="max_participants"]'));
+
+      await pwInput.clear();
+      await pwInput.sendKeys("10");
+    }
+    {
+      const submitButton = await (
+        await shadow(pwProjectCreate)
+      ).findElement(By.css('button[type="submit"]'));
+
+      await click(driver, submitButton);
+    }
+
+    await (await shadow(pwApp)).findElement(By.css("pw-welcome"));
+  }
+
+  {
+    // edit project
+    const pwApp = await driver.findElement(By.css("pw-app"));
+
+    const accountsLink = await (
+      await shadow(pwApp)
+    ).findElement(By.css('a[href="/projects"]'));
+
+    await click(driver, accountsLink);
+
+    const pwUsers = await (
+      await shadow(pwApp)
+    ).findElement(By.css("pw-projects"));
+
+    const user2 = await (
+      await shadow(pwUsers)
+    ).findElement(By.css('a[href="/projects/edit/7"]'));
+
+    await click(driver, user2);
+
+    const pwUserCreate = await (
+      await shadow(pwApp)
+    ).findElement(By.css("pw-project-create"));
+
+    const pwUserGroup = await (
+      await shadow(pwUserCreate)
+    ).findElement(By.css('input[name="title"]'));
+
+    await pwUserGroup.clear();
+    await pwUserGroup.sendKeys(randomValue);
+
+    const submitButton = await (
+      await shadow(pwUserCreate)
+    ).findElement(By.css('button[type="submit"]'));
+
+    await click(driver, submitButton);
+
+    await (await shadow(pwApp)).findElement(By.css("pw-welcome"));
+  }
+
+  {
+    // view project
+
+    const pwApp = await driver.findElement(By.css("pw-app"));
+
+    const accountsLink = await (
+      await shadow(pwApp)
+    ).findElement(By.css('a[href="/projects"]'));
+
+    await click(driver, accountsLink);
+
+    const pwUsers = await (
+      await shadow(pwApp)
+    ).findElement(By.css("pw-projects"));
+
+    const user = await (
+      await shadow(pwUsers)
+    ).findElement(By.css('a[href="/projects/view/7"]'));
+
+    await click(driver, user);
+
+    const pwUserCreate = await (
+      await shadow(pwApp)
+    ).findElement(By.css("pw-project-create"));
+
+    const pwUserGroup = await (
+      await shadow(pwUserCreate)
+    ).findElement(By.css('input[name="title"]'));
+
+    assert.equal(await pwUserGroup.getAttribute("value"), randomValue);
+
+    await driver.navigate().back();
+  }
 }
 
 export async function main() {
@@ -76,27 +416,19 @@ export async function main() {
   });
 
   try {
-    // @ts-expect-error wrong typings
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-call
-    await driver.setNetworkConditions({
-      offline: false,
-      latency: 100, // Additional latency (ms).
-      download_throughput: 50 * 1024, // Maximal aggregated download throughput.
-      upload_throughput: 50 * 1024, // Maximal aggregated upload throughput.
-    });
-
     if (!process.env.BASE_URL) {
       throw new Error("BASE_URL not set!");
     }
 
     await driver.get(process.env.BASE_URL);
 
-    await driver.sleep(2000);
+    await driver.sleep(1000);
 
     const screenshot = await driver.takeScreenshot();
     await writeFile("screenshot.png", screenshot, "base64");
 
     {
+      // open navbar
       const pwApp = await driver.findElement(By.css("pw-app"));
 
       const navbarButton = await (
@@ -107,6 +439,7 @@ export async function main() {
     }
 
     {
+      // go to login page
       const pwApp = await driver.findElement(By.css("pw-app"));
 
       const loginLink = await (
@@ -151,82 +484,9 @@ export async function main() {
       await (await shadow(pwApp)).findElement(By.css("pw-welcome"));
     }
 
-    const groupName = `${Math.random()}`.substring(0, 10);
+    await testUser(driver);
 
-    {
-      // edit user
-
-      const pwApp = await driver.findElement(By.css("pw-app"));
-
-      const accountsLink = await (
-        await shadow(pwApp)
-      ).findElement(By.css('a[href="/users"]'));
-
-      await click(driver, accountsLink);
-
-      const pwUsers = await (
-        await shadow(pwApp)
-      ).findElement(By.css("pw-users"));
-
-      const user2 = await (
-        await shadow(pwUsers)
-      ).findElement(By.css('a[href="/users/edit/7"]'));
-
-      await click(driver, user2);
-
-      const pwUserCreate = await (
-        await shadow(pwApp)
-      ).findElement(By.css("pw-user-create"));
-
-      const pwUserGroup = await (
-        await shadow(pwUserCreate)
-      ).findElement(By.css('input[name="group"]'));
-
-      await pwUserGroup.clear();
-      await pwUserGroup.sendKeys(groupName);
-
-      const submitButton = await (
-        await shadow(pwUserCreate)
-      ).findElement(By.css('button[type="submit"]'));
-
-      await click(driver, submitButton);
-
-      await (await shadow(pwApp)).findElement(By.css("pw-welcome"));
-    }
-
-    {
-      // view user
-
-      const pwApp = await driver.findElement(By.css("pw-app"));
-
-      const accountsLink = await (
-        await shadow(pwApp)
-      ).findElement(By.css('a[href="/users"]'));
-
-      await click(driver, accountsLink);
-
-      const pwUsers = await (
-        await shadow(pwApp)
-      ).findElement(By.css("pw-users"));
-
-      const user = await (
-        await shadow(pwUsers)
-      ).findElement(By.css('a[href="/users/view/7"]'));
-
-      await click(driver, user);
-
-      const pwUserCreate = await (
-        await shadow(pwApp)
-      ).findElement(By.css("pw-user-create"));
-
-      const pwUserGroup = await (
-        await shadow(pwUserCreate)
-      ).findElement(By.css('input[name="group"]'));
-
-      assert.equal(await pwUserGroup.getAttribute("value"), groupName);
-
-      await driver.navigate().back();
-    }
+    await testProject(driver);
 
     {
       // imprint
@@ -279,7 +539,7 @@ export async function main() {
     }
 
     {
-      // filtering
+      // filtering users
 
       const pwApp = await driver.findElement(By.css("pw-app"));
 
@@ -297,6 +557,15 @@ export async function main() {
         await shadow(pwUsers)
       ).findElement(By.css('input[name="filters,username"]'));
 
+      // @ts-expect-error wrong typings
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-call
+      await driver.setNetworkConditions({
+        offline: false,
+        latency: 100, // Additional latency (ms).
+        download_throughput: 50 * 1024, // Maximal aggregated download throughput.
+        upload_throughput: 50 * 1024, // Maximal aggregated upload throughput.
+      });
+
       await filterUsername.sendKeys("admin");
 
       const loadingSpinner = await (
@@ -310,7 +579,74 @@ export async function main() {
       await driver.wait(until.stalenessOf(loadingSpinner));
 
       console.log(new Date());
+
+      // @ts-expect-error wrong typings
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-call
+      await driver.setNetworkConditions({
+        offline: false,
+        latency: 0, // Additional latency (ms).
+        download_throughput: 0, // Maximal aggregated download throughput.
+        upload_throughput: 0, // Maximal aggregated upload throughput.
+      });
+
+      // TODO FIXME verify results
     }
+
+    {
+      // filtering projects
+
+      const pwApp = await driver.findElement(By.css("pw-app"));
+
+      const accountsLink = await (
+        await shadow(pwApp)
+      ).findElement(By.css('a[href="/projects"]'));
+
+      await click(driver, accountsLink);
+
+      const pwUsers = await (
+        await shadow(pwApp)
+      ).findElement(By.css("pw-projects"));
+
+      const filterUsername = await (
+        await shadow(pwUsers)
+      ).findElement(By.css('input[name="filters,title"]'));
+
+      // @ts-expect-error wrong typings
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-call
+      await driver.setNetworkConditions({
+        offline: false,
+        latency: 100, // Additional latency (ms).
+        download_throughput: 50 * 1024, // Maximal aggregated download throughput.
+        upload_throughput: 50 * 1024, // Maximal aggregated upload throughput.
+      });
+
+      await filterUsername.sendKeys("randomproject");
+
+      const loadingSpinner = await (
+        await shadow(pwUsers)
+      ).findElement(By.css(".spinner-grow"));
+
+      assert.ok(loadingSpinner.isDisplayed());
+
+      console.log(new Date());
+
+      await driver.wait(until.stalenessOf(loadingSpinner));
+
+      console.log(new Date());
+
+      // @ts-expect-error wrong typings
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-call
+      await driver.setNetworkConditions({
+        offline: false,
+        latency: 0, // Additional latency (ms).
+        download_throughput: 0, // Maximal aggregated download throughput.
+        upload_throughput: 0, // Maximal aggregated upload throughput.
+      });
+    }
+
+    // TODO filtering with error (this alerts currently afaik (if the error is detected client-side))
+
+    // TODO filtering with empty result
 
     {
       // logout
@@ -355,6 +691,16 @@ export async function main() {
         /Nicht angemeldet! Klicke rechts oben auf Anmelden./
       );
     }
+
+    // important
+
+    // TODO FIXME editing the project leaders + members
+
+    // TODO test pagination
+
+    // TODO FIXME voting
+
+    // TODO test openid
 
     await driver.quit();
 

@@ -42,7 +42,7 @@ export const rawChoiceNullable = z
 const rawUserCommon = {
   id: z.number(),
   username: z.string().min(1).max(100),
-  openid_id: z.string().nullable(),
+  openid_id: z.string().nullish(),
   password_hash: z.string(),
   away: z.boolean(),
   project_leader_id: z.number().nullable(),

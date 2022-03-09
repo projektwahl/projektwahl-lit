@@ -198,12 +198,13 @@ export class PwEntityList<
               )}`,
               window.location.href
             ),
-            {}
+            {},
+            true
           );
 
           return result;
         },
-        autoRun: false,
+        autoRun: false, // TODO FIXME this breaks if you navigate to the same page (as it doesnt cause an update) - maybe we should autorun on url change?
         initialStatus:
           this.initial !== undefined ? TaskStatus.COMPLETE : TaskStatus.INITIAL,
         initialValue: this.initial,
@@ -339,7 +340,8 @@ export class PwEntityList<
                             `?${encodeURIComponent(JSON.stringify(data))}`,
                             window.location.href
                           ),
-                          {}
+                          {},
+                          true
                         );
                         await this._task.run();
                       }}
@@ -405,7 +407,8 @@ export class PwEntityList<
                             `?${encodeURIComponent(JSON.stringify(data))}`,
                             window.location.href
                           ),
-                          {}
+                          {},
+                          true
                         );
                         await this._task.run();
                       }}

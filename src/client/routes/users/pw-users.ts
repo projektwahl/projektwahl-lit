@@ -142,7 +142,7 @@ export class PwUsers<X extends string> extends PwEntityList<
               task: this._task,
               type: "text",
               initial,
-              defaultValue: "",
+              defaultValue: undefined,
             })}
           </th>
 
