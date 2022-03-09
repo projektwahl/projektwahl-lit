@@ -131,7 +131,7 @@ class PwUserCreate extends PwForm<
       >("POST", this.uri, formDataEvent.detail, {});
 
       if (result.success) {
-        HistoryController.goto(new URL("/", window.location.href), {});
+        HistoryController.goto(new URL("/", window.location.href), {}, false);
       }
 
       return result;

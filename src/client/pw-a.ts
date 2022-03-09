@@ -34,5 +34,5 @@ export const aClick = (event: MouseEvent) => {
   if (!target) {
     throw new Error("link not found");
   }
-  HistoryController.goto(new URL(target.href, window.location.href), {});
+  HistoryController.goto(new URL(target.href, window.location.href), {}, false);
 };

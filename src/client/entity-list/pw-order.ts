@@ -157,7 +157,8 @@ export class PwOrder<
               `?${encodeURIComponent(JSON.stringify(data))}`,
               window.location.href
             ),
-            {}
+            {},
+            true
           );
           // TODO FIXME use refreshentitylist / dont do this at all because we navigated anyways
           await this.refreshEntityList();

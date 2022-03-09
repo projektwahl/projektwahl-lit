@@ -217,7 +217,7 @@ export class PwApp extends LitElement {
       // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
       const state = event.state;
       // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-      HistoryController.goto(url, state);
+      HistoryController.goto(url, state, true); // TODO FIXME don't pushstate here at all
     };
 
     this.username = jscookie.get("username");
@@ -346,7 +346,8 @@ export class PwApp extends LitElement {
 
                             HistoryController.goto(
                               new URL("/login", window.location.href),
-                              {}
+                              {},
+                              false
                             );
                           }}
                           class="nav-link"

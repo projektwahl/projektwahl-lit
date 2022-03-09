@@ -72,7 +72,7 @@ class PwLogin extends PwForm<"/api/v1/login"> {
         if (window.opener) {
           window.close();
         } else {
-          HistoryController.goto(new URL("/", window.location.href), {});
+          HistoryController.goto(new URL("/", window.location.href), {}, true);
         }
       }
 

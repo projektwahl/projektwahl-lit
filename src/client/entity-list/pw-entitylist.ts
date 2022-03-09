@@ -198,7 +198,8 @@ export class PwEntityList<
               )}`,
               window.location.href
             ),
-            {}
+            {},
+            true
           );
 
           return result;
@@ -339,7 +340,8 @@ export class PwEntityList<
                             `?${encodeURIComponent(JSON.stringify(data))}`,
                             window.location.href
                           ),
-                          {}
+                          {},
+                          true
                         );
                         await this._task.run();
                       }}
@@ -405,7 +407,8 @@ export class PwEntityList<
                             `?${encodeURIComponent(JSON.stringify(data))}`,
                             window.location.href
                           ),
-                          {}
+                          {},
+                          true
                         );
                         await this._task.run();
                       }}

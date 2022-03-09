@@ -75,7 +75,7 @@ class PwRedirect extends PwForm<"/api/v1/redirect"> {
         if (window.opener) {
           window.close();
         } else {
-          HistoryController.goto(new URL("/", window.location.href), {});
+          HistoryController.goto(new URL("/", window.location.href), {}, true);
         }
       }
 

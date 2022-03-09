@@ -67,8 +67,12 @@ export class HistoryController implements ReactiveController {
     window.removeEventListener("navigate", this.navigateListener);
   }
 
-  static goto(url: URL, state: HistoryState) {
-    window.history.pushState(state, "", url);
+  static goto(url: URL, state: HistoryState, replace: boolean) {
+    if (replace) {
+      window.history.replaceState(state, "", url);
+    } else {
+      window.history.pushState(state, "", url);
+    }
     const event = new CustomEvent("navigate", {
       bubbles: true,
       cancelable: false,
