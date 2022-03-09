@@ -191,7 +191,7 @@ class PwUserCreate extends PwForm<
                   set: (o, v) => (o.openid_id = v),
                   task: this._task,
                   initial: this.initial?.data,
-                  defaultValue: "",
+                  defaultValue: undefined,
                 })}
                 ${pwInputSelect<
                   "/api/v1/users/create" | "/api/v1/users/update",
