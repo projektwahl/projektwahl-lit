@@ -698,6 +698,8 @@ export async function main() {
 
     // TODO test pagination
 
+    // TODO test sorting
+
     // TODO FIXME voting
 
     // TODO test openid

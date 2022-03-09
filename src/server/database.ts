@@ -29,9 +29,9 @@ if (!process.env["DATABASE_URL"]) {
 
 export const sql = postgres(process.env["DATABASE_URL"], {
   host: process.env["DATABASE_HOST"],
-  /*debug: (conn, query, params) => {
+  debug: (conn, query, params) => {
     console.log(query, params);
-  },*/ // this seems to be a performance issue
+  }, // this seems to be a performance issue
 });
 
 export async function retryableBegin(
