@@ -31,7 +31,9 @@ import { sql } from "../../database.js";
 import { MyRequest, requestHandler } from "../../express.js";
 import { checkPassword } from "../../password.js";
 import type { OutgoingHttpHeaders, ServerResponse } from "node:http";
-import { webcrypto as crypto } from "node:crypto";
+import nodeCrypto from "node:crypto";
+// @ts-expect-error wrong typings
+const { webcrypto: crypto }: { webcrypto: Crypto } = nodeCrypto;
 
 const users = <
   T extends { [k: string]: ZodTypeAny },

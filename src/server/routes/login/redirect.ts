@@ -28,7 +28,9 @@ import { MyRequest, requestHandler } from "../../express.js";
 import { client } from "./openid-client.js";
 import type { OutgoingHttpHeaders, ServerResponse } from "node:http";
 import type { Http2ServerResponse } from "node:http2";
-import { webcrypto as crypto } from "node:crypto";
+import nodeCrypto from "node:crypto";
+// @ts-expect-error wrong typings
+const { webcrypto: crypto }: { webcrypto: Crypto } = nodeCrypto;
 
 export async function openidRedirectHandler(
   request: MyRequest,
@@ -42,6 +44,10 @@ export async function openidRedirectHandler(
 
     // https://github.com/projektwahl/projektwahl-sveltekit/blob/work/src/routes/login/index.json.ts
     // https://github.com/projektwahl/projektwahl-sveltekit/blob/work/src/routes/redirect/index.ts_old
+
+    if (!process.env.BASE_URL) {
+      throw new Error("BASE_URL not set")
+    }
 
     if (!client) {
       throw new Error("OpenID not configured!");
@@ -102,11 +108,9 @@ export async function openidRedirectHandler(
       }
 
       const session_id_unhashed = Buffer.from(
-        // @ts-expect-error wrong typings
         crypto.getRandomValues(new Uint8Array(32))
       ).toString("hex");
       const session_id = new Uint8Array(
-        // @ts-expect-error wrong typings
         await crypto.subtle.digest(
           "SHA-512",
           new TextEncoder().encode(session_id_unhashed)

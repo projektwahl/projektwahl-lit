@@ -34,7 +34,9 @@ import type {
   Http2ServerResponse,
   OutgoingHttpHeaders,
 } from "http2";
-import { webcrypto as crypto } from "node:crypto";
+import nodeCrypto from "node:crypto";
+// @ts-expect-error wrong typings
+const { webcrypto: crypto }: { webcrypto: Crypto } = nodeCrypto;
 
 export type MyRequest = (IncomingMessage | Http2ServerRequest) &
   Required<Pick<IncomingMessage | Http2ServerRequest, "url" | "method">>;
