@@ -25,8 +25,8 @@ import { ZodIssueCode } from "zod";
 import type { ResponseType } from "../../../lib/routes.js";
 import { fetchData } from "../../entities.js";
 import { MyRequest, requestHandler } from "../../express.js";
-import { sql2 } from "../../sql/index.js";
 import type { Http2ServerResponse } from "node:http2";
+import { sql } from "../../database.js";
 
 export async function usersHandler(
   request: MyRequest,
@@ -97,7 +97,7 @@ export async function usersHandler(
           "/api/v1/users" as const,
           query,
           (query) => {
-            return sql2`SELECT "id",
+            return sql`SELECT "id",
             "type",
             "username",
             "openid_id",

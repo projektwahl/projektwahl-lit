@@ -24,9 +24,9 @@ import { ZodIssueCode } from "zod";
 import type { ResponseType } from "../../../lib/routes.js";
 import { fetchData } from "../../entities.js";
 import { MyRequest, requestHandler } from "../../express.js";
-import { sql2 } from "../../sql/index.js";
 import type { OutgoingHttpHeaders, ServerResponse } from "node:http";
 import type { Http2ServerResponse } from "node:http2";
+import { sql } from "../../database.js";
 
 export async function choicesHandler(
   request: MyRequest,
@@ -93,7 +93,7 @@ export async function choicesHandler(
         "/api/v1/choices" as const,
         query,
         (query) => {
-          return sql2`SELECT "id",
+          return sql`SELECT "id",
           "title",
           "info",
           "place",
