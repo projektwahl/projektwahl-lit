@@ -112,7 +112,9 @@ FROM users_with_deleted WHERE projects_with_deleted.id = ${
         project.id
       } AND users_with_deleted.type = 'helper' OR users_with_deleted.type = 'admin') RETURNING projects_with_deleted.id;`;
 
-      return z.array(rawProjectSchema.pick({id: true})).parse(await finalQuery);
+      return z
+        .array(rawProjectSchema.pick({ id: true }))
+        .parse(await finalQuery);
     }
   );
 }

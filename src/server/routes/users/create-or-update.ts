@@ -21,7 +21,12 @@ SPDX-License-Identifier: AGPL-3.0-or-later
 SPDX-FileCopyrightText: 2021 Moritz Hedtke <Moritz.Hedtke@t-online.de>
 */
 import postgres from "postgres";
-import { routes, ResponseType, userSchema, rawUserSchema } from "../../../lib/routes.js";
+import {
+  routes,
+  ResponseType,
+  userSchema,
+  rawUserSchema,
+} from "../../../lib/routes.js";
 import { sql } from "../../database.js";
 import { MyRequest, requestHandler } from "../../express.js";
 import { hashPassword } from "../../password.js";
@@ -94,7 +99,15 @@ export async function updateUsersHandler(
   last_updated_by = ${loggedInUser.id}
   WHERE id = ${user.id} RETURNING id, project_leader_id, force_in_project_id;`;
       // TODO FIXME (found using fuzzer) if this tries to update a nonexisting user we should return an error
-      return z.array(rawUserSchema.pick({ id: true, project_leader_id: true, force_in_project_id: true })).parse(await finalQuery);
+      return z
+        .array(
+          rawUserSchema.pick({
+            id: true,
+            project_leader_id: true,
+            force_in_project_id: true,
+          })
+        )
+        .parse(await finalQuery);
     }
   );
 }

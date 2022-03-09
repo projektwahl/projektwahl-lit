@@ -48,7 +48,6 @@ export function updateField<
   E extends { [name: string]: boolean | string | number | null },
   K extends keyof E
 >(table: string, entity: E, name: K) {
-  
   return sql`"${unsafe2(name)}" = CASE WHEN ${
     entity[name] !== undefined
   } THEN ${entity[name] ?? null} ELSE "${unsafe2(table)}"."${unsafe2(
@@ -59,9 +58,7 @@ export function updateField<
 export async function fetchData<R extends keyof typeof entityRoutes>(
   path: R,
   query: entitesType0[R],
-  sqlQuery: (
-    query: entitesType0[R]
-  ) => PendingQuery<Row[]>,
+  sqlQuery: (query: entitesType0[R]) => PendingQuery<Row[]>,
   nullOrdering: {
     [key: string]: "smallest" | "largest";
   }
@@ -109,7 +106,8 @@ export async function fetchData<R extends keyof typeof entityRoutes>(
           : "NULLS FIRST"
       )}`,
     ])
-    .slice(1).reduce((prev, curr) => sql`${prev}${curr}`);
+    .slice(1)
+    .reduce((prev, curr) => sql`${prev}${curr}`);
 
   const paginationCursor: entitesType0[R]["paginationCursor"] =
     query.paginationCursor;
@@ -141,7 +139,8 @@ export async function fetchData<R extends keyof typeof entityRoutes>(
               } ${unsafe2(value[0] ?? null)}`,
             ];
           })
-          .slice(1).reduce((prev, curr) => sql`${prev}${curr}`);;
+          .slice(1)
+          .reduce((prev, curr) => sql`${prev}${curr}`);
 
         return sql`(${sqlQuery(
           query
@@ -156,7 +155,10 @@ export async function fetchData<R extends keyof typeof entityRoutes>(
     } else {
       finalQuery = sql`${queries
         .flatMap((v) => [sql`\nUNION ALL\n`, v])
-        .slice(1).reduce((prev, curr) => sql`${prev}${curr}`)} LIMIT ${query.paginationLimit + 1}`;
+        .slice(1)
+        .reduce((prev, curr) => sql`${prev}${curr}`)} LIMIT ${
+        query.paginationLimit + 1
+      }`;
     }
   }
 

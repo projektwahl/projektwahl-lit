@@ -28,9 +28,7 @@ export interface WritableTemplateStringsArray extends Array<string> {
   raw?: readonly string[];
 }
 
-export function unsafe2(
-  string: null | string | number | symbol
-) {
+export function unsafe2(string: null | string | number | symbol) {
   const r: WritableTemplateStringsArray = [String(string)];
   r.raw = [String(string)];
   // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
