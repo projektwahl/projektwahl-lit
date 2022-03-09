@@ -89,7 +89,7 @@ const pages = {
   },
   "^/login$": async () => {
     const { pwLogin } = await import("./routes/login/pw-login.js");
-    return await pwLogin();
+    return pwLogin();
   },
   "^/users$": async (url: URL) => {
     const { pwUsers } = await import("./routes/users/pw-users.js");
@@ -235,13 +235,15 @@ export class PwApp extends LitElement {
 
       this._apiTask = new Task(this, {
         task: this.nextPage,
-        // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
-        args: () =>
-          [
-            Object.keys(pages).find((k) =>
-              new RegExp(k).test(this.history.url.pathname)
-            ),
-          ] as [keyof typeof pages | undefined],
+        args: () => {
+          const _a: keyof typeof pages | undefined = Object.keys(pages).find((k) =>
+            new RegExp(k).test(this.history.url.pathname)
+          )
+          const _b:  [keyof typeof pages | undefined] = [
+            _a
+          ] 
+          return _b
+        },
         initialStatus:
           this.initial !== undefined ? TaskStatus.COMPLETE : TaskStatus.INITIAL,
         initialValue: this.initial,
