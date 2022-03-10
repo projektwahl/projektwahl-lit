@@ -74,7 +74,7 @@ export class PwUsers<X extends string> extends PwEntityList<
       <a
         @click=${aClick}
         class="btn btn-primary"
-        href="/users/import"
+        href="/users/${`import`}"
         role="button"
         >${msg("Import accounts")}</a
       >`;
