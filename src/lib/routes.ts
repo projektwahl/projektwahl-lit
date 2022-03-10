@@ -254,7 +254,7 @@ export const routes = {
     response: z.object({}).strict(),
   },
   "/api/v1/users/create": {
-    request: rawUserSchema
+    request: z.array(rawUserSchema
       .pick({
         openid_id: true,
         age: true,
@@ -267,11 +267,11 @@ export const routes = {
       .extend({
         password: z.string().optional(),
       })
-      .strict(),
+      .strict()),
     response: createOrUpdateUserResponse(rawUserSchema).strict(),
   },
   "/api/v1/users/update": {
-    request: rawUserSchema
+    request: z.array(rawUserSchema
       .pick({
         openid_id: true,
         age: true,
@@ -290,7 +290,7 @@ export const routes = {
       .extend({
         id: z.number(),
       })
-      .strict(),
+      .strict()),
     response: createOrUpdateUserResponse(rawUserSchema).strict(),
   },
   "/api/v1/projects/create": {

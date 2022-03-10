@@ -103,7 +103,7 @@ class PwUsersImport extends PwForm<"/api/v1/users/create"> {
               ${pwInputFile<"/api/v1/users/create">({
                 url: this.url,
                 type: "file",
-                label: msg(".csv Datei"),
+                label: msg(".json Datei"),
                 name: [],
                 get: (o) => undefined,
                 set: (o, v) => {

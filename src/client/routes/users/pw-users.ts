@@ -70,7 +70,13 @@ export class PwUsers<X extends string> extends PwEntityList<
       href="/users/create"
       role="button"
       >${msg("Create account")}</a
-    >`;
+    > <a
+    @click=${aClick}
+    class="btn btn-primary"
+    href="/users/import"
+    role="button"
+    >${msg("Import accounts")}</a
+  >`;
   }
 
   override get head() {

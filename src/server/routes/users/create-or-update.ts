@@ -52,7 +52,7 @@ export async function createUsersHandler(
       user,
       loggedInUser: Exclude<z.infer<typeof userSchema>, undefined>
     ) => {
-      return await sql`INSERT INTO users_with_deleted (username, openid_id, password_hash, type, "group", age, away, deleted, last_updated_by) VALUES (${
+      const query = sql`INSERT INTO users_with_deleted (username, openid_id, password_hash, type, "group", age, away, deleted, last_updated_by) VALUES (${
         user.username ?? null
       }, ${user.openid_id ?? null}, ${
         user.password ? await hashPassword(user.password) : null
@@ -63,6 +63,10 @@ export async function createUsersHandler(
       }, ${user.deleted ?? false}, ${
         loggedInUser.id
       }) RETURNING id, project_leader_id, force_in_project_id;`;
+      
+      //console.log(await query.describe())
+
+      return await query
     }
   );
 }
@@ -128,7 +132,7 @@ export async function createOrUpdateUsersHandler<
   return await requestHandler(
     "POST",
     path,
-    async function (user, loggedInUser) {
+    async function (users, loggedInUser) {
       // helper is allowed to set voters as away (TODO implement)
       // voter is not allowed to do anything
 
@@ -182,7 +186,12 @@ export async function createOrUpdateUsersHandler<
       try {
         const row = (
           await sql.begin("READ WRITE", async (sql) => {
-            return await dbquery(sql, user, loggedInUser);
+            const results = []
+            for (const user of users) {
+              // TODO FIXME by merging creation and updating again
+              results.push(await dbquery(sql, user, loggedInUser));
+            }
+            return results
           })
         )[0];
 
