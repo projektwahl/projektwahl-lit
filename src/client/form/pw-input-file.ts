@@ -5,9 +5,7 @@ import type { routes } from "../../lib/routes.js";
 import { PwInput } from "./pw-input.js";
 
 // workaround see https://github.com/runem/lit-analyzer/issues/149#issuecomment-1006162839
-export function pwInputFile<
-  P extends keyof typeof routes,
->(
+export function pwInputFile<P extends keyof typeof routes>(
   props: Pick<
     PwInputFile<P>,
     | "type"
@@ -60,9 +58,11 @@ export function pwInputFile<
   ></pw-input-file>`;
 }
 
-export class PwInputFile<
-  P extends keyof typeof routes,
-> extends PwInput<P, Promise<string> | undefined, HTMLInputElement> {
+export class PwInputFile<P extends keyof typeof routes> extends PwInput<
+  P,
+  Promise<string> | undefined,
+  HTMLInputElement
+> {
   myformdataEventListener = (
     event: CustomEvent<z.infer<typeof routes[P]["request"]>>
   ) => {

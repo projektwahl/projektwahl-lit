@@ -51,9 +51,9 @@ class PwUsersImport extends PwForm<"/api/v1/users/create"> {
     super();
 
     this._task = new Task(this, async () => {
-      const formDataEvent = new CustomEvent<
-        { file: Promise<string|undefined> }
-      >("myformdata", {
+      const formDataEvent = new CustomEvent<{
+        file: Promise<string | undefined>;
+      }>("myformdata", {
         bubbles: false,
         detail: {},
       });

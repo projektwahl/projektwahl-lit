@@ -63,10 +63,10 @@ export async function createUsersHandler(
       }, ${user.deleted ?? false}, ${
         loggedInUser.id
       }) RETURNING id, project_leader_id, force_in_project_id;`;
-      
+
       //console.log(await query.describe())
 
-      return await query
+      return await query;
     }
   );
 }
@@ -186,12 +186,12 @@ export async function createOrUpdateUsersHandler<
       try {
         const row = (
           await sql.begin("READ WRITE", async (sql) => {
-            const results = []
+            const results = [];
             for (const user of users) {
               // TODO FIXME by merging creation and updating again
               results.push(await dbquery(sql, user, loggedInUser));
             }
-            return results
+            return results;
           })
         )[0];
 

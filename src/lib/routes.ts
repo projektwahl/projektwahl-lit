@@ -253,44 +253,48 @@ export const routes = {
     request: z.undefined(),
     response: z.object({}).strict(),
   },
-  "/api/v1/users/create": {
-    request: z.array(rawUserSchema
-      .pick({
-        openid_id: true,
-        age: true,
-        away: true,
-        group: true,
-        type: true,
-        username: true,
-        deleted: true,
-      })
-      .extend({
-        password: z.string().optional(),
-      })
-      .strict()),
-    response: createOrUpdateUserResponse(rawUserSchema).strict(),
-  },
-  "/api/v1/users/update": {
-    request: z.array(rawUserSchema
-      .pick({
-        openid_id: true,
-        age: true,
-        away: true,
-        group: true,
-        type: true,
-        username: true,
-        project_leader_id: true,
-        force_in_project_id: true,
-        deleted: true,
-      })
-      .extend({
-        password: z.string(),
-      })
-      .partial()
-      .extend({
-        id: z.number(),
-      })
-      .strict()),
+  "/api/v1/users/create-or-update": {
+    request: z.array(
+      z.discriminatedUnion("action", [
+        rawUserSchema
+          .pick({
+            openid_id: true,
+            age: true,
+            away: true,
+            group: true,
+            type: true,
+            username: true,
+            deleted: true,
+          })
+          .extend({
+            password: z.string().optional(),
+            action: z.literal("create"),
+          })
+          .strict(),
+
+        rawUserSchema
+          .pick({
+            openid_id: true,
+            age: true,
+            away: true,
+            group: true,
+            type: true,
+            username: true,
+            project_leader_id: true,
+            force_in_project_id: true,
+            deleted: true,
+          })
+          .extend({
+            password: z.string(),
+          })
+          .partial()
+          .extend({
+            id: z.number(),
+            action: z.literal("update"),
+          })
+          .strict(),
+      ])
+    ),
     response: createOrUpdateUserResponse(rawUserSchema).strict(),
   },
   "/api/v1/projects/create": {
