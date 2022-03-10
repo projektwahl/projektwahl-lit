@@ -246,6 +246,12 @@ export const routes = {
             username: true,
             deleted: true,
           })
+          .partial({
+            deleted: true,
+            group: true,
+            age: true,
+            away: true
+          })
           .extend({
             password: z.string().optional(),
             action: z.literal("create"),

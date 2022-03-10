@@ -23,6 +23,7 @@ export function pwInputCheckbox<
     | "options"
     | "task"
     | "defaultValue"
+    | "trueValue"
     | "value"
   >
 ) {
@@ -38,6 +39,7 @@ export function pwInputCheckbox<
     task,
     type,
     autocomplete,
+    trueValue,
     defaultValue,
     value,
     ...rest
@@ -57,6 +59,7 @@ export function pwInputCheckbox<
     .task=${task}
     .initial=${initial}
     .defaultValue=${defaultValue}
+    .trueValue=${trueValue}
     .value=${value}
   ></pw-input-checkbox>`;
 }
