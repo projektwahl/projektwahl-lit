@@ -55,16 +55,18 @@ class PwUsersImport extends PwForm<"/api/v1/users/create-or-update"> {
         file: Promise<string | undefined>;
       }>("myformdata", {
         bubbles: false,
-        detail: {},
+        detail: { file: Promise.resolve(undefined) },
       });
       this.form.value?.dispatchEvent(formDataEvent);
 
       // TODO FIXME check that file upload succeeded
 
+      const fileContents = await formDataEvent.detail.file
+
       const result = await myFetch<"/api/v1/users/create-or-update">(
         "POST",
         "/api/v1/users/create-or-update",
-        JSON.parse(await formDataEvent.detail.file),
+        fileContents ? JSON.parse(fileContents) : null,
         {}
       );
 
