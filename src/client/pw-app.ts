@@ -47,7 +47,7 @@ window.addEventListener(
   function (event: PromiseRejectionEvent) {
     console.error("window.unhandledrejection", event.promise);
     alert(`unknown promise error: ${event.reason} ${event.promise}`);
-    event.promise.catch(reason => alert(reason.stack))
+    event.promise.catch((reason) => alert(reason.stack));
   }
 );
 

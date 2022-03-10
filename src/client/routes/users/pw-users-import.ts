@@ -61,7 +61,7 @@ class PwUsersImport extends PwForm<"/api/v1/users/create-or-update"> {
 
       // TODO FIXME check that file upload succeeded
 
-      const fileContents = await formDataEvent.detail.file
+      const fileContents = await formDataEvent.detail.file;
 
       const result = await myFetch<"/api/v1/users/create-or-update">(
         "POST",

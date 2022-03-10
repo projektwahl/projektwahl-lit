@@ -21,11 +21,7 @@ SPDX-License-Identifier: AGPL-3.0-or-later
 SPDX-FileCopyrightText: 2021 Moritz Hedtke <Moritz.Hedtke@t-online.de>
 */
 import postgres from "postgres";
-import {
-  routes,
-  ResponseType,
-  rawUserSchema,
-} from "../../../lib/routes.js";
+import { routes, ResponseType, rawUserSchema } from "../../../lib/routes.js";
 import { sql } from "../../database.js";
 import { MyRequest, requestHandler } from "../../express.js";
 import { hashPassword } from "../../password.js";
@@ -40,7 +36,7 @@ import { z, ZodIssueCode } from "zod";
 
 export async function createOrUpdateUsersHandler(
   request: MyRequest,
-  response: ServerResponse | Http2ServerResponse,
+  response: ServerResponse | Http2ServerResponse
 ) {
   // TODO FIXME create or update multiple
   return await requestHandler(
@@ -76,7 +72,10 @@ export async function createOrUpdateUsersHandler(
       }
 
       if (!(loggedInUser?.type === "admin")) {
-        const returnValue: [OutgoingHttpHeaders, ResponseType<"/api/v1/users/create-or-update">] = [
+        const returnValue: [
+          OutgoingHttpHeaders,
+          ResponseType<"/api/v1/users/create-or-update">
+        ] = [
           {
             "content-type": "text/json; charset=utf-8",
             ":status": 403,
@@ -102,7 +101,7 @@ export async function createOrUpdateUsersHandler(
           await sql.begin("READ WRITE", async (sql) => {
             const results = [];
             for (const user of users) {
-              if ('id' in user) {
+              if ("id" in user) {
                 const field = (name: keyof typeof user) =>
                   updateField("users_with_deleted", user, name);
 
@@ -145,9 +144,9 @@ export async function createOrUpdateUsersHandler(
                 }, ${user.deleted ?? false}, ${
                   loggedInUser.id
                 }) RETURNING id, project_leader_id, force_in_project_id;`;
-          
+
                 //console.log(await query.describe())
-          
+
                 results.push(await query);
               }
             }
@@ -157,14 +156,19 @@ export async function createOrUpdateUsersHandler(
 
         console.log(row);
 
-        const returnValue: [OutgoingHttpHeaders, ResponseType<"/api/v1/users/create-or-update">] = [
+        const returnValue: [
+          OutgoingHttpHeaders,
+          ResponseType<"/api/v1/users/create-or-update">
+        ] = [
           {
             "content-type": "text/json; charset=utf-8",
             ":status": 200,
           },
           {
             success: true as const,
-            data: routes["/api/v1/users/create-or-update"]["response"].parse(row),
+            data: routes["/api/v1/users/create-or-update"]["response"].parse(
+              row
+            ),
           },
         ];
         return returnValue;
@@ -175,7 +179,10 @@ export async function createOrUpdateUsersHandler(
             error.constraint_name === "users_with_deleted_username_key"
           ) {
             // unique violation
-            const returnValue: [OutgoingHttpHeaders, ResponseType<"/api/v1/users/create-or-update">] = [
+            const returnValue: [
+              OutgoingHttpHeaders,
+              ResponseType<"/api/v1/users/create-or-update">
+            ] = [
               {
                 "content-type": "text/json; charset=utf-8",
                 ":status": 200,
@@ -196,7 +203,10 @@ export async function createOrUpdateUsersHandler(
             return returnValue;
           } else {
             // TODO FIXME do this everywhere else / unify
-            const returnValue: [OutgoingHttpHeaders, ResponseType<"/api/v1/users/create-or-update">] = [
+            const returnValue: [
+              OutgoingHttpHeaders,
+              ResponseType<"/api/v1/users/create-or-update">
+            ] = [
               {
                 "content-type": "text/json; charset=utf-8",
                 ":status": 200,
@@ -218,7 +228,10 @@ export async function createOrUpdateUsersHandler(
           }
         }
         console.error(error);
-        const returnValue: [OutgoingHttpHeaders, ResponseType<"/api/v1/users/create-or-update">] = [
+        const returnValue: [
+          OutgoingHttpHeaders,
+          ResponseType<"/api/v1/users/create-or-update">
+        ] = [
           {
             "content-type": "text/json; charset=utf-8",
             ":status": 500,

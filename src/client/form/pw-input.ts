@@ -63,7 +63,7 @@ export abstract class PwInput<
   url!: P;
 
   // these three here are just plain-up terrible but the typings for paths are equally bad
-  name!: string[];
+  name!: (string | number)[];
 
   // TODO FIXME maybe switch this back to Path and lodash-es (but not remove then for now so we could switch back)
   get!: (o: z.infer<typeof routes[P]["request"]>) => T;

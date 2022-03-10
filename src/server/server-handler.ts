@@ -24,9 +24,7 @@ import { readdir, readFile, watch } from "node:fs/promises";
 import { join, resolve } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 import { loginHandler } from "./routes/login/index.js";
-import {
-  createOrUpdateUsersHandler,
-} from "./routes/users/create-or-update.js";
+import { createOrUpdateUsersHandler } from "./routes/users/create-or-update.js";
 import { usersHandler } from "./routes/users/index.js";
 import { openidLoginHandler } from "./routes/login/openid-login.js";
 import { openidRedirectHandler } from "./routes/login/redirect.js";
