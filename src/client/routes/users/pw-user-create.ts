@@ -136,6 +136,7 @@ class PwUserCreate extends PwForm<"/api/v1/users/create-or-update"> {
   }
 
   override render() {
+    console.log("initial", this.initial)
     if (this.initial === undefined || this.initial.success) {
       if (this.actionText === undefined) {
         throw new Error(msg("component not fully initialized"));
@@ -172,7 +173,7 @@ class PwUserCreate extends PwForm<"/api/v1/users/create-or-update"> {
                   get: (o) => o[0].username,
                   set: (o, v) => (o[0].username = v),
                   task: this._task,
-                  initial: this.initial?.data.length == 1 ? [{ action: "update", ...this.initial?.data[0] }] : [],
+                  initial: this.initial?.data.length == 1 ? [{ action: "update", ...this.initial?.data[0] }] : undefined,
                   defaultValue: "",
                 })}
                 ${pwInputText<
@@ -187,7 +188,7 @@ class PwUserCreate extends PwForm<"/api/v1/users/create-or-update"> {
                   get: (o) => o[0].openid_id,
                   set: (o, v) => (o[0].openid_id = v),
                   task: this._task,
-                  initial: this.initial?.data.length == 1 ? [{ action: "update", ...this.initial?.data[0] }] : [],
+                  initial: this.initial?.data.length == 1 ? [{ action: "update", ...this.initial?.data[0] }] : undefined,
                   defaultValue: undefined,
                 })}
                 ${pwInputSelect<
@@ -210,7 +211,7 @@ class PwUserCreate extends PwForm<"/api/v1/users/create-or-update"> {
                     { value: "admin", text: "Admin" },
                   ],
                   task: this._task,
-                  initial: this.initial?.data.length == 1 ? [{ ...this.initial?.data[0], action: "update", type: this.type ?? this.initial?.data[0].type ?? "voter" }] : [],
+                  initial: this.initial?.data.length == 1 ? [{ ...this.initial?.data[0], action: "update", type: this.type ?? this.initial?.data[0].type ?? "voter" }] : undefined,
                   defaultValue: undefined,
                 })}
                 ${(this.type ?? this.initial?.data[0].type ?? "voter") === "voter"
@@ -226,7 +227,7 @@ class PwUserCreate extends PwForm<"/api/v1/users/create-or-update"> {
                       get: (o) => o[0].group,
                       set: (o, v) => (o[0].group = v),
                       task: this._task,
-                      initial: this.initial?.data.length == 1 ? [{ action: "update", ...this.initial?.data[0] }] : [],
+                      initial: this.initial?.data.length == 1 ? [{ action: "update", ...this.initial?.data[0] }] : undefined,
                       defaultValue: "",
                     })}
                     ${pwInputNumber<
@@ -241,7 +242,7 @@ class PwUserCreate extends PwForm<"/api/v1/users/create-or-update"> {
                       get: (o) => o[0].age,
                       set: (o, v) => (o[0].age = v),
                       task: this._task,
-                      initial: this.initial?.data.length == 1 ? [{ action: "update", ...this.initial?.data[0] }] : [],
+                      initial: this.initial?.data.length == 1 ? [{ action: "update", ...this.initial?.data[0] }] : undefined,
                       defaultValue: undefined,
                     })}`
                   : undefined}
@@ -260,7 +261,7 @@ class PwUserCreate extends PwForm<"/api/v1/users/create-or-update"> {
                         set: (o, v) => (o[0].password = v),
                         task: this._task,
                         autocomplete: "new-password",
-                        initial: this.initial?.data.length == 1 ? [{ action: "update", ...this.initial?.data[0] }] : [],
+                        initial: this.initial?.data.length == 1 ? [{ action: "update", ...this.initial?.data[0] }] : undefined,
                         defaultValue: "",
                       })}
                     `
@@ -279,7 +280,7 @@ class PwUserCreate extends PwForm<"/api/v1/users/create-or-update"> {
                   get: (o) => o[0].away,
                   set: (o, v) => (o[0].away = v),
                   task: this._task,
-                  initial: this.initial?.data.length == 1 ? [{ action: "update", ...this.initial?.data[0] }] : [],
+                  initial: this.initial?.data.length == 1 ? [{ action: "update", ...this.initial?.data[0] }] : undefined,
                 })}
                 ${pwInputCheckbox<
                   "/api/v1/users/create-or-update",
@@ -295,7 +296,7 @@ class PwUserCreate extends PwForm<"/api/v1/users/create-or-update"> {
                   get: (o) => o[0].deleted,
                   set: (o, v) => (o[0].deleted = v),
                   task: this._task,
-                  initial: this.initial?.data.length == 1 ? [{ action: "update", ...this.initial?.data[0] }] : [],
+                  initial: this.initial?.data.length == 1 ? [{ action: "update", ...this.initial?.data[0] }] : undefined,
                 })}
                 ${!this.disabled
                   ? html`
