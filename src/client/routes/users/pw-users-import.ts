@@ -28,16 +28,9 @@ import { PwForm } from "../../form/pw-form.js";
 import { HistoryController } from "../../history-controller.js";
 import { msg } from "@lit/localize";
 import "../../form/pw-input.js";
-import type { routes, MinimalSafeParseError } from "../../../lib/routes.js";
-import type { z } from "zod";
 import { bootstrapCss } from "../../index.js";
 import { ref } from "lit/directives/ref.js";
-import { pwInputText } from "../../form/pw-input-text.js";
-import { pwInputSelect } from "../../form/pw-input-select.js";
-import { pwInputNumber } from "../../form/pw-input-number.js";
-import { pwInputCheckbox } from "../../form/pw-input-checkbox.js";
 import { pwInputFile } from "../../form/pw-input-file.js";
-import type { Readable } from "stream";
 
 class PwUsersImport extends PwForm<"/api/v1/users/create"> {
   static get properties() {
@@ -65,6 +58,8 @@ class PwUsersImport extends PwForm<"/api/v1/users/create"> {
         detail: {},
       });
       this.form.value?.dispatchEvent(formDataEvent);
+
+      // TODO FIXME check that file upload succeeded
 
       const result = await myFetch<"/api/v1/users/create">(
         "POST",
