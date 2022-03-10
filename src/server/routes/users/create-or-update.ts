@@ -39,94 +39,12 @@ import { z, ZodIssueCode } from "zod";
 // Also ensure create and update has the same attributes
 // TO IMPROVE this maybe return the full column and also read back that data at all places
 
-export async function createUsersHandler(
-  request: MyRequest,
-  response: ServerResponse | Http2ServerResponse
-) {
-  return await createOrUpdateUsersHandler(
-    "/api/v1/users/create-or-update",
-    request,
-    response,
-    async (
-      sql,
-      user,
-      loggedInUser: Exclude<z.infer<typeof userSchema>, undefined>
-    ) => {
-      const query = sql`INSERT INTO users_with_deleted (username, openid_id, password_hash, type, "group", age, away, deleted, last_updated_by) VALUES (${
-        user.username ?? null
-      }, ${user.openid_id ?? null}, ${
-        user.password ? await hashPassword(user.password) : null
-      }, ${user.type ?? null}, ${
-        user.type === "voter" ? user.group ?? null : null
-      }, ${user.type === "voter" ? user.age ?? null : null}, ${
-        user.away ?? false
-      }, ${user.deleted ?? false}, ${
-        loggedInUser.id
-      }) RETURNING id, project_leader_id, force_in_project_id;`;
-
-      //console.log(await query.describe())
-
-      return await query;
-    }
-  );
-}
-
-export async function updateUsersHandler(
-  request: MyRequest,
-  response: ServerResponse | Http2ServerResponse
-) {
-  return await createOrUpdateUsersHandler(
-    "/api/v1/users/create-or-update",
-    request,
-    response,
-    async (
-      sql,
-      user,
-      loggedInUser: Exclude<z.infer<typeof userSchema>, undefined>
-    ) => {
-      const field = (name: keyof typeof user) =>
-        updateField("users_with_deleted", user, name);
-
-      const finalQuery = sql`UPDATE users_with_deleted SET
-  ${field("username")},
-  ${field("openid_id")},
-  password_hash = CASE WHEN ${!!user.password} THEN ${
-        user.password ? await hashPassword(user.password) : null
-      } ELSE password_hash END,
-  ${field("type")},
-  ${field("group")},
-  ${field("age")},
-  ${field("away")},
-  ${field("project_leader_id")},
-  ${field("force_in_project_id")},
-  ${field("deleted")},
-  last_updated_by = ${loggedInUser.id}
-  WHERE id = ${user.id} RETURNING id, project_leader_id, force_in_project_id;`;
-      // TODO FIXME (found using fuzzer) if this tries to update a nonexisting user we should return an error
-      return z
-        .array(
-          rawUserSchema.pick({
-            id: true,
-            project_leader_id: true,
-            force_in_project_id: true,
-          })
-        )
-        .parse(await finalQuery);
-    }
-  );
-}
-
 export async function createOrUpdateUsersHandler<
   P extends "/api/v1/users/create-or-update"
 >(
   path: P,
   request: MyRequest,
   response: ServerResponse | Http2ServerResponse,
-  dbquery: (
-    sql: postgres.TransactionSql<Record<string, never>>,
-    user: z.infer<typeof routes[P]["request"]>,
-    loggedInUser: Exclude<z.infer<typeof userSchema>, undefined>
-  ) => Promise<z.infer<typeof routes[P]["response"]>[]>
 ) {
   // TODO FIXME create or update multiple
   return await requestHandler(
@@ -188,8 +106,54 @@ export async function createOrUpdateUsersHandler<
           await sql.begin("READ WRITE", async (sql) => {
             const results = [];
             for (const user of users) {
-              // TODO FIXME by merging creation and updating again
-              results.push(await dbquery(sql, user, loggedInUser));
+              if ('id' in user) {
+                const field = (name: keyof typeof user) =>
+                  updateField("users_with_deleted", user, name);
+
+                const finalQuery = sql`UPDATE users_with_deleted SET
+  ${field("username")},
+  ${field("openid_id")},
+  password_hash = CASE WHEN ${!!user.password} THEN ${
+                  user.password ? await hashPassword(user.password) : null
+                } ELSE password_hash END,
+  ${field("type")},
+  ${field("group")},
+  ${field("age")},
+  ${field("away")},
+  ${field("project_leader_id")},
+  ${field("force_in_project_id")},
+  ${field("deleted")},
+  last_updated_by = ${loggedInUser.id}
+  WHERE id = ${user.id} RETURNING id, project_leader_id, force_in_project_id;`;
+                // TODO FIXME (found using fuzzer) if this tries to update a nonexisting user we should return an error
+                results.push(
+                  z
+                    .array(
+                      rawUserSchema.pick({
+                        id: true,
+                        project_leader_id: true,
+                        force_in_project_id: true,
+                      })
+                    )
+                    .parse(await finalQuery)
+                );
+              } else {
+                const query = sql`INSERT INTO users_with_deleted (username, openid_id, password_hash, type, "group", age, away, deleted, last_updated_by) VALUES (${
+                  user.username ?? null
+                }, ${user.openid_id ?? null}, ${
+                  user.password ? await hashPassword(user.password) : null
+                }, ${user.type ?? null}, ${
+                  user.type === "voter" ? user.group ?? null : null
+                }, ${user.type === "voter" ? user.age ?? null : null}, ${
+                  user.away ?? false
+                }, ${user.deleted ?? false}, ${
+                  loggedInUser.id
+                }) RETURNING id, project_leader_id, force_in_project_id;`;
+          
+                //console.log(await query.describe())
+          
+                results.push(await query);
+              }
             }
             return results;
           })
