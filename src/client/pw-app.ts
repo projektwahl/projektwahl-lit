@@ -97,11 +97,15 @@ const pages = {
   },
   "^/users/create$": async () => {
     await import("./routes/users/pw-user-create.js");
-    return html`<pw-user-create uri="/api/v1/users/create"></pw-user-create>`;
+    return html`<pw-user-create
+      uri="/api/v1/users/create-or-update"
+    ></pw-user-create>`;
   },
   "^/users/import$": async () => {
     await import("./routes/users/pw-users-import.js");
-    return html`<pw-users-import uri="/api/v1/users/create"></pw-users-import>`;
+    return html`<pw-users-import
+      uri="/api/v1/users/create-or-update"
+    ></pw-users-import>`;
   },
   "^/users/edit/\\d+$": async (url: URL) => {
     const { pwUser } = await import("./routes/users/pw-user-create.js");

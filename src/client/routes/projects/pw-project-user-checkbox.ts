@@ -69,9 +69,9 @@ class PwProjectUserCheckbox extends LitElement {
     this.input = createRef();
 
     this._task = new Task(this, async () => {
-      const result = await myFetch<"/api/v1/users/update">(
+      const result = await myFetch<"/api/v1/users/create-or-update">(
         "POST",
-        "/api/v1/users/update",
+        "/api/v1/users/create-or-update",
         {
           id: this.user.id,
           [this.name]:

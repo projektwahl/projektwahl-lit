@@ -32,7 +32,7 @@ import { bootstrapCss } from "../../index.js";
 import { ref } from "lit/directives/ref.js";
 import { pwInputFile } from "../../form/pw-input-file.js";
 
-class PwUsersImport extends PwForm<"/api/v1/users/create"> {
+class PwUsersImport extends PwForm<"/api/v1/users/create-or-update"> {
   static get properties() {
     return {
       ...super.properties,
@@ -61,9 +61,9 @@ class PwUsersImport extends PwForm<"/api/v1/users/create"> {
 
       // TODO FIXME check that file upload succeeded
 
-      const result = await myFetch<"/api/v1/users/create">(
+      const result = await myFetch<"/api/v1/users/create-or-update">(
         "POST",
-        "/api/v1/users/create",
+        "/api/v1/users/create-or-update",
         JSON.parse(await formDataEvent.detail.file),
         {}
       );
@@ -100,7 +100,7 @@ class PwUsersImport extends PwForm<"/api/v1/users/create"> {
                 await this._task.run();
               }}
             >
-              ${pwInputFile<"/api/v1/users/create">({
+              ${pwInputFile<"/api/v1/users/create-or-update">({
                 url: this.url,
                 type: "file",
                 label: msg(".json Datei"),

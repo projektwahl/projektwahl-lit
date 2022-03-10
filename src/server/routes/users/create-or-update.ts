@@ -44,7 +44,7 @@ export async function createUsersHandler(
   response: ServerResponse | Http2ServerResponse
 ) {
   return await createOrUpdateUsersHandler(
-    "/api/v1/users/create",
+    "/api/v1/users/create-or-update",
     request,
     response,
     async (
@@ -76,7 +76,7 @@ export async function updateUsersHandler(
   response: ServerResponse | Http2ServerResponse
 ) {
   return await createOrUpdateUsersHandler(
-    "/api/v1/users/update",
+    "/api/v1/users/create-or-update",
     request,
     response,
     async (
@@ -117,7 +117,7 @@ export async function updateUsersHandler(
 }
 
 export async function createOrUpdateUsersHandler<
-  P extends "/api/v1/users/create" | "/api/v1/users/update"
+  P extends "/api/v1/users/create-or-update"
 >(
   path: P,
   request: MyRequest,
@@ -139,7 +139,7 @@ export async function createOrUpdateUsersHandler<
       if (!loggedInUser) {
         const returnValue: [
           OutgoingHttpHeaders,
-          ResponseType<"/api/v1/users/create" | "/api/v1/users/update">
+          ResponseType<"/api/v1/users/create-or-update">
         ] = [
           {
             "content-type": "text/json; charset=utf-8",
