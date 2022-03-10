@@ -76,7 +76,7 @@ export abstract class PwInput<
 
   label!: string | null;
 
-  type: "text" | "password" | "number" | "checkbox" | "select";
+  type: "text" | "password" | "number" | "checkbox" | "select" | "file";
 
   autocomplete?: "username" | "current-password" | "new-password";
 

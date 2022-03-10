@@ -3,22 +3,21 @@ import { createReadStream } from "node:fs";
 import { exit } from "node:process";
 
 if (process.argv.length !== 3) {
-  console.log("usage: node csv2json.js <file>")
-  exit(0)
+  console.log("usage: node csv2json.js <file>");
+  exit(0);
 }
 
-const parser = createReadStream(process.argv[2])
-  .pipe(
-    parse({
-      trim: true,
-      columns: true,
-      delimiter: ",",
-      cast: true,
-    })
-  );
+const parser = createReadStream(process.argv[2]).pipe(
+  parse({
+    trim: true,
+    columns: true,
+    delimiter: ",",
+    cast: true,
+  })
+);
 
-const result = []
+const result = [];
 for await (const entry of parser) {
-	result.push(entry)
+  result.push(entry);
 }
-console.log(JSON.stringify(result, null, 2))
+console.log(JSON.stringify(result, null, 2));
