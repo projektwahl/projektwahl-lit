@@ -109,16 +109,16 @@ class PwUserCreate extends PwForm<"/api/v1/users/create-or-update"> {
         z.infer<typeof routes["/api/v1/users/create-or-update"]["request"]>
       >("myformdata", {
         bubbles: false,
-        // @ts-expect-error not typecheckable with current design
         detail: [
-          {
-            action: this.initial !== undefined ? "update" : "create",
-            project_leader_id: undefined,
-            force_in_project_id: undefined,
-            ...(this.initial?.success
-              ? { id: this.initial.data[0].id }
-              : { id: undefined }), // TODO FIXME
-          },
+          // @ts-expect-error craete
+          this.initial?.success
+            ? {
+                action: "update",
+                project_leader_id: undefined,
+                force_in_project_id: undefined,
+                id: this.initial.data[0].id,
+              }
+            : { action: "create" },
         ],
       });
       this.form.value?.dispatchEvent(formDataEvent);

@@ -109,7 +109,7 @@ export abstract class PwInput<
     return this;
   }
 
-  myformkeysEventListener = (event: CustomEvent<string[][]>) => {
+  myformkeysEventListener = (event: CustomEvent<(string | number)[][]>) => {
     event.detail.push(this.name);
   };
 

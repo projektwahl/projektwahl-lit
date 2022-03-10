@@ -109,6 +109,7 @@ class PwUsersImport extends PwForm<"/api/v1/users/create-or-update"> {
                 name: [],
                 get: (o) => undefined,
                 set: (o, v) => {
+                  // @ts-expect-error hack
                   o.file = v;
                 },
                 task: this._task,
