@@ -25,6 +25,7 @@
     "stacktrace-source-map.js",
     "build.js",
     "require-shim.js",
-    "src/loader.js"
+    "src/loader.js",
+    "csv2json.js"
   ]
 }
