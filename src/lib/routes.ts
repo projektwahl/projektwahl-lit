@@ -108,6 +108,8 @@ export const userSchema = rawUserSchema.pick({
   age: true,
 }).optional();
 
+console.log("noice", userSchema)
+
 export type UnknownKeysParam = "passthrough" | "strict" | "strip";
 
 export const entities = <
