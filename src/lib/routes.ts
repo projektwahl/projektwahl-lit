@@ -53,28 +53,14 @@ const rawUserCommon = {
   last_updated_by: z.number(),
 };
 
-export const rawUserSchema = z.discriminatedUnion("type", [
-  z
-    .object({
-      type: z.literal("voter"),
-      group: z.string().min(1).max(100).nullable(),
-      age: z.number().min(0).max(200).nullable(),
-      ...rawUserCommon,
-    })
-    .strict(),
-  z
-    .object({
-      type: z.literal("helper"),
-      ...rawUserCommon,
-    })
-    .strict(),
-  z
-    .object({
-      type: z.literal("admin"),
-      ...rawUserCommon,
-    })
-    .strict(),
-]);
+export const rawUserSchema = z
+  .object({
+    type: z.enum(["voter", "helper", "admin"]),
+    group: z.string().min(1).max(100).nullable(),
+    age: z.number().min(0).max(200).nullable(),
+    ...rawUserCommon,
+  })
+  .strict();
 
 export const rawProjectSchema = z
   .object({
@@ -100,15 +86,15 @@ export const rawSessionType = z.object({
   user_id: z.number(),
 });
 
-export const userSchema = rawUserSchema.pick({
-  id: true,
-  type: true,
-  username: true,
-  group: true,
-  age: true,
-}).optional();
-
-console.log("noice", userSchema)
+export const userSchema = rawUserSchema
+  .pick({
+    id: true,
+    type: true,
+    username: true,
+    group: true,
+    age: true,
+  })
+  .optional();
 
 export type UnknownKeysParam = "passthrough" | "strict" | "strip";
 
