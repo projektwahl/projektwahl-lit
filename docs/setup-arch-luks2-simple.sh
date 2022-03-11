@@ -752,3 +752,28 @@ sudo nano /etc/prometheus/prometheus.yml
 
 
 sudo nano /opt/projektwahl-lit-staging/docs/my_alerts.yaml && sudo systemctl reload prometheus
+
+
+
+
+# Debugging nodejs performance
+# https://nodejs.org/en/docs/guides/debugging-getting-started/
+sudo systemctl edit projektwahl@production.service
+
+[Service]
+ExecStart=
+ExecStart=node --inspect --enable-source-maps /opt/projektwahl-lit-%i/dist/server.js
+PrivateNetwork=false
+RestrictAddressFamilies=AF_UNIX AF_INET AF_INET6
+IPAddressAllow=localhost
+SocketBindAllow=any
+
+sudo systemctl daemon-reload
+sudo systemctl stop projektwahl@production.service
+
+ss -tulpn | grep 9229
+
+
+ssh -L 9221:localhost:9229 moritz@aes.selfmade4u.de -p 2121
+
+# chrome://inspect
