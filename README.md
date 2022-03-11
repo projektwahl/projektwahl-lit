@@ -45,7 +45,6 @@ cd projektwahl-lit/
 npm ci --ignore-scripts --omit=optional
 openssl req -x509 -newkey rsa:2048 -nodes -sha256 -subj '/CN=localhost' -keyout key.pem -out cert.pem
 npx node-gyp rebuild -C ./node_modules/@dev.mohe/argon2/
-npm run localize-build
 npm run build
 
 DATABASE_URL=postgres://projektwahl:projektwahl@projektwahl/projektwahl node --enable-source-maps dist/setup.cjs
