@@ -11,6 +11,8 @@ Environment=NODE_ENV=production
 Environment=DATABASE_URL=postgres://projektwahl_%i:projektwahl_%i@127.0.0.1/projektwahl_%i
 Environment=DATABASE_HOST=/run/postgresql
 Environment=BASE_URL=https://aes.selfmade4u.de/
+Environment=OPENID_URL=https://login.microsoftonline.com/tenant-id/v2.0
+Environment=CLIENT_ID=client-id
 ExecStart=node /opt/projektwahl-lit-%i/dist/server.js
 LoadCredential=cert.pem:/opt/projektwahl-lit-%i/cert.pem
 LoadCredential=key.pem:/opt/projektwahl-lit-%i/key.pem
