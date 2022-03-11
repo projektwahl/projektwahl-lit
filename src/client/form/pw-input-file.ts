@@ -5,12 +5,9 @@ import type { routes } from "../../lib/routes.js";
 import { PwInput } from "./pw-input.js";
 
 // workaround see https://github.com/runem/lit-analyzer/issues/149#issuecomment-1006162839
-export function pwInputCheckbox<
-  P extends keyof typeof routes,
-  T extends boolean | undefined
->(
+export function pwInputFile<P extends keyof typeof routes>(
   props: Pick<
-    PwInputCheckbox<P, T>,
+    PwInputFile<P>,
     | "type"
     | "autocomplete"
     | "disabled"
@@ -23,7 +20,6 @@ export function pwInputCheckbox<
     | "options"
     | "task"
     | "defaultValue"
-    | "trueValue"
     | "value"
   >
 ) {
@@ -39,14 +35,13 @@ export function pwInputCheckbox<
     task,
     type,
     autocomplete,
-    trueValue,
     defaultValue,
     value,
     ...rest
   } = props;
   let _ = rest;
   _ = 1; // ensure no property is missed - Don't use `{}` as a type. `{}` actually means "any non-nullish value".
-  return html`<pw-input-checkbox
+  return html`<pw-input-file
     type=${type}
     ?disabled=${disabled}
     .label=${label}
@@ -59,35 +54,25 @@ export function pwInputCheckbox<
     .task=${task}
     .initial=${initial}
     .defaultValue=${defaultValue}
-    .trueValue=${trueValue}
     .value=${value}
-  ></pw-input-checkbox>`;
+  ></pw-input-file>`;
 }
 
-export class PwInputCheckbox<
-  P extends keyof typeof routes,
-  T extends boolean | undefined
-> extends PwInput<P, T, HTMLInputElement> {
-  static override get properties() {
-    return {
-      trueValue: { attribute: false },
-      ...super.properties,
-    };
-  }
-
-  trueValue!: T;
-
+export class PwInputFile<P extends keyof typeof routes> extends PwInput<
+  P,
+  Promise<string> | undefined,
+  HTMLInputElement
+> {
   myformdataEventListener = (
     event: CustomEvent<z.infer<typeof routes[P]["request"]>>
   ) => {
     if (!this.input.value) {
       throw new Error();
     }
-    this.set(
-      event.detail,
-      this.input.value.checked ? this.trueValue : this.defaultValue
-    );
+    if (this.input.value.files?.length === 1) {
+      this.set(event.detail, this.input.value.files.item(0)?.text());
+    }
   };
 }
 
-customElements.define("pw-input-checkbox", PwInputCheckbox);
+customElements.define("pw-input-file", PwInputFile);

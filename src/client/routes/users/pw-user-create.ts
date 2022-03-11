@@ -43,7 +43,7 @@ export async function pwUser(id: number, viewOnly = false) {
   return html`<pw-user-create
     ?disabled=${viewOnly}
     .initial=${result}
-    uri="/api/v1/users/update"
+    uri="/api/v1/users/create-or-update"
   ></pw-user-create>`;
 }
 
@@ -65,15 +65,13 @@ const taskFunction = async ([id]: [number]) => {
   if (response.success) {
     return {
       success: true,
-      data: response.data.entities[0],
+      data: response.data.entities,
     };
   }
   return response;
 };
 
-class PwUserCreate extends PwForm<
-  "/api/v1/users/create" | "/api/v1/users/update"
-> {
+class PwUserCreate extends PwForm<"/api/v1/users/create-or-update"> {
   static get properties() {
     return {
       ...super.properties,
@@ -96,39 +94,41 @@ class PwUserCreate extends PwForm<
 
   initial:
     | z.SafeParseSuccess<
-        z.infer<typeof routes["/api/v1/users"]["response"]>["entities"][number]
+        z.infer<typeof routes["/api/v1/users"]["response"]>["entities"]
       >
     | MinimalSafeParseError
     | undefined;
 
-  uri!: "/api/v1/users/create" | "/api/v1/users/update";
+  uri!: "/api/v1/users/create-or-update";
 
   constructor() {
     super();
 
     this._task = new Task(this, async () => {
       const formDataEvent = new CustomEvent<
-        z.infer<
-          typeof routes[
-            | "/api/v1/users/create"
-            | "/api/v1/users/update"]["request"]
-        >
+        z.infer<typeof routes["/api/v1/users/create-or-update"]["request"]>
       >("myformdata", {
         bubbles: false,
-        // @ts-expect-error not typecheckable with current design
-        detail: {
-          project_leader_id: undefined,
-          force_in_project_id: undefined,
-          ...(this.initial?.success
-            ? { id: this.initial.data.id }
-            : { id: undefined }), // TODO FIXME
-        },
+        detail: [
+          // @ts-expect-error craete
+          this.initial?.success
+            ? {
+                action: "update",
+                project_leader_id: undefined,
+                force_in_project_id: undefined,
+                id: this.initial.data[0].id,
+              }
+            : { action: "create" },
+        ],
       });
       this.form.value?.dispatchEvent(formDataEvent);
 
-      const result = await myFetch<
-        "/api/v1/users/create" | "/api/v1/users/update"
-      >("POST", this.uri, formDataEvent.detail, {});
+      const result = await myFetch<"/api/v1/users/create-or-update">(
+        "POST",
+        this.uri,
+        formDataEvent.detail,
+        {}
+      );
 
       if (result.success) {
         HistoryController.goto(new URL("/", window.location.href), {}, false);
@@ -139,6 +139,7 @@ class PwUserCreate extends PwForm<
   }
 
   override render() {
+    console.log("initial", this.initial);
     if (this.initial === undefined || this.initial.success) {
       if (this.actionText === undefined) {
         throw new Error(msg("component not fully initialized"));
@@ -164,47 +165,53 @@ class PwUserCreate extends PwForm<
                 }}
               >
                 ${pwInputText<
-                  "/api/v1/users/create" | "/api/v1/users/update",
+                  "/api/v1/users/create-or-update",
                   string | undefined
                 >({
                   url: this.url,
                   type: "text",
                   disabled: this.disabled,
                   label: msg("Username"),
-                  name: ["username"],
-                  get: (o) => o.username,
-                  set: (o, v) => (o.username = v),
+                  name: [0, "username"],
+                  get: (o) => o[0].username,
+                  set: (o, v) => (o[0].username = v),
                   task: this._task,
-                  initial: this.initial?.data,
+                  initial:
+                    this.initial?.data.length == 1
+                      ? [{ action: "update", ...this.initial?.data[0] }]
+                      : undefined,
                   defaultValue: "",
                 })}
                 ${pwInputText<
-                  "/api/v1/users/create" | "/api/v1/users/update",
+                  "/api/v1/users/create-or-update",
                   string | null | undefined
                 >({
                   url: this.url,
                   type: "text",
                   disabled: this.disabled,
                   label: msg("Third-party email address"),
-                  name: ["openid_id"],
-                  get: (o) => o.openid_id,
-                  set: (o, v) => (o.openid_id = v),
+                  name: [0, "openid_id"],
+                  get: (o) => o[0].openid_id,
+                  set: (o, v) => (o[0].openid_id = v),
                   task: this._task,
-                  initial: this.initial?.data,
+                  initial:
+                    this.initial?.data.length == 1
+                      ? [{ action: "update", ...this.initial?.data[0] }]
+                      : undefined,
                   defaultValue: undefined,
                 })}
                 ${pwInputSelect<
-                  "/api/v1/users/create" | "/api/v1/users/update",
+                  "/api/v1/users/create-or-update",
                   "voter" | "helper" | "admin" | undefined
                 >({
                   url: this.url,
                   type: "select",
                   disabled: this.disabled,
                   label: msg("User type"),
-                  name: ["type"],
-                  get: (o) => o.type,
+                  name: [0, "type"],
+                  get: (o) => o[0].type,
                   set: (o, v) => {
-                    o.type = v;
+                    o[0].type = v;
                     this.type = v;
                   },
                   options: [
@@ -214,97 +221,121 @@ class PwUserCreate extends PwForm<
                   ],
                   task: this._task,
                   initial:
-                    this.initial?.data === undefined
-                      ? undefined
-                      : {
-                          ...this.initial?.data,
-                          type: this.type ?? this.initial?.data.type ?? "voter",
-                        },
+                    this.initial?.data.length == 1
+                      ? [
+                          {
+                            ...this.initial?.data[0],
+                            action: "update",
+                            type:
+                              this.type ??
+                              this.initial?.data[0].type ??
+                              "voter",
+                          },
+                        ]
+                      : undefined,
                   defaultValue: undefined,
                 })}
-                ${(this.type ?? this.initial?.data.type ?? "voter") === "voter"
+                ${(this.type ?? this.initial?.data[0].type ?? "voter") ===
+                "voter"
                   ? html`${pwInputText<
-                      "/api/v1/users/create" | "/api/v1/users/update",
+                      "/api/v1/users/create-or-update",
                       string | null | undefined
                     >({
                       url: this.url,
                       type: "text",
                       disabled: this.disabled,
                       label: msg("Group"),
-                      name: ["group"],
-                      get: (o) => o.group,
-                      set: (o, v) => (o.group = v),
+                      name: [0, "group"],
+                      get: (o) => o[0].group,
+                      set: (o, v) => (o[0].group = v),
                       task: this._task,
-                      initial: this.initial?.data,
+                      initial:
+                        this.initial?.data.length == 1
+                          ? [{ action: "update", ...this.initial?.data[0] }]
+                          : undefined,
                       defaultValue: "",
                     })}
                     ${pwInputNumber<
-                      "/api/v1/users/create" | "/api/v1/users/update",
+                      "/api/v1/users/create-or-update",
                       number | undefined | null
                     >({
                       url: this.url,
                       type: "number",
                       disabled: this.disabled,
                       label: msg("Age"),
-                      name: ["age"],
-                      get: (o) => o.age,
-                      set: (o, v) => (o.age = v),
+                      name: [0, "age"],
+                      get: (o) => o[0].age,
+                      set: (o, v) => (o[0].age = v),
                       task: this._task,
-                      initial: this.initial?.data,
+                      initial:
+                        this.initial?.data.length == 1
+                          ? [{ action: "update", ...this.initial?.data[0] }]
+                          : undefined,
                       defaultValue: undefined,
                     })}`
                   : undefined}
                 ${!this.disabled
                   ? html`
                       ${pwInputText<
-                        "/api/v1/users/create" | "/api/v1/users/update",
+                        "/api/v1/users/create-or-update",
                         string | undefined
                       >({
                         url: this.url,
                         type: "password",
                         disabled: this.disabled,
                         label: msg("Password"),
-                        name: ["password"],
-                        get: (o) => o.password,
-                        set: (o, v) => (o.password = v),
+                        name: [0, "password"],
+                        get: (o) => o[0].password,
+                        set: (o, v) => (o[0].password = v),
                         task: this._task,
                         autocomplete: "new-password",
-                        initial: this.initial?.data,
+                        initial:
+                          this.initial?.data.length == 1
+                            ? [{ action: "update", ...this.initial?.data[0] }]
+                            : undefined,
                         defaultValue: "",
                       })}
                     `
                   : undefined}
                 ${pwInputCheckbox<
-                  "/api/v1/users/create" | "/api/v1/users/update",
+                  "/api/v1/users/create-or-update",
                   boolean | undefined
                 >({
                   url: this.url,
                   type: "checkbox",
                   value: true,
+                  trueValue: true,
                   defaultValue: false,
                   disabled: this.disabled,
                   label: msg("Away"),
-                  name: ["away"],
-                  get: (o) => o.away,
-                  set: (o, v) => (o.away = v),
+                  name: [0, "away"],
+                  get: (o) => o[0].away,
+                  set: (o, v) => (o[0].away = v),
                   task: this._task,
-                  initial: this.initial?.data,
+                  initial:
+                    this.initial?.data.length == 1
+                      ? [{ action: "update", ...this.initial?.data[0] }]
+                      : undefined,
                 })}
                 ${pwInputCheckbox<
-                  "/api/v1/users/create" | "/api/v1/users/update",
+                  "/api/v1/users/create-or-update",
                   boolean | undefined
                 >({
                   url: this.url,
                   type: "checkbox",
                   value: true,
+                  trueValue: true,
                   defaultValue: false,
                   disabled: this.disabled,
                   label: msg("Mark this user as deleted"),
-                  name: ["deleted"],
-                  get: (o) => o.deleted,
-                  set: (o, v) => (o.deleted = v),
+                  name: [0, "deleted"],
+                  get: (o) => o[0].deleted,
+                  set: (o, v) => (o[0].deleted = v),
                   task: this._task,
-                  initial: this.initial?.data,
+                  initial:
+                    this.initial?.data.length == 1
+                      ? [{ action: "update", ...this.initial?.data[0] }]
+                      : undefined,
                 })}
                 ${!this.disabled
                   ? html`

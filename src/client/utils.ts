@@ -94,6 +94,9 @@ export const myFetch = async <P extends keyof typeof routes>(
         // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
         | MinimalSafeParseError = b.safeParse(json.data);
       console.log(c);
+      if (!c.success) {
+        console.error(c.error);
+      }
       return c;
     } else {
       // TODO FIXME

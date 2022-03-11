@@ -121,6 +121,7 @@ export const PwProjectUsers = setupHmr(
                   (o.filters[this.name] = v ? this.projectId : null),
                 task: this._task,
                 type: "checkbox",
+                trueValue: true,
                 defaultValue: undefined,
                 initial: initial,
               })}

@@ -93,6 +93,9 @@
   <source>Create account</source>
   <target>Account erstellen</target>
 </trans-unit>
+<trans-unit id="s49067479a7417f00">
+  <source>Import accounts</source>
+</trans-unit>
 <trans-unit id="s09240e07b5b8d640">
   <source>ID</source>
   <target>ID</target>
@@ -139,6 +142,9 @@
 <trans-unit id="s83efd873c2040478">
   <source>Mark this user as deleted</source>
   <target>Accounts als gelöscht markieren</target>
+</trans-unit>
+<trans-unit id="s5daa9183e1169f88">
+  <source>.json Datei</source>
 </trans-unit>
 <trans-unit id="s199f5853f4e718f7">
   <source>Projects</source>

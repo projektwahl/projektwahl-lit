@@ -24,10 +24,7 @@ import { readdir, readFile, watch } from "node:fs/promises";
 import { join, resolve } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 import { loginHandler } from "./routes/login/index.js";
-import {
-  createUsersHandler,
-  updateUsersHandler,
-} from "./routes/users/create-or-update.js";
+import { createOrUpdateUsersHandler } from "./routes/users/create-or-update.js";
 import { usersHandler } from "./routes/users/index.js";
 import { openidLoginHandler } from "./routes/login/openid-login.js";
 import { openidRedirectHandler } from "./routes/login/redirect.js";
@@ -222,8 +219,7 @@ export async function serverHandler(
       (await logoutHandler(request, response)) ||
       (await openidLoginHandler(request, response)) ||
       (await openidRedirectHandler(request, response)) ||
-      (await createUsersHandler(request, response)) ||
-      (await updateUsersHandler(request, response)) ||
+      (await createOrUpdateUsersHandler(request, response)) ||
       (await createProjectsHandler(request, response)) ||
       (await updateProjectsHandler(request, response)) ||
       (await projectsHandler(request, response)) ||

@@ -63,7 +63,7 @@ export abstract class PwInput<
   url!: P;
 
   // these three here are just plain-up terrible but the typings for paths are equally bad
-  name!: string[];
+  name!: (string | number)[];
 
   // TODO FIXME maybe switch this back to Path and lodash-es (but not remove then for now so we could switch back)
   get!: (o: z.infer<typeof routes[P]["request"]>) => T;
@@ -76,7 +76,7 @@ export abstract class PwInput<
 
   label!: string | null;
 
-  type: "text" | "password" | "number" | "checkbox" | "select";
+  type: "text" | "password" | "number" | "checkbox" | "select" | "file";
 
   autocomplete?: "username" | "current-password" | "new-password";
 
@@ -109,7 +109,7 @@ export abstract class PwInput<
     return this;
   }
 
-  myformkeysEventListener = (event: CustomEvent<string[][]>) => {
+  myformkeysEventListener = (event: CustomEvent<(string | number)[][]>) => {
     event.detail.push(this.name);
   };
 
