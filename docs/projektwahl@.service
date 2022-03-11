@@ -16,6 +16,7 @@ Environment=CLIENT_ID=client-id
 ExecStart=node /opt/projektwahl-lit-%i/dist/server.js
 LoadCredential=cert.pem:/opt/projektwahl-lit-%i/cert.pem
 LoadCredential=key.pem:/opt/projektwahl-lit-%i/key.pem
+LoadCredentialEncrypted=openid_client_secret:/opt/projektwahl-lit-%i/openid_client_secret
 DynamicUser=true
 CapabilityBoundingSet=
 NoNewPrivileges=true
