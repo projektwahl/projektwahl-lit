@@ -209,12 +209,10 @@ export class PwApp extends LitElement {
     this.initialRender = true;
 
     this.nextPage = async ([key]: [keyof typeof pages | undefined]) => {
-      console.log("newPage");
       try {
         if (key) {
           return await pages[key](this.history.url);
         } else {
-          console.log(this.history.url);
           return msg(html`Not Found`);
         }
       } catch (error) {

@@ -95,8 +95,6 @@ class PwProjectUserCheckbox extends LitElement {
   }
 
   render() {
-    console.log(this.user.username);
-    console.log(this.user[this.name] === this.projectId);
     return html` ${bootstrapCss}
       <form ${ref(this.form)}>
         ${this._task.render({

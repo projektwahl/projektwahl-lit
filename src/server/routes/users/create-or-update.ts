@@ -154,8 +154,6 @@ export async function createOrUpdateUsersHandler(
           })
         )[0];
 
-        console.log(row);
-
         const returnValue: [
           OutgoingHttpHeaders,
           ResponseType<"/api/v1/users/create-or-update">

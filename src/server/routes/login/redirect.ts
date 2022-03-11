@@ -59,9 +59,7 @@ export async function openidRedirectHandler(
         data
       );
 
-      console.log(result);
-
-      console.log(result.claims());
+      //console.log(result.claims());
 
       //const userinfo = await client.userinfo(result, {});
 

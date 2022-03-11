@@ -93,7 +93,6 @@ export const myFetch = async <P extends keyof typeof routes>(
         | z.SafeParseSuccess<z.infer<typeof routes[P]["response"]>>
         // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
         | MinimalSafeParseError = b.safeParse(json.data);
-      console.log(c);
       if (!c.success) {
         console.error(c.error);
       }

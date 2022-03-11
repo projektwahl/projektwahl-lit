@@ -166,8 +166,6 @@ export async function fetchData<R extends keyof typeof entityRoutes>(
 
   const sqlResult = await finalQuery;
 
-  console.log(sqlResult);
-
   let entities: z.infer<entitesType[R]["response"]>["entities"] =
     entitiesSchema.parse(sqlResult);
 

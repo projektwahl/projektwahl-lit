@@ -49,8 +49,6 @@ export async function openidLoginHandler(
       scope: "openid email",
     });
 
-    console.log(url);
-
     /** @type {import("node:http2").OutgoingHttpHeaders} */
     const headers: import("node:http2").OutgoingHttpHeaders = {
       "content-type": "text/json; charset=utf-8",

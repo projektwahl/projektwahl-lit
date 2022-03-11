@@ -127,7 +127,6 @@ export function requestHandler<P extends keyof typeof routes>(
             user,
             session_id
           );
-          //console.log("responseBody", responseBody);
           // TODO FIXME add schema for the result shit around that
           if (responseBody.success) {
             routes[path].response.parse(responseBody.data);
@@ -140,7 +139,6 @@ export function requestHandler<P extends keyof typeof routes>(
           response.end(JSON.stringify(responseBody));
         } else {
           // https://github.com/colinhacks/zod/blob/master/ERROR_HANDLING.md
-          //console.log(requestBody.error.issues);
 
           response.writeHead(200, {
             ...defaultHeaders,
