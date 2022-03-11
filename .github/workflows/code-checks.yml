@@ -29,7 +29,7 @@ jobs:
       - run: npx node-gyp rebuild -C ./node_modules/@dev.mohe/argon2/
       - run: npm run build
       - run: npm run typecheck
-      - run: npm rsun localize-extract
+      - run: npm run localize-extract
       - run: git update-index --refresh
       - run: git diff-index --quiet HEAD --
       - run: npm run lint
