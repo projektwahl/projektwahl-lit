@@ -6,10 +6,6 @@ on:
   push:
     branches:
       - main
-      - mohe2015-patch-1
-      - staging
-      - release
-      - testing
 
 jobs:
   deployment:
