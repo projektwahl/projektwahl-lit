@@ -777,3 +777,9 @@ ss -tulpn | grep 9229
 ssh -L 9221:localhost:9229 moritz@aes.selfmade4u.de -p 2121
 
 # chrome://inspect
+
+
+
+
+sudo systemd-creds encrypt --with-key=host - openid_client_secret
+
