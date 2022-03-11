@@ -117,6 +117,15 @@ console.log(pwAppHash);
 
 await rename("dist/pw-app.js", `dist/pw-app_${pwAppHash}.js`);
 
+{
+  let { stdout, stderr } = await exec(
+    "cp -r favicon/* dist/"
+  );
+
+  console.log(stdout);
+  console.log(stderr);
+}
+
 const index = `<!DOCTYPE html>
 <html lang="en">
   <head>
@@ -137,8 +146,13 @@ SPDX-FileCopyrightText: 2021 Moritz Hedtke <Moritz.Hedtke@t-online.de>
       href="/dist/bootstrap_${bootstrapHash}.min.css"
       rel="stylesheet"
     />
-
+    
     <title>Projektwahl</title>
+
+    <link rel="apple-touch-icon" sizes="180x180" href="/dist/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/dist/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/dist/favicon-16x16.png">
+    <link rel="manifest" href="/dist/site.webmanifest">
   </head>
   <body style="height: 100vh;">
     <script
