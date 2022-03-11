@@ -130,6 +130,7 @@ export function requestHandler<P extends keyof typeof routes>(
             routes[path].response.parse(responseBody.data);
           }
           const { ":status": _, ...finalHeaders } = new_headers;
+          // TODO FIXME it is nowhere ensured that :status is set.
           response.writeHead(Number(new_headers[":status"]), {
             ...defaultHeaders,
             ...finalHeaders,
