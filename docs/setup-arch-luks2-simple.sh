@@ -372,7 +372,7 @@ GRANT SELECT,INSERT,UPDATE,DELETE ON sessions TO projektwahl_production;
 
 # Backup
 set -C
-sudo pg_dump --no-acl --no-owner --username projektwahl_production_admin projektwahl > "dump_$(date +"%F %T").sql"
+sudo pg_dump --no-acl --no-owner --username projektwahl_production_admin projektwahl_production > "dump_$(date +"%F %T").sql"
 
 # Recover
 sudo psql --username projektwahl_staging_admin --set ON_ERROR_STOP=on projektwahl_staging < dump.sql
