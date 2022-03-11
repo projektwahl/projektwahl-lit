@@ -39,15 +39,18 @@ import { msg, str } from "@lit/localize";
 // TODO FIXME do this inline in the main page? In case it doesnt load so even on old browsers some error is shown
 window.addEventListener("error", function (event: ErrorEvent) {
   console.error("window.error", event.error);
-  alert(`unknown error: ${event} ${event.error}`);
+  alert(`unknown error: ${String(event)} ${String(event.error)}`);
 });
 
 window.addEventListener(
   "unhandledrejection",
   function (event: PromiseRejectionEvent) {
     console.error("window.unhandledrejection", event.promise);
-    alert(`unknown promise error: ${event.reason} ${event.promise}`);
-    event.promise.catch((reason) => alert(reason.stack));
+    alert(
+      `unknown promise error: ${String(event.reason)} ${String(event.promise)}`
+    );
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+    event.promise.catch((reason) => alert(String(reason.stack)));
   }
 );
 

@@ -66,6 +66,7 @@ class PwUsersImport extends PwForm<"/api/v1/users/create-or-update"> {
       const result = await myFetch<"/api/v1/users/create-or-update">(
         "POST",
         "/api/v1/users/create-or-update",
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
         fileContents ? JSON.parse(fileContents) : null,
         {}
       );
@@ -107,7 +108,7 @@ class PwUsersImport extends PwForm<"/api/v1/users/create-or-update"> {
                 type: "file",
                 label: msg(".json Datei"),
                 name: [],
-                get: (o) => undefined,
+                get: () => undefined,
                 set: (o, v) => {
                   // @ts-expect-error hack
                   o.file = v;
