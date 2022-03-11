@@ -68,7 +68,7 @@ export class PwPrivacy extends LitElement {
         zu nennenden berechtigten Interessen von uns sind die Aufrechterhaltung
         des Dienstes, die Fehlersuche, das Erkennen von Angriffen und die
         Überprüfung der Performance, Verfügbarkeit und Funktionstüchtigkeit des
-        Dienstes. Diese Daten werden für maximal 7 Tage gespeichert (<a
+        Dienstes. Diese Daten werden für maximal einen Monat gespeichert (<a
           href="https://eur-lex.europa.eu/legal-content/DE/TXT/HTML/?uri=CELEX:32016R0679&from=DE#d1e2269-1-1"
           >Artikel 13 Absatz 2a DSGVO</a
         >).
