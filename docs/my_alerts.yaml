@@ -52,7 +52,7 @@ groups:
           description: "Prometheus DeadManSwitch is an always-firing alert. It's used as an end-to-end test of Prometheus through the Alertmanager.\n  VALUE = {{ $value }}\n  LABELS = {{ $labels }}"
       - alert: PrometheusNotConnectedToAlertmanager
         expr: prometheus_notifications_alertmanagers_discovered < 1
-        for: 0m
+        for: 5s
         labels:
           severity: critical
         annotations:
@@ -619,3 +619,10 @@ groups:
         annotations:
           summary: NGINX down (instance {{ $labels.instance }})
           description: "NGINX down.\n  VALUE = {{ $value }}\n  LABELS = {{ $labels }}"
+      - alert: ProjektwahlDown
+        expr: node_systemd_unit_state{name=~"projektwahl@((staging)|(production)).socket",state="active"} != 1
+        labels:
+          severity: critical
+        annotations:
+          summary: Projektwahl down ({{ $labels.name }} on {{ $labels.instance }})
+          description: "Projektwahl down.\n  VALUE = {{ $value }}\n  LABELS = {{ $labels }}"
