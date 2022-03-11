@@ -1,6 +1,6 @@
 import { exec as unpromisifiedExec } from "child_process";
 import { createHash } from "crypto";
-import { readFile, rename, writeFile, rm } from "fs/promises";
+import { readFile, rename, writeFile } from "fs/promises";
 import { promisify } from "util";
 import "./require-shim.js";
 import { build } from "esbuild";
