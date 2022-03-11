@@ -179,8 +179,6 @@ export class PwEntityList<
           });
           this.form.value?.dispatchEvent(formDataEvent);
 
-          console.log(JSON.stringify(formDataEvent.detail));
-
           const result = await myFetch<P>(
             "GET",
             this.url,
@@ -334,7 +332,6 @@ export class PwEntityList<
                             this._task.value?.data.previousCursor;
                           data[this.prefix].paginationDirection = "backwards";
                         }
-                        console.log(data);
                         HistoryController.goto(
                           new URL(
                             `?${encodeURIComponent(JSON.stringify(data))}`,
@@ -401,7 +398,6 @@ export class PwEntityList<
                             this._task.value?.data.nextCursor;
                           data[this.prefix].paginationDirection = "forwards";
                         }
-                        console.log(data);
                         HistoryController.goto(
                           new URL(
                             `?${encodeURIComponent(JSON.stringify(data))}`,

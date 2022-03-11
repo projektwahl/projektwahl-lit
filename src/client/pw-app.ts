@@ -28,7 +28,7 @@ import {
   TemplateResult,
 } from "lit";
 import { bootstrapCss } from "./index.js";
-import { HistoryController } from "./history-controller.js";
+import { HistoryController, HistoryState } from "./history-controller.js";
 import { aClick } from "./pw-a.js";
 import jscookie from "js-cookie";
 import { myFetch } from "./utils.js";
@@ -189,9 +189,15 @@ export class PwApp extends LitElement {
 
   bc!: BroadcastChannel;
 
+  private navigateListener: (
+    this: Window,
+    event: CustomEvent<{ url: URL; state: HistoryState }>
+  ) => void;
+
   override connectedCallback(): void {
     super.connectedCallback();
     window.addEventListener("popstate", this.popstateListener);
+    window.addEventListener("navigate", this.navigateListener);
     this.bc = new BroadcastChannel("updateloginstate");
     this.bc.addEventListener("message", this.updateloginstate);
   }
@@ -199,6 +205,7 @@ export class PwApp extends LitElement {
   override disconnectedCallback(): void {
     super.disconnectedCallback();
     window.removeEventListener("popstate", this.popstateListener);
+    window.removeEventListener("navigate", this.navigateListener);
     this.bc.removeEventListener("message", this.updateloginstate);
     this.bc.close();
   }
@@ -209,12 +216,10 @@ export class PwApp extends LitElement {
     this.initialRender = true;
 
     this.nextPage = async ([key]: [keyof typeof pages | undefined]) => {
-      console.log("newPage");
       try {
         if (key) {
           return await pages[key](this.history.url);
         } else {
-          console.log(this.history.url);
           return msg(html`Not Found`);
         }
       } catch (error) {
@@ -241,6 +246,10 @@ export class PwApp extends LitElement {
     this.navbarOpen = false;
 
     this.history = new HistoryController(this, /.*/);
+
+    this.navigateListener = () => {
+      this.navbarOpen = false;
+    };
   }
 
   override render() {
@@ -277,7 +286,7 @@ export class PwApp extends LitElement {
           >
             <div class="container-fluid">
               <a @click=${aClick} class="navbar-brand" href="/"
-                >${msg("Projektwahl")}-testing</a
+                >${msg("Projektwahl")}</a
               >
               <button
                 class="navbar-toggler"

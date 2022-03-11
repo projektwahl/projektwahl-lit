@@ -51,6 +51,8 @@ try {
 }
 
 {
+  // do not remove this
+  // when building we need to update the localized version too otherwise nothing is actually rebuilt. we could switch back to the runtime localization which may be helpful.
   let { stdout, stderr } = await exec("lit-localize build");
 
   console.log(stdout);
@@ -59,7 +61,7 @@ try {
 
 {
   let { stdout, stderr } = await exec(
-    "esbuild --format=esm --bundle dist/de/src/client/pw-app.js --charset=utf8 --define:window.PRODUCTION=true --entry-names=[dir]/[name] --sourcemap  --analyze --outdir=dist --minify-whitespace --minify-identifiers --minify-syntax --tree-shaking=true --minify"
+    "esbuild --format=esm --bundle dist/de/src/client/pw-app.js --charset=utf8 --define:window.PRODUCTION=true --entry-names=[dir]/[name] --sourcemap  --analyze --outdir=dist --tree-shaking=true"
   );
 
   console.log(stdout);
@@ -100,7 +102,7 @@ await rename(
 // rebuild with path to bootstrap.css
 {
   let { stdout, stderr } = await exec(
-    `esbuild --format=esm --bundle dist/de/src/client/pw-app.js --charset=utf8 --define:window.PRODUCTION=true --define:window.BOOTSTRAP_CSS=\\"/dist/bootstrap_${bootstrapHash}.min.css\\" --entry-names=[dir]/[name] --sourcemap --analyze --outdir=dist --minify-whitespace --minify-syntax --tree-shaking=true`
+    `esbuild --format=esm --bundle dist/de/src/client/pw-app.js --charset=utf8 --define:window.PRODUCTION=true --define:window.BOOTSTRAP_CSS=\\"/dist/bootstrap_${bootstrapHash}.min.css\\" --entry-names=[dir]/[name] --sourcemap --analyze --outdir=dist --tree-shaking=true`
   );
 
   console.log(stdout);
@@ -114,6 +116,13 @@ let pwAppHash = createHash("sha256").update(pwAppContents).digest("hex");
 console.log(pwAppHash);
 
 await rename("dist/pw-app.js", `dist/pw-app_${pwAppHash}.js`);
+
+{
+  let { stdout, stderr } = await exec("cp -r favicon/* dist/");
+
+  console.log(stdout);
+  console.log(stderr);
+}
 
 const index = `<!DOCTYPE html>
 <html lang="en">
@@ -135,8 +144,13 @@ SPDX-FileCopyrightText: 2021 Moritz Hedtke <Moritz.Hedtke@t-online.de>
       href="/dist/bootstrap_${bootstrapHash}.min.css"
       rel="stylesheet"
     />
-
+    
     <title>Projektwahl</title>
+
+    <link rel="apple-touch-icon" sizes="180x180" href="/dist/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/dist/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/dist/favicon-16x16.png">
+    <link rel="manifest" href="/dist/site.webmanifest">
   </head>
   <body style="height: 100vh;">
     <script
@@ -167,7 +181,7 @@ await writeFile("dist/index.html", index);
 
 {
   let { stdout, stderr } = await exec(
-    `esbuild --platform=node --format=cjs --bundle src/server/setup.ts --external:@dev.mohe/argon2 --define:process.env.NODE_ENV=\\"production\\"  --charset=utf8 --entry-names=[dir]/[name] --sourcemap --analyze --outfile=dist/setup.cjs --minify-whitespace --minify-syntax --tree-shaking=true`
+    `esbuild --platform=node --format=cjs --bundle src/server/setup.ts --external:@dev.mohe/argon2 --define:process.env.NODE_ENV=\\"production\\"  --charset=utf8 --entry-names=[dir]/[name] --sourcemap --analyze --outfile=dist/setup.cjs --tree-shaking=true`
   );
 
   console.log(stdout);
@@ -177,7 +191,7 @@ await writeFile("dist/index.html", index);
 {
   /*
   let { stdout, stderr } = await exec(
-    `esbuild --platform=node --format=esm --bundle src/server/index.ts --external:@dev.mohe/argon2/build/Release/argon2.node --define:process.env.NODE_ENV=\\"production\\" --charset=utf8 --entry-names=[dir]/[name] --sourcemap --analyze --outfile=dist/server.js --inject:./require-shim.js --minify-whitespace --minify-syntax --tree-shaking=true --loader:.node=./esbuild-plugin-node-extension.js`
+    `esbuild --platform=node --format=esm --bundle src/server/index.ts --external:@dev.mohe/argon2/build/Release/argon2.node --define:process.env.NODE_ENV=\\"production\\" --charset=utf8 --entry-names=[dir]/[name] --sourcemap --analyze --outfile=dist/server.js --inject:./require-shim.js --tree-shaking=true --loader:.node=./esbuild-plugin-node-extension.js`
   );
 
   console.log(stdout);
@@ -196,8 +210,6 @@ await writeFile("dist/index.html", index);
     sourcemap: true,
     outfile: "dist/server.js",
     inject: ["./require-shim.js"],
-    minifyWhitespace: true,
-    minifySyntax: true,
     treeShaking: true,
     plugins: [nativeNodeModulesPlugin],
   });

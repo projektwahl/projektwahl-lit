@@ -139,7 +139,6 @@ class PwUserCreate extends PwForm<"/api/v1/users/create-or-update"> {
   }
 
   override render() {
-    console.log("initial", this.initial);
     if (this.initial === undefined || this.initial.success) {
       if (this.actionText === undefined) {
         throw new Error(msg("component not fully initialized"));

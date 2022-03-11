@@ -2,6 +2,8 @@
 Type=simple
 Restart=on-failure
 ExecStart=/opt/nginx-prometheus-exporter/nginx-prometheus-exporter -nginx.scrape-uri=http://aes.selfmade4u.de:8080/stub_status
+Wants=nginx.service
+After=nginx.service
 DynamicUser=true
 CapabilityBoundingSet=
 NoNewPrivileges=true

@@ -109,7 +109,7 @@ export function requestHandler<P extends keyof typeof routes>(
 
         if (request.method === "POST") {
           body = routes[path].request.safeParse(await json(request));
-        } else if (url.pathname !== "/api/v1/redirect") {
+        } else {
           body = routes[path].request.safeParse(
             JSON.parse(
               decodeURIComponent(
@@ -117,8 +117,6 @@ export function requestHandler<P extends keyof typeof routes>(
               )
             )
           ); // TODO FIXME if this throws
-        } else {
-          body = routes[path].request.safeParse({});
         }
         const requestBody: ResponseType<P> = body;
         if (requestBody.success) {
@@ -127,12 +125,12 @@ export function requestHandler<P extends keyof typeof routes>(
             user,
             session_id
           );
-          //console.log("responseBody", responseBody);
           // TODO FIXME add schema for the result shit around that
           if (responseBody.success) {
             routes[path].response.parse(responseBody.data);
           }
           const { ":status": _, ...finalHeaders } = new_headers;
+          // TODO FIXME it is nowhere ensured that :status is set.
           response.writeHead(Number(new_headers[":status"]), {
             ...defaultHeaders,
             ...finalHeaders,
@@ -140,7 +138,6 @@ export function requestHandler<P extends keyof typeof routes>(
           response.end(JSON.stringify(responseBody));
         } else {
           // https://github.com/colinhacks/zod/blob/master/ERROR_HANDLING.md
-          //console.log(requestBody.error.issues);
 
           response.writeHead(200, {
             ...defaultHeaders,

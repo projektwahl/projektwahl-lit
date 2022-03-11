@@ -59,8 +59,6 @@ class PwForm<P extends keyof typeof routes> extends LitElement {
     });
     this.form.value?.dispatchEvent(formKeysEvent);
 
-    console.log(formKeysEvent.detail);
-
     return formKeysEvent.detail;
   }
 

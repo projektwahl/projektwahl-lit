@@ -48,32 +48,32 @@ void (async () => {
         )[0]
       );
 
-    const projects = z
-      .array(rawProjectSchema)
-      .parse(
-        await sql`INSERT INTO projects (title, info, place, costs, min_age, max_age, min_participants, max_participants, random_assignments, last_updated_by) (SELECT generate_series, '', '', 0, 5, 13, 5, 20, FALSE, ${admin.id} FROM generate_series(1, 10)) RETURNING *;`
-      );
-
-    console.log(projects);
-
-    // take care to set this value to project_count * min_participants <= user_count <= project_count * max_participants
-    for (let i = 0; i < 1000; i++) {
-      const user = rawUserSchema
-        .pick({
-          id: true,
-        })
+    if (process.env.NODE_ENV === "development") {
+      const projects = z
+        .array(rawProjectSchema)
         .parse(
-          (
-            await sql`INSERT INTO users (username, type, "group", age, last_updated_by) VALUES (${`user${Math.random()}`}, 'voter', 'a', 10, ${
-              admin.id
-            }) ON CONFLICT DO NOTHING RETURNING users.id;`
-          )[0]
+          await sql`INSERT INTO projects (title, info, place, costs, min_age, max_age, min_participants, max_participants, random_assignments, last_updated_by) (SELECT generate_series, '', '', 0, 5, 13, 5, 20, FALSE, ${admin.id} FROM generate_series(1, 10)) RETURNING *;`
         );
-      shuffleArray(projects);
-      for (let j = 0; j < 5 + Math.random() * 3 - 1.5; j++) {
-        await sql`INSERT INTO choices (user_id, project_id, rank) VALUES (${
-          user.id
-        }, ${projects[j]["id"]}, ${j + 1});`;
+
+      // take care to set this value to project_count * min_participants <= user_count <= project_count * max_participants
+      for (let i = 0; i < 1000; i++) {
+        const user = rawUserSchema
+          .pick({
+            id: true,
+          })
+          .parse(
+            (
+              await sql`INSERT INTO users (username, type, "group", age, last_updated_by) VALUES (${`user${Math.random()}`}, 'voter', 'a', 10, ${
+                admin.id
+              }) ON CONFLICT DO NOTHING RETURNING users.id;`
+            )[0]
+          );
+        shuffleArray(projects);
+        for (let j = 0; j < 5 + Math.random() * 3 - 1.5; j++) {
+          await sql`INSERT INTO choices (user_id, project_id, rank) VALUES (${
+            user.id
+          }, ${projects[j]["id"]}, ${j + 1});`;
+        }
       }
     }
   });

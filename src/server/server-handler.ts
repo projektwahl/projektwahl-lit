@@ -253,8 +253,6 @@ export async function serverHandler(
       // TODO FIXME caching (server+clientside)
 
       try {
-        //console.log(filename)
-
         const resolved = await loaderResolve(
           filename,
           {
@@ -269,7 +267,6 @@ export async function serverHandler(
             };
           }
         );
-        //console.log("resolvd", resolved.url)
         const loaded = await loaderLoad(
           resolved.url,
           undefined,

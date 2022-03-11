@@ -6,14 +6,16 @@ RefuseManualStart=true
 Type=simple
 Restart=on-failure
 WorkingDirectory=/opt/projektwahl-lit-%i
-PrivateNetwork=true
 Environment=NODE_ENV=production
 Environment=DATABASE_URL=postgres://projektwahl_%i:projektwahl_%i@127.0.0.1/projektwahl_%i
 Environment=DATABASE_HOST=/run/postgresql
-Environment=BASE_URL=https://aes.selfmade4u.de/
+Environment=BASE_URL=https://aes.selfmade4u.de 
+Environment=OPENID_URL=https://login.microsoftonline.com/tenant-id/v2.0
+Environment=CLIENT_ID=client-id
 ExecStart=node /opt/projektwahl-lit-%i/dist/server.js
 LoadCredential=cert.pem:/opt/projektwahl-lit-%i/cert.pem
 LoadCredential=key.pem:/opt/projektwahl-lit-%i/key.pem
+LoadCredentialEncrypted=openid_client_secret:/opt/projektwahl-lit-%i/openid_client_secret
 DynamicUser=true
 CapabilityBoundingSet=
 NoNewPrivileges=true
@@ -44,17 +46,15 @@ PrivateIPC=true
 RestrictSUIDSGID=true
 RemoveIPC=true
 PrivateMounts=true
-IPAddressDeny=any
 BindReadOnlyPaths=/run/postgresql
 CPUAccounting=true
 MemoryAccounting=true
 MemoryMin=100M
-MemoryMax=1G
 TasksAccounting=true
-TasksMax=1024
 IOAccounting=true
 IPAccounting=true
-
+TasksMax=1024
+MemoryMax=1G
 
 [Install]
 WantedBy=multi-user.target

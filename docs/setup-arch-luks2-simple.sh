@@ -372,7 +372,7 @@ GRANT SELECT,INSERT,UPDATE,DELETE ON sessions TO projektwahl_production;
 
 # Backup
 set -C
-sudo pg_dump --no-acl --no-owner --username projektwahl_production_admin projektwahl > "dump_$(date +"%F %T").sql"
+sudo pg_dump --no-acl --no-owner --username projektwahl_production_admin projektwahl_production > "dump_$(date +"%F %T").sql"
 
 # Recover
 sudo psql --username projektwahl_staging_admin --set ON_ERROR_STOP=on projektwahl_staging < dump.sql
@@ -752,3 +752,34 @@ sudo nano /etc/prometheus/prometheus.yml
 
 
 sudo nano /opt/projektwahl-lit-staging/docs/my_alerts.yaml && sudo systemctl reload prometheus
+
+
+
+
+# Debugging nodejs performance
+# https://nodejs.org/en/docs/guides/debugging-getting-started/
+sudo systemctl edit projektwahl@production.service
+
+[Service]
+ExecStart=
+ExecStart=node --inspect --enable-source-maps /opt/projektwahl-lit-%i/dist/server.js
+PrivateNetwork=false
+RestrictAddressFamilies=AF_UNIX AF_INET AF_INET6
+IPAddressAllow=localhost
+SocketBindAllow=any
+
+sudo systemctl daemon-reload
+sudo systemctl stop projektwahl@production.service
+
+ss -tulpn | grep 9229
+
+
+ssh -L 9221:localhost:9229 moritz@aes.selfmade4u.de -p 2121
+
+# chrome://inspect
+
+
+
+
+sudo systemd-creds encrypt --with-key=host - openid_client_secret
+

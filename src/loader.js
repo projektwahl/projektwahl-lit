@@ -54,8 +54,6 @@ export async function resolve(
 
   const targetUrl = new URL(newSpecifier, parentURL);
 
-  //console.log("target:", targetUrl.href);
-
   if (
     targetUrl.href.startsWith("file://") &&
     (await fileExists(fileURLToPath(targetUrl.href)))
