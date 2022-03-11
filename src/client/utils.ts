@@ -95,7 +95,7 @@ export const myFetch = async <P extends keyof typeof routes>(
         | MinimalSafeParseError = b.safeParse(json.data);
       console.log(c);
       if (!c.success) {
-        console.error(c.error)
+        console.error(c.error);
       }
       return c;
     } else {

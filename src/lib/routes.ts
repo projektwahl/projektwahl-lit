@@ -250,7 +250,7 @@ export const routes = {
             deleted: true,
             group: true,
             age: true,
-            away: true
+            away: true,
           })
           .extend({
             password: z.string().optional(),
@@ -281,11 +281,15 @@ export const routes = {
           .strict(),
       ])
     ),
-    response: z.array(rawUserSchema.pick({
-      id: true,
-      project_leader_id: true,
-      force_in_project_id: true,
-    }).strict()),
+    response: z.array(
+      rawUserSchema
+        .pick({
+          id: true,
+          project_leader_id: true,
+          force_in_project_id: true,
+        })
+        .strict()
+    ),
   },
   "/api/v1/projects/create": {
     request: rawProjectSchema

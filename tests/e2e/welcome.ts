@@ -77,7 +77,7 @@ export async function testUser(driver: WebDriver) {
     {
       const pwUserGroup = await (
         await shadow(pwUserCreate)
-      ).findElement(By.css('input[name="group"]'));
+      ).findElement(By.css('input[name="0,group"]'));
 
       await pwUserGroup.clear();
       await pwUserGroup.sendKeys(groupName);
@@ -101,12 +101,12 @@ export async function testUser(driver: WebDriver) {
       await shadow(pwUserCreate)
     ).findElements(By.css('div[class="invalid-feedback"]'));
 
-    assert.equal(feedbacks.length, 2);
+    assert.equal(feedbacks.length, 1);
 
     {
       const pwUserUsername = await (
         await shadow(pwUserCreate)
-      ).findElement(By.css('input[name="username"]'));
+      ).findElement(By.css('input[name="0,username"]'));
 
       await pwUserUsername.clear();
       await pwUserUsername.sendKeys(`awesomeuser${groupName}`);
@@ -115,7 +115,7 @@ export async function testUser(driver: WebDriver) {
     {
       const pwUserAge = await (
         await shadow(pwUserCreate)
-      ).findElement(By.css('input[name="age"]'));
+      ).findElement(By.css('input[name="0,age"]'));
 
       await pwUserAge.clear();
       await pwUserAge.sendKeys("10");
@@ -155,7 +155,7 @@ export async function testUser(driver: WebDriver) {
 
     const pwUserGroup = await (
       await shadow(pwUserCreate)
-    ).findElement(By.css('input[name="group"]'));
+    ).findElement(By.css('input[name="0,group"]'));
 
     await pwUserGroup.clear();
     await pwUserGroup.sendKeys(groupName);
@@ -194,7 +194,7 @@ export async function testUser(driver: WebDriver) {
 
     const pwUserGroup = await (
       await shadow(pwUserCreate)
-    ).findElement(By.css('input[name="group"]'));
+    ).findElement(By.css('input[name="0,group"]'));
 
     assert.equal(await pwUserGroup.getAttribute("value"), groupName);
 
