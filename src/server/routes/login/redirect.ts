@@ -121,6 +121,7 @@ export async function openidRedirectHandler(
 
       /** @type {import("node:http2").OutgoingHttpHeaders} */
       const responseHeaders: import("node:http2").OutgoingHttpHeaders = {
+        ":status": 200,
         "content-type": "text/json; charset=utf-8",
         "set-cookie": [
           `strict_id=${session_id_unhashed}; Secure; SameSite=Strict; Path=/; HttpOnly; Max-Age=${
