@@ -162,12 +162,12 @@ export async function fetchData<R extends keyof typeof entityRoutes>(
     }
   }
 
-  const entitiesSchema = entitySchema["response"]["shape"]["entities"];
+  //const entitiesSchema = entitySchema["response"]["shape"]["entities"];
 
   const sqlResult = await finalQuery;
 
-  let entities: z.infer<entitesType[R]["response"]>["entities"] =
-    entitiesSchema.parse(sqlResult);
+  // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
+  let entities: z.infer<entitesType[R]["response"]>["entities"] = sqlResult as unknown as z.infer<entitesType[R]["response"]>["entities"];
 
   // https://github.com/projektwahl/projektwahl-sveltekit/blob/work/src/lib/list-entities.ts#L30
 

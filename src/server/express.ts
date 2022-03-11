@@ -125,10 +125,6 @@ export function requestHandler<P extends keyof typeof routes>(
             user,
             session_id
           );
-          // TODO FIXME add schema for the result shit around that
-          if (responseBody.success) {
-            routes[path].response.parse(responseBody.data);
-          }
           const { ":status": _, ...finalHeaders } = new_headers;
           // TODO FIXME it is nowhere ensured that :status is set.
           response.writeHead(Number(new_headers[":status"]), {
