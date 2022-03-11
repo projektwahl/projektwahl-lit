@@ -118,9 +118,7 @@ console.log(pwAppHash);
 await rename("dist/pw-app.js", `dist/pw-app_${pwAppHash}.js`);
 
 {
-  let { stdout, stderr } = await exec(
-    "cp -r favicon/* dist/"
-  );
+  let { stdout, stderr } = await exec("cp -r favicon/* dist/");
 
   console.log(stdout);
   console.log(stderr);
