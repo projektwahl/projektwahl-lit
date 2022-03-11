@@ -36,7 +36,6 @@ jobs:
           git checkout origin/$GIT_BRANCH
           npm install
           npx node-pre-gyp rebuild -C ./node_modules/argon2
-          npm run localize-build
           npm run build
           npm run purgecss
           sudo /usr/bin/systemctl enable --now projektwahl@\$PORT.socket

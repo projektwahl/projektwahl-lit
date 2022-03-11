@@ -1,6 +1,6 @@
 import { exec as unpromisifiedExec } from "child_process";
 import { createHash } from "crypto";
-import { readFile, rename, writeFile } from "fs/promises";
+import { readFile, rename, writeFile, rm } from "fs/promises";
 import { promisify } from "util";
 import "./require-shim.js";
 import { build } from "esbuild";
@@ -43,6 +43,21 @@ const nativeNodeModulesPlugin = {
 };
 
 const exec = promisify(unpromisifiedExec);
+
+try {
+  await rm("dist", { recursive: true });
+} catch (e) {
+  // empty
+}
+
+{
+  // do not remove this
+  // when building we need to update the localized version too otherwise nothing is actually rebuilt. we could switch back to the runtime localization which may be helpful.
+  let { stdout, stderr } = await exec("lit-localize build");
+
+  console.log(stdout);
+  console.log(stderr);
+}
 
 {
   let { stdout, stderr } = await exec(
