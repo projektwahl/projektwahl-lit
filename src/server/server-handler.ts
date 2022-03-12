@@ -213,7 +213,6 @@ export async function serverHandler(
       })();
     }
   } else if (url.pathname.startsWith("/api")) {
-    console.log(url.pathname);
     switch (url.pathname) {
       case "/api/v1/login":
         await loginHandler(url, request, response);
