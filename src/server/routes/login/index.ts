@@ -20,7 +20,6 @@ https://github.com/projektwahl/projektwahl-lit
 SPDX-License-Identifier: AGPL-3.0-or-later
 SPDX-FileCopyrightText: 2021 Moritz Hedtke <Moritz.Hedtke@t-online.de>
 */
-import type { Http2ServerResponse } from "node:http2";
 import { ZodIssueCode, ZodObject, ZodTypeAny } from "zod";
 import {
   rawUserSchema,
@@ -28,9 +27,9 @@ import {
   ResponseType,
 } from "../../../lib/routes.js";
 import { sql } from "../../database.js";
-import { MyRequest, requestHandler } from "../../express.js";
+import { requestHandler } from "../../express.js";
 import { checkPassword } from "../../password.js";
-import type { OutgoingHttpHeaders, ServerResponse } from "node:http";
+import type { OutgoingHttpHeaders } from "node:http";
 import nodeCrypto from "node:crypto";
 // @ts-expect-error wrong typings
 const { webcrypto: crypto }: { webcrypto: Crypto } = nodeCrypto;
@@ -49,11 +48,10 @@ const users = <
     password_hash: true,
   });
 
-export async function loginHandler(
-  request: MyRequest,
-  response: ServerResponse | Http2ServerResponse
-) {
-  return await requestHandler("POST", "/api/v1/login", async function (body) {
+export const loginHandler = requestHandler(
+  "POST",
+  "/api/v1/login",
+  async function (body) {
     const r =
       await sql`SELECT id, username, password_hash, type FROM users WHERE username = ${body.username} LIMIT 1`;
 
@@ -178,5 +176,5 @@ export async function loginHandler(
         data: {},
       },
     ];
-  })(request, response);
-}
+  }
+);

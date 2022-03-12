@@ -22,7 +22,6 @@ SPDX-FileCopyrightText: 2021 Moritz Hedtke <Moritz.Hedtke@t-online.de>
 */
 
 import { json } from "node:stream/consumers";
-import { URL } from "url";
 import { routes, ResponseType, userSchema } from "../lib/routes.js";
 import { z, ZodIssueCode } from "zod";
 import { retryableBegin } from "./database.js";
@@ -52,10 +51,12 @@ export function requestHandler<P extends keyof typeof routes>(
     | PromiseLike<[OutgoingHttpHeaders, ResponseType<P>]>
     | [OutgoingHttpHeaders, ResponseType<P>]
 ): (
+  url: URL,
   request: MyRequest,
   response: ServerResponse | Http2ServerResponse
 ) => Promise<boolean> {
   const fn = async (
+    url: URL,
     request: MyRequest,
     response: ServerResponse | Http2ServerResponse
   ) => {
@@ -71,11 +72,7 @@ export function requestHandler<P extends keyof typeof routes>(
         throw new Error("No CSRF header!");
       }
 
-      const url = new URL(request.url, process.env.BASE_URL);
-      if (
-        request.method === method &&
-        new RegExp(path).test(/** @type {string} */ url.pathname)
-      ) {
+      if (request.method === method) {
         let user: z.infer<typeof userSchema> | undefined = undefined;
         const cookies = request.headers.cookie
           ? cookie.parse(request.headers.cookie)
@@ -125,17 +122,16 @@ export function requestHandler<P extends keyof typeof routes>(
             user,
             session_id
           );
-          // TODO FIXME add schema for the result shit around that
-          if (responseBody.success) {
-            routes[path].response.parse(responseBody.data);
-          }
           const { ":status": _, ...finalHeaders } = new_headers;
           // TODO FIXME it is nowhere ensured that :status is set.
           response.writeHead(Number(new_headers[":status"]), {
             ...defaultHeaders,
             ...finalHeaders,
           });
-          response.end(JSON.stringify(responseBody));
+          const stringified = JSON.stringify(responseBody);
+          setImmediate(() => {
+            response.end(stringified);
+          });
         } else {
           // https://github.com/colinhacks/zod/blob/master/ERROR_HANDLING.md
 

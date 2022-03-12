@@ -180,9 +180,7 @@ export async function serverHandler(
   request: MyRequest,
   response: /*ServerResponse |*/ Http2ServerResponse
 ) {
-  const path = z.string().parse(request.url);
-
-  const url = new URL(path, process.env.BASE_URL);
+  const url = new URL(request.url, process.env.BASE_URL);
 
   if (
     process.env.NODE_ENV === "development" &&
@@ -213,25 +211,45 @@ export async function serverHandler(
       })();
     }
   } else if (url.pathname.startsWith("/api")) {
-    // TODO FIXME store this in a routing table and automatically extract types from that
-    const executed =
-      (await loginHandler(request, response)) ||
-      (await logoutHandler(request, response)) ||
-      (await openidLoginHandler(request, response)) ||
-      (await openidRedirectHandler(request, response)) ||
-      (await createOrUpdateUsersHandler(request, response)) ||
-      (await createProjectsHandler(request, response)) ||
-      (await updateProjectsHandler(request, response)) ||
-      (await projectsHandler(request, response)) ||
-      (await usersHandler(request, response)) ||
-      (await choicesHandler(request, response)) ||
-      (await updateChoiceHandler(request, response));
-
-    if (!executed) {
-      response.writeHead(404, {
-        ...defaultHeaders,
-      });
-      response.end();
+    switch (url.pathname) {
+      case "/api/v1/login":
+        await loginHandler(url, request, response);
+        break;
+      case "/api/v1/logout":
+        await logoutHandler(url, request, response);
+        break;
+      case "/api/v1/openid-login":
+        await openidLoginHandler(url, request, response);
+        break;
+      case "/api/v1/redirect":
+        await openidRedirectHandler(url, request, response);
+        break;
+      case "/api/v1/users/create-or-update":
+        await createOrUpdateUsersHandler(url, request, response);
+        break;
+      case "/api/v1/projects/create":
+        await createProjectsHandler(url, request, response);
+        break;
+      case "/api/v1/projects/update":
+        await updateProjectsHandler(url, request, response);
+        break;
+      case "/api/v1/projects":
+        await projectsHandler(url, request, response);
+        break;
+      case "/api/v1/users":
+        await usersHandler(url, request, response);
+        break;
+      case "/api/v1/choices":
+        await choicesHandler(url, request, response);
+        break;
+      case "/api/v1/choices/update":
+        await updateChoiceHandler(url, request, response);
+        break;
+      default:
+        response.writeHead(404, {
+          ...defaultHeaders,
+        });
+        response.end();
     }
   } else if (process.env.NODE_ENV === "development") {
     // TODO FIXME AUDIT

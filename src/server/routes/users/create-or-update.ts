@@ -23,94 +23,88 @@ SPDX-FileCopyrightText: 2021 Moritz Hedtke <Moritz.Hedtke@t-online.de>
 import postgres from "postgres";
 import { routes, ResponseType, rawUserSchema } from "../../../lib/routes.js";
 import { sql } from "../../database.js";
-import { MyRequest, requestHandler } from "../../express.js";
+import { requestHandler } from "../../express.js";
 import { hashPassword } from "../../password.js";
 import { updateField } from "../../entities.js";
-import type { OutgoingHttpHeaders, ServerResponse } from "node:http";
-import type { Http2ServerResponse } from "node:http2";
+import type { OutgoingHttpHeaders } from "node:http";
 import { z, ZodIssueCode } from "zod";
 
 // TODO FIXME somehow ensure all attributes are read here because this is an easy way to loose data
 // Also ensure create and update has the same attributes
 // TO IMPROVE this maybe return the full column and also read back that data at all places
 
-export async function createOrUpdateUsersHandler(
-  request: MyRequest,
-  response: ServerResponse | Http2ServerResponse
-) {
-  // TODO FIXME create or update multiple
-  return await requestHandler(
-    "POST",
-    "/api/v1/users/create-or-update",
-    async function (users, loggedInUser) {
-      // helper is allowed to set voters as away (TODO implement)
-      // voter is not allowed to do anything
+export const createOrUpdateUsersHandler = requestHandler(
+  "POST",
+  "/api/v1/users/create-or-update",
+  async function (users, loggedInUser) {
+    // helper is allowed to set voters as away (TODO implement)
+    // voter is not allowed to do anything
 
-      if (!loggedInUser) {
-        const returnValue: [
-          OutgoingHttpHeaders,
-          ResponseType<"/api/v1/users/create-or-update">
-        ] = [
-          {
-            "content-type": "text/json; charset=utf-8",
-            ":status": 401,
+    if (!loggedInUser) {
+      const returnValue: [
+        OutgoingHttpHeaders,
+        ResponseType<"/api/v1/users/create-or-update">
+      ] = [
+        {
+          "content-type": "text/json; charset=utf-8",
+          ":status": 401,
+        },
+        {
+          success: false as const,
+          error: {
+            issues: [
+              {
+                code: ZodIssueCode.custom,
+                path: ["unauthorized"],
+                message: "Nicht angemeldet! Klicke rechts oben auf Anmelden.",
+              },
+            ],
           },
-          {
-            success: false as const,
-            error: {
-              issues: [
-                {
-                  code: ZodIssueCode.custom,
-                  path: ["unauthorized"],
-                  message: "Nicht angemeldet! Klicke rechts oben auf Anmelden.",
-                },
-              ],
-            },
-          },
-        ];
-        return returnValue;
-      }
+        },
+      ];
+      return returnValue;
+    }
 
-      if (!(loggedInUser?.type === "admin")) {
-        const returnValue: [
-          OutgoingHttpHeaders,
-          ResponseType<"/api/v1/users/create-or-update">
-        ] = [
-          {
-            "content-type": "text/json; charset=utf-8",
-            ":status": 403,
+    if (!(loggedInUser?.type === "admin")) {
+      const returnValue: [
+        OutgoingHttpHeaders,
+        ResponseType<"/api/v1/users/create-or-update">
+      ] = [
+        {
+          "content-type": "text/json; charset=utf-8",
+          ":status": 403,
+        },
+        {
+          success: false as const,
+          error: {
+            issues: [
+              {
+                code: ZodIssueCode.custom,
+                path: ["forbidden"],
+                message: "Unzureichende Berechtigung!",
+              },
+            ],
           },
-          {
-            success: false as const,
-            error: {
-              issues: [
-                {
-                  code: ZodIssueCode.custom,
-                  path: ["forbidden"],
-                  message: "Unzureichende Berechtigung!",
-                },
-              ],
-            },
-          },
-        ];
-        return returnValue;
-      }
+        },
+      ];
+      return returnValue;
+    }
 
-      try {
-        const row = (
-          await sql.begin("READ WRITE", async (sql) => {
-            const results = [];
-            for (const user of users) {
-              if ("id" in user) {
-                const field = (name: keyof typeof user) =>
-                  updateField("users_with_deleted", user, name);
+    try {
+      const row = (
+        await sql.begin("READ WRITE", async (sql) => {
+          const results = [];
+          for (const user of users) {
+            if ("id" in user) {
+              const field = (name: keyof typeof user) =>
+                updateField("users_with_deleted", user, name);
 
-                const finalQuery = sql`UPDATE users_with_deleted SET
+              const finalQuery = sql`UPDATE users_with_deleted SET
   ${field("username")},
   ${field("openid_id")},
   password_hash = CASE WHEN ${!!user.password} THEN ${
-                  user.password ? await hashPassword(user.password) : null
-                } ELSE password_hash END,
+                user.password ? await hashPassword(user.password) : null
+              } ELSE password_hash END,
   ${field("type")},
   ${field("group")},
   ${field("age")},
@@ -120,135 +114,132 @@ export async function createOrUpdateUsersHandler(
   ${field("deleted")},
   last_updated_by = ${loggedInUser.id}
   WHERE id = ${user.id} RETURNING id, project_leader_id, force_in_project_id;`;
-                // TODO FIXME (found using fuzzer) if this tries to update a nonexisting user we should return an error
-                results.push(
-                  z
-                    .array(
-                      rawUserSchema.pick({
-                        id: true,
-                        project_leader_id: true,
-                        force_in_project_id: true,
-                      })
-                    )
-                    .parse(await finalQuery)
-                );
-              } else {
-                const query = sql`INSERT INTO users_with_deleted (username, openid_id, password_hash, type, "group", age, away, deleted, last_updated_by) VALUES (${
-                  user.username ?? null
-                }, ${user.openid_id ?? null}, ${
-                  user.password ? await hashPassword(user.password) : null
-                }, ${user.type ?? null}, ${
-                  user.type === "voter" ? user.group ?? null : null
-                }, ${user.type === "voter" ? user.age ?? null : null}, ${
-                  user.away ?? false
-                }, ${user.deleted ?? false}, ${
-                  loggedInUser.id
-                }) RETURNING id, project_leader_id, force_in_project_id;`;
+              // TODO FIXME (found using fuzzer) if this tries to update a nonexisting user we should return an error
+              results.push(
+                z
+                  .array(
+                    rawUserSchema.pick({
+                      id: true,
+                      project_leader_id: true,
+                      force_in_project_id: true,
+                    })
+                  )
+                  .parse(await finalQuery)
+              );
+            } else {
+              const query = sql`INSERT INTO users_with_deleted (username, openid_id, password_hash, type, "group", age, away, deleted, last_updated_by) VALUES (${
+                user.username ?? null
+              }, ${user.openid_id ?? null}, ${
+                user.password ? await hashPassword(user.password) : null
+              }, ${user.type ?? null}, ${
+                user.type === "voter" ? user.group ?? null : null
+              }, ${user.type === "voter" ? user.age ?? null : null}, ${
+                user.away ?? false
+              }, ${user.deleted ?? false}, ${
+                loggedInUser.id
+              }) RETURNING id, project_leader_id, force_in_project_id;`;
 
-                //console.log(await query.describe())
+              //console.log(await query.describe())
 
-                results.push(await query);
-              }
+              results.push(await query);
             }
-            return results;
-          })
-        )[0];
-
-        const returnValue: [
-          OutgoingHttpHeaders,
-          ResponseType<"/api/v1/users/create-or-update">
-        ] = [
-          {
-            "content-type": "text/json; charset=utf-8",
-            ":status": 200,
-          },
-          {
-            success: true as const,
-            data: routes["/api/v1/users/create-or-update"]["response"].parse(
-              row
-            ),
-          },
-        ];
-        return returnValue;
-      } catch (error: unknown) {
-        if (error instanceof postgres.PostgresError) {
-          if (
-            error.code === "23505" &&
-            error.constraint_name === "users_with_deleted_username_key"
-          ) {
-            // unique violation
-            const returnValue: [
-              OutgoingHttpHeaders,
-              ResponseType<"/api/v1/users/create-or-update">
-            ] = [
-              {
-                "content-type": "text/json; charset=utf-8",
-                ":status": 200,
-              },
-              {
-                success: false as const,
-                error: {
-                  issues: [
-                    {
-                      code: ZodIssueCode.custom,
-                      path: ["username"],
-                      message: "Nutzer mit diesem Namen existiert bereits!",
-                    },
-                  ],
-                },
-              },
-            ];
-            return returnValue;
-          } else {
-            // TODO FIXME do this everywhere else / unify
-            const returnValue: [
-              OutgoingHttpHeaders,
-              ResponseType<"/api/v1/users/create-or-update">
-            ] = [
-              {
-                "content-type": "text/json; charset=utf-8",
-                ":status": 200,
-              },
-              {
-                success: false as const,
-                error: {
-                  issues: [
-                    {
-                      code: ZodIssueCode.custom,
-                      path: [error.column_name ?? "database"],
-                      message: `${error.message}`,
-                    },
-                  ],
-                },
-              },
-            ];
-            return returnValue;
           }
-        }
-        console.error(error);
-        const returnValue: [
-          OutgoingHttpHeaders,
-          ResponseType<"/api/v1/users/create-or-update">
-        ] = [
-          {
-            "content-type": "text/json; charset=utf-8",
-            ":status": 500,
-          },
-          {
-            success: false as const,
-            error: {
-              issues: [
-                {
-                  code: ZodIssueCode.custom,
-                  path: ["unknown"],
-                  message: "Interner Fehler!",
-                },
-              ],
+          return results;
+        })
+      )[0];
+
+      const returnValue: [
+        OutgoingHttpHeaders,
+        ResponseType<"/api/v1/users/create-or-update">
+      ] = [
+        {
+          "content-type": "text/json; charset=utf-8",
+          ":status": 200,
+        },
+        {
+          success: true as const,
+          data: routes["/api/v1/users/create-or-update"]["response"].parse(row),
+        },
+      ];
+      return returnValue;
+    } catch (error: unknown) {
+      if (error instanceof postgres.PostgresError) {
+        if (
+          error.code === "23505" &&
+          error.constraint_name === "users_with_deleted_username_key"
+        ) {
+          // unique violation
+          const returnValue: [
+            OutgoingHttpHeaders,
+            ResponseType<"/api/v1/users/create-or-update">
+          ] = [
+            {
+              "content-type": "text/json; charset=utf-8",
+              ":status": 200,
             },
-          },
-        ];
-        return returnValue;
+            {
+              success: false as const,
+              error: {
+                issues: [
+                  {
+                    code: ZodIssueCode.custom,
+                    path: ["username"],
+                    message: "Nutzer mit diesem Namen existiert bereits!",
+                  },
+                ],
+              },
+            },
+          ];
+          return returnValue;
+        } else {
+          // TODO FIXME do this everywhere else / unify
+          const returnValue: [
+            OutgoingHttpHeaders,
+            ResponseType<"/api/v1/users/create-or-update">
+          ] = [
+            {
+              "content-type": "text/json; charset=utf-8",
+              ":status": 200,
+            },
+            {
+              success: false as const,
+              error: {
+                issues: [
+                  {
+                    code: ZodIssueCode.custom,
+                    path: [error.column_name ?? "database"],
+                    message: `${error.message}`,
+                  },
+                ],
+              },
+            },
+          ];
+          return returnValue;
+        }
       }
+      console.error(error);
+      const returnValue: [
+        OutgoingHttpHeaders,
+        ResponseType<"/api/v1/users/create-or-update">
+      ] = [
+        {
+          "content-type": "text/json; charset=utf-8",
+          ":status": 500,
+        },
+        {
+          success: false as const,
+          error: {
+            issues: [
+              {
+                code: ZodIssueCode.custom,
+                path: ["unknown"],
+                message: "Interner Fehler!",
+              },
+            ],
+          },
+        },
+      ];
+      return returnValue;
     }
-  )(request, response);
-}
+  }
+);

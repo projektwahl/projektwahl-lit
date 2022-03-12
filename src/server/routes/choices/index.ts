@@ -23,77 +23,72 @@ SPDX-FileCopyrightText: 2021 Moritz Hedtke <Moritz.Hedtke@t-online.de>
 import { ZodIssueCode } from "zod";
 import type { ResponseType } from "../../../lib/routes.js";
 import { fetchData } from "../../entities.js";
-import { MyRequest, requestHandler } from "../../express.js";
-import type { OutgoingHttpHeaders, ServerResponse } from "node:http";
-import type { Http2ServerResponse } from "node:http2";
+import { requestHandler } from "../../express.js";
+import type { OutgoingHttpHeaders } from "node:http";
 import { sql } from "../../database.js";
 
-export async function choicesHandler(
-  request: MyRequest,
-  response: ServerResponse | Http2ServerResponse
-) {
-  return await requestHandler(
-    "GET",
-    "/api/v1/choices",
-    async function (query, loggedInUser) {
-      // helper is allowed to read the normal data
-      // voter is allowed to read the normal data
+export const choicesHandler = requestHandler(
+  "GET",
+  "/api/v1/choices",
+  async function (query, loggedInUser) {
+    // helper is allowed to read the normal data
+    // voter is allowed to read the normal data
 
-      if (!loggedInUser) {
-        const returnValue: [
-          OutgoingHttpHeaders,
-          ResponseType<"/api/v1/choices">
-        ] = [
-          {
-            "content-type": "text/json; charset=utf-8",
-            ":status": 401,
+    if (!loggedInUser) {
+      const returnValue: [
+        OutgoingHttpHeaders,
+        ResponseType<"/api/v1/choices">
+      ] = [
+        {
+          "content-type": "text/json; charset=utf-8",
+          ":status": 401,
+        },
+        {
+          success: false as const,
+          error: {
+            issues: [
+              {
+                code: ZodIssueCode.custom,
+                path: ["unauthorized"],
+                message: "Nicht angemeldet! Klicke rechts oben auf Anmelden.",
+              },
+            ],
           },
-          {
-            success: false as const,
-            error: {
-              issues: [
-                {
-                  code: ZodIssueCode.custom,
-                  path: ["unauthorized"],
-                  message: "Nicht angemeldet! Klicke rechts oben auf Anmelden.",
-                },
-              ],
-            },
-          },
-        ];
-        return returnValue;
-      }
+        },
+      ];
+      return returnValue;
+    }
 
-      if (!(loggedInUser?.type === "voter")) {
-        const returnValue: [
-          OutgoingHttpHeaders,
-          ResponseType<"/api/v1/choices">
-        ] = [
-          {
-            "content-type": "text/json; charset=utf-8",
-            ":status": 403,
+    if (!(loggedInUser?.type === "voter")) {
+      const returnValue: [
+        OutgoingHttpHeaders,
+        ResponseType<"/api/v1/choices">
+      ] = [
+        {
+          "content-type": "text/json; charset=utf-8",
+          ":status": 403,
+        },
+        {
+          success: false as const,
+          error: {
+            issues: [
+              {
+                code: ZodIssueCode.custom,
+                path: ["forbidden"],
+                message: "Unzureichende Berechtigung!",
+              },
+            ],
           },
-          {
-            success: false as const,
-            error: {
-              issues: [
-                {
-                  code: ZodIssueCode.custom,
-                  path: ["forbidden"],
-                  message: "Unzureichende Berechtigung!",
-                },
-              ],
-            },
-          },
-        ];
-        return returnValue;
-      }
+        },
+      ];
+      return returnValue;
+    }
 
-      return await fetchData<"/api/v1/choices">(
-        "/api/v1/choices" as const,
-        query,
-        (query) => {
-          return sql`SELECT "id",
+    return await fetchData<"/api/v1/choices">(
+      "/api/v1/choices" as const,
+      query,
+      (query) => {
+        return sql`SELECT "id",
           "title",
           "info",
           "place",
@@ -110,14 +105,13 @@ export async function choicesHandler(
           FROM projects LEFT OUTER JOIN choices ON (projects.id = choices.project_id AND choices.user_id = ${
             loggedInUser.id
           }) WHERE (${!query.filters.id} OR id = ${
-            query.filters.id ?? null
-          }) AND title LIKE ${"%" + (query.filters.title ?? "") + "%"}
+          query.filters.id ?? null
+        }) AND title LIKE ${"%" + (query.filters.title ?? "") + "%"}
              AND info  LIKE ${"%" + (query.filters.info ?? "") + "%"}`;
-        },
-        {
-          rank: "largest",
-        }
-      );
-    }
-  )(request, response);
-}
+      },
+      {
+        rank: "largest",
+      }
+    );
+  }
+);
