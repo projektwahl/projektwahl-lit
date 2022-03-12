@@ -65,10 +65,6 @@
   <source>Password</source>
   <target>Passwort</target>
 </trans-unit>
-<trans-unit id="s7dc552fda8bc803d">
-  <source><x id="0" equiv-text="${count}"/> per page</source>
-  <target><x id="0" equiv-text="${count}"/> pro Seite</target>
-</trans-unit>
 <trans-unit id="s724828a10b3dd581">
   <source>navigation of user list</source>
   <target>Navigation der Accountliste</target>

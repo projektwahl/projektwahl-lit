@@ -14,3 +14,4 @@ screenshot.png
 *.JPG
 *.rtf
 openid_client_secret
+/src/client/generated

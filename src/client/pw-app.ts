@@ -57,6 +57,17 @@ window.addEventListener(
 ReactiveElement.enableWarning?.("migration");
 ReactiveElement.enableWarning?.("change-in-update");
 
+import {configureLocalization} from '@lit/localize';
+
+import {sourceLocale, targetLocales} from './generated/locales.js';
+
+export const {getLocale, setLocale} = configureLocalization({
+  sourceLocale,
+  targetLocales,
+  loadLocale: (locale) => import(`./generated/${locale}.js`),
+});
+void setLocale("de")
+
 // TODO FIXME create a pw-app directive that can be awaited on the server side.
 // so we actually get server side rendering with datae
 /*
