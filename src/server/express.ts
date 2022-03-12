@@ -128,7 +128,10 @@ export function requestHandler<P extends keyof typeof routes>(
             ...defaultHeaders,
             ...finalHeaders,
           });
-          response.end(JSON.stringify(responseBody));
+          const stringified = JSON.stringify(responseBody)
+          setImmediate(() => {
+            response.end(stringified);
+          })
         } else {
           // https://github.com/colinhacks/zod/blob/master/ERROR_HANDLING.md
 
