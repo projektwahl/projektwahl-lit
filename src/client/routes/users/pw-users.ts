@@ -66,14 +66,14 @@ export class PwUsers<X extends string> extends PwEntityList<
   override get buttons() {
     return html` <a
         @click=${aClick}
-        class="btn btn-primary"
+        class="btn btn-primary mr-1 mb-1"
         href="/users/create"
         role="button"
         >${msg("Create account")}</a
       >
       <a
         @click=${aClick}
-        class="btn btn-primary"
+        class="btn btn-primary mr-1 mb-1"
         href="/users/${`import`}"
         role="button"
         >${msg("Import accounts")}</a

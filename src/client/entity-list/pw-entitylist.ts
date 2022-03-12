@@ -248,9 +248,12 @@ export class PwEntityList<
           }}
           @submit=${(e: Event) => e.preventDefault()}
         >
-          <div class="row justify-content-between">
+          <div class="row justify-content-start">
             <div class="col-auto">${this.buttons}</div>
-            <div class="col-3">
+          </div>
+
+          <div class="row justify-content-end">
+            <div class="col-4">
               ${pwInputSelect<P, number>({
                 url: this.url,
                 label: "Elemente pro Seite",
@@ -262,19 +265,19 @@ export class PwEntityList<
                 initial: data[this.prefix],
                 options: [
                   {
-                    text: ((count: number) => msg(str`${count} per page`))(10),
+                    text: "100",
                     value: 10,
                   },
                   {
-                    text: ((count: number) => msg(str`${count} per page`))(25),
+                    text: "25",
                     value: 25,
                   },
                   {
-                    text: ((count: number) => msg(str`${count} per page`))(50),
+                    text: "50",
                     value: 50,
                   },
                   {
-                    text: ((count: number) => msg(str`${count} per page`))(100),
+                    text: "100",
                     value: 100,
                   },
                 ],
@@ -285,14 +288,16 @@ export class PwEntityList<
 
           ${this.getErrors()}
 
-          <table class="table">
-            <thead>
-              ${this.head}
-            </thead>
-            <tbody>
-              ${this.body}
-            </tbody>
-          </table>
+          <div class="table-responsive">
+            <table class="table">
+              <thead>
+                ${this.head}
+              </thead>
+              <tbody>
+                ${this.body}
+              </tbody>
+            </table>
+          </div>
         </form>
 
         ${this._task.status !== TaskStatus.COMPLETE || this._task.value?.success
