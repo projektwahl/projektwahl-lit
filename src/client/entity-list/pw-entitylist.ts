@@ -28,7 +28,7 @@ import { entityRoutes, ResponseType } from "../../lib/routes.js";
 import { z } from "zod";
 import { PwForm } from "../form/pw-form.js";
 import { bootstrapCss } from "../index.js";
-import { msg, str } from "@lit/localize";
+import { msg } from "@lit/localize";
 import { ifDefined } from "lit/directives/if-defined.js";
 import { myFetch } from "../utils.js";
 import { pwInputSelect } from "../form/pw-input-select.js";

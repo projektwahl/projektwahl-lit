@@ -14,6 +14,7 @@ export function pwInputNumber<
     | "type"
     | "autocomplete"
     | "disabled"
+    | "enabled"
     | "initial"
     | "label"
     | "name"
@@ -28,6 +29,7 @@ export function pwInputNumber<
 ) {
   const {
     disabled,
+    enabled,
     initial,
     label,
     options,
@@ -47,6 +49,7 @@ export function pwInputNumber<
   return html`<pw-input-number
     type=${type}
     ?disabled=${disabled}
+    ?enabled=${enabled}
     .label=${label}
     .get=${get}
     .set=${set}

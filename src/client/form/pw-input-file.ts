@@ -11,6 +11,7 @@ export function pwInputFile<P extends keyof typeof routes>(
     | "type"
     | "autocomplete"
     | "disabled"
+    | "enabled"
     | "initial"
     | "label"
     | "name"
@@ -25,6 +26,7 @@ export function pwInputFile<P extends keyof typeof routes>(
 ) {
   const {
     disabled,
+    enabled,
     initial,
     label,
     options,
@@ -44,6 +46,7 @@ export function pwInputFile<P extends keyof typeof routes>(
   return html`<pw-input-file
     type=${type}
     ?disabled=${disabled}
+    ?enabled=${enabled}
     .label=${label}
     .get=${get}
     .set=${set}
