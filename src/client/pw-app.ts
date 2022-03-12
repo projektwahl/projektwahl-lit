@@ -33,7 +33,7 @@ import { aClick } from "./pw-a.js";
 import jscookie from "js-cookie";
 import { myFetch } from "./utils.js";
 import { Task, TaskStatus } from "@dev.mohe/task";
-import { msg, str } from "@lit/localize";
+import { msg, str, updateWhenLocaleChanges } from "@lit/localize";
 
 // TODO FIXME show more details if possible (maybe error page)
 // TODO FIXME do this inline in the main page? In case it doesnt load so even on old browsers some error is shown
@@ -60,11 +60,12 @@ ReactiveElement.enableWarning?.("change-in-update");
 import {configureLocalization} from '@lit/localize';
 
 import {sourceLocale, targetLocales} from './generated/locales.js';
+import * as templates_de from './generated/de.js';
 
 export const {getLocale, setLocale} = configureLocalization({
   sourceLocale,
   targetLocales,
-  loadLocale: (locale) => import(`./generated/${locale}.js`),
+  loadLocale: async () => templates_de,
 });
 void setLocale("de")
 
@@ -223,6 +224,8 @@ export class PwApp extends LitElement {
 
   constructor() {
     super();
+
+    updateWhenLocaleChanges(this)
 
     this.initialRender = true;
 
