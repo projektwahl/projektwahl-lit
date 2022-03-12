@@ -20,19 +20,14 @@ https://github.com/projektwahl/projektwahl-lit
 SPDX-License-Identifier: AGPL-3.0-or-later
 SPDX-FileCopyrightText: 2021 Moritz Hedtke <Moritz.Hedtke@t-online.de>
 */
-import type { OutgoingHttpHeaders, ServerResponse } from "node:http";
+import type { OutgoingHttpHeaders } from "node:http";
 import { ZodIssueCode } from "zod";
 import type { ResponseType } from "../../../lib/routes.js";
 import { fetchData } from "../../entities.js";
-import { MyRequest, requestHandler } from "../../express.js";
-import type { Http2ServerResponse } from "node:http2";
+import { requestHandler } from "../../express.js";
 import { sql } from "../../database.js";
 
-export async function usersHandler(
-  request: MyRequest,
-  response: ServerResponse | Http2ServerResponse
-) {
-  return await requestHandler(
+export const usersHandler = requestHandler(
     "GET",
     "/api/v1/users",
     async function (query, loggedInUser) {
@@ -123,5 +118,4 @@ export async function usersHandler(
         );
       return ret;
     }
-  )(request, response);
-}
+  )

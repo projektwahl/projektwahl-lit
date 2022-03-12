@@ -23,16 +23,11 @@ SPDX-FileCopyrightText: 2021 Moritz Hedtke <Moritz.Hedtke@t-online.de>
 import { ZodIssueCode } from "zod";
 import type { ResponseType } from "../../../lib/routes.js";
 import { fetchData } from "../../entities.js";
-import { MyRequest, requestHandler } from "../../express.js";
-import type { OutgoingHttpHeaders, ServerResponse } from "node:http";
-import type { Http2ServerResponse } from "node:http2";
+import { requestHandler } from "../../express.js";
+import type { OutgoingHttpHeaders } from "node:http";
 import { sql } from "../../database.js";
 
-export async function choicesHandler(
-  request: MyRequest,
-  response: ServerResponse | Http2ServerResponse
-) {
-  return await requestHandler(
+export const choicesHandler = requestHandler(
     "GET",
     "/api/v1/choices",
     async function (query, loggedInUser) {
@@ -119,5 +114,4 @@ export async function choicesHandler(
         }
       );
     }
-  )(request, response);
-}
+  )

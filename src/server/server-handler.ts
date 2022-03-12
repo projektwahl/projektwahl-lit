@@ -231,22 +231,22 @@ export async function serverHandler(
         await createOrUpdateUsersHandler(url, request, response);
         break;
       case "/api/v1/projects/create":
-        await createProjectsHandler(request, response);
+        await createProjectsHandler(url, request, response);
         break;
       case "/api/v1/projects/update":
-        await updateProjectsHandler(request, response);
+        await updateProjectsHandler(url, request, response);
         break;
       case "/api/v1/projects":
-        await projectsHandler(request, response);
+        await projectsHandler(url, request, response);
         break;
       case "/api/v1/users":
-        await usersHandler(request, response);
+        await usersHandler(url, request, response);
         break;
       case "/api/v1/choices":
-        await choicesHandler(request, response);
+        await choicesHandler(url, request, response);
         break;
       case "/api/v1/choices/update":
-        await updateChoiceHandler(request, response);
+        await updateChoiceHandler(url, request, response);
         break;
       default:
         response.writeHead(404, {

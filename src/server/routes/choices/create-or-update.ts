@@ -22,20 +22,13 @@ SPDX-FileCopyrightText: 2021 Moritz Hedtke <Moritz.Hedtke@t-online.de>
 */
 import type postgres from "postgres";
 import { sql } from "../../database.js";
-import { MyRequest, requestHandler } from "../../express.js";
-import type { OutgoingHttpHeaders, ServerResponse } from "node:http";
-import type { Http2ServerResponse } from "node:http2";
+import { requestHandler } from "../../express.js";
+import type { OutgoingHttpHeaders } from "node:http";
 import type { ResponseType, routes, userSchema } from "../../../lib/routes.js";
 import { z, ZodIssueCode } from "zod";
 
-export async function updateChoiceHandler(
-  request: MyRequest,
-  response: ServerResponse | Http2ServerResponse
-) {
-  return await createOrUpdateChoiceHandler(
+export const updateChoiceHandler = createOrUpdateChoiceHandler(
     "/api/v1/choices/update",
-    request,
-    response,
     async (sql, choice, loggedInUser) => {
       // Only allow updating your own choices. Later we could allow the admin to update somebody else's choices.
       if (choice.rank === null) {
@@ -45,21 +38,18 @@ export async function updateChoiceHandler(
       }
     }
   );
-}
 
-export async function createOrUpdateChoiceHandler<
+export function createOrUpdateChoiceHandler<
   P extends "/api/v1/choices/update"
 >(
   path: P,
-  request: MyRequest,
-  response: ServerResponse | Http2ServerResponse,
   dbquery: (
     sql: postgres.TransactionSql<Record<string, never>>,
     choice: z.infer<typeof routes[P]["request"]>,
     loggedInUser: Exclude<z.infer<typeof userSchema>, undefined>
   ) => Promise<z.infer<typeof routes[P]["response"]>[]>
 ) {
-  return await requestHandler(
+  return requestHandler(
     "POST",
     path,
     async function (choice, loggedInUser) {
@@ -151,5 +141,5 @@ export async function createOrUpdateChoiceHandler<
         return returnValue;
       }
     }
-  )(request, response);
+  )
 }
