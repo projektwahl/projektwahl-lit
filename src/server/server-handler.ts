@@ -180,9 +180,7 @@ export async function serverHandler(
   request: MyRequest,
   response: /*ServerResponse |*/ Http2ServerResponse
 ) {
-  const path = z.string().parse(request.url);
-
-  const url = new URL(path, process.env.BASE_URL);
+  const url = new URL(request.url, process.env.BASE_URL);
 
   if (
     process.env.NODE_ENV === "development" &&
