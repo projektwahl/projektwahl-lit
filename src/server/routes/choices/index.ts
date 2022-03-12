@@ -28,67 +28,67 @@ import type { OutgoingHttpHeaders } from "node:http";
 import { sql } from "../../database.js";
 
 export const choicesHandler = requestHandler(
-    "GET",
-    "/api/v1/choices",
-    async function (query, loggedInUser) {
-      // helper is allowed to read the normal data
-      // voter is allowed to read the normal data
+  "GET",
+  "/api/v1/choices",
+  async function (query, loggedInUser) {
+    // helper is allowed to read the normal data
+    // voter is allowed to read the normal data
 
-      if (!loggedInUser) {
-        const returnValue: [
-          OutgoingHttpHeaders,
-          ResponseType<"/api/v1/choices">
-        ] = [
-          {
-            "content-type": "text/json; charset=utf-8",
-            ":status": 401,
+    if (!loggedInUser) {
+      const returnValue: [
+        OutgoingHttpHeaders,
+        ResponseType<"/api/v1/choices">
+      ] = [
+        {
+          "content-type": "text/json; charset=utf-8",
+          ":status": 401,
+        },
+        {
+          success: false as const,
+          error: {
+            issues: [
+              {
+                code: ZodIssueCode.custom,
+                path: ["unauthorized"],
+                message: "Nicht angemeldet! Klicke rechts oben auf Anmelden.",
+              },
+            ],
           },
-          {
-            success: false as const,
-            error: {
-              issues: [
-                {
-                  code: ZodIssueCode.custom,
-                  path: ["unauthorized"],
-                  message: "Nicht angemeldet! Klicke rechts oben auf Anmelden.",
-                },
-              ],
-            },
-          },
-        ];
-        return returnValue;
-      }
+        },
+      ];
+      return returnValue;
+    }
 
-      if (!(loggedInUser?.type === "voter")) {
-        const returnValue: [
-          OutgoingHttpHeaders,
-          ResponseType<"/api/v1/choices">
-        ] = [
-          {
-            "content-type": "text/json; charset=utf-8",
-            ":status": 403,
+    if (!(loggedInUser?.type === "voter")) {
+      const returnValue: [
+        OutgoingHttpHeaders,
+        ResponseType<"/api/v1/choices">
+      ] = [
+        {
+          "content-type": "text/json; charset=utf-8",
+          ":status": 403,
+        },
+        {
+          success: false as const,
+          error: {
+            issues: [
+              {
+                code: ZodIssueCode.custom,
+                path: ["forbidden"],
+                message: "Unzureichende Berechtigung!",
+              },
+            ],
           },
-          {
-            success: false as const,
-            error: {
-              issues: [
-                {
-                  code: ZodIssueCode.custom,
-                  path: ["forbidden"],
-                  message: "Unzureichende Berechtigung!",
-                },
-              ],
-            },
-          },
-        ];
-        return returnValue;
-      }
+        },
+      ];
+      return returnValue;
+    }
 
-      return await fetchData<"/api/v1/choices">(
-        "/api/v1/choices" as const,
-        query,
-        (query) => {
-          return sql`SELECT "id",
+    return await fetchData<"/api/v1/choices">(
+      "/api/v1/choices" as const,
+      query,
+      (query) => {
+        return sql`SELECT "id",
           "title",
           "info",
           "place",
@@ -105,13 +105,13 @@ export const choicesHandler = requestHandler(
           FROM projects LEFT OUTER JOIN choices ON (projects.id = choices.project_id AND choices.user_id = ${
             loggedInUser.id
           }) WHERE (${!query.filters.id} OR id = ${
-            query.filters.id ?? null
-          }) AND title LIKE ${"%" + (query.filters.title ?? "") + "%"}
+          query.filters.id ?? null
+        }) AND title LIKE ${"%" + (query.filters.title ?? "") + "%"}
              AND info  LIKE ${"%" + (query.filters.info ?? "") + "%"}`;
-        },
-        {
-          rank: "largest",
-        }
-      );
-    }
-  )
+      },
+      {
+        rank: "largest",
+      }
+    );
+  }
+);

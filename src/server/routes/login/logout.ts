@@ -24,31 +24,31 @@ import { sql } from "../../database.js";
 import { requestHandler } from "../../express.js";
 
 export const logoutHandler = requestHandler(
-    "POST",
-    "/api/v1/logout",
-    async function (body, user, session_id) {
-      if (session_id) {
-        await sql.begin("READ WRITE", async (tsql) => {
-          return await tsql`DELETE FROM sessions WHERE session_id = ${session_id}`;
-        });
-      }
-
-      /** @type {import("node:http2").OutgoingHttpHeaders} */
-      const headers: import("node:http2").OutgoingHttpHeaders = {
-        "content-type": "text/json; charset=utf-8",
-        ":status": 200,
-        "set-cookie": [
-          `strict_id=; Expires=Thu, 01 Jan 1970 00:00:00 GMT; Path=/; Secure; HttpOnly; SameSite=Strict`,
-          `lax_id=; Expires=Thu, 01 Jan 1970 00:00:00 GMT; Path=/; Secure; HttpOnly; SameSite=Lax`,
-          `username=; Expires=Thu, 01 Jan 1970 00:00:00 GMT; Path=/; Secure; SameSite=Lax`,
-        ],
-      };
-      return [
-        headers,
-        {
-          success: true as const,
-          data: {},
-        },
-      ];
+  "POST",
+  "/api/v1/logout",
+  async function (body, user, session_id) {
+    if (session_id) {
+      await sql.begin("READ WRITE", async (tsql) => {
+        return await tsql`DELETE FROM sessions WHERE session_id = ${session_id}`;
+      });
     }
-  )
+
+    /** @type {import("node:http2").OutgoingHttpHeaders} */
+    const headers: import("node:http2").OutgoingHttpHeaders = {
+      "content-type": "text/json; charset=utf-8",
+      ":status": 200,
+      "set-cookie": [
+        `strict_id=; Expires=Thu, 01 Jan 1970 00:00:00 GMT; Path=/; Secure; HttpOnly; SameSite=Strict`,
+        `lax_id=; Expires=Thu, 01 Jan 1970 00:00:00 GMT; Path=/; Secure; HttpOnly; SameSite=Lax`,
+        `username=; Expires=Thu, 01 Jan 1970 00:00:00 GMT; Path=/; Secure; SameSite=Lax`,
+      ],
+    };
+    return [
+      headers,
+      {
+        success: true as const,
+        data: {},
+      },
+    ];
+  }
+);

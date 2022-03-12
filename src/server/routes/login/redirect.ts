@@ -31,7 +31,10 @@ import nodeCrypto from "node:crypto";
 // @ts-expect-error wrong typings
 const { webcrypto: crypto }: { webcrypto: Crypto } = nodeCrypto;
 
-export const openidRedirectHandler = requestHandler("GET", "/api/v1/redirect", async function (data) {
+export const openidRedirectHandler = requestHandler(
+  "GET",
+  "/api/v1/redirect",
+  async function (data) {
     // https://github.com/AzureAD/microsoft-authentication-library-for-js/tree/dev/lib/msal-browser
     // https://docs.microsoft.com/en-us/azure/active-directory/develop/scenario-spa-app-registration
     // USE single tenant as for all others we need permissions
@@ -163,4 +166,5 @@ export const openidRedirectHandler = requestHandler("GET", "/api/v1/redirect", a
       ];
       return returnValue;
     }
-  })
+  }
+);

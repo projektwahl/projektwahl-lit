@@ -23,7 +23,10 @@ SPDX-FileCopyrightText: 2021 Moritz Hedtke <Moritz.Hedtke@t-online.de>
 import { requestHandler } from "../../express.js";
 import { client } from "./openid-client.js";
 
-export const openidLoginHandler = requestHandler("GET", "/api/v1/openid-login", function () {
+export const openidLoginHandler = requestHandler(
+  "GET",
+  "/api/v1/openid-login",
+  function () {
     // https://github.com/AzureAD/microsoft-authentication-library-for-js/tree/dev/lib/msal-browser
     // https://docs.microsoft.com/en-us/azure/active-directory/develop/scenario-spa-app-registration
     // USE single tenant as for all others we need permissions
@@ -56,4 +59,5 @@ export const openidLoginHandler = requestHandler("GET", "/api/v1/openid-login", 
         data: {},
       },
     ];
-  })
+  }
+);

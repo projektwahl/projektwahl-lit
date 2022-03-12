@@ -48,7 +48,10 @@ const users = <
     password_hash: true,
   });
 
-export const loginHandler = requestHandler("POST", "/api/v1/login", async function (body) {
+export const loginHandler = requestHandler(
+  "POST",
+  "/api/v1/login",
+  async function (body) {
     const r =
       await sql`SELECT id, username, password_hash, type FROM users WHERE username = ${body.username} LIMIT 1`;
 
@@ -173,4 +176,5 @@ export const loginHandler = requestHandler("POST", "/api/v1/login", async functi
         data: {},
       },
     ];
-  });
+  }
+);

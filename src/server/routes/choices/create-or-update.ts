@@ -28,20 +28,18 @@ import type { ResponseType, routes, userSchema } from "../../../lib/routes.js";
 import { z, ZodIssueCode } from "zod";
 
 export const updateChoiceHandler = createOrUpdateChoiceHandler(
-    "/api/v1/choices/update",
-    async (sql, choice, loggedInUser) => {
-      // Only allow updating your own choices. Later we could allow the admin to update somebody else's choices.
-      if (choice.rank === null) {
-        return await sql`DELETE FROM choices WHERE user_id = ${loggedInUser.id} AND project_id = ${choice.project_id}`;
-      } else {
-        return await sql`INSERT INTO choices (user_id, project_id, rank) VALUES (${loggedInUser.id}, ${choice.project_id}, ${choice.rank}) ON CONFLICT (user_id, project_id) DO UPDATE SET rank = ${choice.rank};`;
-      }
+  "/api/v1/choices/update",
+  async (sql, choice, loggedInUser) => {
+    // Only allow updating your own choices. Later we could allow the admin to update somebody else's choices.
+    if (choice.rank === null) {
+      return await sql`DELETE FROM choices WHERE user_id = ${loggedInUser.id} AND project_id = ${choice.project_id}`;
+    } else {
+      return await sql`INSERT INTO choices (user_id, project_id, rank) VALUES (${loggedInUser.id}, ${choice.project_id}, ${choice.rank}) ON CONFLICT (user_id, project_id) DO UPDATE SET rank = ${choice.rank};`;
     }
-  );
+  }
+);
 
-export function createOrUpdateChoiceHandler<
-  P extends "/api/v1/choices/update"
->(
+export function createOrUpdateChoiceHandler<P extends "/api/v1/choices/update">(
   path: P,
   dbquery: (
     sql: postgres.TransactionSql<Record<string, never>>,
@@ -49,97 +47,93 @@ export function createOrUpdateChoiceHandler<
     loggedInUser: Exclude<z.infer<typeof userSchema>, undefined>
   ) => Promise<z.infer<typeof routes[P]["response"]>[]>
 ) {
-  return requestHandler(
-    "POST",
-    path,
-    async function (choice, loggedInUser) {
-      // helper is allowed to create projects and change their own projects
-      // voter is not allowed to do anything
+  return requestHandler("POST", path, async function (choice, loggedInUser) {
+    // helper is allowed to create projects and change their own projects
+    // voter is not allowed to do anything
 
-      if (!loggedInUser) {
-        const returnValue: [
-          OutgoingHttpHeaders,
-          ResponseType<"/api/v1/choices/update">
-        ] = [
-          {
-            "content-type": "text/json; charset=utf-8",
-            ":status": 401,
+    if (!loggedInUser) {
+      const returnValue: [
+        OutgoingHttpHeaders,
+        ResponseType<"/api/v1/choices/update">
+      ] = [
+        {
+          "content-type": "text/json; charset=utf-8",
+          ":status": 401,
+        },
+        {
+          success: false as const,
+          error: {
+            issues: [
+              {
+                code: ZodIssueCode.custom,
+                path: ["unauthorized"],
+                message: "Nicht angemeldet! Klicke rechts oben auf Anmelden.",
+              },
+            ],
           },
-          {
-            success: false as const,
-            error: {
-              issues: [
-                {
-                  code: ZodIssueCode.custom,
-                  path: ["unauthorized"],
-                  message: "Nicht angemeldet! Klicke rechts oben auf Anmelden.",
-                },
-              ],
-            },
-          },
-        ];
-        return returnValue;
-      }
-
-      if (!(loggedInUser?.type === "voter")) {
-        const returnValue: [OutgoingHttpHeaders, ResponseType<P>] = [
-          {
-            "content-type": "text/json; charset=utf-8",
-            ":status": 403,
-          },
-          {
-            success: false as const,
-            error: {
-              issues: [
-                {
-                  code: ZodIssueCode.custom,
-                  path: ["forbidden"],
-                  message: "Unzureichende Berechtigung!",
-                },
-              ],
-            },
-          },
-        ];
-        return returnValue;
-      }
-
-      try {
-        await sql.begin("READ WRITE", async (sql) => {
-          return await dbquery(sql, choice, loggedInUser);
-        });
-
-        return [
-          {
-            "content-type": "text/json; charset=utf-8",
-            ":status": 200,
-          },
-          {
-            success: true as const,
-            data: {},
-          },
-        ];
-      } catch (error: unknown) {
-        console.error(error);
-        const returnValue: [OutgoingHttpHeaders, ResponseType<P>] = [
-          {
-            "content-type": "text/json; charset=utf-8",
-            ":status": 500,
-          },
-          {
-            success: false as const,
-            error: {
-              issues: [
-                {
-                  code: ZodIssueCode.custom,
-                  path: ["unknown"],
-                  message: "Interner Fehler!",
-                },
-              ],
-            },
-          },
-        ];
-        return returnValue;
-      }
+        },
+      ];
+      return returnValue;
     }
-  )
+
+    if (!(loggedInUser?.type === "voter")) {
+      const returnValue: [OutgoingHttpHeaders, ResponseType<P>] = [
+        {
+          "content-type": "text/json; charset=utf-8",
+          ":status": 403,
+        },
+        {
+          success: false as const,
+          error: {
+            issues: [
+              {
+                code: ZodIssueCode.custom,
+                path: ["forbidden"],
+                message: "Unzureichende Berechtigung!",
+              },
+            ],
+          },
+        },
+      ];
+      return returnValue;
+    }
+
+    try {
+      await sql.begin("READ WRITE", async (sql) => {
+        return await dbquery(sql, choice, loggedInUser);
+      });
+
+      return [
+        {
+          "content-type": "text/json; charset=utf-8",
+          ":status": 200,
+        },
+        {
+          success: true as const,
+          data: {},
+        },
+      ];
+    } catch (error: unknown) {
+      console.error(error);
+      const returnValue: [OutgoingHttpHeaders, ResponseType<P>] = [
+        {
+          "content-type": "text/json; charset=utf-8",
+          ":status": 500,
+        },
+        {
+          success: false as const,
+          error: {
+            issues: [
+              {
+                code: ZodIssueCode.custom,
+                path: ["unknown"],
+                message: "Interner Fehler!",
+              },
+            ],
+          },
+        },
+      ];
+      return returnValue;
+    }
+  });
 }

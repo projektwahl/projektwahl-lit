@@ -28,17 +28,15 @@ import { requestHandler } from "../../express.js";
 import { sql } from "../../database.js";
 
 export const usersHandler = requestHandler(
-    "GET",
-    "/api/v1/users",
-    async function (query, loggedInUser) {
-      // helper is allowed to read the normal data
-      // voter is not allowed to do anything
+  "GET",
+  "/api/v1/users",
+  async function (query, loggedInUser) {
+    // helper is allowed to read the normal data
+    // voter is not allowed to do anything
 
-      if (!loggedInUser) {
-        const returnValue: [
-          OutgoingHttpHeaders,
-          ResponseType<"/api/v1/users">
-        ] = [
+    if (!loggedInUser) {
+      const returnValue: [OutgoingHttpHeaders, ResponseType<"/api/v1/users">] =
+        [
           {
             "content-type": "text/json; charset=utf-8",
             ":status": 401,
@@ -56,15 +54,11 @@ export const usersHandler = requestHandler(
             },
           },
         ];
-        return returnValue;
-      }
-      if (
-        !(loggedInUser?.type === "admin" || loggedInUser?.type === "helper")
-      ) {
-        const returnValue: [
-          OutgoingHttpHeaders,
-          ResponseType<"/api/v1/users">
-        ] = [
+      return returnValue;
+    }
+    if (!(loggedInUser?.type === "admin" || loggedInUser?.type === "helper")) {
+      const returnValue: [OutgoingHttpHeaders, ResponseType<"/api/v1/users">] =
+        [
           {
             "content-type": "text/json; charset=utf-8",
             ":status": 403,
@@ -82,15 +76,15 @@ export const usersHandler = requestHandler(
             },
           },
         ];
-        return returnValue;
-      }
+      return returnValue;
+    }
 
-      const ret: [OutgoingHttpHeaders, ResponseType<"/api/v1/users">] =
-        await fetchData<"/api/v1/users">(
-          "/api/v1/users" as const,
-          query,
-          (query) => {
-            return sql`SELECT "id",
+    const ret: [OutgoingHttpHeaders, ResponseType<"/api/v1/users">] =
+      await fetchData<"/api/v1/users">(
+        "/api/v1/users" as const,
+        query,
+        (query) => {
+          return sql`SELECT "id",
             "type",
             "username",
             "openid_id",
@@ -101,21 +95,21 @@ export const usersHandler = requestHandler(
             "force_in_project_id",
             "deleted" FROM users_with_deleted WHERE (${!query.filters
               .id} OR id = ${query.filters.id ?? null}) AND username LIKE ${
-              "%" + (query.filters.username ?? "") + "%"
-            }
+            "%" + (query.filters.username ?? "") + "%"
+          }
            AND (${!query.filters.project_leader_id} OR project_leader_id = ${
-              query.filters.project_leader_id ?? null
-            })
+            query.filters.project_leader_id ?? null
+          })
            AND (${!query.filters
              .force_in_project_id} OR force_in_project_id = ${
-              query.filters.force_in_project_id ?? null
-            })
+            query.filters.force_in_project_id ?? null
+          })
             AND (${!query.filters.type} OR type = ${
-              query.filters.type ?? null
-            })`;
-          },
-          {}
-        );
-      return ret;
-    }
-  )
+            query.filters.type ?? null
+          })`;
+        },
+        {}
+      );
+    return ret;
+  }
+);

@@ -72,9 +72,7 @@ export function requestHandler<P extends keyof typeof routes>(
         throw new Error("No CSRF header!");
       }
 
-      if (
-        request.method === method
-      ) {
+      if (request.method === method) {
         let user: z.infer<typeof userSchema> | undefined = undefined;
         const cookies = request.headers.cookie
           ? cookie.parse(request.headers.cookie)
