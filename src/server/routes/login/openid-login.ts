@@ -20,16 +20,10 @@ https://github.com/projektwahl/projektwahl-lit
 SPDX-License-Identifier: AGPL-3.0-or-later
 SPDX-FileCopyrightText: 2021 Moritz Hedtke <Moritz.Hedtke@t-online.de>
 */
-import { MyRequest, requestHandler } from "../../express.js";
+import { requestHandler } from "../../express.js";
 import { client } from "./openid-client.js";
-import type { ServerResponse } from "node:http";
-import type { Http2ServerResponse } from "node:http2";
 
-export async function openidLoginHandler(
-  request: MyRequest,
-  response: ServerResponse | Http2ServerResponse
-) {
-  return await requestHandler("GET", "/api/v1/openid-login", function () {
+export const openidLoginHandler = requestHandler("GET", "/api/v1/openid-login", function () {
     // https://github.com/AzureAD/microsoft-authentication-library-for-js/tree/dev/lib/msal-browser
     // https://docs.microsoft.com/en-us/azure/active-directory/develop/scenario-spa-app-registration
     // USE single tenant as for all others we need permissions
@@ -62,5 +56,4 @@ export async function openidLoginHandler(
         data: {},
       },
     ];
-  })(request, response);
-}
+  })

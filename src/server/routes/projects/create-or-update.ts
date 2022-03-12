@@ -23,9 +23,8 @@ SPDX-FileCopyrightText: 2021 Moritz Hedtke <Moritz.Hedtke@t-online.de>
 import postgres from "postgres";
 import { sql } from "../../database.js";
 import { updateField } from "../../entities.js";
-import { MyRequest, requestHandler } from "../../express.js";
-import type { OutgoingHttpHeaders, ServerResponse } from "node:http";
-import type { Http2ServerResponse } from "node:http2";
+import { requestHandler } from "../../express.js";
+import type { OutgoingHttpHeaders } from "node:http";
 import {
   rawProjectSchema,
   ResponseType,
@@ -34,14 +33,8 @@ import {
 } from "../../../lib/routes.js";
 import { z, ZodIssueCode } from "zod";
 
-export async function createProjectsHandler(
-  request: MyRequest,
-  response: ServerResponse | Http2ServerResponse
-) {
-  return await createOrUpdateProjectsHandler(
+export const createProjectsHandler = createOrUpdateProjectsHandler(
     "/api/v1/projects/create",
-    request,
-    response,
     async (
       sql,
       project,
@@ -73,17 +66,10 @@ export async function createProjectsHandler(
 
       return res;
     }
-  );
-}
+  )
 
-export async function updateProjectsHandler(
-  request: MyRequest,
-  response: ServerResponse | Http2ServerResponse
-) {
-  return await createOrUpdateProjectsHandler(
+export const updateProjectsHandler = createOrUpdateProjectsHandler(
     "/api/v1/projects/update",
-    request,
-    response,
     async (
       sql,
       project,
@@ -117,14 +103,11 @@ FROM users_with_deleted WHERE projects_with_deleted.id = ${
         .parse(await finalQuery);
     }
   );
-}
 
-export async function createOrUpdateProjectsHandler<
+export function createOrUpdateProjectsHandler<
   P extends "/api/v1/projects/create" | "/api/v1/projects/update"
 >(
   path: P,
-  request: MyRequest,
-  response: ServerResponse | Http2ServerResponse,
   dbquery: (
     sql: postgres.TransactionSql<Record<string, never>>,
     project: z.infer<typeof routes[P]["request"]>,
@@ -132,7 +115,7 @@ export async function createOrUpdateProjectsHandler<
   ) => Promise<z.infer<typeof routes[P]["response"]>[]>
 ) {
   // TODO FIXME create or update multiple
-  return await requestHandler(
+  return requestHandler(
     "POST",
     path,
     async function (project, loggedInUser) {
@@ -283,5 +266,5 @@ export async function createOrUpdateProjectsHandler<
         return returnValue;
       }
     }
-  )(request, response);
+  );
 }

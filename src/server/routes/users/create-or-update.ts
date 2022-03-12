@@ -23,23 +23,17 @@ SPDX-FileCopyrightText: 2021 Moritz Hedtke <Moritz.Hedtke@t-online.de>
 import postgres from "postgres";
 import { routes, ResponseType, rawUserSchema } from "../../../lib/routes.js";
 import { sql } from "../../database.js";
-import { MyRequest, requestHandler } from "../../express.js";
+import { requestHandler } from "../../express.js";
 import { hashPassword } from "../../password.js";
 import { updateField } from "../../entities.js";
-import type { OutgoingHttpHeaders, ServerResponse } from "node:http";
-import type { Http2ServerResponse } from "node:http2";
+import type { OutgoingHttpHeaders } from "node:http";
 import { z, ZodIssueCode } from "zod";
 
 // TODO FIXME somehow ensure all attributes are read here because this is an easy way to loose data
 // Also ensure create and update has the same attributes
 // TO IMPROVE this maybe return the full column and also read back that data at all places
 
-export async function createOrUpdateUsersHandler(
-  request: MyRequest,
-  response: ServerResponse | Http2ServerResponse
-) {
-  // TODO FIXME create or update multiple
-  return await requestHandler(
+export const createOrUpdateUsersHandler = requestHandler(
     "POST",
     "/api/v1/users/create-or-update",
     async function (users, loggedInUser) {
@@ -250,5 +244,4 @@ export async function createOrUpdateUsersHandler(
         return returnValue;
       }
     }
-  )(request, response);
-}
+  )

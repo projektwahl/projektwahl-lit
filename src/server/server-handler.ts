@@ -216,19 +216,19 @@ export async function serverHandler(
     console.log(url.pathname);
     switch (url.pathname) {
       case "/api/v1/login":
-        await loginHandler(request, response);
+        await loginHandler(url, request, response);
         break;
       case "/api/v1/logout":
-        await logoutHandler(request, response);
+        await logoutHandler(url, request, response);
         break;
       case "/api/v1/openid-login":
-        await openidLoginHandler(request, response);
+        await openidLoginHandler(url, request, response);
         break;
       case "/api/v1/redirect":
-        await openidRedirectHandler(request, response);
+        await openidRedirectHandler(url, request, response);
         break;
       case "/api/v1/users/create-or-update":
-        await createOrUpdateUsersHandler(request, response);
+        await createOrUpdateUsersHandler(url, request, response);
         break;
       case "/api/v1/projects/create":
         await createProjectsHandler(request, response);

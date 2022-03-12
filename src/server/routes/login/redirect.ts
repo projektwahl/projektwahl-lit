@@ -24,19 +24,14 @@ import { sensitiveHeaders } from "node:http2";
 import { ZodIssueCode } from "zod";
 import { rawUserSchema, ResponseType } from "../../../lib/routes.js";
 import { sql } from "../../database.js";
-import { MyRequest, requestHandler } from "../../express.js";
+import { requestHandler } from "../../express.js";
 import { client } from "./openid-client.js";
-import type { OutgoingHttpHeaders, ServerResponse } from "node:http";
-import type { Http2ServerResponse } from "node:http2";
+import type { OutgoingHttpHeaders } from "node:http";
 import nodeCrypto from "node:crypto";
 // @ts-expect-error wrong typings
 const { webcrypto: crypto }: { webcrypto: Crypto } = nodeCrypto;
 
-export async function openidRedirectHandler(
-  request: MyRequest,
-  response: ServerResponse | Http2ServerResponse
-) {
-  return await requestHandler("GET", "/api/v1/redirect", async function (data) {
+export const openidRedirectHandler = requestHandler("GET", "/api/v1/redirect", async function (data) {
     // https://github.com/AzureAD/microsoft-authentication-library-for-js/tree/dev/lib/msal-browser
     // https://docs.microsoft.com/en-us/azure/active-directory/develop/scenario-spa-app-registration
     // USE single tenant as for all others we need permissions
@@ -168,5 +163,4 @@ export async function openidRedirectHandler(
       ];
       return returnValue;
     }
-  })(request, response);
-}
+  })
