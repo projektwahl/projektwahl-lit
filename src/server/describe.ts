@@ -34,8 +34,8 @@ export function typedSql<
     template: TemplateStringsArray,
     ...args: DescriptionTypes<Q>
   ) {
-    const err = new Error().stack
-    try {
+    //const err = new Error().stack
+    //try {
     const { types: computed_query_types, columns: computed_column_types_1 } =
       await sql(template, ...args).describe();
 
@@ -53,10 +53,10 @@ export function typedSql<
     deepStrictEqual(computed_description, description);
 
     return await sql<DescriptionTypes<R>[]>(template, ...args).execute();
-  } catch (error) {
+  /*} catch (error) {
     console.error(err)
     throw error
-  }
+  }*/
   };
 }
 
