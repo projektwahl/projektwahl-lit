@@ -38,14 +38,16 @@ export function typedSql<D extends { types: readonly number[]; columns: { [colum
   }
 }
 
+// https://github.com/microsoft/TypeScript/issues/27995#issuecomment-441283760
 type DescriptionQueryTypes<T extends readonly number[]> = {
    -readonly [K in Exclude<keyof T, keyof number[]>]: T[K] extends number ? (T[K] extends 23 ? number : T[K] extends 1043 ? string : T[K] extends 16 ? boolean : T[K] extends 17425 ? string : unknown) : T[K]; } & { length: T['length']; 
 } & number[]
 
 type DescriptionResultTypes<T> = {
-  -readonly [Property in keyof T]: Property extends number ? (T[Property] extends 23 ? number : T[Property] extends 1043 ? string : T[Property] extends 16 ? boolean : T[Property] extends 17425 ? string : unknown) : never;
+  -readonly [Property in keyof T]: T[Property] extends 23 ? number : T[Property] extends 1043 ? string : T[Property] extends 16 ? boolean : T[Property] extends 17425 ? string : unknown;
 };
 
+// TODO multiple parameters different type
 const results = await typedSql(description)`SELECT * FROM users WHERE id = ${1}`
 
 await sql.end();
