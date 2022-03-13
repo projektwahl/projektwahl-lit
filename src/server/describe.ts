@@ -1,3 +1,4 @@
+import { deepStrictEqual } from "assert";
 import { sql } from "./database.js";
 
 const description = {
@@ -21,23 +22,13 @@ const description = {
 } as const;
 
 type DescriptionTypes<T> = {
-    [Property in keyof T]: T[Property] extends 23 ? number : unknown;
+  -readonly [Property in keyof T]: T[Property] extends 23 ? number : T[Property] extends 1043 ? string : T[Property] extends 16 ? boolean : T[Property] extends 17425 ? string : unknown;
 };
 
-/*
-// https://www.typescriptlang.org/docs/handbook/2/mapped-types.html#further-exploration
-type EventConfig<Events extends { kind: string }> = {
-  [E in Events as E["kind"]]: (event: E) => void;
-}
-type ExtractPII<Type> = {
-  [Property in keyof Type]: Type[Property] extends { pii: true } ? true : false;
-};
-*/
-const args: DescriptionTypes<typeof description["types"]> = [1];
+type A = DescriptionTypes<typeof description["columns"]>[]
+type B = DescriptionTypes<typeof description["types"]>
 
-let test: DescriptionTypes<typeof description["columns"]>;
-
-const { types: computed_query_types, columns: computed_column_types_1 } = await sql`SELECT * FROM users WHERE id = ${1}`.describe()
+const { types: computed_query_types, columns: computed_column_types_1 } = await sql<A, B>`SELECT * FROM users WHERE id = ${1}`.describe()
 
 const computed_column_types = Object.fromEntries(computed_column_types_1.map(v => [v.name, v.type]))
 
@@ -46,7 +37,9 @@ const computed_description = {
   columns: computed_column_types
 }
 
+deepStrictEqual(computed_description, description)
+
 console.log(computed_description);
-console.log(await sql`SELECT * FROM users WHERE id = ${1}`.execute());
+console.log(await sql<DescriptionTypes<typeof description["columns"]>[], DescriptionTypes<typeof description["types"]>>`SELECT * FROM users WHERE id = ${1}`.execute());
 
 await sql.end();
