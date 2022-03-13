@@ -1,6 +1,5 @@
 import { deepStrictEqual } from "assert";
 import type { Sql } from "postgres";
-import { sql } from "./database.js";
 
 /*
 import { sql } from "./database.js";
@@ -38,6 +37,7 @@ export function typedSql<
     //const err = new Error().stack
     //try {
     const { types: computed_query_types, columns: computed_column_types_1 } =
+    // @ts-expect-error unknown
       await sql(template, ...args).describe();
 
     const computed_column_types = Object.fromEntries(
@@ -53,6 +53,7 @@ export function typedSql<
 
     deepStrictEqual(computed_description, description);
 
+    // @ts-expect-error unknown
     return await sql<DescriptionTypes<R>[]>(template, ...args).execute();
     /*} catch (error) {
     console.error(err)
@@ -63,7 +64,7 @@ export function typedSql<
 
 type DescriptionTypes<T> = {
   -readonly [K in keyof T]:
-    | (T[K] extends 23
+    ((T[K] extends (23 | 701)
         ? number
         : T[K] extends 1043
         ? string
@@ -71,8 +72,8 @@ type DescriptionTypes<T> = {
         ? boolean
         : T[K] extends 17
         ? Uint8Array
-        : never)
-    | null;
+        : unknown)
+    | null);
 };
 /*
 const results = await typedSql(

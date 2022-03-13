@@ -22,7 +22,7 @@ SPDX-FileCopyrightText: 2021 Moritz Hedtke <Moritz.Hedtke@t-online.de>
 */
 import { sensitiveHeaders } from "node:http2";
 import { ZodIssueCode } from "zod";
-import { rawUserSchema, ResponseType } from "../../../lib/routes.js";
+import type { ResponseType } from "../../../lib/routes.js";
 import { sql } from "../../database.js";
 import { requestHandler } from "../../express.js";
 import { client } from "./openid-client.js";

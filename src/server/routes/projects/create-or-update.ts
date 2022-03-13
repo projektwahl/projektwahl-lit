@@ -24,8 +24,7 @@ import postgres from "postgres";
 import { sql } from "../../database.js";
 import { requestHandler } from "../../express.js";
 import type { OutgoingHttpHeaders } from "node:http";
-import {
-  rawProjectSchema,
+import type {
   ResponseType,
   routes,
   userSchema,
