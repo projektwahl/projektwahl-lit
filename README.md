@@ -59,17 +59,20 @@ PORT=8443 BASE_URL=https://localhost:8443 DATABASE_URL=postgres://projektwahl:pr
 ```bash
 ln -s $PWD/pre-commit .git/hooks/pre-commit
 
-psql --username=projektwahl --host=projektwahl < src/server/setup.sql
+psql --username=moritz < src/server/setup.sql
 
-NODE_ENV=development DATABASE_URL=postgres://projektwahl:projektwahl@projektwahl/projektwahl DATABASE_HOST=projektwahl npm run setup
+export DATABASE_HOST=/run/postgresql
+export DATABASE_URL=postgres://moritz@localhost/moritz
 
-NODE_ENV=development DATABASE_URL=postgres://projektwahl:projektwahl@projektwahl/projektwahl DATABASE_HOST=projektwahl npm run evaluate
+NODE_ENV=development npm run setup
+
+NODE_ENV=development npm run evaluate
 
 nano $CREDENTIALS_DIRECTORY/openid_client_secret
 
-NODE_ENV=development PORT=8443 BASE_URL=https://localhost:8443 DATABASE_URL=postgres://projektwahl:projektwahl@projektwahl/projektwahl DATABASE_HOST=projektwahl OPENID_URL=openid_url CLIENT_ID=client_id  CREDENTIALS_DIRECTORY=$PWD npm run server
+NODE_ENV=development PORT=8443 BASE_URL=https://localhost:8443 OPENID_URL=openid_url CLIENT_ID=client_id  CREDENTIALS_DIRECTORY=$PWD npm run server
 # or
-NODE_ENV=development PORT=8443 BASE_URL=https://localhost:8443 DATABASE_URL=postgres://projektwahl:projektwahl@projektwahl/projektwahl DATABASE_HOST=projektwahl CREDENTIALS_DIRECTORY=$PWD npm run server
+NODE_ENV=development PORT=8443 BASE_URL=https://localhost:8443 CREDENTIALS_DIRECTORY=$PWD npm run server
 
 # https://localhost:8443/
 ```
