@@ -187,12 +187,13 @@ export abstract class PwInput<
           aria-describedby="${this.randomId}-feedback"
           autocomplete=${ifDefined(this.autocomplete)}
           ?disabled=${
-            !this.enabled && (this.disabled ||
-            this.task.render({
-              complete: () => false,
-              pending: () => true,
-              initial: () => false,
-            }))
+            !this.enabled &&
+            (this.disabled ||
+              this.task.render({
+                complete: () => false,
+                pending: () => true,
+                initial: () => false,
+              }))
           }
         >
           ${

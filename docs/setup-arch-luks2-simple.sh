@@ -317,6 +317,7 @@ cd projektwahl-lit-staging
 openssl req -x509 -newkey rsa:2048 -nodes -sha256 -subj '/CN=localhost' -keyout key.pem -out cert.pem
 npm ci --ignore-scripts --omit=optional
 node-gyp rebuild -C ./node_modules/@dev.mohe/argon2/
+npm run localize-build
 npm run build
 
 sudo mkdir projektwahl-lit-production
@@ -326,6 +327,7 @@ cd projektwahl-lit-production
 openssl req -x509 -newkey rsa:2048 -nodes -sha256 -subj '/CN=localhost' -keyout key.pem -out cert.pem
 npm ci --ignore-scripts --omit=optional
 node-gyp rebuild -C ./node_modules/@dev.mohe/argon2/
+npm run localize-build
 npm run build
 
 

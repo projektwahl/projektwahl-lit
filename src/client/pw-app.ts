@@ -57,17 +57,17 @@ window.addEventListener(
 ReactiveElement.enableWarning?.("migration");
 ReactiveElement.enableWarning?.("change-in-update");
 
-import {configureLocalization} from '@lit/localize';
+import { configureLocalization } from "@lit/localize";
 
-import {sourceLocale, targetLocales} from './generated/locales.js';
-import * as templates_de from './generated/de.js';
+import { sourceLocale, targetLocales } from "./generated/locales.js";
+import * as templates_de from "./generated/de.js";
 
-export const {getLocale, setLocale} = configureLocalization({
+export const { getLocale, setLocale } = configureLocalization({
   sourceLocale,
   targetLocales,
   loadLocale: async () => templates_de,
 });
-void setLocale("de")
+void setLocale("de");
 
 // TODO FIXME create a pw-app directive that can be awaited on the server side.
 // so we actually get server side rendering with datae
@@ -225,7 +225,7 @@ export class PwApp extends LitElement {
   constructor() {
     super();
 
-    updateWhenLocaleChanges(this)
+    updateWhenLocaleChanges(this);
 
     this.initialRender = true;
 
