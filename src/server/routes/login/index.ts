@@ -143,7 +143,7 @@ export const loginHandler = requestHandler(
       await sql.begin("READ WRITE", async (tsql) => {
         return await typedSql(
           tsql,
-          {}
+          { types: [ 1043, 23 ], columns: {} } as const
         )`UPDATE users SET password_hash = ${newHash} WHERE id = ${dbUser.id}`;
       });
     }

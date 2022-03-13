@@ -1,5 +1,6 @@
 import { deepStrictEqual } from "assert";
 import type { Sql } from "postgres";
+import { sql } from "./database.js";
 
 /*
 import { sql } from "./database.js";
@@ -82,3 +83,7 @@ console.log(results[0].type);
 
 await sql.end();
 */
+await typedSql(
+  sql,
+  {}
+)`INSERT INTO sessions (user_id, session_id) VALUES (${1}, ${""})`
