@@ -164,6 +164,7 @@ export async function fetchData<R extends keyof typeof entityRoutes>(
 
   //const entitiesSchema = entitySchema["response"]["shape"]["entities"];
 
+  // would be great to stream the results but they are post processed below
   const sqlResult = await finalQuery;
 
   let entities: z.infer<entitesType[R]["response"]>["entities"] =
