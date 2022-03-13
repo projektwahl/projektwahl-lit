@@ -2,7 +2,7 @@ import { deepStrictEqual } from "assert";
 import { sql } from "./database.js";
 
 const description = {
-  types: [ 23 ],
+  types: [ 23, 16 ],
   columns: {
     id: 23,
     username: 1043,
@@ -23,7 +23,7 @@ const description = {
 
 export function typedSql<D extends { types: readonly number[]; columns: { [column: string]: number } }>(description: D) {
   return async (template: TemplateStringsArray, ...args: DescriptionQueryTypes<D["types"]>) => {
-    const { types: computed_query_types, columns: computed_column_types_1 } = await sql(template, args).describe()
+    const { types: computed_query_types, columns: computed_column_types_1 } = await sql(template, ...args).describe()
 
     const computed_column_types = Object.fromEntries(computed_column_types_1.map(v => [v.name, v.type]))
 
@@ -34,7 +34,7 @@ export function typedSql<D extends { types: readonly number[]; columns: { [colum
 
     deepStrictEqual(computed_description, description)
 
-    return await sql<DescriptionResultTypes<D["columns"]>[]>(template, args).execute()
+    return await sql<DescriptionResultTypes<D["columns"]>[]>(template, ...args).execute()
   }
 }
 
@@ -48,6 +48,8 @@ type DescriptionResultTypes<T> = {
 };
 
 // TODO multiple parameters different type
-const results = await typedSql(description)`SELECT * FROM users WHERE id = ${1}`
+const results = await typedSql(description)`SELECT * FROM users WHERE id = ${1} AND away = ${false}`
+
+console.log(results)
 
 await sql.end();
