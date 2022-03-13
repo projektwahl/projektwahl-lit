@@ -96,38 +96,47 @@ export const createOrUpdateUsersHandler = requestHandler(
           const results = [];
           for (const user of users) {
             if ("id" in user) {
-              const finalQuery = typedSql(sql, {})`UPDATE users_with_deleted SET
+              const finalQuery = typedSql(sql, {
+                types: [
+                     16, 1043,   16, 1043,   16,
+                  17425,   16, 1043,   16,   23,
+                     16,   16,   16,   23,   16,
+                     23,   16,   16,   16, 1043,
+                     23,   23
+                ],
+                columns: { id: 23, project_leader_id: 23, force_in_project_id: 23 }
+              } as const)`UPDATE users_with_deleted SET
   "username" = CASE WHEN ${user.username !== undefined} THEN ${
                 user.username ?? null
-              } ELSE "users_with_deleted"."username" END
+              } ELSE "users_with_deleted"."username" END,
   "openid_id" = CASE WHEN ${user.openid_id !== undefined} THEN ${
                 user.openid_id ?? null
-              } ELSE "users_with_deleted"."openid_id" END
+              } ELSE "users_with_deleted"."openid_id" END,
   "type" = CASE WHEN ${user.type !== undefined} THEN ${
                 user.type ?? null
-              } ELSE "users_with_deleted"."type" END
+              } ELSE "users_with_deleted"."type" END,
   "group" = CASE WHEN ${user.group !== undefined} THEN ${
                 user.group ?? null
-              } ELSE "users_with_deleted"."group" END
+              } ELSE "users_with_deleted"."group" END,
   "age" = CASE WHEN ${user.age !== undefined} THEN ${
                 user.age ?? null
-              } ELSE "users_with_deleted"."age" END
+              } ELSE "users_with_deleted"."age" END,
   "away" = CASE WHEN ${user.away !== undefined} THEN ${
                 user.away ?? null
-              } ELSE "users_with_deleted"."away" END
+              } ELSE "users_with_deleted"."away" END,
   "project_leader_id" = CASE WHEN ${
     user.project_leader_id !== undefined
   } THEN ${
                 user.project_leader_id ?? null
-              } ELSE "users_with_deleted"."project_leader_id" END
+              } ELSE "users_with_deleted"."project_leader_id" END,
   "force_in_project_id" = CASE WHEN ${
     user.force_in_project_id !== undefined
   } THEN ${
                 user.force_in_project_id ?? null
-              } ELSE "users_with_deleted"."force_in_project_id" END
+              } ELSE "users_with_deleted"."force_in_project_id" END,
   "deleted" = CASE WHEN ${user.deleted !== undefined} THEN ${
                 user.deleted ?? null
-              } ELSE "users_with_deleted"."deleted" END
+              } ELSE "users_with_deleted"."deleted" END,
   password_hash = CASE WHEN ${!!user.password} THEN ${
                 user.password ? await hashPassword(user.password) : null
               } ELSE password_hash END,
@@ -148,7 +157,14 @@ export const createOrUpdateUsersHandler = requestHandler(
             } else {
               const query = typedSql(
                 sql,
-                {}
+                {
+                  types: [
+                     1043, 1043, 1043,
+                    17425, 1043,   23,
+                       16,   16,   23
+                  ],
+                  columns: { id: 23, project_leader_id: 23, force_in_project_id: 23 }
+                } as const
               )`INSERT INTO users_with_deleted (username, openid_id, password_hash, type, "group", age, away, deleted, last_updated_by) VALUES (${
                 user.username ?? null
               }, ${user.openid_id ?? null}, ${

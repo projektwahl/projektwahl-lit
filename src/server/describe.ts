@@ -1,5 +1,7 @@
 import { deepStrictEqual } from "assert";
 import type { Sql } from "postgres";
+
+/*
 import { sql } from "./database.js";
 
 const description = {
@@ -21,6 +23,7 @@ const description = {
     last_updated_by: 23,
   },
 } as const;
+*/
 
 export function typedSql<
   Q extends readonly number[],
@@ -42,6 +45,8 @@ export function typedSql<
       columns: computed_column_types,
     };
 
+    console.log(computed_description)
+
     deepStrictEqual(computed_description, description);
 
     return await sql<DescriptionTypes<R>[]>(template, ...args).execute();
@@ -49,15 +54,16 @@ export function typedSql<
 }
 
 type DescriptionTypes<T> = {
-  -readonly [K in keyof T]: T[K] extends 23
+  -readonly [K in keyof T]: (T[K] extends 23
     ? number
     : T[K] extends 1043
     ? string
     : T[K] extends 16
     ? boolean
-    : string;
+    : T[K] extends 17 ? Uint8Array
+    : string) | null;
 };
-
+/*
 const results = await typedSql(
   sql,
   description
@@ -68,3 +74,4 @@ console.log(results);
 console.log(results[0].type);
 
 await sql.end();
+*/
