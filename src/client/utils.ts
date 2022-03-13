@@ -146,6 +146,12 @@ export const sleep = (timeout: number): Promise<void> => {
   });
 };
 
+export const suspend = (): Promise<void> => {
+  return new Promise((resolve) => {
+    setImmediate(resolve);
+  });
+};
+
 type PathTree<T> = {
   [P in keyof T]-?: T[P] extends object ? [P] | [P, ...Path<T[P]>] : [P];
 };
