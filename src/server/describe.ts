@@ -21,7 +21,7 @@ const description = {
   }
 } as const;
 
-export function typedSql<Q extends number[], R extends { [column: string]: number }>(description: { types: Q; columns: R }) {
+export function typedSql<Q extends readonly number[], R extends { [column: string]: number }>(description: { types: Q; columns: R }) {
   return async (template: TemplateStringsArray, ...args: DescriptionQueryTypes<Q>) => {
     const { types: computed_query_types, columns: computed_column_types_1 } = await sql(template, ...args).describe()
 
@@ -40,7 +40,7 @@ export function typedSql<Q extends number[], R extends { [column: string]: numbe
 
 // https://github.com/microsoft/TypeScript/issues/27995#issuecomment-441283760
 type DescriptionQueryTypes<T> = {
-   -readonly [K in keyof T]:T[K] extends 23 ? number : T[K] extends 1043 ? string : T[K] extends 16 ? boolean : T[K] extends 17425 ? string : unknown;
+   -readonly [K in keyof T]: T[K] extends 23 ? number : T[K] extends 1043 ? string : T[K] extends 16 ? boolean : string;
 }
 
 type DescriptionResultTypes<T> = {
