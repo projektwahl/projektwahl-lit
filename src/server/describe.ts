@@ -41,7 +41,7 @@ export function typedSql<
     //const err = new Error().stack
     //try {
     const { types: computed_query_types, columns: computed_column_types_1 } =
-    // @ts-expect-error unknown
+      // @ts-expect-error unknown
       await sql(template, ...args).describe();
 
     const computed_column_types = Object.fromEntries(
@@ -66,17 +66,17 @@ export function typedSql<
   };
 }
 
+// https://github.com/porsager/postgres/blob/rewrite/src/types.js
 type DescriptionTypes<T> = {
-  -readonly [K in keyof T]:
-    (T[K] extends (23 | 701)
-        ? number
-        : T[K] extends 1043
-        ? string
-        : T[K] extends 16
-        ? boolean
-        : T[K] extends 17
-        ? Uint8Array
-        : unknown);
+  -readonly [K in keyof T]: T[K] extends 23 | 701
+    ? number
+    : T[K] extends 1043
+    ? string
+    : T[K] extends 16
+    ? boolean
+    : T[K] extends 17
+    ? Uint8Array
+    : unknown;
 };
 /*
 const results = await typedSql(

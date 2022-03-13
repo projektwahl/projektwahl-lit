@@ -21,10 +21,7 @@ SPDX-License-Identifier: AGPL-3.0-or-later
 SPDX-FileCopyrightText: 2021 Moritz Hedtke <Moritz.Hedtke@t-online.de>
 */
 import { ZodIssueCode, ZodObject, ZodTypeAny } from "zod";
-import type {
-  UnknownKeysParam,
-  ResponseType,
-} from "../../../lib/routes.js";
+import type { UnknownKeysParam, ResponseType } from "../../../lib/routes.js";
 import { sql } from "../../database.js";
 import { requestHandler } from "../../express.js";
 import { checkPassword } from "../../password.js";

@@ -24,11 +24,7 @@ import postgres from "postgres";
 import { sql } from "../../database.js";
 import { requestHandler } from "../../express.js";
 import type { OutgoingHttpHeaders } from "node:http";
-import type {
-  ResponseType,
-  routes,
-  userSchema,
-} from "../../../lib/routes.js";
+import type { ResponseType, routes, userSchema } from "../../../lib/routes.js";
 import { z, ZodIssueCode } from "zod";
 import { typedSql } from "../../describe.js";
 
@@ -197,9 +193,14 @@ export function createOrUpdateProjectsHandler<
     }
 
     try {
-      const row = (
+      const row: { id: number } = (
         await sql.begin("READ WRITE", async (sql) => {
-          return await dbquery(sql, project, loggedInUser);
+          const result: { id: number }[] = await dbquery(
+            sql,
+            project,
+            loggedInUser
+          );
+          return result;
         })
       )[0];
 
