@@ -31,6 +31,7 @@ import { requestHandler } from "../../express.js";
 import { checkPassword } from "../../password.js";
 import type { OutgoingHttpHeaders } from "node:http";
 import nodeCrypto from "node:crypto";
+import { typedSql } from "../../describe.js";
 // @ts-expect-error wrong typings
 const { webcrypto: crypto }: { webcrypto: Crypto } = nodeCrypto;
 
@@ -53,7 +54,7 @@ export const loginHandler = requestHandler(
   "/api/v1/login",
   async function (body) {
     const r =
-      await sql`SELECT id, username, password_hash, type FROM users WHERE username = ${body.username} LIMIT 1`;
+      await typedSql({})`SELECT id, username, password_hash, type FROM users WHERE username = ${body.username} LIMIT 1`;
 
     const dbUser = users(rawUserSchema).optional().parse(r[0]);
 
@@ -135,7 +136,7 @@ export const loginHandler = requestHandler(
 
     if (needsRehash) {
       await sql.begin("READ WRITE", async (tsql) => {
-        return await tsql`UPDATE users SET password_hash = ${newHash} WHERE id = ${dbUser.id}`;
+        return await typedSql(tsql, {})`UPDATE users SET password_hash = ${newHash} WHERE id = ${dbUser.id}`;
       });
     }
 
@@ -150,7 +151,7 @@ export const loginHandler = requestHandler(
     );
 
     await sql.begin("READ WRITE", async (tsql) => {
-      return await tsql`INSERT INTO sessions (user_id, session_id) VALUES (${dbUser.id}, ${session_id})`;
+      return await typedSql(tsql, {})`INSERT INTO sessions (user_id, session_id) VALUES (${dbUser.id}, ${session_id})`;
     });
 
     /** @type {import("node:http2").OutgoingHttpHeaders} */

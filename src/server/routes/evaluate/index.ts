@@ -10,6 +10,7 @@ import {
   rawUserSchema,
 } from "../../../lib/routes.js";
 import { z } from "zod";
+import { typedSql } from "../../describe.js";
 
 const groupByNumber = <T>(
   data: T[],
@@ -208,13 +209,13 @@ const choices = z.array(rawChoice).parse(
 const projects = z
   .array(rawProjectSchema)
   .parse(
-    await sql`SELECT id, min_participants, max_participants FROM projects;`
+    await typedSql({})`SELECT id, min_participants, max_participants FROM projects;`
   );
 
 const users = z
   .array(rawUserSchema)
   .parse(
-    await sql`SELECT id, project_leader_id FROM present_voters ORDER BY id;`
+    await typedSql({})`SELECT id, project_leader_id FROM present_voters ORDER BY id;`
   );
 
 // lodash types are just trash do this yourself

@@ -21,6 +21,7 @@ SPDX-License-Identifier: AGPL-3.0-or-later
 SPDX-FileCopyrightText: 2021 Moritz Hedtke <Moritz.Hedtke@t-online.de>
 */
 import { sql } from "../../database.js";
+import { typedSql } from "../../describe.js";
 import { requestHandler } from "../../express.js";
 
 export const logoutHandler = requestHandler(
@@ -29,7 +30,7 @@ export const logoutHandler = requestHandler(
   async function (body, user, session_id) {
     if (session_id) {
       await sql.begin("READ WRITE", async (tsql) => {
-        return await tsql`DELETE FROM sessions WHERE session_id = ${session_id}`;
+        return await typedSql(tsql, {})`DELETE FROM sessions WHERE session_id = ${session_id}`;
       });
     }
 

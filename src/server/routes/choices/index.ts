@@ -107,7 +107,7 @@ export const choicesHandler = requestHandler(
           }) WHERE (${!query.filters.id} OR id = ${
           query.filters.id ?? null
         }) AND title LIKE ${"%" + (query.filters.title ?? "") + "%"}
-             AND info  LIKE ${"%" + (query.filters.info ?? "") + "%"}`;
+             AND info LIKE ${"%" + (query.filters.info ?? "") + "%"}`;
       },
       {
         rank: "largest",

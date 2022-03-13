@@ -28,6 +28,7 @@ import { requestHandler } from "../../express.js";
 import { client } from "./openid-client.js";
 import type { OutgoingHttpHeaders } from "node:http";
 import nodeCrypto from "node:crypto";
+import { typedSql } from "../../describe.js";
 // @ts-expect-error wrong typings
 const { webcrypto: crypto }: { webcrypto: Crypto } = nodeCrypto;
 
@@ -72,7 +73,7 @@ export const openidRedirectHandler = requestHandler(
         .optional()
         .parse(
           (
-            await sql`SELECT id, username, type FROM users WHERE openid_id = ${
+            await typedSql({})`SELECT id, username, type FROM users WHERE openid_id = ${
               result.claims().email ?? null
             } LIMIT 1`
           )[0]
@@ -114,7 +115,7 @@ export const openidRedirectHandler = requestHandler(
       );
 
       await sql.begin("READ WRITE", async (tsql) => {
-        return await tsql`INSERT INTO sessions (user_id, session_id) VALUES (${dbUser.id}, ${session_id})`;
+        return await typedSql(tsql, {})`INSERT INTO sessions (user_id, session_id) VALUES (${dbUser.id}, ${session_id})`;
       });
 
       /** @type {import("node:http2").OutgoingHttpHeaders} */

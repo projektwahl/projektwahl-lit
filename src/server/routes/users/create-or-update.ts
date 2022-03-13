@@ -28,6 +28,7 @@ import { hashPassword } from "../../password.js";
 import { updateField } from "../../entities.js";
 import type { OutgoingHttpHeaders } from "node:http";
 import { z, ZodIssueCode } from "zod";
+import { typedSql } from "../../describe.js";
 
 // TODO FIXME somehow ensure all attributes are read here because this is an easy way to loose data
 // Also ensure create and update has the same attributes
@@ -127,7 +128,7 @@ export const createOrUpdateUsersHandler = requestHandler(
                   .parse(await finalQuery)
               );
             } else {
-              const query = sql`INSERT INTO users_with_deleted (username, openid_id, password_hash, type, "group", age, away, deleted, last_updated_by) VALUES (${
+              const query = typedSql({})`INSERT INTO users_with_deleted (username, openid_id, password_hash, type, "group", age, away, deleted, last_updated_by) VALUES (${
                 user.username ?? null
               }, ${user.openid_id ?? null}, ${
                 user.password ? await hashPassword(user.password) : null
