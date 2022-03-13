@@ -66,14 +66,14 @@ export class PwUsers<X extends string> extends PwEntityList<
   override get buttons() {
     return html` <a
         @click=${aClick}
-        class="btn btn-primary"
+        class="btn btn-primary mr-1 mb-1"
         href="/users/create"
         role="button"
         >${msg("Create account")}</a
       >
       <a
         @click=${aClick}
-        class="btn btn-primary"
+        class="btn btn-primary mr-1 mb-1"
         href="/users/${`import`}"
         role="button"
         >${msg("Import accounts")}</a
@@ -127,6 +127,7 @@ export class PwUsers<X extends string> extends PwEntityList<
         <tr>
           <th scope="col">
             ${pwInputNumber<"/api/v1/users", number | undefined>({
+              enabled: true,
               url: this.url,
               label: null,
               name: ["filters", "id"],
@@ -141,6 +142,7 @@ export class PwUsers<X extends string> extends PwEntityList<
 
           <th scope="col">
             ${pwInputText<"/api/v1/users", string | undefined>({
+              enabled: true,
               url: this.url,
               label: null,
               name: ["filters", "username"],
@@ -163,6 +165,7 @@ export class PwUsers<X extends string> extends PwEntityList<
               url: this.url,
               type: "select",
               disabled: this.disabled,
+              enabled: true,
               label: null,
               name: ["filters", "type"],
               get: (o) => o.filters.type,

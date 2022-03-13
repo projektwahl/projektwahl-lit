@@ -33,7 +33,7 @@ import { aClick } from "./pw-a.js";
 import jscookie from "js-cookie";
 import { myFetch } from "./utils.js";
 import { Task, TaskStatus } from "@dev.mohe/task";
-import { msg, str } from "@lit/localize";
+import { msg, str, updateWhenLocaleChanges } from "@lit/localize";
 
 // TODO FIXME show more details if possible (maybe error page)
 // TODO FIXME do this inline in the main page? In case it doesnt load so even on old browsers some error is shown
@@ -56,6 +56,19 @@ window.addEventListener(
 
 ReactiveElement.enableWarning?.("migration");
 ReactiveElement.enableWarning?.("change-in-update");
+
+import { configureLocalization } from "@lit/localize";
+
+import { sourceLocale, targetLocales } from "./generated/locales.js";
+import * as templates_de from "./generated/de.js";
+
+export const { getLocale, setLocale } = configureLocalization({
+  sourceLocale,
+  targetLocales,
+  // eslint-disable-next-line @typescript-eslint/require-await
+  loadLocale: async () => templates_de,
+});
+void setLocale(window.LANGUAGE ?? "en");
 
 // TODO FIXME create a pw-app directive that can be awaited on the server side.
 // so we actually get server side rendering with datae
@@ -212,6 +225,8 @@ export class PwApp extends LitElement {
 
   constructor() {
     super();
+
+    updateWhenLocaleChanges(this);
 
     this.initialRender = true;
 

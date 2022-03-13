@@ -129,6 +129,7 @@ export const PwProjectUsers = setupHmr(
 
             <th scope="col">
               ${pwInputNumber<"/api/v1/users", number | undefined>({
+                enabled: true,
                 url: this.url,
                 label: null,
                 name: ["filters", "id"],
@@ -143,6 +144,7 @@ export const PwProjectUsers = setupHmr(
 
             <th scope="col">
               ${pwInputText<"/api/v1/users", string | undefined>({
+                enabled: true,
                 url: this.url,
                 label: null,
                 name: ["filters", "username"],
@@ -161,6 +163,7 @@ export const PwProjectUsers = setupHmr(
                   "/api/v1/users",
                   "voter" | "helper" | "admin" | undefined
                 >({
+                  enabled: true,
                   url: this.url,
                   label: null,
                   name: ["filters", "type"],

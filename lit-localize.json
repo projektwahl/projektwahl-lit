@@ -4,7 +4,9 @@
   "targetLocales": ["de"],
   "tsConfig": "./tsconfig.json",
   "output": {
-    "mode": "transform"
+    "mode": "runtime",
+    "outputDir": "src/client/generated",
+    "localeCodesModule": "src/client/generated/locales.ts"
   },
   "interchange": {
     "format": "xliff",

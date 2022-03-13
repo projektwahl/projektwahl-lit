@@ -1,6 +1,6 @@
 import { exec as unpromisifiedExec } from "child_process";
 import { createHash } from "crypto";
-import { readFile, rename, writeFile, rm } from "fs/promises";
+import { readFile, rename, writeFile } from "fs/promises";
 import { promisify } from "util";
 import "./require-shim.js";
 import { build } from "esbuild";
@@ -44,24 +44,9 @@ const nativeNodeModulesPlugin = {
 
 const exec = promisify(unpromisifiedExec);
 
-try {
-  await rm("dist", { recursive: true });
-} catch (e) {
-  // empty
-}
-
-{
-  // do not remove this
-  // when building we need to update the localized version too otherwise nothing is actually rebuilt. we could switch back to the runtime localization which may be helpful.
-  let { stdout, stderr } = await exec("lit-localize build");
-
-  console.log(stdout);
-  console.log(stderr);
-}
-
 {
   let { stdout, stderr } = await exec(
-    "esbuild --format=esm --bundle dist/de/src/client/pw-app.js --charset=utf8 --define:window.PRODUCTION=true --entry-names=[dir]/[name] --sourcemap  --analyze --outdir=dist --tree-shaking=true"
+    "esbuild --format=esm --bundle ./src/client/pw-app.js --charset=utf8 --define:window.PRODUCTION=true --define:window.LANGUAGE=de --entry-names=[dir]/[name] --sourcemap  --analyze --outdir=dist --tree-shaking=true"
   );
 
   console.log(stdout);
@@ -102,7 +87,7 @@ await rename(
 // rebuild with path to bootstrap.css
 {
   let { stdout, stderr } = await exec(
-    `esbuild --format=esm --bundle dist/de/src/client/pw-app.js --charset=utf8 --define:window.PRODUCTION=true --define:window.BOOTSTRAP_CSS=\\"/dist/bootstrap_${bootstrapHash}.min.css\\" --entry-names=[dir]/[name] --sourcemap --analyze --outdir=dist --tree-shaking=true`
+    `esbuild --format=esm --bundle ./src/client/pw-app.js --charset=utf8 --define:window.PRODUCTION=true --define:window.LANGUAGE=de --define:window.BOOTSTRAP_CSS=\\"/dist/bootstrap_${bootstrapHash}.min.css\\" --entry-names=[dir]/[name] --sourcemap --analyze --outdir=dist --tree-shaking=true`
   );
 
   console.log(stdout);

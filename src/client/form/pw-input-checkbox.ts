@@ -14,6 +14,7 @@ export function pwInputCheckbox<
     | "type"
     | "autocomplete"
     | "disabled"
+    | "enabled"
     | "initial"
     | "label"
     | "name"
@@ -29,6 +30,7 @@ export function pwInputCheckbox<
 ) {
   const {
     disabled,
+    enabled,
     initial,
     label,
     options,
@@ -49,6 +51,7 @@ export function pwInputCheckbox<
   return html`<pw-input-checkbox
     type=${type}
     ?disabled=${disabled}
+    ?enabled=${enabled}
     .label=${label}
     .get=${get}
     .set=${set}

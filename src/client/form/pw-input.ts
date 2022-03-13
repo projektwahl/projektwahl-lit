@@ -44,6 +44,7 @@ export abstract class PwInput<
       options: { attribute: false },
       autocomplete: { type: String },
       disabled: { type: Boolean },
+      enabled: { type: Boolean },
       randomId: { state: true },
       defaultValue: { attribute: false },
       url: { attribute: false },
@@ -71,6 +72,8 @@ export abstract class PwInput<
   set!: (o: z.infer<typeof routes[P]["request"]>, v: T) => void;
 
   disabled?: boolean = false;
+
+  enabled?: boolean = false;
 
   randomId;
 
@@ -184,12 +187,13 @@ export abstract class PwInput<
           aria-describedby="${this.randomId}-feedback"
           autocomplete=${ifDefined(this.autocomplete)}
           ?disabled=${
-            this.disabled ||
-            this.task.render({
-              complete: () => false,
-              pending: () => true,
-              initial: () => false,
-            })
+            !this.enabled &&
+            (this.disabled ||
+              this.task.render({
+                complete: () => false,
+                pending: () => true,
+                initial: () => false,
+              }))
           }
         >
           ${

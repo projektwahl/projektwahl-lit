@@ -103,6 +103,7 @@ class PwChoices<X extends string> extends PwEntityList<"/api/v1/choices", X> {
         <tr>
           <th scope="col">
             ${pwInputNumber<"/api/v1/choices", number | undefined>({
+              enabled: true,
               url: this.url,
               label: null,
               name: ["filters", "id"],
@@ -117,6 +118,7 @@ class PwChoices<X extends string> extends PwEntityList<"/api/v1/choices", X> {
 
           <th scope="col">
             ${pwInputText<"/api/v1/choices", string | undefined>({
+              enabled: true,
               url: this.url,
               label: null,
               name: ["filters", "title"],
@@ -131,6 +133,7 @@ class PwChoices<X extends string> extends PwEntityList<"/api/v1/choices", X> {
 
           <th scope="col">
             ${pwInputNumber<"/api/v1/choices", number | undefined | null>({
+              enabled: true,
               url: this.url,
               label: null,
               name: ["filters", "rank"],
