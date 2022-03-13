@@ -22,7 +22,6 @@ SPDX-FileCopyrightText: 2021 Moritz Hedtke <Moritz.Hedtke@t-online.de>
 */
 import postgres from "postgres";
 import { sql } from "../../database.js";
-import { updateField } from "../../entities.js";
 import { requestHandler } from "../../express.js";
 import type { OutgoingHttpHeaders } from "node:http";
 import {
@@ -76,20 +75,37 @@ export const updateProjectsHandler = createOrUpdateProjectsHandler(
     project,
     loggedInUser: Exclude<z.infer<typeof userSchema>, undefined>
   ) => {
-    const field = (name: keyof typeof project) =>
-      updateField("projects_with_deleted", project, name);
-
     const finalQuery = sql`UPDATE projects_with_deleted SET
-${field("title")},
-${field("info")},
-${field("place")},
-${field("costs")},
-${field("min_age")},
-${field("max_age")},
-${field("min_participants")},
-${field("max_participants")},
-${field("random_assignments")},
-${field("deleted")},
+    "title" = CASE WHEN ${
+      project.title !== undefined
+    } THEN ${project.title ?? null} ELSE "projects_with_deleted"."title" END
+    "info" = CASE WHEN ${
+      project.info !== undefined
+    } THEN ${project.info ?? null} ELSE "projects_with_deleted"."info" END
+    "place" = CASE WHEN ${
+      project.place !== undefined
+    } THEN ${project.place ?? null} ELSE "projects_with_deleted"."place" END
+    "costs" = CASE WHEN ${
+      project.costs !== undefined
+    } THEN ${project.costs ?? null} ELSE "projects_with_deleted"."costs" END
+    "min_age" = CASE WHEN ${
+      project.min_age !== undefined
+    } THEN ${project.min_age ?? null} ELSE "projects_with_deleted"."min_age" END
+    "max_age" = CASE WHEN ${
+      project.max_age !== undefined
+    } THEN ${project.max_age ?? null} ELSE "projects_with_deleted"."max_age" END
+    "min_participants" = CASE WHEN ${
+      project.min_participants !== undefined
+    } THEN ${project.min_participants ?? null} ELSE "projects_with_deleted"."min_participants" END
+    "max_participants" = CASE WHEN ${
+      project.max_participants !== undefined
+    } THEN ${project.max_participants ?? null} ELSE "projects_with_deleted"."max_participants" END
+    "random_assignments" = CASE WHEN ${
+      project.random_assignments !== undefined
+    } THEN ${project.random_assignments ?? null} ELSE "projects_with_deleted"."random_assignments" END
+    "deleted" = CASE WHEN ${
+      project.deleted !== undefined
+    } THEN ${project.deleted ?? null} ELSE "projects_with_deleted"."deleted" END
 last_updated_by = ${loggedInUser.id}
 FROM users_with_deleted WHERE projects_with_deleted.id = ${
       project.id

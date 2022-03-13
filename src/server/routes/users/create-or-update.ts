@@ -25,7 +25,6 @@ import { routes, ResponseType, rawUserSchema } from "../../../lib/routes.js";
 import { sql } from "../../database.js";
 import { requestHandler } from "../../express.js";
 import { hashPassword } from "../../password.js";
-import { updateField } from "../../entities.js";
 import type { OutgoingHttpHeaders } from "node:http";
 import { z, ZodIssueCode } from "zod";
 import { typedSql } from "../../describe.js";
@@ -97,22 +96,37 @@ export const createOrUpdateUsersHandler = requestHandler(
           const results = [];
           for (const user of users) {
             if ("id" in user) {
-              const field = (name: keyof typeof user) =>
-                updateField("users_with_deleted", user, name);
-
               const finalQuery = sql`UPDATE users_with_deleted SET
-  ${field("username")},
-  ${field("openid_id")},
+  "username" = CASE WHEN ${
+    user.username !== undefined
+  } THEN ${user.username ?? null} ELSE "users_with_deleted"."username" END
+  "openid_id" = CASE WHEN ${
+    user.openid_id !== undefined
+  } THEN ${user.openid_id ?? null} ELSE "users_with_deleted"."openid_id" END
+  "type" = CASE WHEN ${
+    user.type !== undefined
+  } THEN ${user.type ?? null} ELSE "users_with_deleted"."type" END
+  "group" = CASE WHEN ${
+    user.group !== undefined
+  } THEN ${user.group ?? null} ELSE "users_with_deleted"."group" END
+  "age" = CASE WHEN ${
+    user.age !== undefined
+  } THEN ${user.age ?? null} ELSE "users_with_deleted"."age" END
+  "away" = CASE WHEN ${
+    user.away !== undefined
+  } THEN ${user.away ?? null} ELSE "users_with_deleted"."away" END
+  "project_leader_id" = CASE WHEN ${
+    user.project_leader_id !== undefined
+  } THEN ${user.project_leader_id ?? null} ELSE "users_with_deleted"."project_leader_id" END
+  "force_in_project_id" = CASE WHEN ${
+    user.force_in_project_id !== undefined
+  } THEN ${user.force_in_project_id ?? null} ELSE "users_with_deleted"."force_in_project_id" END
+  "deleted" = CASE WHEN ${
+    user.deleted !== undefined
+  } THEN ${user.deleted ?? null} ELSE "users_with_deleted"."deleted" END
   password_hash = CASE WHEN ${!!user.password} THEN ${
                 user.password ? await hashPassword(user.password) : null
               } ELSE password_hash END,
-  ${field("type")},
-  ${field("group")},
-  ${field("age")},
-  ${field("away")},
-  ${field("project_leader_id")},
-  ${field("force_in_project_id")},
-  ${field("deleted")},
   last_updated_by = ${loggedInUser.id}
   WHERE id = ${user.id} RETURNING id, project_leader_id, force_in_project_id;`;
               // TODO FIXME (found using fuzzer) if this tries to update a nonexisting user we should return an error
