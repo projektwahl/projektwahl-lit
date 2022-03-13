@@ -4,11 +4,7 @@ import os from "node:os";
 import { constants } from "node:fs";
 import { execFile } from "node:child_process";
 import { sql } from "../../database.js";
-import {
-  rawChoice,
-  rawProjectSchema,
-  rawUserSchema,
-} from "../../../lib/routes.js";
+import { rawChoice } from "../../../lib/routes.js";
 import { z } from "zod";
 import { typedSql } from "../../describe.js";
 

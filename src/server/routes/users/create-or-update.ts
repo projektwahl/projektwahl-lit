@@ -26,7 +26,7 @@ import { sql } from "../../database.js";
 import { requestHandler } from "../../express.js";
 import { hashPassword } from "../../password.js";
 import type { OutgoingHttpHeaders } from "node:http";
-import { z, ZodIssueCode } from "zod";
+import { ZodIssueCode } from "zod";
 import { typedSql } from "../../describe.js";
 
 // TODO FIXME somehow ensure all attributes are read here because this is an easy way to loose data

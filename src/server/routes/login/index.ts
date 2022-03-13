@@ -20,8 +20,8 @@ https://github.com/projektwahl/projektwahl-lit
 SPDX-License-Identifier: AGPL-3.0-or-later
 SPDX-FileCopyrightText: 2021 Moritz Hedtke <Moritz.Hedtke@t-online.de>
 */
-import { ZodIssueCode, ZodObject, ZodTypeAny } from "zod";
-import type { UnknownKeysParam, ResponseType } from "../../../lib/routes.js";
+import { ZodIssueCode } from "zod";
+import type { ResponseType } from "../../../lib/routes.js";
 import { sql } from "../../database.js";
 import { requestHandler } from "../../express.js";
 import { checkPassword } from "../../password.js";
@@ -30,20 +30,6 @@ import nodeCrypto from "node:crypto";
 import { typedSql } from "../../describe.js";
 // @ts-expect-error wrong typings
 const { webcrypto: crypto }: { webcrypto: Crypto } = nodeCrypto;
-
-const users = <
-  T extends { [k: string]: ZodTypeAny },
-  UnknownKeys extends UnknownKeysParam = "strip",
-  Catchall extends ZodTypeAny = ZodTypeAny
->(
-  s: ZodObject<T, UnknownKeys, Catchall>
-) =>
-  s.pick({
-    id: true,
-    type: true,
-    username: true,
-    password_hash: true,
-  });
 
 export const loginHandler = requestHandler(
   "POST",
