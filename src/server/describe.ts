@@ -1,4 +1,5 @@
 import { deepStrictEqual } from "assert";
+import type { AsRowList, PendingQuery, Row, SerializableParameter } from "postgres";
 import { sql } from "./database.js";
 
 const description = {
@@ -21,12 +22,16 @@ const description = {
   }
 } as const;
 
+//https://github.com/microsoft/TypeScript/issues/27995
+
+export function typedSql<D extends { types: number[]; columns: { [column: string]: number } }>(template: TemplateStringsArray, ...args: DescriptionTypes<D["types"]>): PendingQuery<AsRowList<DescriptionTypes<D["columns"]>[]>> {
+  return sql(template, args)
+}
+
 type DescriptionTypes<T> = {
-  -readonly [Property in keyof T]: T[Property] extends 23 ? number : T[Property] extends 1043 ? string : T[Property] extends 16 ? boolean : T[Property] extends 17425 ? string : unknown;
+  -readonly [Property in keyof T]: Property extends number ? (T[Property] extends 23 ? number : T[Property] extends 1043 ? string : T[Property] extends 16 ? boolean : T[Property] extends 17425 ? string : unknown) : never;
 };
 
-type A = DescriptionTypes<typeof description["columns"]>[]
-type B = DescriptionTypes<typeof description["types"]>
 
 const { types: computed_query_types, columns: computed_column_types_1 } = await sql<A, B>`SELECT * FROM users WHERE id = ${1}`.describe()
 
