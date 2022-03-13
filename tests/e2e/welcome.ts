@@ -649,6 +649,17 @@ export async function main() {
     // TODO filtering with empty result
 
     {
+      // open navbar
+      const pwApp = await driver.findElement(By.css("pw-app"));
+
+      const navbarButton = await (
+        await shadow(pwApp)
+      ).findElement(By.css("button.navbar-toggler"));
+
+      await click(driver, navbarButton);
+    }
+
+    {
       // logout
       const pwApp = await driver.findElement(By.css("pw-app"));
 
@@ -659,6 +670,21 @@ export async function main() {
       assert.equal(await logoutButton.getText(), "Logout admin");
 
       await logoutButton.click();
+    }
+
+    {
+      // open navbar
+      const pwApp = await driver.findElement(By.css("pw-app"));
+
+      const navbarButton = await (
+        await shadow(pwApp)
+      ).findElement(By.css("button.navbar-toggler"));
+
+      await click(driver, navbarButton);
+    }
+
+    {
+      const pwApp = await driver.findElement(By.css("pw-app"));
 
       const loginLink = await (
         await shadow(pwApp)
