@@ -25,14 +25,17 @@ const description = {
 } as const;
 */
 
+// stack traces are garbage
 export function typedSql<
   Q extends readonly number[],
   R extends { [column: string]: number }
 >(sql: Sql<Record<string, never>>, description: { types: Q; columns: R }) {
-  return async (
+  return async function test(
     template: TemplateStringsArray,
     ...args: DescriptionTypes<Q>
-  ) => {
+  ) {
+    const err = new Error().stack
+    try {
     const { types: computed_query_types, columns: computed_column_types_1 } =
       await sql(template, ...args).describe();
 
@@ -50,6 +53,10 @@ export function typedSql<
     deepStrictEqual(computed_description, description);
 
     return await sql<DescriptionTypes<R>[]>(template, ...args).execute();
+  } catch (error) {
+    console.error(err)
+    throw error
+  }
   };
 }
 
@@ -61,7 +68,7 @@ type DescriptionTypes<T> = {
     : T[K] extends 16
     ? boolean
     : T[K] extends 17 ? Uint8Array
-    : string) | null;
+    : never) | null;
 };
 /*
 const results = await typedSql(
