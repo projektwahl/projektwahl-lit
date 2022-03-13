@@ -49,12 +49,12 @@ export function typedSql<
       columns: computed_column_types,
     };
 
-    console.log(computed_description)
+    console.log(computed_description);
 
     deepStrictEqual(computed_description, description);
 
     return await sql<DescriptionTypes<R>[]>(template, ...args).execute();
-  /*} catch (error) {
+    /*} catch (error) {
     console.error(err)
     throw error
   }*/
@@ -62,14 +62,17 @@ export function typedSql<
 }
 
 type DescriptionTypes<T> = {
-  -readonly [K in keyof T]: (T[K] extends 23
-    ? number
-    : T[K] extends 1043
-    ? string
-    : T[K] extends 16
-    ? boolean
-    : T[K] extends 17 ? Uint8Array
-    : never) | null;
+  -readonly [K in keyof T]:
+    | (T[K] extends 23
+        ? number
+        : T[K] extends 1043
+        ? string
+        : T[K] extends 16
+        ? boolean
+        : T[K] extends 17
+        ? Uint8Array
+        : never)
+    | null;
 };
 /*
 const results = await typedSql(
@@ -83,7 +86,3 @@ console.log(results[0].type);
 
 await sql.end();
 */
-await typedSql(
-  sql,
-  {}
-)`INSERT INTO sessions (user_id, session_id) VALUES (${1}, ${""})`

@@ -206,20 +206,15 @@ const choices = z.array(rawChoice).parse(
 );
 
 // TODO FIXME database transaction to ensure consistent view of data
-const projects = 
-    await typedSql(
-      sql,
-      {
-        types: [],
-        columns: { id: 23, min_participants: 23, max_participants: 23 }
-      } as const
-    )`SELECT id, min_participants, max_participants FROM projects;`
+const projects = await typedSql(sql, {
+  types: [],
+  columns: { id: 23, min_participants: 23, max_participants: 23 },
+} as const)`SELECT id, min_participants, max_participants FROM projects;`;
 
-const users = 
-    await typedSql(
-      sql,
-      { types: [], columns: { id: 23, project_leader_id: 23 } } as const
-    )`SELECT id, project_leader_id FROM present_voters ORDER BY id;`
+const users = await typedSql(sql, {
+  types: [],
+  columns: { id: 23, project_leader_id: 23 },
+} as const)`SELECT id, project_leader_id FROM present_voters ORDER BY id;`;
 
 // lodash types are just trash do this yourself
 const choicesGroupedByProject = groupByNumber(choices, (v) => v.project_id);

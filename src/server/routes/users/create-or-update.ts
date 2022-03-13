@@ -98,13 +98,14 @@ export const createOrUpdateUsersHandler = requestHandler(
             if ("id" in user) {
               const finalQuery = typedSql(sql, {
                 types: [
-                     16, 1043,   16, 1043,   16,
-                  17425,   16, 1043,   16,   23,
-                     16,   16,   16,   23,   16,
-                     23,   16,   16,   16, 1043,
-                     23,   23
+                  16, 1043, 16, 1043, 16, 17425, 16, 1043, 16, 23, 16, 16, 16,
+                  23, 16, 23, 16, 16, 16, 1043, 23, 23,
                 ],
-                columns: { id: 23, project_leader_id: 23, force_in_project_id: 23 }
+                columns: {
+                  id: 23,
+                  project_leader_id: 23,
+                  force_in_project_id: 23,
+                },
               } as const)`UPDATE users_with_deleted SET
   "username" = CASE WHEN ${user.username !== undefined} THEN ${
                 user.username ?? null
@@ -155,17 +156,14 @@ export const createOrUpdateUsersHandler = requestHandler(
                   .parse(await finalQuery)
               );
             } else {
-              const query = typedSql(
-                sql,
-                {
-                  types: [
-                     1043, 1043, 1043,
-                    17425, 1043,   23,
-                       16,   16,   23
-                  ],
-                  columns: { id: 23, project_leader_id: 23, force_in_project_id: 23 }
-                } as const
-              )`INSERT INTO users_with_deleted (username, openid_id, password_hash, type, "group", age, away, deleted, last_updated_by) VALUES (${
+              const query = typedSql(sql, {
+                types: [1043, 1043, 1043, 17425, 1043, 23, 16, 16, 23],
+                columns: {
+                  id: 23,
+                  project_leader_id: 23,
+                  force_in_project_id: 23,
+                },
+              } as const)`INSERT INTO users_with_deleted (username, openid_id, password_hash, type, "group", age, away, deleted, last_updated_by) VALUES (${
                 user.username ?? null
               }, ${user.openid_id ?? null}, ${
                 user.password ? await hashPassword(user.password) : null

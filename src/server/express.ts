@@ -98,13 +98,16 @@ export function requestHandler<P extends keyof typeof routes>(
           user = (
             await retryableBegin("READ WRITE", async (sql) => {
               //await typedSql(sql, {})`DELETE FROM sessions WHERE CURRENT_TIMESTAMP >= updated_at + interval '24 hours' AND session_id != ${session_id} `
-              return await typedSql(
-                sql,
-                {
-                  types: [ 17 ],
-                  columns: { id: 23, type: 17425, username: 1043, group: 1043, age: 23 }
-                } as const
-              )`UPDATE sessions SET updated_at = CURRENT_TIMESTAMP FROM users WHERE users.id = sessions.user_id AND session_id = ${session_id_} AND CURRENT_TIMESTAMP < updated_at + interval '24 hours' RETURNING users.id, users.type, users.username, users.group, users.age`;
+              return await typedSql(sql, {
+                types: [17],
+                columns: {
+                  id: 23,
+                  type: 17425,
+                  username: 1043,
+                  group: 1043,
+                  age: 23,
+                },
+              } as const)`UPDATE sessions SET updated_at = CURRENT_TIMESTAMP FROM users WHERE users.id = sessions.user_id AND session_id = ${session_id_} AND CURRENT_TIMESTAMP < updated_at + interval '24 hours' RETURNING users.id, users.type, users.username, users.group, users.age`;
             })
           )[0];
         }
