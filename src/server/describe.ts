@@ -21,8 +21,8 @@ const description = {
   }
 } as const;
 
-export function typedSql<D extends { types: readonly number[]; columns: { [column: string]: number } }>(description: D) {
-  return async (template: TemplateStringsArray, ...args: DescriptionQueryTypes<[23, 16]>) => {
+export function typedSql<Q extends number[], R extends { [column: string]: number }>(description: { types: Q; columns: R }) {
+  return async (template: TemplateStringsArray, ...args: DescriptionQueryTypes<Q>) => {
     const { types: computed_query_types, columns: computed_column_types_1 } = await sql(template, ...args).describe()
 
     const computed_column_types = Object.fromEntries(computed_column_types_1.map(v => [v.name, v.type]))
@@ -34,7 +34,7 @@ export function typedSql<D extends { types: readonly number[]; columns: { [colum
 
     deepStrictEqual(computed_description, description)
 
-    return await sql<DescriptionResultTypes<D["columns"]>[]>(template, ...args).execute()
+    return await sql<DescriptionResultTypes<R>[]>(template, ...args).execute()
   }
 }
 
