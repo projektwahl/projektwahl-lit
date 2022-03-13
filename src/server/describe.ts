@@ -1,5 +1,5 @@
 import { deepStrictEqual } from "assert";
-import type { AsRowList, PendingQuery, Row, SerializableParameter } from "postgres";
+import type { AsRowList, PendingQuery } from "postgres";
 import { sql } from "./database.js";
 
 const description = {
@@ -22,29 +22,27 @@ const description = {
   }
 } as const;
 
-//https://github.com/microsoft/TypeScript/issues/27995
+export function typedSql<D extends { types: readonly number[]; columns: { [column: string]: number } }>(description: D) {
+  return async (template: TemplateStringsArray, ...args: DescriptionTypes<D["types"]>) => {
+    const { types: computed_query_types, columns: computed_column_types_1 } = await sql(template, args).describe()
 
-export function typedSql<D extends { types: number[]; columns: { [column: string]: number } }>(template: TemplateStringsArray, ...args: DescriptionTypes<D["types"]>): PendingQuery<AsRowList<DescriptionTypes<D["columns"]>[]>> {
-  return sql(template, args)
+    const computed_column_types = Object.fromEntries(computed_column_types_1.map(v => [v.name, v.type]))
+
+    const computed_description = {
+      types: computed_query_types,
+      columns: computed_column_types
+    }
+
+    deepStrictEqual(computed_description, description)
+
+    return await sql<DescriptionTypes<D["columns"]>[]>(template, args).execute()
+  }
 }
 
 type DescriptionTypes<T> = {
   -readonly [Property in keyof T]: Property extends number ? (T[Property] extends 23 ? number : T[Property] extends 1043 ? string : T[Property] extends 16 ? boolean : T[Property] extends 17425 ? string : unknown) : never;
 };
 
-
-const { types: computed_query_types, columns: computed_column_types_1 } = await sql<A, B>`SELECT * FROM users WHERE id = ${1}`.describe()
-
-const computed_column_types = Object.fromEntries(computed_column_types_1.map(v => [v.name, v.type]))
-
-const computed_description = {
-  types: computed_query_types,
-  columns: computed_column_types
-}
-
-deepStrictEqual(computed_description, description)
-
-console.log(computed_description);
-console.log(await sql<DescriptionTypes<typeof description["columns"]>[], DescriptionTypes<typeof description["types"]>>`SELECT * FROM users WHERE id = ${1}`.execute());
+await typedSql(description)`SELECT * FROM users WHERE id = ${1}`
 
 await sql.end();
