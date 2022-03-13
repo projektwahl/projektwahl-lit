@@ -23,7 +23,7 @@ SPDX-FileCopyrightText: 2021 Moritz Hedtke <Moritz.Hedtke@t-online.de>
 import type { OutgoingHttpHeaders } from "node:http2";
 import type { PendingQuery, Row } from "postgres";
 import type { z } from "zod";
-import { entityRoutes, ResponseType } from "../lib/routes.js";
+import type { entityRoutes, ResponseType } from "../lib/routes.js";
 import { sql } from "./database.js";
 import { unsafe2 } from "./sql/index.js";
 
