@@ -46,7 +46,7 @@ const exec = promisify(unpromisifiedExec);
 
 {
   let { stdout, stderr } = await exec(
-    "esbuild --format=esm --bundle ./src/client/pw-app.js --charset=utf8 --define:window.PRODUCTION=true --entry-names=[dir]/[name] --sourcemap  --analyze --outdir=dist --tree-shaking=true"
+    "esbuild --format=esm --bundle ./src/client/pw-app.js --charset=utf8 --define:window.PRODUCTION=true --define:window.LANGUAGE=de --entry-names=[dir]/[name] --sourcemap  --analyze --outdir=dist --tree-shaking=true"
   );
 
   console.log(stdout);
@@ -87,7 +87,7 @@ await rename(
 // rebuild with path to bootstrap.css
 {
   let { stdout, stderr } = await exec(
-    `esbuild --format=esm --bundle ./src/client/pw-app.js --charset=utf8 --define:window.PRODUCTION=true --define:window.BOOTSTRAP_CSS=\\"/dist/bootstrap_${bootstrapHash}.min.css\\" --entry-names=[dir]/[name] --sourcemap --analyze --outdir=dist --tree-shaking=true`
+    `esbuild --format=esm --bundle ./src/client/pw-app.js --charset=utf8 --define:window.PRODUCTION=true --define:window.LANGUAGE=de --define:window.BOOTSTRAP_CSS=\\"/dist/bootstrap_${bootstrapHash}.min.css\\" --entry-names=[dir]/[name] --sourcemap --analyze --outdir=dist --tree-shaking=true`
   );
 
   console.log(stdout);

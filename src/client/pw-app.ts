@@ -68,7 +68,7 @@ export const { getLocale, setLocale } = configureLocalization({
   // eslint-disable-next-line @typescript-eslint/require-await
   loadLocale: async () => templates_de,
 });
-void setLocale("de");
+void setLocale(window.LANGUAGE ?? "en");
 
 // TODO FIXME create a pw-app directive that can be awaited on the server side.
 // so we actually get server side rendering with datae

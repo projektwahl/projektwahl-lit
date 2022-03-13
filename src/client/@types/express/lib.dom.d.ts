@@ -37,6 +37,8 @@ declare global {
 
   interface Window {
     BOOTSTRAP_CSS: string | undefined;
+    LANGUAGE: string | undefined;
+    PRODUCTION: boolean | undefined;
   }
 
   interface ObjectConstructor {
