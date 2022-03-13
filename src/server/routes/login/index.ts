@@ -58,7 +58,7 @@ export const loginHandler = requestHandler(
       columns: { id: 23, username: 1043, password_hash: 1043, type: 17425 },
     } as const)`SELECT id, username, password_hash, type FROM users WHERE username = ${body.username} LIMIT 1`;
 
-    const dbUser = users(rawUserSchema).optional().parse(r[0]);
+    const dbUser = r[0];
 
     // TODO FIXME this is vulnerable to side channel attacks
     // but maybe it's fine because we want to tell the user whether the account exists

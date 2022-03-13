@@ -144,17 +144,7 @@ export const createOrUpdateUsersHandler = requestHandler(
   last_updated_by = ${loggedInUser.id}
   WHERE id = ${user.id} RETURNING id, project_leader_id, force_in_project_id;`;
               // TODO FIXME (found using fuzzer) if this tries to update a nonexisting user we should return an error
-              results.push(
-                z
-                  .array(
-                    rawUserSchema.pick({
-                      id: true,
-                      project_leader_id: true,
-                      force_in_project_id: true,
-                    })
-                  )
-                  .parse(await finalQuery)
-              );
+              results.push(await finalQuery);
             } else {
               const query = typedSql(sql, {
                 types: [1043, 1043, 1043, 17425, 1043, 23, 16, 16, 23],
@@ -194,7 +184,7 @@ export const createOrUpdateUsersHandler = requestHandler(
         },
         {
           success: true as const,
-          data: routes["/api/v1/users/create-or-update"]["response"].parse(row),
+          data: row,
         },
       ];
       return returnValue;

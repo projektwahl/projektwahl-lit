@@ -64,23 +64,14 @@ export const openidRedirectHandler = requestHandler(
 
       //console.log(userinfo)
 
-      const dbUser = rawUserSchema
-        .pick({
-          id: true,
-          username: true,
-          type: true,
-        })
-        .optional()
-        .parse(
-          (
-            await typedSql(sql, {
-              types: [25],
-              columns: { id: 23, username: 1043, type: 17425 },
-            } as const)`SELECT id, username, type FROM users WHERE openid_id = ${
-              result.claims().email ?? null
-            } LIMIT 1`
-          )[0]
-        );
+      const dbUser = (
+        await typedSql(sql, {
+          types: [25],
+          columns: { id: 23, username: 1043, type: 17425 },
+        } as const)`SELECT id, username, type FROM users WHERE openid_id = ${
+          result.claims().email ?? null
+        } LIMIT 1`
+      )[0];
 
       if (dbUser === undefined) {
         const returnValue: [

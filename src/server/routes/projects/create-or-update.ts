@@ -40,11 +40,10 @@ export const createProjectsHandler = createOrUpdateProjectsHandler(
     project,
     loggedInUser: Exclude<z.infer<typeof userSchema>, undefined>
   ) => {
-    const res = z.array(rawProjectSchema.pick({ id: true })).parse(
-      await typedSql(sql, {
-        types: [1043, 1043, 1043, 701, 23, 23, 23, 23, 16, 16, 23, 23],
-        columns: { id: 23 },
-      } as const)`INSERT INTO projects_with_deleted (title, info, place, costs, min_age, max_age, min_participants, max_participants, random_assignments, deleted, last_updated_by)
+    const res = await typedSql(sql, {
+      types: [1043, 1043, 1043, 701, 23, 23, 23, 23, 16, 16, 23, 23],
+      columns: { id: 23 },
+    } as const)`INSERT INTO projects_with_deleted (title, info, place, costs, min_age, max_age, min_participants, max_participants, random_assignments, deleted, last_updated_by)
             (SELECT 
     ${project.title ?? null},
     ${project.info ?? null},
@@ -55,12 +54,11 @@ export const createProjectsHandler = createOrUpdateProjectsHandler(
     ${project.min_participants ?? null},
     ${project.max_participants ?? null},
     ${project.random_assignments ?? false}, ${project.deleted ?? false}, ${
-        loggedInUser.id
-      } FROM users_with_deleted WHERE users_with_deleted.id = ${
-        loggedInUser.id
-      } AND (users_with_deleted.type = 'helper' OR users_with_deleted.type = 'admin'))
-    RETURNING id;`
-    );
+      loggedInUser.id
+    } FROM users_with_deleted WHERE users_with_deleted.id = ${
+      loggedInUser.id
+    } AND (users_with_deleted.type = 'helper' OR users_with_deleted.type = 'admin'))
+    RETURNING id;`;
 
     // TODO FIXME make this in sql directly
     if (loggedInUser.type === "helper") {
@@ -133,7 +131,7 @@ FROM users_with_deleted WHERE projects_with_deleted.id = ${
       project.id
     } AND users_with_deleted.type = 'helper' OR users_with_deleted.type = 'admin') RETURNING projects_with_deleted.id;`;
 
-    return z.array(rawProjectSchema.pick({ id: true })).parse(await finalQuery);
+    return await finalQuery;
   }
 );
 
@@ -200,17 +198,11 @@ export function createOrUpdateProjectsHandler<
     }
 
     try {
-      const row = rawProjectSchema
-        .pick({
-          id: true,
+      const row = (
+        await sql.begin("READ WRITE", async (sql) => {
+          return await dbquery(sql, project, loggedInUser);
         })
-        .parse(
-          (
-            await sql.begin("READ WRITE", async (sql) => {
-              return await dbquery(sql, project, loggedInUser);
-            })
-          )[0]
-        );
+      )[0];
 
       if (!row) {
         // insufficient permissions
