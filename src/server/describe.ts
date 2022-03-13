@@ -24,7 +24,17 @@ const description = {
     { name: "deleted", type: 16 },
     { name: "last_updated_by", type: 23 },
   ],
+} as const;
+
+type DescriptionQueryTypes<T> = {
+    [Property in keyof T]: T[Property] extends 23 ? number : unknown;
 };
+
+type DescriptionResultTypes<T extends [ { name: string; type: number } ]> = {
+  [Property in keyof T]: T[Property]["type"] extends 23 ? number : unknown;
+};
+
+const args: DescriptionQueryTypes<typeof description["types"]> = [1];
 
 console.log(await sql`SELECT * FROM users WHERE id = ${1}`.describe());
 console.log(await sql`SELECT * FROM users WHERE id = ${1}`.execute());
