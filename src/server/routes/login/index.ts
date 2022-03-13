@@ -55,7 +55,10 @@ export const loginHandler = requestHandler(
   async function (body) {
     const r = await typedSql(
       sql,
-      {}
+      {
+        types: [ 25 ],
+        columns: { id: 23, username: 1043, password_hash: 1043, type: 17425 }
+      } as const
     )`SELECT id, username, password_hash, type FROM users WHERE username = ${body.username} LIMIT 1`;
 
     const dbUser = users(rawUserSchema).optional().parse(r[0]);
@@ -158,7 +161,7 @@ export const loginHandler = requestHandler(
     await sql.begin("READ WRITE", async (tsql) => {
       return await typedSql(
         tsql,
-        {}
+        { types: [ 23, 17 ], columns: {} } as const
       )`INSERT INTO sessions (user_id, session_id) VALUES (${dbUser.id}, ${session_id})`;
     });
 

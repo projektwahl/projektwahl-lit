@@ -43,7 +43,14 @@ export const createProjectsHandler = createOrUpdateProjectsHandler(
     const res = z.array(rawProjectSchema.pick({ id: true })).parse(
       await typedSql(
         sql,
-        {}
+        {
+          types: [
+            1043, 1043, 1043, 701,
+              23,   23,   23,  23,
+              16,   16,   23,  23
+          ],
+          columns: { id: 23 }
+        } as const
       )`INSERT INTO projects_with_deleted (title, info, place, costs, min_age, max_age, min_participants, max_participants, random_assignments, deleted, last_updated_by)
             (SELECT 
     ${project.title ?? null},
@@ -81,43 +88,51 @@ export const updateProjectsHandler = createOrUpdateProjectsHandler(
     project,
     loggedInUser: Exclude<z.infer<typeof userSchema>, undefined>
   ) => {
-    const finalQuery = typedSql(sql, {})`UPDATE projects_with_deleted SET
+    const finalQuery = typedSql(sql, {
+      types: [
+        16, 1043, 16, 1043, 16, 1043,
+        16,  701, 16,   23, 16,   23,
+        16,   23, 16,   23, 16,   16,
+        16,   16, 23,   23, 23,   23
+      ],
+      columns: { id: 23 }
+    } as const)`UPDATE projects_with_deleted SET
     "title" = CASE WHEN ${project.title !== undefined} THEN ${
       project.title ?? null
-    } ELSE "projects_with_deleted"."title" END
+    } ELSE "projects_with_deleted"."title" END,
     "info" = CASE WHEN ${project.info !== undefined} THEN ${
       project.info ?? null
-    } ELSE "projects_with_deleted"."info" END
+    } ELSE "projects_with_deleted"."info" END,
     "place" = CASE WHEN ${project.place !== undefined} THEN ${
       project.place ?? null
-    } ELSE "projects_with_deleted"."place" END
+    } ELSE "projects_with_deleted"."place" END,
     "costs" = CASE WHEN ${project.costs !== undefined} THEN ${
       project.costs ?? null
-    } ELSE "projects_with_deleted"."costs" END
+    } ELSE "projects_with_deleted"."costs" END,
     "min_age" = CASE WHEN ${project.min_age !== undefined} THEN ${
       project.min_age ?? null
-    } ELSE "projects_with_deleted"."min_age" END
+    } ELSE "projects_with_deleted"."min_age" END,
     "max_age" = CASE WHEN ${project.max_age !== undefined} THEN ${
       project.max_age ?? null
-    } ELSE "projects_with_deleted"."max_age" END
+    } ELSE "projects_with_deleted"."max_age" END,
     "min_participants" = CASE WHEN ${
       project.min_participants !== undefined
     } THEN ${
       project.min_participants ?? null
-    } ELSE "projects_with_deleted"."min_participants" END
+    } ELSE "projects_with_deleted"."min_participants" END,
     "max_participants" = CASE WHEN ${
       project.max_participants !== undefined
     } THEN ${
       project.max_participants ?? null
-    } ELSE "projects_with_deleted"."max_participants" END
+    } ELSE "projects_with_deleted"."max_participants" END,
     "random_assignments" = CASE WHEN ${
       project.random_assignments !== undefined
     } THEN ${
       project.random_assignments ?? null
-    } ELSE "projects_with_deleted"."random_assignments" END
+    } ELSE "projects_with_deleted"."random_assignments" END,
     "deleted" = CASE WHEN ${project.deleted !== undefined} THEN ${
       project.deleted ?? null
-    } ELSE "projects_with_deleted"."deleted" END
+    } ELSE "projects_with_deleted"."deleted" END,
 last_updated_by = ${loggedInUser.id}
 FROM users_with_deleted WHERE projects_with_deleted.id = ${
       project.id
