@@ -26,15 +26,17 @@ const description = {
   ],
 } as const;
 
-type DescriptionQueryTypes<T> = {
+type DescriptionQueryTypes<T extends any[]> = {
     [Property in keyof T]: T[Property] extends 23 ? number : unknown;
 };
 
-type DescriptionResultTypes<T extends [ { name: string; type: number } ]> = {
-  [Property in keyof T]: T[Property]["type"] extends 23 ? number : unknown;
+type DescriptionResultTypes<T extends ({ name: string; type: number })[]> = {
+  [Property in keyof T as T[Property]["name"]]: T[Property]["type"] extends 23 ? number : unknown;
 };
 
 const args: DescriptionQueryTypes<typeof description["types"]> = [1];
+
+const test: DescriptionResultTypes<typeof description["columns"]>;
 
 console.log(await sql`SELECT * FROM users WHERE id = ${1}`.describe());
 console.log(await sql`SELECT * FROM users WHERE id = ${1}`.execute());
