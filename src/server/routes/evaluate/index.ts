@@ -209,13 +209,19 @@ const choices = z.array(rawChoice).parse(
 const projects = z
   .array(rawProjectSchema)
   .parse(
-    await typedSql(sql, {})`SELECT id, min_participants, max_participants FROM projects;`
+    await typedSql(
+      sql,
+      {}
+    )`SELECT id, min_participants, max_participants FROM projects;`
   );
 
 const users = z
   .array(rawUserSchema)
   .parse(
-    await typedSql(sql, {})`SELECT id, project_leader_id FROM present_voters ORDER BY id;`
+    await typedSql(
+      sql,
+      {}
+    )`SELECT id, project_leader_id FROM present_voters ORDER BY id;`
   );
 
 // lodash types are just trash do this yourself

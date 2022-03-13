@@ -45,7 +45,10 @@ void (async () => {
       })
       .parse(
         (
-          await typedSql(sql, {})`INSERT INTO users_with_deleted (username, password_hash, type) VALUES ('admin', ${hash}, 'admin') ON CONFLICT (username) DO UPDATE SET "group" = "users_with_deleted"."group" RETURNING id;`
+          await typedSql(
+            sql,
+            {}
+          )`INSERT INTO users_with_deleted (username, password_hash, type) VALUES ('admin', ${hash}, 'admin') ON CONFLICT (username) DO UPDATE SET "group" = "users_with_deleted"."group" RETURNING id;`
         )[0]
       );
 
@@ -53,7 +56,10 @@ void (async () => {
       const projects = z
         .array(rawProjectSchema)
         .parse(
-          await typedSql(sql, {})`INSERT INTO projects (title, info, place, costs, min_age, max_age, min_participants, max_participants, random_assignments, last_updated_by) (SELECT generate_series, '', '', 0, 5, 13, 5, 20, FALSE, ${admin.id} FROM generate_series(1, 10)) RETURNING *;`
+          await typedSql(
+            sql,
+            {}
+          )`INSERT INTO projects (title, info, place, costs, min_age, max_age, min_participants, max_participants, random_assignments, last_updated_by) (SELECT generate_series, '', '', 0, 5, 13, 5, 20, FALSE, ${admin.id} FROM generate_series(1, 10)) RETURNING *;`
         );
 
       // take care to set this value to project_count * min_participants <= user_count <= project_count * max_participants
@@ -64,14 +70,20 @@ void (async () => {
           })
           .parse(
             (
-              await typedSql(sql, {})`INSERT INTO users (username, type, "group", age, last_updated_by) VALUES (${`user${Math.random()}`}, 'voter', 'a', 10, ${
+              await typedSql(
+                sql,
+                {}
+              )`INSERT INTO users (username, type, "group", age, last_updated_by) VALUES (${`user${Math.random()}`}, 'voter', 'a', 10, ${
                 admin.id
               }) ON CONFLICT DO NOTHING RETURNING users.id;`
             )[0]
           );
         shuffleArray(projects);
         for (let j = 0; j < 5 + Math.random() * 3 - 1.5; j++) {
-          await typedSql(sql, {})`INSERT INTO choices (user_id, project_id, rank) VALUES (${
+          await typedSql(
+            sql,
+            {}
+          )`INSERT INTO choices (user_id, project_id, rank) VALUES (${
             user.id
           }, ${projects[j]["id"]}, ${j + 1});`;
         }

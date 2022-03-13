@@ -3,7 +3,7 @@ import type { Sql } from "postgres";
 import { sql } from "./database.js";
 
 const description = {
-  types: [ 23, 16 ],
+  types: [23, 16],
   columns: {
     id: 23,
     username: 1043,
@@ -18,35 +18,53 @@ const description = {
     force_in_project_id: 23,
     computed_in_project_id: 23,
     deleted: 16,
-    last_updated_by: 23
-  }
+    last_updated_by: 23,
+  },
 } as const;
 
-export function typedSql<Q extends readonly number[], R extends { [column: string]: number }>(sql: Sql<Record<string, never>>, description: { types: Q; columns: R }) {
-  return async (template: TemplateStringsArray, ...args: DescriptionTypes<Q>) => {
-    const { types: computed_query_types, columns: computed_column_types_1 } = await sql(template, ...args).describe()
+export function typedSql<
+  Q extends readonly number[],
+  R extends { [column: string]: number }
+>(sql: Sql<Record<string, never>>, description: { types: Q; columns: R }) {
+  return async (
+    template: TemplateStringsArray,
+    ...args: DescriptionTypes<Q>
+  ) => {
+    const { types: computed_query_types, columns: computed_column_types_1 } =
+      await sql(template, ...args).describe();
 
-    const computed_column_types = Object.fromEntries(computed_column_types_1.map(v => [v.name, v.type]))
+    const computed_column_types = Object.fromEntries(
+      computed_column_types_1.map((v) => [v.name, v.type])
+    );
 
     const computed_description = {
       types: computed_query_types,
-      columns: computed_column_types
-    }
+      columns: computed_column_types,
+    };
 
-    deepStrictEqual(computed_description, description)
+    deepStrictEqual(computed_description, description);
 
-    return await sql<DescriptionTypes<R>[]>(template, ...args).execute()
-  }
+    return await sql<DescriptionTypes<R>[]>(template, ...args).execute();
+  };
 }
 
 type DescriptionTypes<T> = {
-   -readonly [K in keyof T]: T[K] extends 23 ? number : T[K] extends 1043 ? string : T[K] extends 16 ? boolean : string;
-}
+  -readonly [K in keyof T]: T[K] extends 23
+    ? number
+    : T[K] extends 1043
+    ? string
+    : T[K] extends 16
+    ? boolean
+    : string;
+};
 
-const results = await typedSql(sql, description)`SELECT * FROM users WHERE id = ${1} AND away = ${false}`
+const results = await typedSql(
+  sql,
+  description
+)`SELECT * FROM users WHERE id = ${1} AND away = ${false}`;
 
-console.log(results)
+console.log(results);
 
-console.log(results[0].type)
+console.log(results[0].type);
 
 await sql.end();

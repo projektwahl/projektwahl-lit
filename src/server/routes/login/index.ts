@@ -53,8 +53,10 @@ export const loginHandler = requestHandler(
   "POST",
   "/api/v1/login",
   async function (body) {
-    const r =
-      await typedSql(sql, {})`SELECT id, username, password_hash, type FROM users WHERE username = ${body.username} LIMIT 1`;
+    const r = await typedSql(
+      sql,
+      {}
+    )`SELECT id, username, password_hash, type FROM users WHERE username = ${body.username} LIMIT 1`;
 
     const dbUser = users(rawUserSchema).optional().parse(r[0]);
 
@@ -136,7 +138,10 @@ export const loginHandler = requestHandler(
 
     if (needsRehash) {
       await sql.begin("READ WRITE", async (tsql) => {
-        return await typedSql(tsql, {})`UPDATE users SET password_hash = ${newHash} WHERE id = ${dbUser.id}`;
+        return await typedSql(
+          tsql,
+          {}
+        )`UPDATE users SET password_hash = ${newHash} WHERE id = ${dbUser.id}`;
       });
     }
 
@@ -151,7 +156,10 @@ export const loginHandler = requestHandler(
     );
 
     await sql.begin("READ WRITE", async (tsql) => {
-      return await typedSql(tsql, {})`INSERT INTO sessions (user_id, session_id) VALUES (${dbUser.id}, ${session_id})`;
+      return await typedSql(
+        tsql,
+        {}
+      )`INSERT INTO sessions (user_id, session_id) VALUES (${dbUser.id}, ${session_id})`;
     });
 
     /** @type {import("node:http2").OutgoingHttpHeaders} */

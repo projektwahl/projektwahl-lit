@@ -73,7 +73,10 @@ export const openidRedirectHandler = requestHandler(
         .optional()
         .parse(
           (
-            await typedSql(sql, {})`SELECT id, username, type FROM users WHERE openid_id = ${
+            await typedSql(
+              sql,
+              {}
+            )`SELECT id, username, type FROM users WHERE openid_id = ${
               result.claims().email ?? null
             } LIMIT 1`
           )[0]
@@ -115,7 +118,10 @@ export const openidRedirectHandler = requestHandler(
       );
 
       await sql.begin("READ WRITE", async (tsql) => {
-        return await typedSql(tsql, {})`INSERT INTO sessions (user_id, session_id) VALUES (${dbUser.id}, ${session_id})`;
+        return await typedSql(
+          tsql,
+          {}
+        )`INSERT INTO sessions (user_id, session_id) VALUES (${dbUser.id}, ${session_id})`;
       });
 
       /** @type {import("node:http2").OutgoingHttpHeaders} */

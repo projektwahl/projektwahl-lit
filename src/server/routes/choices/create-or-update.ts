@@ -33,9 +33,15 @@ export const updateChoiceHandler = createOrUpdateChoiceHandler(
   async (sql, choice, loggedInUser) => {
     // Only allow updating your own choices. Later we could allow the admin to update somebody else's choices.
     if (choice.rank === null) {
-      return await typedSql(sql, {})`DELETE FROM choices WHERE user_id = ${loggedInUser.id} AND project_id = ${choice.project_id}`;
+      return await typedSql(
+        sql,
+        {}
+      )`DELETE FROM choices WHERE user_id = ${loggedInUser.id} AND project_id = ${choice.project_id}`;
     } else {
-      return await typedSql(sql, {})`INSERT INTO choices (user_id, project_id, rank) VALUES (${loggedInUser.id}, ${choice.project_id}, ${choice.rank}) ON CONFLICT (user_id, project_id) DO UPDATE SET rank = ${choice.rank};`;
+      return await typedSql(
+        sql,
+        {}
+      )`INSERT INTO choices (user_id, project_id, rank) VALUES (${loggedInUser.id}, ${choice.project_id}, ${choice.rank}) ON CONFLICT (user_id, project_id) DO UPDATE SET rank = ${choice.rank};`;
     }
   }
 );
