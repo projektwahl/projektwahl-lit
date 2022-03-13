@@ -22,7 +22,7 @@ const description = {
 } as const;
 
 export function typedSql<Q extends readonly number[], R extends { [column: string]: number }>(description: { types: Q; columns: R }) {
-  return async (template: TemplateStringsArray, ...args: DescriptionQueryTypes<Q>) => {
+  return async (template: TemplateStringsArray, ...args: DescriptionTypes<Q>) => {
     const { types: computed_query_types, columns: computed_column_types_1 } = await sql(template, ...args).describe()
 
     const computed_column_types = Object.fromEntries(computed_column_types_1.map(v => [v.name, v.type]))
@@ -34,22 +34,18 @@ export function typedSql<Q extends readonly number[], R extends { [column: strin
 
     deepStrictEqual(computed_description, description)
 
-    return await sql<DescriptionResultTypes<R>[]>(template, ...args).execute()
+    return await sql<DescriptionTypes<R>[]>(template, ...args).execute()
   }
 }
 
-// https://github.com/microsoft/TypeScript/issues/27995#issuecomment-441283760
-type DescriptionQueryTypes<T> = {
+type DescriptionTypes<T> = {
    -readonly [K in keyof T]: T[K] extends 23 ? number : T[K] extends 1043 ? string : T[K] extends 16 ? boolean : string;
 }
 
-type DescriptionResultTypes<T> = {
-  -readonly [Property in keyof T]: T[Property] extends 23 ? number : T[Property] extends 1043 ? string : T[Property] extends 16 ? boolean : T[Property] extends 17425 ? string : unknown;
-};
-
-// TODO multiple parameters different type
 const results = await typedSql(description)`SELECT * FROM users WHERE id = ${1} AND away = ${false}`
 
 console.log(results)
+
+console.log(results[0].type)
 
 await sql.end();
