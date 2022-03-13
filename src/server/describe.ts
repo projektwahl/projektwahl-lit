@@ -25,6 +25,10 @@ const description = {
 } as const;
 */
 
+type NullableObject<Type> = {
+  [Property in keyof Type]: Type[Property] | null;
+};
+
 // stack traces are garbage
 export function typedSql<
   Q extends readonly number[],
@@ -32,7 +36,7 @@ export function typedSql<
 >(sql: Sql<Record<string, never>>, description: { types: Q; columns: R }) {
   return async function test(
     template: TemplateStringsArray,
-    ...args: DescriptionTypes<Q>
+    ...args: NullableObject<DescriptionTypes<Q>>
   ) {
     //const err = new Error().stack
     //try {
@@ -64,7 +68,7 @@ export function typedSql<
 
 type DescriptionTypes<T> = {
   -readonly [K in keyof T]:
-    ((T[K] extends (23 | 701)
+    (T[K] extends (23 | 701)
         ? number
         : T[K] extends 1043
         ? string
@@ -72,8 +76,7 @@ type DescriptionTypes<T> = {
         ? boolean
         : T[K] extends 17
         ? Uint8Array
-        : unknown)
-    | null);
+        : unknown);
 };
 /*
 const results = await typedSql(
