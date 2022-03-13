@@ -59,6 +59,9 @@ PORT=8443 BASE_URL=https://localhost:8443 DATABASE_URL=postgres://projektwahl:pr
 ```bash
 ln -s $PWD/pre-commit .git/hooks/pre-commit
 
+psql --username=moritz
+ALTER DATABASE projektwahl SET default_transaction_isolation = 'serializable';
+ALTER DATABASE projektwahl SET default_transaction_read_only = true;
 psql --username=moritz < src/server/setup.sql
 
 export DATABASE_HOST=/run/postgresql
