@@ -26,6 +26,7 @@
     "setup": "node --experimental-loader ./src/loader.js --enable-source-maps ./src/server/setup.js",
     "server": "node --experimental-loader ./src/loader.js --enable-source-maps --experimental-import-meta-resolve ./src/server/index.js",
     "localize-extract": "lit-localize extract",
+    "localize-build": "lit-localize build",
     "typecheck": "tsc",
     "lit-analyze": "lit-analyzer --strict --rules.no-unknown-attribute off src",
     "build": "node build.js"
