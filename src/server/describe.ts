@@ -22,7 +22,7 @@ const description = {
 } as const;
 
 export function typedSql<D extends { types: readonly number[]; columns: { [column: string]: number } }>(description: D) {
-  return async (template: TemplateStringsArray, ...args: DescriptionQueryTypes<D["types"]>) => {
+  return async (template: TemplateStringsArray, ...args: DescriptionQueryTypes<[23, 16]>) => {
     const { types: computed_query_types, columns: computed_column_types_1 } = await sql(template, ...args).describe()
 
     const computed_column_types = Object.fromEntries(computed_column_types_1.map(v => [v.name, v.type]))
@@ -39,9 +39,9 @@ export function typedSql<D extends { types: readonly number[]; columns: { [colum
 }
 
 // https://github.com/microsoft/TypeScript/issues/27995#issuecomment-441283760
-type DescriptionQueryTypes<T extends readonly number[]> = {
-   -readonly [K in Exclude<keyof T, keyof number[]>]: T[K] extends number ? (T[K] extends 23 ? number : T[K] extends 1043 ? string : T[K] extends 16 ? boolean : T[K] extends 17425 ? string : unknown) : T[K]; } & { length: T['length']; 
-} & number[]
+type DescriptionQueryTypes<T> = {
+   -readonly [K in keyof T]:T[K] extends 23 ? number : T[K] extends 1043 ? string : T[K] extends 16 ? boolean : T[K] extends 17425 ? string : unknown;
+}
 
 type DescriptionResultTypes<T> = {
   -readonly [Property in keyof T]: T[Property] extends 23 ? number : T[Property] extends 1043 ? string : T[Property] extends 16 ? boolean : T[Property] extends 17425 ? string : unknown;
