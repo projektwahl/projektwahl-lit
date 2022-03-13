@@ -69,7 +69,7 @@ export async function fetchData<R extends keyof typeof entityRoutes>(
           password_hash: "nulls-first",
         },*/
 ): Promise<[OutgoingHttpHeaders, ResponseType<R>]> {
-  const entitySchema: entitesType[R] = entityRoutes[path];
+  //const entitySchema: entitesType[R] = entityRoutes[path];
 
   if (
     // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
@@ -166,8 +166,8 @@ export async function fetchData<R extends keyof typeof entityRoutes>(
 
   const sqlResult = await finalQuery;
 
-  // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
   let entities: z.infer<entitesType[R]["response"]>["entities"] =
+    // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
     sqlResult as unknown as z.infer<entitesType[R]["response"]>["entities"];
 
   // https://github.com/projektwahl/projektwahl-sveltekit/blob/work/src/lib/list-entities.ts#L30

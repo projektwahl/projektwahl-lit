@@ -65,6 +65,7 @@ import * as templates_de from "./generated/de.js";
 export const { getLocale, setLocale } = configureLocalization({
   sourceLocale,
   targetLocales,
+  // eslint-disable-next-line @typescript-eslint/require-await
   loadLocale: async () => templates_de,
 });
 void setLocale("de");
