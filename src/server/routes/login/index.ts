@@ -54,7 +54,7 @@ export const loginHandler = requestHandler(
   "/api/v1/login",
   async function (body) {
     const r =
-      await typedSql({})`SELECT id, username, password_hash, type FROM users WHERE username = ${body.username} LIMIT 1`;
+      await typedSql(sql, {})`SELECT id, username, password_hash, type FROM users WHERE username = ${body.username} LIMIT 1`;
 
     const dbUser = users(rawUserSchema).optional().parse(r[0]);
 

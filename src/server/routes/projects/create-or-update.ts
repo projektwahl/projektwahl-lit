@@ -41,7 +41,7 @@ export const createProjectsHandler = createOrUpdateProjectsHandler(
     loggedInUser: Exclude<z.infer<typeof userSchema>, undefined>
   ) => {
     const res = z.array(rawProjectSchema.pick({ id: true })).parse(
-      await typedSql({})`INSERT INTO projects_with_deleted (title, info, place, costs, min_age, max_age, min_participants, max_participants, random_assignments, deleted, last_updated_by)
+      await typedSql(sql, {})`INSERT INTO projects_with_deleted (title, info, place, costs, min_age, max_age, min_participants, max_participants, random_assignments, deleted, last_updated_by)
             (SELECT 
     ${project.title ?? null},
     ${project.info ?? null},
@@ -61,7 +61,7 @@ export const createProjectsHandler = createOrUpdateProjectsHandler(
 
     // TODO FIXME make this in sql directly
     if (loggedInUser.type === "helper") {
-      await typedSql({})`UPDATE users_with_deleted SET project_leader_id = ${res[0].id} WHERE project_leader_id IS NULL AND id = ${loggedInUser.id}`;
+      await typedSql(sql, {})`UPDATE users_with_deleted SET project_leader_id = ${res[0].id} WHERE project_leader_id IS NULL AND id = ${loggedInUser.id}`;
     }
 
     return res;

@@ -73,7 +73,7 @@ export const openidRedirectHandler = requestHandler(
         .optional()
         .parse(
           (
-            await typedSql({})`SELECT id, username, type FROM users WHERE openid_id = ${
+            await typedSql(sql, {})`SELECT id, username, type FROM users WHERE openid_id = ${
               result.claims().email ?? null
             } LIMIT 1`
           )[0]
