@@ -53,3 +53,9 @@ const results = await typedSql(description)`SELECT * FROM users WHERE id = ${1} 
 console.log(results)
 
 await sql.end();
+
+export function test(template: TemplateStringsArray, ...args: [number, boolean]) {
+  return template || args
+}
+
+const jo = test`SELECT * FROM users WHERE id = ${1} AND away = ${false}`
