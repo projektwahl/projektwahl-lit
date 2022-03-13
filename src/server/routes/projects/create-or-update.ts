@@ -75,7 +75,7 @@ export const updateProjectsHandler = createOrUpdateProjectsHandler(
     project,
     loggedInUser: Exclude<z.infer<typeof userSchema>, undefined>
   ) => {
-    const finalQuery = sql`UPDATE projects_with_deleted SET
+    const finalQuery = typedSql(sql, {})`UPDATE projects_with_deleted SET
     "title" = CASE WHEN ${
       project.title !== undefined
     } THEN ${project.title ?? null} ELSE "projects_with_deleted"."title" END

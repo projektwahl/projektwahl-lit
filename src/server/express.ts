@@ -97,7 +97,7 @@ export function requestHandler<P extends keyof typeof routes>(
           // @ts-expect-error todo fixme
           user = (
             await retryableBegin("READ WRITE", async (sql) => {
-              //await sql`DELETE FROM sessions WHERE CURRENT_TIMESTAMP >= updated_at + interval '24 hours' AND session_id != ${session_id} `
+              //await typedSql(sql, {})`DELETE FROM sessions WHERE CURRENT_TIMESTAMP >= updated_at + interval '24 hours' AND session_id != ${session_id} `
               return await typedSql(sql, {})`UPDATE sessions SET updated_at = CURRENT_TIMESTAMP FROM users WHERE users.id = sessions.user_id AND session_id = ${session_id_} AND CURRENT_TIMESTAMP < updated_at + interval '24 hours' RETURNING users.id, users.type, users.username, users.group, users.age`;
             })
           )[0];

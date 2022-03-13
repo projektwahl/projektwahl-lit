@@ -96,7 +96,7 @@ export const createOrUpdateUsersHandler = requestHandler(
           const results = [];
           for (const user of users) {
             if ("id" in user) {
-              const finalQuery = sql`UPDATE users_with_deleted SET
+              const finalQuery = typedSql(sql, {})`UPDATE users_with_deleted SET
   "username" = CASE WHEN ${
     user.username !== undefined
   } THEN ${user.username ?? null} ELSE "users_with_deleted"."username" END
@@ -142,7 +142,7 @@ export const createOrUpdateUsersHandler = requestHandler(
                   .parse(await finalQuery)
               );
             } else {
-              const query = typedSql({})`INSERT INTO users_with_deleted (username, openid_id, password_hash, type, "group", age, away, deleted, last_updated_by) VALUES (${
+              const query = typedSql(sql, {})`INSERT INTO users_with_deleted (username, openid_id, password_hash, type, "group", age, away, deleted, last_updated_by) VALUES (${
                 user.username ?? null
               }, ${user.openid_id ?? null}, ${
                 user.password ? await hashPassword(user.password) : null
