@@ -176,11 +176,17 @@ export const defaultHeaders = {
   "cache-control": "private, no-cache",
 };
 
+if (!process.env.BASE_URL) {
+  throw new Error("BASE_URL not set.");
+}
+
+const BASE_URL = new URL(process.env.BASE_URL);
+
 export async function serverHandler(
   request: MyRequest,
   response: /*ServerResponse |*/ Http2ServerResponse
 ) {
-  const url = new URL(request.url, process.env.BASE_URL);
+  const url = new URL(request.url, BASE_URL);
 
   if (
     process.env.NODE_ENV === "development" &&

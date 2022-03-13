@@ -34,6 +34,7 @@ import type {
   OutgoingHttpHeaders,
 } from "http2";
 import nodeCrypto from "node:crypto";
+import { suspend } from "../client/utils.js";
 // @ts-expect-error wrong typings
 const { webcrypto: crypto }: { webcrypto: Crypto } = nodeCrypto;
 
@@ -92,14 +93,13 @@ export function requestHandler<P extends keyof typeof routes>(
             )
           );
           const session_id_ = session_id;
-          user = userSchema.parse(
-            (
-              await retryableBegin("READ WRITE", async (sql) => {
-                //await sql`DELETE FROM sessions WHERE CURRENT_TIMESTAMP >= updated_at + interval '24 hours' AND session_id != ${session_id} `
-                return await sql`UPDATE sessions SET updated_at = CURRENT_TIMESTAMP FROM users WHERE users.id = sessions.user_id AND session_id = ${session_id_} AND CURRENT_TIMESTAMP < updated_at + interval '24 hours' RETURNING users.id, users.type, users.username, users.group, users.age`;
-              })
-            )[0]
-          );
+          // @ts-expect-error todo fixme
+          user = (
+            await retryableBegin("READ WRITE", async (sql) => {
+              //await sql`DELETE FROM sessions WHERE CURRENT_TIMESTAMP >= updated_at + interval '24 hours' AND session_id != ${session_id} `
+              return await sql`UPDATE sessions SET updated_at = CURRENT_TIMESTAMP FROM users WHERE users.id = sessions.user_id AND session_id = ${session_id_} AND CURRENT_TIMESTAMP < updated_at + interval '24 hours' RETURNING users.id, users.type, users.username, users.group, users.age`;
+            })
+          )[0];
         }
 
         let body: ResponseType<P>;
@@ -117,6 +117,7 @@ export function requestHandler<P extends keyof typeof routes>(
         }
         const requestBody: ResponseType<P> = body;
         if (requestBody.success) {
+          await suspend();
           const [new_headers, responseBody] = await handler(
             requestBody.data,
             user,
