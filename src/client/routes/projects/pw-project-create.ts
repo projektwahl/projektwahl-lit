@@ -81,7 +81,6 @@ export const PwProjectCreate = setupHmr(
     static override get properties() {
       return {
         ...super.properties,
-        url: { attribute: false },
         actionText: { type: String },
         _task: { state: true },
         _initialTask: { state: true },

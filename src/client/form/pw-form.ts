@@ -30,6 +30,7 @@ class PwForm<P extends keyof typeof routes> extends LitElement {
   static get properties() {
     return {
       disabled: { type: Boolean },
+      url: { attribute: false },
     };
   }
 
@@ -43,9 +44,7 @@ class PwForm<P extends keyof typeof routes> extends LitElement {
 
   form: import("lit/directives/ref").Ref<HTMLFormElement>;
 
-  get url(): P {
-    throw new Error("not implemented");
-  }
+  url!: P;
 
   constructor() {
     super();
