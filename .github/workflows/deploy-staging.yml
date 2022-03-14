@@ -8,7 +8,7 @@ on:
   push:
     branches:
       - main
-      - tests
+      - tests2
 
 jobs:
   deployment:
@@ -28,7 +28,8 @@ jobs:
           ssh moritz@staging-aes.selfmade4u.de -p 2121 << EOF
           set -x
           cd /opt/projektwahl-lit-staging/
-          git pull origin $GIT_BRANCH
+          git fetch --prune origin
+          git checkout origin/$GIT_BRANCH
           npm ci --ignore-scripts --omit=optional
           npx node-pre-gyp rebuild -C ./node_modules/argon2
           npm run localize-build
