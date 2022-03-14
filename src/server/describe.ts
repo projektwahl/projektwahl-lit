@@ -26,10 +26,21 @@ export function typedSql<
       computed_column_types_1.map((v) => [v.name, v.type])
     );
 
-    const computed_description = {
+    const computed_description: {
+      types: (number | null)[];
+      columns: {
+        [k: string]: number | null;
+      };
+    } = {
       types: computed_query_types,
       columns: computed_column_types,
     };
+
+    for (let i = 0; i < description.types.length; i++) {
+      if (description.types[i] === null) {
+        computed_description.types[i] = null;
+      }
+    }
 
     for (const [key, value] of Object.entries(description.columns)) {
       if (value === null) {
