@@ -2,7 +2,7 @@
 # SPDX-FileCopyrightText: 2021 Moritz Hedtke <Moritz.Hedtke@t-online.de>
 name: Deployment
 
-concurrency: staging
+concurrency: production
 
 on:
   push:
@@ -14,8 +14,8 @@ jobs:
   deployment:
     runs-on: ubuntu-latest
     environment:
-      name: staging
-      url: https://staging-aes.selfmade4u.de/
+      name: production
+      url: https://aes.selfmade4u.de/
     steps:
       - name: Setup SSH
         run: |
@@ -27,14 +27,14 @@ jobs:
           set -ex
           GIT_BRANCH=${GITHUB_BASE_REF:-${GITHUB_REF#refs/heads/}}
           echo $GIT_BRANCH
-          ssh moritz@staging-aes.selfmade4u.de -p 2121 << EOF
+          ssh moritz@aes.selfmade4u.de -p 2121 << EOF
           set -ex
-          cd /opt/projektwahl-lit-staging/
+          cd /opt/projektwahl-lit-production/
           git fetch --prune origin
           git checkout origin/$GIT_BRANCH
           npm ci --ignore-scripts --omit=optional
           npx node-pre-gyp rebuild -C ./node_modules/argon2
           npm run localize-build
           npm run build
-          sudo systemctl stop projektwahl@staging.service
+          sudo systemctl stop projektwahl@production.service
           EOF
