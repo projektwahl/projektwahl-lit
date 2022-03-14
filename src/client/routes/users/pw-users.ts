@@ -203,20 +203,36 @@ export class PwUsers<X extends string> extends PwEntityList<
               (value) => html`<tr>
                 <th scope="row">
                   <p>
-                    <a @click=${aClick} href="/users/view/${value.id}"
-                      >${value.id}</a
-                    >
+                    ${value.deleted
+                      ? html`<del
+                          ><a @click=${aClick} href="/users/view/${value.id}"
+                            >${value.id}</a
+                          ></del
+                        >`
+                      : html`<a @click=${aClick} href="/users/view/${value.id}"
+                          >${value.id}</a
+                        >`}
                   </p>
                 </th>
                 <td>
                   <p>
-                    <a @click=${aClick} href="/users/view/${value.id}"
-                      >${value.username}</a
-                    >
+                    ${value.deleted
+                      ? html`<del
+                          ><a @click=${aClick} href="/users/view/${value.id}"
+                            >${value.username}</a
+                          ></del
+                        >`
+                      : html`<a @click=${aClick} href="/users/view/${value.id}"
+                          >${value.username}</a
+                        >`}
                   </p>
                 </td>
                 <td>
-                  <p>${value.type}</p>
+                  <p>
+                    ${value.deleted
+                      ? html`<del>${value.type}</del>`
+                      : html`${value.type}`}
+                  </p>
                 </td>
                 <td>
                   <a

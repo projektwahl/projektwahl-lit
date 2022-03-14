@@ -176,7 +176,7 @@ const baseQuery = <
           ])
         )
         .default([]),
-      paginationLimit: z.number().default(100),
+      paginationLimit: z.number().default(10),
     })
     .strict();
 };

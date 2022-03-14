@@ -35,6 +35,7 @@ import { ref } from "lit/directives/ref.js";
 import { pwInputText } from "../../form/pw-input-text.js";
 import { pwInputNumber } from "../../form/pw-input-number.js";
 import { pwInputCheckbox } from "../../form/pw-input-checkbox.js";
+import { aClick } from "../../pw-a.js";
 
 export async function pwProject(id: number, viewOnly = false) {
   const result = await taskFunction([id]);
@@ -140,7 +141,11 @@ export const PwProjectCreate = setupHmr(
         >("POST", this.url, formDataEvent.detail, {});
 
         if (result.success) {
-          HistoryController.goto(new URL("/", window.location.href), {}, false);
+          HistoryController.goto(
+            new URL(`/projects/edit/${result.data.id}`, window.location.href),
+            {},
+            true
+          );
         }
 
         return result;
@@ -326,6 +331,34 @@ export const PwProjectCreate = setupHmr(
                     task: this._task,
                     initial: this.initial?.data,
                   })}
+                  ${!this.disabled
+                    ? html`
+                        <button
+                          type="submit"
+                          ?disabled=${this._task.render({
+                            pending: () => true,
+                            complete: () => false,
+                            initial: () => false,
+                          })}
+                          class="btn btn-primary"
+                        >
+                          ${this.actionText}
+                        </button>
+                      `
+                    : html`<a
+                        class="btn btn-secondary"
+                        @click=${aClick}
+                        href="/projects/edit/${this.initial?.data.id}"
+                        role="button"
+                        >Edit project</a
+                      >`}
+                  <button
+                    type="button"
+                    class="btn btn-secondary"
+                    @click=${() => window.history.back()}
+                  >
+                    ${msg(`Back`)}
+                  </button>
 
                   <!-- Projektleitende -->
                   <!-- TODO FIXME view only -->
@@ -345,21 +378,6 @@ export const PwProjectCreate = setupHmr(
                         prefix="members"
                       ></pw-project-users>`
                     : html``}
-                  ${!this.disabled
-                    ? html`
-                        <button
-                          type="submit"
-                          ?disabled=${this._task.render({
-                            pending: () => true,
-                            complete: () => false,
-                            initial: () => false,
-                          })}
-                          class="btn btn-primary"
-                        >
-                          ${this.actionText}
-                        </button>
-                      `
-                    : undefined}
                 </form>
               </div>
             </div>

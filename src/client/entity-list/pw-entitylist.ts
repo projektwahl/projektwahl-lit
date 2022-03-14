@@ -265,7 +265,7 @@ export class PwEntityList<
                 initial: data[this.prefix],
                 options: [
                   {
-                    text: "100",
+                    text: "10",
                     value: 10,
                   },
                   {
@@ -281,7 +281,7 @@ export class PwEntityList<
                     value: 100,
                   },
                 ],
-                defaultValue: 100,
+                defaultValue: 10,
               })}
             </div>
           </div>

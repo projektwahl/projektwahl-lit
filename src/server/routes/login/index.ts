@@ -163,6 +163,9 @@ export const loginHandler = requestHandler(
         `username=${dbUser.username}; Secure; Path=/; SameSite=Lax; Max-Age=${
           48 * 60 * 60
         };`,
+        `type=${dbUser.type}; Secure; Path=/; SameSite=Lax; Max-Age=${
+          48 * 60 * 60
+        };`,
       ],
     };
     return [

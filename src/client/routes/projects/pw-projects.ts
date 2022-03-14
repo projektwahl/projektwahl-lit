@@ -173,20 +173,44 @@ class PwProjects<X extends string> extends PwEntityList<"/api/v1/projects", X> {
                 (value) => html`<tr>
                   <th scope="row">
                     <p>
-                      <a @click=${aClick} href="/projects/view/${value.id}"
-                        >${value.id}</a
-                      >
+                      ${value.deleted
+                        ? html`<del
+                            ><a
+                              @click=${aClick}
+                              href="/projects/view/${value.id}"
+                              >${value.id}</a
+                            ></del
+                          >`
+                        : html`<a
+                            @click=${aClick}
+                            href="/projects/view/${value.id}"
+                            >${value.id}</a
+                          >`}
                     </p>
                   </th>
                   <td>
                     <p>
-                      <a @click=${aClick} href="/projects/view/${value.id}"
-                        >${value.title}</a
-                      >
+                      ${value.deleted
+                        ? html`<del
+                            ><a
+                              @click=${aClick}
+                              href="/projects/view/${value.id}"
+                              >${value.title}</a
+                            ></del
+                          >`
+                        : html`<a
+                            @click=${aClick}
+                            href="/projects/view/${value.id}"
+                            >${value.title}</a
+                          >`}
                     </p>
                   </td>
                   <td>
-                    <p>${value.info}</p>
+                    <p>
+                      ${value.deleted
+                        ? html`<del>${value.info}</del>`
+                        : html`${value.info}`}
+                    </p>
                   </td>
                   <td>
                     <a

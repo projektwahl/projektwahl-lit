@@ -36,6 +36,7 @@ import { pwInputText } from "../../form/pw-input-text.js";
 import { pwInputSelect } from "../../form/pw-input-select.js";
 import { pwInputNumber } from "../../form/pw-input-number.js";
 import { pwInputCheckbox } from "../../form/pw-input-checkbox.js";
+import { aClick } from "../../pw-a.js";
 
 export async function pwUser(id: number, viewOnly = false) {
   const result = await taskFunction([id]);
@@ -130,7 +131,11 @@ class PwUserCreate extends PwForm<"/api/v1/users/create-or-update"> {
       );
 
       if (result.success) {
-        HistoryController.goto(new URL("/", window.location.href), {}, false);
+        HistoryController.goto(
+          new URL(`/users/edit/${result.data[0].id}`, window.location.href),
+          {},
+          true
+        );
       }
 
       return result;
@@ -349,7 +354,20 @@ class PwUserCreate extends PwForm<"/api/v1/users/create-or-update"> {
                         ${this.actionText}
                       </button>
                     `
-                  : undefined}
+                  : html`<a
+                      class="btn btn-secondary"
+                      href="/users/edit/${this.initial?.data[0].id}"
+                      @click=${aClick}
+                      role="button"
+                      >Edit user</a
+                    >`}
+                <button
+                  type="button"
+                  class="btn btn-secondary"
+                  @click=${() => window.history.back()}
+                >
+                  ${msg(`Back`)}
+                </button>
               </form>
             </div>
           </div>
