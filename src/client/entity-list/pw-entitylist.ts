@@ -167,16 +167,6 @@ export class PwEntityList<
     if (this.initialRender) {
       this._task = new Task(this, {
         task: async () => {
-          if (this.initialRender) {
-            this.initialRender = false;
-            
-            // this is not set yet because its passed using properties
-            console.log(this.initial)
-            if (this.initial) {
-              return this.initial;
-            }  
-          }
-  
           const data = parseRequestWithPrefix(
             this.url,
             this.prefix,
@@ -214,9 +204,14 @@ export class PwEntityList<
   
           return result;
         },
+        autoRun: false, // TODO FIXME this breaks if you navigate to the same page (as it doesnt cause an update) - maybe we should autorun on url change?
+        initialStatus: this.initial !== undefined ? TaskStatus.COMPLETE : TaskStatus.INITIAL,
+        initialValue: this.initial,
       });
   
-      void this._task.run();
+      if (this.initial === undefined) {
+        void this._task.run();
+      }
     }
 
     const data = parseRequestWithPrefix(
