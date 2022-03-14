@@ -22,12 +22,13 @@ SPDX-FileCopyrightText: 2021 Moritz Hedtke <Moritz.Hedtke@t-online.de>
 */
 import { sensitiveHeaders } from "node:http2";
 import { ZodIssueCode } from "zod";
-import { rawUserSchema, ResponseType } from "../../../lib/routes.js";
+import type { ResponseType } from "../../../lib/routes.js";
 import { sql } from "../../database.js";
 import { requestHandler } from "../../express.js";
 import { client } from "./openid-client.js";
 import type { OutgoingHttpHeaders } from "node:http";
 import nodeCrypto from "node:crypto";
+import { typedSql } from "../../describe.js";
 // @ts-expect-error wrong typings
 const { webcrypto: crypto }: { webcrypto: Crypto } = nodeCrypto;
 
@@ -63,20 +64,18 @@ export const openidRedirectHandler = requestHandler(
 
       //console.log(userinfo)
 
-      const dbUser = rawUserSchema
-        .pick({
-          id: true,
-          username: true,
-          type: true,
-        })
-        .optional()
-        .parse(
-          (
-            await sql`SELECT id, username, type FROM users WHERE openid_id = ${
-              result.claims().email ?? null
-            } LIMIT 1`
-          )[0]
-        );
+      const dbUser = (
+        await typedSql(sql, {
+          types: [25],
+          columns: {
+            id: 23,
+            username: 1043,
+            type: null, // custom enum
+          },
+        } as const)`SELECT id, username, type FROM users WHERE openid_id = ${
+          result.claims().email ?? null
+        } LIMIT 1`
+      )[0];
 
       if (dbUser === undefined) {
         const returnValue: [
@@ -114,7 +113,10 @@ export const openidRedirectHandler = requestHandler(
       );
 
       await sql.begin("READ WRITE", async (tsql) => {
-        return await tsql`INSERT INTO sessions (user_id, session_id) VALUES (${dbUser.id}, ${session_id})`;
+        return await typedSql(tsql, {
+          types: [23, 17],
+          columns: {},
+        } as const)`INSERT INTO sessions (user_id, session_id) VALUES (${dbUser.id}, ${session_id})`;
       });
 
       /** @type {import("node:http2").OutgoingHttpHeaders} */

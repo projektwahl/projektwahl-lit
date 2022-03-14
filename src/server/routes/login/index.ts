@@ -20,42 +20,32 @@ https://github.com/projektwahl/projektwahl-lit
 SPDX-License-Identifier: AGPL-3.0-or-later
 SPDX-FileCopyrightText: 2021 Moritz Hedtke <Moritz.Hedtke@t-online.de>
 */
-import { ZodIssueCode, ZodObject, ZodTypeAny } from "zod";
-import {
-  rawUserSchema,
-  UnknownKeysParam,
-  ResponseType,
-} from "../../../lib/routes.js";
+import { ZodIssueCode } from "zod";
+import type { ResponseType } from "../../../lib/routes.js";
 import { sql } from "../../database.js";
 import { requestHandler } from "../../express.js";
 import { checkPassword } from "../../password.js";
 import type { OutgoingHttpHeaders } from "node:http";
 import nodeCrypto from "node:crypto";
+import { typedSql } from "../../describe.js";
 // @ts-expect-error wrong typings
 const { webcrypto: crypto }: { webcrypto: Crypto } = nodeCrypto;
-
-const users = <
-  T extends { [k: string]: ZodTypeAny },
-  UnknownKeys extends UnknownKeysParam = "strip",
-  Catchall extends ZodTypeAny = ZodTypeAny
->(
-  s: ZodObject<T, UnknownKeys, Catchall>
-) =>
-  s.pick({
-    id: true,
-    type: true,
-    username: true,
-    password_hash: true,
-  });
 
 export const loginHandler = requestHandler(
   "POST",
   "/api/v1/login",
   async function (body) {
-    const r =
-      await sql`SELECT id, username, password_hash, type FROM users WHERE username = ${body.username} LIMIT 1`;
+    const r = await typedSql(sql, {
+      types: [25],
+      columns: {
+        id: 23,
+        username: 1043,
+        password_hash: 1043,
+        type: null, // custom enum
+      },
+    } as const)`SELECT id, username, password_hash, type FROM users WHERE username = ${body.username} LIMIT 1`;
 
-    const dbUser = users(rawUserSchema).optional().parse(r[0]);
+    const dbUser = r[0];
 
     // TODO FIXME this is vulnerable to side channel attacks
     // but maybe it's fine because we want to tell the user whether the account exists
@@ -135,7 +125,10 @@ export const loginHandler = requestHandler(
 
     if (needsRehash) {
       await sql.begin("READ WRITE", async (tsql) => {
-        return await tsql`UPDATE users SET password_hash = ${newHash} WHERE id = ${dbUser.id}`;
+        return await typedSql(tsql, {
+          types: [1043, 23],
+          columns: {},
+        } as const)`UPDATE users SET password_hash = ${newHash} WHERE id = ${dbUser.id}`;
       });
     }
 
@@ -150,7 +143,10 @@ export const loginHandler = requestHandler(
     );
 
     await sql.begin("READ WRITE", async (tsql) => {
-      return await tsql`INSERT INTO sessions (user_id, session_id) VALUES (${dbUser.id}, ${session_id})`;
+      return await typedSql(tsql, {
+        types: [23, 17],
+        columns: {},
+      } as const)`INSERT INTO sessions (user_id, session_id) VALUES (${dbUser.id}, ${session_id})`;
     });
 
     /** @type {import("node:http2").OutgoingHttpHeaders} */

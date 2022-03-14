@@ -21,13 +21,13 @@ SPDX-License-Identifier: AGPL-3.0-or-later
 SPDX-FileCopyrightText: 2021 Moritz Hedtke <Moritz.Hedtke@t-online.de>
 */
 import postgres from "postgres";
-import { routes, ResponseType, rawUserSchema } from "../../../lib/routes.js";
+import type { ResponseType } from "../../../lib/routes.js";
 import { sql } from "../../database.js";
 import { requestHandler } from "../../express.js";
 import { hashPassword } from "../../password.js";
-import { updateField } from "../../entities.js";
 import type { OutgoingHttpHeaders } from "node:http";
-import { z, ZodIssueCode } from "zod";
+import { ZodIssueCode } from "zod";
+import { typedSql } from "../../describe.js";
 
 // TODO FIXME somehow ensure all attributes are read here because this is an easy way to loose data
 // Also ensure create and update has the same attributes
@@ -96,38 +96,94 @@ export const createOrUpdateUsersHandler = requestHandler(
           const results = [];
           for (const user of users) {
             if ("id" in user) {
-              const field = (name: keyof typeof user) =>
-                updateField("users_with_deleted", user, name);
-
-              const finalQuery = sql`UPDATE users_with_deleted SET
-  ${field("username")},
-  ${field("openid_id")},
+              const finalQuery = typedSql(sql, {
+                types: [
+                  16,
+                  1043,
+                  16,
+                  1043,
+                  16,
+                  null, // custom enum
+                  16,
+                  1043,
+                  16,
+                  23,
+                  16,
+                  16,
+                  16,
+                  23,
+                  16,
+                  23,
+                  16,
+                  16,
+                  16,
+                  1043,
+                  23,
+                  23,
+                ],
+                columns: {
+                  id: 23,
+                  project_leader_id: 23,
+                  force_in_project_id: 23,
+                },
+              } as const)`UPDATE users_with_deleted SET
+  "username" = CASE WHEN ${user.username !== undefined} THEN ${
+                user.username ?? null
+              } ELSE "users_with_deleted"."username" END,
+  "openid_id" = CASE WHEN ${user.openid_id !== undefined} THEN ${
+                user.openid_id ?? null
+              } ELSE "users_with_deleted"."openid_id" END,
+  "type" = CASE WHEN ${user.type !== undefined} THEN ${
+                user.type ?? null
+              } ELSE "users_with_deleted"."type" END,
+  "group" = CASE WHEN ${user.group !== undefined} THEN ${
+                user.group ?? null
+              } ELSE "users_with_deleted"."group" END,
+  "age" = CASE WHEN ${user.age !== undefined} THEN ${
+                user.age ?? null
+              } ELSE "users_with_deleted"."age" END,
+  "away" = CASE WHEN ${user.away !== undefined} THEN ${
+                user.away ?? null
+              } ELSE "users_with_deleted"."away" END,
+  "project_leader_id" = CASE WHEN ${
+    user.project_leader_id !== undefined
+  } THEN ${
+                user.project_leader_id ?? null
+              } ELSE "users_with_deleted"."project_leader_id" END,
+  "force_in_project_id" = CASE WHEN ${
+    user.force_in_project_id !== undefined
+  } THEN ${
+                user.force_in_project_id ?? null
+              } ELSE "users_with_deleted"."force_in_project_id" END,
+  "deleted" = CASE WHEN ${user.deleted !== undefined} THEN ${
+                user.deleted ?? null
+              } ELSE "users_with_deleted"."deleted" END,
   password_hash = CASE WHEN ${!!user.password} THEN ${
                 user.password ? await hashPassword(user.password) : null
               } ELSE password_hash END,
-  ${field("type")},
-  ${field("group")},
-  ${field("age")},
-  ${field("away")},
-  ${field("project_leader_id")},
-  ${field("force_in_project_id")},
-  ${field("deleted")},
   last_updated_by = ${loggedInUser.id}
   WHERE id = ${user.id} RETURNING id, project_leader_id, force_in_project_id;`;
               // TODO FIXME (found using fuzzer) if this tries to update a nonexisting user we should return an error
-              results.push(
-                z
-                  .array(
-                    rawUserSchema.pick({
-                      id: true,
-                      project_leader_id: true,
-                      force_in_project_id: true,
-                    })
-                  )
-                  .parse(await finalQuery)
-              );
+              results.push(await finalQuery);
             } else {
-              const query = sql`INSERT INTO users_with_deleted (username, openid_id, password_hash, type, "group", age, away, deleted, last_updated_by) VALUES (${
+              const query = typedSql(sql, {
+                types: [
+                  1043,
+                  1043,
+                  1043,
+                  null, // custom enum
+                  1043,
+                  23,
+                  16,
+                  16,
+                  23,
+                ],
+                columns: {
+                  id: 23,
+                  project_leader_id: 23,
+                  force_in_project_id: 23,
+                },
+              } as const)`INSERT INTO users_with_deleted (username, openid_id, password_hash, type, "group", age, away, deleted, last_updated_by) VALUES (${
                 user.username ?? null
               }, ${user.openid_id ?? null}, ${
                 user.password ? await hashPassword(user.password) : null
@@ -158,7 +214,7 @@ export const createOrUpdateUsersHandler = requestHandler(
         },
         {
           success: true as const,
-          data: routes["/api/v1/users/create-or-update"]["response"].parse(row),
+          data: row,
         },
       ];
       return returnValue;

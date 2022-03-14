@@ -35,6 +35,7 @@ import type {
 } from "http2";
 import nodeCrypto from "node:crypto";
 import { suspend } from "../client/utils.js";
+import { typedSql } from "./describe.js";
 // @ts-expect-error wrong typings
 const { webcrypto: crypto }: { webcrypto: Crypto } = nodeCrypto;
 
@@ -96,8 +97,17 @@ export function requestHandler<P extends keyof typeof routes>(
           // @ts-expect-error todo fixme
           user = (
             await retryableBegin("READ WRITE", async (sql) => {
-              //await sql`DELETE FROM sessions WHERE CURRENT_TIMESTAMP >= updated_at + interval '24 hours' AND session_id != ${session_id} `
-              return await sql`UPDATE sessions SET updated_at = CURRENT_TIMESTAMP FROM users WHERE users.id = sessions.user_id AND session_id = ${session_id_} AND CURRENT_TIMESTAMP < updated_at + interval '24 hours' RETURNING users.id, users.type, users.username, users.group, users.age`;
+              //await typedSql(sql, {})`DELETE FROM sessions WHERE CURRENT_TIMESTAMP >= updated_at + interval '24 hours' AND session_id != ${session_id} `
+              return await typedSql(sql, {
+                types: [17],
+                columns: {
+                  id: 23,
+                  type: null, // custom enum
+                  username: 1043,
+                  group: 1043,
+                  age: 23,
+                },
+              } as const)`UPDATE sessions SET updated_at = CURRENT_TIMESTAMP FROM users WHERE users.id = sessions.user_id AND session_id = ${session_id_} AND CURRENT_TIMESTAMP < updated_at + interval '24 hours' RETURNING users.id, users.type, users.username, users.group, users.age`;
             })
           )[0];
         }

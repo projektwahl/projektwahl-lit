@@ -44,17 +44,6 @@ type entitesType0 = {
   [K in keyof typeof entityRoutes]: z.infer<typeof entityRoutes[K]["request"]>;
 };
 
-export function updateField<
-  E extends { [name: string]: boolean | string | number | null },
-  K extends keyof E
->(table: string, entity: E, name: K) {
-  return sql`"${unsafe2(name)}" = CASE WHEN ${
-    entity[name] !== undefined
-  } THEN ${entity[name] ?? null} ELSE "${unsafe2(table)}"."${unsafe2(
-    name
-  )}" END`;
-}
-
 export async function fetchData<R extends keyof typeof entityRoutes>(
   path: R,
   query: entitesType0[R],
@@ -164,6 +153,7 @@ export async function fetchData<R extends keyof typeof entityRoutes>(
 
   //const entitiesSchema = entitySchema["response"]["shape"]["entities"];
 
+  // would be great to stream the results but they are post processed below
   const sqlResult = await finalQuery;
 
   let entities: z.infer<entitesType[R]["response"]>["entities"] =

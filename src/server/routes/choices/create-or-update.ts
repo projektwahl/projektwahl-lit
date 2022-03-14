@@ -26,15 +26,22 @@ import { requestHandler } from "../../express.js";
 import type { OutgoingHttpHeaders } from "node:http";
 import type { ResponseType, routes, userSchema } from "../../../lib/routes.js";
 import { z, ZodIssueCode } from "zod";
+import { typedSql } from "../../describe.js";
 
 export const updateChoiceHandler = createOrUpdateChoiceHandler(
   "/api/v1/choices/update",
   async (sql, choice, loggedInUser) => {
     // Only allow updating your own choices. Later we could allow the admin to update somebody else's choices.
     if (choice.rank === null) {
-      return await sql`DELETE FROM choices WHERE user_id = ${loggedInUser.id} AND project_id = ${choice.project_id}`;
+      return await typedSql(sql, {
+        types: [23, 23],
+        columns: {},
+      } as const)`DELETE FROM choices WHERE user_id = ${loggedInUser.id} AND project_id = ${choice.project_id}`;
     } else {
-      return await sql`INSERT INTO choices (user_id, project_id, rank) VALUES (${loggedInUser.id}, ${choice.project_id}, ${choice.rank}) ON CONFLICT (user_id, project_id) DO UPDATE SET rank = ${choice.rank};`;
+      return await typedSql(sql, {
+        types: [23, 23, 23, 23],
+        columns: {},
+      } as const)`INSERT INTO choices (user_id, project_id, rank) VALUES (${loggedInUser.id}, ${choice.project_id}, ${choice.rank}) ON CONFLICT (user_id, project_id) DO UPDATE SET rank = ${choice.rank};`;
     }
   }
 );

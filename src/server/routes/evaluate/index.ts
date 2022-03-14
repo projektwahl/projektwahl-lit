@@ -4,12 +4,9 @@ import os from "node:os";
 import { constants } from "node:fs";
 import { execFile } from "node:child_process";
 import { sql } from "../../database.js";
-import {
-  rawChoice,
-  rawProjectSchema,
-  rawUserSchema,
-} from "../../../lib/routes.js";
+import { rawChoice } from "../../../lib/routes.js";
 import { z } from "zod";
+import { typedSql } from "../../describe.js";
 
 const groupByNumber = <T>(
   data: T[],
@@ -205,17 +202,15 @@ const choices = z.array(rawChoice).parse(
 );
 
 // TODO FIXME database transaction to ensure consistent view of data
-const projects = z
-  .array(rawProjectSchema)
-  .parse(
-    await sql`SELECT id, min_participants, max_participants FROM projects;`
-  );
+const projects = await typedSql(sql, {
+  types: [],
+  columns: { id: 23, min_participants: 23, max_participants: 23 },
+} as const)`SELECT id, min_participants, max_participants FROM projects;`;
 
-const users = z
-  .array(rawUserSchema)
-  .parse(
-    await sql`SELECT id, project_leader_id FROM present_voters ORDER BY id;`
-  );
+const users = await typedSql(sql, {
+  types: [],
+  columns: { id: 23, project_leader_id: 23 },
+} as const)`SELECT id, project_leader_id FROM present_voters ORDER BY id;`;
 
 // lodash types are just trash do this yourself
 const choicesGroupedByProject = groupByNumber(choices, (v) => v.project_id);
