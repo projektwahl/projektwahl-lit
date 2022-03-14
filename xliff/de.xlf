@@ -139,6 +139,9 @@
   <source>Mark this user as deleted</source>
   <target>Accounts als gelöscht markieren</target>
 </trans-unit>
+<trans-unit id="sc16e00a7a8b2fde2">
+  <source>Back</source>
+</trans-unit>
 <trans-unit id="s5daa9183e1169f88">
   <source>.json Datei</source>
 </trans-unit>
