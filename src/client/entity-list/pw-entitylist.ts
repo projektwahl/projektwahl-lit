@@ -155,7 +155,7 @@ export class PwEntityList<
   }
 
   override render() {
-    console.log(`rerender pw-entitylist ${this.url} ${Math.random()}`)
+    console.log(`rerender pw-entitylist ${this.url} ${Math.random()}`);
     if (this.prefix === undefined) {
       throw new Error("prefix not set");
     }
@@ -172,7 +172,7 @@ export class PwEntityList<
             this.prefix,
             this.history.url
           );
-  
+
           const formDataEvent = new CustomEvent<
             z.infer<typeof entityRoutes[P]["request"]>
           >("myformdata", {
@@ -180,14 +180,14 @@ export class PwEntityList<
             detail: data[this.prefix] ?? {},
           });
           this.form.value?.dispatchEvent(formDataEvent);
-  
+
           const result = await myFetch<P>(
             "GET",
             this.url,
             formDataEvent.detail,
             {}
           );
-  
+
           HistoryController.goto(
             new URL(
               `?${encodeURIComponent(
@@ -201,14 +201,15 @@ export class PwEntityList<
             {},
             true
           );
-  
+
           return result;
         },
         autoRun: false, // TODO FIXME this breaks if you navigate to the same page (as it doesnt cause an update) - maybe we should autorun on url change?
-        initialStatus: this.initial !== undefined ? TaskStatus.COMPLETE : TaskStatus.INITIAL,
+        initialStatus:
+          this.initial !== undefined ? TaskStatus.COMPLETE : TaskStatus.INITIAL,
         initialValue: this.initial,
       });
-  
+
       if (this.initial === undefined) {
         void this._task.run();
       }

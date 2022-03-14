@@ -230,10 +230,10 @@ export class PwApp extends LitElement {
     this.nextPage = async ([key]: [keyof typeof pages | undefined]) => {
       if (this.initialRender) {
         this.initialRender = false;
-  
+
         if (this.initial) {
           return this.initial;
-        }  
+        }
       }
       try {
         if (key) {
@@ -283,7 +283,7 @@ export class PwApp extends LitElement {
   }
 
   override render() {
-    console.log(`rerender pw-app ${Math.random()}`)
+    console.log(`rerender pw-app ${Math.random()}`);
     return html`
       ${bootstrapCss}
       <style>

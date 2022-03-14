@@ -55,7 +55,6 @@ export class PwUsers<X extends string> extends PwEntityList<
 
   constructor() {
     super();
-
   }
 
   override get url() {
