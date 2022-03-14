@@ -11,7 +11,6 @@ import {
 } from "selenium-webdriver";
 import chrome from "selenium-webdriver/chrome.js";
 //import repl from "repl";
-import { writeFile } from "fs/promises";
 
 if (!process.env["BASE_URL"]) {
   console.error("BASE_URL not set!");
