@@ -705,7 +705,7 @@ export async function main() {
 
       await click(driver, navbarButton);
     }
-    f;
+
     {
       const pwApp = await driver.findElement(By.css("pw-app"));
 

@@ -4,4 +4,5 @@
 set -ex
 reuse lint
 npm run format:check
+npm run typecheck
 npm run lint

@@ -22,11 +22,11 @@ jobs:
           echo "${{ secrets.SSH_KNOWN_HOSTS }}" > ~/.ssh/known_hosts
       - name: SSH
         run: |
-          set -x
+          set -ex
           GIT_BRANCH=${GITHUB_BASE_REF:-${GITHUB_REF#refs/heads/}}
           echo $GIT_BRANCH
           ssh moritz@staging-aes.selfmade4u.de -p 2121 << EOF
-          set -x
+          set -ex
           cd /opt/projektwahl-lit-staging/
           git fetch --prune origin
           git checkout origin/$GIT_BRANCH
