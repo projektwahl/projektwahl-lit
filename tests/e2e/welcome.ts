@@ -11,7 +11,6 @@ import {
 } from "selenium-webdriver";
 import chrome from "selenium-webdriver/chrome.js";
 //import repl from "repl";
-import { writeFile } from "fs/promises";
 
 if (!process.env["BASE_URL"]) {
   console.error("BASE_URL not set!");
@@ -422,10 +421,10 @@ export async function main() {
 
     await driver.get(process.env.BASE_URL);
 
-    await driver.sleep(1000);
+    //await driver.sleep(1000);
 
-    const screenshot = await driver.takeScreenshot();
-    await writeFile("screenshot.png", screenshot, "base64");
+    //const screenshot = await driver.takeScreenshot();
+    //await writeFile("screenshot.png", screenshot, "base64");
 
     {
       // open navbar
@@ -671,6 +670,8 @@ export async function main() {
 
       await logoutButton.click();
     }
+
+    await driver.sleep(100); // hack
 
     {
       // open navbar

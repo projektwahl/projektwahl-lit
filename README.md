@@ -44,13 +44,13 @@ git clone https://github.com/projektwahl/projektwahl-lit.git
 cd projektwahl-lit/
 npm ci --ignore-scripts --omit=optional
 openssl req -x509 -newkey rsa:2048 -nodes -sha256 -subj '/CN=localhost' -keyout key.pem -out cert.pem
-npx node-gyp rebuild -C ./node_modules/@dev.mohe/argon2/
+npx node-pre-gyp rebuild -C ./node_modules/argon2
 npm run localize-build
 npm run build
 
-DATABASE_URL=postgres://projektwahl:projektwahl@projektwahl/projektwahl node --enable-source-maps dist/setup.cjs
+DATABASE_URL=postgres://projektwahl:projektwahl@projektwahl/projektwahl node --enable-source-maps dist/setup.js
 
-PORT=8443 BASE_URL=https://localhost:8443 DATABASE_URL=postgres://projektwahl:projektwahl@projektwahl/projektwahl CREDENTIALS_DIRECTORY=$PWD node  --enable-source-maps dist/server.cjs
+PORT=8443 BASE_URL=https://localhost:8443 DATABASE_URL=postgres://projektwahl:projektwahl@projektwahl/projektwahl CREDENTIALS_DIRECTORY=$PWD node  --enable-source-maps dist/server.js
 
 ```
 

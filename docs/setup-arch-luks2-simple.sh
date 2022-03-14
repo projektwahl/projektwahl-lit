@@ -316,7 +316,7 @@ git clone git@github.com:projektwahl/projektwahl-lit.git projektwahl-lit-staging
 cd projektwahl-lit-staging
 openssl req -x509 -newkey rsa:2048 -nodes -sha256 -subj '/CN=localhost' -keyout key.pem -out cert.pem
 npm ci --ignore-scripts --omit=optional
-node-gyp rebuild -C ./node_modules/@dev.mohe/argon2/
+npx node-pre-gyp rebuild -C ./node_modules/argon2
 npm run localize-build
 npm run build
 
@@ -326,7 +326,7 @@ git clone git@github.com:projektwahl/projektwahl-lit.git projektwahl-lit-product
 cd projektwahl-lit-production
 openssl req -x509 -newkey rsa:2048 -nodes -sha256 -subj '/CN=localhost' -keyout key.pem -out cert.pem
 npm ci --ignore-scripts --omit=optional
-node-gyp rebuild -C ./node_modules/@dev.mohe/argon2/
+npx node-pre-gyp rebuild -C ./node_modules/argon2
 npm run localize-build
 npm run build
 
@@ -387,13 +387,13 @@ sudo psql --username projektwahl_staging_admin --set ON_ERROR_STOP=on projektwah
 
 sudo -u projektwahl_staging -i
 cd /opt/projektwahl-lit-staging
-NODE_ENV=production DATABASE_HOST=/run/postgresql DATABASE_URL=postgres://projektwahl_staging:projektwahl_staging@localhost/projektwahl_staging node --enable-source-maps dist/setup.cjs
+NODE_ENV=production DATABASE_HOST=/run/postgresql DATABASE_URL=postgres://projektwahl_staging:projektwahl_staging@localhost/projektwahl_staging node --enable-source-maps dist/setup.js
 
 
 
 sudo -u projektwahl_production -i
 cd /opt/projektwahl-lit-production
-NODE_ENV=production DATABASE_HOST=/run/postgresql DATABASE_URL=postgres://projektwahl_production:projektwahl_production@localhost/projektwahl_production node --enable-source-maps dist/setup.cjs
+NODE_ENV=production DATABASE_HOST=/run/postgresql DATABASE_URL=postgres://projektwahl_production:projektwahl_production@localhost/projektwahl_production node --enable-source-maps dist/setup.js
 
 
 
