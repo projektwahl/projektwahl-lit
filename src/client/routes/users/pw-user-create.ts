@@ -130,7 +130,11 @@ class PwUserCreate extends PwForm<"/api/v1/users/create-or-update"> {
       );
 
       if (result.success) {
-        HistoryController.goto(new URL(`/users/edit/${result.data[0].id}`, window.location.href), {}, true);
+        HistoryController.goto(
+          new URL(`/users/edit/${result.data[0].id}`, window.location.href),
+          {},
+          true
+        );
       }
 
       return result;
@@ -347,6 +351,14 @@ class PwUserCreate extends PwForm<"/api/v1/users/create-or-update"> {
                         class="btn btn-primary"
                       >
                         ${this.actionText}
+                      </button>
+
+                      <button
+                        type="button"
+                        class="btn btn-secondary"
+                        @click=${() => window.history.back()}
+                      >
+                        ${msg(`Back`)}
                       </button>
                     `
                   : undefined}

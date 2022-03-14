@@ -140,7 +140,11 @@ export const PwProjectCreate = setupHmr(
         >("POST", this.url, formDataEvent.detail, {});
 
         if (result.success) {
-          HistoryController.goto(new URL(`/projects/edit/${result.data.id}`, window.location.href), {}, true);
+          HistoryController.goto(
+            new URL(`/projects/edit/${result.data.id}`, window.location.href),
+            {},
+            true
+          );
         }
 
         return result;
@@ -357,6 +361,14 @@ export const PwProjectCreate = setupHmr(
                           class="btn btn-primary"
                         >
                           ${this.actionText}
+                        </button>
+
+                        <button
+                          type="button"
+                          class="btn btn-secondary"
+                          @click=${() => window.history.back()}
+                        >
+                          ${msg(`Back`)}
                         </button>
                       `
                     : undefined}
