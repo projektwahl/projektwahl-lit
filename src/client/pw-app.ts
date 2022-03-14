@@ -175,7 +175,6 @@ export class PwApp extends LitElement {
   static override get properties() {
     return {
       initial: { attribute: false },
-      initialRender: { state: true },
       navbarOpen: { state: true },
       username: { state: true },
     };
@@ -226,8 +225,6 @@ export class PwApp extends LitElement {
   constructor() {
     super();
 
-    updateWhenLocaleChanges(this);
-
     this.initialRender = true;
 
     this.nextPage = async ([key]: [keyof typeof pages | undefined]) => {
@@ -268,6 +265,7 @@ export class PwApp extends LitElement {
   }
 
   override render() {
+    console.log(`rerender pw-app ${Math.random()}`)
     if (this.initialRender) {
       this.initialRender = false;
 
