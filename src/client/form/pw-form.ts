@@ -20,8 +20,8 @@ https://github.com/projektwahl/projektwahl-lit
 SPDX-License-Identifier: AGPL-3.0-or-later
 SPDX-FileCopyrightText: 2021 Moritz Hedtke <Moritz.Hedtke@t-online.de>
 */
-import { html, LitElement, noChange } from "lit";
-import { createRef } from "lit/directives/ref.js";
+import { html, LitElement, noChange, PropertyValueMap } from "lit";
+import { createRef, ref, Ref } from "lit/directives/ref.js";
 import { msg } from "@lit/localize";
 import type { routes, ResponseType } from "../../lib/routes.js";
 import type { Task } from "@dev.mohe/task";
@@ -46,10 +46,14 @@ class PwForm<P extends keyof typeof routes> extends LitElement {
 
   url!: P;
 
+  errors: Ref<HTMLDivElement>;
+
   constructor() {
     super();
 
     this.form = createRef();
+
+    this.errors = createRef();
   }
 
   getCurrentInputElements() {
@@ -68,7 +72,11 @@ class PwForm<P extends keyof typeof routes> extends LitElement {
       complete: (data) => {
         if (!data.success) {
           if (data.error.issues.length > 0) {
-            return html`<div class="alert alert-danger" role="alert">
+            return html`<div
+              ${ref(this.errors)}
+              class="alert alert-danger"
+              role="alert"
+            >
               ${msg("Some errors occurred!")}<br />
               ${data.error.issues
                 .filter(
@@ -85,6 +93,12 @@ class PwForm<P extends keyof typeof routes> extends LitElement {
       },
       pending: () => noChange,
     });
+  }
+
+  protected updated(
+    _changedProperties: PropertyValueMap<any> | Map<PropertyKey, unknown>
+  ): void {
+    this.errors.value?.scrollIntoView();
   }
 }
 
