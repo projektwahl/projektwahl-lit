@@ -671,6 +671,8 @@ export async function main() {
       await logoutButton.click();
     }
 
+    await driver.sleep(100) // hack
+
     {
       // open navbar
       const pwApp = await driver.findElement(By.css("pw-app"));
