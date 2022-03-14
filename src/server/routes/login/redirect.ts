@@ -133,6 +133,9 @@ export const openidRedirectHandler = requestHandler(
           `username=${
             dbUser.username
           }; Secure; SameSite=Strict; Path=/; Max-Age=${48 * 60 * 60};`,
+          `type=${dbUser.type}; Secure; Path=/; SameSite=Lax; Max-Age=${
+            48 * 60 * 60
+          };`,
         ],
         [sensitiveHeaders]: ["set-cookie"],
       };

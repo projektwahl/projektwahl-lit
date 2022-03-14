@@ -199,6 +199,8 @@ export class PwApp extends LitElement {
 
   username: string | undefined;
 
+  type: string | undefined;
+
   bc!: BroadcastChannel;
 
   private navigateListener: (
@@ -257,9 +259,11 @@ export class PwApp extends LitElement {
     };
 
     this.username = jscookie.get("username");
+    this.type = jscookie.get("type");
 
     this.updateloginstate = () => {
       this.username = jscookie.get("username");
+      this.type = jscookie.get("type");
     };
 
     this.navbarOpen = false;
@@ -331,42 +335,48 @@ export class PwApp extends LitElement {
                       >${msg("Home")}</a
                     >
                   </li>
-                  <li class="nav-item">
-                    <a
-                      @click=${aClick}
-                      class="nav-link ${this.history.url.pathname.startsWith(
-                        "/users"
-                      )
-                        ? "active"
-                        : ""}"
-                      href="/users"
-                      >${msg("Accounts")}</a
-                    >
-                  </li>
-                  <li>
-                    <a
-                      @click=${aClick}
-                      class="nav-link ${this.history.url.pathname.startsWith(
-                        "/projects"
-                      )
-                        ? "active"
-                        : ""}"
-                      href="/projects"
-                      >${msg("Projects")}</a
-                    >
-                  </li>
-                  <li>
-                    <a
-                      @click=${aClick}
-                      class="nav-link ${this.history.url.pathname.startsWith(
-                        "/vote"
-                      )
-                        ? "active"
-                        : ""}"
-                      href="/vote"
-                      >${msg("Vote")}</a
-                    >
-                  </li>
+                  ${this.type === "admin" || this.type === "helper"
+                    ? html`<li class="nav-item">
+                        <a
+                          @click=${aClick}
+                          class="nav-link ${this.history.url.pathname.startsWith(
+                            "/users"
+                          )
+                            ? "active"
+                            : ""}"
+                          href="/users"
+                          >${msg("Accounts")}</a
+                        >
+                      </li>`
+                    : ``}
+                  ${this.type === "admin" || this.type === "helper"
+                    ? html`<li>
+                        <a
+                          @click=${aClick}
+                          class="nav-link ${this.history.url.pathname.startsWith(
+                            "/projects"
+                          )
+                            ? "active"
+                            : ""}"
+                          href="/projects"
+                          >${msg("Projects")}</a
+                        >
+                      </li>`
+                    : ``}
+                  ${this.type === "voter"
+                    ? html`<li>
+                        <a
+                          @click=${aClick}
+                          class="nav-link ${this.history.url.pathname.startsWith(
+                            "/vote"
+                          )
+                            ? "active"
+                            : ""}"
+                          href="/vote"
+                          >${msg("Vote")}</a
+                        >
+                      </li>`
+                    : ``}
                 </ul>
                 <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
                   ${this.username

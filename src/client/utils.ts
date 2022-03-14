@@ -59,6 +59,7 @@ export const myFetch = async <P extends keyof typeof routes>(
         jscookie.remove("lax_id");
         jscookie.remove("strict_id");
         jscookie.remove("username");
+        jscookie.remove("type");
 
         const bc = new BroadcastChannel("updateloginstate");
         bc.postMessage("logout");
