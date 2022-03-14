@@ -37,7 +37,12 @@ export const loginHandler = requestHandler(
   async function (body) {
     const r = await typedSql(sql, {
       types: [25],
-      columns: { id: 23, username: 1043, password_hash: 1043, type: 17425 },
+      columns: {
+        id: 23,
+        username: 1043,
+        password_hash: 1043,
+        type: null, // custom enum
+      },
     } as const)`SELECT id, username, password_hash, type FROM users WHERE username = ${body.username} LIMIT 1`;
 
     const dbUser = r[0];

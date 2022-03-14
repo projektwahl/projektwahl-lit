@@ -98,8 +98,28 @@ export const createOrUpdateUsersHandler = requestHandler(
             if ("id" in user) {
               const finalQuery = typedSql(sql, {
                 types: [
-                  16, 1043, 16, 1043, 16, 17425, 16, 1043, 16, 23, 16, 16, 16,
-                  23, 16, 23, 16, 16, 16, 1043, 23, 23,
+                  16,
+                  1043,
+                  16,
+                  1043,
+                  16,
+                  null, // custom enum
+                  16,
+                  1043,
+                  16,
+                  23,
+                  16,
+                  16,
+                  16,
+                  23,
+                  16,
+                  23,
+                  16,
+                  16,
+                  16,
+                  1043,
+                  23,
+                  23,
                 ],
                 columns: {
                   id: 23,
@@ -147,7 +167,17 @@ export const createOrUpdateUsersHandler = requestHandler(
               results.push(await finalQuery);
             } else {
               const query = typedSql(sql, {
-                types: [1043, 1043, 1043, 17425, 1043, 23, 16, 16, 23],
+                types: [
+                  1043,
+                  1043,
+                  1043,
+                  null, // custom enum
+                  1043,
+                  23,
+                  16,
+                  16,
+                  23,
+                ],
                 columns: {
                   id: 23,
                   project_leader_id: 23,

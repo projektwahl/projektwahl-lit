@@ -67,7 +67,11 @@ export const openidRedirectHandler = requestHandler(
       const dbUser = (
         await typedSql(sql, {
           types: [25],
-          columns: { id: 23, username: 1043, type: 17425 },
+          columns: {
+            id: 23,
+            username: 1043,
+            type: null, // custom enum
+          },
         } as const)`SELECT id, username, type FROM users WHERE openid_id = ${
           result.claims().email ?? null
         } LIMIT 1`

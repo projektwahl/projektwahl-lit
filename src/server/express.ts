@@ -102,7 +102,7 @@ export function requestHandler<P extends keyof typeof routes>(
                 types: [17],
                 columns: {
                   id: 23,
-                  type: 17425,
+                  type: null, // custom enum
                   username: 1043,
                   group: 1043,
                   age: 23,
