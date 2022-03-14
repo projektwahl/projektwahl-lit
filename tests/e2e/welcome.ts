@@ -671,7 +671,7 @@ export async function main() {
       await logoutButton.click();
     }
 
-    await driver.sleep(100) // hack
+    await driver.sleep(100); // hack
 
     {
       // open navbar
