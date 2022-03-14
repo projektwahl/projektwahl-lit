@@ -22,35 +22,13 @@ jobs:
           set -x
           GIT_BRANCH=${GITHUB_BASE_REF:-${GITHUB_REF#refs/heads/}}
           echo $GIT_BRANCH
-          ssh moritz@staging.projektwahl.selfmade4u.de << EOF
+          ssh moritz@staging-aes.selfmade4u.de -p 2121 << EOF
           set -x
-          cd /opt/projektwahl-lit
-          git fetch origin
-          git worktree add /opt/projektwahl-lits/$GIT_BRANCH origin/$GIT_BRANCH
-          cd /opt/projektwahl-lits/$GIT_BRANCH
-          git checkout origin/$GIT_BRANCH
-          PORT=\$(cat /opt/projektwahl-lits/$GIT_BRANCH/.github/port)
-          echo \$PORT
-          git worktree add /opt/projektwahl-lits/\$PORT origin/$GIT_BRANCH
-          cd /opt/projektwahl-lits/\$PORT
-          git checkout origin/$GIT_BRANCH
-          npm install
+          cd /opt/projektwahl-lit-staging/
+          git pull origin $GIT_BRANCH
+          npm ci --ignore-scripts --omit=optional
           npx node-pre-gyp rebuild -C ./node_modules/argon2
           npm run localize-build
           npm run build
-          npm run purgecss
-          sudo /usr/bin/systemctl enable --now projektwahl@\$PORT.socket
-          echo "server {
-            server_name $GIT_BRANCH.projektwahl.selfmade4u.de;
-            location / {
-              proxy_pass https://localhost:\$PORT;
-            }
-            listen [::]:443 ssl; # managed by Certbot
-            listen 443 ssl; # managed by Certbot
-            ssl_certificate /etc/letsencrypt/live/projektwahl.selfmade4u.de/fullchain.pem; # managed by Certbot
-            ssl_certificate_key /etc/letsencrypt/live/projektwahl.selfmade4u.de/privkey.pem; # managed by Certbot
-            include /etc/letsencrypt/options-ssl-nginx.conf; # managed by Certbot
-            ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem; # managed by Certbot
-          }" | sudo tee /etc/nginx/sites-enabled/projektwahl-$GIT_BRANCH
-          sudo /usr/bin/systemctl reload nginx
+          sudo systemctl stop projektwahl@staging.service
           EOF

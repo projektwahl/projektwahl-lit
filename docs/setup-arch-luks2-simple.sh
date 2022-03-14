@@ -316,7 +316,7 @@ git clone git@github.com:projektwahl/projektwahl-lit.git projektwahl-lit-staging
 cd projektwahl-lit-staging
 openssl req -x509 -newkey rsa:2048 -nodes -sha256 -subj '/CN=localhost' -keyout key.pem -out cert.pem
 npm ci --ignore-scripts --omit=optional
-node-gyp rebuild -C ./node_modules/@dev.mohe/argon2/
+npx node-pre-gyp rebuild -C ./node_modules/argon2
 npm run localize-build
 npm run build
 
@@ -326,7 +326,7 @@ git clone git@github.com:projektwahl/projektwahl-lit.git projektwahl-lit-product
 cd projektwahl-lit-production
 openssl req -x509 -newkey rsa:2048 -nodes -sha256 -subj '/CN=localhost' -keyout key.pem -out cert.pem
 npm ci --ignore-scripts --omit=optional
-node-gyp rebuild -C ./node_modules/@dev.mohe/argon2/
+npx node-pre-gyp rebuild -C ./node_modules/argon2
 npm run localize-build
 npm run build
 
