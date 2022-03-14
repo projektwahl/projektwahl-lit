@@ -152,68 +152,71 @@ export class PwEntityList<
     this.history = new HistoryController(this, /.*/);
 
     this.initialRender = true;
-
-    this._task = new Task(this, {
-      task: async () => {
-        if (this.initialRender) {
-          this.initialRender = false;
-          
-          console.log(this.initial)
-          if (this.initial) {
-            return this.initial;
-          }  
-        }
-
-        const data = parseRequestWithPrefix(
-          this.url,
-          this.prefix,
-          this.history.url
-        );
-
-        const formDataEvent = new CustomEvent<
-          z.infer<typeof entityRoutes[P]["request"]>
-        >("myformdata", {
-          bubbles: false,
-          detail: data[this.prefix] ?? {},
-        });
-        this.form.value?.dispatchEvent(formDataEvent);
-
-        const result = await myFetch<P>(
-          "GET",
-          this.url,
-          formDataEvent.detail,
-          {}
-        );
-
-        HistoryController.goto(
-          new URL(
-            `?${encodeURIComponent(
-              JSON.stringify({
-                ...data,
-                [this.prefix]: formDataEvent.detail,
-              })
-            )}`,
-            window.location.href
-          ),
-          {},
-          true
-        );
-
-        return result;
-      },
-    });
-
-    void this._task.run();
   }
 
   override render() {
-    console.log(`rerender pw-entitylist ${Math.random()}`)
+    console.log(`rerender pw-entitylist ${this.url} ${Math.random()}`)
     if (this.prefix === undefined) {
       throw new Error("prefix not set");
     }
 
     if (this.actionText === undefined) {
       throw new Error(msg("component not fully initialized"));
+    }
+
+    if (this.initialRender) {
+      this._task = new Task(this, {
+        task: async () => {
+          if (this.initialRender) {
+            this.initialRender = false;
+            
+            // this is not set yet because its passed using properties
+            console.log(this.initial)
+            if (this.initial) {
+              return this.initial;
+            }  
+          }
+  
+          const data = parseRequestWithPrefix(
+            this.url,
+            this.prefix,
+            this.history.url
+          );
+  
+          const formDataEvent = new CustomEvent<
+            z.infer<typeof entityRoutes[P]["request"]>
+          >("myformdata", {
+            bubbles: false,
+            detail: data[this.prefix] ?? {},
+          });
+          this.form.value?.dispatchEvent(formDataEvent);
+  
+          const result = await myFetch<P>(
+            "GET",
+            this.url,
+            formDataEvent.detail,
+            {}
+          );
+  
+          HistoryController.goto(
+            new URL(
+              `?${encodeURIComponent(
+                JSON.stringify({
+                  ...data,
+                  [this.prefix]: formDataEvent.detail,
+                })
+              )}`,
+              window.location.href
+            ),
+            {},
+            true
+          );
+  
+          return result;
+        },
+      });
+  
+      void this._task.run();
     }
 
     const data = parseRequestWithPrefix(

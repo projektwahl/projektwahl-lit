@@ -110,8 +110,6 @@ export const PwProjectCreate = setupHmr(
       | MinimalSafeParseError
       | undefined;
 
-    url!: "/api/v1/projects/create" | "/api/v1/projects/update";
-
     constructor() {
       super();
 

@@ -43,7 +43,9 @@ class PwForm<P extends keyof typeof routes> extends LitElement {
 
   form: import("lit/directives/ref").Ref<HTMLFormElement>;
 
-  url!: P;
+  get url(): P {
+    throw new Error("not implemented");
+  }
 
   constructor() {
     super();

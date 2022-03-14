@@ -45,8 +45,10 @@ export const pwChoices = async (url: URL) => {
 class PwChoices<X extends string> extends PwEntityList<"/api/v1/choices", X> {
   constructor() {
     super();
+  }
 
-    this.url = "/api/v1/choices";
+  override get url() {
+    return "/api/v1/choices" as const;
   }
 
   override get title() {
