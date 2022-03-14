@@ -30,6 +30,7 @@ class PwForm<P extends keyof typeof routes> extends LitElement {
   static get properties() {
     return {
       disabled: { type: Boolean },
+      url: { attribute: false },
     };
   }
 

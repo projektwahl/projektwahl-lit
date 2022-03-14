@@ -95,7 +95,6 @@ export class PwEntityList<
     return {
       task: { attribute: false },
       initial: { attribute: false },
-      initialRender: { state: true },
       debouncedUrl: { state: true },
       prefix: { type: String },
       ...super.properties, // TODO FIXME remove this everywhere? https://lit.dev/docs/components/properties/#accessors-noaccessor
@@ -156,8 +155,13 @@ export class PwEntityList<
   }
 
   override render() {
+    console.log(`rerender pw-entitylist ${this.url} ${Math.random()}`);
     if (this.prefix === undefined) {
       throw new Error("prefix not set");
+    }
+
+    if (this.actionText === undefined) {
+      throw new Error(msg("component not fully initialized"));
     }
 
     if (this.initialRender) {
@@ -211,10 +215,6 @@ export class PwEntityList<
       if (this.initial === undefined) {
         void this._task.run();
       }
-    }
-
-    if (this.actionText === undefined) {
-      throw new Error(msg("component not fully initialized"));
     }
 
     const data = parseRequestWithPrefix(

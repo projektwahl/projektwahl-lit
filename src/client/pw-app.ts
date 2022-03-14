@@ -32,8 +32,8 @@ import { HistoryController, HistoryState } from "./history-controller.js";
 import { aClick } from "./pw-a.js";
 import jscookie from "js-cookie";
 import { myFetch } from "./utils.js";
-import { Task, TaskStatus } from "@dev.mohe/task";
-import { msg, str, updateWhenLocaleChanges } from "@lit/localize";
+import { Task } from "@dev.mohe/task";
+import { msg, str } from "@lit/localize";
 
 // TODO FIXME show more details if possible (maybe error page)
 // TODO FIXME do this inline in the main page? In case it doesnt load so even on old browsers some error is shown
@@ -175,7 +175,6 @@ export class PwApp extends LitElement {
   static override get properties() {
     return {
       initial: { attribute: false },
-      initialRender: { state: true },
       navbarOpen: { state: true },
       username: { state: true },
     };
@@ -226,11 +225,16 @@ export class PwApp extends LitElement {
   constructor() {
     super();
 
-    updateWhenLocaleChanges(this);
-
     this.initialRender = true;
 
     this.nextPage = async ([key]: [keyof typeof pages | undefined]) => {
+      if (this.initialRender) {
+        this.initialRender = false;
+
+        if (this.initial) {
+          return this.initial;
+        }
+      }
       try {
         if (key) {
           return await pages[key](this.history.url);
@@ -265,27 +269,21 @@ export class PwApp extends LitElement {
     this.navigateListener = () => {
       this.navbarOpen = false;
     };
+
+    this._apiTask = new Task(this, {
+      task: this.nextPage,
+      args: () => {
+        const _a: keyof typeof pages | undefined = Object.keys(pages).find(
+          (k) => new RegExp(k).test(this.history.url.pathname)
+        );
+        const _b: [keyof typeof pages | undefined] = [_a];
+        return _b;
+      },
+    });
   }
 
   override render() {
-    if (this.initialRender) {
-      this.initialRender = false;
-
-      this._apiTask = new Task(this, {
-        task: this.nextPage,
-        args: () => {
-          const _a: keyof typeof pages | undefined = Object.keys(pages).find(
-            (k) => new RegExp(k).test(this.history.url.pathname)
-          );
-          const _b: [keyof typeof pages | undefined] = [_a];
-          return _b;
-        },
-        initialStatus:
-          this.initial !== undefined ? TaskStatus.COMPLETE : TaskStatus.INITIAL,
-        initialValue: this.initial,
-      });
-    }
-
+    console.log(`rerender pw-app ${Math.random()}`);
     return html`
       ${bootstrapCss}
       <style>

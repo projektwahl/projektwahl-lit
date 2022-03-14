@@ -188,7 +188,7 @@ class PwChoices<X extends string> extends PwEntityList<"/api/v1/choices", X> {
             : undefined;
         },
         initial: () => {
-          return html`hi`;
+          return html`initial state`;
         },
       })}
     `;

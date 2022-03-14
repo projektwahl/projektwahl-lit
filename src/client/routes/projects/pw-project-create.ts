@@ -81,7 +81,6 @@ export const PwProjectCreate = setupHmr(
     static override get properties() {
       return {
         ...super.properties,
-        url: { attribute: false },
         actionText: { type: String },
         _task: { state: true },
         _initialTask: { state: true },
@@ -109,8 +108,6 @@ export const PwProjectCreate = setupHmr(
         >
       | MinimalSafeParseError
       | undefined;
-
-    url!: "/api/v1/projects/create" | "/api/v1/projects/update";
 
     constructor() {
       super();

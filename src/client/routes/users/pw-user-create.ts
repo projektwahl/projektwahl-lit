@@ -75,7 +75,6 @@ class PwUserCreate extends PwForm<"/api/v1/users/create-or-update"> {
   static get properties() {
     return {
       ...super.properties,
-      uri: { type: String },
       _task: { state: true },
       type: { state: true },
       initial: { attribute: false },
@@ -99,10 +98,10 @@ class PwUserCreate extends PwForm<"/api/v1/users/create-or-update"> {
     | MinimalSafeParseError
     | undefined;
 
-  uri!: "/api/v1/users/create-or-update";
-
   constructor() {
     super();
+
+    this.url = "/api/v1/users/create-or-update";
 
     this._task = new Task(this, async () => {
       const formDataEvent = new CustomEvent<
@@ -125,7 +124,7 @@ class PwUserCreate extends PwForm<"/api/v1/users/create-or-update"> {
 
       const result = await myFetch<"/api/v1/users/create-or-update">(
         "POST",
-        this.uri,
+        this.url,
         formDataEvent.detail,
         {}
       );

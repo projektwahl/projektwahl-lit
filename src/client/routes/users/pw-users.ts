@@ -244,7 +244,7 @@ export class PwUsers<X extends string> extends PwEntityList<
           : undefined;
       },
       initial: () => {
-        return html`hi`;
+        return html`initial state`;
       },
     })}`;
   }
