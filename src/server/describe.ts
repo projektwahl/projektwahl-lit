@@ -20,7 +20,9 @@ export function typedSql<
       // @ts-expect-error unknown
       await sql(template, ...args).describe();
 
-    const computed_column_types = Object.fromEntries(
+    const computed_column_types: {
+      [k: string]: number | null;
+    } = Object.fromEntries(
       computed_column_types_1.map((v) => [v.name, v.type])
     );
 
@@ -28,6 +30,12 @@ export function typedSql<
       types: computed_query_types,
       columns: computed_column_types,
     };
+
+    for (const [key, value] of Object.entries(description.columns)) {
+      if (value === null) {
+        computed_description.columns[key] = null;
+      }
+    }
 
     console.log(computed_description);
 
