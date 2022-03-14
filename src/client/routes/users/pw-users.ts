@@ -56,7 +56,7 @@ export class PwUsers<X extends string> extends PwEntityList<
   constructor() {
     super();
 
-    this.url = "/api/v1/users"
+    this.url = "/api/v1/users";
   }
 
   override get title() {

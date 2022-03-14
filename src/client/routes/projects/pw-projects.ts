@@ -43,7 +43,7 @@ class PwProjects<X extends string> extends PwEntityList<"/api/v1/projects", X> {
   constructor() {
     super();
 
-    this.url = "/api/v1/projects"
+    this.url = "/api/v1/projects";
   }
 
   override get title() {

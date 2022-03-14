@@ -165,6 +165,8 @@ export class PwEntityList<
     }
 
     if (this.initialRender) {
+      this.initialRender = false;
+
       this._task = new Task(this, {
         task: async () => {
           const data = parseRequestWithPrefix(

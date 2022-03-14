@@ -101,7 +101,7 @@ class PwUserCreate extends PwForm<"/api/v1/users/create-or-update"> {
   constructor() {
     super();
 
-    this.url = "/api/v1/users/create-or-update"
+    this.url = "/api/v1/users/create-or-update";
 
     this._task = new Task(this, async () => {
       const formDataEvent = new CustomEvent<
