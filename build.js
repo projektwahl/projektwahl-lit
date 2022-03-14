@@ -173,24 +173,24 @@ SPDX-FileCopyrightText: 2021 Moritz Hedtke <Moritz.Hedtke@t-online.de>
 await writeFile("dist/index.html", index);
 
 {
-  let { stdout, stderr } = await exec(
-    `esbuild --platform=node --format=cjs --bundle src/server/setup.ts --external:@dev.mohe/argon2 --define:process.env.NODE_ENV=\\"production\\"  --charset=utf8 --entry-names=[dir]/[name] --sourcemap --analyze --outfile=dist/setup.cjs --tree-shaking=true`
-  );
-
-  console.log(stdout);
-  console.log(stderr);
+  await build({
+    platform: "node",
+    format: "esm",
+    bundle: true,
+    entryPoints: ["src/server/setup.ts"],
+    define: {
+      "process.env.NODE_ENV": '"production"',
+    },
+    charset: "utf8",
+    sourcemap: true,
+    outfile: "dist/setup.js",
+    inject: ["./require-shim.js"],
+    treeShaking: true,
+    plugins: [nativeNodeModulesPlugin],
+  });
 }
 
 {
-  /*
-  let { stdout, stderr } = await exec(
-    `esbuild --platform=node --format=esm --bundle src/server/index.ts --external:@dev.mohe/argon2/build/Release/argon2.node --define:process.env.NODE_ENV=\\"production\\" --charset=utf8 --entry-names=[dir]/[name] --sourcemap --analyze --outfile=dist/server.js --inject:./require-shim.js --tree-shaking=true --loader:.node=./esbuild-plugin-node-extension.js`
-  );
-
-  console.log(stdout);
-  console.log(stderr);
-  */
-
   await build({
     platform: "node",
     format: "esm",

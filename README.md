@@ -44,7 +44,7 @@ git clone https://github.com/projektwahl/projektwahl-lit.git
 cd projektwahl-lit/
 npm ci --ignore-scripts --omit=optional
 openssl req -x509 -newkey rsa:2048 -nodes -sha256 -subj '/CN=localhost' -keyout key.pem -out cert.pem
-npx node-gyp rebuild -C ./node_modules/@dev.mohe/argon2/
+npx node-pre-gyp rebuild -C ./node_modules/argon2
 npm run localize-build
 npm run build
 
