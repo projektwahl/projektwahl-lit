@@ -130,7 +130,7 @@ class PwUserCreate extends PwForm<"/api/v1/users/create-or-update"> {
       );
 
       if (result.success) {
-        HistoryController.goto(new URL("/", window.location.href), {}, false);
+        HistoryController.goto(new URL(`/users/edit/${result.data[0].id}`, window.location.href), {}, true);
       }
 
       return result;

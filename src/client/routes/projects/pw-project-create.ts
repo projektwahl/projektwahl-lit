@@ -140,7 +140,7 @@ export const PwProjectCreate = setupHmr(
         >("POST", this.url, formDataEvent.detail, {});
 
         if (result.success) {
-          HistoryController.goto(new URL("/", window.location.href), {}, false);
+          HistoryController.goto(new URL(`/projects/edit/${result.data.id}`, window.location.href), {}, true);
         }
 
         return result;

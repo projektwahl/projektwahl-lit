@@ -334,7 +334,7 @@ export class PwApp extends LitElement {
                   <li class="nav-item">
                     <a
                       @click=${aClick}
-                      class="nav-link ${this.history.url.pathname === "/users"
+                      class="nav-link ${this.history.url.pathname.startsWith("/users")
                         ? "active"
                         : ""}"
                       href="/users"
@@ -344,8 +344,7 @@ export class PwApp extends LitElement {
                   <li>
                     <a
                       @click=${aClick}
-                      class="nav-link ${this.history.url.pathname ===
-                      "/projects"
+                      class="nav-link ${this.history.url.pathname.startsWith("/projects")
                         ? "active"
                         : ""}"
                       href="/projects"
@@ -355,7 +354,7 @@ export class PwApp extends LitElement {
                   <li>
                     <a
                       @click=${aClick}
-                      class="nav-link ${this.history.url.pathname === "/vote"
+                      class="nav-link ${this.history.url.pathname.startsWith("/vote")
                         ? "active"
                         : ""}"
                       href="/vote"
