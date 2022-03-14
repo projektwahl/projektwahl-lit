@@ -149,7 +149,7 @@ export async function testUser(driver: WebDriver) {
       await click(driver, submitButton);
     }
 
-    await (await shadow(pwApp)).findElement(By.css("pw-welcome"));
+    await driver.wait(until.urlContains("/users/edit"));
   }
 
   {
@@ -187,7 +187,7 @@ export async function testUser(driver: WebDriver) {
 
     await click(driver, submitButton);
 
-    await (await shadow(pwApp)).findElement(By.css("pw-welcome"));
+    await driver.wait(until.urlContains("/users/edit"));
   }
 
   {
@@ -331,7 +331,7 @@ export async function testProject(driver: WebDriver) {
       await click(driver, submitButton);
     }
 
-    await (await shadow(pwApp)).findElement(By.css("pw-welcome"));
+    await driver.wait(until.urlContains("/projects/edit"));
   }
 
   {
@@ -371,7 +371,7 @@ export async function testProject(driver: WebDriver) {
 
     await click(driver, submitButton);
 
-    await (await shadow(pwApp)).findElement(By.css("pw-welcome"));
+    await driver.wait(until.urlContains("/projects/edit"));
   }
 
   {
@@ -719,13 +719,9 @@ export async function main() {
     {
       // check logged out by checking no permissions
 
+      await driver.get(`${process.env.BASE_URL}/projects`);
+
       const pwApp = await driver.findElement(By.css("pw-app"));
-
-      const projectsLink = await (
-        await shadow(pwApp)
-      ).findElement(By.css('a[href="/projects"]'));
-
-      await click(driver, projectsLink);
 
       const pwProjects = await (
         await shadow(pwApp)
