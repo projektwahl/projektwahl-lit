@@ -44,13 +44,9 @@ const nativeNodeModulesPlugin = {
 
 const exec = promisify(unpromisifiedExec);
 
-let version_full = (await exec(
-  "git rev-parse HEAD"
-)).stdout.trim();
+let version_full = (await exec("git rev-parse HEAD")).stdout.trim();
 
-let version_short = (await exec(
-  "git rev-parse --short HEAD"
-)).stdout.trim();
+let version_short = (await exec("git rev-parse --short HEAD")).stdout.trim();
 
 {
   let { stdout, stderr } = await exec(

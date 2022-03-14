@@ -459,7 +459,12 @@ export class PwApp extends LitElement {
               <a href="/privacy" target="_blank" rel="noopener noreferrer"
                 >${msg("Privacy Policy")}</a
               >
-              | Version <a href="https://github.com/projektwahl/projektwahl-lit/tree/${window.VERSION_FULL ?? "main"}">${window.VERSION_SHORT ?? "main"}</a>
+              | Version
+              <a
+                href="https://github.com/projektwahl/projektwahl-lit/tree/${window.VERSION_FULL ??
+                "main"}"
+                >${window.VERSION_SHORT ?? "main"}</a
+              >
             </span>
           </div>
         </footer>
