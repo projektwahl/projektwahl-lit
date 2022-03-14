@@ -225,7 +225,7 @@ export const PwProjectUsers = setupHmr(
             : result.error;
         },
         initial: () => {
-          return html`hi`;
+          return html`initial state`;
         },
       })}`;
     }

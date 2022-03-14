@@ -95,7 +95,6 @@ export class PwEntityList<
     return {
       task: { attribute: false },
       initial: { attribute: false },
-      initialRender: { state: true },
       debouncedUrl: { state: true },
       prefix: { type: String },
       ...super.properties, // TODO FIXME remove this everywhere? https://lit.dev/docs/components/properties/#accessors-noaccessor
@@ -153,64 +152,64 @@ export class PwEntityList<
     this.history = new HistoryController(this, /.*/);
 
     this.initialRender = true;
+
+    this._task = new Task(this, {
+      task: async () => {
+        if (this.initialRender) {
+          this.initialRender = false;
+          
+          console.log(this.initial)
+          if (this.initial) {
+            return this.initial;
+          }  
+        }
+
+        const data = parseRequestWithPrefix(
+          this.url,
+          this.prefix,
+          this.history.url
+        );
+
+        const formDataEvent = new CustomEvent<
+          z.infer<typeof entityRoutes[P]["request"]>
+        >("myformdata", {
+          bubbles: false,
+          detail: data[this.prefix] ?? {},
+        });
+        this.form.value?.dispatchEvent(formDataEvent);
+
+        const result = await myFetch<P>(
+          "GET",
+          this.url,
+          formDataEvent.detail,
+          {}
+        );
+
+        HistoryController.goto(
+          new URL(
+            `?${encodeURIComponent(
+              JSON.stringify({
+                ...data,
+                [this.prefix]: formDataEvent.detail,
+              })
+            )}`,
+            window.location.href
+          ),
+          {},
+          true
+        );
+
+        return result;
+      },
+    });
+
+    void this._task.run();
   }
 
   override render() {
+    console.log(`rerender pw-entitylist ${Math.random()}`)
     if (this.prefix === undefined) {
       throw new Error("prefix not set");
-    }
-
-    if (this.initialRender) {
-      this.initialRender = false;
-
-      this._task = new Task(this, {
-        task: async () => {
-          const data = parseRequestWithPrefix(
-            this.url,
-            this.prefix,
-            this.history.url
-          );
-
-          const formDataEvent = new CustomEvent<
-            z.infer<typeof entityRoutes[P]["request"]>
-          >("myformdata", {
-            bubbles: false,
-            detail: data[this.prefix] ?? {},
-          });
-          this.form.value?.dispatchEvent(formDataEvent);
-
-          const result = await myFetch<P>(
-            "GET",
-            this.url,
-            formDataEvent.detail,
-            {}
-          );
-
-          HistoryController.goto(
-            new URL(
-              `?${encodeURIComponent(
-                JSON.stringify({
-                  ...data,
-                  [this.prefix]: formDataEvent.detail,
-                })
-              )}`,
-              window.location.href
-            ),
-            {},
-            true
-          );
-
-          return result;
-        },
-        autoRun: false, // TODO FIXME this breaks if you navigate to the same page (as it doesnt cause an update) - maybe we should autorun on url change?
-        initialStatus:
-          this.initial !== undefined ? TaskStatus.COMPLETE : TaskStatus.INITIAL,
-        initialValue: this.initial,
-      });
-
-      if (this.initial === undefined) {
-        void this._task.run();
-      }
     }
 
     if (this.actionText === undefined) {
