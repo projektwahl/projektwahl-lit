@@ -168,16 +168,36 @@ class PwChoices<X extends string> extends PwEntityList<"/api/v1/choices", X> {
                 (value) => html`<tr ${animate()}>
                   <th scope="row">
                     <p>
-                      <a @click=${aClick} href="/choices/view/${value.id}"
-                        >${value.id}</a
-                      >
+                      ${value.deleted
+                        ? html`<del
+                            ><a
+                              @click=${aClick}
+                              href="/projects/view/${value.id}"
+                              >${value.id}</a
+                            ></del
+                          >`
+                        : html`<a
+                            @click=${aClick}
+                            href="/projects/view/${value.id}"
+                            >${value.id}</a
+                          >`}
                     </p>
                   </th>
                   <td>
                     <p>
-                      <a @click=${aClick} href="/choices/view/${value.id}"
-                        >${value.title}</a
-                      >
+                      ${value.deleted
+                        ? html`<del
+                            ><a
+                              @click=${aClick}
+                              href="/projects/view/${value.id}"
+                              >${value.title}</a
+                            ></del
+                          >`
+                        : html`<a
+                            @click=${aClick}
+                            href="/projects/view/${value.id}"
+                            >${value.title}</a
+                          >`}
                     </p>
                   </td>
                   <td>
