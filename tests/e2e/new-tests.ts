@@ -63,7 +63,9 @@ class FormTester {
   }
 
   private async submit() {
-    const submitButton = await this.form.findElement(By.css('button[type="submit"]'));
+    const submitButton = await this.form.findElement(
+      By.css('button[type="submit"]')
+    );
 
     await this.helper.click(submitButton);
   }
@@ -74,6 +76,33 @@ class FormTester {
 
   async submitFailure() {
     await this.submit();
+
+    const alert = await this.helper.driver.wait(
+      until.elementLocated(By.css('div[class="alert alert-danger"]'))
+    );
+
+    assert.match(await alert.getText(), /Some errors occurred./);
+  }
+
+  async getErrorForField(name: string) {
+    console.log(
+      await this.form
+        .findElement(By.css(`input[name=${name}] + .invalid-feedback`))
+        .getText()
+    );
+  }
+
+  async getErrors() {
+    return Promise.all(
+      (await this.form.findElements(By.css(`.invalid-feedback`))).map(
+        async (e) => [
+          await e
+            .findElement(By.xpath("//preceding-sibling::input"))
+            .getAttribute("name"),
+          await e.getText(),
+        ]
+      )
+    );
   }
 }
 
@@ -98,7 +127,7 @@ class Helper {
   constructor(driver: WebDriver) {
     this.driver = driver;
   }
-/*
+  /*
   async shadow(element: WebElement) {
     // @ts-expect-error types are wrong
     // eslint-disable-next-line @typescript-eslint/consistent-type-assertions,@typescript-eslint/no-unsafe-call
@@ -117,51 +146,57 @@ class Helper {
 }
 
 async function runTest(testFunction: (helper: Helper) => Promise<void>) {
-    // SELENIUM_BROWSER=chrome node --experimental-loader ./src/loader.js --enable-source-maps tests/e2e/welcome.js
-    const builder = new Builder()
-      .forBrowser("firefox")
-      .withCapabilities(Capabilities.firefox().set("acceptInsecureCerts", true).setPageLoadStrategy("none"))
-      .withCapabilities(
-        Capabilities.chrome().set(Capability.ACCEPT_INSECURE_TLS_CERTS, true).setPageLoadStrategy("none")
+  // SELENIUM_BROWSER=chrome node --experimental-loader ./src/loader.js --enable-source-maps tests/e2e/welcome.js
+  const builder = new Builder()
+    .forBrowser("firefox")
+    .withCapabilities(
+      Capabilities.firefox()
+        .set("acceptInsecureCerts", true)
+        .setPageLoadStrategy("none")
+    )
+    .withCapabilities(
+      Capabilities.chrome()
+        .set(Capability.ACCEPT_INSECURE_TLS_CERTS, true)
+        .setPageLoadStrategy("none")
+    );
+
+  if (process.env.CI) {
+    builder.setChromeOptions(
+      new chrome.Options().addArguments(
+        "--headless",
+        "--no-sandbox",
+        "--disable-dev-shm-usage"
       )
+    );
+  }
 
-    if (process.env.CI) {
-      builder.setChromeOptions(
-        new chrome.Options().addArguments(
-          "--headless",
-          "--no-sandbox",
-          "--disable-dev-shm-usage"
-        )
-      );
-    }
+  const driver = builder.build();
 
-    const driver = builder.build();
-
-    /*await driver.manage().setTimeouts({
+  /*await driver.manage().setTimeouts({
         implicit: 1000,
     });*/
-    await driver.manage().window().setRect({
-      width: 500,
-      height: 1000,
-    });
+  await driver.manage().window().setRect({
+    width: 500,
+    height: 1000,
+  });
 
-    try {
-      await testFunction(new Helper(driver));
-      // important
+  try {
+    await testFunction(new Helper(driver));
+    // important
 
-      // TODO FIXME editing the project leaders + members
+    // TODO FIXME editing the project leaders + members
 
-      // TODO test pagination
+    // TODO test pagination
 
-      // TODO test sorting
+    // TODO test sorting
 
-      // TODO FIXME voting
+    // TODO FIXME voting
 
-      // TODO test openid
+    // TODO test openid
 
-      await driver.quit();
+    //await driver.quit();
 
-      /*
+    /*
         const theRepl = repl.start();
         theRepl.context.driver = driver;
         theRepl.context.shadow = shadow;
@@ -172,15 +207,15 @@ async function runTest(testFunction: (helper: Helper) => Promise<void>) {
         void driver.quit();
         });
     */
-    } catch (error) {
-      const screenshot = await driver.takeScreenshot();
-      await writeFile("screenshot.png", screenshot, "base64");
+  } catch (error) {
+    const screenshot = await driver.takeScreenshot();
+    await writeFile("screenshot.png", screenshot, "base64");
 
-      //await driver.quit();
+    //await driver.quit();
 
-      throw error;
-    }
+    throw error;
   }
+}
 
 export async function loginWrongUsername(helper: Helper) {
   await helper.driver.get(`${BASE_URL}/login`);
@@ -199,9 +234,16 @@ export async function loginWrongUsername(helper: Helper) {
 
   await helper.driver.wait(until.stalenessOf(loadingIndicator))*/
 
-  const formTester = new FormTester(helper, await helper.driver.wait(until.elementLocated(By.css("pw-login"))));
+  const formTester = new FormTester(
+    helper,
+    await helper.driver.wait(until.elementLocated(By.css("pw-login")))
+  );
 
   await formTester.submitFailure();
+
+  await formTester.getErrorForField("username");
+
+  console.log(await formTester.getErrors());
 }
 
 void runTest(loginWrongUsername);
