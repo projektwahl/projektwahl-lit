@@ -20,33 +20,11 @@ https://github.com/projektwahl/projektwahl-lit
 SPDX-License-Identifier: AGPL-3.0-or-later
 SPDX-FileCopyrightText: 2021 Moritz Hedtke <Moritz.Hedtke@t-online.de>
 */
-import { html } from "lit";
-import { setupHmr } from "../hmr.js";
-import { bootstrapCss } from "../index.js";
-import { PwElement } from "../pw-element.js";
+import { LitElement } from "lit";
 
-export const PwImprint = setupHmr(
-  "PwImprint",
-  class PwImprint extends PwElement {
-    protected render() {
-      return html`
-        ${bootstrapCss}
-
-        <div class="container">
-          <h1 class="text-center">Impressum</h1>
-
-          <h2>Angaben gemäß § 5 TMG</h2>
-          <address>
-            Moritz Hedtke<br />
-            Anne-Frank-Straße 10<br />
-            64354 Reinheim<br />
-            Telefon: +49 (0) 6162 2918<br />
-            E-Mail: Moritz.Hedtke@t-online.de
-          </address>
-        </div>
-      `;
+export class PwElement extends LitElement {
+    // you didn't see this or I will switch to React. Reasoning: Tests, Bootstrap isn't shadow dom ready
+    protected createRenderRoot() {
+        return this;
     }
-  }
-);
-
-customElements.define("pw-imprint", PwImprint);
+}

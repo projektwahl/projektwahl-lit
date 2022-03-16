@@ -22,7 +22,6 @@ SPDX-FileCopyrightText: 2021 Moritz Hedtke <Moritz.Hedtke@t-online.de>
 */
 import {
   html,
-  LitElement,
   noChange,
   ReactiveElement,
   TemplateResult,
@@ -61,6 +60,7 @@ import { configureLocalization } from "@lit/localize";
 
 import { sourceLocale, targetLocales } from "./generated/locales.js";
 import * as templates_de from "./generated/de.js";
+import { PwElement } from "./pw-element.js";
 
 export const { getLocale, setLocale } = configureLocalization({
   sourceLocale,
@@ -171,7 +171,7 @@ const pages = {
   },
 };
 
-export class PwApp extends LitElement {
+export class PwApp extends PwElement {
   static override get properties() {
     return {
       initial: { attribute: false },

@@ -20,13 +20,14 @@ https://github.com/projektwahl/projektwahl-lit
 SPDX-License-Identifier: AGPL-3.0-or-later
 SPDX-FileCopyrightText: 2021 Moritz Hedtke <Moritz.Hedtke@t-online.de>
 */
-import { html, LitElement, noChange } from "lit";
+import { html, noChange } from "lit";
 import { createRef, ref, Ref } from "lit/directives/ref.js";
 import { msg } from "@lit/localize";
 import type { routes, ResponseType } from "../../lib/routes.js";
 import type { Task } from "@dev.mohe/task";
+import { PwElement } from "../pw-element.js";
 
-class PwForm<P extends keyof typeof routes> extends LitElement {
+class PwForm<P extends keyof typeof routes> extends PwElement {
   static get properties() {
     return {
       disabled: { type: Boolean },
