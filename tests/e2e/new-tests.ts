@@ -78,6 +78,8 @@ class FormTester {
 
   async submitSuccess() {
     await this.submit();
+
+    await this.helper.driver.wait(until.stalenessOf(this.form))
   }
 
   async submitFailure() {
@@ -90,7 +92,7 @@ class FormTester {
     );
 
     assert.match(await alert.getText(), /Some errors occurred./);
-    return this.getErrors()
+    return this.getErrors();
   }
 
   /*async getErrorForField(name: string) {
@@ -153,11 +155,20 @@ class Helper {
     await this.driver.executeScript(`arguments[0].click()`, element);
   }
 
+  async waitElem(name: string) {
+    return await this.driver.wait(until.elementLocated(By.css(name)));
+  }
+
   async form(name: string) {
-    return new FormTester(
-      this,
-      await this.driver.wait(until.elementLocated(By.css(name)))
+    return new FormTester(this, await this.waitElem(name));
+  }
+
+  async openNavbar() {
+    const navbarButton = this.driver.findElement(
+      By.css("button.navbar-toggler")
     );
+
+    await this.click(navbarButton);
   }
 }
 
@@ -305,9 +316,29 @@ export async function loginCorrect(helper: Helper) {
   await formTester.submitSuccess();
 }
 
+/*
 await runTest(loginEmptyUsernameAndPassword);
 await runTest(loginWrongUsername);
 await runTest(loginEmptyPassword);
 await runTest(loginEmptyUsername);
 await runTest(loginWrongPassword);
 await runTest(loginCorrect);
+await runTest(welcomeWorks);
+*/
+
+export async function welcomeWorks(helper: Helper) {
+  await helper.driver.get(`${BASE_URL}/`);
+  assert.match(
+    await (await helper.waitElem("pw-welcome")).getText(),
+    /Welcome/
+  );
+}
+
+export async function logoutWorks(helper: Helper) {
+  await loginCorrect(helper);
+  await helper.openNavbar()
+  await helper.click(await helper.driver.findElement(By.css(`a[href="/logout"]`)))
+  await helper.form("pw-welcome");
+}
+
+await runTest(logoutWorks)

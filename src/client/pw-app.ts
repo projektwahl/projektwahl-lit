@@ -377,7 +377,8 @@ export class PwApp extends PwElement {
                   ${this.username
                     ? html`<li class="nav-item">
                         <a
-                          @click=${async () => {
+                          @click=${async (e: Event) => {
+                            e.preventDefault()
                             await myFetch<"/api/v1/logout">(
                               "POST",
                               "/api/v1/logout",
@@ -395,7 +396,7 @@ export class PwApp extends PwElement {
                             );
                           }}
                           class="nav-link"
-                          href="#"
+                          href="/logout"
                           >${msg(str`Logout ${this.username}`)}</a
                         >
                       </li>`
