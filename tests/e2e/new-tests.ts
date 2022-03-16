@@ -105,7 +105,7 @@ class FormTester {
       (await this.form.findElements(By.css(`.invalid-feedback`))).map(
         async (e) => [
           await e
-            .findElement(By.xpath("//preceding-sibling::input"))
+            .findElement(By.xpath("preceding-sibling::input"))
             .getAttribute("name"),
           await e.getText(),
         ]
@@ -273,5 +273,78 @@ export async function loginWrongUsername(helper: Helper) {
   );
 }
 
-void runTest(loginEmptyUsernameAndPassword);
-void runTest(loginWrongUsername);
+export async function loginEmptyPassword(helper: Helper) {
+  await helper.driver.get(`${BASE_URL}/login`);
+
+  const formTester = new FormTester(
+    helper,
+    await helper.driver.wait(until.elementLocated(By.css("pw-login")))
+  );
+
+  await formTester.setField("username", "admin")
+
+  await formTester.submitFailure();
+
+  assert.deepStrictEqual(
+    [["password", "Falsches Passwort!"]],
+    await formTester.getErrors()
+  );
+}
+
+export async function loginEmptyUsername(helper: Helper) {
+  await helper.driver.get(`${BASE_URL}/login`);
+
+  const formTester = new FormTester(
+    helper,
+    await helper.driver.wait(until.elementLocated(By.css("pw-login")))
+  );
+
+  await formTester.setField("password", "password")
+
+  await formTester.submitFailure();
+
+  assert.deepStrictEqual(
+    [["username", "Text muss mindestens 1 Zeichen haben"]],
+    await formTester.getErrors()
+  );
+}
+
+export async function loginWrongPassword(helper: Helper) {
+  await helper.driver.get(`${BASE_URL}/login`);
+
+  const formTester = new FormTester(
+    helper,
+    await helper.driver.wait(until.elementLocated(By.css("pw-login")))
+  );
+
+  await formTester.setField("username", "admin")
+  await formTester.setField("password", "wrongpassword")
+
+  await formTester.submitFailure();
+
+  assert.deepStrictEqual(
+    [["password", "Falsches Passwort!"]],
+    await formTester.getErrors()
+  );
+}
+
+export async function loginCorrect(helper: Helper) {
+  await helper.driver.get(`${BASE_URL}/login`);
+
+  const formTester = new FormTester(
+    helper,
+    await helper.driver.wait(until.elementLocated(By.css("pw-login")))
+  );
+
+  await formTester.setField("username", "admin")
+  await formTester.setField("password", "changeme")
+
+  await formTester.submitSuccess();
+}
+
+await runTest(loginEmptyUsernameAndPassword);
+await runTest(loginWrongUsername);
+await runTest(loginEmptyPassword);
+await runTest(loginEmptyUsername);
+await runTest(loginWrongPassword);
+await runTest(loginCorrect);
