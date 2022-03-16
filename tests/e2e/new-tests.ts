@@ -90,17 +90,18 @@ class FormTester {
     );
 
     assert.match(await alert.getText(), /Some errors occurred./);
+    return this.getErrors()
   }
 
-  async getErrorForField(name: string) {
+  /*async getErrorForField(name: string) {
     console.log(
       await this.form
         .findElement(By.css(`input[name=${name}] + .invalid-feedback`))
         .getText()
     );
-  }
+  }*/
 
-  async getErrors() {
+  private async getErrors() {
     return Promise.all(
       (await this.form.findElements(By.css(`.invalid-feedback`))).map(
         async (e) => [
@@ -249,10 +250,9 @@ await helper.driver.wait(until.stalenessOf(loadingIndicator))*/
 export async function loginEmptyUsernameAndPassword(helper: Helper) {
   await helper.driver.get(`${BASE_URL}/login`);
   const formTester = await helper.form("pw-login");
-  await formTester.submitFailure();
   assert.deepStrictEqual(
     [["username", "Text muss mindestens 1 Zeichen haben"]],
-    await formTester.getErrors()
+    await formTester.submitFailure()
   );
 }
 
@@ -260,10 +260,9 @@ export async function loginWrongUsername(helper: Helper) {
   await helper.driver.get(`${BASE_URL}/login`);
   const formTester = await helper.form("pw-login");
   await formTester.setField("username", "nonexistent");
-  await formTester.submitFailure();
   assert.deepStrictEqual(
     [["username", "Nutzer existiert nicht!"]],
-    await formTester.getErrors()
+    await formTester.submitFailure()
   );
 }
 
@@ -271,10 +270,9 @@ export async function loginEmptyPassword(helper: Helper) {
   await helper.driver.get(`${BASE_URL}/login`);
   const formTester = await helper.form("pw-login");
   await formTester.setField("username", "admin");
-  await formTester.submitFailure();
   assert.deepStrictEqual(
     [["password", "Falsches Passwort!"]],
-    await formTester.getErrors()
+    await formTester.submitFailure()
   );
 }
 
@@ -282,10 +280,9 @@ export async function loginEmptyUsername(helper: Helper) {
   await helper.driver.get(`${BASE_URL}/login`);
   const formTester = await helper.form("pw-login");
   await formTester.setField("password", "password");
-  await formTester.submitFailure();
   assert.deepStrictEqual(
     [["username", "Text muss mindestens 1 Zeichen haben"]],
-    await formTester.getErrors()
+    await formTester.submitFailure()
   );
 }
 
@@ -294,10 +291,9 @@ export async function loginWrongPassword(helper: Helper) {
   const formTester = await helper.form("pw-login");
   await formTester.setField("username", "admin");
   await formTester.setField("password", "wrongpassword");
-  await formTester.submitFailure();
   assert.deepStrictEqual(
     [["password", "Falsches Passwort!"]],
-    await formTester.getErrors()
+    await formTester.submitFailure()
   );
 }
 
