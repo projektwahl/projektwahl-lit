@@ -63,9 +63,7 @@ class FormTester {
   }
 
   private async submit() {
-    const submitButton = await (
-      await this.helper.shadow(this.form)
-    ).findElement(By.css('button[type="submit"]'));
+    const submitButton = await this.form.findElement(By.css('button[type="submit"]'));
 
     await this.helper.click(submitButton);
   }
@@ -100,13 +98,13 @@ class Helper {
   constructor(driver: WebDriver) {
     this.driver = driver;
   }
-
+/*
   async shadow(element: WebElement) {
     // @ts-expect-error types are wrong
     // eslint-disable-next-line @typescript-eslint/consistent-type-assertions,@typescript-eslint/no-unsafe-call
     return (await element.getShadowRoot()) as WebElement;
   }
-
+*/
   async click(element: WebElement) {
     // currently this is just too buggy
 
@@ -116,23 +114,16 @@ class Helper {
 
     await this.driver.executeScript(`arguments[0].click()`, element);
   }
-
-  async getPwAppComponent(name: string) {
-    //const pwApp = await this.driver.findElement(By.css("pw-app"));
-
-    //await this.driver.wait(async () => await (await this.shadow(pwApp)).findElement(By.css(name)), 1000, `Could not find pw-app component ${name}`)
-
-  }
 }
 
 async function runTest(testFunction: (helper: Helper) => Promise<void>) {
     // SELENIUM_BROWSER=chrome node --experimental-loader ./src/loader.js --enable-source-maps tests/e2e/welcome.js
     const builder = new Builder()
       .forBrowser("firefox")
-      .withCapabilities(Capabilities.firefox().set("acceptInsecureCerts", true))
+      .withCapabilities(Capabilities.firefox().set("acceptInsecureCerts", true).setPageLoadStrategy("none"))
       .withCapabilities(
-        Capabilities.chrome().set(Capability.ACCEPT_INSECURE_TLS_CERTS, true)
-      );
+        Capabilities.chrome().set(Capability.ACCEPT_INSECURE_TLS_CERTS, true).setPageLoadStrategy("none")
+      )
 
     if (process.env.CI) {
       builder.setChromeOptions(
@@ -143,7 +134,9 @@ async function runTest(testFunction: (helper: Helper) => Promise<void>) {
         )
       );
     }
+
     const driver = builder.build();
+
     /*await driver.manage().setTimeouts({
         implicit: 1000,
     });*/
@@ -192,7 +185,23 @@ async function runTest(testFunction: (helper: Helper) => Promise<void>) {
 export async function loginWrongUsername(helper: Helper) {
   await helper.driver.get(`${BASE_URL}/login`);
 
-  new FormTester(helper, await helper.getPwAppComponent(`pw-login`));
+  /*// @ts-expect-error wrong typings
+  await helper.driver.setNetworkConditions({
+    offline: false,
+    latency: 100, // Additional latency (ms).
+    download_throughput: 50 * 1024, // Maximal aggregated download throughput.
+    upload_throughput: 50 * 1024, // Maximal aggregated upload throughput.
+  });
+
+  await helper.driver.navigate().to(`${BASE_URL}/login`)
+
+  const loadingIndicator = await helper.driver.findElement(By.css(".spinner-grow"));
+
+  await helper.driver.wait(until.stalenessOf(loadingIndicator))*/
+
+  const formTester = new FormTester(helper, await helper.driver.wait(until.elementLocated(By.css("pw-login"))));
+
+  await formTester.submitFailure();
 }
 
 void runTest(loginWrongUsername);
