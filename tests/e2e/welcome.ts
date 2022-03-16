@@ -21,6 +21,7 @@ SPDX-License-Identifier: AGPL-3.0-or-later
 SPDX-FileCopyrightText: 2021 Moritz Hedtke <Moritz.Hedtke@t-online.de>
 */
 import assert from "assert/strict";
+import { writeFile } from "fs/promises";
 
 import {
   Builder,
@@ -764,6 +765,10 @@ export async function main() {
 */
   } catch (error) {
     console.error(error);
+
+    const screenshot = await driver.takeScreenshot();
+    await writeFile("screenshot.png", screenshot, "base64");
+
     //await driver.quit();
 
     throw error;
