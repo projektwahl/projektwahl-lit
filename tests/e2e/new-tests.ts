@@ -62,6 +62,12 @@ class FormTester {
     this.form = form;
   }
 
+  async setField(name: string, value: string) {
+    const element = await this.form.findElement(By.css(`input[name=${name}]`))
+    await element.clear()
+    await element.sendKeys(value)
+  }
+
   private async submit() {
     const submitButton = await this.form.findElement(
       By.css('button[type="submit"]')
@@ -78,7 +84,9 @@ class FormTester {
     await this.submit();
 
     const alert = await this.helper.driver.wait(
-      until.elementLocated(By.css('div[class="alert alert-danger"]'))
+      until.elementLocated(By.css('div[class="alert alert-danger"]')),
+      1000,
+      "Expected submit failure"
     );
 
     assert.match(await alert.getText(), /Some errors occurred./);
@@ -194,7 +202,7 @@ async function runTest(testFunction: (helper: Helper) => Promise<void>) {
 
     // TODO test openid
 
-    //await driver.quit();
+    await driver.quit();
 
     /*
         const theRepl = repl.start();
@@ -217,7 +225,7 @@ async function runTest(testFunction: (helper: Helper) => Promise<void>) {
   }
 }
 
-export async function loginWrongUsername(helper: Helper) {
+export async function loginEmptyUsernameAndPassword(helper: Helper) {
   await helper.driver.get(`${BASE_URL}/login`);
 
   /*// @ts-expect-error wrong typings
@@ -241,9 +249,29 @@ export async function loginWrongUsername(helper: Helper) {
 
   await formTester.submitFailure();
 
-  await formTester.getErrorForField("username");
-
-  console.log(await formTester.getErrors());
+  assert.deepStrictEqual(
+    [["username", "Text muss mindestens 1 Zeichen haben"]],
+    await formTester.getErrors()
+  );
 }
 
+export async function loginWrongUsername(helper: Helper) {
+  await helper.driver.get(`${BASE_URL}/login`);
+
+  const formTester = new FormTester(
+    helper,
+    await helper.driver.wait(until.elementLocated(By.css("pw-login")))
+  );
+
+  await formTester.setField("username", "nonexistent")
+
+  await formTester.submitFailure();
+
+  assert.deepStrictEqual(
+    [["username", "Nutzer existiert nicht!"]],
+    await formTester.getErrors()
+  );
+}
+
+void runTest(loginEmptyUsernameAndPassword);
 void runTest(loginWrongUsername);
