@@ -410,6 +410,129 @@ export async function testProject(driver: WebDriver) {
   }
 }
 
+export async function openNavbar(driver: WebDriver) {
+  while (
+    !(await (
+      await (
+        await shadow(await driver.findElement(By.css("pw-app")))
+      ).findElement(By.css("#navbarSupportedContent"))
+    ).isDisplayed())
+  ) {
+    // open navbar
+    const pwApp = await driver.findElement(By.css("pw-app"));
+
+    const navbarButton = await (
+      await shadow(pwApp)
+    ).findElement(By.css("button.navbar-toggler"));
+
+    await click(driver, navbarButton);
+  }
+}
+
+export async function loginWith(
+  driver: WebDriver,
+  username: string,
+  password: string
+) {
+  {
+    // go to login page
+    const pwApp = await driver.findElement(By.css("pw-app"));
+
+    const loginLink = await (
+      await shadow(pwApp)
+    ).findElement(By.css('a[href="/login"]'));
+
+    await click(driver, loginLink);
+
+    await driver.switchTo().window((await driver.getAllWindowHandles())[1]);
+  }
+
+  {
+    // login
+    const pwApp = await driver.findElement(By.css("pw-app"));
+
+    const pwLogin = await (await shadow(pwApp)).findElement(By.css("pw-login"));
+
+    const usernameField = await (
+      await shadow(pwLogin)
+    ).findElement(By.css('input[name="username"]'));
+    await usernameField.sendKeys(username);
+
+    const passwordField = await (
+      await shadow(pwLogin)
+    ).findElement(By.css('input[name="password"]'));
+    await passwordField.sendKeys(password);
+
+    const loginButton = await (
+      await shadow(pwLogin)
+    ).findElement(By.css('button[type="submit"]'));
+
+    await click(driver, loginButton);
+  }
+
+  {
+    await driver.switchTo().window((await driver.getAllWindowHandles())[0]);
+
+    const pwApp = await driver.findElement(By.css("pw-app"));
+
+    await (await shadow(pwApp)).findElement(By.css("pw-welcome"));
+  }
+}
+
+async function checkImprint(driver: WebDriver) {
+  {
+    // imprint
+
+    const pwApp = await driver.findElement(By.css("pw-app"));
+
+    const imprintLink = await (
+      await shadow(pwApp)
+    ).findElement(By.css('a[href="/imprint"]'));
+
+    await click(driver, imprintLink);
+
+    await driver.switchTo().window((await driver.getAllWindowHandles())[1]);
+    const pwApp2 = await driver.findElement(By.css("pw-app"));
+
+    const pwImprint = await (
+      await shadow(pwApp2)
+    ).findElement(By.css("pw-imprint"));
+
+    assert.match(await pwImprint.getText(), /Angaben gemäß § 5 TMG/);
+
+    await driver.close();
+
+    await driver.switchTo().window((await driver.getAllWindowHandles())[0]);
+  }
+}
+
+async function checkPrivacy(driver: WebDriver) {
+  {
+    // privacy
+
+    const pwApp = await driver.findElement(By.css("pw-app"));
+
+    const privacyLink = await (
+      await shadow(pwApp)
+    ).findElement(By.css('a[href="/privacy"]'));
+
+    await click(driver, privacyLink);
+
+    await driver.switchTo().window((await driver.getAllWindowHandles())[1]);
+    const pwApp2 = await driver.findElement(By.css("pw-app"));
+
+    const pwPrivacy = await (
+      await shadow(pwApp2)
+    ).findElement(By.css("pw-privacy"));
+
+    assert.match(await pwPrivacy.getText(), /Verantwortlicher/);
+
+    await driver.close();
+
+    await driver.switchTo().window((await driver.getAllWindowHandles())[0]);
+  }
+}
+
 export async function main() {
   // SELENIUM_BROWSER=chrome node --experimental-loader ./src/loader.js --enable-source-maps tests/e2e/welcome.js
   const builder = new Builder()
@@ -430,7 +553,7 @@ export async function main() {
   }
   const driver = builder.build();
   await driver.manage().setTimeouts({
-    implicit: 5000,
+    implicit: 1000,
   });
   await driver.manage().window().setRect({
     width: 500,
@@ -449,116 +572,15 @@ export async function main() {
     //const screenshot = await driver.takeScreenshot();
     //await writeFile("screenshot.png", screenshot, "base64");
 
-    {
-      // open navbar
-      const pwApp = await driver.findElement(By.css("pw-app"));
-
-      const navbarButton = await (
-        await shadow(pwApp)
-      ).findElement(By.css("button.navbar-toggler"));
-
-      await click(driver, navbarButton);
-    }
-
-    {
-      // go to login page
-      const pwApp = await driver.findElement(By.css("pw-app"));
-
-      const loginLink = await (
-        await shadow(pwApp)
-      ).findElement(By.css('a[href="/login"]'));
-
-      await click(driver, loginLink);
-
-      await driver.switchTo().window((await driver.getAllWindowHandles())[1]);
-    }
-
-    {
-      // login
-      const pwApp = await driver.findElement(By.css("pw-app"));
-
-      const pwLogin = await (
-        await shadow(pwApp)
-      ).findElement(By.css("pw-login"));
-
-      const usernameField = await (
-        await shadow(pwLogin)
-      ).findElement(By.css('input[name="username"]'));
-      await usernameField.sendKeys("admin");
-
-      const passwordField = await (
-        await shadow(pwLogin)
-      ).findElement(By.css('input[name="password"]'));
-      await passwordField.sendKeys("changeme");
-
-      const loginButton = await (
-        await shadow(pwLogin)
-      ).findElement(By.css('button[type="submit"]'));
-
-      await click(driver, loginButton);
-    }
-
-    {
-      await driver.switchTo().window((await driver.getAllWindowHandles())[0]);
-
-      const pwApp = await driver.findElement(By.css("pw-app"));
-
-      await (await shadow(pwApp)).findElement(By.css("pw-welcome"));
-    }
+    await loginWith(driver, "admin", "changeme");
 
     await testUser(driver);
 
     await testProject(driver);
 
-    {
-      // imprint
+    await checkImprint(driver);
 
-      const pwApp = await driver.findElement(By.css("pw-app"));
-
-      const imprintLink = await (
-        await shadow(pwApp)
-      ).findElement(By.css('a[href="/imprint"]'));
-
-      await click(driver, imprintLink);
-
-      await driver.switchTo().window((await driver.getAllWindowHandles())[1]);
-      const pwApp2 = await driver.findElement(By.css("pw-app"));
-
-      const pwImprint = await (
-        await shadow(pwApp2)
-      ).findElement(By.css("pw-imprint"));
-
-      assert.match(await pwImprint.getText(), /Angaben gemäß § 5 TMG/);
-
-      await driver.close();
-
-      await driver.switchTo().window((await driver.getAllWindowHandles())[0]);
-    }
-
-    {
-      // privacy
-
-      const pwApp = await driver.findElement(By.css("pw-app"));
-
-      const privacyLink = await (
-        await shadow(pwApp)
-      ).findElement(By.css('a[href="/privacy"]'));
-
-      await click(driver, privacyLink);
-
-      await driver.switchTo().window((await driver.getAllWindowHandles())[1]);
-      const pwApp2 = await driver.findElement(By.css("pw-app"));
-
-      const pwPrivacy = await (
-        await shadow(pwApp2)
-      ).findElement(By.css("pw-privacy"));
-
-      assert.match(await pwPrivacy.getText(), /Verantwortlicher/);
-
-      await driver.close();
-
-      await driver.switchTo().window((await driver.getAllWindowHandles())[0]);
-    }
+    await checkPrivacy(driver);
 
     {
       // filtering users
@@ -670,16 +692,7 @@ export async function main() {
 
     // TODO filtering with empty result
 
-    {
-      // open navbar
-      const pwApp = await driver.findElement(By.css("pw-app"));
-
-      const navbarButton = await (
-        await shadow(pwApp)
-      ).findElement(By.css("button.navbar-toggler"));
-
-      await click(driver, navbarButton);
-    }
+    await openNavbar(driver);
 
     {
       // logout
@@ -694,20 +707,10 @@ export async function main() {
       await logoutButton.click();
     }
 
-    await driver.sleep(100); // hack
+    await openNavbar(driver);
 
     {
-      // open navbar
-      const pwApp = await driver.findElement(By.css("pw-app"));
-
-      const navbarButton = await (
-        await shadow(pwApp)
-      ).findElement(By.css("button.navbar-toggler"));
-
-      await click(driver, navbarButton);
-    }
-
-    {
+      // check logged out
       const pwApp = await driver.findElement(By.css("pw-app"));
 
       const loginLink = await (
