@@ -40,6 +40,26 @@ if (!process.env["BASE_URL"]) {
   process.exit(1);
 }
 
+// all tests should be independently runnable (as we don't use test runner)
+// implement a simple implementation of that ourself
+// before every test we need to reset the database and restart the browser
+
+// maybe convert to that class-based approach
+
+// all actions should verify that they are done and that they are successful.
+
+class FormTester {
+  driver: WebDriver;
+
+  constructor(driver: WebDriver) {
+    this.driver = driver;
+  }
+
+  async submitSuccess() {}
+
+  async submitFailure() {}
+}
+
 // https://chrome.google.com/webstore/detail/selenium-ide/mooikfkahbdckldjjndioackbalphokd
 // https://www.selenium.dev/selenium/docs/api/javascript/module/selenium-webdriver/
 
@@ -533,7 +553,7 @@ async function checkPrivacy(driver: WebDriver) {
   }
 }
 
-export async function main() {
+export async function test(testFunction: (driver: WebDriver) => Promise<void>) {
   // SELENIUM_BROWSER=chrome node --experimental-loader ./src/loader.js --enable-source-maps tests/e2e/welcome.js
   const builder = new Builder()
     .forBrowser("firefox")
@@ -561,186 +581,7 @@ export async function main() {
   });
 
   try {
-    if (!process.env.BASE_URL) {
-      throw new Error("BASE_URL not set!");
-    }
-
-    await driver.get(process.env.BASE_URL);
-
-    //await driver.sleep(1000);
-
-    //const screenshot = await driver.takeScreenshot();
-    //await writeFile("screenshot.png", screenshot, "base64");
-
-    await loginWith(driver, "admin", "changeme");
-
-    await testUser(driver);
-
-    await testProject(driver);
-
-    await checkImprint(driver);
-
-    await checkPrivacy(driver);
-
-    {
-      // filtering users
-
-      const pwApp = await driver.findElement(By.css("pw-app"));
-
-      const accountsLink = await (
-        await shadow(pwApp)
-      ).findElement(By.css('a[href="/users"]'));
-
-      await click(driver, accountsLink);
-
-      const pwUsers = await (
-        await shadow(pwApp)
-      ).findElement(By.css("pw-users"));
-
-      const filterUsername = await (
-        await shadow(pwUsers)
-      ).findElement(By.css('input[name="filters,username"]'));
-
-      // @ts-expect-error wrong typings
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-call
-      await driver.setNetworkConditions({
-        offline: false,
-        latency: 100, // Additional latency (ms).
-        download_throughput: 50 * 1024, // Maximal aggregated download throughput.
-        upload_throughput: 50 * 1024, // Maximal aggregated upload throughput.
-      });
-
-      await filterUsername.sendKeys("admin");
-
-      const loadingSpinner = await (
-        await shadow(pwUsers)
-      ).findElement(By.css(".spinner-grow"));
-
-      assert.ok(loadingSpinner.isDisplayed());
-
-      console.log(new Date());
-
-      await driver.wait(until.stalenessOf(loadingSpinner));
-
-      console.log(new Date());
-
-      // @ts-expect-error wrong typings
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-call
-      await driver.setNetworkConditions({
-        offline: false,
-        latency: 0, // Additional latency (ms).
-        download_throughput: 0, // Maximal aggregated download throughput.
-        upload_throughput: 0, // Maximal aggregated upload throughput.
-      });
-
-      // TODO FIXME verify results
-    }
-
-    {
-      // filtering projects
-
-      const pwApp = await driver.findElement(By.css("pw-app"));
-
-      const accountsLink = await (
-        await shadow(pwApp)
-      ).findElement(By.css('a[href="/projects"]'));
-
-      await click(driver, accountsLink);
-
-      const pwUsers = await (
-        await shadow(pwApp)
-      ).findElement(By.css("pw-projects"));
-
-      const filterUsername = await (
-        await shadow(pwUsers)
-      ).findElement(By.css('input[name="filters,title"]'));
-
-      // @ts-expect-error wrong typings
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-call
-      await driver.setNetworkConditions({
-        offline: false,
-        latency: 100, // Additional latency (ms).
-        download_throughput: 50 * 1024, // Maximal aggregated download throughput.
-        upload_throughput: 50 * 1024, // Maximal aggregated upload throughput.
-      });
-
-      await filterUsername.sendKeys("randomproject");
-
-      const loadingSpinner = await (
-        await shadow(pwUsers)
-      ).findElement(By.css(".spinner-grow"));
-
-      assert.ok(loadingSpinner.isDisplayed());
-
-      console.log(new Date());
-
-      await driver.wait(until.stalenessOf(loadingSpinner));
-
-      console.log(new Date());
-
-      // @ts-expect-error wrong typings
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-call
-      await driver.setNetworkConditions({
-        offline: false,
-        latency: 0, // Additional latency (ms).
-        download_throughput: 0, // Maximal aggregated download throughput.
-        upload_throughput: 0, // Maximal aggregated upload throughput.
-      });
-    }
-
-    // TODO filtering with error (this alerts currently afaik (if the error is detected client-side))
-
-    // TODO filtering with empty result
-
-    await openNavbar(driver);
-
-    {
-      // logout
-      const pwApp = await driver.findElement(By.css("pw-app"));
-
-      const logoutButton = await (
-        await shadow(pwApp)
-      ).findElement(By.partialLinkText("Logout"));
-
-      assert.equal(await logoutButton.getText(), "Logout admin");
-
-      await logoutButton.click();
-    }
-
-    await openNavbar(driver);
-
-    {
-      // check logged out
-      const pwApp = await driver.findElement(By.css("pw-app"));
-
-      const loginLink = await (
-        await shadow(pwApp)
-      ).findElement(By.css('a[href="/login"]'));
-
-      assert.equal(await loginLink.getText(), "Login");
-    }
-
-    {
-      // check logged out by checking no permissions
-
-      await driver.get(`${process.env.BASE_URL}/projects`);
-
-      const pwApp = await driver.findElement(By.css("pw-app"));
-
-      const pwProjects = await (
-        await shadow(pwApp)
-      ).findElement(By.css("pw-projects"));
-
-      const alert = await (
-        await shadow(pwProjects)
-      ).findElement(By.css('div[class="alert alert-danger"]'));
-
-      assert.match(
-        await alert.getText(),
-        /Nicht angemeldet! Klicke rechts oben auf Anmelden./
-      );
-    }
-
+    await testFunction(driver);
     // important
 
     // TODO FIXME editing the project leaders + members
@@ -778,4 +619,189 @@ export async function main() {
   }
 }
 
-await main();
+async function baseTest(driver: WebDriver) {
+  if (!process.env.BASE_URL) {
+    throw new Error("BASE_URL not set!");
+  }
+
+  await driver.get(process.env.BASE_URL);
+
+  //await driver.sleep(1000);
+
+  //const screenshot = await driver.takeScreenshot();
+  //await writeFile("screenshot.png", screenshot, "base64");
+
+  await loginWith(driver, "admin", "changeme");
+
+  await testUser(driver);
+
+  await testProject(driver);
+
+  await checkImprint(driver);
+
+  await checkPrivacy(driver);
+
+  {
+    // filtering users
+
+    const pwApp = await driver.findElement(By.css("pw-app"));
+
+    const accountsLink = await (
+      await shadow(pwApp)
+    ).findElement(By.css('a[href="/users"]'));
+
+    await click(driver, accountsLink);
+
+    const pwUsers = await (await shadow(pwApp)).findElement(By.css("pw-users"));
+
+    const filterUsername = await (
+      await shadow(pwUsers)
+    ).findElement(By.css('input[name="filters,username"]'));
+
+    // @ts-expect-error wrong typings
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-call
+    await driver.setNetworkConditions({
+      offline: false,
+      latency: 100, // Additional latency (ms).
+      download_throughput: 50 * 1024, // Maximal aggregated download throughput.
+      upload_throughput: 50 * 1024, // Maximal aggregated upload throughput.
+    });
+
+    await filterUsername.sendKeys("admin");
+
+    const loadingSpinner = await (
+      await shadow(pwUsers)
+    ).findElement(By.css(".spinner-grow"));
+
+    assert.ok(loadingSpinner.isDisplayed());
+
+    console.log(new Date());
+
+    await driver.wait(until.stalenessOf(loadingSpinner));
+
+    console.log(new Date());
+
+    // @ts-expect-error wrong typings
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-call
+    await driver.setNetworkConditions({
+      offline: false,
+      latency: 0, // Additional latency (ms).
+      download_throughput: 0, // Maximal aggregated download throughput.
+      upload_throughput: 0, // Maximal aggregated upload throughput.
+    });
+
+    // TODO FIXME verify results
+  }
+
+  {
+    // filtering projects
+
+    const pwApp = await driver.findElement(By.css("pw-app"));
+
+    const accountsLink = await (
+      await shadow(pwApp)
+    ).findElement(By.css('a[href="/projects"]'));
+
+    await click(driver, accountsLink);
+
+    const pwUsers = await (
+      await shadow(pwApp)
+    ).findElement(By.css("pw-projects"));
+
+    const filterUsername = await (
+      await shadow(pwUsers)
+    ).findElement(By.css('input[name="filters,title"]'));
+
+    // @ts-expect-error wrong typings
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-call
+    await driver.setNetworkConditions({
+      offline: false,
+      latency: 100, // Additional latency (ms).
+      download_throughput: 50 * 1024, // Maximal aggregated download throughput.
+      upload_throughput: 50 * 1024, // Maximal aggregated upload throughput.
+    });
+
+    await filterUsername.sendKeys("randomproject");
+
+    const loadingSpinner = await (
+      await shadow(pwUsers)
+    ).findElement(By.css(".spinner-grow"));
+
+    assert.ok(loadingSpinner.isDisplayed());
+
+    console.log(new Date());
+
+    await driver.wait(until.stalenessOf(loadingSpinner));
+
+    console.log(new Date());
+
+    // @ts-expect-error wrong typings
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-call
+    await driver.setNetworkConditions({
+      offline: false,
+      latency: 0, // Additional latency (ms).
+      download_throughput: 0, // Maximal aggregated download throughput.
+      upload_throughput: 0, // Maximal aggregated upload throughput.
+    });
+  }
+
+  // TODO filtering with error (this alerts currently afaik (if the error is detected client-side))
+
+  // TODO filtering with empty result
+
+  await openNavbar(driver);
+
+  {
+    // logout
+    const pwApp = await driver.findElement(By.css("pw-app"));
+
+    const logoutButton = await (
+      await shadow(pwApp)
+    ).findElement(By.partialLinkText("Logout"));
+
+    assert.equal(await logoutButton.getText(), "Logout admin");
+
+    await logoutButton.click();
+  }
+
+  await openNavbar(driver);
+
+  {
+    // check logged out
+    const pwApp = await driver.findElement(By.css("pw-app"));
+
+    const loginLink = await (
+      await shadow(pwApp)
+    ).findElement(By.css('a[href="/login"]'));
+
+    assert.equal(await loginLink.getText(), "Login");
+  }
+
+  {
+    // check logged out by checking no permissions
+
+    await driver.get(`${process.env.BASE_URL}/projects`);
+
+    const pwApp = await driver.findElement(By.css("pw-app"));
+
+    const pwProjects = await (
+      await shadow(pwApp)
+    ).findElement(By.css("pw-projects"));
+
+    const alert = await (
+      await shadow(pwProjects)
+    ).findElement(By.css('div[class="alert alert-danger"]'));
+
+    assert.match(
+      await alert.getText(),
+      /Nicht angemeldet! Klicke rechts oben auf Anmelden./
+    );
+  }
+}
+
+// TODO FIXME reset database
+
+// TODO FIXME allow tests in parallel (if not reset database)
+// TODO FIXME allow only running some tests
+
+void test(baseTest);
