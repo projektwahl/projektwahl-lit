@@ -54,20 +54,20 @@ if (!process.env.BASE_URL) {
 }
 
 class FormTester {
-  driver: WebDriver;
+  helper: Helper;
   form: WebElement;
 
-  constructor(driver: WebDriver, form: WebElement) {
-    this.driver = driver;
+  constructor(helper: Helper, form: WebElement) {
+    this.helper = helper;
     this.form = form;
   }
 
   private async submit() {
     const submitButton = await (
-      await shadow(this.form)
+      await this.helper.shadow(this.form)
     ).findElement(By.css('button[type="submit"]'));
 
-    await click(this.driver, submitButton);
+    await this.helper.click(submitButton);
   }
 
   async submitSuccess() {
@@ -107,17 +107,25 @@ class Helper {
     return (await element.getShadowRoot()) as WebElement;
   }
 
-  async click(driver: WebDriver, element: WebElement) {
+  async click(element: WebElement) {
     // currently this is just too buggy
 
     //await driver.executeScript(`arguments[0].scrollIntoView(true);`, element);
 
     //await driver.sleep(250);
 
-    await driver.executeScript(`arguments[0].click()`, element);
+    await this.driver.executeScript(`arguments[0].click()`, element);
   }
 
-  async runTest(testFunction: (driver: WebDriver) => Promise<void>) {
+  async getPwAppComponent(name: string) {
+    //const pwApp = await this.driver.findElement(By.css("pw-app"));
+
+    //await this.driver.wait(async () => await (await this.shadow(pwApp)).findElement(By.css(name)), 1000, `Could not find pw-app component ${name}`)
+
+  }
+}
+
+async function runTest(testFunction: (helper: Helper) => Promise<void>) {
     // SELENIUM_BROWSER=chrome node --experimental-loader ./src/loader.js --enable-source-maps tests/e2e/welcome.js
     const builder = new Builder()
       .forBrowser("firefox")
@@ -145,7 +153,7 @@ class Helper {
     });
 
     try {
-      await testFunction(driver);
+      await testFunction(new Helper(driver));
       // important
 
       // TODO FIXME editing the project leaders + members
@@ -172,8 +180,6 @@ class Helper {
         });
     */
     } catch (error) {
-      console.error(error);
-
       const screenshot = await driver.takeScreenshot();
       await writeFile("screenshot.png", screenshot, "base64");
 
@@ -183,17 +189,10 @@ class Helper {
     }
   }
 
-  async getPwAppComponent(driver: WebDriver, name: string) {
-    const pwApp = await driver.findElement(By.css("pw-app"));
+export async function loginWrongUsername(helper: Helper) {
+  await helper.driver.get(`${BASE_URL}/login`);
 
-    return await (await this.shadow(pwApp)).findElement(By.css(name));
-  }
-}
-
-export async function loginWrongUsername(driver: WebDriver) {
-  await driver.get(`${BASE_URL}/login`);
-
-  new FormTester(driver, await getPwAppComponent(driver, `pw-login`));
+  new FormTester(helper, await helper.getPwAppComponent(`pw-login`));
 }
 
 void runTest(loginWrongUsername);

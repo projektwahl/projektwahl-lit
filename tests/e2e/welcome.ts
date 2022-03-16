@@ -21,6 +21,7 @@ SPDX-License-Identifier: AGPL-3.0-or-later
 SPDX-FileCopyrightText: 2021 Moritz Hedtke <Moritz.Hedtke@t-online.de>
 */
 import assert from "assert/strict";
+/*
 import { writeFile } from "fs/promises";
 
 import {
@@ -687,3 +688,4 @@ async function baseTest(driver: WebDriver) {
 // TODO FIXME allow only running some tests
 
 void runTest(baseTest);
+*/
