@@ -63,9 +63,18 @@ class FormTester {
   }
 
   async setField(name: string, value: string) {
-    const element = await this.form.findElement(By.css(`input[name=${name}]`));
+    const element = await this.form.findElement(
+      By.css(`input[name="${name}"]`)
+    );
     await element.clear();
     await element.sendKeys(value);
+  }
+
+  async getField(name: string) {
+    const element = await this.form.findElement(
+      By.css(`input[name="${name}"]`)
+    );
+    return await element.getAttribute("value");
   }
 
   private async submit() {
@@ -79,7 +88,7 @@ class FormTester {
   async submitSuccess() {
     await this.submit();
 
-    await this.helper.driver.wait(until.stalenessOf(this.form))
+    await this.helper.driver.wait(until.stalenessOf(this.form));
   }
 
   async submitFailure() {
@@ -324,6 +333,7 @@ await runTest(loginEmptyUsername);
 await runTest(loginWrongPassword);
 await runTest(loginCorrect);
 await runTest(welcomeWorks);
+await runTest(logoutWorks)
 */
 
 export async function welcomeWorks(helper: Helper) {
@@ -336,9 +346,38 @@ export async function welcomeWorks(helper: Helper) {
 
 export async function logoutWorks(helper: Helper) {
   await loginCorrect(helper);
-  await helper.openNavbar()
-  await helper.click(await helper.driver.findElement(By.css(`a[href="/logout"]`)))
+  await helper.openNavbar();
+  await helper.click(
+    await helper.driver.findElement(By.css(`a[href="/logout"]`))
+  );
   await helper.form("pw-welcome");
 }
 
-await runTest(logoutWorks)
+export async function createUserAllFields(helper: Helper) {
+  await loginCorrect(helper);
+  await helper.openNavbar();
+  await helper.click(
+    await helper.driver.findElement(By.css(`a[href="/users"]`))
+  );
+  await helper.form("pw-users");
+  await helper.click(
+    await helper.driver.findElement(By.css(`a[href="/users/create"]`))
+  );
+  let form = await helper.form("pw-user-create");
+  const username = `username${Math.random()}`;
+  const group = `group${Math.random()}`.substring(0, 15);
+  await form.setField("0,username", username);
+  await form.setField("0,group", group);
+  await form.submitSuccess();
+  await helper.driver.wait(until.urlContains("/users/edit/"));
+  const id = (await helper.driver.getCurrentUrl()).substring(
+    "https://localhost:8443/users/edit/".length
+  );
+  console.log(id);
+  await helper.driver.get(`https://localhost:8443/users/view/${id}`);
+  form = await helper.form("pw-user-create");
+  assert.equal(await form.getField("0,username"), username);
+
+  //await helper.driver.sleep(100000)
+}
+await runTest(createUserAllFields);

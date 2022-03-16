@@ -378,7 +378,7 @@ export class PwApp extends PwElement {
                     ? html`<li class="nav-item">
                         <a
                           @click=${async (e: Event) => {
-                            e.preventDefault()
+                            e.preventDefault();
                             await myFetch<"/api/v1/logout">(
                               "POST",
                               "/api/v1/logout",
