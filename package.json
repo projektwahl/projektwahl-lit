@@ -44,7 +44,7 @@
     "lit": "^2.2.0",
     "openid-client": "^5.1.4",
     "postgres": "porsager/postgres#rewrite",
-    "zod": "^3.13.4"
+    "zod": "^3.14.1"
   },
   "dependenciesComments": {
     "hot-esm": "1.2.2",
