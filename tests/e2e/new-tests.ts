@@ -22,6 +22,9 @@ SPDX-FileCopyrightText: 2021 Moritz Hedtke <Moritz.Hedtke@t-online.de>
 */
 import assert from "assert/strict";
 import { writeFile } from "fs/promises";
+import nodeCrypto from "node:crypto";
+// @ts-expect-error wrong typings
+const { webcrypto: crypto }: { webcrypto: Crypto } = nodeCrypto;
 
 import {
   Builder,
@@ -233,7 +236,7 @@ async function runTest(testFunction: (helper: Helper) => Promise<void>) {
   }
 }
 
-export async function loginEmptyUsernameAndPassword(helper: Helper) {
+async function loginEmptyUsernameAndPassword(helper: Helper) {
   await helper.driver.get(`${BASE_URL}/login`);
   const formTester = await helper.form("pw-login");
   assert.deepStrictEqual(
@@ -242,7 +245,7 @@ export async function loginEmptyUsernameAndPassword(helper: Helper) {
   );
 }
 
-export async function loginWrongUsername(helper: Helper) {
+async function loginWrongUsername(helper: Helper) {
   await helper.driver.get(`${BASE_URL}/login`);
   const formTester = await helper.form("pw-login");
   await formTester.setField("username", "nonexistent");
@@ -252,7 +255,7 @@ export async function loginWrongUsername(helper: Helper) {
   );
 }
 
-export async function loginEmptyPassword(helper: Helper) {
+async function loginEmptyPassword(helper: Helper) {
   await helper.driver.get(`${BASE_URL}/login`);
   const formTester = await helper.form("pw-login");
   await formTester.setField("username", "admin");
@@ -262,7 +265,7 @@ export async function loginEmptyPassword(helper: Helper) {
   );
 }
 
-export async function loginEmptyUsername(helper: Helper) {
+async function loginEmptyUsername(helper: Helper) {
   await helper.driver.get(`${BASE_URL}/login`);
   const formTester = await helper.form("pw-login");
   await formTester.setField("password", "password");
@@ -272,7 +275,7 @@ export async function loginEmptyUsername(helper: Helper) {
   );
 }
 
-export async function loginWrongPassword(helper: Helper) {
+async function loginWrongPassword(helper: Helper) {
   await helper.driver.get(`${BASE_URL}/login`);
   const formTester = await helper.form("pw-login");
   await formTester.setField("username", "admin");
@@ -283,7 +286,7 @@ export async function loginWrongPassword(helper: Helper) {
   );
 }
 
-export async function loginCorrect(helper: Helper) {
+async function loginCorrect(helper: Helper) {
   await helper.driver.get(`${BASE_URL}/login`);
   const formTester = await helper.form("pw-login");
   await formTester.setField("username", "admin");
@@ -291,7 +294,7 @@ export async function loginCorrect(helper: Helper) {
   await formTester.submitSuccess();
 }
 
-export async function welcomeWorks(helper: Helper) {
+async function welcomeWorks(helper: Helper) {
   await helper.driver.get(`${BASE_URL}/`);
   assert.match(
     await (await helper.waitElem("pw-welcome")).getText(),
@@ -299,7 +302,7 @@ export async function welcomeWorks(helper: Helper) {
   );
 }
 
-export async function imprintWorks(helper: Helper) {
+async function imprintWorks(helper: Helper) {
   await helper.driver.get(`${BASE_URL}/`);
   await helper.click(
     await helper.driver.findElement(By.css(`a[href="/imprint"]`))
@@ -317,7 +320,7 @@ export async function imprintWorks(helper: Helper) {
     .window((await helper.driver.getAllWindowHandles())[0]);
 }
 
-export async function privacyWorks(helper: Helper) {
+async function privacyWorks(helper: Helper) {
   await helper.driver.get(`${BASE_URL}/`);
   await helper.click(
     await helper.driver.findElement(By.css(`a[href="/privacy"]`))
@@ -335,7 +338,7 @@ export async function privacyWorks(helper: Helper) {
     .window((await helper.driver.getAllWindowHandles())[0]);
 }
 
-export async function logoutWorks(helper: Helper) {
+async function logoutWorks(helper: Helper) {
   await loginCorrect(helper);
   await helper.openNavbar();
   await helper.driver.get(`${BASE_URL}/imprint`);
@@ -346,7 +349,7 @@ export async function logoutWorks(helper: Helper) {
   await helper.form("pw-login");
 }
 
-export async function createUserAllFields(helper: Helper) {
+async function createUserAllFields(helper: Helper) {
   await loginCorrect(helper);
   await helper.openNavbar();
   await helper.click(
@@ -357,7 +360,7 @@ export async function createUserAllFields(helper: Helper) {
     await helper.driver.findElement(By.css(`a[href="/users/create"]`))
   );
   let form = await helper.form("pw-user-create");
-  const username = `username${Math.random()}`;
+  const username = `username${crypto.getRandomValues(new Uint32Array(1))[0]}`;
   const email = `email${Math.random()}`.substring(0, 15);
   const group = `group${Math.random()}`.substring(0, 15);
   const age = Math.floor(Math.random() * 10);
@@ -382,7 +385,7 @@ export async function createUserAllFields(helper: Helper) {
   assert.equal((await form.getCheckboxField("0,away")) === "true", away);
   assert.equal((await form.getCheckboxField("0,deleted")) === "true", deleted);
 
-  const username2 = `username${Math.random()}`;
+  const username2 = `username${crypto.getRandomValues(new Uint32Array(1))[0]}`;
   await form.setField("0,username", username2);
   await form.submit(); // submitSuccess doesnt work because it doesnt hide the form
 
@@ -424,7 +427,7 @@ export async function createUserAllFields(helper: Helper) {
   //await helper.driver.sleep(100000)
 }
 
-export async function createProjectAllFields(helper: Helper) {
+async function createProjectAllFields(helper: Helper) {
   await loginCorrect(helper);
   await helper.openNavbar();
   await helper.click(
@@ -522,7 +525,7 @@ export async function createProjectAllFields(helper: Helper) {
   assert.equal((await form.getCheckboxField("deleted")) === "true", deleted);
 }
 
-export async function checkNotLoggedInUsers(helper: Helper) {
+async function checkNotLoggedInUsers(helper: Helper) {
   await helper.driver.get(`${BASE_URL}/users`);
 
   const alert = await helper.driver.wait(
@@ -534,7 +537,7 @@ export async function checkNotLoggedInUsers(helper: Helper) {
   assert.match(await alert.getText(), /Nicht angemeldet!/);
 }
 
-export async function checkNotLoggedInProjects(helper: Helper) {
+async function checkNotLoggedInProjects(helper: Helper) {
   await helper.driver.get(`${BASE_URL}/projects`);
 
   const alert = await helper.driver.wait(
