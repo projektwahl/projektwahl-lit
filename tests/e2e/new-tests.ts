@@ -75,7 +75,7 @@ class FormTester {
       By.css(`input[name="${name}"]`)
     );
     if ((await element.getAttribute("checked")) ?? "false" != `${value}`) {
-      element.click();
+      this.helper.click(element);
     }
   }
 
@@ -330,6 +330,7 @@ await runTest(welcomeWorks);
 await runTest(imprintWorks);
 await runTest(privacyWorks);
 await runTest(logoutWorks);
+await runTest(createUserAllFields);
 */
 
 
@@ -455,4 +456,99 @@ export async function createUserAllFields(helper: Helper) {
 
   //await helper.driver.sleep(100000)
 }
-await runTest(createUserAllFields);
+
+
+
+export async function createProjectAllFields(helper: Helper) {
+  await loginCorrect(helper);
+  await helper.openNavbar();
+  await helper.click(
+    await helper.driver.findElement(By.css(`a[href="/projects"]`))
+  );
+  await helper.form("pw-projects");
+  await helper.click(
+    await helper.driver.findElement(By.css(`a[href="/projects/create"]`))
+  );
+  let form = await helper.form("pw-project-create");
+  const title = `title${Math.random()}`;
+  const info = `info${Math.random()}`;
+  const place = `place${Math.random()}`;
+  const costs = Math.floor(Math.random() * 10);
+  const min_age = Math.floor(Math.random() * 10);
+  const max_age = Math.floor(Math.random() * 10);
+  const min_participants = Math.floor(Math.random() * 10) + 1;
+  const max_participants = Math.floor(Math.random() * 10);
+  const random_assignments = Math.random() > 0.5 ? true : false;
+  const deleted = Math.random() > 0.5 ? true : false;
+  await form.setField("title", title);
+  await form.setField("info", info);
+  await form.setField("place", place);
+  await form.setField("costs", `${costs}`);
+  await form.setField("min_age", `${min_age}`);
+  await form.setField("max_age", `${max_age}`);
+  await form.setField("min_participants", `${min_participants}`);
+  await form.setField("max_participants", `${max_participants}`);
+  await form.checkField("random_assignments", random_assignments);
+  await form.checkField("deleted", deleted);
+  await form.submitSuccess();
+  await helper.driver.wait(until.urlContains("/projects/edit/"), 1000);
+  const id = (await helper.driver.getCurrentUrl()).substring(
+    "https://localhost:8443/projects/edit/".length
+  );
+  form = await helper.form("pw-project-create");
+  assert.equal(await form.getField("title"), title);
+  assert.equal(await form.getField("info"), info);
+  assert.equal(await form.getField("place"), place);
+  assert.equal(await form.getField("costs"), `${costs}`);
+  assert.equal(await form.getField("min_age"), `${min_age}`);
+  assert.equal(await form.getField("max_age"), `${max_age}`);
+  assert.equal(await form.getField("min_participants"), `${min_participants}`);
+  assert.equal(await form.getField("max_participants"), `${max_participants}`);
+  assert.equal(await form.getCheckboxField("random_assignments") ?? "false", `${random_assignments}`);
+  assert.equal(await form.getCheckboxField("deleted") ?? "false", `${deleted}`);
+
+  const title2 = `title${Math.random()}`;
+  await form.setField("title", title2);
+  await form.submit(); // submitSuccess doesnt work because it doesnt hide the form
+
+  await helper.click(
+    await helper.driver.findElement(By.css(`button[class="btn btn-secondary"]`))
+  );
+
+  form = await helper.form("pw-projects");
+
+  // @ts-expect-error wrong typings
+  await helper.driver.setNetworkConditions({
+    offline: false,
+    latency: 100, // Additional latency (ms).
+    download_throughput: 50 * 1024, // Maximal aggregated download throughput.
+    upload_throughput: 50 * 1024, // Maximal aggregated upload throughput.
+  });
+
+  await form.setField("filters,id", id);
+  await form.setField("filters,title", title2);
+
+  const loadingIndicator = await helper.driver.wait(until.elementLocated(By.css(".spinner-grow")), 1000);
+  await helper.driver.wait(until.stalenessOf(loadingIndicator))
+
+  // click view button
+  await helper.click(
+    await helper.driver.findElement(By.css(`td p a`))
+  );
+
+  form = await helper.form("pw-project-create");
+  assert.equal(await form.getField("title"), title2);
+  assert.equal(await form.getField("info"), info);
+  assert.equal(await form.getField("place"), place);
+  assert.equal(await form.getField("costs"), `${costs}`);
+  assert.equal(await form.getField("min_age"), `${min_age}`);
+  assert.equal(await form.getField("max_age"), `${max_age}`);
+  assert.equal(await form.getField("min_participants"), `${min_participants}`);
+  assert.equal(await form.getField("max_participants"), `${max_participants}`);
+  assert.equal(await form.getCheckboxField("random_assignments") ?? "false", `${random_assignments}`);
+  assert.equal(await form.getCheckboxField("deleted") ?? "false", `${deleted}`);
+
+
+  //await helper.driver.sleep(100000)
+}
+await runTest(createProjectAllFields);
