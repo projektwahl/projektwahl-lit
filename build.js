@@ -174,20 +174,7 @@ SPDX-FileCopyrightText: 2021 Moritz Hedtke <Moritz.Hedtke@t-online.de>
     ></script>
     <noscript>Bitte aktiviere JavaScript!</noscript>
 
-    <pw-app>
-    
-    <div
-    style="position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 1337;"
-  >
-    <div
-        class="spinner-grow text-primary"
-        role="status"
-      >
-        <span class="visually-hidden">Loading...</span>
-      </div>
-  </div>
-    
-    </pw-app>
+    <pw-app></pw-app>
   </body>
 </html>
 `;
