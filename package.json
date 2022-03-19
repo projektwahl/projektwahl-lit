@@ -47,7 +47,8 @@
   },
   "devDependencies": {
     "esbuild": "^0.14.27",
-    "esbuild-linux-64": "^0.14.27"
+    "esbuild-linux-64": "^0.14.27",
+    "node-gyp": "^9.0.0"
   },
   "optionalDependencies": {
     "@types/cookie": "^0.4.1",

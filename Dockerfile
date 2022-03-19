@@ -6,4 +6,4 @@ RUN npm install
 CMD ["/bin/bash"]
 COPY . .
 
-# docker build -t getting-started . && docker run -it getting-started
+# docker build -t getting-started . && docker run -it getting-started npm run format:check
