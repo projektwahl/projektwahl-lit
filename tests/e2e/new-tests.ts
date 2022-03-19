@@ -32,7 +32,7 @@ import {
   WebDriver,
   WebElement,
 } from "selenium-webdriver";
-import chrome, { Driver } from "selenium-webdriver/chrome.js";
+import chrome from "selenium-webdriver/chrome.js";
 
 if (!process.env["BASE_URL"]) {
   console.error("BASE_URL not set!");
@@ -65,8 +65,8 @@ class FormTester {
     const element = await this.form.findElement(
       By.css(`input[name="${name}"]`)
     );
-    if ((await element.getAttribute("checked")) ?? "false" != `${value}`) {
-      this.helper.click(element);
+    if (((await element.getAttribute("checked")) === "true") != value) {
+      await this.helper.click(element);
     }
   }
 
@@ -379,11 +379,8 @@ export async function createUserAllFields(helper: Helper) {
   assert.equal(await form.getField("0,openid_id"), email);
   assert.equal(await form.getField("0,group"), group);
   assert.equal(await form.getField("0,age"), `${age}`);
-  assert.equal((await form.getCheckboxField("0,away")) ?? "false", `${away}`);
-  assert.equal(
-    (await form.getCheckboxField("0,deleted")) ?? "false",
-    `${deleted}`
-  );
+  assert.equal((await form.getCheckboxField("0,away")) === "true", away);
+  assert.equal((await form.getCheckboxField("0,deleted")) === "true", deleted);
 
   const username2 = `username${Math.random()}`;
   await form.setField("0,username", username2);
@@ -395,7 +392,8 @@ export async function createUserAllFields(helper: Helper) {
 
   form = await helper.form("pw-users");
 
-  // @ts-expect-error wrong typings
+  // @ts-expect-error wrong typings2
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-call
   await helper.driver.setNetworkConditions({
     offline: false,
     latency: 100, // Additional latency (ms).
@@ -420,11 +418,8 @@ export async function createUserAllFields(helper: Helper) {
   assert.equal(await form.getField("0,openid_id"), email);
   assert.equal(await form.getField("0,group"), group);
   assert.equal(await form.getField("0,age"), `${age}`);
-  assert.equal((await form.getCheckboxField("0,away")) ?? "false", `${away}`);
-  assert.equal(
-    (await form.getCheckboxField("0,deleted")) ?? "false",
-    `${deleted}`
-  );
+  assert.equal((await form.getCheckboxField("0,away")) === "true", away);
+  assert.equal((await form.getCheckboxField("0,deleted")) === "true", deleted);
 
   //await helper.driver.sleep(100000)
 }
@@ -475,13 +470,10 @@ export async function createProjectAllFields(helper: Helper) {
   assert.equal(await form.getField("min_participants"), `${min_participants}`);
   assert.equal(await form.getField("max_participants"), `${max_participants}`);
   assert.equal(
-    (await form.getCheckboxField("random_assignments")) ?? "false",
-    `${random_assignments}`
+    (await form.getCheckboxField("random_assignments")) === "true",
+    random_assignments
   );
-  assert.equal(
-    (await form.getCheckboxField("deleted")) ?? "false",
-    `${deleted}`
-  );
+  assert.equal((await form.getCheckboxField("deleted")) === "true", deleted);
 
   const title2 = `title${Math.random()}`;
   await form.setField("title", title2);
@@ -494,6 +486,7 @@ export async function createProjectAllFields(helper: Helper) {
   form = await helper.form("pw-projects");
 
   // @ts-expect-error wrong typings
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-call
   await helper.driver.setNetworkConditions({
     offline: false,
     latency: 100, // Additional latency (ms).
@@ -523,13 +516,10 @@ export async function createProjectAllFields(helper: Helper) {
   assert.equal(await form.getField("min_participants"), `${min_participants}`);
   assert.equal(await form.getField("max_participants"), `${max_participants}`);
   assert.equal(
-    (await form.getCheckboxField("random_assignments")) ?? "false",
-    `${random_assignments}`
+    (await form.getCheckboxField("random_assignments")) === "true",
+    random_assignments
   );
-  assert.equal(
-    (await form.getCheckboxField("deleted")) ?? "false",
-    `${deleted}`
-  );
+  assert.equal((await form.getCheckboxField("deleted")) === "true", deleted);
 }
 
 export async function checkNotLoggedInUsers(helper: Helper) {
