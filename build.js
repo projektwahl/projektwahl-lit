@@ -66,9 +66,9 @@ const nativeNodeModulesPlugin = {
 
 const exec = promisify(unpromisifiedExec);
 
-let version_full = (await exec("git rev-parse HEAD")).stdout.trim();
+let version_full = (await exec("git rev-parse HEAD || echo NOVERSION")).stdout.trim();
 
-let version_short = (await exec("git rev-parse --short HEAD")).stdout.trim();
+let version_short = (await exec("git rev-parse --short HEAD || echo NOVERSION")).stdout.trim();
 
 {
   let { stdout, stderr } = await exec(
@@ -199,6 +199,7 @@ await writeFile("dist/index.html", index);
     define: {
       "process.env.NODE_ENV": '"production"',
     },
+    external: ["@dev.mohe/argon2"],
     charset: "utf8",
     sourcemap: true,
     outfile: "dist/setup.js",
@@ -217,6 +218,7 @@ await writeFile("dist/index.html", index);
     define: {
       "process.env.NODE_ENV": '"production"',
     },
+    external: ["@dev.mohe/argon2"],
     charset: "utf8",
     sourcemap: true,
     outfile: "dist/server.js",
