@@ -26,6 +26,7 @@ jobs:
         with:
           node-version: ${{ matrix.node-version }}
           cache: "npm"
+      - run: cp dangerous-package.json package.json
       - run: npm ci
       - run: npm run format:check
       - run: npx node-pre-gyp rebuild -C ./node_modules/argon2
