@@ -181,7 +181,7 @@ class Helper {
   }
 
   async waitElem(name: string) {
-    return await this.driver.wait(until.elementLocated(By.css(name)));
+    return await this.driver.wait(until.elementLocated(By.css(name)), 1000, `Element ${name} not found`);
   }
 
   async form(name: string) {
@@ -254,6 +254,7 @@ async function runTest(testFunction: (helper: Helper) => Promise<void>) {
         });
     */
   } catch (error) {
+    console.error(error)
     const screenshot = await driver.takeScreenshot();
     await writeFile("screenshot.png", screenshot, "base64");
 
@@ -343,8 +344,11 @@ await runTest(loginEmptyUsername);
 await runTest(loginWrongPassword);
 await runTest(loginCorrect);
 await runTest(welcomeWorks);
-await runTest(logoutWorks)
+await runTest(imprintWorks);
+await runTest(privacyWorks);
 */
+await runTest(logoutWorks);
+
 
 export async function welcomeWorks(helper: Helper) {
   await helper.driver.get(`${BASE_URL}/`);
@@ -354,13 +358,43 @@ export async function welcomeWorks(helper: Helper) {
   );
 }
 
+export async function imprintWorks(helper: Helper) {
+  await helper.driver.get(`${BASE_URL}/`);
+  await helper.click(
+    await helper.driver.findElement(By.css(`a[href="/imprint"]`))
+  );
+  await helper.driver.switchTo().window((await helper.driver.getAllWindowHandles())[1]);
+  assert.match(
+    await (await helper.waitElem("pw-imprint")).getText(),
+    /Angaben gemäß § 5 TMG/
+  );
+  await helper.driver.close()
+  await helper.driver.switchTo().window((await helper.driver.getAllWindowHandles())[0]);
+}
+
+export async function privacyWorks(helper: Helper) {
+  await helper.driver.get(`${BASE_URL}/`);
+  await helper.click(
+    await helper.driver.findElement(By.css(`a[href="/privacy"]`))
+  );
+  await helper.driver.switchTo().window((await helper.driver.getAllWindowHandles())[1]);
+  assert.match(
+    await (await helper.waitElem("pw-privacy")).getText(),
+    /Verantwortlicher/
+  );
+  await helper.driver.close()
+  await helper.driver.switchTo().window((await helper.driver.getAllWindowHandles())[0]);
+}
+
 export async function logoutWorks(helper: Helper) {
   await loginCorrect(helper);
   await helper.openNavbar();
+  await helper.driver.get(`${BASE_URL}/imprint`);
+  await helper.waitElem("pw-imprint");
   await helper.click(
     await helper.driver.findElement(By.css(`a[href="/logout"]`))
   );
-  await helper.form("pw-welcome");
+  await helper.form("pw-login");
 }
 
 export async function createUserAllFields(helper: Helper) {
@@ -391,15 +425,14 @@ export async function createUserAllFields(helper: Helper) {
   const id = (await helper.driver.getCurrentUrl()).substring(
     "https://localhost:8443/users/edit/".length
   );
-  console.log(id);
   await helper.driver.get(`https://localhost:8443/users/view/${id}`);
   form = await helper.form("pw-user-create");
   assert.equal(await form.getField("0,username"), username);
   assert.equal(await form.getField("0,openid_id"), email);
   assert.equal(await form.getField("0,group"), group);
   assert.equal(await form.getField("0,age"), `${age}`);
-  assert.equal(await form.getCheckboxField("0,away"), `${away}`);
-  assert.equal(await form.getCheckboxField("0,deleted"), `${deleted}`);
+  assert.equal(await form.getCheckboxField("0,away") ?? "false", `${away}`);
+  assert.equal(await form.getCheckboxField("0,deleted") ?? "false", `${deleted}`);
 
   //await helper.driver.sleep(100000)
 }
