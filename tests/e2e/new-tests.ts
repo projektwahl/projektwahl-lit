@@ -33,21 +33,12 @@ import {
   WebElement,
 } from "selenium-webdriver";
 import chrome, { Driver } from "selenium-webdriver/chrome.js";
-//import repl from "repl";
 
 if (!process.env["BASE_URL"]) {
   console.error("BASE_URL not set!");
   process.exit(1);
 }
 const BASE_URL = process.env.BASE_URL;
-
-// all tests should be independently runnable (as we don't use test runner)
-// implement a simple implementation of that ourself
-// before every test we need to reset the database and restart the browser
-
-// maybe convert to that class-based approach
-
-// all actions should verify that they are done and that they are successful.
 
 if (!process.env.BASE_URL) {
   throw new Error("BASE_URL not set!");
@@ -120,14 +111,6 @@ class FormTester {
     return this.getErrors();
   }
 
-  /*async getErrorForField(name: string) {
-    console.log(
-      await this.form
-        .findElement(By.css(`input[name=${name}] + .invalid-feedback`))
-        .getText()
-    );
-  }*/
-
   private async getErrors() {
     return Promise.all(
       (await this.form.findElements(By.css(`.invalid-feedback`))).map(
@@ -163,25 +146,17 @@ class Helper {
   constructor(driver: WebDriver) {
     this.driver = driver;
   }
-  /*
-  async shadow(element: WebElement) {
-    // @ts-expect-error types are wrong
-    // eslint-disable-next-line @typescript-eslint/consistent-type-assertions,@typescript-eslint/no-unsafe-call
-    return (await element.getShadowRoot()) as WebElement;
-  }
-*/
+
   async click(element: WebElement) {
-    // currently this is just too buggy
-
-    //await driver.executeScript(`arguments[0].scrollIntoView(true);`, element);
-
-    //await driver.sleep(250);
-
     await this.driver.executeScript(`arguments[0].click()`, element);
   }
 
   async waitElem(name: string) {
-    return await this.driver.wait(until.elementLocated(By.css(name)), 1000, `Element ${name} not found`);
+    return await this.driver.wait(
+      until.elementLocated(By.css(name)),
+      1000,
+      `Element ${name} not found`
+    );
   }
 
   async form(name: string) {
@@ -198,7 +173,6 @@ class Helper {
 }
 
 async function runTest(testFunction: (helper: Helper) => Promise<void>) {
-  // SELENIUM_BROWSER=chrome node --experimental-loader ./src/loader.js --enable-source-maps tests/e2e/welcome.js
   const builder = new Builder()
     .forBrowser("firefox")
     .withCapabilities(Capabilities.firefox().set("acceptInsecureCerts", true))
@@ -251,11 +225,9 @@ async function runTest(testFunction: (helper: Helper) => Promise<void>) {
         });
     */
   } catch (error) {
-    console.error(error)
+    console.error(error);
     const screenshot = await driver.takeScreenshot();
     await writeFile("screenshot.png", screenshot, "base64");
-
-    //await driver.quit();
 
     throw error;
   }
@@ -319,21 +291,6 @@ export async function loginCorrect(helper: Helper) {
   await formTester.submitSuccess();
 }
 
-/*
-await runTest(loginEmptyUsernameAndPassword);
-await runTest(loginWrongUsername);
-await runTest(loginEmptyPassword);
-await runTest(loginEmptyUsername);
-await runTest(loginWrongPassword);
-await runTest(loginCorrect);
-await runTest(welcomeWorks);
-await runTest(imprintWorks);
-await runTest(privacyWorks);
-await runTest(logoutWorks);
-await runTest(createUserAllFields);
-*/
-
-
 export async function welcomeWorks(helper: Helper) {
   await helper.driver.get(`${BASE_URL}/`);
   assert.match(
@@ -347,13 +304,17 @@ export async function imprintWorks(helper: Helper) {
   await helper.click(
     await helper.driver.findElement(By.css(`a[href="/imprint"]`))
   );
-  await helper.driver.switchTo().window((await helper.driver.getAllWindowHandles())[1]);
+  await helper.driver
+    .switchTo()
+    .window((await helper.driver.getAllWindowHandles())[1]);
   assert.match(
     await (await helper.waitElem("pw-imprint")).getText(),
     /Angaben gemäß § 5 TMG/
   );
-  await helper.driver.close()
-  await helper.driver.switchTo().window((await helper.driver.getAllWindowHandles())[0]);
+  await helper.driver.close();
+  await helper.driver
+    .switchTo()
+    .window((await helper.driver.getAllWindowHandles())[0]);
 }
 
 export async function privacyWorks(helper: Helper) {
@@ -361,13 +322,17 @@ export async function privacyWorks(helper: Helper) {
   await helper.click(
     await helper.driver.findElement(By.css(`a[href="/privacy"]`))
   );
-  await helper.driver.switchTo().window((await helper.driver.getAllWindowHandles())[1]);
+  await helper.driver
+    .switchTo()
+    .window((await helper.driver.getAllWindowHandles())[1]);
   assert.match(
     await (await helper.waitElem("pw-privacy")).getText(),
     /Verantwortlicher/
   );
-  await helper.driver.close()
-  await helper.driver.switchTo().window((await helper.driver.getAllWindowHandles())[0]);
+  await helper.driver.close();
+  await helper.driver
+    .switchTo()
+    .window((await helper.driver.getAllWindowHandles())[0]);
 }
 
 export async function logoutWorks(helper: Helper) {
@@ -414,8 +379,11 @@ export async function createUserAllFields(helper: Helper) {
   assert.equal(await form.getField("0,openid_id"), email);
   assert.equal(await form.getField("0,group"), group);
   assert.equal(await form.getField("0,age"), `${age}`);
-  assert.equal(await form.getCheckboxField("0,away") ?? "false", `${away}`);
-  assert.equal(await form.getCheckboxField("0,deleted") ?? "false", `${deleted}`);
+  assert.equal((await form.getCheckboxField("0,away")) ?? "false", `${away}`);
+  assert.equal(
+    (await form.getCheckboxField("0,deleted")) ?? "false",
+    `${deleted}`
+  );
 
   const username2 = `username${Math.random()}`;
   await form.setField("0,username", username2);
@@ -438,26 +406,28 @@ export async function createUserAllFields(helper: Helper) {
   await form.setField("filters,id", id);
   await form.setField("filters,username", username2);
 
-  const loadingIndicator = await helper.driver.wait(until.elementLocated(By.css(".spinner-grow")), 1000);
-  await helper.driver.wait(until.stalenessOf(loadingIndicator))
+  const loadingIndicator = await helper.driver.wait(
+    until.elementLocated(By.css(".spinner-grow")),
+    1000
+  );
+  await helper.driver.wait(until.stalenessOf(loadingIndicator));
 
   // click view button
-  await helper.click(
-    await helper.driver.findElement(By.css(`td p a`))
-  );
+  await helper.click(await helper.driver.findElement(By.css(`td p a`)));
 
   form = await helper.form("pw-user-create");
   assert.equal(await form.getField("0,username"), username2);
   assert.equal(await form.getField("0,openid_id"), email);
   assert.equal(await form.getField("0,group"), group);
   assert.equal(await form.getField("0,age"), `${age}`);
-  assert.equal(await form.getCheckboxField("0,away") ?? "false", `${away}`);
-  assert.equal(await form.getCheckboxField("0,deleted") ?? "false", `${deleted}`);
+  assert.equal((await form.getCheckboxField("0,away")) ?? "false", `${away}`);
+  assert.equal(
+    (await form.getCheckboxField("0,deleted")) ?? "false",
+    `${deleted}`
+  );
 
   //await helper.driver.sleep(100000)
 }
-
-
 
 export async function createProjectAllFields(helper: Helper) {
   await loginCorrect(helper);
@@ -504,8 +474,14 @@ export async function createProjectAllFields(helper: Helper) {
   assert.equal(await form.getField("max_age"), `${max_age}`);
   assert.equal(await form.getField("min_participants"), `${min_participants}`);
   assert.equal(await form.getField("max_participants"), `${max_participants}`);
-  assert.equal(await form.getCheckboxField("random_assignments") ?? "false", `${random_assignments}`);
-  assert.equal(await form.getCheckboxField("deleted") ?? "false", `${deleted}`);
+  assert.equal(
+    (await form.getCheckboxField("random_assignments")) ?? "false",
+    `${random_assignments}`
+  );
+  assert.equal(
+    (await form.getCheckboxField("deleted")) ?? "false",
+    `${deleted}`
+  );
 
   const title2 = `title${Math.random()}`;
   await form.setField("title", title2);
@@ -528,13 +504,14 @@ export async function createProjectAllFields(helper: Helper) {
   await form.setField("filters,id", id);
   await form.setField("filters,title", title2);
 
-  const loadingIndicator = await helper.driver.wait(until.elementLocated(By.css(".spinner-grow")), 1000);
-  await helper.driver.wait(until.stalenessOf(loadingIndicator))
+  const loadingIndicator = await helper.driver.wait(
+    until.elementLocated(By.css(".spinner-grow")),
+    1000
+  );
+  await helper.driver.wait(until.stalenessOf(loadingIndicator));
 
   // click view button
-  await helper.click(
-    await helper.driver.findElement(By.css(`td p a`))
-  );
+  await helper.click(await helper.driver.findElement(By.css(`td p a`)));
 
   form = await helper.form("pw-project-create");
   assert.equal(await form.getField("title"), title2);
@@ -545,10 +522,51 @@ export async function createProjectAllFields(helper: Helper) {
   assert.equal(await form.getField("max_age"), `${max_age}`);
   assert.equal(await form.getField("min_participants"), `${min_participants}`);
   assert.equal(await form.getField("max_participants"), `${max_participants}`);
-  assert.equal(await form.getCheckboxField("random_assignments") ?? "false", `${random_assignments}`);
-  assert.equal(await form.getCheckboxField("deleted") ?? "false", `${deleted}`);
-
-
-  //await helper.driver.sleep(100000)
+  assert.equal(
+    (await form.getCheckboxField("random_assignments")) ?? "false",
+    `${random_assignments}`
+  );
+  assert.equal(
+    (await form.getCheckboxField("deleted")) ?? "false",
+    `${deleted}`
+  );
 }
+
+export async function checkNotLoggedInUsers(helper: Helper) {
+  await helper.driver.get(`${BASE_URL}/users`);
+
+  const alert = await helper.driver.wait(
+    until.elementLocated(By.css('div[class="alert alert-danger"]')),
+    1000,
+    "Expected submit failure"
+  );
+
+  assert.match(await alert.getText(), /Nicht angemeldet!/);
+}
+
+export async function checkNotLoggedInProjects(helper: Helper) {
+  await helper.driver.get(`${BASE_URL}/projects`);
+
+  const alert = await helper.driver.wait(
+    until.elementLocated(By.css('div[class="alert alert-danger"]')),
+    1000,
+    "Expected submit failure"
+  );
+
+  assert.match(await alert.getText(), /Nicht angemeldet!/);
+}
+
+await runTest(checkNotLoggedInUsers);
+await runTest(checkNotLoggedInProjects);
+await runTest(loginEmptyUsernameAndPassword);
+await runTest(loginWrongUsername);
+await runTest(loginEmptyPassword);
+await runTest(loginEmptyUsername);
+await runTest(loginWrongPassword);
+await runTest(loginCorrect);
+await runTest(welcomeWorks);
+await runTest(imprintWorks);
+await runTest(privacyWorks);
+await runTest(logoutWorks);
+await runTest(createUserAllFields);
 await runTest(createProjectAllFields);
