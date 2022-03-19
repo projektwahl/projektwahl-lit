@@ -70,11 +70,27 @@ class FormTester {
     await element.sendKeys(value);
   }
 
+  async checkField(name: string, value: boolean) {
+    const element = await this.form.findElement(
+      By.css(`input[name="${name}"]`)
+    );
+    if ((await element.getAttribute("checked")) ?? "false" != `${value}`) {
+      element.click();
+    }
+  }
+
   async getField(name: string) {
     const element = await this.form.findElement(
       By.css(`input[name="${name}"]`)
     );
     return await element.getAttribute("value");
+  }
+
+  async getCheckboxField(name: string) {
+    const element = await this.form.findElement(
+      By.css(`input[name="${name}"]`)
+    );
+    return await element.getAttribute("checked");
   }
 
   private async submit() {
@@ -185,15 +201,9 @@ async function runTest(testFunction: (helper: Helper) => Promise<void>) {
   // SELENIUM_BROWSER=chrome node --experimental-loader ./src/loader.js --enable-source-maps tests/e2e/welcome.js
   const builder = new Builder()
     .forBrowser("firefox")
+    .withCapabilities(Capabilities.firefox().set("acceptInsecureCerts", true))
     .withCapabilities(
-      Capabilities.firefox()
-        .set("acceptInsecureCerts", true)
-        .setPageLoadStrategy("none")
-    )
-    .withCapabilities(
-      Capabilities.chrome()
-        .set(Capability.ACCEPT_INSECURE_TLS_CERTS, true)
-        .setPageLoadStrategy("none")
+      Capabilities.chrome().set(Capability.ACCEPT_INSECURE_TLS_CERTS, true)
     );
 
   if (process.env.CI) {
@@ -365,9 +375,17 @@ export async function createUserAllFields(helper: Helper) {
   );
   let form = await helper.form("pw-user-create");
   const username = `username${Math.random()}`;
+  const email = `email${Math.random()}`.substring(0, 15);
   const group = `group${Math.random()}`.substring(0, 15);
+  const age = Math.floor(Math.random() * 10);
+  const away = Math.random() > 0.5 ? true : false;
+  const deleted = Math.random() > 0.5 ? true : false;
   await form.setField("0,username", username);
+  await form.setField("0,openid_id", email);
   await form.setField("0,group", group);
+  await form.setField("0,age", `${age}`);
+  await form.checkField("0,away", away);
+  await form.checkField("0,deleted", deleted);
   await form.submitSuccess();
   await helper.driver.wait(until.urlContains("/users/edit/"));
   const id = (await helper.driver.getCurrentUrl()).substring(
@@ -377,6 +395,11 @@ export async function createUserAllFields(helper: Helper) {
   await helper.driver.get(`https://localhost:8443/users/view/${id}`);
   form = await helper.form("pw-user-create");
   assert.equal(await form.getField("0,username"), username);
+  assert.equal(await form.getField("0,openid_id"), email);
+  assert.equal(await form.getField("0,group"), group);
+  assert.equal(await form.getField("0,age"), `${age}`);
+  assert.equal(await form.getCheckboxField("0,away"), `${away}`);
+  assert.equal(await form.getCheckboxField("0,deleted"), `${deleted}`);
 
   //await helper.driver.sleep(100000)
 }

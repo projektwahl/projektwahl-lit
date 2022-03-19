@@ -166,7 +166,9 @@ export abstract class PwInput<
           type=${this.type}
           name=${this.name}
           value=${ifDefined(
-            this.initial !== undefined ? this.get(this.initial) : undefined
+            this.initial !== undefined && this.type !== "checkbox"
+              ? this.get(this.initial)
+              : undefined
           )}
           ?checked=${
             this.initial !== undefined ? this.get(this.initial) : false
