@@ -26,13 +26,15 @@ jobs:
         with:
           node-version: ${{ matrix.node-version }}
           cache: "npm"
+      - run: cp dangerous-package.json package.json
       - run: npm ci
       - run: npm run format:check
-      - run: npx node-pre-gyp rebuild -C ./node_modules/argon2
+      - run: npx node-gyp rebuild -C ./node_modules/@dev.mohe/argon2
       - run: npm run localize-build
       - run: npm run build
       - run: npm run typecheck
       - run: npm run localize-extract
+      - run: git checkout -- package.json
       - run: git update-index --refresh
       - run: git diff-index --quiet HEAD --
       - run: npm run lint

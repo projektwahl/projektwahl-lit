@@ -157,7 +157,7 @@ class Helper {
   async waitElem(name: string) {
     return await this.driver.wait(
       until.elementLocated(By.css(name)),
-      1000,
+      2000,
       `Element ${name} not found`
     );
   }

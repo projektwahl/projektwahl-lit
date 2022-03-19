@@ -66,9 +66,13 @@ const nativeNodeModulesPlugin = {
 
 const exec = promisify(unpromisifiedExec);
 
-let version_full = (await exec("git rev-parse HEAD")).stdout.trim();
+let version_full = (
+  await exec("git rev-parse HEAD || echo NOVERSION")
+).stdout.trim();
 
-let version_short = (await exec("git rev-parse --short HEAD")).stdout.trim();
+let version_short = (
+  await exec("git rev-parse --short HEAD || echo NOVERSION")
+).stdout.trim();
 
 {
   let { stdout, stderr } = await exec(
@@ -170,20 +174,7 @@ SPDX-FileCopyrightText: 2021 Moritz Hedtke <Moritz.Hedtke@t-online.de>
     ></script>
     <noscript>Bitte aktiviere JavaScript!</noscript>
 
-    <pw-app>
-    
-    <div
-    style="position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 1337;"
-  >
-    <div
-        class="spinner-grow text-primary"
-        role="status"
-      >
-        <span class="visually-hidden">Loading...</span>
-      </div>
-  </div>
-    
-    </pw-app>
+    <pw-app></pw-app>
   </body>
 </html>
 `;
@@ -199,6 +190,7 @@ await writeFile("dist/index.html", index);
     define: {
       "process.env.NODE_ENV": '"production"',
     },
+    external: ["@dev.mohe/argon2"],
     charset: "utf8",
     sourcemap: true,
     outfile: "dist/setup.js",
@@ -217,6 +209,7 @@ await writeFile("dist/index.html", index);
     define: {
       "process.env.NODE_ENV": '"production"',
     },
+    external: ["@dev.mohe/argon2"],
     charset: "utf8",
     sourcemap: true,
     outfile: "dist/server.js",

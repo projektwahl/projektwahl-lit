@@ -3,6 +3,7 @@
 # SPDX-FileCopyrightText: 2021 Moritz Hedtke <Moritz.Hedtke@t-online.de>
 set -ex
 reuse lint
-npm run format:check
-npm run typecheck
-npm run lint
+docker build -t getting-started .
+docker run getting-started npm run format:check
+docker run getting-started npm run typecheck
+docker run getting-started npm run lint
