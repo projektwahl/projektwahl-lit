@@ -21,7 +21,7 @@ SPDX-License-Identifier: AGPL-3.0-or-later
 SPDX-FileCopyrightText: 2021 Moritz Hedtke <Moritz.Hedtke@t-online.de>
 */
 import { html, literal } from "lit/static-html.js";
-import { LitElement, noChange } from "lit";
+import { noChange } from "lit";
 import { bootstrapCss } from "../index.js";
 import { ifDefined } from "lit/directives/if-defined.js";
 import { msg } from "@lit/localize";
@@ -30,12 +30,13 @@ import { repeat } from "lit/directives/repeat.js";
 import type { routes, ResponseType } from "../../lib/routes.js";
 import type { z } from "zod";
 import type { Task } from "@dev.mohe/task";
+import { PwElement } from "../pw-element.js";
 
 export abstract class PwInput<
   P extends keyof typeof routes,
   T,
   I extends Element
-> extends LitElement {
+> extends PwElement {
   static override get properties() {
     return {
       label: { attribute: false },
@@ -165,7 +166,9 @@ export abstract class PwInput<
           type=${this.type}
           name=${this.name}
           value=${ifDefined(
-            this.initial !== undefined ? this.get(this.initial) : undefined
+            this.initial !== undefined && this.type !== "checkbox"
+              ? this.get(this.initial)
+              : undefined
           )}
           ?checked=${
             this.initial !== undefined ? this.get(this.initial) : false

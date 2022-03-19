@@ -33,9 +33,9 @@ import type {
   Http2ServerResponse,
   OutgoingHttpHeaders,
 } from "http2";
-import nodeCrypto from "node:crypto";
 import { suspend } from "../client/utils.js";
 import { typedSql } from "./describe.js";
+import nodeCrypto from "node:crypto";
 // @ts-expect-error wrong typings
 const { webcrypto: crypto }: { webcrypto: Crypto } = nodeCrypto;
 

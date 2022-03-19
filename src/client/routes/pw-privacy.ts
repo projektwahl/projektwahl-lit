@@ -20,10 +20,11 @@ https://github.com/projektwahl/projektwahl-lit
 SPDX-License-Identifier: AGPL-3.0-or-later
 SPDX-FileCopyrightText: 2021 Moritz Hedtke <Moritz.Hedtke@t-online.de>
 */
-import { html, LitElement } from "lit";
+import { html } from "lit";
 import { bootstrapCss } from "../index.js";
+import { PwElement } from "../pw-element.js";
 
-export class PwPrivacy extends LitElement {
+export class PwPrivacy extends PwElement {
   protected render() {
     return html`
       ${bootstrapCss}

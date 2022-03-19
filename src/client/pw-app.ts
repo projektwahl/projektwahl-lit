@@ -20,13 +20,7 @@ https://github.com/projektwahl/projektwahl-lit
 SPDX-License-Identifier: AGPL-3.0-or-later
 SPDX-FileCopyrightText: 2021 Moritz Hedtke <Moritz.Hedtke@t-online.de>
 */
-import {
-  html,
-  LitElement,
-  noChange,
-  ReactiveElement,
-  TemplateResult,
-} from "lit";
+import { html, noChange, ReactiveElement, TemplateResult } from "lit";
 import { bootstrapCss } from "./index.js";
 import { HistoryController, HistoryState } from "./history-controller.js";
 import { aClick } from "./pw-a.js";
@@ -61,6 +55,7 @@ import { configureLocalization } from "@lit/localize";
 
 import { sourceLocale, targetLocales } from "./generated/locales.js";
 import * as templates_de from "./generated/de.js";
+import { PwElement } from "./pw-element.js";
 
 export const { getLocale, setLocale } = configureLocalization({
   sourceLocale,
@@ -171,7 +166,7 @@ const pages = {
   },
 };
 
-export class PwApp extends LitElement {
+export class PwApp extends PwElement {
   static override get properties() {
     return {
       initial: { attribute: false },
@@ -382,7 +377,8 @@ export class PwApp extends LitElement {
                   ${this.username
                     ? html`<li class="nav-item">
                         <a
-                          @click=${async () => {
+                          @click=${async (e: Event) => {
+                            e.preventDefault();
                             await myFetch<"/api/v1/logout">(
                               "POST",
                               "/api/v1/logout",
@@ -400,7 +396,7 @@ export class PwApp extends LitElement {
                             );
                           }}
                           class="nav-link"
-                          href="#"
+                          href="/logout"
                           >${msg(str`Logout ${this.username}`)}</a
                         >
                       </li>`

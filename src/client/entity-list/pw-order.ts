@@ -20,13 +20,14 @@ https://github.com/projektwahl/projektwahl-lit
 SPDX-License-Identifier: AGPL-3.0-or-later
 SPDX-FileCopyrightText: 2021 Moritz Hedtke <Moritz.Hedtke@t-online.de>
 */
-import { html, LitElement } from "lit";
+import { html } from "lit";
 import { bootstrapCss } from "../index.js";
 import { HistoryController } from "../history-controller.js";
 import { msg, str } from "@lit/localize";
 import type { entityRoutes } from "../../lib/routes.js";
 import type { z } from "zod";
 import { parseRequestWithPrefix } from "./pw-entitylist.js";
+import { PwElement } from "../pw-element.js";
 
 // workaround see https://github.com/runem/lit-analyzer/issues/149#issuecomment-1006162839
 export function pwOrder<P extends keyof typeof entityRoutes, X extends string>(
@@ -52,7 +53,7 @@ export function pwOrder<P extends keyof typeof entityRoutes, X extends string>(
 export class PwOrder<
   P extends keyof typeof entityRoutes,
   X extends string
-> extends LitElement {
+> extends PwElement {
   static override get properties() {
     return {
       title: { type: String },

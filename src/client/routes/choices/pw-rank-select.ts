@@ -22,15 +22,16 @@ SPDX-FileCopyrightText: 2021 Moritz Hedtke <Moritz.Hedtke@t-online.de>
 */
 import "../../form/pw-input.js";
 import { Task, TaskStatus } from "@dev.mohe/task";
-import { html, LitElement } from "lit";
+import { html } from "lit";
 import { myFetch } from "../../utils.js";
 import { createRef, ref } from "lit/directives/ref.js";
 import { msg } from "@lit/localize";
 import { bootstrapCss } from "../../index.js";
 import type { routes, ResponseType } from "../../../lib/routes.js";
 import type { z } from "zod";
+import { PwElement } from "../../pw-element.js";
 
-class PwRankSelect extends LitElement {
+class PwRankSelect extends PwElement {
   static override get properties() {
     return {
       _task: { state: true },
