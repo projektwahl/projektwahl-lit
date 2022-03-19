@@ -93,7 +93,7 @@ class FormTester {
     return await element.getAttribute("checked");
   }
 
-  private async submit() {
+  async submit() {
     const submitButton = await this.form.findElement(
       By.css('button[type="submit"]')
     );
@@ -104,7 +104,7 @@ class FormTester {
   async submitSuccess() {
     await this.submit();
 
-    await this.helper.driver.wait(until.stalenessOf(this.form));
+    await this.helper.driver.wait(until.stalenessOf(this.form), 1000);
   }
 
   async submitFailure() {
@@ -218,9 +218,6 @@ async function runTest(testFunction: (helper: Helper) => Promise<void>) {
 
   const driver = builder.build();
 
-  /*await driver.manage().setTimeouts({
-        implicit: 1000,
-    });*/
   await driver.manage().window().setRect({
     width: 500,
     height: 1000,
@@ -263,20 +260,6 @@ async function runTest(testFunction: (helper: Helper) => Promise<void>) {
     throw error;
   }
 }
-
-/*// @ts-expect-error wrong typings
-await helper.driver.setNetworkConditions({
-  offline: false,
-  latency: 100, // Additional latency (ms).
-  download_throughput: 50 * 1024, // Maximal aggregated download throughput.
-  upload_throughput: 50 * 1024, // Maximal aggregated upload throughput.
-});
-
-await helper.driver.navigate().to(`${BASE_URL}/login`)
-
-const loadingIndicator = await helper.driver.findElement(By.css(".spinner-grow"));
-
-await helper.driver.wait(until.stalenessOf(loadingIndicator))*/
 
 export async function loginEmptyUsernameAndPassword(helper: Helper) {
   await helper.driver.get(`${BASE_URL}/login`);
@@ -346,8 +329,8 @@ await runTest(loginCorrect);
 await runTest(welcomeWorks);
 await runTest(imprintWorks);
 await runTest(privacyWorks);
-*/
 await runTest(logoutWorks);
+*/
 
 
 export async function welcomeWorks(helper: Helper) {
@@ -421,13 +404,49 @@ export async function createUserAllFields(helper: Helper) {
   await form.checkField("0,away", away);
   await form.checkField("0,deleted", deleted);
   await form.submitSuccess();
-  await helper.driver.wait(until.urlContains("/users/edit/"));
+  await helper.driver.wait(until.urlContains("/users/edit/"), 1000);
   const id = (await helper.driver.getCurrentUrl()).substring(
     "https://localhost:8443/users/edit/".length
   );
-  await helper.driver.get(`https://localhost:8443/users/view/${id}`);
   form = await helper.form("pw-user-create");
   assert.equal(await form.getField("0,username"), username);
+  assert.equal(await form.getField("0,openid_id"), email);
+  assert.equal(await form.getField("0,group"), group);
+  assert.equal(await form.getField("0,age"), `${age}`);
+  assert.equal(await form.getCheckboxField("0,away") ?? "false", `${away}`);
+  assert.equal(await form.getCheckboxField("0,deleted") ?? "false", `${deleted}`);
+
+  const username2 = `username${Math.random()}`;
+  await form.setField("0,username", username2);
+  await form.submit(); // submitSuccess doesnt work because it doesnt hide the form
+
+  await helper.click(
+    await helper.driver.findElement(By.css(`button[class="btn btn-secondary"]`))
+  );
+
+  form = await helper.form("pw-users");
+
+  // @ts-expect-error wrong typings
+  await helper.driver.setNetworkConditions({
+    offline: false,
+    latency: 100, // Additional latency (ms).
+    download_throughput: 50 * 1024, // Maximal aggregated download throughput.
+    upload_throughput: 50 * 1024, // Maximal aggregated upload throughput.
+  });
+
+  await form.setField("filters,id", id);
+  await form.setField("filters,username", username2);
+
+  const loadingIndicator = await helper.driver.wait(until.elementLocated(By.css(".spinner-grow")), 1000);
+  await helper.driver.wait(until.stalenessOf(loadingIndicator))
+
+  // click view button
+  await helper.click(
+    await helper.driver.findElement(By.css(`td p a`))
+  );
+
+  form = await helper.form("pw-user-create");
+  assert.equal(await form.getField("0,username"), username2);
   assert.equal(await form.getField("0,openid_id"), email);
   assert.equal(await form.getField("0,group"), group);
   assert.equal(await form.getField("0,age"), `${age}`);
