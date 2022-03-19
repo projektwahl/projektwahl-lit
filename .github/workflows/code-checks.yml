@@ -29,7 +29,7 @@ jobs:
       - run: cp dangerous-package.json package.json
       - run: npm ci
       - run: npm run format:check
-      - run: npx node-pre-gyp rebuild -C ./node_modules/argon2
+      - run: npx node-gyp rebuild -C ./node_modules/@dev.mohe/argon2
       - run: npm run localize-build
       - run: npm run build
       - run: npm run typecheck
