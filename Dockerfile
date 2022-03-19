@@ -7,3 +7,4 @@ CMD ["/bin/bash"]
 COPY . .
 
 # docker build -t getting-started . && docker run -it getting-started npm run format:check
+# docker build -t getting-started . && docker run --mount type=bind,source="$(pwd)"/build.js,target=/app/build.js -it getting-started npm run format
