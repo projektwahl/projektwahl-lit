@@ -96,7 +96,7 @@ class FormTester {
 
     const loadingIndicator = await this.helper.driver.wait(
       until.elementLocated(By.css(".spinner-grow")),
-      1000,
+      10000,
       "spinner 1"
     );
     await this.helper.driver.wait(until.stalenessOf(loadingIndicator), 10000, "loading indicator 1");
@@ -105,7 +105,7 @@ class FormTester {
   async submitSuccess() {
     await this.submit();
 
-    await this.helper.driver.wait(until.stalenessOf(this.form), 1000, "form submit expected stale");
+    await this.helper.driver.wait(until.stalenessOf(this.form), 10000, "form submit expected stale");
   }
 
   async submitFailure() {
@@ -113,7 +113,7 @@ class FormTester {
 
     const alert = await this.helper.driver.wait(
       until.elementLocated(By.css('div[class="alert alert-danger"]')),
-      1000,
+      10000,
       "Expected submit failure 1"
     );
 
@@ -212,8 +212,8 @@ async function runTest(testFunction: (helper: Helper) => Promise<void>) {
   await driver.setNetworkConditions({
     offline: false,
     latency: 100, // Additional latency (ms).
-    //download_throughput: 100 * 1024, // Maximal aggregated download throughput.
-    //upload_throughput: 100 * 1024, // Maximal aggregated upload throughput.
+    download_throughput: 100 * 1024, // Maximal aggregated download throughput.
+    upload_throughput: 100 * 1024, // Maximal aggregated upload throughput.
   });
 
   try {
@@ -389,7 +389,7 @@ async function createUserAllFields(helper: Helper) {
   await form.checkField("0,away", away);
   await form.checkField("0,deleted", deleted);
   await form.submitSuccess();
-  await helper.driver.wait(until.urlContains("/users/edit/"), 1000);
+  await helper.driver.wait(until.urlContains("/users/edit/"), 10000);
   const id = (await helper.driver.getCurrentUrl()).substring(
     "https://localhost:8443/users/edit/".length
   );
@@ -416,7 +416,7 @@ async function createUserAllFields(helper: Helper) {
 
   const loadingIndicator = await helper.driver.wait(
     until.elementLocated(By.css(".spinner-grow")),
-    1000,
+    10000,
     "spinner 2"
   );
   await helper.driver.wait(until.stalenessOf(loadingIndicator), 10000, "loading indicator 1");
@@ -501,7 +501,7 @@ async function createProjectAllFields(helper: Helper) {
 
   const loadingIndicator = await helper.driver.wait(
     until.elementLocated(By.css(".spinner-grow")),
-    1000,
+    10000,
     "spinner 3"
   );
   await helper.driver.wait(until.stalenessOf(loadingIndicator), 10000, "loading indicator 2");

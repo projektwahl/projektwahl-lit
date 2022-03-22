@@ -226,19 +226,6 @@ export class PwEntityList<
     return html`
       ${bootstrapCss}
       <main class="container">
-        <div
-          style="position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 1337;"
-        >
-          ${this._task.render({
-            pending: () => html`<div
-              class="spinner-grow text-primary"
-              role="status"
-            >
-              <span class="visually-hidden">${msg("Loading...")}</span>
-            </div>`,
-          })}
-        </div>
-
         <h1 class="text-center">${this.title}</h1>
 
         <form

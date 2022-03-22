@@ -69,7 +69,7 @@ class PwForm<P extends keyof typeof routes> extends PwElement {
   }
 
   getErrors() {
-    return this._task.render({
+    return html`${this._task.render({
       complete: (data) => {
         if (!data.success) {
           if (data.error.issues.length > 0) {
@@ -93,7 +93,18 @@ class PwForm<P extends keyof typeof routes> extends PwElement {
         return html``;
       },
       pending: () => noChange,
-    });
+    })}<div
+    style="position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 1337;"
+  >
+    ${this._task.render({
+      pending: () => html`<div
+        class="spinner-grow text-primary"
+        role="status"
+      >
+        <span class="visually-hidden">${msg("Loading...")}</span>
+      </div>`,
+    })}
+  </div>`;
   }
 
   protected updated(): void {
