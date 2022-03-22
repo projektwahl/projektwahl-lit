@@ -453,7 +453,7 @@ async function createProjectAllFields(helper: Helper) {
   const min_age = Math.floor(Math.random() * 10);
   const max_age = Math.floor(Math.random() * 10);
   const min_participants = Math.floor(Math.random() * 10) + 1;
-  const max_participants = Math.floor(Math.random() * 10);
+  const max_participants = Math.floor(Math.random() * 10) + 1;
   const random_assignments = Math.random() > 0.5 ? true : false;
   const deleted = Math.random() > 0.5 ? true : false;
   await form.setField("title", title);
