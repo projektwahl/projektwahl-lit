@@ -19,7 +19,7 @@
   "scripts": {
     "format": "prettier --ignore-path .prettierignore --write .",
     "format:check": "prettier --loglevel debug --ignore-path .prettierignore --check .",
-    "test": "SELENIUM_BROWSER=chrome node  --experimental-loader ./src/loader.js --enable-source-maps tests/e2e/new-tests.js",
+    "test": "docker build -t getting-started . && docker run --mount type=bind,source=\"$(pwd)\"/tests/e2e/new-tests.ts,target=/app/tests/e2e/new-tests.ts --net=host -e BASE_URL -e CI=1 -it getting-started npm run test",
     "lint": "eslint .",
     "lint:fix": "eslint --fix .",
     "evaluate": "node --experimental-loader ./src/loader.js --enable-source-maps ./src/server/routes/evaluate/index.js",

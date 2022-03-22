@@ -1,6 +1,7 @@
 # SPDX-License-Identifier: AGPL-3.0-or-later
 # SPDX-FileCopyrightText: 2021 Moritz Hedtke <Moritz.Hedtke@t-online.de>
 FROM node
+RUN apt-get update && apt-get full-upgrade && apt-get install -y chromium chromium-driver
 WORKDIR /app
 RUN chown node:node /app
 USER node
