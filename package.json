@@ -17,8 +17,8 @@
   "description": "Software to manage choosing projects and automatically assigning people to projects.",
   "type": "module",
   "scripts": {
-    "format": "prettier --write .",
-    "format:check": "prettier --check .",
+    "format": "prettier --ignore-path .prettierignore --write .",
+    "format:check": "prettier --loglevel debug --ignore-path .prettierignore --check .",
     "test": "SELENIUM_BROWSER=chrome node  --experimental-loader ./src/loader.js --enable-source-maps tests/e2e/new-tests.js",
     "lint": "eslint .",
     "lint:fix": "eslint --fix .",
