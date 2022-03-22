@@ -34,7 +34,6 @@ jobs:
           git checkout origin/$GIT_BRANCH
           npm ci --ignore-scripts --omit=optional
           ./node_modules/@dev.mohe/argon2/build.sh /usr/include/node/
-          npm run localize-build
           npm run build
           sudo systemctl stop projektwahl@staging.service
           EOF

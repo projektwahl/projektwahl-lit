@@ -31,7 +31,6 @@ jobs:
       - run: npm ci
       - run: npm run format:check
       - run: ./node_modules/@dev.mohe/argon2/build.sh /usr/include/node/
-      - run: npm run localize-build
       - run: npm run build
       - run: npm run typecheck
       - run: npm run localize-extract

@@ -1,0 +1,83 @@
+
+    // Do not modify this file by hand!
+    // Re-generate this file by running lit-localize
+
+    import {html} from 'lit';
+    import {str} from '@lit/localize';
+
+    /* eslint-disable no-irregular-whitespace */
+    /* eslint-disable @typescript-eslint/no-explicit-any */
+
+    export const templates = {
+      'hc66aaa662761137a': html`Nicht gefunden`,
+'hd684a0e714c0d252': html`✓`,
+'he49e57357d4caee2': html`Also lieber "Ich mag fliegende Autos." anstatt
+ "Moritz1234!".<br>Du kannst auch einen Passwort-Manager
+ verwenden, z.B.`,
+'s01a8d45397ec133b': `Sicherheit`,
+'s01dc5a60edf9e053': `Komponente nicht vollständig initialisiert`,
+'s03f42eea72154959': `Accountname`,
+'s0561a43eeaf34c64': `Mit Schulaccount anmelden`,
+'s05ca1d6cf0a89899': `Denk dran: Lange Passwörter sind viel sicherer als welche mit vielen Sonderzeichen.`,
+'s09240e07b5b8d640': `ID`,
+'s0c97387dc725a9e2': `Account erstellen`,
+'s13b3f5afa0862d1c': `Ort/Raum`,
+'s17597a8bb4810524': `Lizenz`,
+'s199f5853f4e718f7': `Projekte`,
+'s1dc79c57a4bab199': `Bitwarden`,
+'s1f7e12b71164c5da': `Impressum`,
+'s2063a9d17c280fe5': `Info`,
+'s2667d13ee670a19d': str`${0} abmelden`,
+'s3e9c025477abb23d': `Projekt anzeigen`,
+'s416ccf81fded518c': str`Nach ${0} sortieren`,
+'s494268b948a317a2': `Einige Fehler sind aufgetreten!`,
+'s49730f3d5751a433': `Wird geladen...`,
+'s530b5e503198f143': `Nächste Seite`,
+'s586d6bd2eca2da93': `Accounts`,
+'s59417c8662ddc5f2': `maximale Jahrgangsstufe`,
+'s5aab4b7939a81663': `Vorherige Seite`,
+'s63fd8c3d71e20415': `höchstens teilnehmend`,
+'s6abb1cd87fe0114e': `Start`,
+'s724828a10b3dd581': `Navigation der Accountliste`,
+'s7a391ae3182a86b5': `Danksagung`,
+'s7bef03c295945331': `Projekt aktualisieren`,
+'s7e3a936c4f113dd4': `Projektleitung`,
+'s83871af4c0d79211': `Kosten`,
+'s83efd873c2040478': `Accounts als gelöscht markieren`,
+'s840d9c93fd926ecb': `Zufällige Projektzuweisungen erlaubt`,
+'s879f3dab73cde287': str`Fehler: ${0}`,
+'s88608c78750c1b37': `Account anzeigen`,
+'s8af61807443f32a4': `Aktionen`,
+'s8bfdcea2687691c2': `Als Gast anmelden`,
+'s97dc2365368a965f': `Wahl`,
+'s9841212bd35bac27': `Priorität`,
+'s98b1cb8fb62909ec': `Klasse`,
+'s99f110d27e30b289': `Titel`,
+'s9f9492d30a96b9c6': `Accounttyp`,
+'s9fd5683fdd21fe41': `Navigation umschalten`,
+'sa2b8f32796bda377': `mindestens teilnehmend`,
+'sa86d79c867c8f453': `Account aktualisieren`,
+'sab07cf2bfae8483f': `Datenschutzerklärung`,
+'sb23eed07fcaf3095': `Wahl`,
+'sb57e557f2fef10c2': `Projektwahl`,
+'sc8da3cc71de63832': `Anmelden`,
+'scdb1bac161852c73': `Willkommen`,
+'sd0a19e0b6e7d20e2': `Projekt als gelöscht markieren`,
+'sd2223afb7d6b100d': `Typ`,
+'se478d5906376d65e': `Dieser Text kann angepasst werden.`,
+'se48bd9e6c2a3109d': `Accounts`,
+'sea8d39886fdb9cf5': `Garantierte Projektmitglieder`,
+'sececb48b4688a29b': `Abwesend`,
+'see65a67b4c57946c': `minimale Jahrgangsstufe`,
+'sef49aec68fd1dc66': `Name`,
+'sf6e1665c7022a1f8': `Passwort`,
+'sf9b8d419a00f04bc': `Jahrgang`,
+'sfb43be2359ccab14': `Projekt erstellen`,
+'sfebb69bee8b5102d': `Quellcode`,
+'s0a8c18046fb2a0f6': `Third-party login`,
+'s49067479a7417f00': `Import accounts`,
+'s7039d8b5b12742f7': `Third-party email address`,
+'sc16e00a7a8b2fde2': `Back`,
+'s5daa9183e1169f88': `.json Datei`,
+    };
+  
