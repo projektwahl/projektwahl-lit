@@ -33,8 +33,7 @@ jobs:
           git fetch --prune origin
           git checkout origin/$GIT_BRANCH
           npm ci --ignore-scripts --omit=optional
-          npx node-gyp rebuild -C ./node_modules/@dev.mohe/argon2
-          npm run localize-build
+          ./node_modules/@dev.mohe/argon2/build.sh /usr/include/node/
           npm run build
           sudo systemctl stop projektwahl@production.service
           EOF

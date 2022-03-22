@@ -48,7 +48,6 @@ SPDX-FileCopyrightText: 2021 Moritz Hedtke <Moritz.Hedtke@t-online.de>
               pkgs.reuse
               pkgs.nixpkgs-fmt
               #pkgs.nodePackages.npm-check-updates
-              #pkgs.nodePackages.node-gyp
               #pkgs.cbc
               pkgs.glpk
               #pkgs.lp_solve

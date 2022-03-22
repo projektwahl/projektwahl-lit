@@ -17,22 +17,22 @@
   "description": "Software to manage choosing projects and automatically assigning people to projects.",
   "type": "module",
   "scripts": {
-    "format": "prettier --ignore-path .gitignore --write .",
-    "format:check": "prettier --ignore-path .gitignore --check .",
+    "format": "prettier --ignore-path .prettierignore --write .",
+    "format:check": "prettier --loglevel debug --ignore-path .prettierignore --check .",
     "test": "SELENIUM_BROWSER=chrome node  --experimental-loader ./src/loader.js --enable-source-maps tests/e2e/new-tests.js",
     "lint": "eslint .",
     "lint:fix": "eslint --fix .",
     "evaluate": "node --experimental-loader ./src/loader.js --enable-source-maps ./src/server/routes/evaluate/index.js",
     "setup": "node --experimental-loader ./src/loader.js --enable-source-maps ./src/server/setup.js",
     "server": "node --experimental-loader ./src/loader.js --enable-source-maps --experimental-import-meta-resolve ./src/server/index.js",
-    "localize-extract": "lit-localize extract",
-    "localize-build": "lit-localize build",
+    "localize-extract": "mkdir -p src/client/generated && docker build -t getting-started . && docker run --mount type=bind,source=\"$(pwd)\"/src/client/generated,target=/app/src/client/generated -it getting-started npm run localize-extract",
+    "localize-build": "mkdir -p src/client/generated && docker build -t getting-started . && docker run --mount type=bind,source=\"$(pwd)\"/src/client/generated,target=/app/src/client/generated -it getting-started npm run localize-build",
     "typecheck": "tsc",
     "lit-analyze": "lit-analyzer --strict --rules.no-unknown-attribute off src",
     "build": "node build.js"
   },
   "dependencies": {
-    "@dev.mohe/argon2": "^0.29.1",
+    "@dev.mohe/argon2": "^0.29.4",
     "@dev.mohe/task": "^1.1.1",
     "@lit-labs/motion": "^1.0.2",
     "@lit/localize": "^0.11.2",
@@ -47,13 +47,12 @@
   },
   "devDependencies": {
     "esbuild": "^0.14.27",
-    "esbuild-linux-64": "^0.14.27",
-    "node-gyp": "^9.0.0"
+    "esbuild-linux-64": "^0.14.27"
   },
   "optionalDependencies": {
     "@types/cookie": "^0.4.1",
     "@types/js-cookie": "^3.0.1",
-    "@types/node": "^17.0.21",
+    "@types/node": "^17.0.22",
     "typescript": "^4.6.2"
   }
 }
