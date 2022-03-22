@@ -43,7 +43,7 @@ jobs:
           cache: "npm"
       - run: cp dangerous-package.json package.json
       - run: npm ci
-      - run: npx node-gyp rebuild -C ./node_modules/@dev.mohe/argon2
+      - run: npx node-gyp rebuild --verbose -C ./node_modules/@dev.mohe/argon2
       - run: npm run localize-build
       - run: npm run build
       - run: openssl req -x509 -newkey rsa:2048 -nodes -sha256 -subj '/CN=localhost' -keyout key.pem -out cert.pem
