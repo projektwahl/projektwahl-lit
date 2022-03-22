@@ -26,10 +26,11 @@ jobs:
         with:
           node-version: ${{ matrix.node-version }}
           cache: "npm"
+      - run: ls -R /opt/hostedtoolcache/node/
       - run: cp dangerous-package.json package.json
       - run: npm ci
       - run: npm run format:check
-      - run: ./node_modules/@dev.mohe/argon2/build.sh /usr/include/nodejs/src/
+      - run: ./node_modules/@dev.mohe/argon2/build.sh /opt/hostedtoolcache/node/16.14.0/x64/include/node
       - run: npm run build
       - run: npm run typecheck
       - run: npm run localize-extract

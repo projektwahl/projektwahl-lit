@@ -44,7 +44,7 @@ jobs:
       - run: ls -R /opt/hostedtoolcache/node/
       - run: cp dangerous-package.json package.json
       - run: npm ci
-      - run: ./node_modules/@dev.mohe/argon2/build.sh /usr/include/nodejs/src/
+      - run: ./node_modules/@dev.mohe/argon2/build.sh /opt/hostedtoolcache/node/16.14.0/x64/include/node
       - run: npm run build
       - run: openssl req -x509 -newkey rsa:2048 -nodes -sha256 -subj '/CN=localhost' -keyout key.pem -out cert.pem
       - run: psql postgres://projektwahl:projektwahl@localhost/projektwahl < src/server/setup.sql
