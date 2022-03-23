@@ -99,13 +99,21 @@ class FormTester {
       1000,
       "spinner 1"
     );
-    await this.helper.driver.wait(until.stalenessOf(loadingIndicator), 1000, "loading indicator 1");
+    await this.helper.driver.wait(
+      until.stalenessOf(loadingIndicator),
+      1000,
+      "loading indicator 1"
+    );
   }
 
   async submitSuccess() {
     await this.submit();
 
-    await this.helper.driver.wait(until.stalenessOf(this.form), 1000, "form submit expected stale");
+    await this.helper.driver.wait(
+      until.stalenessOf(this.form),
+      1000,
+      "form submit expected stale"
+    );
   }
 
   async submitFailure() {
@@ -419,7 +427,11 @@ async function createUserAllFields(helper: Helper) {
     1000,
     "spinner 2"
   );
-  await helper.driver.wait(until.stalenessOf(loadingIndicator), 1000, "loading indicator 1");
+  await helper.driver.wait(
+    until.stalenessOf(loadingIndicator),
+    1000,
+    "loading indicator 1"
+  );
 
   // click view button
   await helper.click(await helper.driver.findElement(By.css(`td p a`)));
@@ -504,7 +516,11 @@ async function createProjectAllFields(helper: Helper) {
     1000,
     "spinner 3"
   );
-  await helper.driver.wait(until.stalenessOf(loadingIndicator), 1000, "loading indicator 2");
+  await helper.driver.wait(
+    until.stalenessOf(loadingIndicator),
+    1000,
+    "loading indicator 2"
+  );
 
   // click view button
   await helper.click(await helper.driver.findElement(By.css(`td p a`)));
