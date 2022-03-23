@@ -33,7 +33,7 @@ import { PwElement } from "../pw-element.js";
 export function pwOrder<P extends keyof typeof entityRoutes, X extends string>(
   props: Pick<
     PwOrder<P, X>,
-    "url" | "name" | "prefix" | "title" | "refreshEntityList"
+    "url" | "name" | "prefix" | "title" | "refreshEntityList" | "value"
   >
 ) {
   const { url, name, title, refreshEntityList, prefix, ...rest } = props;
@@ -44,6 +44,7 @@ export function pwOrder<P extends keyof typeof entityRoutes, X extends string>(
     .url=${url}
     prefix=${prefix}
     .title=${title}
+    .value=${value}
     .refreshEntityList=${refreshEntityList}
   ></pw-order>`;
 }
@@ -73,6 +74,8 @@ export class PwOrder<
   prefix!: X;
 
   name!: z.infer<typeof entityRoutes[P]["request"]>["sorting"][number][0];
+
+  value!: z.infer<typeof entityRoutes[P]["request"]>["sorting"][number][2];
 
   title!: string;
 
@@ -137,7 +140,7 @@ export class PwOrder<
 
           // @ts-expect-error mapped types probably needed
           const a: z.infer<typeof entityRoutes[P]["request"]>["sorting"] =
-            newElement !== null ? [[oldElement[0], newElement]] : [];
+            newElement !== null ? [[oldElement[0], newElement, oldElement[2]]] : [];
 
           // @ts-expect-error mapped types probably needed
           data[this.prefix]["sorting"] = [
