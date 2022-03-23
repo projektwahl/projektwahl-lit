@@ -64,6 +64,10 @@ type entitiesType6 = {
   [K in keyof typeof entityRoutes]: entitiesType4[K][0];
 };
 
+type MappedId<T> = {
+  [P in keyof T]: T[P];
+};
+
 export async function fetchData<R extends keyof typeof entityRoutes>(
   path: R,
   query: entitiesType0[R],
