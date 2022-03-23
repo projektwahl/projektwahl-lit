@@ -71,33 +71,29 @@ export async function fetchData<R extends keyof typeof entityRoutes>(
         },*/
 ): Promise<[OutgoingHttpHeaders, ResponseType<R>]> {
   //const entitySchema: entitiesType[R] = entityRoutes[path];
-  const sorting: Array<entitiesType4[R]> = query.sorting;
+  let sorting: Array<entitiesType4[R]> = query.sorting;
 
   if (
     !sorting.find((e) => e[0] == "id")
   ) {
-    query.sorting.push(["id", "ASC"]);
+    sorting.push(["id", "ASC"]);
   }
 
   // orderBy needs to be reversed for backwards pagination
   if (query.paginationDirection === "backwards") {
-    let s: z.infer<typeof entityRoutes[R]["request"]>["sorting"] =
-      query.sorting;
     // @ts-expect-error mapped types?
-    s = s.map<z.infer<typeof entityRoutes[R]["request"]>["sorting"][number]>(
-      // @ts-expect-error mapped types?
-      (v: z.infer<typeof entityRoutes[R]["request"]>["sorting"][number]) => [
+    sorting = sorting.map(
+      (v) => [
         v[0],
         v[1] === "ASC" ? "DESC" : "ASC",
       ]
     );
-    query.sorting = s;
   }
 
-  const orderByQuery = query.sorting
+  const orderByQuery = sorting
     .flatMap((v) => [
       sql`,`,
-      sql`${orderByQueries[v[0]](query.sorting[v[0]])} ${unsafe2(v[1])}`,
+      sql`${orderByQueries[v[0]](sorting[v[0]])} ${unsafe2(v[1])}`,
     ])
     .slice(1)
     .reduce((prev, curr) => sql`${prev}${curr}`);
