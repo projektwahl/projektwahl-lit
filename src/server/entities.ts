@@ -126,12 +126,9 @@ export async function fetchData<R extends keyof typeof entityRoutes>(
       query.paginationLimit + 1
     })`;
   } else {
-    const s: Array<
-      z.infer<typeof entityRoutes[R]["request"]>["sorting"][number]
-    > = query.sorting;
-    const queries = s.map(
-      (value: entitiesType0[R]["sorting"][number], index) => {
-        const part = query.sorting.slice(0, index + 1);
+    const queries = sorting.map(
+      (value, index) => {
+        const part = sorting.slice(0, index + 1);
 
         const parts = part
           .flatMap((value, index) => {
