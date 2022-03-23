@@ -56,7 +56,8 @@ const rawUserCommon = {
 export const rawUserSchema = z
   .object({
     type: z.enum(["voter", "helper", "admin"]),
-    group: z.string().min(1).max(100).nullable(),
+    // TODO FIXME use discriminated union (but then we have problems with .pick again)
+    group: z.string().min(0).max(100).nullable(),
     age: z.number().min(0).max(200).nullable(),
     ...rawUserCommon,
   })
