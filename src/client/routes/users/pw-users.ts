@@ -230,8 +230,18 @@ export class PwUsers<X extends string> extends PwEntityList<
                 <td>
                   <p>
                     ${value.deleted
-                      ? html`<del>${value.type}</del>`
-                      : html`${value.type}`}
+                      ? html`<del
+                          >${value.type === "admin"
+                            ? msg("Admin")
+                            : value.type === "helper"
+                            ? msg("Lehrer")
+                            : msg("Schüler")}</del
+                        >`
+                      : html`${value.type === "admin"
+                          ? msg("Admin")
+                          : value.type === "helper"
+                          ? msg("Lehrer")
+                          : msg("Schüler")}`}
                   </p>
                 </td>
                 <td>
