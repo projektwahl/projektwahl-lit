@@ -119,28 +119,20 @@ export class PwOrder<
           const oldElementIndex = data[this.prefix]["sorting"].findIndex(
             ([e]) => e === this.name
           );
-          let oldElement: [
-            z.infer<typeof entityRoutes[P]["request"]>["sorting"][number][0],
-            "ASC" | "DESC" | "downup"
-          ];
-          if (oldElementIndex == -1) {
-            oldElement = [this.name, `downup`];
-          } else {
-            oldElement = data[this.prefix]["sorting"].splice(
-              oldElementIndex,
-              1
-            )[0];
-          }
+          let oldElement: z.infer<typeof entityRoutes[P]["request"]>["sorting"][number] = data[this.prefix]["sorting"].splice(
+            oldElementIndex,
+            1
+          )[0];
           let newElement: "ASC" | "DESC" | null;
           switch (oldElement[1]) {
-            case "downup":
-              newElement = "ASC";
+            case "DESC":
+              newElement = null;
               break;
             case "ASC":
               newElement = "DESC";
               break;
             default:
-              newElement = null;
+              newElement = "ASC";
           }
 
           // @ts-expect-error mapped types probably needed

@@ -48,6 +48,12 @@ type entitiesType2 = {
   }
 };
 
+type entitiesType9 = {
+  [K in keyof typeof entityRoutes]: {
+    [R in z.infer<typeof entityRoutes[K]["request"]>["sorting"][number][0]]: z.infer<typeof entityRoutes[K]["request"]>["sorting"][number][2];
+  }
+};
+
 type entitiesType3 = {
   [K in keyof typeof entityRoutes]: z.infer<typeof entityRoutes[K]["request"]>["sorting"];
 };
@@ -74,7 +80,7 @@ type MappedId<T> = {
 
 type entitiesType8 = {
   [K in keyof typeof entityRoutes]: {
-    [key in entitiesType1[K]]: (query: entitiesType2[K][key], paginationDirection: "forwards" | "backwards") => PendingQuery<Row[]>
+    [key in entitiesType1[K]]: (order: entitiesType2[K][key], paginationDirection: "forwards" | "backwards", v: entitiesType9[K][key]) => PendingQuery<Row[]>
   }
 }
 

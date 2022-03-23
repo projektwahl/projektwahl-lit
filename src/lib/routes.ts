@@ -322,8 +322,8 @@ export const routes = {
       z.tuple([z.literal("id" as const), z.enum(["ASC", "DESC"] as const)]),
       z.tuple([z.literal("username" as const), z.enum(["ASC", "DESC"] as const)]),
       z.tuple([z.literal("type" as const), z.enum(["ASC", "DESC"] as const)]),
-      z.tuple([z.literal("project_leader_id_eq" as const), z.number()]),
-      z.tuple([z.literal("force_in_project_id_eq" as const), z.number()]),
+      z.tuple([z.literal("project_leader_id_eq" as const), z.enum(["ASC", "DESC"] as const), z.number()]),
+      z.tuple([z.literal("force_in_project_id_eq" as const), z.enum(["ASC", "DESC"] as const), z.number()]),
     ]))),
     response: z
       .object({
