@@ -110,7 +110,9 @@ export const usersHandler = requestHandler(
         },
         {},
         {
-          "test": () => sql`hi`
+          id: () => sql`id`,
+          type: () => sql`type`,
+          username: () => sql`username`,
         }
       );
     return ret;
