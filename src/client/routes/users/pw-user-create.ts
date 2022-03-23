@@ -201,7 +201,7 @@ class PwUserCreate extends PwForm<"/api/v1/users/create-or-update"> {
                     this.initial?.data.length == 1
                       ? [{ action: "update", ...this.initial?.data[0] }]
                       : undefined,
-                  defaultValue: undefined,
+                  defaultValue: null,
                 })}
                 ${pwInputSelect<
                   "/api/v1/users/create-or-update",
