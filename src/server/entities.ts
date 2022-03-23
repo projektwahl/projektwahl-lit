@@ -72,13 +72,17 @@ type MappedId<T> = {
   [P in keyof T]: T[P];
 };
 
+type entitiesType8 = {
+  [K in keyof typeof entityRoutes]: {
+    [key in entitiesType1[K]]: (query: entitiesType2[K][key], paginationDirection: "forwards" | "backwards") => PendingQuery<Row[]>
+  }
+}
+
 export async function fetchData<R extends keyof typeof entityRoutes>(
   path: R,
   query: entitiesType0[R],
   sqlQuery: (query: entitiesType0[R]) => PendingQuery<Row[]>,
-  orderByQueries: {
-    [key in entitiesType1[R]]: (query: entitiesType2[R][key], paginationDirection: "forwards" | "backwards") => PendingQuery<Row[]>
-  }
+  orderByQueries: entitiesType8[R]
   /*{
           id: "nulls-first",
           type: "nulls-first",
