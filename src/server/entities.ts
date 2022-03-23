@@ -56,7 +56,11 @@ type entitiesType4 = {
   [K in keyof typeof entityRoutes]: z.infer<typeof entityRoutes[K]["request"]>["sorting"][number];
 };
 
-type entitiesType5 = {
+type entitiesType5<X extends [any, ...any]> = {
+  [K in keyof typeof entityRoutes]: X[0];
+};
+
+type entitiesType6 = {
   [K in keyof typeof entityRoutes]: entitiesType4[K][0];
 };
 
@@ -96,7 +100,8 @@ export async function fetchData<R extends keyof typeof entityRoutes>(
 
   const orderByQuery = sorting
     .flatMap((v) =>  {
-      const v0: entitiesType5[R] = v[0];
+      const vconst = v;
+      const v0: entitiesType6[R] = vconst[0];
       return [
         sql`,`,
         sql`${orderByQueries[v0](sorting[v0])} ${unsafe2(v[1])}`,
