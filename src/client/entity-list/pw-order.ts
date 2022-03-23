@@ -36,7 +36,7 @@ export function pwOrder<P extends keyof typeof entityRoutes, X extends string>(
     "url" | "name" | "prefix" | "title" | "refreshEntityList" | "value"
   >
 ) {
-  const { url, name, title, refreshEntityList, prefix, ...rest } = props;
+  const { url, name, title, refreshEntityList, prefix, value, ...rest } = props;
   let _ = rest;
   _ = 1; // ensure no property is missed - Don't use `{}` as a type. `{}` actually means "any non-nullish value".
   return html`<pw-order

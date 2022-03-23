@@ -98,6 +98,7 @@ export class PwUsers<X extends string> extends PwEntityList<
               name: "id",
               prefix: this.prefix,
               title: msg("ID"),
+              value: undefined,
             })}
           </th>
 
@@ -108,6 +109,7 @@ export class PwUsers<X extends string> extends PwEntityList<
               name: "username",
               prefix: this.prefix,
               title: msg("Name"),
+              value: undefined,
             })}
           </th>
 
@@ -118,6 +120,7 @@ export class PwUsers<X extends string> extends PwEntityList<
               name: "type",
               prefix: this.prefix,
               title: msg("Type"),
+              value: undefined,
             })}
           </th>
 

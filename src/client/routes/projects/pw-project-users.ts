@@ -84,6 +84,7 @@ export const PwProjectUsers = setupHmr(
                 name: `${this.name}_eq`,
                 prefix: this.prefix,
                 title: "",
+                value: this.projectId,
               })}
             </th>
 
@@ -94,6 +95,7 @@ export const PwProjectUsers = setupHmr(
                 name: "id",
                 prefix: this.prefix,
                 title: msg("ID"),
+                value: undefined,
               })}
             </th>
 
@@ -104,6 +106,7 @@ export const PwProjectUsers = setupHmr(
                 name: "username",
                 prefix: this.prefix,
                 title: msg("Name"),
+                value: undefined,
               })}
             </th>
 
@@ -114,6 +117,7 @@ export const PwProjectUsers = setupHmr(
                 name: "type",
                 prefix: this.prefix,
                 title: msg("Type"),
+                value: undefined,
               })}
             </th>
           </tr>
