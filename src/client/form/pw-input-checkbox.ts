@@ -47,7 +47,7 @@ export function pwInputCheckbox<
     | "task"
     | "defaultValue"
     | "trueValue"
-    | "value"
+    | "falseValue"
   >
 ) {
   const {
@@ -65,7 +65,7 @@ export function pwInputCheckbox<
     autocomplete,
     trueValue,
     defaultValue,
-    value,
+    falseValue,
     ...rest
   } = props;
   let _ = rest;
@@ -85,7 +85,7 @@ export function pwInputCheckbox<
     .initial=${initial}
     .defaultValue=${defaultValue}
     .trueValue=${trueValue}
-    .value=${value}
+    .falseValue=${falseValue}
   ></pw-input-checkbox>`;
 }
 
@@ -100,6 +100,7 @@ export class PwInputCheckbox<
     };
   }
 
+  falseValue!: T;
   trueValue!: T;
 
   myformdataEventListener = (
@@ -110,7 +111,7 @@ export class PwInputCheckbox<
     }
     this.set(
       event.detail,
-      this.input.value.checked ? this.trueValue : this.defaultValue
+      this.input.value.checked ? this.trueValue : this.falseValue
     );
   };
 }

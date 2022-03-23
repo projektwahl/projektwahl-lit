@@ -46,7 +46,6 @@ export function pwInputText<
     | "options"
     | "task"
     | "defaultValue"
-    | "value"
   >
 ) {
   const {
@@ -63,7 +62,6 @@ export function pwInputText<
     type,
     autocomplete,
     defaultValue,
-    value,
     ...rest
   } = props;
   let _ = rest;
@@ -82,7 +80,6 @@ export function pwInputText<
     .task=${task}
     .initial=${initial}
     .defaultValue=${defaultValue}
-    .value=${value}
   ></pw-input-text>`;
 }
 

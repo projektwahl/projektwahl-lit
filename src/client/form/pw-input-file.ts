@@ -43,7 +43,6 @@ export function pwInputFile<P extends keyof typeof routes>(
     | "options"
     | "task"
     | "defaultValue"
-    | "value"
   >
 ) {
   const {
@@ -60,7 +59,6 @@ export function pwInputFile<P extends keyof typeof routes>(
     type,
     autocomplete,
     defaultValue,
-    value,
     ...rest
   } = props;
   let _ = rest;
@@ -79,7 +77,6 @@ export function pwInputFile<P extends keyof typeof routes>(
     .task=${task}
     .initial=${initial}
     .defaultValue=${defaultValue}
-    .value=${value}
   ></pw-input-file>`;
 }
 

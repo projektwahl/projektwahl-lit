@@ -95,8 +95,6 @@ export abstract class PwInput<
 
   initial?: z.infer<typeof routes[P]["request"]>;
 
-  value?: T;
-
   input: Ref<I>;
 
   form!: HTMLFormElement;
@@ -184,7 +182,9 @@ export abstract class PwInput<
               : undefined
           )}
           ?checked=${
-            this.initial !== undefined ? this.get(this.initial) : false
+            this.initial !== undefined
+              ? this.get(this.initial)
+              : this.defaultValue
           }
           class="${
             this.type === "checkbox" ? "form-check-input" : "form-control"

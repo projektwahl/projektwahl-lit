@@ -303,9 +303,9 @@ export const PwProjectCreate = setupHmr(
                   >({
                     url: this.url,
                     type: "checkbox",
-                    value: true,
                     trueValue: true,
-                    defaultValue: false,
+                    falseValue: false,
+                    defaultValue: true,
                     disabled: this.disabled,
                     label: msg("Allow random assignments"),
                     name: ["random_assignments"],
@@ -320,8 +320,8 @@ export const PwProjectCreate = setupHmr(
                   >({
                     url: this.url,
                     type: "checkbox",
-                    value: true,
                     trueValue: true,
+                    falseValue: false,
                     defaultValue: false,
                     disabled: this.disabled,
                     label: msg("Mark this project as deleted"),
