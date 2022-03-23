@@ -109,9 +109,9 @@ export const usersHandler = requestHandler(
           })`;
         },
         {
-          id: () => sql`id`,
-          type: () => sql`type`,
-          username: () => sql`username`,
+          id: (q, o) => sql`id ${o === "backwards" ? (q === "ASC" ? "DESC" : "ASC") : q}`,
+          type: (q, o) => sql`type ${o === "backwards" ? (q === "ASC" ? "DESC" : "ASC") : q}`,
+          username: (q, o) => sql`username ${o === "backwards" ? (q === "ASC" ? "DESC" : "ASC") : q}`,
         }
       );
     return ret;

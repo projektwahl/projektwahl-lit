@@ -111,11 +111,11 @@ export const projectsHandler = requestHandler(
              AND info  LIKE ${"%" + (query.filters.info ?? "") + "%"}`;
       },
       {
-        id: () => sql`id`,
-        title: () => sql`title`,
-        info: () => sql`info`,
-        force_in_project_eq: (q) => sql`(users_with_deleted.project_leader_id IS NOT DISTINCT FROM 2)`,
-        project_leader_id_eq: (q) => sql`(users_with_deleted.project_leader_id IS NOT DISTINCT FROM 2)`
+        id: (q, o) => sql`id ${o === "backwards" ? (q === "ASC" ? "DESC" : "ASC") : q}`,
+        title: (q, o) => sql`title ${o === "backwards" ? (q === "ASC" ? "DESC" : "ASC") : q}`,
+        info: (q, o) => sql`info ${o === "backwards" ? (q === "ASC" ? "DESC" : "ASC") : q}`,
+        force_in_project_eq: (q, o) => sql`(users_with_deleted.project_leader_id IS NOT DISTINCT FROM ${o})`,
+        project_leader_id_eq: (q, o) => sql`(users_with_deleted.project_leader_id IS NOT DISTINCT FROM ${o})`
       }
     );
   }

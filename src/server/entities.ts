@@ -77,7 +77,7 @@ export async function fetchData<R extends keyof typeof entityRoutes>(
   query: entitiesType0[R],
   sqlQuery: (query: entitiesType0[R]) => PendingQuery<Row[]>,
   orderByQueries: {
-    [key in entitiesType1[R]]: (query: entitiesType2[R][key]) => PendingQuery<Row[]>
+    [key in entitiesType1[R]]: (query: entitiesType2[R][key], paginationDirection: "forwards" | "backwards") => PendingQuery<Row[]>
   }
   /*{
           id: "nulls-first",
@@ -95,24 +95,13 @@ export async function fetchData<R extends keyof typeof entityRoutes>(
     sorting.push(["id", "ASC"]);
   }
 
-  // orderBy needs to be reversed for backwards pagination
-  if (query.paginationDirection === "backwards") {
-    // @ts-expect-error mapped types?
-    sorting = sorting.map(
-      (v) => [
-        v[0],
-        v[1] === "ASC" ? "DESC" : "ASC",
-      ]
-    );
-  }
-
   const orderByQuery = sorting
     .flatMap((v) =>  {
       const v0: entitiesType6[R] = v[0];
       const v1: entitiesType2[R][typeof v0] = v[1];
       return [
         sql`,`,
-        sql`${orderByQueries[v0](v1)} ${unsafe2(v[1])}`,
+        sql`${orderByQueries[v0](v1, query.paginationCursor)} ${unsafe2(v[1])}`,
     ]})
     .slice(1)
     .reduce((prev, curr) => sql`${prev}${curr}`);
