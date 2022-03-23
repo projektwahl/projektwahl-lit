@@ -197,7 +197,7 @@ export const PwProjectCreate = setupHmr(
                     string | undefined
                   >({
                     url: this.url,
-                    type: "text",
+                    type: "textarea",
                     disabled: this.disabled,
                     label: msg("Info"),
                     name: ["info"],

@@ -80,7 +80,14 @@ export abstract class PwInput<
 
   label!: string | null;
 
-  type: "text" | "password" | "number" | "checkbox" | "select" | "file";
+  type:
+    | "text"
+    | "textarea"
+    | "password"
+    | "number"
+    | "checkbox"
+    | "select"
+    | "file";
 
   autocomplete?: "username" | "current-password" | "new-password";
 
@@ -153,7 +160,13 @@ export abstract class PwInput<
               >`
             : undefined
         }
-        <${this.type === "select" ? literal`select` : literal`input`}
+        <${
+          this.type === "select"
+            ? literal`select`
+            : this.type === "textarea"
+            ? literal`textarea`
+            : literal`input`
+        }
           ${ref(this.input)}
           @input=${() => {
             this.input.value?.dispatchEvent(
@@ -216,7 +229,13 @@ export abstract class PwInput<
                 )
               : undefined
           }
-        </${this.type === "select" ? literal`select` : literal`input`}>
+        </${
+          this.type === "select"
+            ? literal`select`
+            : this.type === "textarea"
+            ? literal`textarea`
+            : literal`input`
+        }>
         ${
           this.autocomplete === "new-password"
             ? html`<div id="passwordHelp" class="form-text">
