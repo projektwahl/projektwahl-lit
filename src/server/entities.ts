@@ -50,6 +50,9 @@ export async function fetchData<R extends keyof typeof entityRoutes>(
   sqlQuery: (query: entitesType0[R]) => PendingQuery<Row[]>,
   nullOrdering: {
     [key: string]: "smallest" | "largest";
+  },
+  orderByQueries: {
+    [key in keyof z.infer<typeof entityRoutes[R]["request"]>["sorting"][number][0]]: (query: entitesType0[R]) => PendingQuery<Row[]>
   }
   /*{
           id: "nulls-first",
@@ -86,7 +89,7 @@ export async function fetchData<R extends keyof typeof entityRoutes>(
   const orderByQuery = query.sorting
     .flatMap((v) => [
       sql`,`,
-      sql`${unsafe2(v[0])} ${unsafe2(v[1])} ${unsafe2(
+      sql`${orderByQueries[v[0]]} ${unsafe2(v[1])} ${unsafe2(
         v[1] === "ASC"
           ? nullOrdering[v[0]] === "smallest"
             ? "NULLS FIRST"

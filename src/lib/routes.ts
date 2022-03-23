@@ -150,10 +150,12 @@ const project = rawProjectSchema.pick({
 
 const baseQuery = <
   T extends { [k: string]: ZodTypeAny },
+  U extends string,
+  SK extends Readonly<[U, ...U[]]>,
   UnknownKeys extends UnknownKeysParam = "strip",
-  Catchall extends ZodTypeAny = ZodTypeAny
+  Catchall extends ZodTypeAny = ZodTypeAny,
 >(
-  s: ZodObject<T, UnknownKeys, Catchall>, sortingKeys: [string, ...string[]]
+  s: ZodObject<T, UnknownKeys, Catchall>, sortingKeys: SK
 ) => {
   return z
     .object({
@@ -165,7 +167,7 @@ const baseQuery = <
       sorting: z
         .array(
           z.tuple([
-            z.enum(
+            z.enum<U, SK>(
               sortingKeys
             ),
             z.enum(["ASC", "DESC"]),

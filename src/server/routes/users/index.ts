@@ -108,7 +108,10 @@ export const usersHandler = requestHandler(
             query.filters.type ?? null
           })`;
         },
-        {}
+        {},
+        {
+          "test": () => sql`hi`
+        }
       );
     return ret;
   }
