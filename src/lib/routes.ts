@@ -153,7 +153,7 @@ const baseQuery = <
   UnknownKeys extends UnknownKeysParam = "strip",
   Catchall extends ZodTypeAny = ZodTypeAny
 >(
-  s: ZodObject<T, UnknownKeys, Catchall>
+  s: ZodObject<T, UnknownKeys, Catchall>, sortingKeys: [string, ...string[]]
 ) => {
   return z
     .object({
@@ -166,12 +166,7 @@ const baseQuery = <
         .array(
           z.tuple([
             z.enum(
-              // As we can't guarantee at least one element this probably will never be possible
-              // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
-              Object.keys(s.shape) as [
-                keyof T & string,
-                ...(keyof T & string)[]
-              ]
+              sortingKeys
             ),
             z.enum(["ASC", "DESC"]),
           ])
@@ -331,7 +326,7 @@ export const routes = {
     response: z.object({}).extend({ id: z.number() }).strict(),
   },
   "/api/v1/users": {
-    request: baseQuery(rawUserSchema),
+    request: baseQuery(rawUserSchema, ["id", "username", "type"]),
     response: z
       .object({
         entities: z.array(users(rawUserSchema)),
@@ -341,7 +336,7 @@ export const routes = {
       .strict(),
   },
   "/api/v1/projects": {
-    request: baseQuery(rawProjectSchema),
+    request: baseQuery(rawProjectSchema, ["id", "title", "info", "project_leader_id_eq", "force_in_project_eq"]),
     response: z
       .object({
         entities: z.array(project),
@@ -351,7 +346,7 @@ export const routes = {
       .strict(),
   },
   "/api/v1/choices": {
-    request: baseQuery(rawChoiceNullable.merge(rawProjectSchema)),
+    request: baseQuery(rawChoiceNullable.merge(rawProjectSchema), ["rank"]),
     response: z
       .object({
         entities: z.array(choices),

@@ -77,7 +77,15 @@ export const PwProjectUsers = setupHmr(
         const initial = data[this.prefix];
 
         return html`<tr>
-            <th class="table-cell-hover" scope="col">${msg(html`&#x2713;`)}</th>
+            <th class="table-cell-hover p-0" scope="col">
+              ${pwOrder({
+                url: "/api/v1/users",
+                refreshEntityList: () => this._task.run(),
+                name: this.name,
+                prefix: this.prefix,
+                title: "",
+              })}
+            </th>
 
             <th class="table-cell-hover p-0" scope="col">
               ${pwOrder({

@@ -20,7 +20,7 @@ https://github.com/projektwahl/projektwahl-lit
 SPDX-License-Identifier: AGPL-3.0-or-later
 SPDX-FileCopyrightText: 2021 Moritz Hedtke <Moritz.Hedtke@t-online.de>
 */
-import { html } from "lit";
+import { html, TemplateResult } from "lit";
 import { bootstrapCss } from "../index.js";
 import { HistoryController } from "../history-controller.js";
 import { msg, str } from "@lit/localize";
@@ -43,7 +43,7 @@ export function pwOrder<P extends keyof typeof entityRoutes, X extends string>(
     .name=${name}
     .url=${url}
     prefix=${prefix}
-    title=${title}
+    .title=${title}
     .refreshEntityList=${refreshEntityList}
   ></pw-order>`;
 }
@@ -56,7 +56,7 @@ export class PwOrder<
 > extends PwElement {
   static override get properties() {
     return {
-      title: { type: String },
+      title: { attribute: false },
       name: { attribute: false },
       path: { attribute: false },
       refreshEntityList: { attribute: false },
