@@ -64,6 +64,10 @@ type entitiesType6 = {
   [K in keyof typeof entityRoutes]: entitiesType4[K][0];
 };
 
+type entitiesType7 = {
+  [K in keyof typeof entityRoutes]: entitiesType4[K][1];
+};
+
 type MappedId<T> = {
   [P in keyof T]: T[P];
 };
@@ -104,11 +108,11 @@ export async function fetchData<R extends keyof typeof entityRoutes>(
 
   const orderByQuery = sorting
     .flatMap((v) =>  {
-      const vconst = v;
-      const v0: entitiesType6[R] = vconst[0];
+      const v0: entitiesType6[R] = v[0];
+      const v1: entitiesType2[R][typeof v0] = v[1];
       return [
         sql`,`,
-        sql`${orderByQueries[v0](sorting[v0])} ${unsafe2(v[1])}`,
+        sql`${orderByQueries[v0](v1)} ${unsafe2(v[1])}`,
     ]})
     .slice(1)
     .reduce((prev, curr) => sql`${prev}${curr}`);
