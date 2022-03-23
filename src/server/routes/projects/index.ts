@@ -110,7 +110,14 @@ export const projectsHandler = requestHandler(
         }
              AND info  LIKE ${"%" + (query.filters.info ?? "") + "%"}`;
       },
-      {}
+      {},
+      {
+        id: () => sql`id`,
+        title: () => sql`title`,
+        info: () => sql`info`,
+        force_in_project_eq: (q) => sql`(users_with_deleted.project_leader_id IS NOT DISTINCT FROM 2)`,
+        project_leader_id_eq: (q) => sql`(users_with_deleted.project_leader_id IS NOT DISTINCT FROM 2)`
+      }
     );
   }
 );

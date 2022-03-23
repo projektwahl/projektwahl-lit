@@ -89,7 +89,6 @@ export async function fetchData<R extends keyof typeof entityRoutes>(
     query.sorting = s;
   }
 
-  // (users_with_deleted.project_leader_id IS NOT DISTINCT FROM 2)
   const orderByQuery = query.sorting
     .flatMap((v) => [
       sql`,`,
