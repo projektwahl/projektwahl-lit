@@ -33,13 +33,7 @@ import { unsafe2 } from "./sql/index.js";
 type entitiesType = {
   [K in keyof typeof entityRoutes]: typeof entityRoutes[K];
 };
-/*
-type mappedInfer1<R extends keyof typeof entityRoutes> = {
-  [K in keyof z.infer<entitiesType[R]["response"]>]: z.infer<
-    entitiesType[R]["response"]
-  >[K];
-};
-*/
+
 type entitiesType0 = {
   [K in keyof typeof entityRoutes]: z.infer<typeof entityRoutes[K]["request"]>;
 };
@@ -48,15 +42,26 @@ type entitiesType1 = {
   [K in keyof typeof entityRoutes]: z.infer<typeof entityRoutes[K]["request"]>["sorting"][number][0];
 };
 
+type entitiesType2 = {
+  [K in keyof typeof entityRoutes]: {
+    [R in z.infer<typeof entityRoutes[K]["request"]>["sorting"][number][0]]: z.infer<typeof entityRoutes[K]["request"]>["sorting"][number][1];
+  }
+};
+
+type entitiesType3 = {
+  [K in keyof typeof entityRoutes]: z.infer<typeof entityRoutes[K]["request"]>["sorting"];
+};
+
+type entitiesType4 = {
+  [K in keyof typeof entityRoutes]: z.infer<typeof entityRoutes[K]["request"]>["sorting"][number];
+};
+
 export async function fetchData<R extends keyof typeof entityRoutes>(
   path: R,
   query: entitiesType0[R],
   sqlQuery: (query: entitiesType0[R]) => PendingQuery<Row[]>,
-  nullOrdering: {
-    [key: string]: "smallest" | "largest";
-  },
   orderByQueries: {
-    [key in entitiesType1[R]]: (query: entitiesType0[R]) => PendingQuery<Row[]>
+    [key in entitiesType1[R]]: (query: entitiesType2[R][key]) => PendingQuery<Row[]>
   }
   /*{
           id: "nulls-first",
@@ -66,10 +71,10 @@ export async function fetchData<R extends keyof typeof entityRoutes>(
         },*/
 ): Promise<[OutgoingHttpHeaders, ResponseType<R>]> {
   //const entitySchema: entitiesType[R] = entityRoutes[path];
+  const sorting: Array<entitiesType4[R]> = query.sorting;
 
   if (
-    // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
-    !(query.sorting as [string, "ASC" | "DESC"][]).find((e) => e[0] == "id")
+    !sorting.find((e) => e[0] == "id")
   ) {
     query.sorting.push(["id", "ASC"]);
   }
@@ -92,15 +97,7 @@ export async function fetchData<R extends keyof typeof entityRoutes>(
   const orderByQuery = query.sorting
     .flatMap((v) => [
       sql`,`,
-      sql`${orderByQueries[v[0]]} ${unsafe2(v[1])} ${unsafe2(
-        v[1] === "ASC"
-          ? nullOrdering[v[0]] === "smallest"
-            ? "NULLS FIRST"
-            : "NULLS LAST"
-          : nullOrdering[v[0]] === "smallest"
-          ? "NULLS LAST"
-          : "NULLS FIRST"
-      )}`,
+      sql`${orderByQueries[v[0]](query.sorting[v[0]])} ${unsafe2(v[1])}`,
     ])
     .slice(1)
     .reduce((prev, curr) => sql`${prev}${curr}`);
