@@ -85,7 +85,7 @@ let version_short = (
 
 {
   let { stdout, stderr } = await exec(
-    "cp node_modules/bootstrap/dist/css/bootstrap.css.map dist/"
+    "cp node_modules/bootstrap/dist/css/bootstrap.min.css.map dist/"
   );
 
   console.log(stdout);
@@ -94,7 +94,8 @@ let version_short = (
 
 {
   let { stdout, stderr } = await exec(
-    "purgecss --css node_modules/bootstrap/dist/css/bootstrap.css --content dist/*.js --output dist/bootstrap.min.css --font-face --keyframes --variables"
+    //"purgecss --css node_modules/bootstrap/dist/css/bootstrap.css --content dist/*.js --output dist/bootstrap.min.css --font-face --keyframes --variables"
+    "cp node_modules/bootstrap/dist/css/bootstrap.min.css dist/"
   );
 
   console.log(stdout);
