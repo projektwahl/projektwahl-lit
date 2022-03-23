@@ -117,7 +117,7 @@ export class PwOrder<
           }
 
           const oldElementIndex = data[this.prefix]["sorting"].findIndex(
-            ([e]: [string, string]) => e === this.name
+            ([e]) => e === this.name
           );
           let oldElement: [
             z.infer<typeof entityRoutes[P]["request"]>["sorting"][number][0],

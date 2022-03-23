@@ -350,6 +350,7 @@ export const routes = {
   "/api/v1/choices": {
     request: baseQuery(rawChoiceNullable.merge(rawProjectSchema), z.array(z.union([
      z.tuple([z.literal("id" as const), z.enum(["ASC", "DESC"] as const)]),
+     z.tuple([z.literal("title" as const), z.enum(["ASC", "DESC"] as const)]),
      z.tuple([z.literal("rank" as const), z.enum(["ASC", "DESC"] as const)]),
     ]))),
     response: z

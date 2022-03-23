@@ -90,7 +90,7 @@ export async function fetchData<R extends keyof typeof entityRoutes>(
           password_hash: "nulls-first",
         },*/
 ): Promise<[OutgoingHttpHeaders, ResponseType<R>]> {
-  //const entitySchema: entitiesType[R] = entityRoutes[path];
+  // @ts-expect-error bruh
   let sorting: Array<entitiesType4[R]> = query.sorting;
 
   if (
@@ -101,10 +101,13 @@ export async function fetchData<R extends keyof typeof entityRoutes>(
 
   const orderByQuery = sorting
     .flatMap((v) =>  {
+      // @ts-expect-error bruh
       const v0: entitiesType6[R] = v[0];
+      // @ts-expect-error bruh
       const v1: entitiesType2[R][typeof v0] = v[1];
       return [
         sql`,`,
+        // @ts-expect-error bruh
         sql`${orderByQueries[v0](v1, query.paginationCursor)} ${unsafe2(v[1])}`,
     ]})
     .slice(1)
