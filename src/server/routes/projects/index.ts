@@ -110,7 +110,6 @@ export const projectsHandler = requestHandler(
         }
              AND info  LIKE ${"%" + (query.filters.info ?? "") + "%"}`;
       },
-      {},
       {
         id: () => sql`id`,
         title: () => sql`title`,

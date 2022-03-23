@@ -110,7 +110,7 @@ export const choicesHandler = requestHandler(
              AND info LIKE ${"%" + (query.filters.info ?? "") + "%"}`;
       },
       {
-        rank: "largest",
+        rank: (q) => sql`rank ASC`,
       }
     );
   }

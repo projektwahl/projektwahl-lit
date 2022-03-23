@@ -108,7 +108,6 @@ export const usersHandler = requestHandler(
             query.filters.type ?? null
           })`;
         },
-        {},
         {
           id: () => sql`id`,
           type: () => sql`type`,
