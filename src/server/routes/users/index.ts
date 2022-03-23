@@ -112,6 +112,8 @@ export const usersHandler = requestHandler(
           id: (q, o) => sql`id ${o === "backwards" ? (q === "ASC" ? "DESC" : "ASC") : q}`,
           type: (q, o) => sql`type ${o === "backwards" ? (q === "ASC" ? "DESC" : "ASC") : q}`,
           username: (q, o) => sql`username ${o === "backwards" ? (q === "ASC" ? "DESC" : "ASC") : q}`,
+          force_in_project_id_eq: (q, o) => sql`(users_with_deleted.project_leader_id IS NOT DISTINCT FROM ${q})`,
+        project_leader_id_eq: (q, o) => sql`(users_with_deleted.project_leader_id IS NOT DISTINCT FROM ${q})`
         }
       );
     return ret;

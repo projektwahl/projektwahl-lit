@@ -112,6 +112,7 @@ export const choicesHandler = requestHandler(
       {
         // TODO FIXME nulls first/last
         rank: (q, o) => sql`rank ${o === "backwards" ? (q === "ASC" ? "DESC" : "ASC") : q}`,
+        title: (q, o) => sql`id ${o === "backwards" ? (q === "ASC" ? "DESC" : "ASC") : q}`,
         id: (q, o) => sql`id ${o === "backwards" ? (q === "ASC" ? "DESC" : "ASC") : q}`,
       }
     );

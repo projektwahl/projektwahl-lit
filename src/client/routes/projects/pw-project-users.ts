@@ -81,7 +81,7 @@ export const PwProjectUsers = setupHmr(
               ${pwOrder({
                 url: "/api/v1/users",
                 refreshEntityList: () => this._task.run(),
-                name: this.name,
+                name: `${this.name}_eq`,
                 prefix: this.prefix,
                 title: "",
               })}
