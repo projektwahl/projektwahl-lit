@@ -20,7 +20,7 @@ https://github.com/projektwahl/projektwahl-lit
 SPDX-License-Identifier: AGPL-3.0-or-later
 SPDX-FileCopyrightText: 2021 Moritz Hedtke <Moritz.Hedtke@t-online.de>
 */
-import { z, ZodIssue, ZodObject, ZodTypeAny } from "zod";
+import { z, ZodArray, ZodIssue, ZodObject, ZodType, ZodTypeAny } from "zod";
 import { result } from "./result.js";
 
 export const rawChoice = z
@@ -149,13 +149,12 @@ const project = rawProjectSchema.pick({
 });
 
 const baseQuery = <
-  T extends { [k: string]: ZodTypeAny },
-  U extends string,
-  SK extends Readonly<[U, ...U[]]>,
+  T1 extends { [k: string]: ZodTypeAny },
+  T2 extends ZodTypeAny,
   UnknownKeys extends UnknownKeysParam = "strip",
   Catchall extends ZodTypeAny = ZodTypeAny,
 >(
-  s: ZodObject<T, UnknownKeys, Catchall>, sortingKeys: SK
+  s: ZodObject<T1, UnknownKeys, Catchall>, sorting: ZodArray<T2>
 ) => {
   return z
     .object({
@@ -164,16 +163,7 @@ const baseQuery = <
         .default("forwards"),
       paginationCursor: s.partial().nullish(), // if this is null the start is at start/end depending on paginationDirection
       filters: s.partial(),
-      sorting: z
-        .array(
-          z.tuple([
-            z.enum<U, SK>(
-              sortingKeys
-            ),
-            z.enum(["ASC", "DESC"]),
-          ])
-        )
-        .default([]),
+      sorting: sorting,
       paginationLimit: z.number().default(10),
     })
     .strict();
@@ -328,7 +318,11 @@ export const routes = {
     response: z.object({}).extend({ id: z.number() }).strict(),
   },
   "/api/v1/users": {
-    request: baseQuery(rawUserSchema, ["id", "username", "type"]),
+    request: baseQuery(rawUserSchema, z.array(z.union([
+      z.tuple([z.literal("id" as const), z.enum(["ASC", "DESC"] as const)]),
+      z.tuple([z.literal("username" as const), z.enum(["ASC", "DESC"] as const)]),
+      z.tuple([z.literal("type" as const), z.enum(["ASC", "DESC"] as const)]),
+    ]))),
     response: z
       .object({
         entities: z.array(users(rawUserSchema)),
@@ -338,7 +332,13 @@ export const routes = {
       .strict(),
   },
   "/api/v1/projects": {
-    request: baseQuery(rawProjectSchema, ["id", "title", "info", "project_leader_id_eq", "force_in_project_eq"]),
+    request: baseQuery(rawProjectSchema, z.array(z.union([
+      z.tuple([z.literal("id" as const), z.enum(["ASC", "DESC"] as const)]),
+      z.tuple([z.literal("title" as const), z.enum(["ASC", "DESC"] as const)]),
+      z.tuple([z.literal("info" as const), z.enum(["ASC", "DESC"] as const)]),
+      z.tuple([z.literal("project_leader_id_eq" as const), z.number()]),
+      z.tuple([z.literal("force_in_project_eq" as const), z.number()]),
+     ]))),
     response: z
       .object({
         entities: z.array(project),
@@ -348,7 +348,10 @@ export const routes = {
       .strict(),
   },
   "/api/v1/choices": {
-    request: baseQuery(rawChoiceNullable.merge(rawProjectSchema), ["rank"]),
+    request: baseQuery(rawChoiceNullable.merge(rawProjectSchema), z.array(z.union([
+     z.tuple([z.literal("id" as const), z.enum(["ASC", "DESC"] as const)]),
+     z.tuple([z.literal("rank" as const), z.enum(["ASC", "DESC"] as const)]),
+    ]))),
     response: z
       .object({
         entities: z.array(choices),
