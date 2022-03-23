@@ -114,7 +114,7 @@ export async function fetchData<R extends keyof typeof entityRoutes>(
       return [
         sql`,`,
         // @ts-expect-error bruh
-        sql`${orderByQueries[v0](v1, query.paginationCursor)} ${unsafe2(v[1])}`,
+        sql`${orderByQueries[v0](v1, query.paginationCursor)}`,
     ]})
     .slice(1)
     .reduce((prev, curr) => sql`${prev}${curr}`);

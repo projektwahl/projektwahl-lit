@@ -115,37 +115,34 @@ export class PwOrder<
             this.history.url
           );
 
-          if (!data[this.prefix]["sorting"]) {
-            data[this.prefix]["sorting"] = [];
-          }
-
           const oldElementIndex = data[this.prefix]["sorting"].findIndex(
             ([e]) => e === this.name
           );
-          let oldElement: z.infer<typeof entityRoutes[P]["request"]>["sorting"][number] = data[this.prefix]["sorting"].splice(
-            oldElementIndex,
-            1
-          )[0];
-          let newElement: "ASC" | "DESC" | null;
-          switch (oldElement[1]) {
+          let oldElement: [z.infer<typeof entityRoutes[P]["request"]>["sorting"][number][0], null|z.infer<typeof entityRoutes[P]["request"]>["sorting"][number][1], z.infer<typeof entityRoutes[P]["request"]>["sorting"][number][2]];
+          
+          if (oldElementIndex !== -1) {
+            oldElement = data[this.prefix]["sorting"].splice(
+              oldElementIndex,
+              1
+            )[0];
+          } else {
+            oldElement = [this.name, null, this.value];
+          }
+          switch (oldElement?.[1]) {
             case "DESC":
-              newElement = null;
+              oldElement[1] = null;
               break;
             case "ASC":
-              newElement = "DESC";
+              oldElement[1] = "DESC";
               break;
             default:
-              newElement = "ASC";
+              oldElement[1] = "ASC";
           }
-
-          // @ts-expect-error mapped types probably needed
-          const a: z.infer<typeof entityRoutes[P]["request"]>["sorting"] =
-            newElement !== null ? [[oldElement[0], newElement, oldElement[2]]] : [];
 
           // @ts-expect-error mapped types probably needed
           data[this.prefix]["sorting"] = [
             ...data[this.prefix]["sorting"],
-            ...a,
+            ...(oldElement[1] ? oldElement : []),
           ];
 
           HistoryController.goto(

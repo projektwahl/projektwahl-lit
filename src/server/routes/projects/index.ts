@@ -111,9 +111,9 @@ export const projectsHandler = requestHandler(
              AND info  LIKE ${"%" + (query.filters.info ?? "") + "%"}`;
       },
       {
-        id: (q, o) => sql`id ${o === "backwards" ? (q === "ASC" ? "DESC" : "ASC") : q}`,
-        title: (q, o) => sql`title ${o === "backwards" ? (q === "ASC" ? "DESC" : "ASC") : q}`,
-        info: (q, o) => sql`info ${o === "backwards" ? (q === "ASC" ? "DESC" : "ASC") : q}`,
+        id: (q, o) => sql`id ${sql.unsafe(o === "backwards" ? (q === "ASC" ? "DESC" : "ASC") : (q === "ASC" ? "ASC" : "DESC"))}`,
+        title: (q, o) => sql`title ${sql.unsafe(o === "backwards" ? (q === "ASC" ? "DESC" : "ASC") : (q === "ASC" ? "ASC" : "DESC"))}`,
+        info: (q, o) => sql`info ${sql.unsafe(o === "backwards" ? (q === "ASC" ? "DESC" : "ASC") : (q === "ASC" ? "ASC" : "DESC"))}`,
       }
     );
   }
