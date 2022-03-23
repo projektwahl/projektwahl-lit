@@ -25,7 +25,7 @@ import { bootstrapCss } from "../index.js";
 import { HistoryController } from "../history-controller.js";
 import { msg, str } from "@lit/localize";
 import type { entityRoutes } from "../../lib/routes.js";
-import type { z } from "zod";
+import { z } from "zod";
 import { parseRequestWithPrefix } from "./pw-entitylist.js";
 import { PwElement } from "../pw-element.js";
 
@@ -126,7 +126,7 @@ export class PwOrder<
               1
             )[0];
           } else {
-            oldElement = [this.name, null, this.value];
+            oldElement = this.value ? [this.name, null, this.value] : [this.name, null];
           }
           switch (oldElement?.[1]) {
             case "DESC":
@@ -142,7 +142,7 @@ export class PwOrder<
           // @ts-expect-error mapped types probably needed
           data[this.prefix]["sorting"] = [
             ...data[this.prefix]["sorting"],
-            ...(oldElement[1] ? oldElement : []),
+            ...(oldElement[1] ? [oldElement] : []),
           ];
 
           HistoryController.goto(

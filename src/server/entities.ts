@@ -74,6 +74,10 @@ type entitiesType7 = {
   [K in keyof typeof entityRoutes]: entitiesType4[K][1];
 };
 
+type entitiesType10 = {
+  [K in keyof typeof entityRoutes]: entitiesType4[K][2];
+};
+
 type MappedId<T> = {
   [P in keyof T]: T[P];
 };
@@ -111,10 +115,11 @@ export async function fetchData<R extends keyof typeof entityRoutes>(
       const v0: entitiesType6[R] = v[0];
       // @ts-expect-error bruh
       const v1: entitiesType2[R][typeof v0] = v[1];
+      const v2: entitiesType10[R] = v[2];
       return [
         sql`,`,
         // @ts-expect-error bruh
-        sql`${orderByQueries[v0](v1, query.paginationCursor)}`,
+        sql`${orderByQueries[v0](v1, query.paginationCursor, v2)}`,
     ]})
     .slice(1)
     .reduce((prev, curr) => sql`${prev}${curr}`);

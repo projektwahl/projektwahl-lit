@@ -112,7 +112,7 @@ export const usersHandler = requestHandler(
           id: (q, o) => sql`id ${sql.unsafe(o === "backwards" ? (q === "ASC" ? "DESC" : "ASC") : (q === "ASC" ? "ASC" : "DESC"))}`,
           type: (q, o) => sql`type ${sql.unsafe(o === "backwards" ? (q === "ASC" ? "DESC" : "ASC") : (q === "ASC" ? "ASC" : "DESC"))}`,
           username: (q, o) => sql`username ${sql.unsafe(o === "backwards" ? (q === "ASC" ? "DESC" : "ASC") : (q === "ASC" ? "ASC" : "DESC"))}`,
-          force_in_project_id_eq: (q, o, v) => sql`(users_with_deleted.project_leader_id IS NOT DISTINCT FROM ${v ?? null}) ${sql.unsafe(o === "backwards" ? (q === "ASC" ? "DESC" : "ASC") : (q === "ASC" ? "ASC" : "DESC"))}`,
+          force_in_project_id_eq: (q, o, v) => sql`(users_with_deleted.force_in_project_id IS NOT DISTINCT FROM ${v ?? null}) ${sql.unsafe(o === "backwards" ? (q === "ASC" ? "DESC" : "ASC") : (q === "ASC" ? "ASC" : "DESC"))}`,
         project_leader_id_eq: (q, o, v) => sql`(users_with_deleted.project_leader_id IS NOT DISTINCT FROM ${v ?? null}) ${sql.unsafe(o === "backwards" ? (q === "ASC" ? "DESC" : "ASC") : (q === "ASC" ? "ASC" : "DESC"))}`
         }
       );
