@@ -18,6 +18,10 @@
   <source>Some errors occurred!</source>
   <target>Einige Fehler sind aufgetreten!</target>
 </trans-unit>
+<trans-unit id="s49730f3d5751a433">
+  <source>Loading...</source>
+  <target>Wird geladen...</target>
+</trans-unit>
 <trans-unit id="s01dc5a60edf9e053">
   <source>component not fully initialized</source>
   <target>Komponente nicht vollständig initialisiert</target>
@@ -40,10 +44,6 @@
 </trans-unit>
 <trans-unit id="s0a8c18046fb2a0f6">
   <source>Third-party login</source>
-</trans-unit>
-<trans-unit id="s49730f3d5751a433">
-  <source>Loading...</source>
-  <target>Wird geladen...</target>
 </trans-unit>
 <trans-unit id="sc8da3cc71de63832">
   <source>Login</source>

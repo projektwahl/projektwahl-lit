@@ -30,7 +30,7 @@ jobs:
       - run: cp dangerous-package.json package.json
       - run: npm ci
       - run: npm run format:check
-      - run: ./node_modules/@dev.mohe/argon2/build.sh /opt/hostedtoolcache/node/16.14.0/x64/include/node
+      - run: ./node_modules/@dev.mohe/argon2/build.sh /opt/hostedtoolcache/node/$(node -v | cut -c2-)/x64/include/node
       - run: npm run build
       - run: npm run typecheck
       - run: npm run localize-extract

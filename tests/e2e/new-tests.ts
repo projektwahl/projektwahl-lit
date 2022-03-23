@@ -93,12 +93,27 @@ class FormTester {
     );
 
     await this.helper.click(submitButton);
+
+    const loadingIndicator = await this.helper.driver.wait(
+      until.elementLocated(By.css(".spinner-grow")),
+      1000,
+      "spinner 1"
+    );
+    await this.helper.driver.wait(
+      until.stalenessOf(loadingIndicator),
+      1000,
+      "loading indicator 1"
+    );
   }
 
   async submitSuccess() {
     await this.submit();
 
-    await this.helper.driver.wait(until.stalenessOf(this.form), 1000);
+    await this.helper.driver.wait(
+      until.stalenessOf(this.form),
+      1000,
+      "form submit expected stale"
+    );
   }
 
   async submitFailure() {
@@ -107,7 +122,7 @@ class FormTester {
     const alert = await this.helper.driver.wait(
       until.elementLocated(By.css('div[class="alert alert-danger"]')),
       1000,
-      "Expected submit failure"
+      "Expected submit failure 1"
     );
 
     assert.match(await alert.getText(), /Some errors occurred./);
@@ -198,6 +213,15 @@ async function runTest(testFunction: (helper: Helper) => Promise<void>) {
   await driver.manage().window().setRect({
     width: 500,
     height: 1000,
+  });
+
+  // @ts-expect-error wrong typings2
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-call
+  await driver.setNetworkConditions({
+    offline: false,
+    latency: 100, // Additional latency (ms).
+    download_throughput: 0, // Maximal aggregated download throughput.
+    upload_throughput: 0, // Maximal aggregated upload throughput.
   });
 
   try {
@@ -395,23 +419,19 @@ async function createUserAllFields(helper: Helper) {
 
   form = await helper.form("pw-users");
 
-  // @ts-expect-error wrong typings2
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-call
-  await helper.driver.setNetworkConditions({
-    offline: false,
-    latency: 100, // Additional latency (ms).
-    download_throughput: 50 * 1024, // Maximal aggregated download throughput.
-    upload_throughput: 50 * 1024, // Maximal aggregated upload throughput.
-  });
-
   await form.setField("filters,id", id);
   await form.setField("filters,username", username2);
 
   const loadingIndicator = await helper.driver.wait(
     until.elementLocated(By.css(".spinner-grow")),
-    1000
+    1000,
+    "spinner 2"
   );
-  await helper.driver.wait(until.stalenessOf(loadingIndicator));
+  await helper.driver.wait(
+    until.stalenessOf(loadingIndicator),
+    1000,
+    "loading indicator 1"
+  );
 
   // click view button
   await helper.click(await helper.driver.findElement(By.css(`td p a`)));
@@ -424,7 +444,7 @@ async function createUserAllFields(helper: Helper) {
   assert.equal((await form.getCheckboxField("0,away")) === "true", away);
   assert.equal((await form.getCheckboxField("0,deleted")) === "true", deleted);
 
-  //await helper.driver.sleep(100000)
+  //await helper.driver.sleep(1000)
 }
 
 async function createProjectAllFields(helper: Helper) {
@@ -445,7 +465,7 @@ async function createProjectAllFields(helper: Helper) {
   const min_age = Math.floor(Math.random() * 10);
   const max_age = Math.floor(Math.random() * 10);
   const min_participants = Math.floor(Math.random() * 10) + 1;
-  const max_participants = Math.floor(Math.random() * 10);
+  const max_participants = Math.floor(Math.random() * 10) + 1;
   const random_assignments = Math.random() > 0.5 ? true : false;
   const deleted = Math.random() > 0.5 ? true : false;
   await form.setField("title", title);
@@ -488,23 +508,19 @@ async function createProjectAllFields(helper: Helper) {
 
   form = await helper.form("pw-projects");
 
-  // @ts-expect-error wrong typings
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-call
-  await helper.driver.setNetworkConditions({
-    offline: false,
-    latency: 100, // Additional latency (ms).
-    download_throughput: 50 * 1024, // Maximal aggregated download throughput.
-    upload_throughput: 50 * 1024, // Maximal aggregated upload throughput.
-  });
-
   await form.setField("filters,id", id);
   await form.setField("filters,title", title2);
 
   const loadingIndicator = await helper.driver.wait(
     until.elementLocated(By.css(".spinner-grow")),
-    1000
+    1000,
+    "spinner 3"
   );
-  await helper.driver.wait(until.stalenessOf(loadingIndicator));
+  await helper.driver.wait(
+    until.stalenessOf(loadingIndicator),
+    1000,
+    "loading indicator 2"
+  );
 
   // click view button
   await helper.click(await helper.driver.findElement(By.css(`td p a`)));
@@ -531,7 +547,7 @@ async function checkNotLoggedInUsers(helper: Helper) {
   const alert = await helper.driver.wait(
     until.elementLocated(By.css('div[class="alert alert-danger"]')),
     1000,
-    "Expected submit failure"
+    "Expected submit failure 2"
   );
 
   assert.match(await alert.getText(), /Nicht angemeldet!/);
@@ -543,7 +559,7 @@ async function checkNotLoggedInProjects(helper: Helper) {
   const alert = await helper.driver.wait(
     until.elementLocated(By.css('div[class="alert alert-danger"]')),
     1000,
-    "Expected submit failure"
+    "Expected submit failure 3"
   );
 
   assert.match(await alert.getText(), /Nicht angemeldet!/);
