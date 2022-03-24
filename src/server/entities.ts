@@ -128,7 +128,7 @@ export async function fetchData<R extends keyof typeof entityRoutes>(
   let sorting: entitiesType15[R] = mappedIndexing(query, "sorting");
 
   if (!sorting.find((e) => e[0] == "id")) {
-    sorting.push(["id", "ASC"]);
+    sorting.push(["id", "ASC", null]);
   }
 
   const orderByQuery = sorting
