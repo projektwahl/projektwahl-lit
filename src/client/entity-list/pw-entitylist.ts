@@ -69,11 +69,11 @@ export const parseRequestWithPrefix = <
     // @ts-expect-error wrong typings I assume
     .setKey(prefix, entityRoutes[apiUrl]["request"].default({ filters: {} }))
     .passthrough();
-  const data: parseRequestWithPrefixType<PREFIX>[P] = mappedFunctionCall(schema, v => v.parse(
+  const data: parseRequestWithPrefixType<PREFIX>[P] = mappedFunctionCall(schema, 
     JSON.parse(
       decodeURIComponent(url.search == "" ? "{}" : url.search.substring(1))
     )
-  ));
+  );
   /*const a: z.infer<z.ZodObject<{[k in PREFIX]: typeof entityRoutes[P]["request"]}, "strict", z.ZodTypeAny, {[k in PREFIX]:  z.infer<typeof entityRoutes[P]["request"]>}, Record<string, unknown>>>[PREFIX] = data[prefix];
   const b: z.infer<typeof entityRoutes[P]["request"]> = a;*/
   return data;
