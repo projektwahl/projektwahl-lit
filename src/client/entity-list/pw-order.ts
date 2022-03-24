@@ -28,7 +28,7 @@ import { entityRoutes } from "../../lib/routes.js";
 import type { z } from "zod";
 import { parseRequestWithPrefix, parseRequestWithPrefixType } from "./pw-entitylist.js";
 import { PwElement } from "../pw-element.js";
-import { mappedIndexing } from '../../lib/result.js'
+import { mappedIndexing, mappedTuple } from '../../lib/result.js'
 
 type entitiesType0 = {
   [K in keyof typeof entityRoutes]: z.infer<typeof entityRoutes[K]["request"]>;
@@ -164,7 +164,7 @@ export class PwOrder<
               case "ASC":
                 //sorting.push([theName, "DESC", theValue])
 
-                const adding: entitiesType4[P] = [theName, "DESC", theValue]
+                const adding: entitiesType4[P] = mappedTuple(theName, "DESC", theValue)
 
                 sorting = [
                   ...sorting,

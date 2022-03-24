@@ -76,6 +76,23 @@ export function mappedIndexing<
   return value[index];
 }
 
+export type ToTuple<
+K extends string|symbol|number,
+T extends { [key in K]: any },
+Q extends { [key in K]: any },
+R extends { [key in K]: any }> = {
+  [key in K]: [T[key], Q[key], R[key]];
+};
+
+export function mappedTuple<
+K extends string|number|symbol,
+T extends { [key in K]: any },
+Q extends { [key in K]: any },
+R extends { [key in K]: any }
+>(value1: T[K], value2: Q[K], value3: R[K]): ToTuple<K, T, Q, R>[K] {
+  return [value1, value2, value3];
+}
+
 export function testa<Output>(zodtype: ZodType<Output>, data: unknown): Output {
   return zodtype.parse(data)
 }
