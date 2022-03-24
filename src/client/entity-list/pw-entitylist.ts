@@ -390,13 +390,13 @@ export class PwEntityList<
                         );
 
                         if (!data[this.prefix]) {
-                          data[this.prefix] = {
+                          mappedIndexingSet(data, this.prefix, {
                             filters: {},
                             paginationDirection: "forwards",
                             paginationLimit: 100,
                             sorting: [],
                             paginationCursor: null,
-                          };
+                          });
                         }
                         if (this._task.value?.success) {
                           data[this.prefix].paginationCursor =

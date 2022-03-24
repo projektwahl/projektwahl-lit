@@ -79,7 +79,7 @@ class PwProjects<X extends string> extends PwEntityList<"/api/v1/projects", X> {
               name: "id",
               prefix: this.prefix,
               title: msg("ID"),
-              value: undefined,
+              value: null,
             })}
           </th>
 
@@ -90,7 +90,7 @@ class PwProjects<X extends string> extends PwEntityList<"/api/v1/projects", X> {
               name: "title",
               prefix: this.prefix,
               title: msg("Title"),
-              value: undefined,
+              value: null,
             })}
           </th>
 
@@ -101,7 +101,7 @@ class PwProjects<X extends string> extends PwEntityList<"/api/v1/projects", X> {
               name: "info",
               prefix: this.prefix,
               title: msg("Info"),
-              value: undefined,
+              value: null,
             })}
           </th>
 
