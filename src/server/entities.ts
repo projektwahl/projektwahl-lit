@@ -26,7 +26,7 @@ import type { z } from "zod";
 import type { entityRoutes, ResponseType } from "../lib/routes.js";
 import { sql } from "./database.js";
 import { unsafe2 } from "./sql/index.js";
-import { mappedIndexing } from '../lib/result.js'
+import { mappedIndexing } from "../lib/result.js";
 
 // Mapped Types
 // https://www.typescriptlang.org/docs/handbook/2/mapped-types.html

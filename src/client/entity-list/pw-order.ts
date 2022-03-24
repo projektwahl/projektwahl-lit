@@ -26,25 +26,34 @@ import { HistoryController } from "../history-controller.js";
 import { msg, str } from "@lit/localize";
 import type { entityRoutes } from "../../lib/routes.js";
 import type { z } from "zod";
-import { parseRequestWithPrefix, parseRequestWithPrefixType } from "./pw-entitylist.js";
+import {
+  parseRequestWithPrefix,
+  parseRequestWithPrefixType,
+} from "./pw-entitylist.js";
 import { PwElement } from "../pw-element.js";
-import { mappedIndexing, mappedTuple } from '../../lib/result.js'
+import { mappedIndexing, mappedTuple } from "../../lib/result.js";
 
 type entitiesType0 = {
   [P in keyof typeof entityRoutes]: z.infer<typeof entityRoutes[P]["request"]>;
 };
 
 type entitiesType1 = {
-  [P in keyof typeof entityRoutes]: z.infer<typeof entityRoutes[P]["request"]>["sorting"][number][0]
-}
+  [P in keyof typeof entityRoutes]: z.infer<
+    typeof entityRoutes[P]["request"]
+  >["sorting"][number][0];
+};
 
 type entitiesType15 = {
-  [P in keyof typeof entityRoutes]: z.infer<typeof entityRoutes[P]["request"]>["sorting"][number][1]
-}
+  [P in keyof typeof entityRoutes]: z.infer<
+    typeof entityRoutes[P]["request"]
+  >["sorting"][number][1];
+};
 
 type entitiesType2 = {
-  [P in keyof typeof entityRoutes]: z.infer<typeof entityRoutes[P]["request"]>["sorting"][number][2]
-}
+  [P in keyof typeof entityRoutes]: z.infer<
+    typeof entityRoutes[P]["request"]
+  >["sorting"][number][2];
+};
 
 type entitiesType3 = {
   [P in keyof typeof entityRoutes]: Array<
@@ -53,8 +62,9 @@ type entitiesType3 = {
 };
 
 type entitiesType4 = {
-  [P in keyof typeof entityRoutes]: 
-    z.infer<typeof entityRoutes[P]["request"]>["sorting"][number];
+  [P in keyof typeof entityRoutes]: z.infer<
+    typeof entityRoutes[P]["request"]
+  >["sorting"][number];
 };
 
 // workaround see https://github.com/runem/lit-analyzer/issues/149#issuecomment-1006162839
@@ -137,28 +147,26 @@ export class PwOrder<
       <button
         @click=${async () => {
           // TODO FIXME put this into the history implementation?
-          const data: parseRequestWithPrefixType<X>[P]  = parseRequestWithPrefix(
+          const data: parseRequestWithPrefixType<X>[P] = parseRequestWithPrefix(
             this.url,
             this.prefix,
             this.history.url
           );
 
-          const actualData: entitiesType0[P] = mappedIndexing(data, this.prefix);
+          const actualData: entitiesType0[P] = mappedIndexing(
+            data,
+            this.prefix
+          );
 
           let sorting: entitiesType3[P] = mappedIndexing(actualData, "sorting");
-          
-          const oldElementIndex = sorting.findIndex(
-            ([e]) => e === this.name
-          );
+
+          const oldElementIndex = sorting.findIndex(([e]) => e === this.name);
 
           if (oldElementIndex !== -1) {
             // splice REMOVES the elements from the original array
             let oldElement: z.infer<
               typeof entityRoutes[P]["request"]
-            >["sorting"][number] = sorting.splice(
-              oldElementIndex,
-              1
-            )[0];
+            >["sorting"][number] = sorting.splice(oldElementIndex, 1)[0];
 
             const theName: entitiesType1[P] = this.name;
             const theValue: entitiesType2[P] = this.value;
@@ -168,21 +176,31 @@ export class PwOrder<
                 break;
               case "ASC":
                 //sorting.push([theName, "DESC", theValue])
-                const adding = mappedTuple<P, entitiesType1, entitiesType15, entitiesType2>(this.url, theName, "DESC", theValue)
+                const adding = mappedTuple<
+                  P,
+                  entitiesType1,
+                  entitiesType15,
+                  entitiesType2
+                >(this.url, theName, "DESC", theValue);
 
                 // @ts-expect-error bruh
-                const adding2: entitiesType4[P] = adding
+                const adding2: entitiesType4[P] = adding;
 
-                sorting.push(adding2)
+                sorting.push(adding2);
                 break;
             }
           } else {
-            const adding = mappedTuple<P, entitiesType1, entitiesType15, entitiesType2>(this.url, this.name, "ASC", this.value)
+            const adding = mappedTuple<
+              P,
+              entitiesType1,
+              entitiesType15,
+              entitiesType2
+            >(this.url, this.name, "ASC", this.value);
 
             // @ts-expect-error bruh
-            const adding2: entitiesType4[P] = adding
+            const adding2: entitiesType4[P] = adding;
 
-            sorting.push(adding2)
+            sorting.push(adding2);
           }
 
           HistoryController.goto(

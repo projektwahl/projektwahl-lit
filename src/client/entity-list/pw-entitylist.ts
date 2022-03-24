@@ -32,7 +32,11 @@ import { msg } from "@lit/localize";
 import { ifDefined } from "lit/directives/if-defined.js";
 import { myFetch } from "../utils.js";
 import { pwInputSelect } from "../form/pw-input-select.js";
-import { mappedFunctionCall, mappedIndexing, mappedIndexingSet } from "../../lib/result.js";
+import {
+  mappedFunctionCall,
+  mappedIndexing,
+  mappedIndexingSet,
+} from "../../lib/result.js";
 
 type entitiesType0 = {
   [P in keyof typeof entityRoutes]: z.infer<typeof entityRoutes[P]["request"]>;
@@ -47,18 +51,18 @@ export type parseRequestWithPrefixType<PREFIX extends string> = {
       { [k in PREFIX]: z.infer<typeof entityRoutes[P]["request"]> },
       Record<string, unknown>
     >
-  >
-}
+  >;
+};
 
 export type parseRequestWithPrefixSchemaType<PREFIX extends string> = {
   [P in keyof typeof entityRoutes]: z.ZodObject<
-  { [k in PREFIX]: typeof entityRoutes[P]["request"] },
-  "passthrough",
-  z.ZodTypeAny,
-  { [k in PREFIX]: z.infer<typeof entityRoutes[P]["request"]> },
-  Record<string, unknown>
->
-}
+    { [k in PREFIX]: typeof entityRoutes[P]["request"] },
+    "passthrough",
+    z.ZodTypeAny,
+    { [k in PREFIX]: z.infer<typeof entityRoutes[P]["request"]> },
+    Record<string, unknown>
+  >;
+};
 
 export const parseRequestWithPrefix = <
   P extends keyof typeof entityRoutes,
@@ -73,7 +77,8 @@ export const parseRequestWithPrefix = <
     // @ts-expect-error wrong typings I assume
     .setKey(prefix, entityRoutes[apiUrl]["request"].default({ filters: {} }))
     .passthrough();
-  const data: parseRequestWithPrefixType<PREFIX>[P] = mappedFunctionCall(schema, 
+  const data: parseRequestWithPrefixType<PREFIX>[P] = mappedFunctionCall(
+    schema,
     JSON.parse(
       decodeURIComponent(url.search == "" ? "{}" : url.search.substring(1))
     )

@@ -81,34 +81,38 @@ export function mappedIndexingSet<
   K extends string,
   I extends string | number | symbol
 >(value: T[K], index: I, newValue: ToIndexed<T, I>[K]): void {
-  return value[index] = newValue;
+  return (value[index] = newValue);
 }
 
 export type ToTuple<
-K extends string|symbol|number,
-T extends { [key in K]: any },
-Q extends { [key in K]: any },
-R extends { [key in K]: any }> = {
+  K extends string | symbol | number,
+  T extends { [key in K]: any },
+  Q extends { [key in K]: any },
+  R extends { [key in K]: any }
+> = {
   [key in K]: [T[key], Q[key], R[key]];
 };
 
 export function mappedTuple<
-K extends string|number|symbol,
-T extends { [key in K]: any },
-Q extends { [key in K]: any },
-R extends { [key in K]: any }
+  K extends string | number | symbol,
+  T extends { [key in K]: any },
+  Q extends { [key in K]: any },
+  R extends { [key in K]: any }
 >(path: K, value1: T[K], value2: Q[K], value3: R[K]): ToTuple<K, T, Q, R>[K] {
   return [value1, value2, value3];
 }
 
 export function testa<Output>(zodtype: ZodType<Output>, data: unknown): Output {
-  return zodtype.parse(data)
+  return zodtype.parse(data);
 }
 
 export type MappedFunctionCallType<T extends { [K: string]: ZodType<any> }> = {
-  [K in keyof T]: T[K]["_output"]
-}
+  [K in keyof T]: T[K]["_output"];
+};
 
-export function mappedFunctionCall<T extends { [K: string]: ZodType<any> }, K extends string>(schema: T[K], value: unknown): MappedFunctionCallType<T>[K] {
+export function mappedFunctionCall<
+  T extends { [K: string]: ZodType<any> },
+  K extends string
+>(schema: T[K], value: unknown): MappedFunctionCallType<T>[K] {
   return testa(schema, value);
 }
