@@ -76,6 +76,7 @@ class PwChoices<X extends string> extends PwEntityList<"/api/v1/choices", X> {
               name: "id",
               prefix: this.prefix,
               title: msg("ID"),
+              value: null,
             })}
           </th>
 
@@ -86,6 +87,7 @@ class PwChoices<X extends string> extends PwEntityList<"/api/v1/choices", X> {
               name: "title",
               prefix: this.prefix,
               title: msg("Title"),
+              value: null,
             })}
           </th>
 
@@ -96,6 +98,7 @@ class PwChoices<X extends string> extends PwEntityList<"/api/v1/choices", X> {
               name: "rank",
               prefix: this.prefix,
               title: msg("Rank"),
+              value: null,
             })}
           </th>
         </tr>

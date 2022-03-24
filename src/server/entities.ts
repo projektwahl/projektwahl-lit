@@ -26,31 +26,80 @@ import type { z } from "zod";
 import type { entityRoutes, ResponseType } from "../lib/routes.js";
 import { sql } from "./database.js";
 import { unsafe2 } from "./sql/index.js";
+import { mappedFunctionCall2, mappedIndexing } from "../lib/result.js";
 
 // Mapped Types
 // https://www.typescriptlang.org/docs/handbook/2/mapped-types.html
 
-type entitesType = {
+type entitiesType = {
   [K in keyof typeof entityRoutes]: typeof entityRoutes[K];
 };
-/*
-type mappedInfer1<R extends keyof typeof entityRoutes> = {
-  [K in keyof z.infer<entitesType[R]["response"]>]: z.infer<
-    entitesType[R]["response"]
-  >[K];
-};
-*/
-type entitesType0 = {
+
+type entitiesType0 = {
   [K in keyof typeof entityRoutes]: z.infer<typeof entityRoutes[K]["request"]>;
+};
+
+type entitiesType1 = {
+  [K in keyof typeof entityRoutes]: z.infer<
+    typeof entityRoutes[K]["request"]
+  >["sorting"][number][0];
+};
+
+type entitiesType2 = {
+  [K in keyof typeof entityRoutes]: {
+    [R in z.infer<
+      typeof entityRoutes[K]["request"]
+    >["sorting"][number][0]]: z.infer<
+      typeof entityRoutes[K]["request"]
+    >["sorting"][number][1];
+  };
+};
+
+type entitiesType9 = {
+  [K in keyof typeof entityRoutes]: {
+    [R in z.infer<
+      typeof entityRoutes[K]["request"]
+    >["sorting"][number][0]]: z.infer<
+      typeof entityRoutes[K]["request"]
+    >["sorting"][number][2];
+  };
+};
+
+type entitiesType4 = {
+  [K in keyof typeof entityRoutes]: z.infer<
+    typeof entityRoutes[K]["request"]
+  >["sorting"][number];
+};
+
+type entitiesType15 = {
+  [K in keyof typeof entityRoutes]: Array<
+    z.infer<typeof entityRoutes[K]["request"]>["sorting"][number]
+  >;
+};
+
+type entitiesType6 = {
+  [K in keyof typeof entityRoutes]: entitiesType4[K][0];
+};
+
+type entitiesType10 = {
+  [K in keyof typeof entityRoutes]: entitiesType4[K][2];
+};
+
+type entitiesType8 = {
+  [K in keyof typeof entityRoutes]: {
+    [key in entitiesType1[K]]: (
+      order: entitiesType2[K][key],
+      paginationDirection: "forwards" | "backwards",
+      v: entitiesType9[K][key]
+    ) => PendingQuery<Row[]>;
+  };
 };
 
 export async function fetchData<R extends keyof typeof entityRoutes>(
   path: R,
-  query: entitesType0[R],
-  sqlQuery: (query: entitesType0[R]) => PendingQuery<Row[]>,
-  nullOrdering: {
-    [key: string]: "smallest" | "largest";
-  }
+  query: entitiesType0[R],
+  sqlQuery: (query: entitiesType0[R]) => PendingQuery<Row[]>,
+  orderByQueries: entitiesType8[R]
   /*{
           id: "nulls-first",
           type: "nulls-first",
@@ -58,91 +107,67 @@ export async function fetchData<R extends keyof typeof entityRoutes>(
           password_hash: "nulls-first",
         },*/
 ): Promise<[OutgoingHttpHeaders, ResponseType<R>]> {
-  //const entitySchema: entitesType[R] = entityRoutes[path];
+  const sorting: entitiesType15[R] = mappedIndexing(query, "sorting");
 
-  if (
-    // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
-    !(query.sorting as [string, "ASC" | "DESC"][]).find((e) => e[0] == "id")
-  ) {
-    query.sorting.push(["id", "ASC"]);
+  if (!sorting.find((e) => e[0] == "id")) {
+    sorting.push(["id", "ASC", null]);
   }
 
-  // orderBy needs to be reversed for backwards pagination
-  if (query.paginationDirection === "backwards") {
-    let s: z.infer<typeof entityRoutes[R]["request"]>["sorting"] =
-      query.sorting;
-    // @ts-expect-error mapped types?
-    s = s.map<z.infer<typeof entityRoutes[R]["request"]>["sorting"][number]>(
-      // @ts-expect-error mapped types?
-      (v: z.infer<typeof entityRoutes[R]["request"]>["sorting"][number]) => [
-        v[0],
-        v[1] === "ASC" ? "DESC" : "ASC",
-      ]
-    );
-    query.sorting = s;
-  }
-
-  const orderByQuery = query.sorting
-    .flatMap((v) => [
+  // TODO FIXME flatmap with the mappedfunctincall?
+  const orderByQuery = mappedFunctionCall2(sorting, (v: entitiesType4[R]) => {
+    const v0: entitiesType6[R] = mappedIndexing<entitiesType4, R, 0>(v, 0);
+    // @ts-expect-error bruh
+    const v1: entitiesType2[R][typeof v0] = mappedIndexing(v, 1);
+    const v2: entitiesType10[R] = mappedIndexing(v, 2);
+    return [
       sql`,`,
-      sql`${unsafe2(v[0])} ${unsafe2(v[1])} ${unsafe2(
-        v[1] === "ASC"
-          ? nullOrdering[v[0]] === "smallest"
-            ? "NULLS FIRST"
-            : "NULLS LAST"
-          : nullOrdering[v[0]] === "smallest"
-          ? "NULLS LAST"
-          : "NULLS FIRST"
-      )}`,
-    ])
+      // @ts-expect-error bruh
+      sql`${orderByQueries[v0](v1, query.paginationCursor, v2)}`,
+    ];
+  })
     .slice(1)
-    .reduce((prev, curr) => sql`${prev}${curr}`);
+    .reduce<PendingQuery<Row[]>>((prev, curr) => sql`${prev}${curr}`, sql``);
 
-  const paginationCursor: entitesType0[R]["paginationCursor"] =
+  const paginationCursor: entitiesType0[R]["paginationCursor"] =
     query.paginationCursor;
 
-  let finalQuery;
+  let sqlResult;
   if (!paginationCursor) {
-    finalQuery = sql`(${sqlQuery(query)} ORDER BY ${orderByQuery} LIMIT ${
-      query.paginationLimit + 1
-    })`;
+    sqlResult = await sql`${sql`(${sqlQuery(
+      query
+    )} ORDER BY ${orderByQuery} LIMIT ${query.paginationLimit + 1})`}`;
   } else {
-    const s: Array<
-      z.infer<typeof entityRoutes[R]["request"]>["sorting"][number]
-    > = query.sorting;
-    const queries = s.map(
-      (value: entitesType0[R]["sorting"][number], index) => {
-        const part = query.sorting.slice(0, index + 1);
+    const queries = sorting.map((value, index) => {
+      const part = sorting.slice(0, index + 1);
 
-        const parts = part
-          .flatMap((value, index) => {
-            return [
-              sql` AND `,
-              // @ts-expect-error this seems impossible to type - we probably need to unify this to the indexed type before
-              sql`${paginationCursor ? paginationCursor[value[0]] : null} ${
-                index === part.length - 1
-                  ? value[1] === "ASC"
-                    ? sql`<`
-                    : sql`>`
-                  : sql`IS NOT DISTINCT FROM`
-              } ${unsafe2(value[0] ?? null)}`,
-            ];
-          })
-          .slice(1)
-          .reduce((prev, curr) => sql`${prev}${curr}`);
+      const parts = part
+        .flatMap((value, index) => {
+          return [
+            sql` AND `,
+            // @ts-expect-error this seems impossible to type - we probably need to unify this to the indexed type before
+            sql`${paginationCursor ? paginationCursor[value[0]] : null} ${
+              index === part.length - 1
+                ? value[1] === "ASC"
+                  ? sql`<`
+                  : sql`>`
+                : sql`IS NOT DISTINCT FROM`
+            } ${unsafe2(value[0] ?? null)}`,
+          ];
+        })
+        .slice(1)
+        .reduce((prev, curr) => sql`${prev}${curr}`);
 
-        return sql`(${sqlQuery(
-          query
-        )} AND (${parts}) ORDER BY ${orderByQuery} LIMIT ${
-          query.paginationLimit + 1
-        })`;
-      }
-    );
+      return sql`(${sqlQuery(
+        query
+      )} AND (${parts}) ORDER BY ${orderByQuery} LIMIT ${
+        query.paginationLimit + 1
+      })`;
+    });
 
     if (queries.length == 1) {
-      finalQuery = queries[0];
+      sqlResult = await sql`queries[0]`;
     } else {
-      finalQuery = sql`${queries
+      sqlResult = await sql`${queries
         .flatMap((v) => [sql`\nUNION ALL\n`, v])
         .slice(1)
         .reduce((prev, curr) => sql`${prev}${curr}`)} LIMIT ${
@@ -154,16 +179,15 @@ export async function fetchData<R extends keyof typeof entityRoutes>(
   //const entitiesSchema = entitySchema["response"]["shape"]["entities"];
 
   // would be great to stream the results but they are post processed below
-  const sqlResult = await finalQuery;
 
-  let entities: z.infer<entitesType[R]["response"]>["entities"] =
+  let entities: z.infer<entitiesType[R]["response"]>["entities"] =
     // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
-    sqlResult as unknown as z.infer<entitesType[R]["response"]>["entities"];
+    sqlResult as unknown as z.infer<entitiesType[R]["response"]>["entities"];
 
   // https://github.com/projektwahl/projektwahl-sveltekit/blob/work/src/lib/list-entities.ts#L30
 
-  let nextCursor: z.infer<entitesType[R]["response"]>["nextCursor"] = null;
-  let previousCursor: z.infer<entitesType[R]["response"]>["previousCursor"] =
+  let nextCursor: z.infer<entitiesType[R]["response"]>["nextCursor"] = null;
+  let previousCursor: z.infer<entitiesType[R]["response"]>["previousCursor"] =
     null;
   // TODO FIXME also recalculate the other cursor because data could've been deleted in between / the filters have changed
   if (query.paginationDirection === "forwards") {

@@ -98,6 +98,7 @@ export class PwUsers<X extends string> extends PwEntityList<
               name: "id",
               prefix: this.prefix,
               title: msg("ID"),
+              value: null,
             })}
           </th>
 
@@ -108,6 +109,7 @@ export class PwUsers<X extends string> extends PwEntityList<
               name: "username",
               prefix: this.prefix,
               title: msg("Name"),
+              value: null,
             })}
           </th>
 
@@ -118,6 +120,7 @@ export class PwUsers<X extends string> extends PwEntityList<
               name: "type",
               prefix: this.prefix,
               title: msg("Type"),
+              value: null,
             })}
           </th>
 
@@ -230,8 +233,18 @@ export class PwUsers<X extends string> extends PwEntityList<
                 <td>
                   <p>
                     ${value.deleted
-                      ? html`<del>${value.type}</del>`
-                      : html`${value.type}`}
+                      ? html`<del
+                          >${value.type === "admin"
+                            ? msg("Admin")
+                            : value.type === "helper"
+                            ? msg("Lehrer")
+                            : msg("Schüler")}</del
+                        >`
+                      : html`${value.type === "admin"
+                          ? msg("Admin")
+                          : value.type === "helper"
+                          ? msg("Lehrer")
+                          : msg("Schüler")}`}
                   </p>
                 </td>
                 <td>

@@ -149,11 +149,13 @@ const project = rawProjectSchema.pick({
 });
 
 const baseQuery = <
-  T extends { [k: string]: ZodTypeAny },
+  T1 extends { [k: string]: ZodTypeAny },
+  T2 extends ZodTypeAny,
   UnknownKeys extends UnknownKeysParam = "strip",
   Catchall extends ZodTypeAny = ZodTypeAny
 >(
-  s: ZodObject<T, UnknownKeys, Catchall>
+  s: ZodObject<T1, UnknownKeys, Catchall>,
+  sorting: T2
 ) => {
   return z
     .object({
@@ -162,21 +164,7 @@ const baseQuery = <
         .default("forwards"),
       paginationCursor: s.partial().nullish(), // if this is null the start is at start/end depending on paginationDirection
       filters: s.partial(),
-      sorting: z
-        .array(
-          z.tuple([
-            z.enum(
-              // As we can't guarantee at least one element this probably will never be possible
-              // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
-              Object.keys(s.shape) as [
-                keyof T & string,
-                ...(keyof T & string)[]
-              ]
-            ),
-            z.enum(["ASC", "DESC"]),
-          ])
-        )
-        .default([]),
+      sorting: sorting,
       paginationLimit: z.number().default(10),
     })
     .strict();
@@ -331,7 +319,40 @@ export const routes = {
     response: z.object({}).extend({ id: z.number() }).strict(),
   },
   "/api/v1/users": {
-    request: baseQuery(rawUserSchema),
+    request: baseQuery(
+      rawUserSchema,
+      z
+        .array(
+          z.union([
+            z.tuple([
+              z.literal("id" as const),
+              z.enum(["ASC", "DESC"] as const),
+              z.null(),
+            ]),
+            z.tuple([
+              z.literal("username" as const),
+              z.enum(["ASC", "DESC"] as const),
+              z.null(),
+            ]),
+            z.tuple([
+              z.literal("type" as const),
+              z.enum(["ASC", "DESC"] as const),
+              z.null(),
+            ]),
+            z.tuple([
+              z.literal("project_leader_id_eq" as const),
+              z.enum(["ASC", "DESC"] as const),
+              z.number(),
+            ]),
+            z.tuple([
+              z.literal("force_in_project_id_eq" as const),
+              z.enum(["ASC", "DESC"] as const),
+              z.number(),
+            ]),
+          ])
+        )
+        .default([])
+    ),
     response: z
       .object({
         entities: z.array(users(rawUserSchema)),
@@ -341,7 +362,30 @@ export const routes = {
       .strict(),
   },
   "/api/v1/projects": {
-    request: baseQuery(rawProjectSchema),
+    request: baseQuery(
+      rawProjectSchema,
+      z
+        .array(
+          z.union([
+            z.tuple([
+              z.literal("id" as const),
+              z.enum(["ASC", "DESC"] as const),
+              z.null(),
+            ]),
+            z.tuple([
+              z.literal("title" as const),
+              z.enum(["ASC", "DESC"] as const),
+              z.null(),
+            ]),
+            z.tuple([
+              z.literal("info" as const),
+              z.enum(["ASC", "DESC"] as const),
+              z.null(),
+            ]),
+          ])
+        )
+        .default([])
+    ),
     response: z
       .object({
         entities: z.array(project),
@@ -351,7 +395,30 @@ export const routes = {
       .strict(),
   },
   "/api/v1/choices": {
-    request: baseQuery(rawChoiceNullable.merge(rawProjectSchema)),
+    request: baseQuery(
+      rawChoiceNullable.merge(rawProjectSchema),
+      z
+        .array(
+          z.union([
+            z.tuple([
+              z.literal("id" as const),
+              z.enum(["ASC", "DESC"] as const),
+              z.null(),
+            ]),
+            z.tuple([
+              z.literal("title" as const),
+              z.enum(["ASC", "DESC"] as const),
+              z.null(),
+            ]),
+            z.tuple([
+              z.literal("rank" as const),
+              z.enum(["ASC", "DESC"] as const),
+              z.null(),
+            ]),
+          ])
+        )
+        .default([])
+    ),
     response: z
       .object({
         entities: z.array(choices),

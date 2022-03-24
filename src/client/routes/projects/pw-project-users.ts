@@ -77,7 +77,16 @@ export const PwProjectUsers = setupHmr(
         const initial = data[this.prefix];
 
         return html`<tr>
-            <th class="table-cell-hover" scope="col">${msg(html`&#x2713;`)}</th>
+            <th class="table-cell-hover p-0" scope="col">
+              ${pwOrder({
+                url: "/api/v1/users",
+                refreshEntityList: () => this._task.run(),
+                name: `${this.name}_eq`,
+                prefix: this.prefix,
+                title: "",
+                value: this.projectId,
+              })}
+            </th>
 
             <th class="table-cell-hover p-0" scope="col">
               ${pwOrder({
@@ -86,6 +95,7 @@ export const PwProjectUsers = setupHmr(
                 name: "id",
                 prefix: this.prefix,
                 title: msg("ID"),
+                value: null,
               })}
             </th>
 
@@ -96,6 +106,7 @@ export const PwProjectUsers = setupHmr(
                 name: "username",
                 prefix: this.prefix,
                 title: msg("Name"),
+                value: null,
               })}
             </th>
 
@@ -106,6 +117,7 @@ export const PwProjectUsers = setupHmr(
                 name: "type",
                 prefix: this.prefix,
                 title: msg("Type"),
+                value: null,
               })}
             </th>
           </tr>
@@ -122,6 +134,7 @@ export const PwProjectUsers = setupHmr(
                 task: this._task,
                 type: "checkbox",
                 trueValue: true,
+                falseValue: false,
                 defaultValue: undefined,
                 initial: initial,
               })}

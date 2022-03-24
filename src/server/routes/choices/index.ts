@@ -110,7 +110,37 @@ export const choicesHandler = requestHandler(
              AND info LIKE ${"%" + (query.filters.info ?? "") + "%"}`;
       },
       {
-        rank: "largest",
+        // TODO FIXME nulls first/last
+        rank: (q, o) =>
+          sql`rank ${sql.unsafe(
+            o === "backwards"
+              ? q === "ASC"
+                ? "DESC"
+                : "ASC"
+              : q === "ASC"
+              ? "ASC"
+              : "DESC"
+          )}`,
+        title: (q, o) =>
+          sql`id ${sql.unsafe(
+            o === "backwards"
+              ? q === "ASC"
+                ? "DESC"
+                : "ASC"
+              : q === "ASC"
+              ? "ASC"
+              : "DESC"
+          )}`,
+        id: (q, o) =>
+          sql`id ${sql.unsafe(
+            o === "backwards"
+              ? q === "ASC"
+                ? "DESC"
+                : "ASC"
+              : q === "ASC"
+              ? "ASC"
+              : "DESC"
+          )}`,
       }
     );
   }

@@ -22,7 +22,7 @@ SPDX-FileCopyrightText: 2021 Moritz Hedtke <Moritz.Hedtke@t-online.de>
 */
 
 import { z, ZodObject, ZodType, ZodTypeAny, ZodTypeDef } from "zod";
-import type { UnknownKeysParam } from "./routes.js";
+import type { entityRoutes, UnknownKeysParam } from "./routes.js";
 
 export const successResult = <
   T extends { [k: string]: ZodTypeAny },
@@ -60,3 +60,78 @@ export const result = <
 >(
   s: ZodObject<T, UnknownKeys, Catchall>
 ) => z.union([successResult(s), failureResult(z.record(z.string()))]);
+
+export type ToIndexed<
+  T extends { [K: string]: { [inner in I]: unknown } },
+  I extends string | number | symbol
+> = {
+  [K in keyof T]: T[K][I];
+};
+
+export function mappedIndexing<
+  T extends { [K: string]: { [inner in I]: unknown } },
+  K extends string,
+  I extends string | number | symbol
+>(value: T[K], index: I): ToIndexed<T, I>[K] {
+  return value[index];
+}
+
+export function mappedIndexingSet<
+  T extends { [K: string]: { [inner in I]: unknown } },
+  K extends string,
+  I extends string | number | symbol
+>(value: T[K], index: I, newValue: ToIndexed<T, I>[K]): void {
+  value[index] = newValue;
+}
+
+export type ToTuple<
+  K extends string | symbol | number,
+  T extends { [key in K]: unknown },
+  Q extends { [key in K]: unknown },
+  R extends { [key in K]: unknown }
+> = {
+  [key in K]: [T[key], Q[key], R[key]];
+};
+
+export function mappedTuple<
+  K extends string | number | symbol,
+  T extends { [key in K]: unknown },
+  Q extends { [key in K]: unknown },
+  R extends { [key in K]: unknown }
+>(path: K, value1: T[K], value2: Q[K], value3: R[K]): ToTuple<K, T, Q, R>[K] {
+  return [value1, value2, value3];
+}
+
+export function testa<Output>(zodtype: ZodType<Output>, data: unknown): Output {
+  return zodtype.parse(data);
+}
+
+export type MappedFunctionCallType<
+  T extends { [K: string]: ZodType<unknown> }
+> = {
+  [K in keyof T]: T[K]["_output"];
+};
+
+export function mappedFunctionCall<
+  T extends { [K: string]: ZodType<unknown> },
+  K extends string
+>(schema: T[K], value: unknown): MappedFunctionCallType<T>[K] {
+  return testa(schema, value);
+}
+
+type entitiesType15 = {
+  [K in keyof typeof entityRoutes]: Array<entitiesType4[K]>;
+};
+
+type entitiesType4 = {
+  [K in keyof typeof entityRoutes]: z.infer<
+    typeof entityRoutes[K]["request"]
+  >["sorting"][number];
+};
+
+export function mappedFunctionCall2<R extends keyof typeof entityRoutes, U>(
+  array: entitiesType15[R],
+  functio: (v: entitiesType4[R]) => U
+): Array<U> {
+  return array.flatMap(functio);
+}

@@ -17,16 +17,16 @@
   "description": "Software to manage choosing projects and automatically assigning people to projects.",
   "type": "module",
   "scripts": {
-    "format": "docker build -t getting-started . && docker run --mount type=bind,source=\"$(pwd)\"/tests,target=/app/tests --mount type=bind,source=\"$(pwd)\"/src,target=/app/src -it getting-started npm run format",
+    "format": "docker build -t getting-started . && docker run --mount type=bind,source=\"$(pwd)\"/tests,target=/opt/projektwahl-lit/tests --mount type=bind,source=\"$(pwd)\"/src,target=/opt/projektwahl-lit/src -it getting-started npm run format",
     "format:check": "prettier --ignore-path .prettierignore --check .",
-    "test": "docker build -t getting-started . && docker run --mount type=bind,source=\"$(pwd)\"/tests/e2e/new-tests.ts,target=/app/tests/e2e/new-tests.ts --net=host -e BASE_URL -e CI=1 -it getting-started npm run test",
-    "lint": "eslint .",
-    "lint:fix": "eslint --fix .",
+    "test": "docker build -t getting-started . && docker run --mount type=bind,source=\"$(pwd)\"/tests/e2e/new-tests.ts,target=/opt/projektwahl-lit/tests/e2e/new-tests.ts --net=host -e BASE_URL -e CI=1 -it getting-started npm run test",
+    "lint": "docker build -t getting-started . && docker run --mount type=bind,source=\"$(pwd)\"/tests,target=/opt/projektwahl-lit/tests --mount type=bind,source=\"$(pwd)\"/src,target=/opt/projektwahl-lit/src -it getting-started npm run lint",
+    "lint:fix": "docker build -t getting-started . && docker run --mount type=bind,source=\"$(pwd)\"/tests,target=/opt/projektwahl-lit/tests --mount type=bind,source=\"$(pwd)\"/src,target=/opt/projektwahl-lit/src -it getting-started npm run lint:fix",
     "evaluate": "node --experimental-loader ./src/loader.js --enable-source-maps ./src/server/routes/evaluate/index.js",
     "setup": "node --experimental-loader ./src/loader.js --enable-source-maps ./src/server/setup.js",
     "server": "node --experimental-loader ./src/loader.js --enable-source-maps --experimental-import-meta-resolve ./src/server/index.js",
-    "localize-extract": "mkdir -p src/client/generated && docker build -t getting-started . && docker run --mount type=bind,source=\"$(pwd)\"/xliff,target=/app/xliff -it getting-started npm run localize-extract",
-    "localize-build": "mkdir -p src/client/generated && docker build -t getting-started . && docker run --mount type=bind,source=\"$(pwd)\"/src/client/generated,target=/app/src/client/generated -it getting-started npm run localize-build",
+    "localize-extract": "mkdir -p src/client/generated && docker build -t getting-started . && docker run --mount type=bind,source=\"$(pwd)\"/xliff,target=/opt/projektwahl-lit/xliff -it getting-started npm run localize-extract",
+    "localize-build": "mkdir -p src/client/generated && docker build -t getting-started . && docker run --mount type=bind,source=\"$(pwd)\"/src/client/generated,target=/opt/projektwahl-lit/src/client/generated -it getting-started npm run localize-build",
     "typecheck": "tsc",
     "lit-analyze": "lit-analyzer --strict --rules.no-unknown-attribute off src",
     "build": "node build.js"
@@ -42,7 +42,7 @@
     "js-cookie": "^3.0.1",
     "lit": "^2.2.1",
     "openid-client": "^5.1.4",
-    "postgres": "porsager/postgres#rewrite",
+    "postgres": "porsager/postgres",
     "zod": "^3.14.2"
   },
   "devDependencies": {

@@ -26,24 +26,63 @@ import { HistoryController } from "../history-controller.js";
 import { msg, str } from "@lit/localize";
 import type { entityRoutes } from "../../lib/routes.js";
 import type { z } from "zod";
-import { parseRequestWithPrefix } from "./pw-entitylist.js";
+import {
+  parseRequestWithPrefix,
+  parseRequestWithPrefixType,
+} from "./pw-entitylist.js";
 import { PwElement } from "../pw-element.js";
+import { mappedIndexing, mappedTuple } from "../../lib/result.js";
+
+type entitiesType0 = {
+  [P in keyof typeof entityRoutes]: z.infer<typeof entityRoutes[P]["request"]>;
+};
+
+type entitiesType1 = {
+  [P in keyof typeof entityRoutes]: z.infer<
+    typeof entityRoutes[P]["request"]
+  >["sorting"][number][0];
+};
+
+type entitiesType15 = {
+  [P in keyof typeof entityRoutes]: z.infer<
+    typeof entityRoutes[P]["request"]
+  >["sorting"][number][1];
+};
+
+type entitiesType2 = {
+  [P in keyof typeof entityRoutes]: z.infer<
+    typeof entityRoutes[P]["request"]
+  >["sorting"][number][2];
+};
+
+type entitiesType3 = {
+  [P in keyof typeof entityRoutes]: Array<
+    z.infer<typeof entityRoutes[P]["request"]>["sorting"][number]
+  >;
+};
+
+type entitiesType4 = {
+  [P in keyof typeof entityRoutes]: z.infer<
+    typeof entityRoutes[P]["request"]
+  >["sorting"][number];
+};
 
 // workaround see https://github.com/runem/lit-analyzer/issues/149#issuecomment-1006162839
 export function pwOrder<P extends keyof typeof entityRoutes, X extends string>(
   props: Pick<
     PwOrder<P, X>,
-    "url" | "name" | "prefix" | "title" | "refreshEntityList"
+    "url" | "name" | "prefix" | "title" | "refreshEntityList" | "value"
   >
 ) {
-  const { url, name, title, refreshEntityList, prefix, ...rest } = props;
+  const { url, name, title, refreshEntityList, prefix, value, ...rest } = props;
   let _ = rest;
   _ = 1; // ensure no property is missed - Don't use `{}` as a type. `{}` actually means "any non-nullish value".
   return html`<pw-order
     .name=${name}
     .url=${url}
     prefix=${prefix}
-    title=${title}
+    .title=${title}
+    .value=${value}
     .refreshEntityList=${refreshEntityList}
   ></pw-order>`;
 }
@@ -56,7 +95,7 @@ export class PwOrder<
 > extends PwElement {
   static override get properties() {
     return {
-      title: { type: String },
+      title: { attribute: false },
       name: { attribute: false },
       path: { attribute: false },
       refreshEntityList: { attribute: false },
@@ -72,7 +111,9 @@ export class PwOrder<
 
   prefix!: X;
 
-  name!: z.infer<typeof entityRoutes[P]["request"]>["sorting"][number][0];
+  name!: entitiesType1[P];
+
+  value!: entitiesType2[P];
 
   title!: string;
 
@@ -106,52 +147,66 @@ export class PwOrder<
       <button
         @click=${async () => {
           // TODO FIXME put this into the history implementation?
-          const data = parseRequestWithPrefix(
+          const data: parseRequestWithPrefixType<X>[P] = parseRequestWithPrefix(
             this.url,
             this.prefix,
             this.history.url
           );
 
-          if (!data[this.prefix]["sorting"]) {
-            data[this.prefix]["sorting"] = [];
-          }
-
-          const oldElementIndex = data[this.prefix]["sorting"].findIndex(
-            ([e]: [string, string]) => e === this.name
+          const actualData: entitiesType0[P] = mappedIndexing(
+            data,
+            this.prefix
           );
-          let oldElement: [
-            z.infer<typeof entityRoutes[P]["request"]>["sorting"][number][0],
-            "ASC" | "DESC" | "downup"
-          ];
-          if (oldElementIndex == -1) {
-            oldElement = [this.name, `downup`];
+
+          const sorting: entitiesType3[P] = mappedIndexing(
+            actualData,
+            "sorting"
+          );
+
+          const oldElementIndex = sorting.findIndex(([e]) => e === this.name);
+
+          if (oldElementIndex !== -1) {
+            // splice REMOVES the elements from the original array
+            const oldElement: z.infer<
+              typeof entityRoutes[P]["request"]
+            >["sorting"][number] = sorting.splice(oldElementIndex, 1)[0];
+
+            const theName: entitiesType1[P] = this.name;
+            const theValue: entitiesType2[P] = this.value;
+
+            switch (oldElement?.[1]) {
+              case "DESC":
+                break;
+              case "ASC": {
+                //sorting.push([theName, "DESC", theValue])
+                const adding = mappedTuple<
+                  P,
+                  entitiesType1,
+                  entitiesType15,
+                  entitiesType2
+                >(this.url, theName, "DESC", theValue);
+
+                // @ts-expect-error bruh
+                const adding2: entitiesType4[P] = adding;
+
+                sorting.push(adding2);
+
+                break;
+              }
+            }
           } else {
-            oldElement = data[this.prefix]["sorting"].splice(
-              oldElementIndex,
-              1
-            )[0];
-          }
-          let newElement: "ASC" | "DESC" | null;
-          switch (oldElement[1]) {
-            case "downup":
-              newElement = "ASC";
-              break;
-            case "ASC":
-              newElement = "DESC";
-              break;
-            default:
-              newElement = null;
-          }
+            const adding = mappedTuple<
+              P,
+              entitiesType1,
+              entitiesType15,
+              entitiesType2
+            >(this.url, this.name, "ASC", this.value);
 
-          // @ts-expect-error mapped types probably needed
-          const a: z.infer<typeof entityRoutes[P]["request"]>["sorting"] =
-            newElement !== null ? [[oldElement[0], newElement]] : [];
+            // @ts-expect-error bruh
+            const adding2: entitiesType4[P] = adding;
 
-          // @ts-expect-error mapped types probably needed
-          data[this.prefix]["sorting"] = [
-            ...data[this.prefix]["sorting"],
-            ...a,
-          ];
+            sorting.push(adding2);
+          }
 
           HistoryController.goto(
             new URL(

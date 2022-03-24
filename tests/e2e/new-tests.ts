@@ -64,6 +64,16 @@ class FormTester {
     await element.sendKeys(value);
   }
 
+  async setTextareaField(name: string, value: string) {
+    const element = await this.form.findElement(
+      By.css(`textarea[name="${name}"]`)
+    );
+    await element.click();
+    await element.clear();
+    await element.click();
+    await element.sendKeys(value);
+  }
+
   async checkField(name: string, value: boolean) {
     const element = await this.form.findElement(
       By.css(`input[name="${name}"]`)
@@ -74,9 +84,7 @@ class FormTester {
   }
 
   async getField(name: string) {
-    const element = await this.form.findElement(
-      By.css(`input[name="${name}"]`)
-    );
+    const element = await this.form.findElement(By.css(`*[name="${name}"]`));
     return await element.getAttribute("value");
   }
 
@@ -96,12 +104,12 @@ class FormTester {
 
     const loadingIndicator = await this.helper.driver.wait(
       until.elementLocated(By.css(".spinner-grow")),
-      1000,
+      2000,
       "spinner 1"
     );
     await this.helper.driver.wait(
       until.stalenessOf(loadingIndicator),
-      1000,
+      2000,
       "loading indicator 1"
     );
   }
@@ -111,7 +119,7 @@ class FormTester {
 
     await this.helper.driver.wait(
       until.stalenessOf(this.form),
-      1000,
+      2000,
       "form submit expected stale"
     );
   }
@@ -121,7 +129,7 @@ class FormTester {
 
     const alert = await this.helper.driver.wait(
       until.elementLocated(By.css('div[class="alert alert-danger"]')),
-      1000,
+      2000,
       "Expected submit failure 1"
     );
 
@@ -219,7 +227,7 @@ async function runTest(testFunction: (helper: Helper) => Promise<void>) {
   // eslint-disable-next-line @typescript-eslint/no-unsafe-call
   await driver.setNetworkConditions({
     offline: false,
-    latency: 100, // Additional latency (ms).
+    latency: 200, // Additional latency (ms).
     download_throughput: 0, // Maximal aggregated download throughput.
     upload_throughput: 0, // Maximal aggregated upload throughput.
   });
@@ -397,7 +405,7 @@ async function createUserAllFields(helper: Helper) {
   await form.checkField("0,away", away);
   await form.checkField("0,deleted", deleted);
   await form.submitSuccess();
-  await helper.driver.wait(until.urlContains("/users/edit/"), 1000);
+  await helper.driver.wait(until.urlContains("/users/edit/"), 2000);
   const id = (await helper.driver.getCurrentUrl()).substring(
     "https://localhost:8443/users/edit/".length
   );
@@ -424,12 +432,12 @@ async function createUserAllFields(helper: Helper) {
 
   const loadingIndicator = await helper.driver.wait(
     until.elementLocated(By.css(".spinner-grow")),
-    1000,
+    2000,
     "spinner 2"
   );
   await helper.driver.wait(
     until.stalenessOf(loadingIndicator),
-    1000,
+    2000,
     "loading indicator 1"
   );
 
@@ -469,7 +477,7 @@ async function createProjectAllFields(helper: Helper) {
   const random_assignments = Math.random() > 0.5 ? true : false;
   const deleted = Math.random() > 0.5 ? true : false;
   await form.setField("title", title);
-  await form.setField("info", info);
+  await form.setTextareaField("info", info);
   await form.setField("place", place);
   await form.setField("costs", `${costs}`);
   await form.setField("min_age", `${min_age}`);
@@ -479,7 +487,7 @@ async function createProjectAllFields(helper: Helper) {
   await form.checkField("random_assignments", random_assignments);
   await form.checkField("deleted", deleted);
   await form.submitSuccess();
-  await helper.driver.wait(until.urlContains("/projects/edit/"), 1000);
+  await helper.driver.wait(until.urlContains("/projects/edit/"), 2000);
   const id = (await helper.driver.getCurrentUrl()).substring(
     "https://localhost:8443/projects/edit/".length
   );
@@ -513,12 +521,12 @@ async function createProjectAllFields(helper: Helper) {
 
   const loadingIndicator = await helper.driver.wait(
     until.elementLocated(By.css(".spinner-grow")),
-    1000,
+    2000,
     "spinner 3"
   );
   await helper.driver.wait(
     until.stalenessOf(loadingIndicator),
-    1000,
+    2000,
     "loading indicator 2"
   );
 
@@ -546,7 +554,7 @@ async function checkNotLoggedInUsers(helper: Helper) {
 
   const alert = await helper.driver.wait(
     until.elementLocated(By.css('div[class="alert alert-danger"]')),
-    1000,
+    2000,
     "Expected submit failure 2"
   );
 
@@ -558,7 +566,7 @@ async function checkNotLoggedInProjects(helper: Helper) {
 
   const alert = await helper.driver.wait(
     until.elementLocated(By.css('div[class="alert alert-danger"]')),
-    1000,
+    2000,
     "Expected submit failure 3"
   );
 
