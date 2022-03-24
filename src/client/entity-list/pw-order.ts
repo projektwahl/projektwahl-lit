@@ -24,14 +24,14 @@ import { html, TemplateResult } from "lit";
 import { bootstrapCss } from "../index.js";
 import { HistoryController } from "../history-controller.js";
 import { msg, str } from "@lit/localize";
-import { entityRoutes } from "../../lib/routes.js";
+import type { entityRoutes } from "../../lib/routes.js";
 import type { z } from "zod";
 import { parseRequestWithPrefix, parseRequestWithPrefixType } from "./pw-entitylist.js";
 import { PwElement } from "../pw-element.js";
 import { mappedIndexing, mappedTuple } from '../../lib/result.js'
 
 type entitiesType0 = {
-  [K in keyof typeof entityRoutes]: z.infer<typeof entityRoutes[K]["request"]>;
+  [P in keyof typeof entityRoutes]: z.infer<typeof entityRoutes[P]["request"]>;
 };
 
 type entitiesType1 = {
@@ -47,14 +47,14 @@ type entitiesType2 = {
 }
 
 type entitiesType3 = {
-  [K in keyof typeof entityRoutes]: Array<
-    z.infer<typeof entityRoutes[K]["request"]>["sorting"][number]
+  [P in keyof typeof entityRoutes]: Array<
+    z.infer<typeof entityRoutes[P]["request"]>["sorting"][number]
   >;
 };
 
 type entitiesType4 = {
-  [K in keyof typeof entityRoutes]: 
-    z.infer<typeof entityRoutes[K]["request"]>["sorting"][number];
+  [P in keyof typeof entityRoutes]: 
+    z.infer<typeof entityRoutes[P]["request"]>["sorting"][number];
 };
 
 // workaround see https://github.com/runem/lit-analyzer/issues/149#issuecomment-1006162839
@@ -168,11 +168,16 @@ export class PwOrder<
               case "ASC":
                 //sorting.push([theName, "DESC", theValue])
 
-                const adding: entitiesType4[P] = mappedTuple<P, entitiesType1, entitiesType15, entitiesType2>(theName, "DESC", theValue)
+                const adding = mappedTuple<P, entitiesType1, entitiesType15, entitiesType2>(this.url, theName, "DESC", theValue)
+
+                // @ts-expect-error
+                const adding2: entitiesType4[P] = adding
+
+                const adding3: entitiesType3[P] = [adding2];
 
                 sorting = [
                   ...sorting,
-                  ...adding,
+                  ...adding3,
                 ];
                 break;
             }
