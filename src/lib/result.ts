@@ -75,3 +75,15 @@ export function mappedIndexing<
 >(value: T[K], index: I): ToIndexed<T, I>[K] {
   return value[index];
 }
+
+export function testa<Output>(zodtype: ZodType<Output>, data: unknown): Output {
+  return zodtype.parse(data)
+}
+
+export type MappedFunctionCallType<T extends { [K: string]: ZodType<any> }> = {
+  [K in keyof T]: T[K]["_output"]
+}
+
+export function mappedFunctionCall<T extends { [K: string]: ZodType<any> }, K extends string>(schema: T[K], value: unknown): MappedFunctionCallType<T>[K] {
+  return testa(schema, value);
+}

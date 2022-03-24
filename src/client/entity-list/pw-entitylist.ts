@@ -32,6 +32,7 @@ import { msg } from "@lit/localize";
 import { ifDefined } from "lit/directives/if-defined.js";
 import { myFetch } from "../utils.js";
 import { pwInputSelect } from "../form/pw-input-select.js";
+import { mappedFunctionCall } from "../../lib/result.js";
 
 export type parseRequestWithPrefixType<PREFIX extends string> = {
   [P in keyof typeof entityRoutes]: z.infer<
@@ -68,11 +69,11 @@ export const parseRequestWithPrefix = <
     // @ts-expect-error wrong typings I assume
     .setKey(prefix, entityRoutes[apiUrl]["request"].default({ filters: {} }))
     .passthrough();
-  const data: parseRequestWithPrefixType<PREFIX>[P] = schema.parse(
+  const data: parseRequestWithPrefixType<PREFIX>[P] = mappedFunctionCall(schema, v => v.parse(
     JSON.parse(
       decodeURIComponent(url.search == "" ? "{}" : url.search.substring(1))
     )
-  );
+  ));
   /*const a: z.infer<z.ZodObject<{[k in PREFIX]: typeof entityRoutes[P]["request"]}, "strict", z.ZodTypeAny, {[k in PREFIX]:  z.infer<typeof entityRoutes[P]["request"]>}, Record<string, unknown>>>[PREFIX] = data[prefix];
   const b: z.infer<typeof entityRoutes[P]["request"]> = a;*/
   return data;
