@@ -65,7 +65,7 @@ export const createOrUpdateUsersHandler = requestHandler(
       return returnValue;
     }
 
-    if (!(loggedInUser?.type === "admin")) {
+    if (!(loggedInUser?.type === "admin" || loggedInUser?.type === "helper")) {
       const returnValue: [
         OutgoingHttpHeaders,
         ResponseType<"/api/v1/users/create-or-update">
@@ -89,6 +89,9 @@ export const createOrUpdateUsersHandler = requestHandler(
       ];
       return returnValue;
     }
+
+    // for setting in_project_id to null we need to check the db if the user was in this particular project previously
+    //if (loggedInUser?.type === "helper" && users.every(user => user.action === "update" && user.))
 
     try {
       const row = (

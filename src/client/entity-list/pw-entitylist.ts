@@ -113,12 +113,14 @@ export class PwEntityList<
 
   connectedCallback(): void {
     super.connectedCallback();
-    const bc = new BroadcastChannel("updateloginstate");
-    bc.onmessage = (event) => {
-      if (event.data === "login") {
-        void this._task.run();
-      }
-    };
+    if ("BroadcastChannel" in window) {
+      const bc = new BroadcastChannel("updateloginstate");
+      bc.onmessage = (event) => {
+        if (event.data === "login") {
+          void this._task.run();
+        }
+      };
+    }
   }
 
   static override styles = css`
