@@ -26,7 +26,7 @@ import type { z } from "zod";
 import type { entityRoutes, ResponseType } from "../lib/routes.js";
 import { sql } from "./database.js";
 import { unsafe2 } from "./sql/index.js";
-import { mappedIndexing } from "../lib/result.js";
+import { mappedFunctionCall2, mappedIndexing } from "../lib/result.js";
 
 // Mapped Types
 // https://www.typescriptlang.org/docs/handbook/2/mapped-types.html
@@ -114,29 +114,28 @@ export async function fetchData<R extends keyof typeof entityRoutes>(
   }
 
   // TODO FIXME flatmap with the mappedfunctincall?
-  const orderByQuery = sorting
-    .flatMap((v) => {
-      const theV: entitiesType4[R] = v;
-      const v0: entitiesType6[R] = mappedIndexing<entitiesType4, R, 0>(theV, 0);
-      const v1: entitiesType2[R][typeof v0] = mappedIndexing(theV, 1);
-      const v2: entitiesType10[R] = mappedIndexing(theV, 2);
-      return [
-        sql`,`,
-        // @ts-expect-error bruh
-        sql`${orderByQueries[v0](v1, query.paginationCursor, v2)}`,
-      ];
-    })
+  const orderByQuery = mappedFunctionCall2(sorting, (v: entitiesType4[R]) => {
+    const v0: entitiesType6[R] = mappedIndexing<entitiesType4, R, 0>(v, 0);
+    // @ts-expect-error bruh
+    const v1: entitiesType2[R][typeof v0] = mappedIndexing(v, 1);
+    const v2: entitiesType10[R] = mappedIndexing(v, 2);
+    return [
+      sql`,`,
+      // @ts-expect-error bruh
+      sql`${orderByQueries[v0](v1, query.paginationCursor, v2)}`,
+    ];
+  })
     .slice(1)
-    .reduce((prev, curr) => sql`${prev}${curr}`);
+    .reduce<PendingQuery<Row[]>>((prev, curr) => sql`${prev}${curr}`, sql``);
 
   const paginationCursor: entitiesType0[R]["paginationCursor"] =
     query.paginationCursor;
 
-  let finalQuery;
+  let sqlResult;
   if (!paginationCursor) {
-    finalQuery = sql`(${sqlQuery(query)} ORDER BY ${orderByQuery} LIMIT ${
-      query.paginationLimit + 1
-    })`;
+    sqlResult = await sql`${sql`(${sqlQuery(
+      query
+    )} ORDER BY ${orderByQuery} LIMIT ${query.paginationLimit + 1})`}`;
   } else {
     const queries = sorting.map((value, index) => {
       const part = sorting.slice(0, index + 1);
@@ -166,9 +165,9 @@ export async function fetchData<R extends keyof typeof entityRoutes>(
     });
 
     if (queries.length == 1) {
-      finalQuery = queries[0];
+      sqlResult = await sql`queries[0]`;
     } else {
-      finalQuery = sql`${queries
+      sqlResult = await sql`${queries
         .flatMap((v) => [sql`\nUNION ALL\n`, v])
         .slice(1)
         .reduce((prev, curr) => sql`${prev}${curr}`)} LIMIT ${
@@ -180,7 +179,6 @@ export async function fetchData<R extends keyof typeof entityRoutes>(
   //const entitiesSchema = entitySchema["response"]["shape"]["entities"];
 
   // would be great to stream the results but they are post processed below
-  const sqlResult = await finalQuery;
 
   let entities: z.infer<entitiesType[R]["response"]>["entities"] =
     // eslint-disable-next-line @typescript-eslint/consistent-type-assertions

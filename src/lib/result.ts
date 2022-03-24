@@ -22,7 +22,7 @@ SPDX-FileCopyrightText: 2021 Moritz Hedtke <Moritz.Hedtke@t-online.de>
 */
 
 import { z, ZodObject, ZodType, ZodTypeAny, ZodTypeDef } from "zod";
-import type { UnknownKeysParam } from "./routes.js";
+import type { entityRoutes, UnknownKeysParam } from "./routes.js";
 
 export const successResult = <
   T extends { [k: string]: ZodTypeAny },
@@ -106,7 +106,9 @@ export function testa<Output>(zodtype: ZodType<Output>, data: unknown): Output {
   return zodtype.parse(data);
 }
 
-export type MappedFunctionCallType<T extends { [K: string]: ZodType<unknown> }> = {
+export type MappedFunctionCallType<
+  T extends { [K: string]: ZodType<unknown> }
+> = {
   [K in keyof T]: T[K]["_output"];
 };
 
@@ -115,4 +117,21 @@ export function mappedFunctionCall<
   K extends string
 >(schema: T[K], value: unknown): MappedFunctionCallType<T>[K] {
   return testa(schema, value);
+}
+
+type entitiesType15 = {
+  [K in keyof typeof entityRoutes]: Array<entitiesType4[K]>;
+};
+
+type entitiesType4 = {
+  [K in keyof typeof entityRoutes]: z.infer<
+    typeof entityRoutes[K]["request"]
+  >["sorting"][number];
+};
+
+export function mappedFunctionCall2<R extends keyof typeof entityRoutes, U>(
+  array: entitiesType15[R],
+  functio: (v: entitiesType4[R]) => U
+): Array<U> {
+  return array.flatMap(functio);
 }

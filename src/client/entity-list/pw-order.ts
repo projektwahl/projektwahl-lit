@@ -158,7 +158,10 @@ export class PwOrder<
             this.prefix
           );
 
-          const sorting: entitiesType3[P] = mappedIndexing(actualData, "sorting");
+          const sorting: entitiesType3[P] = mappedIndexing(
+            actualData,
+            "sorting"
+          );
 
           const oldElementIndex = sorting.findIndex(([e]) => e === this.name);
 
