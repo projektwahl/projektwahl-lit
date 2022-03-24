@@ -113,6 +113,9 @@ export const createOrUpdateUsersHandler = requestHandler(
           for (const user of users) {
             if ("id" in user) {
              
+              
+              // TODO FIXME check that only that column is updated.
+
              /* if (user.project_leader_id === null) {
                 const permissionsQuery = await typedSql(sql, {} as const)`SELECT COUNT(*) FROM users_with_deleted AS voter INNER JOIN users_with_deleted AS helper ON voter.id = ${user.id} AND voter.type = 'voter' AND voter.project_leader_id IS NOT NULL AND helper.id = ${loggedInUser.id} AND helper.type = 'helper' AND helper.project_leader_id = voter.project_leader_id;`
               } else if (user.project_leader_id !== undefined) {
