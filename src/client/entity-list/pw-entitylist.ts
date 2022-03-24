@@ -63,7 +63,7 @@ export const parseRequestWithPrefix = <
   apiUrl: P,
   prefix: PREFIX,
   url: URL
-) => {
+): parseRequestWithPrefixType<PREFIX>[P] => {
   const schema: parseRequestWithPrefixSchemaType<PREFIX>[P] = z
     .object({})
     // @ts-expect-error wrong typings I assume

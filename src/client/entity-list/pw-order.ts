@@ -26,9 +26,13 @@ import { HistoryController } from "../history-controller.js";
 import { msg, str } from "@lit/localize";
 import type { entityRoutes } from "../../lib/routes.js";
 import type { z } from "zod";
-import { parseRequestWithPrefix } from "./pw-entitylist.js";
+import { parseRequestWithPrefix, parseRequestWithPrefixType } from "./pw-entitylist.js";
 import { PwElement } from "../pw-element.js";
 import { mappedIndexing } from '../../lib/result.js'
+
+type entitiesType0 = {
+  [K in keyof typeof entityRoutes]: z.infer<typeof entityRoutes[K]["request"]>;
+};
 
 // workaround see https://github.com/runem/lit-analyzer/issues/149#issuecomment-1006162839
 export function pwOrder<P extends keyof typeof entityRoutes, X extends string>(
@@ -110,14 +114,14 @@ export class PwOrder<
       <button
         @click=${async () => {
           // TODO FIXME put this into the history implementation?
-          const data = parseRequestWithPrefix(
+          const data: parseRequestWithPrefixType<X>[P]  = parseRequestWithPrefix(
             this.url,
             this.prefix,
             this.history.url
           );
 
-          const actualData: typeof entityRoutes[P]["request"] = mappedIndexing(data, this.prefix);
-
+          const actualData: entitiesType0[P] = mappedIndexing(data, this.prefix);
+          
           const oldElementIndex = data[this.prefix]["sorting"].findIndex(
             ([e]) => e === this.name
           );
