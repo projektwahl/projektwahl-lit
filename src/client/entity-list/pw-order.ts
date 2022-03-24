@@ -25,7 +25,7 @@ import { bootstrapCss } from "../index.js";
 import { HistoryController } from "../history-controller.js";
 import { msg, str } from "@lit/localize";
 import type { entityRoutes } from "../../lib/routes.js";
-import { z } from "zod";
+import type { z } from "zod";
 import { parseRequestWithPrefix } from "./pw-entitylist.js";
 import { PwElement } from "../pw-element.js";
 
@@ -118,32 +118,30 @@ export class PwOrder<
           const oldElementIndex = data[this.prefix]["sorting"].findIndex(
             ([e]) => e === this.name
           );
-          let oldElement: [z.infer<typeof entityRoutes[P]["request"]>["sorting"][number][0], null|z.infer<typeof entityRoutes[P]["request"]>["sorting"][number][1], z.infer<typeof entityRoutes[P]["request"]>["sorting"][number][2]];
           
           if (oldElementIndex !== -1) {
-            oldElement = data[this.prefix]["sorting"].splice(
+            let oldElement: z.infer<typeof entityRoutes[P]["request"]>["sorting"][number] = data[this.prefix]["sorting"].splice(
               oldElementIndex,
               1
             )[0];
-          } else {
-            oldElement = this.value ? [this.name, null, this.value] : [this.name, null];
-          }
-          switch (oldElement?.[1]) {
-            case "DESC":
-              oldElement[1] = null;
-              break;
-            case "ASC":
-              oldElement[1] = "DESC";
-              break;
-            default:
-              oldElement[1] = "ASC";
-          }
 
-          // @ts-expect-error mapped types probably needed
-          data[this.prefix]["sorting"] = [
-            ...data[this.prefix]["sorting"],
-            ...(oldElement[1] ? [oldElement] : []),
-          ];
+            switch (oldElement?.[1]) {
+              case "DESC":
+                break;
+              case "ASC":
+                data[this.prefix]["sorting"] = [
+                  ...data[this.prefix]["sorting"],
+                  ([[this.name, "DESC", this.value]]),
+                ];
+                break;
+            }
+          } else {
+            data[this.prefix]["sorting"] = [
+              ...data[this.prefix]["sorting"],
+              ...([[this.name, "ASC", this.value]]),
+            ];;
+          }
+        
 
           HistoryController.goto(
             new URL(

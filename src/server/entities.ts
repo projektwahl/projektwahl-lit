@@ -27,6 +27,14 @@ import type { entityRoutes, ResponseType } from "../lib/routes.js";
 import { sql } from "./database.js";
 import { unsafe2 } from "./sql/index.js";
 
+type ToIndexed<T extends { [K: string]: Array<any> }, I extends number> = {
+  [K in keyof T]: T[K][I]
+}
+
+export function mappedIndexing<T extends { [K: string]: Array<any> }, I extends number>(value: T, index: I): ToIndexed<T, I> {
+  return value[index];
+}
+
 // Mapped Types
 // https://www.typescriptlang.org/docs/handbook/2/mapped-types.html
 
