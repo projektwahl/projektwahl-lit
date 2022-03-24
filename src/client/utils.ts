@@ -61,8 +61,10 @@ export const myFetch = async <P extends keyof typeof routes>(
         jscookie.remove("username");
         jscookie.remove("type");
 
-        const bc = new BroadcastChannel("updateloginstate");
-        bc.postMessage("logout");
+        if ("BroadcastChannel" in window) {
+          const bc = new BroadcastChannel("updateloginstate");
+          bc.postMessage("logout");
+        }
       }
       try {
         // eslint-disable-next-line @typescript-eslint/no-unsafe-return

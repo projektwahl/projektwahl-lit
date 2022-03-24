@@ -68,9 +68,11 @@ class PwRedirect extends PwForm<"/api/v1/redirect"> {
       );
 
       if (result.success) {
-        const bc = new BroadcastChannel("updateloginstate");
-        bc.postMessage("login");
-        bc.close();
+        if ("BroadcastChannel" in window) {
+          const bc = new BroadcastChannel("updateloginstate");
+          bc.postMessage("login");
+          bc.close();
+        }
 
         if (window.opener) {
           window.close();

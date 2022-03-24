@@ -207,8 +207,10 @@ export class PwApp extends PwElement {
     super.connectedCallback();
     window.addEventListener("popstate", this.popstateListener);
     window.addEventListener("navigate", this.navigateListener);
-    this.bc = new BroadcastChannel("updateloginstate");
-    this.bc.addEventListener("message", this.updateloginstate);
+    if ("BroadcastChannel" in window) {
+      this.bc = new BroadcastChannel("updateloginstate");
+      this.bc.addEventListener("message", this.updateloginstate);
+    }
   }
 
   override disconnectedCallback(): void {
