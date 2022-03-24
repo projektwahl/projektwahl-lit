@@ -76,6 +76,14 @@ export function mappedIndexing<
   return value[index];
 }
 
+export function mappedIndexingSet<
+  T extends { [K: string]: { [inner in I]: any } },
+  K extends string,
+  I extends string | number | symbol
+>(value: T[K], index: I, newValue: ToIndexed<T, I>[K]): void {
+  return value[index] = newValue;
+}
+
 export type ToTuple<
 K extends string|symbol|number,
 T extends { [key in K]: any },

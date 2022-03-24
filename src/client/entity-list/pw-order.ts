@@ -152,6 +152,7 @@ export class PwOrder<
           );
 
           if (oldElementIndex !== -1) {
+            // splice REMOVES the elements from the original array
             let oldElement: z.infer<
               typeof entityRoutes[P]["request"]
             >["sorting"][number] = sorting.splice(
@@ -167,23 +168,12 @@ export class PwOrder<
                 break;
               case "ASC":
                 //sorting.push([theName, "DESC", theValue])
-
                 const adding = mappedTuple<P, entitiesType1, entitiesType15, entitiesType2>(this.url, theName, "DESC", theValue)
 
                 // @ts-expect-error bruh
                 const adding2: entitiesType4[P] = adding
 
-                // @ts-expect-error bruh
-                const adding3: entitiesType3[P] = [adding2];
-
                 sorting.push(adding2)
-
-                /*
-                // uff
-                sorting = [
-                  ...sorting,
-                  ...adding3,
-                ];*/
                 break;
             }
           } else {

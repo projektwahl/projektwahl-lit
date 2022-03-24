@@ -32,7 +32,11 @@ import { msg } from "@lit/localize";
 import { ifDefined } from "lit/directives/if-defined.js";
 import { myFetch } from "../utils.js";
 import { pwInputSelect } from "../form/pw-input-select.js";
-import { mappedFunctionCall } from "../../lib/result.js";
+import { mappedFunctionCall, mappedIndexing, mappedIndexingSet } from "../../lib/result.js";
+
+type entitiesType0 = {
+  [P in keyof typeof entityRoutes]: z.infer<typeof entityRoutes[P]["request"]>;
+};
 
 export type parseRequestWithPrefixType<PREFIX extends string> = {
   [P in keyof typeof entityRoutes]: z.infer<
@@ -320,13 +324,13 @@ export class PwEntityList<
                         );
 
                         if (!data[this.prefix]) {
-                          data[this.prefix] = {
+                          mappedIndexingSet(data, this.prefix, {
                             filters: {},
                             paginationDirection: "forwards",
                             paginationLimit: 100,
                             sorting: [],
                             paginationCursor: null,
-                          };
+                          });
                         }
                         if (this._task.value?.success) {
                           data[this.prefix].paginationCursor =
