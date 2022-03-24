@@ -31,7 +31,7 @@ type ToIndexed<T extends { [K: string]: Array<any> }, I extends number> = {
   [K in keyof T]: T[K][I]
 }
 
-export function mappedIndexing<T extends { [K: string]: Array<any> }, I extends number>(value: T, index: I): ToIndexed<T, I> {
+export function mappedIndexing<T extends { [K: string]: Array<any> }, K extends string, I extends number>(value: T[K], index: I): ToIndexed<T, I> {
   return value[index];
 }
 
