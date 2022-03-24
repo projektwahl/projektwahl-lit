@@ -24,7 +24,7 @@ import { html, TemplateResult } from "lit";
 import { bootstrapCss } from "../index.js";
 import { HistoryController } from "../history-controller.js";
 import { msg, str } from "@lit/localize";
-import type { entityRoutes } from "../../lib/routes.js";
+import { entityRoutes } from "../../lib/routes.js";
 import type { z } from "zod";
 import { parseRequestWithPrefix, parseRequestWithPrefixType } from "./pw-entitylist.js";
 import { PwElement } from "../pw-element.js";
@@ -32,6 +32,20 @@ import { mappedIndexing } from '../../lib/result.js'
 
 type entitiesType0 = {
   [K in keyof typeof entityRoutes]: z.infer<typeof entityRoutes[K]["request"]>;
+};
+
+type entitiesType1 = {
+  [P in keyof typeof entityRoutes]: z.infer<typeof entityRoutes[P]["request"]>["sorting"][number][0]
+}
+
+type entitiesType2 = {
+  [P in keyof typeof entityRoutes]: z.infer<typeof entityRoutes[P]["request"]>["sorting"][number][2]
+}
+
+type entitiesType3 = {
+  [K in keyof typeof entityRoutes]: Array<
+    z.infer<typeof entityRoutes[K]["request"]>["sorting"][number]
+  >;
 };
 
 // workaround see https://github.com/runem/lit-analyzer/issues/149#issuecomment-1006162839
@@ -78,9 +92,9 @@ export class PwOrder<
 
   prefix!: X;
 
-  name!: z.infer<typeof entityRoutes[P]["request"]>["sorting"][number][0];
+  name!: entitiesType1[P];
 
-  value!: z.infer<typeof entityRoutes[P]["request"]>["sorting"][number][2];
+  value!: entitiesType2[P];
 
   title!: string;
 
@@ -121,32 +135,41 @@ export class PwOrder<
           );
 
           const actualData: entitiesType0[P] = mappedIndexing(data, this.prefix);
+
+          let sorting: entitiesType3[P] = mappedIndexing(actualData, "sorting");
           
-          const oldElementIndex = data[this.prefix]["sorting"].findIndex(
+          const oldElementIndex = sorting.findIndex(
             ([e]) => e === this.name
           );
 
           if (oldElementIndex !== -1) {
             let oldElement: z.infer<
               typeof entityRoutes[P]["request"]
-            >["sorting"][number] = data[this.prefix]["sorting"].splice(
+            >["sorting"][number] = sorting.splice(
               oldElementIndex,
               1
             )[0];
+
+            const theName: entitiesType1[P] = this.name;
+            const theValue: entitiesType2[P] = this.value;
 
             switch (oldElement?.[1]) {
               case "DESC":
                 break;
               case "ASC":
-                data[this.prefix]["sorting"] = [
-                  ...data[this.prefix]["sorting"],
-                  [[this.name, "DESC", this.value]],
+                //sorting.push([theName, "DESC", theValue])
+
+                const adding: entitiesType3[P] = [[theName, "DESC", theValue]]
+
+                sorting = [
+                  ...sorting,
+                  ...adding,
                 ];
                 break;
             }
           } else {
-            data[this.prefix]["sorting"] = [
-              ...data[this.prefix]["sorting"],
+            sorting = [
+              ...sorting,
               ...[[this.name, "ASC", this.value]],
             ];
           }
