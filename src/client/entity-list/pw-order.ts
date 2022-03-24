@@ -170,22 +170,29 @@ export class PwOrder<
 
                 const adding = mappedTuple<P, entitiesType1, entitiesType15, entitiesType2>(this.url, theName, "DESC", theValue)
 
-                // @ts-expect-error
+                // @ts-expect-error bruh
                 const adding2: entitiesType4[P] = adding
 
+                // @ts-expect-error bruh
                 const adding3: entitiesType3[P] = [adding2];
 
+                sorting.push(adding2)
+
+                /*
+                // uff
                 sorting = [
                   ...sorting,
                   ...adding3,
-                ];
+                ];*/
                 break;
             }
           } else {
-            sorting = [
-              ...sorting,
-              ...[[this.name, "ASC", this.value]],
-            ];
+            const adding = mappedTuple<P, entitiesType1, entitiesType15, entitiesType2>(this.url, this.name, "ASC", this.value)
+
+            // @ts-expect-error bruh
+            const adding2: entitiesType4[P] = adding
+
+            sorting.push(adding2)
           }
 
           HistoryController.goto(
