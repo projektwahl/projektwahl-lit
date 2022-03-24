@@ -108,6 +108,15 @@
   <source>Actions</source>
   <target>Aktionen</target>
 </trans-unit>
+<trans-unit id="saae1c70e168b45b4">
+  <source>Admin</source>
+</trans-unit>
+<trans-unit id="s38c268c406e1b02b">
+  <source>Lehrer</source>
+</trans-unit>
+<trans-unit id="s461237cd996d9d4a">
+  <source>Schüler</source>
+</trans-unit>
 <trans-unit id="s88608c78750c1b37">
   <source>View account</source>
   <target>Account anzeigen</target>
@@ -160,10 +169,6 @@
 <trans-unit id="s2063a9d17c280fe5">
   <source>Info</source>
   <target>Info</target>
-</trans-unit>
-<trans-unit id="hd684a0e714c0d252">
-  <source>✓</source>
-  <target>✓</target>
 </trans-unit>
 <trans-unit id="s3e9c025477abb23d">
   <source>View project</source>
