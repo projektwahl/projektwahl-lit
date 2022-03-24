@@ -119,10 +119,8 @@ export async function fetchData<R extends keyof typeof entityRoutes>(
 
   const orderByQuery = sorting
     .flatMap((v) =>  {
-      // @ts-expect-error bruh
-      const v0: entitiesType6[R] = v[0];
-      // @ts-expect-error bruh
-      const v1: entitiesType2[R][typeof v0] = v[1];
+      const v0: entitiesType6[R] = mappedIndexing(v, 0);
+      const v1: entitiesType2[R][typeof v0] = mappedIndexing(v, 1);
       const v2: entitiesType10[R] = mappedIndexing(v, 2);
       return [
         sql`,`,
