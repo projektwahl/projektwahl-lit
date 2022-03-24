@@ -118,9 +118,11 @@ export class PwOrder<
           const oldElementIndex = data[this.prefix]["sorting"].findIndex(
             ([e]) => e === this.name
           );
-          
+
           if (oldElementIndex !== -1) {
-            let oldElement: z.infer<typeof entityRoutes[P]["request"]>["sorting"][number] = data[this.prefix]["sorting"].splice(
+            let oldElement: z.infer<
+              typeof entityRoutes[P]["request"]
+            >["sorting"][number] = data[this.prefix]["sorting"].splice(
               oldElementIndex,
               1
             )[0];
@@ -131,17 +133,16 @@ export class PwOrder<
               case "ASC":
                 data[this.prefix]["sorting"] = [
                   ...data[this.prefix]["sorting"],
-                  ([[this.name, "DESC", this.value]]),
+                  [[this.name, "DESC", this.value]],
                 ];
                 break;
             }
           } else {
             data[this.prefix]["sorting"] = [
               ...data[this.prefix]["sorting"],
-              ...([[this.name, "ASC", this.value]]),
-            ];;
+              ...[[this.name, "ASC", this.value]],
+            ];
           }
-        
 
           HistoryController.goto(
             new URL(

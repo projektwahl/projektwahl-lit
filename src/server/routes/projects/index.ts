@@ -111,9 +111,36 @@ export const projectsHandler = requestHandler(
              AND info  LIKE ${"%" + (query.filters.info ?? "") + "%"}`;
       },
       {
-        id: (q, o) => sql`id ${sql.unsafe(o === "backwards" ? (q === "ASC" ? "DESC" : "ASC") : (q === "ASC" ? "ASC" : "DESC"))}`,
-        title: (q, o) => sql`title ${sql.unsafe(o === "backwards" ? (q === "ASC" ? "DESC" : "ASC") : (q === "ASC" ? "ASC" : "DESC"))}`,
-        info: (q, o) => sql`info ${sql.unsafe(o === "backwards" ? (q === "ASC" ? "DESC" : "ASC") : (q === "ASC" ? "ASC" : "DESC"))}`,
+        id: (q, o) =>
+          sql`id ${sql.unsafe(
+            o === "backwards"
+              ? q === "ASC"
+                ? "DESC"
+                : "ASC"
+              : q === "ASC"
+              ? "ASC"
+              : "DESC"
+          )}`,
+        title: (q, o) =>
+          sql`title ${sql.unsafe(
+            o === "backwards"
+              ? q === "ASC"
+                ? "DESC"
+                : "ASC"
+              : q === "ASC"
+              ? "ASC"
+              : "DESC"
+          )}`,
+        info: (q, o) =>
+          sql`info ${sql.unsafe(
+            o === "backwards"
+              ? q === "ASC"
+                ? "DESC"
+                : "ASC"
+              : q === "ASC"
+              ? "ASC"
+              : "DESC"
+          )}`,
       }
     );
   }

@@ -111,9 +111,36 @@ export const choicesHandler = requestHandler(
       },
       {
         // TODO FIXME nulls first/last
-        rank: (q, o) => sql`rank ${sql.unsafe(o === "backwards" ? (q === "ASC" ? "DESC" : "ASC") : (q === "ASC" ? "ASC" : "DESC"))}`,
-        title: (q, o) => sql`id ${sql.unsafe(o === "backwards" ? (q === "ASC" ? "DESC" : "ASC") : (q === "ASC" ? "ASC" : "DESC"))}`,
-        id: (q, o) => sql`id ${sql.unsafe(o === "backwards" ? (q === "ASC" ? "DESC" : "ASC") : (q === "ASC" ? "ASC" : "DESC"))}`,
+        rank: (q, o) =>
+          sql`rank ${sql.unsafe(
+            o === "backwards"
+              ? q === "ASC"
+                ? "DESC"
+                : "ASC"
+              : q === "ASC"
+              ? "ASC"
+              : "DESC"
+          )}`,
+        title: (q, o) =>
+          sql`id ${sql.unsafe(
+            o === "backwards"
+              ? q === "ASC"
+                ? "DESC"
+                : "ASC"
+              : q === "ASC"
+              ? "ASC"
+              : "DESC"
+          )}`,
+        id: (q, o) =>
+          sql`id ${sql.unsafe(
+            o === "backwards"
+              ? q === "ASC"
+                ? "DESC"
+                : "ASC"
+              : q === "ASC"
+              ? "ASC"
+              : "DESC"
+          )}`,
       }
     );
   }

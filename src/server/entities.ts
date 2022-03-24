@@ -27,11 +27,18 @@ import type { entityRoutes, ResponseType } from "../lib/routes.js";
 import { sql } from "./database.js";
 import { unsafe2 } from "./sql/index.js";
 
-type ToIndexed<T extends { [K: string]: { [inner in I]: any } }, I extends string|number|symbol> = {
-  [K in keyof T]: T[K][I]
-}
+type ToIndexed<
+  T extends { [K: string]: { [inner in I]: any } },
+  I extends string | number | symbol
+> = {
+  [K in keyof T]: T[K][I];
+};
 
-export function mappedIndexing<T extends { [K: string]: { [inner in I]: any } }, K extends string, I extends string|number|symbol>(value: T[K], index: I): ToIndexed<T, I>[K] {
+export function mappedIndexing<
+  T extends { [K: string]: { [inner in I]: any } },
+  K extends string,
+  I extends string | number | symbol
+>(value: T[K], index: I): ToIndexed<T, I>[K] {
   return value[index];
 }
 
@@ -47,31 +54,47 @@ type entitiesType0 = {
 };
 
 type entitiesType1 = {
-  [K in keyof typeof entityRoutes]: z.infer<typeof entityRoutes[K]["request"]>["sorting"][number][0];
+  [K in keyof typeof entityRoutes]: z.infer<
+    typeof entityRoutes[K]["request"]
+  >["sorting"][number][0];
 };
 
 type entitiesType2 = {
   [K in keyof typeof entityRoutes]: {
-    [R in z.infer<typeof entityRoutes[K]["request"]>["sorting"][number][0]]: z.infer<typeof entityRoutes[K]["request"]>["sorting"][number][1];
-  }
+    [R in z.infer<
+      typeof entityRoutes[K]["request"]
+    >["sorting"][number][0]]: z.infer<
+      typeof entityRoutes[K]["request"]
+    >["sorting"][number][1];
+  };
 };
 
 type entitiesType9 = {
   [K in keyof typeof entityRoutes]: {
-    [R in z.infer<typeof entityRoutes[K]["request"]>["sorting"][number][0]]: z.infer<typeof entityRoutes[K]["request"]>["sorting"][number][2];
-  }
+    [R in z.infer<
+      typeof entityRoutes[K]["request"]
+    >["sorting"][number][0]]: z.infer<
+      typeof entityRoutes[K]["request"]
+    >["sorting"][number][2];
+  };
 };
 
 type entitiesType3 = {
-  [K in keyof typeof entityRoutes]: z.infer<typeof entityRoutes[K]["request"]>["sorting"];
+  [K in keyof typeof entityRoutes]: z.infer<
+    typeof entityRoutes[K]["request"]
+  >["sorting"];
 };
 
 type entitiesType4 = {
-  [K in keyof typeof entityRoutes]: z.infer<typeof entityRoutes[K]["request"]>["sorting"][number];
+  [K in keyof typeof entityRoutes]: z.infer<
+    typeof entityRoutes[K]["request"]
+  >["sorting"][number];
 };
 
 type entitiesType15 = {
-  [K in keyof typeof entityRoutes]: Array<z.infer<typeof entityRoutes[K]["request"]>["sorting"][number]>;
+  [K in keyof typeof entityRoutes]: Array<
+    z.infer<typeof entityRoutes[K]["request"]>["sorting"][number]
+  >;
 };
 
 type entitiesType5<X extends [any, ...any]> = {
@@ -96,9 +119,13 @@ type MappedId<T> = {
 
 type entitiesType8 = {
   [K in keyof typeof entityRoutes]: {
-    [key in entitiesType1[K]]: (order: entitiesType2[K][key], paginationDirection: "forwards" | "backwards", v: entitiesType9[K][key]) => PendingQuery<Row[]>
-  }
-}
+    [key in entitiesType1[K]]: (
+      order: entitiesType2[K][key],
+      paginationDirection: "forwards" | "backwards",
+      v: entitiesType9[K][key]
+    ) => PendingQuery<Row[]>;
+  };
+};
 
 export async function fetchData<R extends keyof typeof entityRoutes>(
   path: R,
@@ -114,14 +141,12 @@ export async function fetchData<R extends keyof typeof entityRoutes>(
 ): Promise<[OutgoingHttpHeaders, ResponseType<R>]> {
   let sorting: entitiesType15[R] = mappedIndexing(query, "sorting");
 
-  if (
-    !sorting.find((e) => e[0] == "id")
-  ) {
+  if (!sorting.find((e) => e[0] == "id")) {
     sorting.push(["id", "ASC"]);
   }
 
   const orderByQuery = sorting
-    .flatMap((v) =>  {
+    .flatMap((v) => {
       const v0: entitiesType6[R] = mappedIndexing(v, 0);
       const v1: entitiesType2[R][typeof v0] = mappedIndexing(v, 1);
       const v2: entitiesType10[R] = mappedIndexing(v, 2);
@@ -129,7 +154,8 @@ export async function fetchData<R extends keyof typeof entityRoutes>(
         sql`,`,
         // @ts-expect-error bruh
         sql`${orderByQueries[v0](v1, query.paginationCursor, v2)}`,
-    ]})
+      ];
+    })
     .slice(1)
     .reduce((prev, curr) => sql`${prev}${curr}`);
 
@@ -142,34 +168,32 @@ export async function fetchData<R extends keyof typeof entityRoutes>(
       query.paginationLimit + 1
     })`;
   } else {
-    const queries = sorting.map(
-      (value, index) => {
-        const part = sorting.slice(0, index + 1);
+    const queries = sorting.map((value, index) => {
+      const part = sorting.slice(0, index + 1);
 
-        const parts = part
-          .flatMap((value, index) => {
-            return [
-              sql` AND `,
-              // @ts-expect-error this seems impossible to type - we probably need to unify this to the indexed type before
-              sql`${paginationCursor ? paginationCursor[value[0]] : null} ${
-                index === part.length - 1
-                  ? value[1] === "ASC"
-                    ? sql`<`
-                    : sql`>`
-                  : sql`IS NOT DISTINCT FROM`
-              } ${unsafe2(value[0] ?? null)}`,
-            ];
-          })
-          .slice(1)
-          .reduce((prev, curr) => sql`${prev}${curr}`);
+      const parts = part
+        .flatMap((value, index) => {
+          return [
+            sql` AND `,
+            // @ts-expect-error this seems impossible to type - we probably need to unify this to the indexed type before
+            sql`${paginationCursor ? paginationCursor[value[0]] : null} ${
+              index === part.length - 1
+                ? value[1] === "ASC"
+                  ? sql`<`
+                  : sql`>`
+                : sql`IS NOT DISTINCT FROM`
+            } ${unsafe2(value[0] ?? null)}`,
+          ];
+        })
+        .slice(1)
+        .reduce((prev, curr) => sql`${prev}${curr}`);
 
-        return sql`(${sqlQuery(
-          query
-        )} AND (${parts}) ORDER BY ${orderByQuery} LIMIT ${
-          query.paginationLimit + 1
-        })`;
-      }
-    );
+      return sql`(${sqlQuery(
+        query
+      )} AND (${parts}) ORDER BY ${orderByQuery} LIMIT ${
+        query.paginationLimit + 1
+      })`;
+    });
 
     if (queries.length == 1) {
       finalQuery = queries[0];
