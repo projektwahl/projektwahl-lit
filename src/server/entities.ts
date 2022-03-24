@@ -27,11 +27,11 @@ import type { entityRoutes, ResponseType } from "../lib/routes.js";
 import { sql } from "./database.js";
 import { unsafe2 } from "./sql/index.js";
 
-type ToIndexed<T extends { [K: string]: Array<any> }, I extends number> = {
+type ToIndexed<T extends { [K: string]: { [inner in I]: any } }, I extends string|number|symbol> = {
   [K in keyof T]: T[K][I]
 }
 
-export function mappedIndexing<T extends { [K: string]: Array<any> }, K extends string, I extends number>(value: T[K], index: I): ToIndexed<T, I>[K] {
+export function mappedIndexing<T extends { [K: string]: { [inner in I]: any } }, K extends string, I extends string|number|symbol>(value: T[K], index: I): ToIndexed<T, I>[K] {
   return value[index];
 }
 
@@ -68,6 +68,10 @@ type entitiesType3 = {
 
 type entitiesType4 = {
   [K in keyof typeof entityRoutes]: z.infer<typeof entityRoutes[K]["request"]>["sorting"][number];
+};
+
+type entitiesType15 = {
+  [K in keyof typeof entityRoutes]: Array<z.infer<typeof entityRoutes[K]["request"]>["sorting"][number]>;
 };
 
 type entitiesType5<X extends [any, ...any]> = {
@@ -108,8 +112,7 @@ export async function fetchData<R extends keyof typeof entityRoutes>(
           password_hash: "nulls-first",
         },*/
 ): Promise<[OutgoingHttpHeaders, ResponseType<R>]> {
-  // @ts-expect-error bruh
-  let sorting: Array<entitiesType4[R]> = query.sorting;
+  let sorting: entitiesType15[R] = mappedIndexing(query, "sorting");
 
   if (
     !sorting.find((e) => e[0] == "id")
