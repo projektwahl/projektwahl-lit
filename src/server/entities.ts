@@ -65,12 +65,6 @@ type entitiesType9 = {
   };
 };
 
-type entitiesType3 = {
-  [K in keyof typeof entityRoutes]: z.infer<
-    typeof entityRoutes[K]["request"]
-  >["sorting"];
-};
-
 type entitiesType4 = {
   [K in keyof typeof entityRoutes]: z.infer<
     typeof entityRoutes[K]["request"]
@@ -83,24 +77,12 @@ type entitiesType15 = {
   >;
 };
 
-type entitiesType5<X extends [any, ...any]> = {
-  [K in keyof typeof entityRoutes]: X[0];
-};
-
 type entitiesType6 = {
   [K in keyof typeof entityRoutes]: entitiesType4[K][0];
 };
 
-type entitiesType7 = {
-  [K in keyof typeof entityRoutes]: entitiesType4[K][1];
-};
-
 type entitiesType10 = {
   [K in keyof typeof entityRoutes]: entitiesType4[K][2];
-};
-
-type MappedId<T> = {
-  [P in keyof T]: T[P];
 };
 
 type entitiesType8 = {
@@ -125,7 +107,7 @@ export async function fetchData<R extends keyof typeof entityRoutes>(
           password_hash: "nulls-first",
         },*/
 ): Promise<[OutgoingHttpHeaders, ResponseType<R>]> {
-  let sorting: entitiesType15[R] = mappedIndexing(query, "sorting");
+  const sorting: entitiesType15[R] = mappedIndexing(query, "sorting");
 
   if (!sorting.find((e) => e[0] == "id")) {
     sorting.push(["id", "ASC", null]);

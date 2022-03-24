@@ -34,13 +34,8 @@ import { myFetch } from "../utils.js";
 import { pwInputSelect } from "../form/pw-input-select.js";
 import {
   mappedFunctionCall,
-  mappedIndexing,
   mappedIndexingSet,
 } from "../../lib/result.js";
-
-type entitiesType0 = {
-  [P in keyof typeof entityRoutes]: z.infer<typeof entityRoutes[P]["request"]>;
-};
 
 export type parseRequestWithPrefixType<PREFIX extends string> = {
   [P in keyof typeof entityRoutes]: z.infer<

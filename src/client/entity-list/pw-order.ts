@@ -20,7 +20,7 @@ https://github.com/projektwahl/projektwahl-lit
 SPDX-License-Identifier: AGPL-3.0-or-later
 SPDX-FileCopyrightText: 2021 Moritz Hedtke <Moritz.Hedtke@t-online.de>
 */
-import { html, TemplateResult } from "lit";
+import { html } from "lit";
 import { bootstrapCss } from "../index.js";
 import { HistoryController } from "../history-controller.js";
 import { msg, str } from "@lit/localize";
@@ -158,13 +158,13 @@ export class PwOrder<
             this.prefix
           );
 
-          let sorting: entitiesType3[P] = mappedIndexing(actualData, "sorting");
+          const sorting: entitiesType3[P] = mappedIndexing(actualData, "sorting");
 
           const oldElementIndex = sorting.findIndex(([e]) => e === this.name);
 
           if (oldElementIndex !== -1) {
             // splice REMOVES the elements from the original array
-            let oldElement: z.infer<
+            const oldElement: z.infer<
               typeof entityRoutes[P]["request"]
             >["sorting"][number] = sorting.splice(oldElementIndex, 1)[0];
 
@@ -174,7 +174,7 @@ export class PwOrder<
             switch (oldElement?.[1]) {
               case "DESC":
                 break;
-              case "ASC":
+              case "ASC": {
                 //sorting.push([theName, "DESC", theValue])
                 const adding = mappedTuple<
                   P,
@@ -187,7 +187,9 @@ export class PwOrder<
                 const adding2: entitiesType4[P] = adding;
 
                 sorting.push(adding2);
+
                 break;
+              }
             }
           } else {
             const adding = mappedTuple<
