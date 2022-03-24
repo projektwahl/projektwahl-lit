@@ -62,14 +62,14 @@ export const result = <
 ) => z.union([successResult(s), failureResult(z.record(z.string()))]);
 
 export type ToIndexed<
-  T extends { [K: string]: { [inner in I]: any } },
+  T extends { [K: string]: { [inner in I]: unknown } },
   I extends string | number | symbol
 > = {
   [K in keyof T]: T[K][I];
 };
 
 export function mappedIndexing<
-  T extends { [K: string]: { [inner in I]: any } },
+  T extends { [K: string]: { [inner in I]: unknown } },
   K extends string,
   I extends string | number | symbol
 >(value: T[K], index: I): ToIndexed<T, I>[K] {
@@ -77,27 +77,27 @@ export function mappedIndexing<
 }
 
 export function mappedIndexingSet<
-  T extends { [K: string]: { [inner in I]: any } },
+  T extends { [K: string]: { [inner in I]: unknown } },
   K extends string,
   I extends string | number | symbol
 >(value: T[K], index: I, newValue: ToIndexed<T, I>[K]): void {
-  return (value[index] = newValue);
+  value[index] = newValue;
 }
 
 export type ToTuple<
   K extends string | symbol | number,
-  T extends { [key in K]: any },
-  Q extends { [key in K]: any },
-  R extends { [key in K]: any }
+  T extends { [key in K]: unknown },
+  Q extends { [key in K]: unknown },
+  R extends { [key in K]: unknown }
 > = {
   [key in K]: [T[key], Q[key], R[key]];
 };
 
 export function mappedTuple<
   K extends string | number | symbol,
-  T extends { [key in K]: any },
-  Q extends { [key in K]: any },
-  R extends { [key in K]: any }
+  T extends { [key in K]: unknown },
+  Q extends { [key in K]: unknown },
+  R extends { [key in K]: unknown }
 >(path: K, value1: T[K], value2: Q[K], value3: R[K]): ToTuple<K, T, Q, R>[K] {
   return [value1, value2, value3];
 }
@@ -106,12 +106,12 @@ export function testa<Output>(zodtype: ZodType<Output>, data: unknown): Output {
   return zodtype.parse(data);
 }
 
-export type MappedFunctionCallType<T extends { [K: string]: ZodType<any> }> = {
+export type MappedFunctionCallType<T extends { [K: string]: ZodType<unknown> }> = {
   [K in keyof T]: T[K]["_output"];
 };
 
 export function mappedFunctionCall<
-  T extends { [K: string]: ZodType<any> },
+  T extends { [K: string]: ZodType<unknown> },
   K extends string
 >(schema: T[K], value: unknown): MappedFunctionCallType<T>[K] {
   return testa(schema, value);

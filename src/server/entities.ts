@@ -113,11 +113,13 @@ export async function fetchData<R extends keyof typeof entityRoutes>(
     sorting.push(["id", "ASC", null]);
   }
 
+  // TODO FIXME flatmap with the mappedfunctincall?
   const orderByQuery = sorting
     .flatMap((v) => {
-      const v0: entitiesType6[R] = mappedIndexing(v, 0);
-      const v1: entitiesType2[R][typeof v0] = mappedIndexing(v, 1);
-      const v2: entitiesType10[R] = mappedIndexing(v, 2);
+      const theV: entitiesType4[R] = v;
+      const v0: entitiesType6[R] = mappedIndexing<entitiesType4, R, 0>(theV, 0);
+      const v1: entitiesType2[R][typeof v0] = mappedIndexing(theV, 1);
+      const v2: entitiesType10[R] = mappedIndexing(theV, 2);
       return [
         sql`,`,
         // @ts-expect-error bruh
