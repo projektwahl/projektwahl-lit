@@ -28,6 +28,7 @@ import type { entityRoutes } from "../../lib/routes.js";
 import type { z } from "zod";
 import { parseRequestWithPrefix } from "./pw-entitylist.js";
 import { PwElement } from "../pw-element.js";
+import { mappedIndexing } from '../../lib/result.js'
 
 // workaround see https://github.com/runem/lit-analyzer/issues/149#issuecomment-1006162839
 export function pwOrder<P extends keyof typeof entityRoutes, X extends string>(
@@ -114,6 +115,8 @@ export class PwOrder<
             this.prefix,
             this.history.url
           );
+
+          const actualData: typeof entityRoutes[P]["request"] = mappedIndexing(data, this.prefix);
 
           const oldElementIndex = data[this.prefix]["sorting"].findIndex(
             ([e]) => e === this.name

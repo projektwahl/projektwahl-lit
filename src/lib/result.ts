@@ -60,3 +60,18 @@ export const result = <
 >(
   s: ZodObject<T, UnknownKeys, Catchall>
 ) => z.union([successResult(s), failureResult(z.record(z.string()))]);
+
+export type ToIndexed<
+  T extends { [K: string]: { [inner in I]: any } },
+  I extends string | number | symbol
+> = {
+  [K in keyof T]: T[K][I];
+};
+
+export function mappedIndexing<
+  T extends { [K: string]: { [inner in I]: any } },
+  K extends string,
+  I extends string | number | symbol
+>(value: T[K], index: I): ToIndexed<T, I>[K] {
+  return value[index];
+}

@@ -26,21 +26,7 @@ import type { z } from "zod";
 import type { entityRoutes, ResponseType } from "../lib/routes.js";
 import { sql } from "./database.js";
 import { unsafe2 } from "./sql/index.js";
-
-type ToIndexed<
-  T extends { [K: string]: { [inner in I]: any } },
-  I extends string | number | symbol
-> = {
-  [K in keyof T]: T[K][I];
-};
-
-export function mappedIndexing<
-  T extends { [K: string]: { [inner in I]: any } },
-  K extends string,
-  I extends string | number | symbol
->(value: T[K], index: I): ToIndexed<T, I>[K] {
-  return value[index];
-}
+import { mappedIndexing } from '../lib/result.js'
 
 // Mapped Types
 // https://www.typescriptlang.org/docs/handbook/2/mapped-types.html
