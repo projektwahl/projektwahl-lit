@@ -64,6 +64,16 @@ class FormTester {
     await element.sendKeys(value);
   }
 
+  async setTextareaField(name: string, value: string) {
+    const element = await this.form.findElement(
+      By.css(`textarea[name="${name}"]`)
+    );
+    await element.click();
+    await element.clear();
+    await element.click();
+    await element.sendKeys(value);
+  }
+
   async checkField(name: string, value: boolean) {
     const element = await this.form.findElement(
       By.css(`input[name="${name}"]`)
@@ -74,9 +84,7 @@ class FormTester {
   }
 
   async getField(name: string) {
-    const element = await this.form.findElement(
-      By.css(`input[name="${name}"]`)
-    );
+    const element = await this.form.findElement(By.css(`*[name="${name}"]`));
     return await element.getAttribute("value");
   }
 
@@ -219,7 +227,7 @@ async function runTest(testFunction: (helper: Helper) => Promise<void>) {
   // eslint-disable-next-line @typescript-eslint/no-unsafe-call
   await driver.setNetworkConditions({
     offline: false,
-    latency: 100, // Additional latency (ms).
+    latency: 200, // Additional latency (ms).
     download_throughput: 0, // Maximal aggregated download throughput.
     upload_throughput: 0, // Maximal aggregated upload throughput.
   });
@@ -469,7 +477,7 @@ async function createProjectAllFields(helper: Helper) {
   const random_assignments = Math.random() > 0.5 ? true : false;
   const deleted = Math.random() > 0.5 ? true : false;
   await form.setField("title", title);
-  await form.setField("info", info);
+  await form.setTextareaField("info", info);
   await form.setField("place", place);
   await form.setField("costs", `${costs}`);
   await form.setField("min_age", `${min_age}`);

@@ -174,18 +174,22 @@ export abstract class PwInput<
               })
             );
           }}
-          type=${this.type}
+          type=${ifDefined(this.type !== "textarea" ? this.type : undefined)}
           name=${this.name}
           value=${ifDefined(
-            this.initial !== undefined && this.type !== "checkbox"
+            this.initial !== undefined &&
+              this.type !== "checkbox" &&
+              this.type !== "textarea"
               ? this.get(this.initial)
               : undefined
           )}
-          ?checked=${
-            this.initial !== undefined
-              ? this.get(this.initial)
-              : this.defaultValue
-          }
+          ?checked=${ifDefined(
+            this.type === "checkbox"
+              ? this.initial !== undefined
+                ? this.get(this.initial)
+                : this.defaultValue
+              : undefined
+          )}
           class="${
             this.type === "checkbox" ? "form-check-input" : "form-control"
           } ${this.task.render({
@@ -211,31 +215,31 @@ export abstract class PwInput<
                 initial: () => false,
               }))
           }
-        >
-          ${
-            this.type === "select" && this.options
-              ? repeat(
-                  this.options,
-                  (o) => o.value,
-                  (o) =>
-                    html`<option
-                      ?selected=${this.initial !== undefined
-                        ? this.get(this.initial) === o.value
-                        : false}
-                      value=${o.value}
-                    >
-                      ${o.text}
-                    </option>`
-                )
-              : undefined
-          }
-        </${
-          this.type === "select"
-            ? literal`select`
-            : this.type === "textarea"
-            ? literal`textarea`
-            : literal`input`
-        }>
+        >${
+          this.type === "select" && this.options
+            ? repeat(
+                this.options,
+                (o) => o.value,
+                (o) =>
+                  html`<option
+                    ?selected=${this.initial !== undefined
+                      ? this.get(this.initial) === o.value
+                      : false}
+                    value=${o.value}
+                  >
+                    ${o.text}
+                  </option>`
+              )
+            : this.type === "textarea" && this.initial
+            ? this.get(this.initial)
+            : undefined
+        }</${
+      this.type === "select"
+        ? literal`select`
+        : this.type === "textarea"
+        ? literal`textarea`
+        : literal`input`
+    }>
         ${
           this.autocomplete === "new-password"
             ? html`<div id="passwordHelp" class="form-text">
