@@ -38,6 +38,10 @@ type entitiesType1 = {
   [P in keyof typeof entityRoutes]: z.infer<typeof entityRoutes[P]["request"]>["sorting"][number][0]
 }
 
+type entitiesType15 = {
+  [P in keyof typeof entityRoutes]: z.infer<typeof entityRoutes[P]["request"]>["sorting"][number][1]
+}
+
 type entitiesType2 = {
   [P in keyof typeof entityRoutes]: z.infer<typeof entityRoutes[P]["request"]>["sorting"][number][2]
 }
@@ -164,7 +168,7 @@ export class PwOrder<
               case "ASC":
                 //sorting.push([theName, "DESC", theValue])
 
-                const adding: entitiesType4[P] = mappedTuple(theName, "DESC", theValue)
+                const adding: entitiesType4[P] = mappedTuple<P, entitiesType1, entitiesType15, entitiesType2>(theName, "DESC", theValue)
 
                 sorting = [
                   ...sorting,
