@@ -48,6 +48,11 @@ type entitiesType3 = {
   >;
 };
 
+type entitiesType4 = {
+  [K in keyof typeof entityRoutes]: 
+    z.infer<typeof entityRoutes[K]["request"]>["sorting"][number];
+};
+
 // workaround see https://github.com/runem/lit-analyzer/issues/149#issuecomment-1006162839
 export function pwOrder<P extends keyof typeof entityRoutes, X extends string>(
   props: Pick<
@@ -159,7 +164,7 @@ export class PwOrder<
               case "ASC":
                 //sorting.push([theName, "DESC", theValue])
 
-                const adding: entitiesType3[P] = [[theName, "DESC", theValue]]
+                const adding: entitiesType4[P] = [theName, "DESC", theValue]
 
                 sorting = [
                   ...sorting,
