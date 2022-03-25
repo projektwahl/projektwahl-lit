@@ -154,7 +154,7 @@ export abstract class PwInput<
     // https://getbootstrap.com/docs/5.1/forms/validation/
     return html`
       ${bootstrapCss}
-      <div class="col">
+      <div class="col mb-3">
       ${
         this.type !== "checkbox" && this.label !== null
           ? html`<label for=${this.randomId} class="form-label"
@@ -162,7 +162,7 @@ export abstract class PwInput<
             >`
           : undefined
       }
-      <div class="${this.type !== "checkbox" ? "input-group" : ""} mb-3">
+      <div class="${this.type !== "checkbox" ? "input-group" : ""}">
         <${
           this.type === "select"
             ? literal`select`
@@ -245,7 +245,13 @@ export abstract class PwInput<
         ? literal`textarea`
         : literal`input`
     }>
-    
+    ${
+      this.type === "checkbox" && this.label !== null
+        ? html`<label for=${this.randomId} class="form-check-label"
+            >${this.label}</label
+          >`
+        : undefined
+    }
     <button class="btn btn-outline-secondary" type="button">
                   <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-counterclockwise" viewBox="0 0 16 16">
                   <path fill-rule="evenodd" d="M8 3a5 5 0 1 1-4.546 2.914.5.5 0 0 0-.908-.417A6 6 0 1 0 8 2v1z"/>
@@ -278,35 +284,29 @@ export abstract class PwInput<
         })}
       </div>
       ${
-                    this.autocomplete === "new-password"
-                      ? html`<div id="passwordHelp" class="form-text">
-                          <a
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            href="https://imgs.xkcd.com/comics/password_strength.png"
-                            >${msg(
-                              "Denk dran: Lange Passwörter sind viel sicherer als welche mit vielen Sonderzeichen."
-                            )}</a
-                          ><br />
-                          ${msg(html` Also lieber "Ich mag fliegende Autos."
-                            anstatt "Moritz1234!".<br />Du kannst auch einen
-                            Passwort-Manager verwenden, z.B.`)}
-                          <a
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            href="https://bitwarden.com/download/"
-                            >${msg("Bitwarden")}</a
-                          >
-                        </div>`
-                      : undefined
-                  }
-      ${
-        this.type === "checkbox" && this.label !== null
-          ? html`<label for=${this.randomId} class="form-check-label"
-              >${this.label}</label
-            >`
+        this.autocomplete === "new-password"
+          ? html`<div id="passwordHelp" class="form-text">
+              <a
+                target="_blank"
+                rel="noopener noreferrer"
+                href="https://imgs.xkcd.com/comics/password_strength.png"
+                >${msg(
+                  "Denk dran: Lange Passwörter sind viel sicherer als welche mit vielen Sonderzeichen."
+                )}</a
+              ><br />
+              ${msg(html` Also lieber "Ich mag fliegende Autos." anstatt
+                "Moritz1234!".<br />Du kannst auch einen Passwort-Manager
+                verwenden, z.B.`)}
+              <a
+                target="_blank"
+                rel="noopener noreferrer"
+                href="https://bitwarden.com/download/"
+                >${msg("Bitwarden")}</a
+              >
+            </div>`
           : undefined
       }
+      
       </div>
     `;
   }
