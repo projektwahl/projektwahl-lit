@@ -394,6 +394,52 @@ CREATE TRIGGER trigger_check_project_leader_choices BEFORE INSERT ON choices
 FOR EACH ROW
 EXECUTE FUNCTION check_project_leader_choices();
 
+
+
+
+
+
+-- https://www.postgresql.org/docs/14/plpgsql-trigger.html
+-- https://www.postgresql.org/docs/current/sql-createtrigger.html
+
+CREATE OR REPLACE FUNCTION check_users_project_leader_id1() RETURNS TRIGGER AS $body$
+BEGIN
+  RAISE EXCEPTION 'Testweise darfst du keine project_leader_ids ändern';
+  RETURN NEW;
+END;
+$body$ LANGUAGE plpgsql;
+
+DROP TRIGGER IF EXISTS trigger_check_users_project_leader_id1 ON users_with_deleted;
+
+CREATE TRIGGER trigger_check_users_project_leader_id1
+BEFORE UPDATE OF project_leader_id ON users_with_deleted
+FOR EACH ROW
+EXECUTE FUNCTION check_users_project_leader_id1();
+
+--CREATE TRIGGER trigger_check_users_project_leader_id
+--BEFORE INSERT OR UPDATE ON users_with_deleted
+--FOR EACH ROW
+--EXECUTE FUNCTION check_users_project_leader_id();
+
+-- UPDATE OF project_leader_id
+
+-- UPDATE OF (anything else)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 INSERT INTO settings (id, election_running) VALUES (1, false) ON CONFLICT DO NOTHING;
 
 COMMIT;
