@@ -87,7 +87,6 @@ export const PwProjectCreate = setupHmr(
         _initialTask: { state: true },
         type: { state: true },
         initial: { attribute: false },
-        initialRender: { state: true },
       };
     }
 
@@ -98,8 +97,6 @@ export const PwProjectCreate = setupHmr(
         ? msg("Update project")
         : msg("Create project");
     }
-
-    initialRender: boolean;
 
     initial:
       | z.SafeParseSuccess<
@@ -112,8 +109,6 @@ export const PwProjectCreate = setupHmr(
 
     constructor() {
       super();
-
-      this.initialRender = false;
 
       /**
        * @override

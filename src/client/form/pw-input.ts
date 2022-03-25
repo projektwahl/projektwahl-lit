@@ -60,6 +60,7 @@ export abstract class PwInput<
         attribute: false,
       },
       resettable: { attribute: false },
+      currentValue: { state: true },
     };
   }
 
@@ -106,6 +107,8 @@ export abstract class PwInput<
   options?: { value: T; text: string }[];
 
   defaultValue!: T;
+
+  currentValue: any;
 
   constructor() {
     super();

@@ -177,8 +177,6 @@ export class PwApp extends PwElement {
 
   private history;
 
-  initialRender: boolean;
-
   initial: import("lit").TemplateResult | undefined;
 
   navbarOpen: boolean;
@@ -224,12 +222,8 @@ export class PwApp extends PwElement {
   constructor() {
     super();
 
-    this.initialRender = true;
-
     this.nextPage = async ([key]: [keyof typeof pages | undefined]) => {
-      if (this.initialRender) {
-        this.initialRender = false;
-
+      if (!this.hasUpdated) {
         if (this.initial) {
           return this.initial;
         }

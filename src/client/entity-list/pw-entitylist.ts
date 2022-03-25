@@ -150,8 +150,6 @@ export class PwEntityList<
     return "blub";
   }
 
-  initialRender: boolean;
-
   initial: ResponseType<P> | undefined;
 
   protected history;
@@ -162,8 +160,6 @@ export class PwEntityList<
     super();
 
     this.history = new HistoryController(this, /.*/);
-
-    this.initialRender = true;
   }
 
   override render() {
@@ -176,9 +172,7 @@ export class PwEntityList<
       throw new Error(msg("component not fully initialized"));
     }
 
-    if (this.initialRender) {
-      this.initialRender = false;
-
+    if (!this.hasUpdated) {
       this._task = new Task(this, {
         task: async () => {
           const data = parseRequestWithPrefix(
