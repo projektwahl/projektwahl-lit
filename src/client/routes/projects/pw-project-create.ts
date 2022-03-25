@@ -110,12 +110,6 @@ export const PwProjectCreate = setupHmr(
     constructor() {
       super();
 
-      this.formData = {
-        ...(this.initial?.success
-          ? { id: this.initial.data.id }
-          : { id: undefined }), // TODO FIXME
-      }
-
       /**
        * @override
        */
@@ -137,6 +131,14 @@ export const PwProjectCreate = setupHmr(
     }
 
     override render() {
+      if (!this.hasUpdated) {
+        this.formData = {
+          ...(this.initial?.success
+            ? { id: this.initial.data.id }
+            : { id: undefined }), // TODO FIXME
+        }
+      }
+
       if (this.initial === undefined || this.initial.success) {
         if (this.actionText === undefined) {
           throw new Error(msg("component not fully initialized"));

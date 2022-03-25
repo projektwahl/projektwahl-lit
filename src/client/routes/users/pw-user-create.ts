@@ -102,17 +102,6 @@ class PwUserCreate extends PwForm<"/api/v1/users/create-or-update"> {
   constructor() {
     super();
 
-    this.formData = [
-      this.initial?.success
-        ? {
-            action: "update",
-            project_leader_id: undefined,
-            force_in_project_id: undefined,
-            id: this.initial.data[0].id,
-          }
-        : { action: "create" },
-    ]
-
     this.url = "/api/v1/users/create-or-update";
 
     this._task = new Task(this, async () => {
@@ -136,6 +125,19 @@ class PwUserCreate extends PwForm<"/api/v1/users/create-or-update"> {
   }
 
   override render() {
+    if (!this.hasUpdated) {
+      this.formData = [
+        this.initial?.success
+          ? {
+              action: "update",
+              project_leader_id: undefined,
+              force_in_project_id: undefined,
+              id: this.initial.data[0].id,
+            }
+          : { action: "create" },
+      ]
+    }
+
     if (this.initial === undefined || this.initial.success) {
       if (this.actionText === undefined) {
         throw new Error(msg("component not fully initialized"));
