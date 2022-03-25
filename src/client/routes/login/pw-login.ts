@@ -50,17 +50,10 @@ class PwLogin extends PwForm<"/api/v1/login"> {
     super();
 
     this._task = new Task(this, async () => {
-      const formDataEvent = new CustomEvent("myformdata", {
-        bubbles: false,
-        detail: {},
-      });
-      this.form.value?.dispatchEvent(formDataEvent);
-
       const result = await myFetch<"/api/v1/login">(
         "POST",
         "/api/v1/login",
-        // @ts-expect-error TODO FIXME design change needed
-        formDataEvent.detail,
+        this.formData,
         {}
       );
 

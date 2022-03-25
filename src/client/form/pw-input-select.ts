@@ -87,20 +87,23 @@ export class PwInputSelect<
   P extends keyof typeof routes,
   T extends string | number | undefined
 > extends PwInput<P, T, HTMLSelectElement> {
-  myformdataEventListener = (
-    event: CustomEvent<z.infer<typeof routes[P]["request"]>>
+  mypwinputchangeDispatcher = (
   ) => {
     if (!this.input.value) {
       throw new Error();
     }
     const input = this.input.value;
-    this.set(
-      event.detail,
-      input.selectedIndex == -1
-        ? this.defaultValue
-        : this.options?.find((v) => v.value == input.value)?.value ??
-            this.defaultValue // To make numbers work
-    );
+
+    this.currentValue = input.selectedIndex == -1
+    ? this.defaultValue
+    : this.options?.find((v) => v.value == input.value)?.value ??
+        this.defaultValue // To make numbers work
+
+    this.dispatchEvent(new CustomEvent<unknown>("pwinputchange", {
+      bubbles: true,
+      cancelable: false,
+      detail: this.currentValue
+    }))
   };
 }
 

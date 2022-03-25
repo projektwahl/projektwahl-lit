@@ -31,8 +31,7 @@ declare global {
   }
 
   interface HTMLElementEventMap {
-    myformdata: CustomEvent<Record<string, unknown>>;
-    myformkeys: CustomEvent<string[][]>;
+    pwinputchange: CustomEvent<unknown>;
   }
 
   interface Window {

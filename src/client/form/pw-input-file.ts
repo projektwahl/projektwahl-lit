@@ -85,14 +85,21 @@ export class PwInputFile<P extends keyof typeof routes> extends PwInput<
   Promise<string> | undefined,
   HTMLInputElement
 > {
-  myformdataEventListener = (
-    event: CustomEvent<z.infer<typeof routes[P]["request"]>>
+  mypwinputchangeDispatcher = (
   ) => {
     if (!this.input.value) {
       throw new Error();
     }
     if (this.input.value.files?.length === 1) {
-      this.set(event.detail, this.input.value.files.item(0)?.text());
+      this.currentValue = this.input.value.files.item(0)?.text()
+
+      this.dispatchEvent(new CustomEvent<unknown>("pwinputchange", {
+        bubbles: true,
+        cancelable: false,
+        detail: this.currentValue
+      }))
+    } else {
+      throw new Error("invalid amount of files selected")
     }
   };
 }

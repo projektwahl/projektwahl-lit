@@ -175,24 +175,16 @@ export class PwEntityList<
     if (!this.hasUpdated) {
       this._task = new Task(this, {
         task: async () => {
-          const data = parseRequestWithPrefix(
+          /*const initialData = parseRequestWithPrefix(
             this.url,
             this.prefix,
             this.history.url
-          );
-
-          const formDataEvent = new CustomEvent<
-            z.infer<typeof entityRoutes[P]["request"]>
-          >("myformdata", {
-            bubbles: false,
-            detail: data[this.prefix] ?? {},
-          });
-          this.form.value?.dispatchEvent(formDataEvent);
+          );*/
 
           const result = await myFetch<P>(
             "GET",
             this.url,
-            formDataEvent.detail,
+            this.formData,
             {}
           );
 
@@ -201,7 +193,7 @@ export class PwEntityList<
               `?${encodeURIComponent(
                 JSON.stringify({
                   ...data,
-                  [this.prefix]: formDataEvent.detail,
+                  [this.prefix]: this.formData,
                 })
               )}`,
               window.location.href

@@ -124,12 +124,7 @@ export abstract class PwInput<
     return this;
   }
 
-  myformkeysEventListener = (event: CustomEvent<(string | number)[][]>) => {
-    event.detail.push(this.name);
-  };
-
-  abstract myformdataEventListener: (
-    event: CustomEvent<z.infer<typeof routes[P]["request"]>>
+  abstract mypwinputchangeDispatcher: (
   ) => void;
 
   override connectedCallback() {
@@ -139,14 +134,12 @@ export abstract class PwInput<
       throw new Error();
     }
     this.form = form;
-    this.form.addEventListener("myformdata", this.myformdataEventListener);
-    this.form.addEventListener("myformkeys", this.myformkeysEventListener);
+    this.addEventListener("input", this.mypwinputchangeDispatcher);
   }
 
   override disconnectedCallback() {
     super.disconnectedCallback();
-    this.form.removeEventListener("myformdata", this.myformdataEventListener);
-    this.form.removeEventListener("myformkeys", this.myformkeysEventListener);
+    this.removeEventListener("input", this.mypwinputchangeDispatcher);
   }
 
   override render() {
@@ -179,9 +172,6 @@ export abstract class PwInput<
         }
           ${ref(this.input)}
           @input=${() => {
-            this.currentValue = this.input.value.value;
-            console.log(this.currentValue)
-
             this.input.value?.dispatchEvent(
               new CustomEvent("refreshentitylist", {
                 bubbles: true,

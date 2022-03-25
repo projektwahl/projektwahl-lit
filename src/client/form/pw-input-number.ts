@@ -87,19 +87,22 @@ export class PwInputNumber<
   P extends keyof typeof routes,
   T extends number | undefined | null
 > extends PwInput<P, T, HTMLInputElement> {
-  myformdataEventListener = (
-    event: CustomEvent<z.infer<typeof routes[P]["request"]>>
+  mypwinputchangeDispatcher = (
   ) => {
     if (!this.input.value) {
       throw new Error();
     }
-    this.set(
-      event.detail,
-      this.input.value.value === ""
-        ? this.defaultValue
-        : // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
-          (this.input.value.valueAsNumber as T)
-    );
+
+    this.currentValue = this.input.value.value === ""
+    ? this.defaultValue
+    : // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
+      (this.input.value.valueAsNumber as T)
+
+    this.dispatchEvent(new CustomEvent<unknown>("pwinputchange", {
+      bubbles: true,
+      cancelable: false,
+      detail: this.currentValue
+    }))
   };
 }
 

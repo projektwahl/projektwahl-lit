@@ -51,17 +51,12 @@ class PwUsersImport extends PwForm<"/api/v1/users/create-or-update"> {
     super();
 
     this._task = new Task(this, async () => {
-      const formDataEvent = new CustomEvent<{
-        file: Promise<string | undefined>;
-      }>("myformdata", {
-        bubbles: false,
-        detail: { file: Promise.resolve(undefined) },
-      });
-      this.form.value?.dispatchEvent(formDataEvent);
+      /* const initialData: { file: Promise.resolve(undefined) } */
+      
 
       // TODO FIXME check that file upload succeeded
 
-      const fileContents = await formDataEvent.detail.file;
+      const fileContents = await this.formData.file;
 
       const result = await myFetch<"/api/v1/users/create-or-update">(
         "POST",

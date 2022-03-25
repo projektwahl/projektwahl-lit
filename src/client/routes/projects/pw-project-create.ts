@@ -114,26 +114,15 @@ export const PwProjectCreate = setupHmr(
        * @override
        */
       this._task = new Task(this, async () => {
-        const formDataEvent = new CustomEvent<
-          z.infer<
-            typeof routes[
-              | "/api/v1/projects/create"
-              | "/api/v1/projects/update"]["request"]
-          >
-        >("myformdata", {
-          bubbles: false,
-          // @ts-expect-error not typecheckable with current design
-          detail: {
+        /* const initialData = {
             ...(this.initial?.success
               ? { id: this.initial.data.id }
               : { id: undefined }), // TODO FIXME
-          },
-        });
-        this.form.value?.dispatchEvent(formDataEvent);
+          } */
 
         const result = await myFetch<
           "/api/v1/projects/create" | "/api/v1/projects/update"
-        >("POST", this.url, formDataEvent.detail, {});
+        >("POST", this.url, this.formData, {});
 
         if (result.success) {
           HistoryController.goto(

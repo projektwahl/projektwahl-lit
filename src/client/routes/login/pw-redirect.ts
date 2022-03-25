@@ -47,12 +47,6 @@ class PwRedirect extends PwForm<"/api/v1/redirect"> {
     super();
 
     this._task = new Task(this, async () => {
-      const formDataEvent = new CustomEvent("myformdata", {
-        bubbles: false,
-        detail: {},
-      });
-      this.form.value?.dispatchEvent(formDataEvent);
-
       const searchParams = z
         .object({
           session_state: z.string(),

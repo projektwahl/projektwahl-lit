@@ -103,16 +103,19 @@ export class PwInputCheckbox<
   falseValue!: T;
   trueValue!: T;
 
-  myformdataEventListener = (
-    event: CustomEvent<z.infer<typeof routes[P]["request"]>>
+  mypwinputchangeDispatcher = (
   ) => {
     if (!this.input.value) {
       throw new Error();
     }
-    this.set(
-      event.detail,
-      this.input.value.checked ? this.trueValue : this.falseValue
-    );
+
+    this.currentValue = this.input.value.checked ? this.trueValue : this.falseValue
+
+    this.dispatchEvent(new CustomEvent<unknown>("pwinputchange", {
+      bubbles: true,
+      cancelable: false,
+      detail: this.currentValue
+    }))
   };
 }
 
