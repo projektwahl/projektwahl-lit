@@ -150,7 +150,11 @@ export abstract class PwInput<
     }
 
     if (!this.hasUpdated) {
-      this.set(this.pwForm.formData, this.get(this.initial));
+      if (this.initial !== undefined) {
+        this.set(this.pwForm.formData, this.get(this.initial));
+      } else {
+        this.set(this.pwForm.formData, this.defaultValue);
+      }
     }
 
     // https://getbootstrap.com/docs/5.1/forms/validation/

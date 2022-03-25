@@ -80,6 +80,11 @@ class PwLogin extends PwForm<"/api/v1/login"> {
       throw new Error(msg("component not fully initialized"));
     }
 
+    if (!this.hasUpdated) {
+      // @ts-expect-error impossible
+      this.formData = {}
+    }
+
     return html`
       ${bootstrapCss}
       <main class="container">
