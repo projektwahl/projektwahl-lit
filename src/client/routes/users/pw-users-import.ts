@@ -54,6 +54,7 @@ class PwUsersImport extends PwForm<"/api/v1/users/create-or-update"> {
       // TODO FIXME check that file upload succeeded
 
       // @ts-expect-error impossible
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
       const fileContents = await this.formData.file;
 
       const result = await myFetch<"/api/v1/users/create-or-update">(

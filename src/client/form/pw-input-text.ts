@@ -22,9 +22,7 @@ SPDX-FileCopyrightText: 2021 Moritz Hedtke <Moritz.Hedtke@t-online.de>
 */
 import { html } from "lit";
 import { ifDefined } from "lit/directives/if-defined.js";
-import type { z } from "zod";
 import type { routes } from "../../lib/routes.js";
-import { PwForm } from "./pw-form.js";
 import { PwInput } from "./pw-input.js";
 
 // workaround see https://github.com/runem/lit-analyzer/issues/149#issuecomment-1006162839

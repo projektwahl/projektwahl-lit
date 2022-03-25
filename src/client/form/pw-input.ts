@@ -79,7 +79,7 @@ export abstract class PwInput<
 
   enabled?: boolean = false;
 
-  resettable: boolean = false;
+  resettable = false;
 
   randomId;
 
@@ -128,13 +128,14 @@ export abstract class PwInput<
   override connectedCallback() {
     super.connectedCallback();
     this.addEventListener("input", this.mypwinputchangeDispatcher);
-    let curr: HTMLElement | null = this;
-    while (!(curr instanceof PwForm)) {
+    let curr: HTMLElement | null = this.parentElement;
+    while (!(curr === null || curr instanceof PwForm)) {
       curr = curr.parentElement;
-      if (!curr) {
-        throw new Error("PwForm not found");
-      }
     }
+    if (!curr) {
+      throw new Error("PwForm not found");
+    }
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
     this.pwForm = curr;
   }
 
