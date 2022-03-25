@@ -132,6 +132,7 @@ export const PwProjectCreate = setupHmr(
 
     override render() {
       if (!this.hasUpdated) {
+        // @ts-expect-error impossible
         this.formData = {
           ...(this.initial?.success
             ? { id: this.initial.data.id }

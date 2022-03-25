@@ -127,6 +127,7 @@ class PwUserCreate extends PwForm<"/api/v1/users/create-or-update"> {
   override render() {
     if (!this.hasUpdated) {
       this.formData = [
+        // @ts-expect-error impossible
         this.initial?.success
           ? {
               action: "update",

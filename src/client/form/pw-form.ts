@@ -26,6 +26,7 @@ import { msg } from "@lit/localize";
 import type { routes, ResponseType } from "../../lib/routes.js";
 import type { Task } from "@dev.mohe/task";
 import { PwElement } from "../pw-element.js";
+import type { z } from "zod";
 
 class PwForm<P extends keyof typeof routes> extends PwElement {
   static get properties() {
@@ -49,7 +50,7 @@ class PwForm<P extends keyof typeof routes> extends PwElement {
 
   errors: Ref<HTMLDivElement>;
 
-  formData: any; // maybe set the initial data here instead of in the pw-input's. Then just inherit the data from here. the advantage would be that this would potentially make typescript correct (except probably for creation, so not really an argument)
+  formData!: z.infer<typeof routes[P]["request"]>;
 
   constructor() {
     super();

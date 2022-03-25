@@ -53,6 +53,7 @@ class PwUsersImport extends PwForm<"/api/v1/users/create-or-update"> {
     this._task = new Task(this, async () => {
       // TODO FIXME check that file upload succeeded
 
+      // @ts-expect-error impossible
       const fileContents = await this.formData.file;
 
       const result = await myFetch<"/api/v1/users/create-or-update">(
@@ -77,6 +78,7 @@ class PwUsersImport extends PwForm<"/api/v1/users/create-or-update"> {
     }
 
     if (!this.hasUpdated) {
+      // @ts-expect-error impossible
       this.formData = { file: Promise.resolve(undefined) };
     }
 
