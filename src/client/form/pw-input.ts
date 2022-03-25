@@ -31,6 +31,7 @@ import type { routes, ResponseType } from "../../lib/routes.js";
 import type { z } from "zod";
 import type { Task } from "@dev.mohe/task";
 import { PwElement } from "../pw-element.js";
+import type { PwForm } from "./pw-form.js";
 
 export abstract class PwInput<
   P extends keyof typeof routes,
@@ -101,14 +102,12 @@ export abstract class PwInput<
 
   input: Ref<I>;
 
-  form!: HTMLFormElement;
-
   // TODO FIXME
   options?: { value: T; text: string }[];
 
   defaultValue!: T;
 
-  currentValue: any;
+  pwForm!: PwForm<P>;
 
   constructor() {
     super();
@@ -129,11 +128,6 @@ export abstract class PwInput<
 
   override connectedCallback() {
     super.connectedCallback();
-    const form = this.closest("form");
-    if (!form) {
-      throw new Error();
-    }
-    this.form = form;
     this.addEventListener("input", this.mypwinputchangeDispatcher);
   }
 
@@ -148,7 +142,7 @@ export abstract class PwInput<
     }
 
     if (!this.hasUpdated) {
-      this.currentValue = this.get(this.initial);
+      this.set(this.pwForm.formData, this.get(this.initial));
     }
 
     // https://getbootstrap.com/docs/5.1/forms/validation/

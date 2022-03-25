@@ -49,6 +49,8 @@ class PwForm<P extends keyof typeof routes> extends PwElement {
 
   errors: Ref<HTMLDivElement>;
 
+  formData: any; // maybe set the initial data here instead of in the pw-input's. Then just inherit the data from here. the advantage would be that this would potentially make typescript correct (except probably for creation, so not really an argument)
+
   constructor() {
     super();
 
@@ -57,15 +59,12 @@ class PwForm<P extends keyof typeof routes> extends PwElement {
     this.errors = createRef();
   }
 
-  getCurrentInputElements() {
-    const formKeysEvent = new CustomEvent<string[][]>("myformkeys", {
-      bubbles: true,
-      composed: true,
-      detail: [],
-    });
-    this.form.value?.dispatchEvent(formKeysEvent);
+  connectedCallback(): void {
+    super.connectedCallback();
+  }
 
-    return formKeysEvent.detail;
+  disconnectedCallback(): void {
+    super.disconnectedCallback();
   }
 
   getErrors() {

@@ -24,6 +24,7 @@ import { html } from "lit";
 import { ifDefined } from "lit/directives/if-defined.js";
 import type { z } from "zod";
 import type { routes } from "../../lib/routes.js";
+import type { PwForm } from "./pw-form.js";
 import { PwInput } from "./pw-input.js";
 
 // workaround see https://github.com/runem/lit-analyzer/issues/149#issuecomment-1006162839
@@ -94,15 +95,14 @@ export class PwInputSelect<
     }
     const input = this.input.value;
 
-    this.currentValue = input.selectedIndex == -1
+    this.set(this.closest<PwForm<P>>("pw-form")?.formData, input.selectedIndex == -1
     ? this.defaultValue
     : this.options?.find((v) => v.value == input.value)?.value ??
-        this.defaultValue // To make numbers work
+        this.defaultValue) // To make numbers work
 
-    this.dispatchEvent(new CustomEvent<unknown>("pwinputchange", {
+    this.dispatchEvent(new CustomEvent("pwinputchange", {
       bubbles: true,
       cancelable: false,
-      detail: this.currentValue
     }))
   };
 }
