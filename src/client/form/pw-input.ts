@@ -162,7 +162,7 @@ export abstract class PwInput<
             >`
           : undefined
       }
-      <div class="input-group mb-3">
+      <div class="${this.type !== "checkbox" ? "input-group" : ""} mb-3">
         <${
           this.type === "select"
             ? literal`select`
@@ -251,29 +251,7 @@ export abstract class PwInput<
                   <path fill-rule="evenodd" d="M8 3a5 5 0 1 1-4.546 2.914.5.5 0 0 0-.908-.417A6 6 0 1 0 8 2v1z"/>
                   <path d="M8 4.466V.534a.25.25 0 0 0-.41-.192L5.23 2.308a.25.25 0 0 0 0 .384l2.36 1.966A.25.25 0 0 0 8 4.466z"/>
                 </svg>
-                  </button>${
-                    this.autocomplete === "new-password"
-                      ? html`<div id="passwordHelp" class="form-text">
-                          <a
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            href="https://imgs.xkcd.com/comics/password_strength.png"
-                            >${msg(
-                              "Denk dran: Lange Passwörter sind viel sicherer als welche mit vielen Sonderzeichen."
-                            )}</a
-                          ><br />
-                          ${msg(html` Also lieber "Ich mag fliegende Autos."
-                            anstatt "Moritz1234!".<br />Du kannst auch einen
-                            Passwort-Manager verwenden, z.B.`)}
-                          <a
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            href="https://bitwarden.com/download/"
-                            >${msg("Bitwarden")}</a
-                          >
-                        </div>`
-                      : undefined
-                  }
+                  </button>
         
         ${this.task.render({
           complete: (v) => {
@@ -299,6 +277,29 @@ export abstract class PwInput<
           pending: () => noChange,
         })}
       </div>
+      ${
+                    this.autocomplete === "new-password"
+                      ? html`<div id="passwordHelp" class="form-text">
+                          <a
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            href="https://imgs.xkcd.com/comics/password_strength.png"
+                            >${msg(
+                              "Denk dran: Lange Passwörter sind viel sicherer als welche mit vielen Sonderzeichen."
+                            )}</a
+                          ><br />
+                          ${msg(html` Also lieber "Ich mag fliegende Autos."
+                            anstatt "Moritz1234!".<br />Du kannst auch einen
+                            Passwort-Manager verwenden, z.B.`)}
+                          <a
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            href="https://bitwarden.com/download/"
+                            >${msg("Bitwarden")}</a
+                          >
+                        </div>`
+                      : undefined
+                  }
       ${
         this.type === "checkbox" && this.label !== null
           ? html`<label for=${this.randomId} class="form-check-label"
