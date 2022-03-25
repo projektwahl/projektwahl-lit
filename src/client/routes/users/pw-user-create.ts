@@ -135,7 +135,7 @@ class PwUserCreate extends PwForm<"/api/v1/users/create-or-update"> {
               id: this.initial.data[0].id,
             }
           : { action: "create" },
-      ]
+      ];
     }
 
     if (this.initial === undefined || this.initial.success) {

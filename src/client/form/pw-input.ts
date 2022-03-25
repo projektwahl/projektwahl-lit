@@ -123,8 +123,7 @@ export abstract class PwInput<
     return this;
   }
 
-  abstract mypwinputchangeDispatcher: (
-  ) => void;
+  abstract mypwinputchangeDispatcher: () => void;
 
   override connectedCallback() {
     super.connectedCallback();
@@ -133,7 +132,7 @@ export abstract class PwInput<
     while (!(curr instanceof PwForm)) {
       curr = curr.parentElement;
       if (!curr) {
-        throw new Error("PwForm not found")
+        throw new Error("PwForm not found");
       }
     }
     this.pwForm = curr;
@@ -184,8 +183,7 @@ export abstract class PwInput<
           type=${ifDefined(this.type !== "textarea" ? this.type : undefined)}
           name=${this.name}
           value=${ifDefined(
-              this.type !== "checkbox" &&
-              this.type !== "textarea"
+            this.type !== "checkbox" && this.type !== "textarea"
               ? this.get(this.pwForm.formData)
               : undefined
           )}

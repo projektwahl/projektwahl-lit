@@ -104,18 +104,22 @@ export class PwInputCheckbox<
   falseValue!: T;
   trueValue!: T;
 
-  mypwinputchangeDispatcher = (
-  ) => {
+  mypwinputchangeDispatcher = () => {
     if (!this.input.value) {
       throw new Error();
     }
 
-    this.set(this.pwForm.formData, this.input.value.checked ? this.trueValue : this.falseValue)
+    this.set(
+      this.pwForm.formData,
+      this.input.value.checked ? this.trueValue : this.falseValue
+    );
 
-    this.dispatchEvent(new CustomEvent("pwinputchange", {
-      bubbles: true,
-      cancelable: false,
-    }))
+    this.dispatchEvent(
+      new CustomEvent("pwinputchange", {
+        bubbles: true,
+        cancelable: false,
+      })
+    );
   };
 }
 

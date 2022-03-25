@@ -50,7 +50,7 @@ class PwUsersImport extends PwForm<"/api/v1/users/create-or-update"> {
   constructor() {
     super();
 
-    this._task = new Task(this, async () => {    
+    this._task = new Task(this, async () => {
       // TODO FIXME check that file upload succeeded
 
       const fileContents = await this.formData.file;
@@ -77,7 +77,7 @@ class PwUsersImport extends PwForm<"/api/v1/users/create-or-update"> {
     }
 
     if (!this.hasUpdated) {
-      this.formData = { file: Promise.resolve(undefined) }
+      this.formData = { file: Promise.resolve(undefined) };
     }
 
     return html`

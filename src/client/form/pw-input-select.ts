@@ -88,22 +88,26 @@ export class PwInputSelect<
   P extends keyof typeof routes,
   T extends string | number | undefined
 > extends PwInput<P, T, HTMLSelectElement> {
-  mypwinputchangeDispatcher = (
-  ) => {
+  mypwinputchangeDispatcher = () => {
     if (!this.input.value) {
       throw new Error();
     }
     const input = this.input.value;
 
-    this.set(this.pwForm.formData, input.selectedIndex == -1
-    ? this.defaultValue
-    : this.options?.find((v) => v.value == input.value)?.value ??
-        this.defaultValue) // To make numbers work
+    this.set(
+      this.pwForm.formData,
+      input.selectedIndex == -1
+        ? this.defaultValue
+        : this.options?.find((v) => v.value == input.value)?.value ??
+            this.defaultValue
+    ); // To make numbers work
 
-    this.dispatchEvent(new CustomEvent("pwinputchange", {
-      bubbles: true,
-      cancelable: false,
-    }))
+    this.dispatchEvent(
+      new CustomEvent("pwinputchange", {
+        bubbles: true,
+        cancelable: false,
+      })
+    );
   };
 }
 

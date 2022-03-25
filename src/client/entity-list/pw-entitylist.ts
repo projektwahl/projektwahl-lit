@@ -181,12 +181,7 @@ export class PwEntityList<
             this.history.url
           );*/
 
-          const result = await myFetch<P>(
-            "GET",
-            this.url,
-            this.formData,
-            {}
-          );
+          const result = await myFetch<P>("GET", this.url, this.formData, {});
 
           HistoryController.goto(
             new URL(

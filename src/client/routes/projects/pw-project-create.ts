@@ -136,7 +136,7 @@ export const PwProjectCreate = setupHmr(
           ...(this.initial?.success
             ? { id: this.initial.data.id }
             : { id: undefined }), // TODO FIXME
-        }
+        };
       }
 
       if (this.initial === undefined || this.initial.success) {
