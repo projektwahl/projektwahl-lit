@@ -110,16 +110,16 @@ export const PwProjectCreate = setupHmr(
     constructor() {
       super();
 
+      this.formData = {
+        ...(this.initial?.success
+          ? { id: this.initial.data.id }
+          : { id: undefined }), // TODO FIXME
+      }
+
       /**
        * @override
        */
       this._task = new Task(this, async () => {
-        /* const initialData = {
-            ...(this.initial?.success
-              ? { id: this.initial.data.id }
-              : { id: undefined }), // TODO FIXME
-          } */
-
         const result = await myFetch<
           "/api/v1/projects/create" | "/api/v1/projects/update"
         >("POST", this.url, this.formData, {});

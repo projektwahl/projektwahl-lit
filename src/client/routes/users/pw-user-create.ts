@@ -102,21 +102,20 @@ class PwUserCreate extends PwForm<"/api/v1/users/create-or-update"> {
   constructor() {
     super();
 
+    this.formData = [
+      this.initial?.success
+        ? {
+            action: "update",
+            project_leader_id: undefined,
+            force_in_project_id: undefined,
+            id: this.initial.data[0].id,
+          }
+        : { action: "create" },
+    ]
+
     this.url = "/api/v1/users/create-or-update";
 
     this._task = new Task(this, async () => {
-      const initialData = [
-        // @ts-expect-error craete
-        this.initial?.success
-          ? {
-              action: "update",
-              project_leader_id: undefined,
-              force_in_project_id: undefined,
-              id: this.initial.data[0].id,
-            }
-          : { action: "create" },
-      ]
-
       const result = await myFetch<"/api/v1/users/create-or-update">(
         "POST",
         this.url,
