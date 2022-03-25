@@ -95,7 +95,7 @@ export class PwInputSelect<
     }
     const input = this.input.value;
 
-    this.set(this.closest<PwForm<P>>("pw-form")?.formData, input.selectedIndex == -1
+    this.set(this.pwForm.formData, input.selectedIndex == -1
     ? this.defaultValue
     : this.options?.find((v) => v.value == input.value)?.value ??
         this.defaultValue) // To make numbers work

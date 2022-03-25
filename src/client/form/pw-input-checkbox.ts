@@ -110,7 +110,7 @@ export class PwInputCheckbox<
       throw new Error();
     }
 
-    this.set(this.closest<PwForm<P>>("pw-form")?.formData, this.input.value.checked ? this.trueValue : this.falseValue)
+    this.set(this.pwForm.formData, this.input.value.checked ? this.trueValue : this.falseValue)
 
     this.dispatchEvent(new CustomEvent("pwinputchange", {
       bubbles: true,

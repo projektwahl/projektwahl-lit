@@ -99,7 +99,7 @@ export class PwInputText<
     // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
     const val = this.input.value.value as T;
 
-    this.set(this.closest<PwForm<P>>("pw-form")?.formData, val === "" ? this.defaultValue : val)
+    this.set(this.pwForm.formData, val === "" ? this.defaultValue : val)
 
     this.dispatchEvent(new CustomEvent("pwinputchange", {
       bubbles: true,

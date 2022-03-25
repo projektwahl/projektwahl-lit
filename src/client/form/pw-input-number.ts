@@ -94,7 +94,7 @@ export class PwInputNumber<
       throw new Error();
     }
 
-    this.set(this.closest<PwForm<P>>("pw-form")?.formData, this.input.value.value === ""
+    this.set(this.pwForm.formData, this.input.value.value === ""
     ? this.defaultValue
     : // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
       (this.input.value.valueAsNumber as T))

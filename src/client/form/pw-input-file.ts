@@ -92,7 +92,7 @@ export class PwInputFile<P extends keyof typeof routes> extends PwInput<
       throw new Error();
     }
     if (this.input.value.files?.length === 1) {
-      this.set(this.closest<PwForm<P>>("pw-form")?.formData, this.input.value.files.item(0)?.text())
+      this.set(this.pwForm.formData, this.input.value.files.item(0)?.text())
 
       this.dispatchEvent(new CustomEvent("pwinputchange", {
         bubbles: true,

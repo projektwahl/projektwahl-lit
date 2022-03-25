@@ -31,7 +31,7 @@ import type { routes, ResponseType } from "../../lib/routes.js";
 import type { z } from "zod";
 import type { Task } from "@dev.mohe/task";
 import { PwElement } from "../pw-element.js";
-import type { PwForm } from "./pw-form.js";
+import { PwForm } from "./pw-form.js";
 
 export abstract class PwInput<
   P extends keyof typeof routes,
@@ -129,6 +129,14 @@ export abstract class PwInput<
   override connectedCallback() {
     super.connectedCallback();
     this.addEventListener("input", this.mypwinputchangeDispatcher);
+    let curr: HTMLElement | null = this;
+    while (!(curr instanceof PwForm)) {
+      curr = curr.parentElement;
+      if (!curr) {
+        throw new Error("PwForm not found")
+      }
+    }
+    this.pwForm = curr;
   }
 
   override disconnectedCallback() {
@@ -178,13 +186,13 @@ export abstract class PwInput<
           value=${ifDefined(
               this.type !== "checkbox" &&
               this.type !== "textarea"
-              ? this.currentValue
+              ? this.get(this.pwForm.formData)
               : undefined
           )}
           ?checked=${ifDefined(
             this.type === "checkbox"
-              ? this.currentValue !== undefined
-                ? this.currentValue
+              ? this.get(this.pwForm.formData) !== undefined
+                ? this.get(this.pwForm.formData)
                 : this.defaultValue
               : undefined
           )}
@@ -220,8 +228,8 @@ export abstract class PwInput<
                 (o) => o.value,
                 (o) =>
                   html`<option
-                    ?selected=${this.currentValue !== undefined
-                      ? this.currentValue === o.value
+                    ?selected=${this.get(this.pwForm.formData) !== undefined
+                      ? this.get(this.pwForm.formData) === o.value
                       : false}
                     value=${o.value}
                   >
@@ -229,7 +237,7 @@ export abstract class PwInput<
                   </option>`
               )
             : this.type === "textarea"
-            ? this.currentValue
+            ? this.get(this.pwForm.formData)
             : undefined
         }</${
       this.type === "select"

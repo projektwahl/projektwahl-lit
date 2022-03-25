@@ -81,7 +81,7 @@ class PwForm<P extends keyof typeof routes> extends PwElement {
                 ${data.error.issues
                   .filter(
                     (i) =>
-                      ![...this.getCurrentInputElements()].find(
+                      !Object.keys(this.formData).find(
                         (v) => JSON.stringify(v) === JSON.stringify(i.path)
                       )
                   )
