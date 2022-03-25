@@ -154,6 +154,10 @@ export abstract class PwInput<
       throw new Error(msg("component not fully initialized"));
     }
 
+    if (!this.hasUpdated) {
+      this.currentValue = this.get(this.initial);
+    }
+
     // https://getbootstrap.com/docs/5.1/forms/validation/
     return html`
       ${bootstrapCss}
@@ -175,6 +179,9 @@ export abstract class PwInput<
         }
           ${ref(this.input)}
           @input=${() => {
+            this.currentValue = this.input.value.value;
+            console.log(this.currentValue)
+
             this.input.value?.dispatchEvent(
               new CustomEvent("refreshentitylist", {
                 bubbles: true,
@@ -185,16 +192,15 @@ export abstract class PwInput<
           type=${ifDefined(this.type !== "textarea" ? this.type : undefined)}
           name=${this.name}
           value=${ifDefined(
-            this.initial !== undefined &&
               this.type !== "checkbox" &&
               this.type !== "textarea"
-              ? this.get(this.initial)
+              ? this.currentValue
               : undefined
           )}
           ?checked=${ifDefined(
             this.type === "checkbox"
-              ? this.initial !== undefined
-                ? this.get(this.initial)
+              ? this.currentValue !== undefined
+                ? this.currentValue
                 : this.defaultValue
               : undefined
           )}
@@ -230,16 +236,16 @@ export abstract class PwInput<
                 (o) => o.value,
                 (o) =>
                   html`<option
-                    ?selected=${this.initial !== undefined
-                      ? this.get(this.initial) === o.value
+                    ?selected=${this.currentValue !== undefined
+                      ? this.currentValue === o.value
                       : false}
                     value=${o.value}
                   >
                     ${o.text}
                   </option>`
               )
-            : this.type === "textarea" && this.initial
-            ? this.get(this.initial)
+            : this.type === "textarea"
+            ? this.currentValue
             : undefined
         }</${
       this.type === "select"
