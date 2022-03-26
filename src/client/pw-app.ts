@@ -184,10 +184,14 @@ export class PwApp extends PwElement {
   private popstateListener: (this: Window, ev: PopStateEvent) => void;
   private updateloginstate: (this: Window, ev: Event) => void;
 
-  protected _apiTask!: Task<[keyof typeof pages | undefined, HistoryState], TemplateResult>;
+  protected _apiTask!: Task<
+    [keyof typeof pages | undefined, HistoryState],
+    TemplateResult
+  >;
 
   nextPage: ([key]: [
-    keyof typeof pages | undefined, HistoryState
+    keyof typeof pages | undefined,
+    HistoryState
   ]) => Promise<TemplateResult>;
 
   username: string | undefined;
@@ -222,8 +226,11 @@ export class PwApp extends PwElement {
   constructor() {
     super();
 
-    this.nextPage = async ([key, _]: [keyof typeof pages | undefined, HistoryState]) => {
-      console.log("nextPage")
+    this.nextPage = async ([key, _]: [
+      keyof typeof pages | undefined,
+      HistoryState
+    ]) => {
+      console.log("nextPage");
       if (!this.hasUpdated) {
         if (this.initial) {
           return this.initial;
@@ -272,7 +279,10 @@ export class PwApp extends PwElement {
         const _a: keyof typeof pages | undefined = Object.keys(pages).find(
           (k) => new RegExp(k).test(this.history.url.pathname)
         );
-        const _b: [keyof typeof pages | undefined, HistoryState] = [_a, this.history.state];
+        const _b: [keyof typeof pages | undefined, HistoryState] = [
+          _a,
+          this.history.state,
+        ];
         return _b;
       },
     });

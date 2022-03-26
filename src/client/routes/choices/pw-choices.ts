@@ -72,7 +72,6 @@ class PwChoices<X extends string> extends PwEntityList<"/api/v1/choices", X> {
           <th class="table-cell-hover p-0" scope="col">
             ${pwOrder({
               url: "/api/v1/choices",
-              refreshEntityList: () => this._task.run(),
               name: "id",
               prefix: this.prefix,
               title: msg("ID"),
@@ -83,7 +82,6 @@ class PwChoices<X extends string> extends PwEntityList<"/api/v1/choices", X> {
           <th class="table-cell-hover p-0" scope="col">
             ${pwOrder({
               url: "/api/v1/choices",
-              refreshEntityList: () => this._task.run(),
               name: "title",
               prefix: this.prefix,
               title: msg("Title"),
@@ -94,7 +92,6 @@ class PwChoices<X extends string> extends PwEntityList<"/api/v1/choices", X> {
           <th class="table-cell-hover p-0" scope="col">
             ${pwOrder({
               url: "/api/v1/choices",
-              refreshEntityList: () => this._task.run(),
               name: "rank",
               prefix: this.prefix,
               title: msg("Rank"),

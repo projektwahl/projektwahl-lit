@@ -247,14 +247,18 @@ export abstract class PwInput<
           type=${ifDefined(this.type !== "textarea" ? this.type : undefined)}
           name=${this.name}
           .value=${live(
-            this.type !== "checkbox" && this.type !== "textarea"
-              ? this.get(this.pwForm.formData)
-              : undefined
+            ifDefined(
+              this.type !== "checkbox" && this.type !== "textarea"
+                ? this.get(this.pwForm.formData)
+                : undefined
+            )
           )}
           ?checked=${live(
-            this.type === "checkbox"
-              ? this.get(this.pwForm.formData)
-              : undefined
+            ifDefined(
+              this.type === "checkbox"
+                ? this.get(this.pwForm.formData)
+                : undefined
+            )
           )}
           class="${
             this.type === "checkbox" ? "form-check-input" : "form-control"
