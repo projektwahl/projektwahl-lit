@@ -47,6 +47,7 @@ export function pwInputCheckbox<
     | "defaultValue"
     | "trueValue"
     | "falseValue"
+    | "resettable"
   >
 ) {
   const {
@@ -65,6 +66,7 @@ export function pwInputCheckbox<
     trueValue,
     defaultValue,
     falseValue,
+    resettable,
     ...rest
   } = props;
   let _ = rest;
@@ -85,6 +87,7 @@ export function pwInputCheckbox<
     .defaultValue=${defaultValue}
     .trueValue=${trueValue}
     .falseValue=${falseValue}
+    .resettable=${resettable}
   ></pw-input-checkbox>`;
 }
 

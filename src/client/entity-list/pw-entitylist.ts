@@ -266,6 +266,7 @@ export class PwEntityList<
                   },
                 ],
                 defaultValue: 10,
+                resettable: false,
               })}
             </div>
           </div>

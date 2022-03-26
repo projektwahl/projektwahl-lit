@@ -113,6 +113,7 @@ class PwChoices<X extends string> extends PwEntityList<"/api/v1/choices", X> {
               type: "number",
               defaultValue: undefined,
               initial,
+              resettable: false,
             })}
           </th>
 
@@ -128,6 +129,7 @@ class PwChoices<X extends string> extends PwEntityList<"/api/v1/choices", X> {
               type: "text",
               initial,
               defaultValue: "",
+              resettable: false,
             })}
           </th>
 
@@ -143,6 +145,7 @@ class PwChoices<X extends string> extends PwEntityList<"/api/v1/choices", X> {
               type: "number",
               defaultValue: undefined,
               initial,
+              resettable: false,
             })}
           </th>
         </tr>

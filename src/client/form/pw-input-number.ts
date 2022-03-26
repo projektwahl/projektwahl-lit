@@ -45,6 +45,7 @@ export function pwInputNumber<
     | "options"
     | "task"
     | "defaultValue"
+    | "resettable"
   >
 ) {
   const {
@@ -61,6 +62,7 @@ export function pwInputNumber<
     type,
     autocomplete,
     defaultValue,
+    resettable,
     ...rest
   } = props;
   let _ = rest;
@@ -79,6 +81,7 @@ export function pwInputNumber<
     .task=${task}
     .initial=${initial}
     .defaultValue=${defaultValue}
+    .resettable=${resettable}
   ></pw-input-number>`;
 }
 

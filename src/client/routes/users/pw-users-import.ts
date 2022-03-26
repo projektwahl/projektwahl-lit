@@ -119,6 +119,7 @@ class PwUsersImport extends PwForm<"/api/v1/users/create-or-update"> {
                 },
                 task: this._task,
                 defaultValue: undefined,
+                resettable: false,
               })}
 
               <button

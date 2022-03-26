@@ -133,6 +133,7 @@ export const PwProjectUsers = setupHmr(
                 falseValue: false,
                 defaultValue: undefined,
                 initial: initial,
+                resettable: false,
               })}
             </th>
 
@@ -148,6 +149,7 @@ export const PwProjectUsers = setupHmr(
                 type: "number",
                 defaultValue: undefined,
                 initial,
+                resettable: false,
               })}
             </th>
 
@@ -163,6 +165,7 @@ export const PwProjectUsers = setupHmr(
                 type: "text",
                 initial,
                 defaultValue: undefined,
+                resettable: false,
               })}
             </th>
 
@@ -182,6 +185,7 @@ export const PwProjectUsers = setupHmr(
                   type: "text",
                   defaultValue: undefined,
                   initial,
+                  resettable: false,
                 })
               }
             </th>

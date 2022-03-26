@@ -188,6 +188,7 @@ export const PwProjectCreate = setupHmr(
                     task: this._task,
                     initial: this.initial?.data,
                     defaultValue: "",
+                    resettable: this.initial !== undefined,
                   })}
                   ${pwInputText<
                     "/api/v1/projects/create" | "/api/v1/projects/update",
@@ -203,6 +204,7 @@ export const PwProjectCreate = setupHmr(
                     task: this._task,
                     initial: this.initial?.data,
                     defaultValue: "",
+                    resettable: this.initial !== undefined,
                   })}
                   ${pwInputText<
                     "/api/v1/projects/create" | "/api/v1/projects/update",
@@ -218,6 +220,7 @@ export const PwProjectCreate = setupHmr(
                     task: this._task,
                     initial: this.initial?.data,
                     defaultValue: "",
+                    resettable: this.initial !== undefined,
                   })}
                   ${pwInputNumber<
                     "/api/v1/projects/create" | "/api/v1/projects/update",
@@ -233,6 +236,7 @@ export const PwProjectCreate = setupHmr(
                     task: this._task,
                     initial: this.initial?.data,
                     defaultValue: undefined,
+                    resettable: this.initial !== undefined,
                   })}
                   ${pwInputNumber<
                     "/api/v1/projects/create" | "/api/v1/projects/update",
@@ -248,6 +252,7 @@ export const PwProjectCreate = setupHmr(
                     task: this._task,
                     initial: this.initial?.data,
                     defaultValue: undefined,
+                    resettable: this.initial !== undefined,
                   })}
                   ${pwInputNumber<
                     "/api/v1/projects/create" | "/api/v1/projects/update",
@@ -263,6 +268,7 @@ export const PwProjectCreate = setupHmr(
                     task: this._task,
                     initial: this.initial?.data,
                     defaultValue: undefined,
+                    resettable: this.initial !== undefined,
                   })}
                   ${pwInputNumber<
                     "/api/v1/projects/create" | "/api/v1/projects/update",
@@ -278,6 +284,7 @@ export const PwProjectCreate = setupHmr(
                     task: this._task,
                     initial: this.initial?.data,
                     defaultValue: undefined,
+                    resettable: this.initial !== undefined,
                   })}
                   ${pwInputNumber<
                     "/api/v1/projects/create" | "/api/v1/projects/update",
@@ -293,6 +300,7 @@ export const PwProjectCreate = setupHmr(
                     task: this._task,
                     initial: this.initial?.data,
                     defaultValue: undefined,
+                    resettable: this.initial !== undefined,
                   })}
                   ${pwInputCheckbox<
                     "/api/v1/projects/create" | "/api/v1/projects/update",
@@ -310,6 +318,7 @@ export const PwProjectCreate = setupHmr(
                     set: (o, v) => (o.random_assignments = v),
                     task: this._task,
                     initial: this.initial?.data,
+                    resettable: this.initial !== undefined,
                   })}
                   ${pwInputCheckbox<
                     "/api/v1/projects/create" | "/api/v1/projects/update",
@@ -327,6 +336,7 @@ export const PwProjectCreate = setupHmr(
                     set: (o, v) => (o.deleted = v),
                     task: this._task,
                     initial: this.initial?.data,
+                    resettable: this.initial !== undefined,
                   })}
                   ${!this.disabled
                     ? html`

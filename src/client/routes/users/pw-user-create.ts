@@ -190,6 +190,7 @@ class PwUserCreate extends PwForm<"/api/v1/users/create-or-update"> {
                   task: this._task,
                   initial: this.initial?.data,
                   defaultValue: "",
+                  resettable: this.initial !== undefined,
                 })}
                 ${pwInputText<
                   "/api/v1/users/create-or-update",
@@ -205,6 +206,7 @@ class PwUserCreate extends PwForm<"/api/v1/users/create-or-update"> {
                   task: this._task,
                   initial: this.initial?.data,
                   defaultValue: null,
+                  resettable: this.initial !== undefined,
                 })}
                 ${pwInputSelect<
                   "/api/v1/users/create-or-update",
@@ -228,6 +230,7 @@ class PwUserCreate extends PwForm<"/api/v1/users/create-or-update"> {
                   task: this._task,
                   initial: this.initial?.data,
                   defaultValue: "voter",
+                  resettable: this.initial !== undefined,
                 })}
                 ${this.formData[0].type === "voter"
                   ? html`${pwInputText<
@@ -244,6 +247,7 @@ class PwUserCreate extends PwForm<"/api/v1/users/create-or-update"> {
                       task: this._task,
                       initial: this.initial?.data,
                       defaultValue: "",
+                      resettable: this.initial !== undefined,
                     })}
                     ${pwInputNumber<
                       "/api/v1/users/create-or-update",
@@ -259,6 +263,7 @@ class PwUserCreate extends PwForm<"/api/v1/users/create-or-update"> {
                       task: this._task,
                       initial: this.initial?.data,
                       defaultValue: undefined,
+                      resettable: this.initial !== undefined,
                     })}`
                   : undefined}
                 ${!this.disabled
@@ -278,6 +283,7 @@ class PwUserCreate extends PwForm<"/api/v1/users/create-or-update"> {
                         autocomplete: "new-password",
                         initial: this.initial?.data,
                         defaultValue: "",
+                        resettable: this.initial !== undefined,
                       })}
                     `
                   : undefined}
@@ -297,6 +303,7 @@ class PwUserCreate extends PwForm<"/api/v1/users/create-or-update"> {
                   set: (o, v) => (o[0].away = v),
                   task: this._task,
                   initial: this.initial?.data,
+                  resettable: this.initial !== undefined,
                 })}
                 ${pwInputCheckbox<
                   "/api/v1/users/create-or-update",
@@ -314,6 +321,7 @@ class PwUserCreate extends PwForm<"/api/v1/users/create-or-update"> {
                   set: (o, v) => (o[0].deleted = v),
                   task: this._task,
                   initial: this.initial?.data,
+                  resettable: this.initial !== undefined,
                 })}
                 ${!this.disabled
                   ? html`

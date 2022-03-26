@@ -127,6 +127,7 @@ class PwLogin extends PwForm<"/api/v1/login"> {
                 set: (o, v) => (o.username = v),
                 task: this._task,
                 defaultValue: "",
+                resettable: false,
               })}
               ${pwInputText<"/api/v1/login", string>({
                 url: this.url,
@@ -138,6 +139,7 @@ class PwLogin extends PwForm<"/api/v1/login"> {
                 autocomplete: "current-password",
                 task: this._task,
                 defaultValue: "",
+                resettable: false,
               })}
               ${!this.disabled
                 ? html`

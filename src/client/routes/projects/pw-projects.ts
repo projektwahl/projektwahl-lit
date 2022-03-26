@@ -118,6 +118,7 @@ class PwProjects<X extends string> extends PwEntityList<"/api/v1/projects", X> {
               type: "number",
               defaultValue: undefined,
               initial,
+              resettable: false,
             })}
           </th>
 
@@ -133,6 +134,7 @@ class PwProjects<X extends string> extends PwEntityList<"/api/v1/projects", X> {
               type: "text",
               initial,
               defaultValue: "",
+              resettable: false,
             })}
           </th>
 
@@ -148,6 +150,7 @@ class PwProjects<X extends string> extends PwEntityList<"/api/v1/projects", X> {
               type: "text",
               defaultValue: undefined,
               initial,
+              resettable: false,
             })}
           </th>
 
