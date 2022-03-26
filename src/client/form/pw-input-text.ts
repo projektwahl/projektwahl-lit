@@ -97,6 +97,13 @@ export class PwInputText<
     const val = this.input.value.value as T;
 
     this.set(this.pwForm.formData, val === "" ? this.defaultValue : val);
+
+    this.input.value?.dispatchEvent(
+      new CustomEvent("refreshentitylist", {
+        bubbles: true,
+        composed: true,
+      })
+    );
   };
 }
 

@@ -38,7 +38,12 @@ class PwLogin extends PwForm<"/api/v1/login"> {
       ...super.properties,
       url: { attribute: false },
       actionText: { type: String },
-      _task: { state: true },
+      _task: {
+        state: true,
+        hasChanged: () => {
+          return true;
+        },
+      },
     };
   }
 

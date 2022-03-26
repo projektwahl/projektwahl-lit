@@ -83,8 +83,18 @@ export const PwProjectCreate = setupHmr(
       return {
         ...super.properties,
         actionText: { type: String },
-        _task: { state: true },
-        _initialTask: { state: true },
+        _task: {
+          state: true,
+          hasChanged: () => {
+            return true;
+          },
+        },
+        _initialTask: {
+          state: true,
+          hasChanged: () => {
+            return true;
+          },
+        },
         type: { state: true },
         initial: { attribute: false },
       };
@@ -121,7 +131,7 @@ export const PwProjectCreate = setupHmr(
         if (result.success) {
           HistoryController.goto(
             new URL(`/projects/edit/${result.data.id}`, window.location.href),
-            {},
+            { random: Math.random() },
             true
           );
         }

@@ -32,6 +32,7 @@ import type { z } from "zod";
 import type { Task } from "@dev.mohe/task";
 import { PwElement } from "../pw-element.js";
 import { PwForm } from "./pw-form.js";
+import { live } from "lit/directives/live.js";
 
 export abstract class PwInput<
   P extends keyof typeof routes,
@@ -40,10 +41,27 @@ export abstract class PwInput<
 > extends PwElement {
   static override get properties() {
     return {
+      ...super.properties,
       label: { attribute: false },
-      name: { attribute: false },
+      name: {
+        attribute: false,
+        hasChanged: (
+          newVal: (string | number)[],
+          oldVal: (string | number)[]
+        ) => {
+          return JSON.stringify(newVal) !== JSON.stringify(oldVal);
+        },
+      },
       type: { type: String },
-      options: { attribute: false },
+      options: {
+        attribute: false,
+        hasChanged: (
+          newVal: (string | number)[],
+          oldVal: (string | number)[]
+        ) => {
+          return JSON.stringify(newVal) !== JSON.stringify(oldVal);
+        },
+      },
       autocomplete: { type: String },
       disabled: { type: Boolean },
       enabled: { type: Boolean },
@@ -52,38 +70,60 @@ export abstract class PwInput<
       url: { attribute: false },
       task: {
         attribute: false,
-        /*hasChanged: () => {
-          return true; // TODO FIXME bug in @dev.mohe/task
-          // I think the problem was that passing down a @dev.mohe/task doesnt work as this doesnt trigger updates in the subcomponent
-        },*/
+        hasChanged: () => {
+          return true;
+        },
       },
       initial: {
+        // TODO FIXME pass the inner element instead (and don't use the get method below)
         attribute: false,
       },
       resettable: { attribute: false },
     };
   }
 
+  /**
+   * The url of the request.
+   */
   url!: P;
 
-  // these three here are just plain-up terrible but the typings for paths are equally bad
+  /**
+   * The path in the request to this inputs value.
+   */
   name!: (string | number)[];
 
-  // TODO FIXME maybe switch this back to Path and lodash-es (but not remove then for now so we could switch back)
+  /**
+   * Extracts the value from the routes request data.
+   */
   get!: (o: z.infer<typeof routes[P]["request"]>) => T;
 
+  /**
+   * Sets the value in the routes request data.
+   */
   set!: (o: z.infer<typeof routes[P]["request"]>, v: T) => void;
 
+  // TODO FIXME maybe merge these two?
   disabled?: boolean = false;
-
   enabled?: boolean = false;
 
+  /**
+   * Whether the input is resettable. Adds a reset button that resets the value to the initial value.
+   */
   resettable = false;
 
+  /**
+   * A random id to associate the label and input errors to the input.
+   */
   randomId;
 
+  /**
+   * The label.
+   */
   label!: string | null;
 
+  /**
+   * Field type
+   */
   type:
     | "text"
     | "textarea"
@@ -93,19 +133,37 @@ export abstract class PwInput<
     | "select"
     | "file";
 
+  /**
+   * Autocompletion settings.
+   */
   autocomplete?: "username" | "current-password" | "new-password";
 
+  /**
+   * The task that is executed in the parent form.
+   */
   task!: Task<[URLSearchParams], ResponseType<P>>;
 
+  /**
+   * The initial data to show and reset to.
+   */
   initial?: z.infer<typeof routes[P]["request"]>;
 
+  /**
+   * A reference to the input element.
+   */
   input: Ref<I>;
 
   // TODO FIXME
   options?: { value: T; text: string }[];
 
-  defaultValue!: T; // TODO FIXME merge into initial?
+  /**
+   * The default value. This values is used if e.g. a text/number field is empty.
+   */
+  defaultValue!: T;
 
+  /**
+   * The parent form.
+   */
   pwForm!: PwForm<P>;
 
   constructor() {
@@ -144,16 +202,16 @@ export abstract class PwInput<
   }
 
   override render() {
+    console.log("pw-input rerender");
     if (this.label === undefined || this.task === undefined) {
       throw new Error(msg("component not fully initialized"));
     }
 
     if (!this.hasUpdated) {
-      if (this.initial !== undefined) {
-        this.set(this.pwForm.formData, this.get(this.initial));
-      } else {
-        this.set(this.pwForm.formData, this.defaultValue);
-      }
+      this.set(
+        this.pwForm.formData,
+        this.initial !== undefined ? this.get(this.initial) : this.defaultValue
+      );
     }
 
     // https://getbootstrap.com/docs/5.1/forms/validation/
@@ -169,6 +227,7 @@ export abstract class PwInput<
       }
       <div class="${this.type !== "checkbox" ? "input-group" : ""}">
         <${
+          /** maybe this is the issue for live update? */
           this.type === "select"
             ? literal`select`
             : this.type === "textarea"
@@ -176,29 +235,21 @@ export abstract class PwInput<
             : literal`input`
         }
           ${ref(this.input)}
-          @input=${() => {
-            this.input.value?.dispatchEvent(
-              new CustomEvent("refreshentitylist", {
-                bubbles: true,
-                composed: true,
-              })
-            );
-          }}
           type=${ifDefined(this.type !== "textarea" ? this.type : undefined)}
           name=${this.name}
-          value=${ifDefined(
-            this.initial !== undefined &&
-              this.type !== "checkbox" &&
-              this.type !== "textarea"
-              ? this.get(this.initial)
-              : undefined
+          .value=${live(
+            ifDefined(
+              this.type !== "checkbox" && this.type !== "textarea"
+                ? this.get(this.pwForm.formData)
+                : undefined
+            )
           )}
-          ?checked=${ifDefined(
-            this.type === "checkbox"
-              ? this.initial !== undefined
-                ? this.get(this.initial)
-                : this.defaultValue
-              : undefined
+          ?checked=${live(
+            ifDefined(
+              this.type === "checkbox"
+                ? this.get(this.pwForm.formData)
+                : undefined
+            )
           )}
           class="${
             this.type === "checkbox" ? "form-check-input" : "form-control"
@@ -232,16 +283,16 @@ export abstract class PwInput<
                 (o) => o.value,
                 (o) =>
                   html`<option
-                    ?selected=${this.initial !== undefined
-                      ? this.get(this.initial) === o.value
-                      : false}
+                    ?selected=${live(
+                      this.get(this.pwForm.formData) === o.value
+                    )}
                     value=${o.value}
                   >
                     ${o.text}
                   </option>`
               )
-            : this.type === "textarea" && this.initial !== undefined
-            ? this.get(this.initial)
+            : this.type === "textarea"
+            ? this.get(this.pwForm.formData)
             : undefined
         }</${
       this.type === "select"
@@ -257,7 +308,15 @@ export abstract class PwInput<
           >`
         : undefined
     }
-    <button class="btn btn-outline-secondary" type="button">
+    <button @click=${() => {
+      console.log("reset");
+      this.set(
+        this.pwForm.formData,
+        this.initial !== undefined ? this.get(this.initial) : this.defaultValue
+      );
+      console.log(this.pwForm.formData);
+      this.requestUpdate();
+    }} class="btn btn-outline-secondary" type="button">
                   <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-counterclockwise" viewBox="0 0 16 16">
                   <path fill-rule="evenodd" d="M8 3a5 5 0 1 1-4.546 2.914.5.5 0 0 0-.908-.417A6 6 0 1 0 8 2v1z"/>
                   <path d="M8 4.466V.534a.25.25 0 0 0-.41-.192L5.23 2.308a.25.25 0 0 0 0 .384l2.36 1.966A.25.25 0 0 0 8 4.466z"/>

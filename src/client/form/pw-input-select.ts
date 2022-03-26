@@ -99,6 +99,13 @@ export class PwInputSelect<
         : this.options?.find((v) => v.value == input.value)?.value ??
             this.defaultValue
     ); // To make numbers work
+
+    this.input.value?.dispatchEvent(
+      new CustomEvent("refreshentitylist", {
+        bubbles: true,
+        composed: true,
+      })
+    );
   };
 }
 

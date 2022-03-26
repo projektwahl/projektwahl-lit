@@ -69,12 +69,9 @@ type entitiesType4 = {
 
 // workaround see https://github.com/runem/lit-analyzer/issues/149#issuecomment-1006162839
 export function pwOrder<P extends keyof typeof entityRoutes, X extends string>(
-  props: Pick<
-    PwOrder<P, X>,
-    "url" | "name" | "prefix" | "title" | "refreshEntityList" | "value"
-  >
+  props: Pick<PwOrder<P, X>, "url" | "name" | "prefix" | "title" | "value">
 ) {
-  const { url, name, title, refreshEntityList, prefix, value, ...rest } = props;
+  const { url, name, title, prefix, value, ...rest } = props;
   let _ = rest;
   _ = 1; // ensure no property is missed - Don't use `{}` as a type. `{}` actually means "any non-nullish value".
   return html`<pw-order
@@ -83,7 +80,6 @@ export function pwOrder<P extends keyof typeof entityRoutes, X extends string>(
     prefix=${prefix}
     .title=${title}
     .value=${value}
-    .refreshEntityList=${refreshEntityList}
   ></pw-order>`;
 }
 
@@ -98,7 +94,6 @@ export class PwOrder<
       title: { attribute: false },
       name: { attribute: false },
       path: { attribute: false },
-      refreshEntityList: { attribute: false },
       url: { attribute: false },
       prefix: { type: String },
     };
@@ -120,8 +115,6 @@ export class PwOrder<
   randomId;
 
   history;
-
-  refreshEntityList!: () => Promise<void>;
 
   url!: P;
 
@@ -145,7 +138,7 @@ export class PwOrder<
     return html`
       ${bootstrapCss}
       <button
-        @click=${async () => {
+        @click=${() => {
           // TODO FIXME put this into the history implementation?
           const data: parseRequestWithPrefixType<X>[P] = parseRequestWithPrefix(
             this.url,
@@ -216,8 +209,6 @@ export class PwOrder<
             {},
             true
           );
-          // TODO FIXME use refreshentitylist / dont do this at all because we navigated anyways
-          await this.refreshEntityList();
         }}
         name="${this.name.toString()}"
         type="button"

@@ -27,4 +27,8 @@ export class PwElement extends LitElement {
   protected createRenderRoot() {
     return this;
   }
+
+  protected willUpdate(_changedProperties: Map<PropertyKey, unknown>): void {
+    console.log(this.tagName, _changedProperties);
+  }
 }

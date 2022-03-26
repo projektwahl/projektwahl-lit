@@ -37,7 +37,12 @@ class PwUsersImport extends PwForm<"/api/v1/users/create-or-update"> {
     return {
       ...super.properties,
       uri: { type: String },
-      _task: { state: true },
+      _task: {
+        state: true,
+        hasChanged: () => {
+          return true;
+        },
+      },
       type: { state: true },
       initial: { attribute: false },
     };

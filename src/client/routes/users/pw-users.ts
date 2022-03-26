@@ -94,7 +94,6 @@ export class PwUsers<X extends string> extends PwEntityList<
           <th class="table-cell-hover p-0" scope="col">
             ${pwOrder({
               url: "/api/v1/users",
-              refreshEntityList: () => this._task.run(),
               name: "id",
               prefix: this.prefix,
               title: msg("ID"),
@@ -105,7 +104,6 @@ export class PwUsers<X extends string> extends PwEntityList<
           <th class="table-cell-hover p-0" scope="col">
             ${pwOrder({
               url: "/api/v1/users",
-              refreshEntityList: () => this._task.run(),
               name: "username",
               prefix: this.prefix,
               title: msg("Name"),
@@ -116,7 +114,6 @@ export class PwUsers<X extends string> extends PwEntityList<
           <th class="table-cell-hover p-0" scope="col">
             ${pwOrder({
               url: "/api/v1/users",
-              refreshEntityList: () => this._task.run(),
               name: "type",
               prefix: this.prefix,
               title: msg("Type"),
