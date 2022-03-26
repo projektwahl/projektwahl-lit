@@ -235,14 +235,6 @@ export abstract class PwInput<
             : literal`input`
         }
           ${ref(this.input)}
-          @input=${() => {
-            this.input.value?.dispatchEvent(
-              new CustomEvent("refreshentitylist", {
-                bubbles: true,
-                composed: true,
-              })
-            );
-          }}
           type=${ifDefined(this.type !== "textarea" ? this.type : undefined)}
           name=${this.name}
           .value=${live(

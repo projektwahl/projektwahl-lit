@@ -103,6 +103,7 @@ export class PwEntityList<
 > extends PwForm<P> {
   static override get properties() {
     return {
+      ...super.properties,
       task: {
         attribute: false,
         hasChanged: () => {
@@ -112,7 +113,6 @@ export class PwEntityList<
       initial: { attribute: false },
       debouncedUrl: { state: true },
       prefix: { type: String },
-      ...super.properties, // TODO FIXME remove this everywhere? https://lit.dev/docs/components/properties/#accessors-noaccessor
     };
   }
 
@@ -177,6 +177,12 @@ export class PwEntityList<
       throw new Error(msg("component not fully initialized"));
     }
 
+    const data = parseRequestWithPrefix(
+      this.url,
+      this.prefix,
+      this.history.url
+    );
+
     if (!this.hasUpdated) {
       this.formData =
         parseRequestWithPrefix(this.url, this.prefix, this.history.url)[
@@ -185,8 +191,6 @@ export class PwEntityList<
 
       this._task = new Task(this, {
         task: async () => {
-          const result = await myFetch<P>("GET", this.url, this.formData, {});
-
           HistoryController.goto(
             new URL(
               `?${encodeURIComponent(
@@ -201,6 +205,8 @@ export class PwEntityList<
             true
           );
 
+          const result = await myFetch<P>("GET", this.url, this.formData, {});
+
           return result;
         },
         autoRun: false, // TODO FIXME this breaks if you navigate to the same page (as it doesnt cause an update) - maybe we should autorun on url change?
@@ -213,12 +219,6 @@ export class PwEntityList<
         void this._task.run();
       }
     }
-
-    const data = parseRequestWithPrefix(
-      this.url,
-      this.prefix,
-      this.history.url
-    );
 
     return html`
       ${bootstrapCss}

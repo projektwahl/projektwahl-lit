@@ -111,6 +111,13 @@ export class PwInputCheckbox<
       this.pwForm.formData,
       this.input.value.checked ? this.trueValue : this.falseValue
     );
+
+    this.input.value?.dispatchEvent(
+      new CustomEvent("refreshentitylist", {
+        bubbles: true,
+        composed: true,
+      })
+    );
   };
 }
 

@@ -226,8 +226,8 @@ async function runTest(testFunction: (helper: Helper) => Promise<void>) {
   await driver.setNetworkConditions({
     offline: false,
     latency: 200, // Additional latency (ms).
-    download_throughput: 0, // Maximal aggregated download throughput.
-    upload_throughput: 0, // Maximal aggregated upload throughput.
+    download_throughput: 1000000, // Maximal aggregated download throughput.
+    upload_throughput: 1000000, // Maximal aggregated upload throughput.
   });
 
   try {
@@ -591,6 +591,8 @@ async function checkNotLoggedInProjects(helper: Helper) {
   assert.match(await alert.getText(), /Nicht angemeldet!/);
 }
 
+await runTest(createUserAllFields);
+await runTest(createProjectAllFields);
 await runTest(checkNotLoggedInUsers);
 await runTest(checkNotLoggedInProjects);
 await runTest(loginEmptyUsernameAndPassword);
@@ -603,5 +605,3 @@ await runTest(welcomeWorks);
 await runTest(imprintWorks);
 await runTest(privacyWorks);
 await runTest(logoutWorks);
-await runTest(createUserAllFields);
-await runTest(createProjectAllFields);

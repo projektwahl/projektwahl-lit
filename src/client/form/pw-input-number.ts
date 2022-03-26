@@ -98,6 +98,13 @@ export class PwInputNumber<
         : // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
           (this.input.value.valueAsNumber as T)
     );
+
+    this.input.value?.dispatchEvent(
+      new CustomEvent("refreshentitylist", {
+        bubbles: true,
+        composed: true,
+      })
+    );
   };
 }
 
