@@ -35,9 +35,9 @@ import {
 } from "../../../lib/routes.js";
 import type { z } from "zod";
 import { bootstrapCss } from "../../index.js";
-import { ref } from "lit/directives/ref.js";
+import { createRef, Ref, ref } from "lit/directives/ref.js";
 import { pwInputText } from "../../form/pw-input-text.js";
-import { pwInputSelect } from "../../form/pw-input-select.js";
+import { PwInputSelect, pwInputSelect } from "../../form/pw-input-select.js";
 import { pwInputNumber } from "../../form/pw-input-number.js";
 import { pwInputCheckbox } from "../../form/pw-input-checkbox.js";
 import { aClick } from "../../pw-a.js";
@@ -108,6 +108,13 @@ class PwUserCreate extends PwForm<"/api/v1/users/create-or-update"> {
     | MinimalSafeParseError
     | undefined;
 
+  typeRef!: Ref<
+    PwInputSelect<
+      "/api/v1/users/create-or-update",
+      "voter" | "helper" | "admin" | undefined
+    >
+  >;
+
   constructor() {
     super();
 
@@ -132,9 +139,10 @@ class PwUserCreate extends PwForm<"/api/v1/users/create-or-update"> {
           true
         );
       }
-
       return result;
     });
+
+    this.typeRef = createRef();
   }
 
   override render() {
@@ -156,6 +164,8 @@ class PwUserCreate extends PwForm<"/api/v1/users/create-or-update"> {
       if (this.actionText === undefined) {
         throw new Error(msg("component not fully initialized"));
       }
+
+      console.log("bro ", this.typeRef.value?.inputValue);
 
       return html`
         ${bootstrapCss}
@@ -231,8 +241,9 @@ class PwUserCreate extends PwForm<"/api/v1/users/create-or-update"> {
                   initial: this.initial?.data,
                   defaultValue: "voter",
                   resettable: this.initial !== undefined,
+                  pwRef: this.typeRef,
                 })}
-                ${this.formData[0].type === "voter"
+                ${this.typeRef.value?.inputValue === "voter"
                   ? html`${pwInputText<
                       "/api/v1/users/create-or-update",
                       string | null | undefined

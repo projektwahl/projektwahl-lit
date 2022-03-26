@@ -94,13 +94,12 @@ export class PwInputNumber<
       throw new Error();
     }
 
-    this.set(
-      this.pwForm.formData,
+    this.inputValue =
       this.input.value.value === ""
         ? this.defaultValue
         : // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
-          (this.input.value.valueAsNumber as T)
-    );
+          (this.input.value.valueAsNumber as T);
+    this.set(this.pwForm.formData, this.inputValue);
 
     this.input.value?.dispatchEvent(
       new CustomEvent("refreshentitylist", {

@@ -110,10 +110,10 @@ export class PwInputCheckbox<
       throw new Error();
     }
 
-    this.set(
-      this.pwForm.formData,
-      this.input.value.checked ? this.trueValue : this.falseValue
-    );
+    this.inputValue = this.input.value.checked
+      ? this.trueValue
+      : this.falseValue;
+    this.set(this.pwForm.formData, this.inputValue);
 
     this.input.value?.dispatchEvent(
       new CustomEvent("refreshentitylist", {

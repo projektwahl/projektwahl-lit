@@ -217,7 +217,7 @@ async function runTest(testFunction: (helper: Helper) => Promise<void>) {
   const driver = builder.build();
 
   await driver.manage().window().setRect({
-    width: 500,
+    width: 1000,
     height: 1000,
   });
 
@@ -381,6 +381,16 @@ async function logoutWorks(helper: Helper) {
 
 async function createUserAllFields(helper: Helper) {
   await loginCorrect(helper);
+
+  // @ts-expect-error wrong typings2
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-call
+  await helper.driver.setNetworkConditions({
+    offline: false,
+    latency: 200, // Additional latency (ms).
+    download_throughput: 1000000, // Maximal aggregated download throughput.
+    upload_throughput: 1000000, // Maximal aggregated upload throughput.
+  });
+
   await helper.openNavbar();
   await helper.click(
     await helper.driver.findElement(By.css(`a[href="/users"]`))
@@ -466,6 +476,16 @@ async function createUserAllFields(helper: Helper) {
 async function createProjectAllFields(helper: Helper) {
   await loginCorrect(helper);
   await helper.openNavbar();
+
+  // @ts-expect-error wrong typings2
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-call
+  await helper.driver.setNetworkConditions({
+    offline: false,
+    latency: 200, // Additional latency (ms).
+    download_throughput: 1000000, // Maximal aggregated download throughput.
+    upload_throughput: 1000000, // Maximal aggregated upload throughput.
+  });
+
   await helper.click(
     await helper.driver.findElement(By.css(`a[href="/projects"]`))
   );
@@ -591,8 +611,8 @@ async function checkNotLoggedInProjects(helper: Helper) {
   assert.match(await alert.getText(), /Nicht angemeldet!/);
 }
 
-await runTest(createUserAllFields);
 await runTest(createProjectAllFields);
+await runTest(createUserAllFields);
 await runTest(checkNotLoggedInUsers);
 await runTest(checkNotLoggedInProjects);
 await runTest(loginEmptyUsernameAndPassword);
