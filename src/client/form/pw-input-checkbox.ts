@@ -111,13 +111,6 @@ export class PwInputCheckbox<
       this.pwForm.formData,
       this.input.value.checked ? this.trueValue : this.falseValue
     );
-
-    this.dispatchEvent(
-      new CustomEvent("pwinputchange", {
-        bubbles: true,
-        cancelable: false,
-      })
-    );
   };
 }
 

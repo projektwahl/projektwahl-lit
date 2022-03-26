@@ -97,13 +97,6 @@ export class PwInputText<
     const val = this.input.value.value as T;
 
     this.set(this.pwForm.formData, val === "" ? this.defaultValue : val);
-
-    this.dispatchEvent(
-      new CustomEvent("pwinputchange", {
-        bubbles: true,
-        cancelable: false,
-      })
-    );
   };
 }
 

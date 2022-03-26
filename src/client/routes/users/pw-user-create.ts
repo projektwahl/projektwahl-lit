@@ -90,8 +90,6 @@ class PwUserCreate extends PwForm<"/api/v1/users/create-or-update"> {
       : msg("Create account");
   }
 
-  type?: "voter" | "admin" | "helper";
-
   initial:
     | z.SafeParseSuccess<
         z.infer<typeof routes["/api/v1/users"]["response"]>["entities"]
@@ -211,7 +209,7 @@ class PwUserCreate extends PwForm<"/api/v1/users/create-or-update"> {
                   get: (o) => o[0].type,
                   set: (o, v) => {
                     o[0].type = v;
-                    this.type = v;
+                    this.requestUpdate(); // hack to update on this
                   },
                   options: [
                     { value: "voter", text: "Schüler" },
@@ -225,17 +223,12 @@ class PwUserCreate extends PwForm<"/api/v1/users/create-or-update"> {
                           {
                             ...this.initial?.data[0],
                             action: "update",
-                            type:
-                              this.type ??
-                              this.initial?.data[0].type ??
-                              "voter",
                           },
                         ]
                       : undefined,
                   defaultValue: "voter",
                 })}
-                ${(this.type ?? this.initial?.data[0].type ?? "voter") ===
-                "voter"
+                ${this.formData[0].type === "voter"
                   ? html`${pwInputText<
                       "/api/v1/users/create-or-update",
                       string | null | undefined

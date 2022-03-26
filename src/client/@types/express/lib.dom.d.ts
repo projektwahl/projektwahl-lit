@@ -30,10 +30,6 @@ declare global {
     }>;
   }
 
-  interface HTMLElementEventMap {
-    pwinputchange: CustomEvent<unknown>;
-  }
-
   interface Window {
     BOOTSTRAP_CSS: string | undefined;
     LANGUAGE: string | undefined;
