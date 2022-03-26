@@ -192,7 +192,7 @@ export class PwEntityList<
               )}`,
               window.location.href
             ),
-            {},
+            this.history.state,
             true
           );
 
@@ -321,7 +321,7 @@ export class PwEntityList<
                             `?${encodeURIComponent(JSON.stringify(data))}`,
                             window.location.href
                           ),
-                          {},
+                          this.history.state,
                           true
                         );
                         await this._task.run();
@@ -387,7 +387,7 @@ export class PwEntityList<
                             `?${encodeURIComponent(JSON.stringify(data))}`,
                             window.location.href
                           ),
-                          {},
+                          this.history.state,
                           true
                         );
                         await this._task.run();

@@ -80,7 +80,7 @@ export const PwProjectUsers = setupHmr(
             <th class="table-cell-hover p-0" scope="col">
               ${pwOrder({
                 url: "/api/v1/users",
-                refreshEntityList: () => this._task.run(),
+                refreshEntityList: this._task.run,
                 name: `${this.name}_eq`,
                 prefix: this.prefix,
                 title: "",
@@ -91,7 +91,7 @@ export const PwProjectUsers = setupHmr(
             <th class="table-cell-hover p-0" scope="col">
               ${pwOrder({
                 url: "/api/v1/users",
-                refreshEntityList: () => this._task.run(),
+                refreshEntityList: this._task.run,
                 name: "id",
                 prefix: this.prefix,
                 title: msg("ID"),
@@ -102,7 +102,7 @@ export const PwProjectUsers = setupHmr(
             <th class="table-cell-hover p-0" scope="col">
               ${pwOrder({
                 url: "/api/v1/users",
-                refreshEntityList: () => this._task.run(),
+                refreshEntityList: this._task.run,
                 name: "username",
                 prefix: this.prefix,
                 title: msg("Name"),
@@ -113,7 +113,7 @@ export const PwProjectUsers = setupHmr(
             <th class="table-cell-hover p-0" scope="col">
               ${pwOrder({
                 url: "/api/v1/users",
-                refreshEntityList: () => this._task.run(),
+                refreshEntityList: this._task.run,
                 name: "type",
                 prefix: this.prefix,
                 title: msg("Type"),

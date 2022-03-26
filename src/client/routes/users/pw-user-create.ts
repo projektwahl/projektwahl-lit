@@ -97,6 +97,7 @@ class PwUserCreate extends PwForm<"/api/v1/users/create-or-update"> {
       : msg("Create account");
   }
 
+  // TODO FIXME I think this also needs to be a task and then we need to add loading state here.
   initial:
     | z.SafeParseSuccess<z.infer<typeof updateUserAction>[]>
     | MinimalSafeParseError
@@ -122,7 +123,7 @@ class PwUserCreate extends PwForm<"/api/v1/users/create-or-update"> {
       if (result.success) {
         HistoryController.goto(
           new URL(`/users/edit/${result.data[0].id}`, window.location.href),
-          {},
+          { random: Math.random() },
           true
         );
       }

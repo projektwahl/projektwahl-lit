@@ -121,7 +121,7 @@ export const PwProjectCreate = setupHmr(
         if (result.success) {
           HistoryController.goto(
             new URL(`/projects/edit/${result.data.id}`, window.location.href),
-            {},
+            { random: Math.random() },
             true
           );
         }

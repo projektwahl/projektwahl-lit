@@ -75,7 +75,7 @@ class PwProjects<X extends string> extends PwEntityList<"/api/v1/projects", X> {
           <th class="table-cell-hover p-0" scope="col">
             ${pwOrder({
               url: "/api/v1/projects",
-              refreshEntityList: () => this._task.run(),
+              refreshEntityList: this._task.run,
               name: "id",
               prefix: this.prefix,
               title: msg("ID"),
@@ -86,7 +86,7 @@ class PwProjects<X extends string> extends PwEntityList<"/api/v1/projects", X> {
           <th class="table-cell-hover p-0" scope="col">
             ${pwOrder({
               url: "/api/v1/projects",
-              refreshEntityList: () => this._task.run(),
+              refreshEntityList: this._task.run,
               name: "title",
               prefix: this.prefix,
               title: msg("Title"),
@@ -97,7 +97,7 @@ class PwProjects<X extends string> extends PwEntityList<"/api/v1/projects", X> {
           <th class="table-cell-hover p-0" scope="col">
             ${pwOrder({
               url: "/api/v1/projects",
-              refreshEntityList: () => this._task.run(),
+              refreshEntityList: this._task.run,
               name: "info",
               prefix: this.prefix,
               title: msg("Info"),
