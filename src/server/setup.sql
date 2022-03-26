@@ -411,10 +411,16 @@ $body$ LANGUAGE plpgsql;
 
 DROP TRIGGER IF EXISTS trigger_check_users_project_leader_id1 ON users_with_deleted;
 
-CREATE TRIGGER trigger_check_users_project_leader_id1
-BEFORE UPDATE OF project_leader_id ON users_with_deleted
-FOR EACH ROW
-EXECUTE FUNCTION check_users_project_leader_id1();
+--CREATE TRIGGER trigger_check_users_project_leader_id1
+--BEFORE UPDATE OF project_leader_id ON users_with_deleted
+--FOR EACH ROW
+--EXECUTE FUNCTION check_users_project_leader_id1();
+
+
+
+
+
+
 
 --CREATE TRIGGER trigger_check_users_project_leader_id
 --BEFORE INSERT OR UPDATE ON users_with_deleted
