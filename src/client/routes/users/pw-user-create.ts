@@ -28,7 +28,11 @@ import { PwForm } from "../../form/pw-form.js";
 import { HistoryController } from "../../history-controller.js";
 import { msg } from "@lit/localize";
 import "../../form/pw-input.js";
-import { routes, MinimalSafeParseError, updateUserAction } from "../../../lib/routes.js";
+import {
+  routes,
+  MinimalSafeParseError,
+  updateUserAction,
+} from "../../../lib/routes.js";
 import type { z } from "zod";
 import { bootstrapCss } from "../../index.js";
 import { ref } from "lit/directives/ref.js";
@@ -66,9 +70,10 @@ const taskFunction = async ([id]: [number]) => {
   if (response.success) {
     return {
       success: true,
-      data: response.data.entities.length == 1
-      ? [{ action: "update", ...response.data.entities[0] }]
-      : [],
+      data:
+        response.data.entities.length == 1
+          ? [{ action: "update", ...response.data.entities[0] }]
+          : [],
     };
   }
   return response;
@@ -93,16 +98,16 @@ class PwUserCreate extends PwForm<"/api/v1/users/create-or-update"> {
   }
 
   initial:
-    | z.SafeParseSuccess<
-        z.infer<typeof updateUserAction>[]
-      >
+    | z.SafeParseSuccess<z.infer<typeof updateUserAction>[]>
     | MinimalSafeParseError
     | undefined;
 
   constructor() {
     super();
 
-    routes["/api/v1/users/create-or-update"]["request"]["element"]["options"].get("voter")    
+    routes["/api/v1/users/create-or-update"]["request"]["element"][
+      "options"
+    ].get("voter");
 
     this.url = "/api/v1/users/create-or-update";
 

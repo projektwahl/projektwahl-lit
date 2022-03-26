@@ -42,13 +42,25 @@ export abstract class PwInput<
     return {
       ...super.properties,
       label: { attribute: false },
-      name: { attribute: false, hasChanged: (newVal: (string | number)[], oldVal: (string | number)[]) => {
-        return JSON.stringify(newVal) !== JSON.stringify(oldVal)
-      } },
+      name: {
+        attribute: false,
+        hasChanged: (
+          newVal: (string | number)[],
+          oldVal: (string | number)[]
+        ) => {
+          return JSON.stringify(newVal) !== JSON.stringify(oldVal);
+        },
+      },
       type: { type: String },
-      options: { attribute: false, hasChanged: (newVal: (string | number)[], oldVal: (string | number)[]) => {
-        return JSON.stringify(newVal) !== JSON.stringify(oldVal)
-      } },
+      options: {
+        attribute: false,
+        hasChanged: (
+          newVal: (string | number)[],
+          oldVal: (string | number)[]
+        ) => {
+          return JSON.stringify(newVal) !== JSON.stringify(oldVal);
+        },
+      },
       autocomplete: { type: String },
       disabled: { type: Boolean },
       enabled: { type: Boolean },
@@ -62,7 +74,8 @@ export abstract class PwInput<
           // I think the problem was that passing down a @dev.mohe/task doesnt work as this doesnt trigger updates in the subcomponent
         },*/
       },
-      initial: { // TODO FIXME pass the inner element instead (and don't use the get method below)
+      initial: {
+        // TODO FIXME pass the inner element instead (and don't use the get method below)
         attribute: false,
       },
       resettable: { attribute: false },
@@ -81,7 +94,7 @@ export abstract class PwInput<
 
   /**
    * Extracts the value from the routes request data.
-   */  
+   */
   get!: (o: z.infer<typeof routes[P]["request"]>) => T;
 
   /**
@@ -189,13 +202,16 @@ export abstract class PwInput<
   }
 
   override render() {
-    console.log("pw-input rerender")
+    console.log("pw-input rerender");
     if (this.label === undefined || this.task === undefined) {
       throw new Error(msg("component not fully initialized"));
     }
 
     if (!this.hasUpdated) {
-      this.set(this.pwForm.formData,this.initial !== undefined ? this.get(this.initial) : this.defaultValue);
+      this.set(
+        this.pwForm.formData,
+        this.initial !== undefined ? this.get(this.initial) : this.defaultValue
+      );
     }
 
     // https://getbootstrap.com/docs/5.1/forms/validation/
@@ -300,8 +316,11 @@ export abstract class PwInput<
         : undefined
     }
     <button @click=${() => {
-      console.log("reset")
-      this.set(this.pwForm.formData,this.initial !== undefined ? this.get(this.initial) : this.defaultValue);
+      console.log("reset");
+      this.set(
+        this.pwForm.formData,
+        this.initial !== undefined ? this.get(this.initial) : this.defaultValue
+      );
       this.requestUpdate();
     }} class="btn btn-outline-secondary" type="button">
                   <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-counterclockwise" viewBox="0 0 16 16">
