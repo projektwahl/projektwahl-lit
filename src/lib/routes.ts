@@ -186,6 +186,50 @@ const choices = rawChoiceNullable.merge(
   })
 );
 
+export const createUserAction = rawUserSchema
+.pick({
+  openid_id: true,
+  age: true,
+  away: true,
+  group: true,
+  type: true,
+  username: true,
+  deleted: true,
+})
+.partial({
+  deleted: true,
+  group: true,
+  age: true,
+  away: true,
+})
+.extend({
+  password: z.string().optional(),
+  action: z.literal("create"),
+})
+.strict()
+
+export const updateUserAction = rawUserSchema
+.pick({
+  openid_id: true,
+  age: true,
+  away: true,
+  group: true,
+  type: true,
+  username: true,
+  project_leader_id: true,
+  force_in_project_id: true,
+  deleted: true,
+})
+.extend({
+  password: z.string(),
+})
+.partial()
+.extend({
+  id: z.number(),
+  action: z.literal("update"),
+})
+.strict()
+
 // TODO FIXME possible strict by default?
 export const routes = {
   "/api/v1/logout": {
@@ -225,49 +269,9 @@ export const routes = {
   "/api/v1/users/create-or-update": {
     request: z.array(
       z.discriminatedUnion("action", [
-        rawUserSchema
-          .pick({
-            openid_id: true,
-            age: true,
-            away: true,
-            group: true,
-            type: true,
-            username: true,
-            deleted: true,
-          })
-          .partial({
-            deleted: true,
-            group: true,
-            age: true,
-            away: true,
-          })
-          .extend({
-            password: z.string().optional(),
-            action: z.literal("create"),
-          })
-          .strict(),
+        createUserAction,
 
-        rawUserSchema
-          .pick({
-            openid_id: true,
-            age: true,
-            away: true,
-            group: true,
-            type: true,
-            username: true,
-            project_leader_id: true,
-            force_in_project_id: true,
-            deleted: true,
-          })
-          .extend({
-            password: z.string(),
-          })
-          .partial()
-          .extend({
-            id: z.number(),
-            action: z.literal("update"),
-          })
-          .strict(),
+        updateUserAction,
       ])
     ),
     response: z.array(

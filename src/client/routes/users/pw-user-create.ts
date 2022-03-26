@@ -28,7 +28,7 @@ import { PwForm } from "../../form/pw-form.js";
 import { HistoryController } from "../../history-controller.js";
 import { msg } from "@lit/localize";
 import "../../form/pw-input.js";
-import type { routes, MinimalSafeParseError } from "../../../lib/routes.js";
+import { routes, MinimalSafeParseError, updateUserAction } from "../../../lib/routes.js";
 import type { z } from "zod";
 import { bootstrapCss } from "../../index.js";
 import { ref } from "lit/directives/ref.js";
@@ -66,7 +66,9 @@ const taskFunction = async ([id]: [number]) => {
   if (response.success) {
     return {
       success: true,
-      data: response.data.entities,
+      data: response.data.entities.length == 1
+      ? [{ action: "update", ...response.data.entities[0] }]
+      : [],
     };
   }
   return response;
@@ -92,13 +94,15 @@ class PwUserCreate extends PwForm<"/api/v1/users/create-or-update"> {
 
   initial:
     | z.SafeParseSuccess<
-        z.infer<typeof routes["/api/v1/users"]["response"]>["entities"]
+        z.infer<typeof updateUserAction>[]
       >
     | MinimalSafeParseError
     | undefined;
 
   constructor() {
     super();
+
+    routes["/api/v1/users/create-or-update"]["request"]["element"]["options"].get("voter")    
 
     this.url = "/api/v1/users/create-or-update";
 
@@ -173,10 +177,7 @@ class PwUserCreate extends PwForm<"/api/v1/users/create-or-update"> {
                   get: (o) => o[0].username,
                   set: (o, v) => (o[0].username = v),
                   task: this._task,
-                  initial:
-                    this.initial?.data.length == 1
-                      ? [{ action: "update", ...this.initial?.data[0] }]
-                      : undefined,
+                  initial: this.initial?.data,
                   defaultValue: "",
                 })}
                 ${pwInputText<
@@ -191,10 +192,7 @@ class PwUserCreate extends PwForm<"/api/v1/users/create-or-update"> {
                   get: (o) => o[0].openid_id,
                   set: (o, v) => (o[0].openid_id = v),
                   task: this._task,
-                  initial:
-                    this.initial?.data.length == 1
-                      ? [{ action: "update", ...this.initial?.data[0] }]
-                      : undefined,
+                  initial: this.initial?.data,
                   defaultValue: null,
                 })}
                 ${pwInputSelect<
@@ -217,15 +215,7 @@ class PwUserCreate extends PwForm<"/api/v1/users/create-or-update"> {
                     { value: "admin", text: "Admin" },
                   ],
                   task: this._task,
-                  initial:
-                    this.initial?.data.length == 1
-                      ? [
-                          {
-                            ...this.initial?.data[0],
-                            action: "update",
-                          },
-                        ]
-                      : undefined,
+                  initial: this.initial?.data,
                   defaultValue: "voter",
                 })}
                 ${this.formData[0].type === "voter"
@@ -241,10 +231,7 @@ class PwUserCreate extends PwForm<"/api/v1/users/create-or-update"> {
                       get: (o) => o[0].group,
                       set: (o, v) => (o[0].group = v),
                       task: this._task,
-                      initial:
-                        this.initial?.data.length == 1
-                          ? [{ action: "update", ...this.initial?.data[0] }]
-                          : undefined,
+                      initial: this.initial?.data,
                       defaultValue: "",
                     })}
                     ${pwInputNumber<
@@ -259,10 +246,7 @@ class PwUserCreate extends PwForm<"/api/v1/users/create-or-update"> {
                       get: (o) => o[0].age,
                       set: (o, v) => (o[0].age = v),
                       task: this._task,
-                      initial:
-                        this.initial?.data.length == 1
-                          ? [{ action: "update", ...this.initial?.data[0] }]
-                          : undefined,
+                      initial: this.initial?.data,
                       defaultValue: undefined,
                     })}`
                   : undefined}
@@ -281,10 +265,7 @@ class PwUserCreate extends PwForm<"/api/v1/users/create-or-update"> {
                         set: (o, v) => (o[0].password = v),
                         task: this._task,
                         autocomplete: "new-password",
-                        initial:
-                          this.initial?.data.length == 1
-                            ? [{ action: "update", ...this.initial?.data[0] }]
-                            : undefined,
+                        initial: this.initial?.data,
                         defaultValue: "",
                       })}
                     `
@@ -304,10 +285,7 @@ class PwUserCreate extends PwForm<"/api/v1/users/create-or-update"> {
                   get: (o) => o[0].away,
                   set: (o, v) => (o[0].away = v),
                   task: this._task,
-                  initial:
-                    this.initial?.data.length == 1
-                      ? [{ action: "update", ...this.initial?.data[0] }]
-                      : undefined,
+                  initial: this.initial?.data,
                 })}
                 ${pwInputCheckbox<
                   "/api/v1/users/create-or-update",
@@ -324,10 +302,7 @@ class PwUserCreate extends PwForm<"/api/v1/users/create-or-update"> {
                   get: (o) => o[0].deleted,
                   set: (o, v) => (o[0].deleted = v),
                   task: this._task,
-                  initial:
-                    this.initial?.data.length == 1
-                      ? [{ action: "update", ...this.initial?.data[0] }]
-                      : undefined,
+                  initial: this.initial?.data,
                 })}
                 ${!this.disabled
                   ? html`
@@ -363,10 +338,6 @@ class PwUserCreate extends PwForm<"/api/v1/users/create-or-update"> {
         </main>
       `;
     } else {
-      // TODO FIXME
-      /*const errors = Object.entries(data.error)
-          .filter(([k]) => !this.getCurrentInputElements().includes(k))
-          .map(([k, v]) => html`${k}: ${v}<br />`);*/
       if (this.initial.error.issues.length > 0) {
         return html`${bootstrapCss}
             <main class="container">
