@@ -247,14 +247,13 @@ export abstract class PwInput<
           type=${ifDefined(this.type !== "textarea" ? this.type : undefined)}
           name=${this.name}
           .value=${live(
-              this.type !== "checkbox" &&
-              this.type !== "textarea"
+            this.type !== "checkbox" && this.type !== "textarea"
               ? this.get(this.pwForm.formData)
               : undefined
           )}
           ?checked=${live(
             this.type === "checkbox"
-                ? this.get(this.pwForm.formData)
+              ? this.get(this.pwForm.formData)
               : undefined
           )}
           class="${
@@ -289,7 +288,9 @@ export abstract class PwInput<
                 (o) => o.value,
                 (o) =>
                   html`<option
-                    ?selected=${live(this.get(this.pwForm.formData) === o.value)}
+                    ?selected=${live(
+                      this.get(this.pwForm.formData) === o.value
+                    )}
                     value=${o.value}
                   >
                     ${o.text}
@@ -318,7 +319,7 @@ export abstract class PwInput<
         this.pwForm.formData,
         this.initial !== undefined ? this.get(this.initial) : this.defaultValue
       );
-      console.log(this.pwForm.formData)
+      console.log(this.pwForm.formData);
       this.requestUpdate();
     }} class="btn btn-outline-secondary" type="button">
                   <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-counterclockwise" viewBox="0 0 16 16">
