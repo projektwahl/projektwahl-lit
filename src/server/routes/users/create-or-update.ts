@@ -108,7 +108,7 @@ export const createOrUpdateUsersHandler = requestHandler(
 
     try {
       const row = (
-        await sql.begin("READ WRITE", async (sql) => {
+        await sql.begin("READ WRITE", async (tsql) => {
           const results = [];
           for (const user of users) {
             if ("id" in user) {
@@ -120,72 +120,37 @@ export const createOrUpdateUsersHandler = requestHandler(
                 const permissionsQuery = await typedSql(sql, {} as const)`SELECT COUNT(*) FROM users_with_deleted AS voter INNER JOIN users_with_deleted AS helper ON voter.id = ${user.id} AND voter.type = 'voter' AND voter.project_leader_id IS NULL AND helper.id = ${loggedInUser.id} AND helper.type = 'helper' AND helper.project_leader_id = ${user.project_leader_id};`
               }*/
 
-              const finalQuery = typedSql(sql, {
-                types: [
-                  16,
-                  1043,
-                  16,
-                  1043,
-                  16,
-                  null, // custom enum
-                  16,
-                  1043,
-                  16,
-                  23,
-                  16,
-                  16,
-                  16,
-                  23,
-                  16,
-                  23,
-                  16,
-                  16,
-                  16,
-                  1043,
-                  23,
-                  23,
-                ],
-                columns: {
-                  id: 23,
-                  project_leader_id: 23,
-                  force_in_project_id: 23,
-                },
-              } as const)`UPDATE users_with_deleted SET
-  "username" = CASE WHEN ${user.username !== undefined} THEN ${
-                user.username ?? null
-              } ELSE "users_with_deleted"."username" END,
-  "openid_id" = CASE WHEN ${user.openid_id !== undefined} THEN ${
-                user.openid_id ?? null
-              } ELSE "users_with_deleted"."openid_id" END,
-  "type" = CASE WHEN ${user.type !== undefined} THEN ${
-                user.type ?? null
-              } ELSE "users_with_deleted"."type" END,
-  "group" = CASE WHEN ${user.group !== undefined} THEN ${
-                user.group ?? null
-              } ELSE "users_with_deleted"."group" END,
-  "age" = CASE WHEN ${user.age !== undefined} THEN ${
-                user.age ?? null
-              } ELSE "users_with_deleted"."age" END,
-  "away" = CASE WHEN ${user.away !== undefined} THEN ${
-                user.away ?? null
-              } ELSE "users_with_deleted"."away" END,
-  "project_leader_id" = CASE WHEN ${
+              // TODO FIXME client should send their old values so we can compare and show an error if there are conflicts
+
+              // TODO FIXME clean this up like in entities.ts
+
+              const finalQuery = tsql`UPDATE users_with_deleted SET
+  ${user.username !== undefined ? sql`"username" = ${user.username},` : sql``}
+  ${
+    user.openid_id !== undefined ? sql`"openid_id" = ${user.openid_id},` : sql``
+  }
+  ${user.type !== undefined ? sql`"type" = ${user.type},` : sql``}
+  ${user.group !== undefined ? sql`"group" = ${user.group},` : sql``}
+  ${user.age !== undefined ? sql`age = ${user.age},` : sql``}
+  ${user.away !== undefined ? sql`"away" = ${user.away},` : sql``}
+  ${
     user.project_leader_id !== undefined
-  } THEN ${
-                user.project_leader_id ?? null
-              } ELSE "users_with_deleted"."project_leader_id" END,
-  "force_in_project_id" = CASE WHEN ${
+      ? sql`"project_leader_id" = ${user.project_leader_id},`
+      : sql``
+  }
+  ${
     user.force_in_project_id !== undefined
-  } THEN ${
-                user.force_in_project_id ?? null
-              } ELSE "users_with_deleted"."force_in_project_id" END,
-  "deleted" = CASE WHEN ${user.deleted !== undefined} THEN ${
-                user.deleted ?? null
-              } ELSE "users_with_deleted"."deleted" END,
-  password_hash = CASE WHEN ${!!user.password} THEN ${
-                user.password ? await hashPassword(user.password) : null
-              } ELSE password_hash END,
-  last_updated_by = ${loggedInUser.id}
+      ? sql`"force_in_project_id" = ${user.force_in_project_id},`
+      : sql``
+  }
+  ${user.deleted !== undefined ? sql`"deleted" = ${user.deleted},` : sql``}
+  ${
+    user.password !== undefined
+      ? sql`"password_hash" = ${await hashPassword(user.password)},`
+      : sql``
+  }
+  "last_updated_by" = ${loggedInUser.id}
+
   WHERE id = ${user.id} RETURNING id, project_leader_id, force_in_project_id;`;
               // TODO FIXME (found using fuzzer) if this tries to update a nonexisting user we should return an error
               results.push(await finalQuery);
@@ -238,6 +203,7 @@ export const createOrUpdateUsersHandler = requestHandler(
         },
         {
           success: true as const,
+          // @ts-expect-error need to fix typedSql for dynamic queries
           data: row,
         },
       ];
