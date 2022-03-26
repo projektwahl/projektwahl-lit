@@ -40,10 +40,15 @@ export abstract class PwInput<
 > extends PwElement {
   static override get properties() {
     return {
+      ...super.properties,
       label: { attribute: false },
-      name: { attribute: false },
+      name: { attribute: false, hasChanged: (newVal: (string | number)[], oldVal: (string | number)[]) => {
+        return JSON.stringify(newVal) !== JSON.stringify(oldVal)
+      } },
       type: { type: String },
-      options: { attribute: false },
+      options: { attribute: false, hasChanged: (newVal: (string | number)[], oldVal: (string | number)[]) => {
+        return JSON.stringify(newVal) !== JSON.stringify(oldVal)
+      } },
       autocomplete: { type: String },
       disabled: { type: Boolean },
       enabled: { type: Boolean },
@@ -57,7 +62,7 @@ export abstract class PwInput<
           // I think the problem was that passing down a @dev.mohe/task doesnt work as this doesnt trigger updates in the subcomponent
         },*/
       },
-      initial: {
+      initial: { // TODO FIXME pass the inner element instead (and don't use the get method below)
         attribute: false,
       },
       resettable: { attribute: false },
@@ -184,16 +189,13 @@ export abstract class PwInput<
   }
 
   override render() {
+    console.log("pw-input rerender")
     if (this.label === undefined || this.task === undefined) {
       throw new Error(msg("component not fully initialized"));
     }
 
     if (!this.hasUpdated) {
-      if (this.initial !== undefined) {
-        this.set(this.pwForm.formData, this.get(this.initial));
-      } else {
-        this.set(this.pwForm.formData, this.defaultValue);
-      }
+      this.set(this.pwForm.formData,this.initial !== undefined ? this.get(this.initial) : this.defaultValue);
     }
 
     // https://getbootstrap.com/docs/5.1/forms/validation/
@@ -297,7 +299,11 @@ export abstract class PwInput<
           >`
         : undefined
     }
-    <button class="btn btn-outline-secondary" type="button">
+    <button @click=${() => {
+      console.log("reset")
+      this.set(this.pwForm.formData,this.initial !== undefined ? this.get(this.initial) : this.defaultValue);
+      this.requestUpdate();
+    }} class="btn btn-outline-secondary" type="button">
                   <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-counterclockwise" viewBox="0 0 16 16">
                   <path fill-rule="evenodd" d="M8 3a5 5 0 1 1-4.546 2.914.5.5 0 0 0-.908-.417A6 6 0 1 0 8 2v1z"/>
                   <path d="M8 4.466V.534a.25.25 0 0 0-.41-.192L5.23 2.308a.25.25 0 0 0 0 .384l2.36 1.966A.25.25 0 0 0 8 4.466z"/>

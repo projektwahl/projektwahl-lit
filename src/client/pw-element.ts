@@ -20,11 +20,15 @@ https://github.com/projektwahl/projektwahl-lit
 SPDX-License-Identifier: AGPL-3.0-or-later
 SPDX-FileCopyrightText: 2021 Moritz Hedtke <Moritz.Hedtke@t-online.de>
 */
-import { LitElement } from "lit";
+import { LitElement, PropertyValueMap } from "lit";
 
 export class PwElement extends LitElement {
   // you didn't see this or I will switch to React. Reasoning: Tests, Bootstrap isn't shadow dom ready
   protected createRenderRoot() {
     return this;
+  }
+
+  protected willUpdate(_changedProperties: PropertyValueMap<any> | Map<PropertyKey, unknown>): void {
+    console.log(this.tagName, _changedProperties)
   }
 }
