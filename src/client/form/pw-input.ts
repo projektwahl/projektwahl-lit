@@ -61,7 +61,6 @@ export abstract class PwInput<
         attribute: false,
       },
       resettable: { attribute: false },
-      currentValue: { state: true },
     };
   }
 
@@ -105,7 +104,7 @@ export abstract class PwInput<
   // TODO FIXME
   options?: { value: T; text: string }[];
 
-  defaultValue!: T;
+  defaultValue!: T; // TODO FIXME merge into initial?
 
   pwForm!: PwForm<P>;
 
@@ -188,14 +187,16 @@ export abstract class PwInput<
           type=${ifDefined(this.type !== "textarea" ? this.type : undefined)}
           name=${this.name}
           value=${ifDefined(
-            this.type !== "checkbox" && this.type !== "textarea"
-              ? this.get(this.pwForm.formData)
+            this.initial !== undefined &&
+              this.type !== "checkbox" &&
+              this.type !== "textarea"
+              ? this.get(this.initial)
               : undefined
           )}
           ?checked=${ifDefined(
             this.type === "checkbox"
-              ? this.get(this.pwForm.formData) !== undefined
-                ? this.get(this.pwForm.formData)
+              ? this.initial !== undefined
+                ? this.get(this.initial)
                 : this.defaultValue
               : undefined
           )}
@@ -231,16 +232,16 @@ export abstract class PwInput<
                 (o) => o.value,
                 (o) =>
                   html`<option
-                    ?selected=${this.get(this.pwForm.formData) !== undefined
-                      ? this.get(this.pwForm.formData) === o.value
+                    ?selected=${this.initial !== undefined
+                      ? this.get(this.initial) === o.value
                       : false}
                     value=${o.value}
                   >
                     ${o.text}
                   </option>`
               )
-            : this.type === "textarea"
-            ? this.get(this.pwForm.formData)
+            : this.type === "textarea" && this.initial !== undefined
+            ? this.get(this.initial)
             : undefined
         }</${
       this.type === "select"
