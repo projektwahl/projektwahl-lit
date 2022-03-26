@@ -177,12 +177,6 @@ export class PwEntityList<
       throw new Error(msg("component not fully initialized"));
     }
 
-    const data = parseRequestWithPrefix(
-      this.url,
-      this.prefix,
-      this.history.url
-    );
-
     if (!this.hasUpdated) {
       this.formData =
         parseRequestWithPrefix(this.url, this.prefix, this.history.url)[
@@ -191,14 +185,16 @@ export class PwEntityList<
 
       this._task = new Task(this, {
         task: async () => {
+          const data = parseRequestWithPrefix(
+            this.url,
+            this.prefix,
+            this.history.url
+          );
+          
           HistoryController.goto(
             new URL(
               `?${encodeURIComponent(
-                JSON.stringify({
-                  ...data,
-                  [this.prefix]: this.formData,
-                })
-              )}`,
+                JSON.stringify(data))}`,
               window.location.href
             ),
             this.history.state,
@@ -219,6 +215,12 @@ export class PwEntityList<
         void this._task.run();
       }
     }
+
+    const data = parseRequestWithPrefix(
+      this.url,
+      this.prefix,
+      this.history.url
+    );
 
     return html`
       ${bootstrapCss}

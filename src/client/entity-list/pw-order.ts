@@ -206,7 +206,7 @@ export class PwOrder<
               `?${encodeURIComponent(JSON.stringify(data))}`,
               window.location.href
             ),
-            {},
+            {}, // TODO FIXME this.history.state - this currently forces a full navigation
             true
           );
         }}
