@@ -82,7 +82,7 @@ class PwLogin extends PwForm<"/api/v1/login"> {
 
     if (!this.hasUpdated) {
       // @ts-expect-error impossible
-      this.formData = {}
+      this.formData = {};
     }
 
     return html`

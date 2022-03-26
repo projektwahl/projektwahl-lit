@@ -232,7 +232,7 @@ class PwUserCreate extends PwForm<"/api/v1/users/create-or-update"> {
                           },
                         ]
                       : undefined,
-                  defaultValue: undefined,
+                  defaultValue: "voter",
                 })}
                 ${(this.type ?? this.initial?.data[0].type ?? "voter") ===
                 "voter"

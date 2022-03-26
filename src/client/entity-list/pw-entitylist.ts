@@ -173,15 +173,13 @@ export class PwEntityList<
     }
 
     if (!this.hasUpdated) {
-      this.formData = parseRequestWithPrefix(
-        this.url,
-        this.prefix,
-        this.history.url
-      )[this.prefix] ?? {};
-      
+      this.formData =
+        parseRequestWithPrefix(this.url, this.prefix, this.history.url)[
+          this.prefix
+        ] ?? {};
+
       this._task = new Task(this, {
         task: async () => {
-
           const result = await myFetch<P>("GET", this.url, this.formData, {});
 
           HistoryController.goto(
