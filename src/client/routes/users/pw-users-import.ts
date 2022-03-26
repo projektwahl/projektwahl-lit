@@ -51,17 +51,11 @@ class PwUsersImport extends PwForm<"/api/v1/users/create-or-update"> {
     super();
 
     this._task = new Task(this, async () => {
-      const formDataEvent = new CustomEvent<{
-        file: Promise<string | undefined>;
-      }>("myformdata", {
-        bubbles: false,
-        detail: { file: Promise.resolve(undefined) },
-      });
-      this.form.value?.dispatchEvent(formDataEvent);
-
       // TODO FIXME check that file upload succeeded
 
-      const fileContents = await formDataEvent.detail.file;
+      // @ts-expect-error impossible
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+      const fileContents = await this.formData.file;
 
       const result = await myFetch<"/api/v1/users/create-or-update">(
         "POST",
@@ -82,6 +76,11 @@ class PwUsersImport extends PwForm<"/api/v1/users/create-or-update"> {
   override render() {
     if (this.actionText === undefined) {
       throw new Error(msg("component not fully initialized"));
+    }
+
+    if (!this.hasUpdated) {
+      // @ts-expect-error impossible
+      this.formData = { file: Promise.resolve(undefined) };
     }
 
     return html`

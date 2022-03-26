@@ -90,8 +90,6 @@ class PwUserCreate extends PwForm<"/api/v1/users/create-or-update"> {
       : msg("Create account");
   }
 
-  type?: "voter" | "admin" | "helper";
-
   initial:
     | z.SafeParseSuccess<
         z.infer<typeof routes["/api/v1/users"]["response"]>["entities"]
@@ -105,28 +103,10 @@ class PwUserCreate extends PwForm<"/api/v1/users/create-or-update"> {
     this.url = "/api/v1/users/create-or-update";
 
     this._task = new Task(this, async () => {
-      const formDataEvent = new CustomEvent<
-        z.infer<typeof routes["/api/v1/users/create-or-update"]["request"]>
-      >("myformdata", {
-        bubbles: false,
-        detail: [
-          // @ts-expect-error craete
-          this.initial?.success
-            ? {
-                action: "update",
-                project_leader_id: undefined,
-                force_in_project_id: undefined,
-                id: this.initial.data[0].id,
-              }
-            : { action: "create" },
-        ],
-      });
-      this.form.value?.dispatchEvent(formDataEvent);
-
       const result = await myFetch<"/api/v1/users/create-or-update">(
         "POST",
         this.url,
-        formDataEvent.detail,
+        this.formData,
         {}
       );
 
@@ -143,6 +123,20 @@ class PwUserCreate extends PwForm<"/api/v1/users/create-or-update"> {
   }
 
   override render() {
+    if (!this.hasUpdated) {
+      this.formData = [
+        // @ts-expect-error impossible
+        this.initial?.success
+          ? {
+              action: "update",
+              project_leader_id: undefined,
+              force_in_project_id: undefined,
+              id: this.initial.data[0].id,
+            }
+          : { action: "create" },
+      ];
+    }
+
     if (this.initial === undefined || this.initial.success) {
       if (this.actionText === undefined) {
         throw new Error(msg("component not fully initialized"));
@@ -215,7 +209,7 @@ class PwUserCreate extends PwForm<"/api/v1/users/create-or-update"> {
                   get: (o) => o[0].type,
                   set: (o, v) => {
                     o[0].type = v;
-                    this.type = v;
+                    this.requestUpdate(); // hack to update on this
                   },
                   options: [
                     { value: "voter", text: "Schüler" },
@@ -229,17 +223,12 @@ class PwUserCreate extends PwForm<"/api/v1/users/create-or-update"> {
                           {
                             ...this.initial?.data[0],
                             action: "update",
-                            type:
-                              this.type ??
-                              this.initial?.data[0].type ??
-                              "voter",
                           },
                         ]
                       : undefined,
-                  defaultValue: undefined,
+                  defaultValue: "voter",
                 })}
-                ${(this.type ?? this.initial?.data[0].type ?? "voter") ===
-                "voter"
+                ${this.formData[0].type === "voter"
                   ? html`${pwInputText<
                       "/api/v1/users/create-or-update",
                       string | null | undefined

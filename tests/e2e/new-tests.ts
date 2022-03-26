@@ -95,7 +95,7 @@ class FormTester {
     return await element.getAttribute("checked");
   }
 
-  async submit() {
+  private async submit() {
     const submitButton = await this.form.findElement(
       By.css('button[type="submit"]')
     );
@@ -117,20 +117,18 @@ class FormTester {
   async submitSuccess() {
     await this.submit();
 
-    await this.helper.driver.wait(
-      until.stalenessOf(this.form),
-      2000,
-      "form submit expected stale"
+    const alerts = await this.helper.driver.findElements(
+      By.css('div[class="alert alert-danger"]')
     );
+
+    assert.equal(alerts.length, 0);
   }
 
   async submitFailure() {
     await this.submit();
 
-    const alert = await this.helper.driver.wait(
-      until.elementLocated(By.css('div[class="alert alert-danger"]')),
-      2000,
-      "Expected submit failure 1"
+    const alert = await this.helper.driver.findElement(
+      By.css('div[class="alert alert-danger"]')
     );
 
     assert.match(await alert.getText(), /Some errors occurred./);
@@ -409,6 +407,16 @@ async function createUserAllFields(helper: Helper) {
   const id = (await helper.driver.getCurrentUrl()).substring(
     "https://localhost:8443/users/edit/".length
   );
+  const loadingIndicator1 = await helper.driver.wait(
+    until.elementLocated(By.css(".spinner-grow")),
+    2000,
+    "spinner 1 1"
+  );
+  await helper.driver.wait(
+    until.stalenessOf(loadingIndicator1),
+    2000,
+    "loading indicator 1 2"
+  );
   form = await helper.form("pw-user-create");
   assert.equal(await form.getField("0,username"), username);
   assert.equal(await form.getField("0,openid_id"), email);
@@ -419,7 +427,7 @@ async function createUserAllFields(helper: Helper) {
 
   const username2 = `username${crypto.getRandomValues(new Uint32Array(1))[0]}`;
   await form.setField("0,username", username2);
-  await form.submit(); // submitSuccess doesnt work because it doesnt hide the form
+  await form.submitSuccess();
 
   await helper.click(
     await helper.driver.findElement(By.css(`button[class="btn btn-secondary"]`))
@@ -491,6 +499,16 @@ async function createProjectAllFields(helper: Helper) {
   const id = (await helper.driver.getCurrentUrl()).substring(
     "https://localhost:8443/projects/edit/".length
   );
+  const loadingIndicator1 = await helper.driver.wait(
+    until.elementLocated(By.css(".spinner-grow")),
+    2000,
+    "spinner 1 1"
+  );
+  await helper.driver.wait(
+    until.stalenessOf(loadingIndicator1),
+    2000,
+    "loading indicator 1 2"
+  );
   form = await helper.form("pw-project-create");
   assert.equal(await form.getField("title"), title);
   assert.equal(await form.getField("info"), info);
@@ -508,7 +526,7 @@ async function createProjectAllFields(helper: Helper) {
 
   const title2 = `title${Math.random()}`;
   await form.setField("title", title2);
-  await form.submit(); // submitSuccess doesnt work because it doesnt hide the form
+  await form.submitSuccess();
 
   await helper.click(
     await helper.driver.findElement(By.css(`button[class="btn btn-secondary"]`))

@@ -26,6 +26,7 @@ import { msg } from "@lit/localize";
 import type { routes, ResponseType } from "../../lib/routes.js";
 import type { Task } from "@dev.mohe/task";
 import { PwElement } from "../pw-element.js";
+import type { z } from "zod";
 
 class PwForm<P extends keyof typeof routes> extends PwElement {
   static get properties() {
@@ -49,6 +50,9 @@ class PwForm<P extends keyof typeof routes> extends PwElement {
 
   errors: Ref<HTMLDivElement>;
 
+  // this is intentionally not { state: true } as then updating the children is just super slow
+  formData!: z.infer<typeof routes[P]["request"]>;
+
   constructor() {
     super();
 
@@ -57,15 +61,12 @@ class PwForm<P extends keyof typeof routes> extends PwElement {
     this.errors = createRef();
   }
 
-  getCurrentInputElements() {
-    const formKeysEvent = new CustomEvent<string[][]>("myformkeys", {
-      bubbles: true,
-      composed: true,
-      detail: [],
-    });
-    this.form.value?.dispatchEvent(formKeysEvent);
+  connectedCallback(): void {
+    super.connectedCallback();
+  }
 
-    return formKeysEvent.detail;
+  disconnectedCallback(): void {
+    super.disconnectedCallback();
   }
 
   getErrors() {
@@ -82,7 +83,7 @@ class PwForm<P extends keyof typeof routes> extends PwElement {
                 ${data.error.issues
                   .filter(
                     (i) =>
-                      ![...this.getCurrentInputElements()].find(
+                      !Object.keys(this.formData).find(
                         (v) => JSON.stringify(v) === JSON.stringify(i.path)
                       )
                   )

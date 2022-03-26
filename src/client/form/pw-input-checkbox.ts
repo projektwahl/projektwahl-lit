@@ -22,7 +22,6 @@ SPDX-FileCopyrightText: 2021 Moritz Hedtke <Moritz.Hedtke@t-online.de>
 */
 import { html } from "lit";
 import { ifDefined } from "lit/directives/if-defined.js";
-import type { z } from "zod";
 import type { routes } from "../../lib/routes.js";
 import { PwInput } from "./pw-input.js";
 
@@ -103,14 +102,13 @@ export class PwInputCheckbox<
   falseValue!: T;
   trueValue!: T;
 
-  myformdataEventListener = (
-    event: CustomEvent<z.infer<typeof routes[P]["request"]>>
-  ) => {
+  mypwinputchangeDispatcher = () => {
     if (!this.input.value) {
       throw new Error();
     }
+
     this.set(
-      event.detail,
+      this.pwForm.formData,
       this.input.value.checked ? this.trueValue : this.falseValue
     );
   };

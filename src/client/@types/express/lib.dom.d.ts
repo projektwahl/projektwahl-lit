@@ -30,11 +30,6 @@ declare global {
     }>;
   }
 
-  interface HTMLElementEventMap {
-    myformdata: CustomEvent<Record<string, unknown>>;
-    myformkeys: CustomEvent<string[][]>;
-  }
-
   interface Window {
     BOOTSTRAP_CSS: string | undefined;
     LANGUAGE: string | undefined;

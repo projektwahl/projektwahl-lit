@@ -93,12 +93,33 @@ export const createOrUpdateUsersHandler = requestHandler(
     // for setting in_project_id to null we need to check the db if the user was in this particular project previously
     //if (loggedInUser?.type === "helper" && users.every(user => user.action === "update" && user.))
 
+    // if in_project_id is not null we need to check that no old value is overwritten
+
+    // maybe do the check in a transaction? or use a trigger?
+
+    /*
+     SELECT COUNT(*) FROM users_with_deleted WHERE (id = 5 and type = 'voter' AND (users_with_deleted.project_leader_id IS NULL AND 105 IS NOT NULL OR users_with_deleted.project_leader_id = 105 AND NULL IS NULL)) OR (id = 2106 AND type = 'helper' AND project_leader_id = 105);
+
+
+     SELECT COUNT(*) FROM users_with_deleted AS voter INNER JOIN users_with_deleted AS helper ON voter.id = 5 AND voter.type = 'voter' AND voter.project_leader_id IS NOT NULL AND helper.id = 2106 AND helper.type = 'helper' AND helper.project_leader_id = voter.project_leader_id;
+
+     SELECT COUNT(*) FROM users_with_deleted AS voter INNER JOIN users_with_deleted AS helper ON voter.id = 5 AND voter.type = 'voter' AND voter.project_leader_id IS NULL AND helper.id = 2106 AND helper.type = 'helper' AND helper.project_leader_id = 105;
+    */
+
     try {
       const row = (
         await sql.begin("READ WRITE", async (sql) => {
           const results = [];
           for (const user of users) {
             if ("id" in user) {
+              // TODO FIXME check that only that column is updated.
+
+              /* if (user.project_leader_id === null) {
+                const permissionsQuery = await typedSql(sql, {} as const)`SELECT COUNT(*) FROM users_with_deleted AS voter INNER JOIN users_with_deleted AS helper ON voter.id = ${user.id} AND voter.type = 'voter' AND voter.project_leader_id IS NOT NULL AND helper.id = ${loggedInUser.id} AND helper.type = 'helper' AND helper.project_leader_id = voter.project_leader_id;`
+              } else if (user.project_leader_id !== undefined) {
+                const permissionsQuery = await typedSql(sql, {} as const)`SELECT COUNT(*) FROM users_with_deleted AS voter INNER JOIN users_with_deleted AS helper ON voter.id = ${user.id} AND voter.type = 'voter' AND voter.project_leader_id IS NULL AND helper.id = ${loggedInUser.id} AND helper.type = 'helper' AND helper.project_leader_id = ${user.project_leader_id};`
+              }*/
+
               const finalQuery = typedSql(sql, {
                 types: [
                   16,

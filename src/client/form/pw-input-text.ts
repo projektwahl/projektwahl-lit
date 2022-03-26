@@ -22,7 +22,6 @@ SPDX-FileCopyrightText: 2021 Moritz Hedtke <Moritz.Hedtke@t-online.de>
 */
 import { html } from "lit";
 import { ifDefined } from "lit/directives/if-defined.js";
-import type { z } from "zod";
 import type { routes } from "../../lib/routes.js";
 import { PwInput } from "./pw-input.js";
 
@@ -87,9 +86,7 @@ export class PwInputText<
   P extends keyof typeof routes,
   T extends string | undefined | null
 > extends PwInput<P, T, HTMLInputElement> {
-  myformdataEventListener = (
-    event: CustomEvent<z.infer<typeof routes[P]["request"]>>
-  ) => {
+  mypwinputchangeDispatcher = () => {
     if (!this.input.value) {
       throw new Error();
     }
@@ -98,7 +95,8 @@ export class PwInputText<
     }
     // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
     const val = this.input.value.value as T;
-    this.set(event.detail, val === "" ? this.defaultValue : val);
+
+    this.set(this.pwForm.formData, val === "" ? this.defaultValue : val);
   };
 }
 

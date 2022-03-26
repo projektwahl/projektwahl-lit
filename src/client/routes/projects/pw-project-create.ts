@@ -87,7 +87,6 @@ export const PwProjectCreate = setupHmr(
         _initialTask: { state: true },
         type: { state: true },
         initial: { attribute: false },
-        initialRender: { state: true },
       };
     }
 
@@ -98,8 +97,6 @@ export const PwProjectCreate = setupHmr(
         ? msg("Update project")
         : msg("Create project");
     }
-
-    initialRender: boolean;
 
     initial:
       | z.SafeParseSuccess<
@@ -113,32 +110,13 @@ export const PwProjectCreate = setupHmr(
     constructor() {
       super();
 
-      this.initialRender = false;
-
       /**
        * @override
        */
       this._task = new Task(this, async () => {
-        const formDataEvent = new CustomEvent<
-          z.infer<
-            typeof routes[
-              | "/api/v1/projects/create"
-              | "/api/v1/projects/update"]["request"]
-          >
-        >("myformdata", {
-          bubbles: false,
-          // @ts-expect-error not typecheckable with current design
-          detail: {
-            ...(this.initial?.success
-              ? { id: this.initial.data.id }
-              : { id: undefined }), // TODO FIXME
-          },
-        });
-        this.form.value?.dispatchEvent(formDataEvent);
-
         const result = await myFetch<
           "/api/v1/projects/create" | "/api/v1/projects/update"
-        >("POST", this.url, formDataEvent.detail, {});
+        >("POST", this.url, this.formData, {});
 
         if (result.success) {
           HistoryController.goto(
@@ -153,6 +131,15 @@ export const PwProjectCreate = setupHmr(
     }
 
     override render() {
+      if (!this.hasUpdated) {
+        // @ts-expect-error impossible
+        this.formData = {
+          ...(this.initial?.success
+            ? { id: this.initial.data.id }
+            : { id: undefined }), // TODO FIXME
+        };
+      }
+
       if (this.initial === undefined || this.initial.success) {
         if (this.actionText === undefined) {
           throw new Error(msg("component not fully initialized"));

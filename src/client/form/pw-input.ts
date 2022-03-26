@@ -31,6 +31,7 @@ import type { routes, ResponseType } from "../../lib/routes.js";
 import type { z } from "zod";
 import type { Task } from "@dev.mohe/task";
 import { PwElement } from "../pw-element.js";
+import { PwForm } from "./pw-form.js";
 
 export abstract class PwInput<
   P extends keyof typeof routes,
@@ -59,6 +60,7 @@ export abstract class PwInput<
       initial: {
         attribute: false,
       },
+      resettable: { attribute: false },
     };
   }
 
@@ -75,6 +77,8 @@ export abstract class PwInput<
   disabled?: boolean = false;
 
   enabled?: boolean = false;
+
+  resettable = false;
 
   randomId;
 
@@ -97,12 +101,12 @@ export abstract class PwInput<
 
   input: Ref<I>;
 
-  form!: HTMLFormElement;
-
   // TODO FIXME
   options?: { value: T; text: string }[];
 
-  defaultValue!: T;
+  defaultValue!: T; // TODO FIXME merge into initial?
+
+  pwForm!: PwForm<P>;
 
   constructor() {
     super();
@@ -118,29 +122,25 @@ export abstract class PwInput<
     return this;
   }
 
-  myformkeysEventListener = (event: CustomEvent<(string | number)[][]>) => {
-    event.detail.push(this.name);
-  };
-
-  abstract myformdataEventListener: (
-    event: CustomEvent<z.infer<typeof routes[P]["request"]>>
-  ) => void;
+  abstract mypwinputchangeDispatcher: () => void;
 
   override connectedCallback() {
     super.connectedCallback();
-    const form = this.closest("form");
-    if (!form) {
-      throw new Error();
+    this.addEventListener("input", this.mypwinputchangeDispatcher);
+    let curr: HTMLElement | null = this.parentElement;
+    while (!(curr === null || curr instanceof PwForm)) {
+      curr = curr.parentElement;
     }
-    this.form = form;
-    this.form.addEventListener("myformdata", this.myformdataEventListener);
-    this.form.addEventListener("myformkeys", this.myformkeysEventListener);
+    if (!curr) {
+      throw new Error("PwForm not found");
+    }
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+    this.pwForm = curr;
   }
 
   override disconnectedCallback() {
     super.disconnectedCallback();
-    this.form.removeEventListener("myformdata", this.myformdataEventListener);
-    this.form.removeEventListener("myformkeys", this.myformkeysEventListener);
+    this.removeEventListener("input", this.mypwinputchangeDispatcher);
   }
 
   override render() {
@@ -148,16 +148,26 @@ export abstract class PwInput<
       throw new Error(msg("component not fully initialized"));
     }
 
+    if (!this.hasUpdated) {
+      if (this.initial !== undefined) {
+        this.set(this.pwForm.formData, this.get(this.initial));
+      } else {
+        this.set(this.pwForm.formData, this.defaultValue);
+      }
+    }
+
+    // https://getbootstrap.com/docs/5.1/forms/validation/
     return html`
       ${bootstrapCss}
-      <div class="mb-3">
-        ${
-          this.type !== "checkbox" && this.label !== null
-            ? html`<label for=${this.randomId} class="form-label"
-                >${this.label}:</label
-              >`
-            : undefined
-        }
+      <div class="col mb-3">
+      ${
+        this.type !== "checkbox" && this.label !== null
+          ? html`<label for=${this.randomId} class="form-label"
+              >${this.label}:</label
+            >`
+          : undefined
+      }
+      <div class="${this.type !== "checkbox" ? "input-group" : ""}">
         <${
           this.type === "select"
             ? literal`select`
@@ -230,7 +240,7 @@ export abstract class PwInput<
                     ${o.text}
                   </option>`
               )
-            : this.type === "textarea" && this.initial
+            : this.type === "textarea" && this.initial !== undefined
             ? this.get(this.initial)
             : undefined
         }</${
@@ -240,36 +250,20 @@ export abstract class PwInput<
         ? literal`textarea`
         : literal`input`
     }>
-        ${
-          this.autocomplete === "new-password"
-            ? html`<div id="passwordHelp" class="form-text">
-                <a
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  href="https://imgs.xkcd.com/comics/password_strength.png"
-                  >${msg(
-                    "Denk dran: Lange Passwörter sind viel sicherer als welche mit vielen Sonderzeichen."
-                  )}</a
-                ><br />
-                ${msg(html` Also lieber "Ich mag fliegende Autos." anstatt
-                  "Moritz1234!".<br />Du kannst auch einen Passwort-Manager
-                  verwenden, z.B.`)}
-                <a
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  href="https://bitwarden.com/download/"
-                  >${msg("Bitwarden")}</a
-                >
-              </div>`
-            : undefined
-        }
-        ${
-          this.type === "checkbox" && this.label !== null
-            ? html`<label for=${this.randomId} class="form-check-label"
-                >${this.label}</label
-              >`
-            : undefined
-        }
+    ${
+      this.type === "checkbox" && this.label !== null
+        ? html`<label for=${this.randomId} class="form-check-label"
+            >${this.label}</label
+          >`
+        : undefined
+    }
+    <button class="btn btn-outline-secondary" type="button">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-counterclockwise" viewBox="0 0 16 16">
+                  <path fill-rule="evenodd" d="M8 3a5 5 0 1 1-4.546 2.914.5.5 0 0 0-.908-.417A6 6 0 1 0 8 2v1z"/>
+                  <path d="M8 4.466V.534a.25.25 0 0 0-.41-.192L5.23 2.308a.25.25 0 0 0 0 .384l2.36 1.966A.25.25 0 0 0 8 4.466z"/>
+                </svg>
+                  </button>
+        
         ${this.task.render({
           complete: (v) => {
             if (!v.success) {
@@ -293,6 +287,31 @@ export abstract class PwInput<
           initial: () => undefined,
           pending: () => noChange,
         })}
+      </div>
+      ${
+        this.autocomplete === "new-password"
+          ? html`<div id="passwordHelp" class="form-text">
+              <a
+                target="_blank"
+                rel="noopener noreferrer"
+                href="https://imgs.xkcd.com/comics/password_strength.png"
+                >${msg(
+                  "Denk dran: Lange Passwörter sind viel sicherer als welche mit vielen Sonderzeichen."
+                )}</a
+              ><br />
+              ${msg(html` Also lieber "Ich mag fliegende Autos." anstatt
+                "Moritz1234!".<br />Du kannst auch einen Passwort-Manager
+                verwenden, z.B.`)}
+              <a
+                target="_blank"
+                rel="noopener noreferrer"
+                href="https://bitwarden.com/download/"
+                >${msg("Bitwarden")}</a
+              >
+            </div>`
+          : undefined
+      }
+      
       </div>
     `;
   }

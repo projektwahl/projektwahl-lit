@@ -150,8 +150,6 @@ export class PwEntityList<
     return "blub";
   }
 
-  initialRender: boolean;
-
   initial: ResponseType<P> | undefined;
 
   protected history;
@@ -162,8 +160,6 @@ export class PwEntityList<
     super();
 
     this.history = new HistoryController(this, /.*/);
-
-    this.initialRender = true;
   }
 
   override render() {
@@ -176,38 +172,22 @@ export class PwEntityList<
       throw new Error(msg("component not fully initialized"));
     }
 
-    if (this.initialRender) {
-      this.initialRender = false;
+    if (!this.hasUpdated) {
+      this.formData =
+        parseRequestWithPrefix(this.url, this.prefix, this.history.url)[
+          this.prefix
+        ] ?? {};
 
       this._task = new Task(this, {
         task: async () => {
-          const data = parseRequestWithPrefix(
-            this.url,
-            this.prefix,
-            this.history.url
-          );
-
-          const formDataEvent = new CustomEvent<
-            z.infer<typeof entityRoutes[P]["request"]>
-          >("myformdata", {
-            bubbles: false,
-            detail: data[this.prefix] ?? {},
-          });
-          this.form.value?.dispatchEvent(formDataEvent);
-
-          const result = await myFetch<P>(
-            "GET",
-            this.url,
-            formDataEvent.detail,
-            {}
-          );
+          const result = await myFetch<P>("GET", this.url, this.formData, {});
 
           HistoryController.goto(
             new URL(
               `?${encodeURIComponent(
                 JSON.stringify({
                   ...data,
-                  [this.prefix]: formDataEvent.detail,
+                  [this.prefix]: this.formData,
                 })
               )}`,
               window.location.href
