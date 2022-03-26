@@ -245,17 +245,14 @@ export abstract class PwInput<
           type=${ifDefined(this.type !== "textarea" ? this.type : undefined)}
           name=${this.name}
           value=${ifDefined(
-            this.initial !== undefined &&
               this.type !== "checkbox" &&
               this.type !== "textarea"
-              ? this.get(this.initial)
+              ? this.get(this.pwForm.formData)
               : undefined
           )}
           ?checked=${ifDefined(
             this.type === "checkbox"
-              ? this.initial !== undefined
-                ? this.get(this.initial)
-                : this.defaultValue
+                ? this.get(this.pwForm.formData)
               : undefined
           )}
           class="${
@@ -290,16 +287,14 @@ export abstract class PwInput<
                 (o) => o.value,
                 (o) =>
                   html`<option
-                    ?selected=${this.initial !== undefined
-                      ? this.get(this.initial) === o.value
-                      : false}
+                    ?selected=${this.get(this.pwForm.formData) === o.value}
                     value=${o.value}
                   >
                     ${o.text}
                   </option>`
               )
-            : this.type === "textarea" && this.initial !== undefined
-            ? this.get(this.initial)
+            : this.type === "textarea"
+            ? this.get(this.pwForm.formData)
             : undefined
         }</${
       this.type === "select"
