@@ -70,10 +70,9 @@ export abstract class PwInput<
       url: { attribute: false },
       task: {
         attribute: false,
-        /*hasChanged: () => {
-          return true; // TODO FIXME bug in @dev.mohe/task
-          // I think the problem was that passing down a @dev.mohe/task doesnt work as this doesnt trigger updates in the subcomponent
-        },*/
+        hasChanged: () => {
+          return true;
+        },
       },
       initial: {
         // TODO FIXME pass the inner element instead (and don't use the get method below)

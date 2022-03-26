@@ -35,7 +35,12 @@ class PwRedirect extends PwForm<"/api/v1/redirect"> {
   static override get properties() {
     return {
       ...super.properties,
-      _task: { state: true },
+      _task: {
+        state: true,
+        hasChanged: () => {
+          return true;
+        },
+      },
     };
   }
 

@@ -83,8 +83,18 @@ export const PwProjectCreate = setupHmr(
       return {
         ...super.properties,
         actionText: { type: String },
-        _task: { state: true },
-        _initialTask: { state: true },
+        _task: {
+          state: true,
+          hasChanged: () => {
+            return true;
+          },
+        },
+        _initialTask: {
+          state: true,
+          hasChanged: () => {
+            return true;
+          },
+        },
         type: { state: true },
         initial: { attribute: false },
       };

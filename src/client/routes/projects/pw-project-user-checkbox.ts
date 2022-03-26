@@ -35,7 +35,12 @@ import { PwElement } from "../../pw-element.js";
 class PwProjectUserCheckbox extends PwElement {
   static override get properties() {
     return {
-      _task: { state: true },
+      _task: {
+        state: true,
+        hasChanged: () => {
+          return true;
+        },
+      },
       disabled: { state: true },
       user: { attribute: false },
       projectId: { type: Number },

@@ -83,8 +83,9 @@ class PwForm<P extends keyof typeof routes> extends PwElement {
                 ${data.error.issues
                   .filter(
                     (i) =>
+                      // TODO FIXME nested keys don't work
                       !Object.keys(this.formData).find(
-                        (v) => JSON.stringify(v) === JSON.stringify(i.path)
+                        (v) => JSON.stringify([v]) === JSON.stringify(i.path)
                       )
                   )
                   .map(

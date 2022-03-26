@@ -83,7 +83,12 @@ class PwUserCreate extends PwForm<"/api/v1/users/create-or-update"> {
   static get properties() {
     return {
       ...super.properties,
-      _task: { state: true },
+      _task: {
+        state: true,
+        hasChanged: () => {
+          return true;
+        },
+      },
       type: { state: true },
       initial: { attribute: false },
     };

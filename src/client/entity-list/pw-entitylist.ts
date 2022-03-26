@@ -103,7 +103,12 @@ export class PwEntityList<
 > extends PwForm<P> {
   static override get properties() {
     return {
-      task: { attribute: false },
+      task: {
+        attribute: false,
+        hasChanged: () => {
+          return true;
+        },
+      },
       initial: { attribute: false },
       debouncedUrl: { state: true },
       prefix: { type: String },
