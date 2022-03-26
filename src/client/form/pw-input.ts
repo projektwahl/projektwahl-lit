@@ -64,26 +64,48 @@ export abstract class PwInput<
     };
   }
 
+  /**
+   * The url of the request.
+   */
   url!: P;
 
-  // these three here are just plain-up terrible but the typings for paths are equally bad
+  /**
+   * The path in the request to this inputs value.
+   */
   name!: (string | number)[];
 
-  // TODO FIXME maybe switch this back to Path and lodash-es (but not remove then for now so we could switch back)
+  /**
+   * Extracts the value from the routes request data.
+   */  
   get!: (o: z.infer<typeof routes[P]["request"]>) => T;
 
+  /**
+   * Sets the value in the routes request data.
+   */
   set!: (o: z.infer<typeof routes[P]["request"]>, v: T) => void;
 
+  // TODO FIXME maybe merge these two?
   disabled?: boolean = false;
-
   enabled?: boolean = false;
 
+  /**
+   * Whether the input is resettable. Adds a reset button that resets the value to the initial value.
+   */
   resettable = false;
 
+  /**
+   * A random id to associate the label and input errors to the input.
+   */
   randomId;
 
+  /**
+   * The label.
+   */
   label!: string | null;
 
+  /**
+   * Field type
+   */
   type:
     | "text"
     | "textarea"
@@ -93,19 +115,37 @@ export abstract class PwInput<
     | "select"
     | "file";
 
+  /**
+   * Autocompletion settings.
+   */
   autocomplete?: "username" | "current-password" | "new-password";
 
+  /**
+   * The task that is executed in the parent form.
+   */
   task!: Task<[URLSearchParams], ResponseType<P>>;
 
+  /**
+   * The initial data to show and reset to.
+   */
   initial?: z.infer<typeof routes[P]["request"]>;
 
+  /**
+   * A reference to the input element.
+   */
   input: Ref<I>;
 
   // TODO FIXME
   options?: { value: T; text: string }[];
 
-  defaultValue!: T; // TODO FIXME merge into initial?
+  /**
+   * The default value. This values is used if e.g. a text/number field is empty.
+   */
+  defaultValue!: T;
 
+  /**
+   * The parent form.
+   */
   pwForm!: PwForm<P>;
 
   constructor() {
