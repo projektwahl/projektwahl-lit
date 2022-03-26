@@ -30,13 +30,10 @@
   <source>Denk dran: Lange Passwörter sind viel sicherer als welche mit vielen Sonderzeichen.</source>
   <target>Denk dran: Lange Passwörter sind viel sicherer als welche mit vielen Sonderzeichen.</target>
 </trans-unit>
-<trans-unit id="he49e57357d4caee2">
+<trans-unit id="h080d38748cee9c72">
   <source> Also lieber "Ich mag fliegende Autos." anstatt
-                  "Moritz1234!".<x id="0" equiv-text="&lt;br>"/>Du kannst auch einen Passwort-Manager
-                  verwenden, z.B.</source>
-  <target>Also lieber "Ich mag fliegende Autos." anstatt
- "Moritz1234!".<x id="0" equiv-text="&lt;br>"/>Du kannst auch einen Passwort-Manager
- verwenden, z.B.</target>
+                "Moritz1234!".<x id="0" equiv-text="&lt;br>"/>Du kannst auch einen Passwort-Manager
+                verwenden, z.B.</source>
 </trans-unit>
 <trans-unit id="s1dc79c57a4bab199">
   <source>Bitwarden</source>
