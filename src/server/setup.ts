@@ -44,7 +44,10 @@ void (async () => {
       } as const)`INSERT INTO users_with_deleted (username, password_hash, type) VALUES ('admin', ${hash}, 'admin') ON CONFLICT (username) DO UPDATE SET "group" = "users_with_deleted"."group" RETURNING id;`
     )[0];
 
-    if (process.env.NODE_ENV === "development" || process.env.NODE_ENV === "testing") {
+    if (
+      process.env.NODE_ENV === "development" ||
+      process.env.NODE_ENV === "testing"
+    ) {
       const projects = await typedSql(sql, {
         types: [23],
         columns: {

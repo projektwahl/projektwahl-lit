@@ -190,7 +190,8 @@ export async function serverHandler(
   const url = new URL(request.url, BASE_URL);
 
   if (
-    (process.env.NODE_ENV === "development" || process.env.NODE_ENV === "testing") &&
+    (process.env.NODE_ENV === "development" ||
+      process.env.NODE_ENV === "testing") &&
     (url.pathname === "/favicon.ico" || url.pathname === "/robots.txt")
   ) {
     response.writeHead(404, {
@@ -198,7 +199,8 @@ export async function serverHandler(
     });
     response.end();
   } else if (
-    (process.env.NODE_ENV === "development" || process.env.NODE_ENV === "testing") &&
+    (process.env.NODE_ENV === "development" ||
+      process.env.NODE_ENV === "testing") &&
     url.pathname === "/api/v1/hmr"
   ) {
     response.writeHead(200, {
@@ -262,7 +264,10 @@ export async function serverHandler(
         });
         response.end();
     }
-  } else if (process.env.NODE_ENV === "development" || process.env.NODE_ENV === "testing") {
+  } else if (
+    process.env.NODE_ENV === "development" ||
+    process.env.NODE_ENV === "testing"
+  ) {
     // TODO FIXME AUDIT
     // curl --insecure --path-as-is -v `${process.env.BASE_URL}/../src/index.js`
     const { resolve: loaderResolve, load: loaderLoad } = await import(

@@ -36,6 +36,7 @@ import {
   WebElement,
 } from "selenium-webdriver";
 import chrome from "selenium-webdriver/chrome.js";
+import firefox from "selenium-webdriver/firefox.js";
 
 if (!process.env["BASE_URL"]) {
   console.error("BASE_URL not set!");
@@ -102,7 +103,9 @@ class FormTester {
 
     await this.helper.click(submitButton);
 
-    const loadingIndicator = await this.helper.driver.findElement(By.css(".spinner-grow"));
+    const loadingIndicator = await this.helper.driver.findElement(
+      By.css(".spinner-grow")
+    );
 
     await this.helper.driver.wait(
       until.stalenessOf(loadingIndicator),
@@ -193,16 +196,30 @@ class Helper {
   }
 }
 
-async function runTestAllBrowsers(testFunction: (helper: Helper) => Promise<void>) {
-  await Promise.all([runTest("firefox", testFunction), runTest("chrome", testFunction)]);
+async function runTestAllBrowsers(
+  testFunction: (helper: Helper) => Promise<void>
+) {
+  await Promise.all([
+    runTest("firefox", testFunction),
+    runTest("chrome", testFunction),
+  ]);
 }
 
-async function runTest(browser: "firefox" | "chrome", testFunction: (helper: Helper) => Promise<void>) {
+async function runTest(
+  browser: "firefox" | "chrome",
+  testFunction: (helper: Helper) => Promise<void>
+) {
+  // https://github.com/mozilla/geckodriver/issues/882
   const builder = new Builder()
     .disableEnvironmentOverrides()
-    .usingServer(browser === "chrome" ? "http://localhost:9515" : "http://localhost:4444")
-    .withCapabilities(new Capabilities().setAcceptInsecureCerts(true).setBrowserName(browser))
-  
+    .withCapabilities(
+      new Capabilities().setAcceptInsecureCerts(true).setBrowserName(browser)
+    );
+
+  if (browser === "chrome") {
+    builder.usingServer("http://localhost:9515")
+  }
+
   if (process.env.CI) {
     builder.setChromeOptions(
       new chrome.Options().addArguments(
@@ -211,6 +228,7 @@ async function runTest(browser: "firefox" | "chrome", testFunction: (helper: Hel
         "--disable-dev-shm-usage"
       )
     );
+    builder.setFirefoxOptions(new firefox.Options().headless());
   }
 
   const driver = builder.build();
@@ -398,7 +416,9 @@ async function createUserAllFields(helper: Helper) {
   const id = (await helper.driver.getCurrentUrl()).substring(
     "https://localhost:8443/users/edit/".length
   );
-  const loadingIndicator1 = await helper.driver.findElement(By.css(".spinner-grow"));
+  const loadingIndicator1 = await helper.driver.findElement(
+    By.css(".spinner-grow")
+  );
 
   await helper.driver.wait(
     until.stalenessOf(loadingIndicator1),
@@ -426,7 +446,9 @@ async function createUserAllFields(helper: Helper) {
   await form.setField("filters,id", id);
   await form.setField("filters,username", username2);
 
-  const loadingIndicator = await helper.driver.findElement(By.css(".spinner-grow"));
+  const loadingIndicator = await helper.driver.findElement(
+    By.css(".spinner-grow")
+  );
 
   await helper.driver.wait(
     until.stalenessOf(loadingIndicator),
@@ -485,7 +507,9 @@ async function createProjectAllFields(helper: Helper) {
   const id = (await helper.driver.getCurrentUrl()).substring(
     "https://localhost:8443/projects/edit/".length
   );
-  const loadingIndicator1 = await helper.driver.findElement(By.css(".spinner-grow"))
+  const loadingIndicator1 = await helper.driver.findElement(
+    By.css(".spinner-grow")
+  );
 
   await helper.driver.wait(
     until.stalenessOf(loadingIndicator1),
@@ -520,7 +544,9 @@ async function createProjectAllFields(helper: Helper) {
   await form.setField("filters,id", id);
   await form.setField("filters,title", title2);
 
-  const loadingIndicator = await helper.driver.findElement(By.css(".spinner-grow"))
+  const loadingIndicator = await helper.driver.findElement(
+    By.css(".spinner-grow")
+  );
 
   await helper.driver.wait(
     until.stalenessOf(loadingIndicator),
@@ -571,17 +597,17 @@ async function checkNotLoggedInProjects(helper: Helper) {
   assert.match(await alert.getText(), /Nicht angemeldet!/);
 }
 
-runTestAllBrowsers(createProjectAllFields);
-runTestAllBrowsers(createUserAllFields);
-runTestAllBrowsers(checkNotLoggedInUsers);
-runTestAllBrowsers(checkNotLoggedInProjects);
-runTestAllBrowsers(loginEmptyUsernameAndPassword);
-runTestAllBrowsers(loginWrongUsername);
-runTestAllBrowsers(loginEmptyPassword);
-runTestAllBrowsers(loginEmptyUsername);
-runTestAllBrowsers(loginWrongPassword);
-runTestAllBrowsers(loginCorrect);
-runTestAllBrowsers(welcomeWorks);
-runTestAllBrowsers(imprintWorks);
-runTestAllBrowsers(privacyWorks);
-runTestAllBrowsers(logoutWorks);
+await runTestAllBrowsers(createProjectAllFields);
+await runTestAllBrowsers(createUserAllFields);
+await runTestAllBrowsers(checkNotLoggedInUsers);
+await runTestAllBrowsers(checkNotLoggedInProjects);
+await runTestAllBrowsers(loginEmptyUsernameAndPassword);
+await runTestAllBrowsers(loginWrongUsername);
+await runTestAllBrowsers(loginEmptyPassword);
+await runTestAllBrowsers(loginEmptyUsername);
+await runTestAllBrowsers(loginWrongPassword);
+await runTestAllBrowsers(loginCorrect);
+await runTestAllBrowsers(welcomeWorks);
+await runTestAllBrowsers(imprintWorks);
+await runTestAllBrowsers(privacyWorks);
+await runTestAllBrowsers(logoutWorks);

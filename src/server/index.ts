@@ -39,7 +39,11 @@ if (!process.env["CREDENTIALS_DIRECTORY"]) {
   process.exit(1);
 }
 
-if ((process.env.NODE_ENV === "development" || process.env.NODE_ENV === "testing") && cluster.isPrimary) {
+if (
+  (process.env.NODE_ENV === "development" ||
+    process.env.NODE_ENV === "testing") &&
+  cluster.isPrimary
+) {
   console.log(`Primary is running`);
 
   cluster.fork();
@@ -120,7 +124,10 @@ if ((process.env.NODE_ENV === "development" || process.env.NODE_ENV === "testing
       }
     );
 
-    if (process.env.NODE_ENV === "development" || process.env.NODE_ENV === "testing") {
+    if (
+      process.env.NODE_ENV === "development" ||
+      process.env.NODE_ENV === "testing"
+    ) {
       cluster.worker?.on("message", (message) => {
         //let getConnections = promisify(server.getConnections).bind(server)
         //console.log(await getConnections())
