@@ -171,7 +171,7 @@ class PwProjects<X extends string> extends PwEntityList<"/api/v1/projects", X> {
           return noChange;
         },
         complete: (result) => {
-          console.log("COMPLETE", result)
+          console.log("COMPLETE", result);
           return result.success
             ? result.data.entities.map(
                 (value) => html`<tr>

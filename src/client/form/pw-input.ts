@@ -29,7 +29,7 @@ import { createRef, Ref, ref } from "lit/directives/ref.js";
 import { repeat } from "lit/directives/repeat.js";
 import type { routes, ResponseType } from "../../lib/routes.js";
 import type { z } from "zod";
-import type { Task } from "@dev.mohe/task";
+import type { Task } from "@lit-labs/task";
 import { PwElement } from "../pw-element.js";
 import { PwForm } from "./pw-form.js";
 import { live } from "lit/directives/live.js";

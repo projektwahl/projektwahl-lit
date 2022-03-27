@@ -23,7 +23,7 @@ SPDX-FileCopyrightText: 2021 Moritz Hedtke <Moritz.Hedtke@t-online.de>
 import { css, html, TemplateResult } from "lit";
 import { HistoryController } from "../history-controller.js";
 import { ref } from "lit/directives/ref.js";
-import { Task, TaskStatus } from "@dev.mohe/task";
+import { Task, TaskStatus } from "@lit-labs/task";
 import { entityRoutes, ResponseType } from "../../lib/routes.js";
 import { z } from "zod";
 import { PwForm } from "../form/pw-form.js";
@@ -165,6 +165,38 @@ export class PwEntityList<
     super();
 
     this.history = new HistoryController(this, /.*/);
+
+    this._task = new Task(this, {
+      task: async () => {
+        if (!this.hasUpdated) {
+          if (this.initial !== undefined) {
+            return this.initial;
+          }
+        }
+
+        const data = parseRequestWithPrefix(
+          this.url,
+          this.prefix,
+          this.history.url
+        );
+
+        HistoryController.goto(
+          new URL(
+            `?${encodeURIComponent(JSON.stringify(data))}`,
+            window.location.href
+          ),
+          this.history.state,
+          true
+        );
+
+        const result = await myFetch<P>("GET", this.url, this.formData, {});
+
+        console.log("result", result);
+
+        return result;
+      },
+      autoRun: false, // TODO FIXME this breaks if you navigate to the same page (as it doesnt cause an update) - maybe we should autorun on url change?
+    });
   }
 
   override render() {
@@ -183,39 +215,7 @@ export class PwEntityList<
           this.prefix
         ] ?? {};
 
-      this._task = new Task(this, {
-        task: async () => {
-          const data = parseRequestWithPrefix(
-            this.url,
-            this.prefix,
-            this.history.url
-          );
-          
-          HistoryController.goto(
-            new URL(
-              `?${encodeURIComponent(
-                JSON.stringify(data))}`,
-              window.location.href
-            ),
-            this.history.state,
-            true
-          );
-
-          const result = await myFetch<P>("GET", this.url, this.formData, {});
-
-          console.log("result", result)
-
-          return result;
-        },
-        autoRun: false, // TODO FIXME this breaks if you navigate to the same page (as it doesnt cause an update) - maybe we should autorun on url change?
-        initialStatus:
-          this.initial !== undefined ? TaskStatus.COMPLETE : TaskStatus.INITIAL,
-        initialValue: this.initial,
-      });
-
-      if (this.initial === undefined) {
-        void this._task.run();
-      }
+      void this._task.run();
     }
 
     const data = parseRequestWithPrefix(
@@ -225,10 +225,10 @@ export class PwEntityList<
     );
 
     // this looks equal, so maybe lit tasks is buggy?
-    console.log(this.body)
+    console.log(this.body);
 
     // the task data is wrong
-    console.log("taskk", this._task)
+    console.log("taskk", this._task);
 
     return html`
       ${bootstrapCss}
