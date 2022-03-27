@@ -259,9 +259,13 @@ export class PwEntityList<
                 name: ["paginationLimit"],
                 get: (o) => o.paginationLimit,
                 set: (o, v) => {
-                  o.paginationLimit = v;
+                  if (o.paginationLimit !== v) {
+                    o.paginationLimit = v;
 
-                  void this._task.run();
+                    void this._task.run();
+                  } else {
+                    o.paginationLimit = v;
+                  }
                 },
                 task: this._task,
                 type: "select",
