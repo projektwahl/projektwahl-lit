@@ -202,7 +202,7 @@ export abstract class PwInput<
   }
 
   protected willUpdate(_changedProperties: Map<PropertyKey, unknown>): void {
-    if (_changedProperties.has("initial")) {
+    if (this.resettable && _changedProperties.has("initial")) {
       // this is a "hack" so that rerendering with new initial data resets the resettable fields.
 
       // the input value contains the value that is shown to the user
@@ -241,7 +241,7 @@ export abstract class PwInput<
       this.set(
         this.pwForm.formData,
         // @ts-expect-error tmp error
-        this.initial !== undefined ? undefined : this.defaultValue
+        this.resettable ? undefined : this.inputValue
       );
     }
 
