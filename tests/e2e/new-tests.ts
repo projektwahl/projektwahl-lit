@@ -102,11 +102,8 @@ class FormTester {
 
     await this.helper.click(submitButton);
 
-    const loadingIndicator = await this.helper.driver.wait(
-      until.elementLocated(By.css(".spinner-grow")),
-      10000,
-      "spinner 1"
-    );
+    const loadingIndicator = await this.helper.driver.findElement(By.css(".spinner-grow"));
+
     await this.helper.driver.wait(
       until.stalenessOf(loadingIndicator),
       10000,
@@ -400,11 +397,8 @@ async function createUserAllFields(helper: Helper) {
   const id = (await helper.driver.getCurrentUrl()).substring(
     "https://localhost:8443/users/edit/".length
   );
-  const loadingIndicator1 = await helper.driver.wait(
-    until.elementLocated(By.css(".spinner-grow")),
-    10000,
-    "spinner 1 4"
-  );
+  const loadingIndicator1 = await helper.driver.findElement(By.css(".spinner-grow"));
+
   await helper.driver.wait(
     until.stalenessOf(loadingIndicator1),
     10000,
@@ -431,11 +425,8 @@ async function createUserAllFields(helper: Helper) {
   await form.setField("filters,id", id);
   await form.setField("filters,username", username2);
 
-  const loadingIndicator = await helper.driver.wait(
-    until.elementLocated(By.css(".spinner-grow")),
-    2000,
-    "spinner 2"
-  );
+  const loadingIndicator = await helper.driver.findElement(By.css(".spinner-grow"));
+
   await helper.driver.wait(
     until.stalenessOf(loadingIndicator),
     2000,
@@ -493,11 +484,8 @@ async function createProjectAllFields(helper: Helper) {
   const id = (await helper.driver.getCurrentUrl()).substring(
     "https://localhost:8443/projects/edit/".length
   );
-  const loadingIndicator1 = await helper.driver.wait(
-    until.elementLocated(By.css(".spinner-grow")),
-    10000,
-    "spinner 1 1"
-  );
+  const loadingIndicator1 = await helper.driver.findElement(By.css(".spinner-grow"))
+
   await helper.driver.wait(
     until.stalenessOf(loadingIndicator1),
     10000,
@@ -531,11 +519,8 @@ async function createProjectAllFields(helper: Helper) {
   await form.setField("filters,id", id);
   await form.setField("filters,title", title2);
 
-  const loadingIndicator = await helper.driver.wait(
-    until.elementLocated(By.css(".spinner-grow")),
-    2000,
-    "spinner 3"
-  );
+  const loadingIndicator = await helper.driver.findElement(By.css(".spinner-grow"))
+
   await helper.driver.wait(
     until.stalenessOf(loadingIndicator),
     2000,
