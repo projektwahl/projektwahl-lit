@@ -182,7 +182,12 @@ export class PwEntityList<
 
         HistoryController.goto(
           new URL(
-            `?${encodeURIComponent(JSON.stringify(data))}`,
+            `?${encodeURIComponent(
+              JSON.stringify({
+                ...data,
+                [this.prefix]: this.formData,
+              })
+            )}`,
             window.location.href
           ),
           this.history.state,
@@ -253,10 +258,14 @@ export class PwEntityList<
                 label: "Elemente pro Seite",
                 name: ["paginationLimit"],
                 get: (o) => o.paginationLimit,
-                set: (o, v) => (o.paginationLimit = v),
+                set: (o, v) => {
+                  o.paginationLimit = v;
+
+                  void this._task.run();
+                },
                 task: this._task,
                 type: "select",
-                initial: data[this.prefix],
+                initial: this.formData,
                 options: [
                   {
                     text: "10",
@@ -311,13 +320,7 @@ export class PwEntityList<
                     <a
                       @click=${async (e: Event) => {
                         e.preventDefault();
-
-                        const data = parseRequestWithPrefix(
-                          this.url,
-                          this.prefix,
-                          this.history.url
-                        );
-
+                        /*
                         if (!data[this.prefix]) {
                           mappedIndexingSet(data, this.prefix, {
                             filters: {},
@@ -327,19 +330,12 @@ export class PwEntityList<
                             paginationCursor: null,
                           });
                         }
+*/
                         if (this._task.value?.success) {
-                          data[this.prefix].paginationCursor =
+                          this.formData.paginationCursor =
                             this._task.value?.data.previousCursor;
-                          data[this.prefix].paginationDirection = "backwards";
+                          this.formData.paginationDirection = "backwards";
                         }
-                        HistoryController.goto(
-                          new URL(
-                            `?${encodeURIComponent(JSON.stringify(data))}`,
-                            window.location.href
-                          ),
-                          this.history.state,
-                          true
-                        );
                         await this._task.run();
                       }}
                       class="page-link"
@@ -378,12 +374,7 @@ export class PwEntityList<
                       @click=${async (e: Event) => {
                         e.preventDefault();
 
-                        const data = parseRequestWithPrefix(
-                          this.url,
-                          this.prefix,
-                          this.history.url
-                        );
-
+                        /*
                         if (!data[this.prefix]) {
                           mappedIndexingSet(data, this.prefix, {
                             filters: {},
@@ -393,19 +384,13 @@ export class PwEntityList<
                             paginationCursor: null,
                           });
                         }
+*/
+
                         if (this._task.value?.success) {
-                          data[this.prefix].paginationCursor =
+                          this.formData.paginationCursor =
                             this._task.value?.data.nextCursor;
-                          data[this.prefix].paginationDirection = "forwards";
+                          this.formData.paginationDirection = "forwards";
                         }
-                        HistoryController.goto(
-                          new URL(
-                            `?${encodeURIComponent(JSON.stringify(data))}`,
-                            window.location.href
-                          ),
-                          this.history.state,
-                          true
-                        );
                         await this._task.run();
                       }}
                       class="page-link"

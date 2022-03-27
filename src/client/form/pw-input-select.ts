@@ -122,14 +122,8 @@ export class PwInputSelect<
         ? this.defaultValue
         : this.options?.find((v) => v.value == input.value)?.value ??
           this.defaultValue;
+    console.log("ONCHANGE");
     this.set(this.pwForm.formData, this.inputValue);
-
-    this.input.value?.dispatchEvent(
-      new CustomEvent("refreshentitylist", {
-        bubbles: true,
-        composed: true,
-      })
-    );
   };
 }
 

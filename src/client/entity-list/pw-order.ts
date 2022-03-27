@@ -139,6 +139,8 @@ export class PwOrder<
       ${bootstrapCss}
       <button
         @click=${() => {
+          // TODO FIXME make this a pw-input and implement it using their set and get functions
+
           // TODO FIXME put this into the history implementation?
           const data: parseRequestWithPrefixType<X>[P] = parseRequestWithPrefix(
             this.url,
@@ -200,15 +202,6 @@ export class PwOrder<
 
             sorting.push(adding2);
           }
-
-          HistoryController.goto(
-            new URL(
-              `?${encodeURIComponent(JSON.stringify(data))}`,
-              window.location.href
-            ),
-            {}, // TODO FIXME this.history.state - this currently forces a full navigation
-            true
-          );
         }}
         name="${this.name.toString()}"
         type="button"

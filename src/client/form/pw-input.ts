@@ -209,6 +209,9 @@ export abstract class PwInput<
       this.inputValue =
         this.initial !== undefined ? this.get(this.initial) : this.defaultValue;
 
+      // TODO FIXME this may create an infinite loop if the initial is always changing
+      console.log("BUG: potential infinite loop pw-input initial updated.");
+
       // in case this is an update set the value to undefined as it wasn't changed yet.
       this.set(
         this.pwForm.formData,
