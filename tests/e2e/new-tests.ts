@@ -30,7 +30,6 @@ import {
   Builder,
   By,
   Capabilities,
-  Capability,
   until,
   WebDriver,
   WebElement,
@@ -601,38 +600,40 @@ async function checkNotLoggedInProjects(helper: Helper) {
 
 // TODO better would be some kind of queing system where a ready browser takes the next task
 
-runTestAllBrowsers(async (helper) => {
-  console.log("start1");
-  await createProjectAllFields(helper);
-  await helper.driver.manage().deleteAllCookies();
-  await createUserAllFields(helper);
-  console.log("end1");
-});
+await Promise.all([
+  runTestAllBrowsers(async (helper) => {
+    console.log("start1");
+    await createProjectAllFields(helper);
+    await helper.driver.manage().deleteAllCookies();
+    await createUserAllFields(helper);
+    console.log("end1");
+  }),
 
-runTestAllBrowsers(async (helper) => {
-  console.log("start3");
-  await loginEmptyUsernameAndPassword(helper);
-  await helper.driver.manage().deleteAllCookies();
-  await loginWrongUsername(helper);
-  await helper.driver.manage().deleteAllCookies();
-  await loginEmptyPassword(helper);
-  await helper.driver.manage().deleteAllCookies();
-  await loginEmptyUsername(helper);
-  await helper.driver.manage().deleteAllCookies();
-  await loginWrongPassword(helper);
-  await helper.driver.manage().deleteAllCookies();
-  await loginCorrect(helper);
-  await helper.driver.manage().deleteAllCookies();
-  await welcomeWorks(helper);
-  await helper.driver.manage().deleteAllCookies();
-  await imprintWorks(helper);
-  await helper.driver.manage().deleteAllCookies();
-  await privacyWorks(helper);
-  await helper.driver.manage().deleteAllCookies();
-  await logoutWorks(helper);
-  await helper.driver.manage().deleteAllCookies();
-  await checkNotLoggedInUsers(helper);
-  await helper.driver.manage().deleteAllCookies();
-  await checkNotLoggedInProjects(helper);
-  console.log("end3");
-});
+  runTestAllBrowsers(async (helper) => {
+    console.log("start3");
+    await loginEmptyUsernameAndPassword(helper);
+    await helper.driver.manage().deleteAllCookies();
+    await loginWrongUsername(helper);
+    await helper.driver.manage().deleteAllCookies();
+    await loginEmptyPassword(helper);
+    await helper.driver.manage().deleteAllCookies();
+    await loginEmptyUsername(helper);
+    await helper.driver.manage().deleteAllCookies();
+    await loginWrongPassword(helper);
+    await helper.driver.manage().deleteAllCookies();
+    await loginCorrect(helper);
+    await helper.driver.manage().deleteAllCookies();
+    await welcomeWorks(helper);
+    await helper.driver.manage().deleteAllCookies();
+    await imprintWorks(helper);
+    await helper.driver.manage().deleteAllCookies();
+    await privacyWorks(helper);
+    await helper.driver.manage().deleteAllCookies();
+    await logoutWorks(helper);
+    await helper.driver.manage().deleteAllCookies();
+    await checkNotLoggedInUsers(helper);
+    await helper.driver.manage().deleteAllCookies();
+    await checkNotLoggedInProjects(helper);
+    console.log("end3");
+  }),
+]);
