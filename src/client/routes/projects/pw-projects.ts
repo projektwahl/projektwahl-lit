@@ -75,30 +75,39 @@ class PwProjects<X extends string> extends PwEntityList<"/api/v1/projects", X> {
           <th class="table-cell-hover p-0" scope="col">
             ${pwOrder({
               url: "/api/v1/projects",
-              name: "id",
+              name: ["sorting", "id"],
+              orderBy: "id",
               prefix: this.prefix,
               title: msg("ID"),
               value: null,
+              get: (o) => o.sorting,
+              set: (o, v) => (o.sorting = v),
             })}
           </th>
 
           <th class="table-cell-hover p-0" scope="col">
             ${pwOrder({
               url: "/api/v1/projects",
-              name: "title",
+              name: ["sorting", "title"],
+              orderBy: "title",
               prefix: this.prefix,
               title: msg("Title"),
               value: null,
+              get: (o) => o.sorting,
+              set: (o, v) => (o.sorting = v),
             })}
           </th>
 
           <th class="table-cell-hover p-0" scope="col">
             ${pwOrder({
               url: "/api/v1/projects",
-              name: "info",
+              name: ["sorting", "info"],
+              orderBy: "info",
               prefix: this.prefix,
               title: msg("Info"),
               value: null,
+              get: (o) => o.sorting,
+              set: (o, v) => (o.sorting = v),
             })}
           </th>
 

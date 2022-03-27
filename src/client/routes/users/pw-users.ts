@@ -94,30 +94,39 @@ export class PwUsers<X extends string> extends PwEntityList<
           <th class="table-cell-hover p-0" scope="col">
             ${pwOrder({
               url: "/api/v1/users",
-              name: "id",
+              name: ["sorting", "id"],
+              orderBy: "id",
               prefix: this.prefix,
               title: msg("ID"),
               value: null,
+              get: (o) => o.sorting,
+              set: (o, v) => (o.sorting = v),
             })}
           </th>
 
           <th class="table-cell-hover p-0" scope="col">
             ${pwOrder({
               url: "/api/v1/users",
-              name: "username",
+              name: ["sorting", "username"],
+              orderBy: "username",
               prefix: this.prefix,
               title: msg("Name"),
               value: null,
+              get: (o) => o.sorting,
+              set: (o, v) => (o.sorting = v),
             })}
           </th>
 
           <th class="table-cell-hover p-0" scope="col">
             ${pwOrder({
               url: "/api/v1/users",
-              name: "type",
+              name: ["sorting", "type"],
+              orderBy: "type",
               prefix: this.prefix,
               title: msg("Type"),
               value: null,
+              get: (o) => o.sorting,
+              set: (o, v) => (o.sorting = v),
             })}
           </th>
 

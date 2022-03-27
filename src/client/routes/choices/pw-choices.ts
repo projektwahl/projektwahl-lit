@@ -72,7 +72,8 @@ class PwChoices<X extends string> extends PwEntityList<"/api/v1/choices", X> {
           <th class="table-cell-hover p-0" scope="col">
             ${pwOrder({
               url: "/api/v1/choices",
-              name: "id",
+              name: ["sorting", "id"],
+              orderBy: "id",
               prefix: this.prefix,
               title: msg("ID"),
               value: null,
@@ -82,7 +83,8 @@ class PwChoices<X extends string> extends PwEntityList<"/api/v1/choices", X> {
           <th class="table-cell-hover p-0" scope="col">
             ${pwOrder({
               url: "/api/v1/choices",
-              name: "title",
+              name: ["sorting", "title"],
+              orderBy: "title",
               prefix: this.prefix,
               title: msg("Title"),
               value: null,
@@ -92,7 +94,8 @@ class PwChoices<X extends string> extends PwEntityList<"/api/v1/choices", X> {
           <th class="table-cell-hover p-0" scope="col">
             ${pwOrder({
               url: "/api/v1/choices",
-              name: "rank",
+              name: ["sorting", "rank"],
+              orderBy: "rank",
               prefix: this.prefix,
               title: msg("Rank"),
               value: null,
