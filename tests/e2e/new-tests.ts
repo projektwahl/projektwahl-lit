@@ -585,17 +585,17 @@ async function checkNotLoggedInProjects(helper: Helper) {
   assert.match(await alert.getText(), /Nicht angemeldet!/);
 }
 
-await runTest(createProjectAllFields);
-await runTest(createUserAllFields);
-await runTest(checkNotLoggedInUsers);
-await runTest(checkNotLoggedInProjects);
-await runTest(loginEmptyUsernameAndPassword);
-await runTest(loginWrongUsername);
-await runTest(loginEmptyPassword);
-await runTest(loginEmptyUsername);
-await runTest(loginWrongPassword);
-await runTest(loginCorrect);
-await runTest(welcomeWorks);
-await runTest(imprintWorks);
-await runTest(privacyWorks);
-await runTest(logoutWorks);
+runTest(createProjectAllFields);
+runTest(createUserAllFields);
+runTest(checkNotLoggedInUsers);
+runTest(checkNotLoggedInProjects);
+runTest(loginEmptyUsernameAndPassword);
+runTest(loginWrongUsername);
+runTest(loginEmptyPassword);
+runTest(loginEmptyUsername);
+runTest(loginWrongPassword);
+runTest(loginCorrect);
+runTest(welcomeWorks);
+runTest(imprintWorks);
+runTest(privacyWorks);
+runTest(logoutWorks);
