@@ -193,15 +193,16 @@ class Helper {
   }
 }
 
-async function runTest(testFunction: (helper: Helper) => Promise<void>) {
-  const builder = new Builder()
-    .usingServer("http://localhost:9515")
-    .forBrowser("firefox")
-    .withCapabilities(Capabilities.firefox().set("acceptInsecureCerts", true))
-    .withCapabilities(
-      Capabilities.chrome().set(Capability.ACCEPT_INSECURE_TLS_CERTS, true)
-    );
+async function runTestAllBrowsers(testFunction: (helper: Helper) => Promise<void>) {
+  await Promise.all([runTest("firefox", testFunction), runTest("chrome", testFunction)]);
+}
 
+async function runTest(browser: "firefox" | "chrome", testFunction: (helper: Helper) => Promise<void>) {
+  const builder = new Builder()
+    .disableEnvironmentOverrides()
+    .usingServer(browser === "chrome" ? "http://localhost:9515" : "http://localhost:4444")
+    .withCapabilities(new Capabilities().setAcceptInsecureCerts(true).setBrowserName(browser))
+  
   if (process.env.CI) {
     builder.setChromeOptions(
       new chrome.Options().addArguments(
@@ -570,17 +571,17 @@ async function checkNotLoggedInProjects(helper: Helper) {
   assert.match(await alert.getText(), /Nicht angemeldet!/);
 }
 
-runTest(createProjectAllFields);
-runTest(createUserAllFields);
-runTest(checkNotLoggedInUsers);
-runTest(checkNotLoggedInProjects);
-runTest(loginEmptyUsernameAndPassword);
-runTest(loginWrongUsername);
-runTest(loginEmptyPassword);
-runTest(loginEmptyUsername);
-runTest(loginWrongPassword);
-runTest(loginCorrect);
-runTest(welcomeWorks);
-runTest(imprintWorks);
-runTest(privacyWorks);
-runTest(logoutWorks);
+runTestAllBrowsers(createProjectAllFields);
+runTestAllBrowsers(createUserAllFields);
+runTestAllBrowsers(checkNotLoggedInUsers);
+runTestAllBrowsers(checkNotLoggedInProjects);
+runTestAllBrowsers(loginEmptyUsernameAndPassword);
+runTestAllBrowsers(loginWrongUsername);
+runTestAllBrowsers(loginEmptyPassword);
+runTestAllBrowsers(loginEmptyUsername);
+runTestAllBrowsers(loginWrongPassword);
+runTestAllBrowsers(loginCorrect);
+runTestAllBrowsers(welcomeWorks);
+runTestAllBrowsers(imprintWorks);
+runTestAllBrowsers(privacyWorks);
+runTestAllBrowsers(logoutWorks);
