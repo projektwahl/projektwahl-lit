@@ -23,7 +23,6 @@ SPDX-FileCopyrightText: 2021 Moritz Hedtke <Moritz.Hedtke@t-online.de>
 import assert from "assert/strict";
 import { writeFile } from "fs/promises";
 import nodeCrypto from "node:crypto";
-import { exit } from "process";
 // @ts-expect-error wrong typings
 const { webcrypto: crypto }: { webcrypto: Crypto } = nodeCrypto;
 
@@ -205,7 +204,7 @@ async function runTestAllBrowsers(
 ) {
   await Promise.all([
     runTest("firefox", testFunction),
-    //runTest("chrome", testFunction),
+    runTest("chrome", testFunction),
   ]);
 }
 
@@ -574,96 +573,169 @@ const randomFromArray = function <T>(array: T[]): T {
 };
 
 async function checkProjectSortingWorks(helper: Helper) {
-  await loginCorrect(helper);
-  await helper.openNavbar();
+  for (let j = 0; j < 10; j++) {
+    await loginCorrect(helper);
+    await helper.openNavbar();
 
-  await helper.click(
-    await helper.driver.findElement(By.css(`a[href="/projects"]`))
-  );
-  await helper.form("pw-projects");
-
-  for (let i = 0; i < Math.random() * 10; i++) {
-    const randomOrderButton = randomFromArray(
-      await helper.driver.findElements(By.css("pw-order button"))
+    await helper.click(
+      await helper.driver.findElement(By.css(`a[href="/projects"]`))
     );
-    await randomOrderButton.click();
-  }
+    await helper.form("pw-projects");
 
-  let rows = [];
-
-  while (true) {
-    await helper.waitUntilLoaded();
-
-    const thisRows = await helper.driver.findElements(
-      By.css('tbody tr th[scope="row"]')
-    );
-    const thisRowsText = await Promise.all(
-      thisRows.map((r) => r.getText().then((v) => Number(v)))
-    );
-
-    console.log(thisRowsText);
-
-    rows.push(...thisRowsText);
-
-    const nextPage = await helper.driver.findElement(
-      By.css('a[aria-label="next page"]')
-    );
-
-    if (!((await nextPage.getAttribute("aria-disabled")) === "false")) {
-      break;
+    for (let i = 0; i < Math.random() * 10; i++) {
+      const randomOrderButton = randomFromArray(
+        await helper.driver.findElements(By.css("pw-order button"))
+      );
+      await randomOrderButton.click();
     }
 
-    await helper.click(nextPage);
+    const rows = [];
+
+    for (;;) {
+      await helper.waitUntilLoaded();
+
+      const thisRows = await helper.driver.findElements(
+        By.css('tbody tr th[scope="row"]')
+      );
+      const thisRowsText = await Promise.all(
+        thisRows.map((r) => r.getText().then((v) => Number(v)))
+      );
+
+      console.log(thisRowsText);
+
+      rows.push(...thisRowsText);
+
+      const nextPage = await helper.driver.findElement(
+        By.css('a[aria-label="next page"]')
+      );
+
+      if (!((await nextPage.getAttribute("aria-disabled")) === "false")) {
+        break;
+      }
+
+      await helper.click(nextPage);
+    }
+
+    console.log("end");
+
+    // TODO FIXME reset database before every run so this works
+    assert.equal(100, rows.length);
+
+    console.log(rows.sort((a, b) => a - b));
+
+    assert.deepEqual(
+      Array.from({ length: rows.length }, (_, i) => i + 1),
+      rows
+    );
   }
-
-  console.log("end");
-
-  console.log(rows.sort((a, b) => a - b));
-
-  assert.equal(Array.from({length: rows.length}, (_, i) => i + 1), rows)
-
-  await helper.driver.sleep(10000);
 }
+
+async function checkUsersSortingWorks(helper: Helper) {
+  for (let j = 0; j < 2; j++) {
+    await loginCorrect(helper);
+    await helper.openNavbar();
+
+    await helper.click(
+      await helper.driver.findElement(By.css(`a[href="/users"]`))
+    );
+    await helper.form("pw-users");
+
+    for (let i = 0; i < Math.random() * 10; i++) {
+      const randomOrderButton = randomFromArray(
+        await helper.driver.findElements(By.css("pw-order button"))
+      );
+      await randomOrderButton.click();
+    }
+
+    const rows = [];
+
+    for (;;) {
+      await helper.waitUntilLoaded();
+
+      const thisRows = await helper.driver.findElements(
+        By.css('tbody tr th[scope="row"]')
+      );
+      const thisRowsText = await Promise.all(
+        thisRows.map((r) => r.getText().then((v) => Number(v)))
+      );
+
+      console.log(thisRowsText);
+
+      rows.push(...thisRowsText);
+
+      const nextPage = await helper.driver.findElement(
+        By.css('a[aria-label="next page"]')
+      );
+
+      if (!((await nextPage.getAttribute("aria-disabled")) === "false")) {
+        break;
+      }
+
+      await helper.click(nextPage);
+    }
+
+    console.log("end");
+
+    // TODO FIXME reset database before every run so this works
+    assert.equal(1001, rows.length);
+
+    console.log(rows.sort((a, b) => a - b));
+
+    assert.deepEqual(
+      Array.from({ length: rows.length }, (_, i) => i + 1),
+      rows
+    );
+  }
+}
+
 // TODO better would be some kind of queing system where a ready browser takes the next task
 
-await runTestAllBrowsers(checkProjectSortingWorks);
+await runTestAllBrowsers(async (helper) => {
+  await checkProjectSortingWorks(helper);
+  await helper.driver.manage().deleteAllCookies();
 
-exit(0);
+  await checkUsersSortingWorks(helper);
+  await helper.driver.manage().deleteAllCookies();
 
-await Promise.all([
-  runTestAllBrowsers(async (helper) => {
-    console.log("start1");
-    await createProjectAllFields(helper);
-    await helper.driver.manage().deleteAllCookies();
-    await createUserAllFields(helper);
-    console.log("end1");
-  }),
+  await createProjectAllFields(helper);
+  await helper.driver.manage().deleteAllCookies();
 
-  runTestAllBrowsers(async (helper) => {
-    console.log("start3");
-    await loginEmptyUsernameAndPassword(helper);
-    await helper.driver.manage().deleteAllCookies();
-    await loginWrongUsername(helper);
-    await helper.driver.manage().deleteAllCookies();
-    await loginEmptyPassword(helper);
-    await helper.driver.manage().deleteAllCookies();
-    await loginEmptyUsername(helper);
-    await helper.driver.manage().deleteAllCookies();
-    await loginWrongPassword(helper);
-    await helper.driver.manage().deleteAllCookies();
-    await loginCorrect(helper);
-    await helper.driver.manage().deleteAllCookies();
-    await welcomeWorks(helper);
-    await helper.driver.manage().deleteAllCookies();
-    await imprintWorks(helper);
-    await helper.driver.manage().deleteAllCookies();
-    await privacyWorks(helper);
-    await helper.driver.manage().deleteAllCookies();
-    await logoutWorks(helper);
-    await helper.driver.manage().deleteAllCookies();
-    await checkNotLoggedInUsers(helper);
-    await helper.driver.manage().deleteAllCookies();
-    await checkNotLoggedInProjects(helper);
-    console.log("end3");
-  }),
-]);
+  await createUserAllFields(helper);
+  await helper.driver.manage().deleteAllCookies();
+
+  await loginEmptyUsernameAndPassword(helper);
+  await helper.driver.manage().deleteAllCookies();
+
+  await loginWrongUsername(helper);
+  await helper.driver.manage().deleteAllCookies();
+
+  await loginEmptyPassword(helper);
+  await helper.driver.manage().deleteAllCookies();
+
+  await loginEmptyUsername(helper);
+  await helper.driver.manage().deleteAllCookies();
+
+  await loginWrongPassword(helper);
+  await helper.driver.manage().deleteAllCookies();
+
+  await loginCorrect(helper);
+  await helper.driver.manage().deleteAllCookies();
+
+  await welcomeWorks(helper);
+  await helper.driver.manage().deleteAllCookies();
+
+  await imprintWorks(helper);
+  await helper.driver.manage().deleteAllCookies();
+
+  await privacyWorks(helper);
+  await helper.driver.manage().deleteAllCookies();
+
+  await logoutWorks(helper);
+  await helper.driver.manage().deleteAllCookies();
+
+  await checkNotLoggedInUsers(helper);
+  await helper.driver.manage().deleteAllCookies();
+
+  await checkNotLoggedInProjects(helper);
+  await helper.driver.manage().deleteAllCookies();
+});

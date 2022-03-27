@@ -153,7 +153,7 @@ export class PwOrder<
   }
 
   mypwinputchangeDispatcher = () => {
-    // @ts-expect-error
+    // @ts-expect-error fddfd
     const sorting: entitiesType3[P] = this.get(this.pwForm.formData);
 
     const oldElementIndex = sorting.findIndex(([e]) => e === this.orderBy);
@@ -241,7 +241,7 @@ export class PwOrder<
         id=${this.randomId}
       >
         ${(() => {
-          // @ts-expect-error
+          // @ts-expect-error dfgg
           const sorting: entitiesType3[P] = this.inputValue;
 
           const value = sorting.find(([e]) => e === `${this.orderBy}`)?.[1];

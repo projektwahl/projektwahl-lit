@@ -77,6 +77,10 @@ class PwChoices<X extends string> extends PwEntityList<"/api/v1/choices", X> {
               prefix: this.prefix,
               title: msg("ID"),
               value: null,
+              get: (o) => o.sorting,
+              set: (o, v) => (o.sorting = v),
+              initial,
+              defaultValue: [],
             })}
           </th>
 
@@ -88,6 +92,10 @@ class PwChoices<X extends string> extends PwEntityList<"/api/v1/choices", X> {
               prefix: this.prefix,
               title: msg("Title"),
               value: null,
+              get: (o) => o.sorting,
+              set: (o, v) => (o.sorting = v),
+              initial,
+              defaultValue: [],
             })}
           </th>
 
@@ -99,6 +107,10 @@ class PwChoices<X extends string> extends PwEntityList<"/api/v1/choices", X> {
               prefix: this.prefix,
               title: msg("Rank"),
               value: null,
+              get: (o) => o.sorting,
+              set: (o, v) => (o.sorting = v),
+              initial,
+              defaultValue: [],
             })}
           </th>
         </tr>
