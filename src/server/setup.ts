@@ -33,7 +33,7 @@ const shuffleArray = <T>(array: T[]) => {
   }
 };
 
-void (async () => {
+await (async () => {
   await sql.begin("READ WRITE", async (sql) => {
     const hash = await hashPassword("changeme");
 

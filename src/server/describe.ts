@@ -36,50 +36,50 @@ export function typedSql<
     template: TemplateStringsArray,
     ...args: NullableObject<DescriptionTypes<Q>>
   ) {
-    const err = new Error()
+    const err = new Error();
     try {
-    const { types: computed_query_types, columns: computed_column_types_1 } =
-      // @ts-expect-error unknown
-      await sql(template, ...args).describe();
+      const { types: computed_query_types, columns: computed_column_types_1 } =
+        // @ts-expect-error unknown
+        await sql(template, ...args).describe();
 
-    const computed_column_types: {
-      [k: string]: number | null;
-    } = Object.fromEntries(
-      computed_column_types_1.map((v) => [v.name, v.type])
-    );
-
-    const computed_description: {
-      types: (number | null)[];
-      columns: {
+      const computed_column_types: {
         [k: string]: number | null;
+      } = Object.fromEntries(
+        computed_column_types_1.map((v) => [v.name, v.type])
+      );
+
+      const computed_description: {
+        types: (number | null)[];
+        columns: {
+          [k: string]: number | null;
+        };
+      } = {
+        types: computed_query_types,
+        columns: computed_column_types,
       };
-    } = {
-      types: computed_query_types,
-      columns: computed_column_types,
-    };
 
-    for (let i = 0; i < description.types.length; i++) {
-      if (description.types[i] === null) {
-        computed_description.types[i] = null;
+      for (let i = 0; i < description.types.length; i++) {
+        if (description.types[i] === null) {
+          computed_description.types[i] = null;
+        }
       }
-    }
 
-    for (const [key, value] of Object.entries(description.columns)) {
-      if (value === null) {
-        computed_description.columns[key] = null;
+      for (const [key, value] of Object.entries(description.columns)) {
+        if (value === null) {
+          computed_description.columns[key] = null;
+        }
       }
-    }
 
-    // console.log(computed_description);
+      // console.log(computed_description);
 
-    deepStrictEqual(computed_description, description);
+      deepStrictEqual(computed_description, description);
 
-    // @ts-expect-error unknown
-    return await sql<DescriptionTypes<R>[]>(template, ...args).execute();
+      // @ts-expect-error unknown
+      return await sql<DescriptionTypes<R>[]>(template, ...args).execute();
     } catch (error) {
-    console.error(err)
-    throw error
-  }
+      console.error(err);
+      throw error;
+    }
   };
 }
 
