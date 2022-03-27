@@ -203,6 +203,8 @@ export class PwEntityList<
 
           const result = await myFetch<P>("GET", this.url, this.formData, {});
 
+          console.log("result", result)
+
           return result;
         },
         autoRun: false, // TODO FIXME this breaks if you navigate to the same page (as it doesnt cause an update) - maybe we should autorun on url change?
@@ -221,6 +223,12 @@ export class PwEntityList<
       this.prefix,
       this.history.url
     );
+
+    // this looks equal, so maybe lit tasks is buggy?
+    console.log(this.body)
+
+    // the task data is wrong
+    console.log("taskk", this._task)
 
     return html`
       ${bootstrapCss}
