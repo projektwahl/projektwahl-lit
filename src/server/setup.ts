@@ -67,7 +67,7 @@ void (async () => {
       } as const)`INSERT INTO projects (title, info, place, costs, min_age, max_age, min_participants, max_participants, random_assignments, last_updated_by) (SELECT generate_series, '', '', 0, 5, 13, 5, 20, FALSE, ${admin.id} FROM generate_series(1, 100)) RETURNING *;`;
 
       // take care to set this value to project_count * min_participants <= user_count <= project_count * max_participants
-      for (let i = 0; i < 1000; i++) {
+      for (let i = 0; i < 500; i++) {
         const user = (
           await typedSql(sql, {
             types: [1043, 23],
