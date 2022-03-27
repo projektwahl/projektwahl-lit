@@ -26,17 +26,8 @@ import { HistoryController } from "../history-controller.js";
 import { msg, str } from "@lit/localize";
 import type { entityRoutes } from "../../lib/routes.js";
 import type { z } from "zod";
-import {
-  parseRequestWithPrefix,
-  parseRequestWithPrefixType,
-} from "./pw-entitylist.js";
-import { PwElement } from "../pw-element.js";
-import { mappedIndexing, mappedTuple } from "../../lib/result.js";
+import { mappedTuple } from "../../lib/result.js";
 import { PwInput } from "../form/pw-input.js";
-
-type entitiesType0 = {
-  [P in keyof typeof entityRoutes]: z.infer<typeof entityRoutes[P]["request"]>;
-};
 
 type entitiesType1 = {
   [P in keyof typeof entityRoutes]: z.infer<
@@ -72,10 +63,31 @@ type entitiesType4 = {
 export function pwOrder<P extends keyof typeof entityRoutes, X extends string>(
   props: Pick<
     PwOrder<P, X>,
-    "url" | "name" | "prefix" | "title" | "value" | "orderBy" | "get" | "set"
+    | "url"
+    | "name"
+    | "prefix"
+    | "title"
+    | "value"
+    | "orderBy"
+    | "get"
+    | "set"
+    | "initial"
+    | "defaultValue"
   >
 ) {
-  const { url, name, title, prefix, value, orderBy, get, set, ...rest } = props;
+  const {
+    url,
+    name,
+    title,
+    prefix,
+    value,
+    orderBy,
+    get,
+    set,
+    initial,
+    defaultValue,
+    ...rest
+  } = props;
   let _ = rest;
   _ = 1; // ensure no property is missed - Don't use `{}` as a type. `{}` actually means "any non-nullish value".
   return html`<pw-order
@@ -87,6 +99,8 @@ export function pwOrder<P extends keyof typeof entityRoutes, X extends string>(
     .title=${title}
     .value=${value}
     .orderBy=${orderBy}
+    .initial=${initial}
+    .defaultValue=${defaultValue}
   ></pw-order>`;
 }
 
@@ -104,7 +118,6 @@ export class PwOrder<
     return {
       ...super.properties,
       title: { attribute: false },
-      name: { attribute: false },
       path: { attribute: false },
       url: { attribute: false },
       prefix: { attribute: false },
@@ -187,6 +200,16 @@ export class PwOrder<
 
       sorting.push(adding2);
     }
+
+    this.inputValue = sorting;
+    this.set(this.pwForm.formData, this.inputValue);
+
+    this.dispatchEvent(
+      new CustomEvent("refreshentitylist", {
+        bubbles: true,
+        composed: true,
+      })
+    );
   };
 
   override render() {
@@ -196,6 +219,16 @@ export class PwOrder<
       this.prefix === undefined
     ) {
       throw new Error(msg("component not fully initialized"));
+    }
+
+    // stolen from pw-input.ts
+    if (!this.hasUpdated) {
+      // the input value contains the value that is shown to the user
+      this.inputValue =
+        this.initial !== undefined ? this.get(this.initial) : this.defaultValue;
+
+      // in case this is an update set the value to undefined as it wasn't changed yet.
+      this.set(this.pwForm.formData, this.inputValue);
     }
 
     return html`
@@ -209,7 +242,7 @@ export class PwOrder<
       >
         ${(() => {
           // @ts-expect-error
-          const sorting: entitiesType3[P] = this.get(this.pwForm.formData);
+          const sorting: entitiesType3[P] = this.inputValue;
 
           const value = sorting.find(([e]) => e === `${this.orderBy}`)?.[1];
           return value === "ASC"

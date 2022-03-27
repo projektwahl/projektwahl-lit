@@ -82,6 +82,8 @@ class PwProjects<X extends string> extends PwEntityList<"/api/v1/projects", X> {
               value: null,
               get: (o) => o.sorting,
               set: (o, v) => (o.sorting = v),
+              initial,
+              defaultValue: [],
             })}
           </th>
 
@@ -95,6 +97,8 @@ class PwProjects<X extends string> extends PwEntityList<"/api/v1/projects", X> {
               value: null,
               get: (o) => o.sorting,
               set: (o, v) => (o.sorting = v),
+              initial,
+              defaultValue: [],
             })}
           </th>
 
@@ -108,6 +112,8 @@ class PwProjects<X extends string> extends PwEntityList<"/api/v1/projects", X> {
               value: null,
               get: (o) => o.sorting,
               set: (o, v) => (o.sorting = v),
+              initial,
+              defaultValue: [],
             })}
           </th>
 

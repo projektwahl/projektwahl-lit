@@ -87,6 +87,8 @@ export const PwProjectUsers = setupHmr(
                 value: this.projectId,
                 get: (o) => o.sorting,
                 set: (o, v) => (o.sorting = v),
+                initial,
+                defaultValue: [],
               })}
             </th>
 
@@ -100,6 +102,8 @@ export const PwProjectUsers = setupHmr(
                 value: null,
                 get: (o) => o.sorting,
                 set: (o, v) => (o.sorting = v),
+                initial,
+                defaultValue: [],
               })}
             </th>
 
@@ -113,6 +117,8 @@ export const PwProjectUsers = setupHmr(
                 value: null,
                 get: (o) => o.sorting,
                 set: (o, v) => (o.sorting = v),
+                initial,
+                defaultValue: [],
               })}
             </th>
 
@@ -126,6 +132,8 @@ export const PwProjectUsers = setupHmr(
                 value: null,
                 get: (o) => o.sorting,
                 set: (o, v) => (o.sorting = v),
+                initial,
+                defaultValue: [],
               })}
             </th>
           </tr>

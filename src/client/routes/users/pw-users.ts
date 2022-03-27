@@ -101,6 +101,8 @@ export class PwUsers<X extends string> extends PwEntityList<
               value: null,
               get: (o) => o.sorting,
               set: (o, v) => (o.sorting = v),
+              initial,
+              defaultValue: [],
             })}
           </th>
 
@@ -114,6 +116,8 @@ export class PwUsers<X extends string> extends PwEntityList<
               value: null,
               get: (o) => o.sorting,
               set: (o, v) => (o.sorting = v),
+              initial,
+              defaultValue: [],
             })}
           </th>
 
@@ -127,6 +131,8 @@ export class PwUsers<X extends string> extends PwEntityList<
               value: null,
               get: (o) => o.sorting,
               set: (o, v) => (o.sorting = v),
+              initial,
+              defaultValue: [],
             })}
           </th>
 
