@@ -544,8 +544,10 @@ async function createProjectAllFields(helper: Helper) {
   await form.setField("filters,id", id);
   await form.setField("filters,title", title2);
 
-  const loadingIndicator = await helper.driver.findElement(
-    By.css(".spinner-grow")
+  const loadingIndicator = await helper.driver.wait(
+    until.elementLocated(By.css(".spinner-grow")),
+    10000,
+    "dfslfshidlih"
   );
 
   await helper.driver.wait(
@@ -578,7 +580,7 @@ async function checkNotLoggedInUsers(helper: Helper) {
 
   const alert = await helper.driver.wait(
     until.elementLocated(By.css('div[class="alert alert-danger"]')),
-    2000,
+    5000,
     "Expected submit failure 2"
   );
 
@@ -590,30 +592,47 @@ async function checkNotLoggedInProjects(helper: Helper) {
 
   const alert = await helper.driver.wait(
     until.elementLocated(By.css('div[class="alert alert-danger"]')),
-    2000,
+    5000,
     "Expected submit failure 3"
   );
 
   assert.match(await alert.getText(), /Nicht angemeldet!/);
 }
 
-await Promise.all([
-  runTestAllBrowsers(createProjectAllFields),
-  runTestAllBrowsers(createUserAllFields),
-  runTestAllBrowsers(checkNotLoggedInUsers),
-  runTestAllBrowsers(checkNotLoggedInProjects),
-]);
-await Promise.all([
-  await runTestAllBrowsers(loginEmptyUsernameAndPassword),
-  await runTestAllBrowsers(loginWrongUsername),
-  await runTestAllBrowsers(loginEmptyPassword),
-  await runTestAllBrowsers(loginEmptyUsername),
-]);
-await Promise.all([
-  await runTestAllBrowsers(loginWrongPassword),
-  await runTestAllBrowsers(loginCorrect),
-  await runTestAllBrowsers(welcomeWorks),
-  await runTestAllBrowsers(imprintWorks),
-  await runTestAllBrowsers(privacyWorks),
-  await runTestAllBrowsers(logoutWorks),
-]);
+// TODO better would be some kind of queing system where a ready browser takes the next task
+
+runTestAllBrowsers(async (helper) => {
+  console.log("start1");
+  await createProjectAllFields(helper);
+  await helper.driver.manage().deleteAllCookies();
+  await createUserAllFields(helper);
+  console.log("end1");
+});
+
+runTestAllBrowsers(async (helper) => {
+  console.log("start3");
+  await loginEmptyUsernameAndPassword(helper);
+  await helper.driver.manage().deleteAllCookies();
+  await loginWrongUsername(helper);
+  await helper.driver.manage().deleteAllCookies();
+  await loginEmptyPassword(helper);
+  await helper.driver.manage().deleteAllCookies();
+  await loginEmptyUsername(helper);
+  await helper.driver.manage().deleteAllCookies();
+  await loginWrongPassword(helper);
+  await helper.driver.manage().deleteAllCookies();
+  await loginCorrect(helper);
+  await helper.driver.manage().deleteAllCookies();
+  await welcomeWorks(helper);
+  await helper.driver.manage().deleteAllCookies();
+  await imprintWorks(helper);
+  await helper.driver.manage().deleteAllCookies();
+  await privacyWorks(helper);
+  await helper.driver.manage().deleteAllCookies();
+  await logoutWorks(helper);
+  await helper.driver.manage().deleteAllCookies();
+  await checkNotLoggedInUsers(helper);
+  await helper.driver.manage().deleteAllCookies();
+  await checkNotLoggedInProjects(helper);
+  console.log("end3");
+});

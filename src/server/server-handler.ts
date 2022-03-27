@@ -221,7 +221,7 @@ export async function serverHandler(
     }
   } else if (url.pathname.startsWith("/api")) {
     if (process.env.NODE_ENV === "testing") {
-      await sleep(250);
+      await sleep(500);
     }
 
     switch (url.pathname) {
