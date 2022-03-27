@@ -456,7 +456,7 @@ EXECUTE FUNCTION check_users_project_leader_id2();
 
 CREATE OR REPLACE FUNCTION check_users_project_leader_id3() RETURNS TRIGGER AS $body$
 BEGIN
-  IF (SELECT COUNT(*) FROM users_with_deleted WHERE id = NEW.last_updated_by AND type = 'admin') != 1 THEN
+  IF NEW.last_updated_by IS NOT NULL AND (SELECT COUNT(*) FROM users_with_deleted WHERE id = NEW.last_updated_by AND type = 'admin') != 1 THEN
     RAISE EXCEPTION 'Lehrer dürfen keine Schüler erstellen!';
   END IF;
   RETURN NEW;

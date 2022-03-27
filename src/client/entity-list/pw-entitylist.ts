@@ -32,7 +32,7 @@ import { msg } from "@lit/localize";
 import { ifDefined } from "lit/directives/if-defined.js";
 import { myFetch } from "../utils.js";
 import { pwInputSelect } from "../form/pw-input-select.js";
-import { mappedFunctionCall, mappedIndexingSet } from "../../lib/result.js";
+import { mappedFunctionCall } from "../../lib/result.js";
 
 export type parseRequestWithPrefixType<PREFIX extends string> = {
   [P in keyof typeof entityRoutes]: z.infer<
@@ -222,12 +222,6 @@ export class PwEntityList<
 
       void this._task.run();
     }
-
-    const data = parseRequestWithPrefix(
-      this.url,
-      this.prefix,
-      this.history.url
-    );
 
     // this looks equal, so maybe lit tasks is buggy?
     console.log(this.body);
