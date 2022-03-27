@@ -485,7 +485,7 @@
               (method git-fetch)
               (uri (git-reference
                     (url "https://github.com/lit/lit")
-                    (commit (string-append "@dev.mohe/task@" version))))
+                    (commit (string-append "@lit-labs/task@" version))))
               (file-name (git-file-name name version))
               (sha256
                (base32
@@ -1003,7 +1003,7 @@
        ("openid-client" ,openid-client)
        ("lit" ,lit)
        ("js-cookie" ,js-cookie)
-       ("@dev.mohe/task" ,lit-labs-task)
+       ("@lit-labs/task" ,lit-labs-task)
        ("@lit-labs/ssr" ,lit-labs-ssr)
        ("@lit-labs/motion" ,lit-labs-motion)
        ("postgres" ,postgres)

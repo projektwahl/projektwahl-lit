@@ -29,7 +29,7 @@ import { createRef, Ref, ref } from "lit/directives/ref.js";
 import { repeat } from "lit/directives/repeat.js";
 import type { routes, ResponseType } from "../../lib/routes.js";
 import type { z } from "zod";
-import type { Task } from "@dev.mohe/task";
+import type { Task } from "@lit-labs/task";
 import { PwElement } from "../pw-element.js";
 import { PwForm } from "./pw-form.js";
 import { live } from "lit/directives/live.js";
@@ -166,6 +166,11 @@ export abstract class PwInput<
    */
   pwForm!: PwForm<P>;
 
+  /**
+   * The value that is currently shown to the user. This value may differ from the value in pwForm.formData e.g. in case you are updating values and have either not changed a field yet or reset the field. This is so the update on the server only updates the fields that you actually changed.
+   */
+  inputValue!: T;
+
   constructor() {
     super();
     this.randomId = "id" + Math.random().toString().replace(".", "");
@@ -196,6 +201,26 @@ export abstract class PwInput<
     this.pwForm = curr;
   }
 
+  protected willUpdate(_changedProperties: Map<PropertyKey, unknown>): void {
+    if (this.resettable && _changedProperties.has("initial")) {
+      // this is a "hack" so that rerendering with new initial data resets the resettable fields.
+
+      // the input value contains the value that is shown to the user
+      this.inputValue =
+        this.initial !== undefined ? this.get(this.initial) : this.defaultValue;
+
+      // TODO FIXME this may create an infinite loop if the initial is always changing
+      console.log("BUG: potential infinite loop pw-input initial updated.");
+
+      // in case this is an update set the value to undefined as it wasn't changed yet.
+      this.set(
+        this.pwForm.formData,
+        // @ts-expect-error tmp error
+        this.initial !== undefined ? undefined : this.defaultValue
+      );
+    }
+  }
+
   override disconnectedCallback() {
     super.disconnectedCallback();
     this.removeEventListener("input", this.mypwinputchangeDispatcher);
@@ -208,9 +233,15 @@ export abstract class PwInput<
     }
 
     if (!this.hasUpdated) {
+      // the input value contains the value that is shown to the user
+      this.inputValue =
+        this.initial !== undefined ? this.get(this.initial) : this.defaultValue;
+
+      // in case this is an update set the value to undefined as it wasn't changed yet.
       this.set(
         this.pwForm.formData,
-        this.initial !== undefined ? this.get(this.initial) : this.defaultValue
+        // @ts-expect-error tmp error
+        this.resettable ? undefined : this.inputValue
       );
     }
 
@@ -240,16 +271,12 @@ export abstract class PwInput<
           .value=${live(
             ifDefined(
               this.type !== "checkbox" && this.type !== "textarea"
-                ? this.get(this.pwForm.formData)
+                ? this.inputValue
                 : undefined
             )
           )}
           ?checked=${live(
-            ifDefined(
-              this.type === "checkbox"
-                ? this.get(this.pwForm.formData)
-                : undefined
-            )
+            ifDefined(this.type === "checkbox" ? this.inputValue : undefined)
           )}
           class="${
             this.type === "checkbox" ? "form-check-input" : "form-control"
@@ -283,16 +310,14 @@ export abstract class PwInput<
                 (o) => o.value,
                 (o) =>
                   html`<option
-                    ?selected=${live(
-                      this.get(this.pwForm.formData) === o.value
-                    )}
+                    ?selected=${live(this.inputValue === o.value)}
                     value=${o.value}
                   >
                     ${o.text}
                   </option>`
               )
             : this.type === "textarea"
-            ? this.get(this.pwForm.formData)
+            ? this.inputValue
             : undefined
         }</${
       this.type === "select"
@@ -308,21 +333,45 @@ export abstract class PwInput<
           >`
         : undefined
     }
-    <button @click=${() => {
-      console.log("reset");
-      this.set(
-        this.pwForm.formData,
-        this.initial !== undefined ? this.get(this.initial) : this.defaultValue
-      );
-      console.log(this.pwForm.formData);
-      this.requestUpdate();
-    }} class="btn btn-outline-secondary" type="button">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-counterclockwise" viewBox="0 0 16 16">
-                  <path fill-rule="evenodd" d="M8 3a5 5 0 1 1-4.546 2.914.5.5 0 0 0-.908-.417A6 6 0 1 0 8 2v1z"/>
-                  <path d="M8 4.466V.534a.25.25 0 0 0-.41-.192L5.23 2.308a.25.25 0 0 0 0 .384l2.36 1.966A.25.25 0 0 0 8 4.466z"/>
-                </svg>
-                  </button>
-        
+    ${
+      this.resettable
+        ? html`<button
+            @click=${() => {
+              console.log("reset");
+              this.inputValue =
+                this.initial !== undefined
+                  ? this.get(this.initial)
+                  : this.defaultValue;
+              this.set(
+                this.pwForm.formData,
+                // @ts-expect-error tmp error
+                this.initial !== undefined ? undefined : this.defaultValue
+              );
+              console.log(this.pwForm.formData);
+              this.requestUpdate();
+            }}
+            class="btn btn-outline-secondary"
+            type="button"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="16"
+              height="16"
+              fill="currentColor"
+              class="bi bi-arrow-counterclockwise"
+              viewBox="0 0 16 16"
+            >
+              <path
+                fill-rule="evenodd"
+                d="M8 3a5 5 0 1 1-4.546 2.914.5.5 0 0 0-.908-.417A6 6 0 1 0 8 2v1z"
+              />
+              <path
+                d="M8 4.466V.534a.25.25 0 0 0-.41-.192L5.23 2.308a.25.25 0 0 0 0 .384l2.36 1.966A.25.25 0 0 0 8 4.466z"
+              />
+            </svg>
+          </button>`
+        : undefined
+    }
         ${this.task.render({
           complete: (v) => {
             if (!v.success) {

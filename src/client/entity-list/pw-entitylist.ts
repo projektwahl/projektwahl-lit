@@ -23,7 +23,7 @@ SPDX-FileCopyrightText: 2021 Moritz Hedtke <Moritz.Hedtke@t-online.de>
 import { css, html, TemplateResult } from "lit";
 import { HistoryController } from "../history-controller.js";
 import { ref } from "lit/directives/ref.js";
-import { Task, TaskStatus } from "@dev.mohe/task";
+import { Task, TaskStatus } from "@lit-labs/task";
 import { entityRoutes, ResponseType } from "../../lib/routes.js";
 import { z } from "zod";
 import { PwForm } from "../form/pw-form.js";
@@ -32,7 +32,7 @@ import { msg } from "@lit/localize";
 import { ifDefined } from "lit/directives/if-defined.js";
 import { myFetch } from "../utils.js";
 import { pwInputSelect } from "../form/pw-input-select.js";
-import { mappedFunctionCall, mappedIndexingSet } from "../../lib/result.js";
+import { mappedFunctionCall } from "../../lib/result.js";
 
 export type parseRequestWithPrefixType<PREFIX extends string> = {
   [P in keyof typeof entityRoutes]: z.infer<
@@ -165,6 +165,43 @@ export class PwEntityList<
     super();
 
     this.history = new HistoryController(this, /.*/);
+
+    this._task = new Task(this, {
+      task: async () => {
+        if (!this.hasUpdated) {
+          if (this.initial !== undefined) {
+            return this.initial;
+          }
+        }
+
+        const data = parseRequestWithPrefix(
+          this.url,
+          this.prefix,
+          this.history.url
+        );
+
+        HistoryController.goto(
+          new URL(
+            `?${encodeURIComponent(
+              JSON.stringify({
+                ...data,
+                [this.prefix]: this.formData,
+              })
+            )}`,
+            window.location.href
+          ),
+          this.history.state,
+          true
+        );
+
+        const result = await myFetch<P>("GET", this.url, this.formData, {});
+
+        console.log("result", result);
+
+        return result;
+      },
+      autoRun: false, // TODO FIXME this breaks if you navigate to the same page (as it doesnt cause an update) - maybe we should autorun on url change?
+    });
   }
 
   override render() {
@@ -177,48 +214,20 @@ export class PwEntityList<
       throw new Error(msg("component not fully initialized"));
     }
 
-    const data = parseRequestWithPrefix(
-      this.url,
-      this.prefix,
-      this.history.url
-    );
-
     if (!this.hasUpdated) {
       this.formData =
         parseRequestWithPrefix(this.url, this.prefix, this.history.url)[
           this.prefix
         ] ?? {};
 
-      this._task = new Task(this, {
-        task: async () => {
-          HistoryController.goto(
-            new URL(
-              `?${encodeURIComponent(
-                JSON.stringify({
-                  ...data,
-                  [this.prefix]: this.formData,
-                })
-              )}`,
-              window.location.href
-            ),
-            this.history.state,
-            true
-          );
-
-          const result = await myFetch<P>("GET", this.url, this.formData, {});
-
-          return result;
-        },
-        autoRun: false, // TODO FIXME this breaks if you navigate to the same page (as it doesnt cause an update) - maybe we should autorun on url change?
-        initialStatus:
-          this.initial !== undefined ? TaskStatus.COMPLETE : TaskStatus.INITIAL,
-        initialValue: this.initial,
-      });
-
-      if (this.initial === undefined) {
-        void this._task.run();
-      }
+      void this._task.run();
     }
+
+    // this looks equal, so maybe lit tasks is buggy?
+    console.log(this.body);
+
+    // the task data is wrong
+    console.log("taskk", this._task);
 
     return html`
       ${bootstrapCss}
@@ -243,10 +252,18 @@ export class PwEntityList<
                 label: "Elemente pro Seite",
                 name: ["paginationLimit"],
                 get: (o) => o.paginationLimit,
-                set: (o, v) => (o.paginationLimit = v),
+                set: (o, v) => {
+                  if (o.paginationLimit !== v) {
+                    o.paginationLimit = v;
+
+                    void this._task.run();
+                  } else {
+                    o.paginationLimit = v;
+                  }
+                },
                 task: this._task,
                 type: "select",
-                initial: data[this.prefix],
+                initial: this.formData,
                 options: [
                   {
                     text: "10",
@@ -266,6 +283,7 @@ export class PwEntityList<
                   },
                 ],
                 defaultValue: 10,
+                resettable: false,
               })}
             </div>
           </div>
@@ -300,13 +318,7 @@ export class PwEntityList<
                     <a
                       @click=${async (e: Event) => {
                         e.preventDefault();
-
-                        const data = parseRequestWithPrefix(
-                          this.url,
-                          this.prefix,
-                          this.history.url
-                        );
-
+                        /*
                         if (!data[this.prefix]) {
                           mappedIndexingSet(data, this.prefix, {
                             filters: {},
@@ -316,19 +328,12 @@ export class PwEntityList<
                             paginationCursor: null,
                           });
                         }
+*/
                         if (this._task.value?.success) {
-                          data[this.prefix].paginationCursor =
+                          this.formData.paginationCursor =
                             this._task.value?.data.previousCursor;
-                          data[this.prefix].paginationDirection = "backwards";
+                          this.formData.paginationDirection = "backwards";
                         }
-                        HistoryController.goto(
-                          new URL(
-                            `?${encodeURIComponent(JSON.stringify(data))}`,
-                            window.location.href
-                          ),
-                          this.history.state,
-                          true
-                        );
                         await this._task.run();
                       }}
                       class="page-link"
@@ -367,12 +372,7 @@ export class PwEntityList<
                       @click=${async (e: Event) => {
                         e.preventDefault();
 
-                        const data = parseRequestWithPrefix(
-                          this.url,
-                          this.prefix,
-                          this.history.url
-                        );
-
+                        /*
                         if (!data[this.prefix]) {
                           mappedIndexingSet(data, this.prefix, {
                             filters: {},
@@ -382,19 +382,13 @@ export class PwEntityList<
                             paginationCursor: null,
                           });
                         }
+*/
+
                         if (this._task.value?.success) {
-                          data[this.prefix].paginationCursor =
+                          this.formData.paginationCursor =
                             this._task.value?.data.nextCursor;
-                          data[this.prefix].paginationDirection = "forwards";
+                          this.formData.paginationDirection = "forwards";
                         }
-                        HistoryController.goto(
-                          new URL(
-                            `?${encodeURIComponent(JSON.stringify(data))}`,
-                            window.location.href
-                          ),
-                          this.history.state,
-                          true
-                        );
                         await this._task.run();
                       }}
                       class="page-link"

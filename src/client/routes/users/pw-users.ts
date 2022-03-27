@@ -137,6 +137,7 @@ export class PwUsers<X extends string> extends PwEntityList<
               type: "number",
               defaultValue: undefined,
               initial,
+              resettable: false,
             })}
           </th>
 
@@ -152,6 +153,7 @@ export class PwUsers<X extends string> extends PwEntityList<
               type: "text",
               initial,
               defaultValue: undefined,
+              resettable: false,
             })}
           </th>
 
@@ -179,6 +181,7 @@ export class PwUsers<X extends string> extends PwEntityList<
               task: this._task,
               initial,
               defaultValue: undefined,
+              resettable: false,
             })}
           </th>
 

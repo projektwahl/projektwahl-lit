@@ -45,6 +45,7 @@ export function pwInputText<
     | "options"
     | "task"
     | "defaultValue"
+    | "resettable"
   >
 ) {
   const {
@@ -61,6 +62,7 @@ export function pwInputText<
     type,
     autocomplete,
     defaultValue,
+    resettable,
     ...rest
   } = props;
   let _ = rest;
@@ -79,6 +81,7 @@ export function pwInputText<
     .task=${task}
     .initial=${initial}
     .defaultValue=${defaultValue}
+    .resettable=${resettable}
   ></pw-input-text>`;
 }
 
@@ -96,7 +99,8 @@ export class PwInputText<
     // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
     const val = this.input.value.value as T;
 
-    this.set(this.pwForm.formData, val === "" ? this.defaultValue : val);
+    this.inputValue = val === "" ? this.defaultValue : val;
+    this.set(this.pwForm.formData, this.inputValue);
 
     this.input.value?.dispatchEvent(
       new CustomEvent("refreshentitylist", {

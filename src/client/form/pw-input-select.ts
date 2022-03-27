@@ -24,6 +24,7 @@ import { html } from "lit";
 import { ifDefined } from "lit/directives/if-defined.js";
 import type { routes } from "../../lib/routes.js";
 import { PwInput } from "./pw-input.js";
+import { Ref, ref } from "lit/directives/ref.js";
 
 // workaround see https://github.com/runem/lit-analyzer/issues/149#issuecomment-1006162839
 export function pwInputSelect<
@@ -45,7 +46,8 @@ export function pwInputSelect<
     | "options"
     | "task"
     | "defaultValue"
-  >
+    | "resettable"
+  > & { pwRef?: Ref<PwInputSelect<P, T>> }
 ) {
   const {
     disabled,
@@ -61,25 +63,48 @@ export function pwInputSelect<
     type,
     autocomplete,
     defaultValue,
+    resettable,
+    pwRef,
     ...rest
   } = props;
   let _ = rest;
   _ = 1; // ensure no property is missed - Don't use `{}` as a type. `{}` actually means "any non-nullish value".
-  return html`<pw-input-select
-    type=${type}
-    ?disabled=${disabled}
-    ?enabled=${enabled}
-    .label=${label}
-    .get=${get}
-    .set=${set}
-    .url=${url}
-    .name=${name}
-    .options=${options}
-    autocomplete=${ifDefined(autocomplete)}
-    .task=${task}
-    .initial=${initial}
-    .defaultValue=${defaultValue}
-  ></pw-input-select>`;
+  if (pwRef) {
+    return html`<pw-input-select
+      ${ref(pwRef)}
+      type=${type}
+      ?disabled=${disabled}
+      ?enabled=${enabled}
+      .label=${label}
+      .get=${get}
+      .set=${set}
+      .url=${url}
+      .name=${name}
+      .options=${options}
+      autocomplete=${ifDefined(autocomplete)}
+      .task=${task}
+      .initial=${initial}
+      .defaultValue=${defaultValue}
+      .resettable=${resettable}
+    ></pw-input-select>`;
+  } else {
+    return html`<pw-input-select
+      type=${type}
+      ?disabled=${disabled}
+      ?enabled=${enabled}
+      .label=${label}
+      .get=${get}
+      .set=${set}
+      .url=${url}
+      .name=${name}
+      .options=${options}
+      autocomplete=${ifDefined(autocomplete)}
+      .task=${task}
+      .initial=${initial}
+      .defaultValue=${defaultValue}
+      .resettable=${resettable}
+    ></pw-input-select>`;
+  }
 }
 
 export class PwInputSelect<
@@ -92,20 +117,13 @@ export class PwInputSelect<
     }
     const input = this.input.value;
 
-    this.set(
-      this.pwForm.formData,
+    this.inputValue =
       input.selectedIndex == -1
         ? this.defaultValue
         : this.options?.find((v) => v.value == input.value)?.value ??
-            this.defaultValue
-    ); // To make numbers work
-
-    this.input.value?.dispatchEvent(
-      new CustomEvent("refreshentitylist", {
-        bubbles: true,
-        composed: true,
-      })
-    );
+          this.defaultValue;
+    console.log("ONCHANGE");
+    this.set(this.pwForm.formData, this.inputValue);
   };
 }
 

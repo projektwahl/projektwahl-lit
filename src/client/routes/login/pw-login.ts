@@ -22,7 +22,7 @@ SPDX-FileCopyrightText: 2021 Moritz Hedtke <Moritz.Hedtke@t-online.de>
 */
 import { html } from "lit";
 import "../../form/pw-form.js";
-import { Task } from "@dev.mohe/task";
+import { Task } from "@lit-labs/task";
 import { myFetch } from "../../utils.js";
 import { PwForm } from "../../form/pw-form.js";
 import { HistoryController } from "../../history-controller.js";
@@ -127,6 +127,7 @@ class PwLogin extends PwForm<"/api/v1/login"> {
                 set: (o, v) => (o.username = v),
                 task: this._task,
                 defaultValue: "",
+                resettable: false,
               })}
               ${pwInputText<"/api/v1/login", string>({
                 url: this.url,
@@ -138,6 +139,7 @@ class PwLogin extends PwForm<"/api/v1/login"> {
                 autocomplete: "current-password",
                 task: this._task,
                 defaultValue: "",
+                resettable: false,
               })}
               ${!this.disabled
                 ? html`

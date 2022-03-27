@@ -396,7 +396,7 @@ EXECUTE FUNCTION check_project_leader_choices();
 
 
 
-
+-- https://www.postgresql.org/docs/current/plpgsql.html
 
 
 -- https://www.postgresql.org/docs/14/plpgsql-trigger.html
@@ -404,33 +404,71 @@ EXECUTE FUNCTION check_project_leader_choices();
 
 CREATE OR REPLACE FUNCTION check_users_project_leader_id1() RETURNS TRIGGER AS $body$
 BEGIN
-  RAISE EXCEPTION 'Testweise darfst du keine project_leader_ids ändern';
+  IF (SELECT COUNT(*) FROM users_with_deleted WHERE id = NEW.last_updated_by AND type = 'admin') = 1 THEN
+    RETURN NEW;
+  END IF;
+  IF (SELECT COUNT(*) FROM users_with_deleted WHERE id = NEW.last_updated_by AND type = 'helper') != 1 THEN
+    RAISE EXCEPTION 'Nur Lehrer und Admins dürfen dies ändern!';
+  END IF;
+  IF (NEW.project_leader_id IS NULL) THEN
+    IF (SELECT COUNT(*) FROM users_with_deleted AS voter INNER JOIN users_with_deleted AS helper ON voter.id = OLD.id AND voter.type = 'voter' AND voter.project_leader_id IS NOT NULL AND helper.id = NEW.last_updated_by AND helper.type = 'helper' AND helper.project_leader_id = voter.project_leader_id) != 1 THEN
+      RAISE EXCEPTION 'Sie dürfen nur aus Ihrem eigenen Projekt Projektleiter entfernen!';
+    END IF;
+  ELSE
+    IF (SELECT COUNT(*) FROM users_with_deleted AS voter INNER JOIN users_with_deleted AS helper ON voter.id = OLD.id AND voter.type = 'voter' AND voter.project_leader_id IS NULL AND helper.id = NEW.last_updated_by AND helper.type = 'helper' AND helper.project_leader_id = NEW.project_leader_id) != 1 THEN
+      RAISE EXCEPTION 'Sie dürfen nur in Ihr eigenes Projekt Projektleiter hinzufügen!';
+    END IF;
+  END IF;
   RETURN NEW;
 END;
 $body$ LANGUAGE plpgsql;
 
 DROP TRIGGER IF EXISTS trigger_check_users_project_leader_id1 ON users_with_deleted;
 
---CREATE TRIGGER trigger_check_users_project_leader_id1
---BEFORE UPDATE OF project_leader_id ON users_with_deleted
---FOR EACH ROW
---EXECUTE FUNCTION check_users_project_leader_id1();
+CREATE TRIGGER trigger_check_users_project_leader_id1
+BEFORE UPDATE OF project_leader_id ON users_with_deleted
+FOR EACH ROW
+EXECUTE FUNCTION check_users_project_leader_id1();
+
+
+
+
+CREATE OR REPLACE FUNCTION check_users_project_leader_id2() RETURNS TRIGGER AS $body$
+BEGIN
+  IF (SELECT COUNT(*) FROM users_with_deleted WHERE id = NEW.last_updated_by AND type = 'admin') != 1 THEN
+    RAISE EXCEPTION 'Lehrer dürfen Schüler nur Projektleiter oder Mitglieder ihrer eigenen Projekte ändern.';
+  END IF;
+  RETURN NEW;
+END;
+$body$ LANGUAGE plpgsql;
+
+DROP TRIGGER IF EXISTS trigger_check_users_project_leader_id2 ON users_with_deleted;
+
+-- SECURITY: Update columns if you add/change some
+CREATE TRIGGER trigger_check_users_project_leader_id2
+BEFORE UPDATE OF id, username, openid_id, password_hash, type, "group", age, away, password_changed, force_in_project_id, computed_in_project_id, deleted ON users_with_deleted
+FOR EACH ROW
+EXECUTE FUNCTION check_users_project_leader_id2();
 
 
 
 
 
+CREATE OR REPLACE FUNCTION check_users_project_leader_id3() RETURNS TRIGGER AS $body$
+BEGIN
+  IF NEW.last_updated_by IS NOT NULL AND (SELECT COUNT(*) FROM users_with_deleted WHERE id = NEW.last_updated_by AND type = 'admin') != 1 THEN
+    RAISE EXCEPTION 'Lehrer dürfen keine Schüler erstellen!';
+  END IF;
+  RETURN NEW;
+END;
+$body$ LANGUAGE plpgsql;
 
+DROP TRIGGER IF EXISTS trigger_check_users_project_leader_id3 ON users_with_deleted;
 
---CREATE TRIGGER trigger_check_users_project_leader_id
---BEFORE INSERT OR UPDATE ON users_with_deleted
---FOR EACH ROW
---EXECUTE FUNCTION check_users_project_leader_id();
-
--- UPDATE OF project_leader_id
-
--- UPDATE OF (anything else)
-
+CREATE TRIGGER trigger_check_users_project_leader_id3
+BEFORE INSERT ON users_with_deleted
+FOR EACH ROW
+EXECUTE FUNCTION check_users_project_leader_id3();
 
 
 

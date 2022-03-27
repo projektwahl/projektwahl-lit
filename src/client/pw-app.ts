@@ -26,7 +26,7 @@ import { HistoryController, HistoryState } from "./history-controller.js";
 import { aClick } from "./pw-a.js";
 import jscookie from "js-cookie";
 import { myFetch } from "./utils.js";
-import { Task } from "@dev.mohe/task";
+import { Task } from "@lit-labs/task";
 import { msg, str } from "@lit/localize";
 
 // TODO FIXME show more details if possible (maybe error page)
@@ -185,13 +185,13 @@ export class PwApp extends PwElement {
   private updateloginstate: (this: Window, ev: Event) => void;
 
   protected _apiTask!: Task<
-    [keyof typeof pages | undefined, HistoryState],
+    [keyof typeof pages | undefined /*, HistoryState*/],
     TemplateResult
   >;
 
   nextPage: ([key]: [
-    keyof typeof pages | undefined,
-    HistoryState
+    keyof typeof pages | undefined
+    //HistoryState
   ]) => Promise<TemplateResult>;
 
   username: string | undefined;
@@ -226,9 +226,9 @@ export class PwApp extends PwElement {
   constructor() {
     super();
 
-    this.nextPage = async ([key, _]: [
-      keyof typeof pages | undefined,
-      HistoryState
+    this.nextPage = async ([key /*, _*/]: [
+      keyof typeof pages | undefined
+      //HistoryState
     ]) => {
       console.log("nextPage");
       if (!this.hasUpdated) {
@@ -279,9 +279,9 @@ export class PwApp extends PwElement {
         const _a: keyof typeof pages | undefined = Object.keys(pages).find(
           (k) => new RegExp(k).test(this.history.url.pathname)
         );
-        const _b: [keyof typeof pages | undefined, HistoryState] = [
+        const _b: [keyof typeof pages | undefined /*, HistoryState*/] = [
           _a,
-          this.history.state,
+          //this.history.state,
         ];
         return _b;
       },

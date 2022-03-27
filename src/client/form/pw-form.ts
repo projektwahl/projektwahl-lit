@@ -24,7 +24,7 @@ import { html, noChange } from "lit";
 import { createRef, ref, Ref } from "lit/directives/ref.js";
 import { msg } from "@lit/localize";
 import type { routes, ResponseType } from "../../lib/routes.js";
-import type { Task } from "@dev.mohe/task";
+import type { Task } from "@lit-labs/task";
 import { PwElement } from "../pw-element.js";
 import type { z } from "zod";
 
