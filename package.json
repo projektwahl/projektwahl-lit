@@ -19,7 +19,7 @@
   "scripts": {
     "format": "docker build -t getting-started . && docker run --mount type=bind,source=\"$(pwd)\"/tests,target=/opt/projektwahl-lit/tests --mount type=bind,source=\"$(pwd)\"/src,target=/opt/projektwahl-lit/src -it getting-started npm run format",
     "format:check": "prettier --ignore-path .prettierignore --check .",
-    "test": "docker build -t getting-started . && docker run --mount type=bind,source=\"$(pwd)\"/tests/e2e/new-tests.ts,target=/opt/projektwahl-lit/tests/e2e/new-tests.ts --net=host -e BASE_URL -e CI=1 -it getting-started npm run test",
+    "test": "docker build -t getting-started . && docker run --mount type=bind,source=\"$(pwd)\"/tests/e2e/new-tests.ts,target=/opt/projektwahl-lit/tests/e2e/new-tests.ts --net=host -e BASE_URL -e DATABASE_URL -e DATABASE_HOST -e CI=1 -it getting-started npm run test",
     "lint": "docker build -t getting-started . && docker run --mount type=bind,source=\"$(pwd)\"/tests,target=/opt/projektwahl-lit/tests --mount type=bind,source=\"$(pwd)\"/src,target=/opt/projektwahl-lit/src -it getting-started npm run lint",
     "lint:fix": "docker build -t getting-started . && docker run --mount type=bind,source=\"$(pwd)\"/tests,target=/opt/projektwahl-lit/tests --mount type=bind,source=\"$(pwd)\"/src,target=/opt/projektwahl-lit/src -it getting-started npm run lint:fix",
     "evaluate": "node --experimental-loader ./src/loader.js --enable-source-maps ./src/server/routes/evaluate/index.js",

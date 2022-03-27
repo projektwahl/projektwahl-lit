@@ -36,6 +36,7 @@ import {
 } from "selenium-webdriver";
 import chrome from "selenium-webdriver/chrome.js";
 import firefox from "selenium-webdriver/firefox.js";
+import { sql } from "../../src/server/database.js";
 
 if (!process.env["BASE_URL"]) {
   console.error("BASE_URL not set!");
@@ -687,6 +688,17 @@ async function checkUsersSortingWorks(helper: Helper) {
 }
 
 // TODO better would be some kind of queing system where a ready browser takes the next task
+
+await sql`DROP TABLE settings;`
+await sql`DROP TABLE sessions;`
+await sql`DROP TABLE choices_history;`
+await sql`DROP TABLE choices;`
+await sql`DROP TABLE users_history;`
+await sql`DROP TABLE users_with_deleted;`
+await sql`DROP TABLE projects_history;`
+await sql`DROP TABLE projects_with_deleted;`
+await sql.file("src/server/setup.sql")
+await import("../../src/server/setup.js")
 
 await runTestAllBrowsers(async (helper) => {
   await checkProjectSortingWorks(helper);

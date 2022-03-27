@@ -67,7 +67,7 @@ ALTER DATABASE projektwahl SET default_transaction_read_only = true;
 
 psql --username=moritz < src/server/setup.sql
 
-NODE_ENV=development DATABASE_HOST=/run/postgresql DATABASE_URL=postgres://moritz@localhost/moritz npm run setup
+NODE_ENV=development BASE_URL=https://localhost:8443 DATABASE_HOST=/run/postgresql DATABASE_URL=postgres://moritz@localhost/moritz npm run setup
 
 NODE_ENV=development npm run evaluate
 

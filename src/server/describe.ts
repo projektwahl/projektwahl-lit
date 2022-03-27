@@ -36,8 +36,8 @@ export function typedSql<
     template: TemplateStringsArray,
     ...args: NullableObject<DescriptionTypes<Q>>
   ) {
-    //const err = new Error().stack
-    //try {
+    const err = new Error()
+    try {
     const { types: computed_query_types, columns: computed_column_types_1 } =
       // @ts-expect-error unknown
       await sql(template, ...args).describe();
@@ -70,16 +70,16 @@ export function typedSql<
       }
     }
 
-    console.log(computed_description);
+    // console.log(computed_description);
 
     deepStrictEqual(computed_description, description);
 
     // @ts-expect-error unknown
     return await sql<DescriptionTypes<R>[]>(template, ...args).execute();
-    /*} catch (error) {
+    } catch (error) {
     console.error(err)
     throw error
-  }*/
+  }
   };
 }
 
