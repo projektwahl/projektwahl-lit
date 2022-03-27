@@ -165,7 +165,7 @@ export async function fetchData<R extends keyof typeof entityRoutes>(
     });
 
     if (queries.length == 1) {
-      sqlResult = await sql`queries[0]`;
+      sqlResult = await sql`${queries[0]}`;
     } else {
       sqlResult = await sql`${queries
         .flatMap((v) => [sql`\nUNION ALL\n`, v])

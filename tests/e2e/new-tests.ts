@@ -30,12 +30,12 @@ import {
   Builder,
   By,
   Capabilities,
-  Capability,
   until,
   WebDriver,
   WebElement,
 } from "selenium-webdriver";
 import chrome from "selenium-webdriver/chrome.js";
+import firefox from "selenium-webdriver/firefox.js";
 
 if (!process.env["BASE_URL"]) {
   console.error("BASE_URL not set!");
@@ -102,16 +102,7 @@ class FormTester {
 
     await this.helper.click(submitButton);
 
-    const loadingIndicator = await this.helper.driver.wait(
-      until.elementLocated(By.css(".spinner-grow")),
-      2000,
-      "spinner 1"
-    );
-    await this.helper.driver.wait(
-      until.stalenessOf(loadingIndicator),
-      2000,
-      "loading indicator 1"
-    );
+    await this.helper.waitUntilLoaded();
   }
 
   async submitSuccess() {
@@ -175,6 +166,18 @@ class Helper {
     await this.driver.executeScript(`arguments[0].click()`, element);
   }
 
+  async waitUntilLoaded() {
+    const loadingIndicator = await this.driver.findElement(
+      By.css(".spinner-grow")
+    );
+
+    await this.driver.wait(
+      until.stalenessOf(loadingIndicator),
+      10000,
+      "waitUntilLoaded"
+    );
+  }
+
   async waitElem(name: string) {
     return await this.driver.wait(
       until.elementLocated(By.css(name)),
@@ -196,13 +199,29 @@ class Helper {
   }
 }
 
-async function runTest(testFunction: (helper: Helper) => Promise<void>) {
+async function runTestAllBrowsers(
+  testFunction: (helper: Helper) => Promise<void>
+) {
+  await Promise.all([
+    runTest("firefox", testFunction),
+    runTest("chrome", testFunction),
+  ]);
+}
+
+async function runTest(
+  browser: "firefox" | "chrome",
+  testFunction: (helper: Helper) => Promise<void>
+) {
+  // https://github.com/mozilla/geckodriver/issues/882
   const builder = new Builder()
-    .forBrowser("firefox")
-    .withCapabilities(Capabilities.firefox().set("acceptInsecureCerts", true))
+    .disableEnvironmentOverrides()
     .withCapabilities(
-      Capabilities.chrome().set(Capability.ACCEPT_INSECURE_TLS_CERTS, true)
+      new Capabilities().setAcceptInsecureCerts(true).setBrowserName(browser)
     );
+
+  if (browser === "chrome") {
+    builder.usingServer("http://localhost:9515");
+  }
 
   if (process.env.CI) {
     builder.setChromeOptions(
@@ -212,6 +231,7 @@ async function runTest(testFunction: (helper: Helper) => Promise<void>) {
         "--disable-dev-shm-usage"
       )
     );
+    builder.setFirefoxOptions(new firefox.Options().headless());
   }
 
   const driver = builder.build();
@@ -219,15 +239,6 @@ async function runTest(testFunction: (helper: Helper) => Promise<void>) {
   await driver.manage().window().setRect({
     width: 1000,
     height: 1000,
-  });
-
-  // @ts-expect-error wrong typings2
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-call
-  await driver.setNetworkConditions({
-    offline: false,
-    latency: 200, // Additional latency (ms).
-    download_throughput: 1000000, // Maximal aggregated download throughput.
-    upload_throughput: 1000000, // Maximal aggregated upload throughput.
   });
 
   try {
@@ -382,15 +393,6 @@ async function logoutWorks(helper: Helper) {
 async function createUserAllFields(helper: Helper) {
   await loginCorrect(helper);
 
-  // @ts-expect-error wrong typings2
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-call
-  await helper.driver.setNetworkConditions({
-    offline: false,
-    latency: 200, // Additional latency (ms).
-    download_throughput: 1000000, // Maximal aggregated download throughput.
-    upload_throughput: 1000000, // Maximal aggregated upload throughput.
-  });
-
   await helper.openNavbar();
   await helper.click(
     await helper.driver.findElement(By.css(`a[href="/users"]`))
@@ -417,16 +419,7 @@ async function createUserAllFields(helper: Helper) {
   const id = (await helper.driver.getCurrentUrl()).substring(
     "https://localhost:8443/users/edit/".length
   );
-  const loadingIndicator1 = await helper.driver.wait(
-    until.elementLocated(By.css(".spinner-grow")),
-    2000,
-    "spinner 1 1"
-  );
-  await helper.driver.wait(
-    until.stalenessOf(loadingIndicator1),
-    2000,
-    "loading indicator 1 2"
-  );
+  await helper.waitUntilLoaded();
   form = await helper.form("pw-user-create");
   assert.equal(await form.getField("0,username"), username);
   assert.equal(await form.getField("0,openid_id"), email);
@@ -448,16 +441,7 @@ async function createUserAllFields(helper: Helper) {
   await form.setField("filters,id", id);
   await form.setField("filters,username", username2);
 
-  const loadingIndicator = await helper.driver.wait(
-    until.elementLocated(By.css(".spinner-grow")),
-    2000,
-    "spinner 2"
-  );
-  await helper.driver.wait(
-    until.stalenessOf(loadingIndicator),
-    2000,
-    "loading indicator 1"
-  );
+  await helper.waitUntilLoaded();
 
   // click view button
   await helper.click(await helper.driver.findElement(By.css(`td p a`)));
@@ -476,15 +460,6 @@ async function createUserAllFields(helper: Helper) {
 async function createProjectAllFields(helper: Helper) {
   await loginCorrect(helper);
   await helper.openNavbar();
-
-  // @ts-expect-error wrong typings2
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-call
-  await helper.driver.setNetworkConditions({
-    offline: false,
-    latency: 200, // Additional latency (ms).
-    download_throughput: 1000000, // Maximal aggregated download throughput.
-    upload_throughput: 1000000, // Maximal aggregated upload throughput.
-  });
 
   await helper.click(
     await helper.driver.findElement(By.css(`a[href="/projects"]`))
@@ -519,16 +494,7 @@ async function createProjectAllFields(helper: Helper) {
   const id = (await helper.driver.getCurrentUrl()).substring(
     "https://localhost:8443/projects/edit/".length
   );
-  const loadingIndicator1 = await helper.driver.wait(
-    until.elementLocated(By.css(".spinner-grow")),
-    2000,
-    "spinner 1 1"
-  );
-  await helper.driver.wait(
-    until.stalenessOf(loadingIndicator1),
-    2000,
-    "loading indicator 1 2"
-  );
+  await helper.waitUntilLoaded();
   form = await helper.form("pw-project-create");
   assert.equal(await form.getField("title"), title);
   assert.equal(await form.getField("info"), info);
@@ -557,16 +523,7 @@ async function createProjectAllFields(helper: Helper) {
   await form.setField("filters,id", id);
   await form.setField("filters,title", title2);
 
-  const loadingIndicator = await helper.driver.wait(
-    until.elementLocated(By.css(".spinner-grow")),
-    2000,
-    "spinner 3"
-  );
-  await helper.driver.wait(
-    until.stalenessOf(loadingIndicator),
-    2000,
-    "loading indicator 2"
-  );
+  await helper.waitUntilLoaded();
 
   // click view button
   await helper.click(await helper.driver.findElement(By.css(`td p a`)));
@@ -592,7 +549,7 @@ async function checkNotLoggedInUsers(helper: Helper) {
 
   const alert = await helper.driver.wait(
     until.elementLocated(By.css('div[class="alert alert-danger"]')),
-    2000,
+    5000,
     "Expected submit failure 2"
   );
 
@@ -604,24 +561,181 @@ async function checkNotLoggedInProjects(helper: Helper) {
 
   const alert = await helper.driver.wait(
     until.elementLocated(By.css('div[class="alert alert-danger"]')),
-    2000,
+    5000,
     "Expected submit failure 3"
   );
 
   assert.match(await alert.getText(), /Nicht angemeldet!/);
 }
 
-await runTest(createProjectAllFields);
-await runTest(createUserAllFields);
-await runTest(checkNotLoggedInUsers);
-await runTest(checkNotLoggedInProjects);
-await runTest(loginEmptyUsernameAndPassword);
-await runTest(loginWrongUsername);
-await runTest(loginEmptyPassword);
-await runTest(loginEmptyUsername);
-await runTest(loginWrongPassword);
-await runTest(loginCorrect);
-await runTest(welcomeWorks);
-await runTest(imprintWorks);
-await runTest(privacyWorks);
-await runTest(logoutWorks);
+const randomFromArray = function <T>(array: T[]): T {
+  return array[Math.floor(Math.random() * array.length)];
+};
+
+async function checkProjectSortingWorks(helper: Helper) {
+  for (let j = 0; j < 10; j++) {
+    await loginCorrect(helper);
+    await helper.openNavbar();
+
+    await helper.click(
+      await helper.driver.findElement(By.css(`a[href="/projects"]`))
+    );
+    await helper.form("pw-projects");
+
+    for (let i = 0; i < Math.random() * 10; i++) {
+      const randomOrderButton = randomFromArray(
+        await helper.driver.findElements(By.css("pw-order button"))
+      );
+      await randomOrderButton.click();
+    }
+
+    const rows = [];
+
+    for (;;) {
+      await helper.waitUntilLoaded();
+
+      const thisRows = await helper.driver.findElements(
+        By.css('tbody tr th[scope="row"]')
+      );
+      const thisRowsText = await Promise.all(
+        thisRows.map((r) => r.getText().then((v) => Number(v)))
+      );
+
+      console.log(thisRowsText);
+
+      rows.push(...thisRowsText);
+
+      const nextPage = await helper.driver.findElement(
+        By.css('a[aria-label="next page"]')
+      );
+
+      if (!((await nextPage.getAttribute("aria-disabled")) === "false")) {
+        break;
+      }
+
+      await helper.click(nextPage);
+    }
+
+    console.log("end");
+
+    // TODO FIXME reset database before every run so this works
+    assert.equal(100, rows.length);
+
+    console.log(rows.sort((a, b) => a - b));
+
+    assert.deepEqual(
+      Array.from({ length: rows.length }, (_, i) => i + 1),
+      rows
+    );
+  }
+}
+
+async function checkUsersSortingWorks(helper: Helper) {
+  for (let j = 0; j < 2; j++) {
+    await loginCorrect(helper);
+    await helper.openNavbar();
+
+    await helper.click(
+      await helper.driver.findElement(By.css(`a[href="/users"]`))
+    );
+    await helper.form("pw-users");
+
+    for (let i = 0; i < Math.random() * 10; i++) {
+      const randomOrderButton = randomFromArray(
+        await helper.driver.findElements(By.css("pw-order button"))
+      );
+      await randomOrderButton.click();
+    }
+
+    const rows = [];
+
+    for (;;) {
+      await helper.waitUntilLoaded();
+
+      const thisRows = await helper.driver.findElements(
+        By.css('tbody tr th[scope="row"]')
+      );
+      const thisRowsText = await Promise.all(
+        thisRows.map((r) => r.getText().then((v) => Number(v)))
+      );
+
+      console.log(thisRowsText);
+
+      rows.push(...thisRowsText);
+
+      const nextPage = await helper.driver.findElement(
+        By.css('a[aria-label="next page"]')
+      );
+
+      if (!((await nextPage.getAttribute("aria-disabled")) === "false")) {
+        break;
+      }
+
+      await helper.click(nextPage);
+    }
+
+    console.log("end");
+
+    // TODO FIXME reset database before every run so this works
+    assert.equal(1001, rows.length);
+
+    console.log(rows.sort((a, b) => a - b));
+
+    assert.deepEqual(
+      Array.from({ length: rows.length }, (_, i) => i + 1),
+      rows
+    );
+  }
+}
+
+// TODO better would be some kind of queing system where a ready browser takes the next task
+
+await runTestAllBrowsers(async (helper) => {
+  await checkProjectSortingWorks(helper);
+  await helper.driver.manage().deleteAllCookies();
+
+  await checkUsersSortingWorks(helper);
+  await helper.driver.manage().deleteAllCookies();
+
+  await createProjectAllFields(helper);
+  await helper.driver.manage().deleteAllCookies();
+
+  await createUserAllFields(helper);
+  await helper.driver.manage().deleteAllCookies();
+
+  await loginEmptyUsernameAndPassword(helper);
+  await helper.driver.manage().deleteAllCookies();
+
+  await loginWrongUsername(helper);
+  await helper.driver.manage().deleteAllCookies();
+
+  await loginEmptyPassword(helper);
+  await helper.driver.manage().deleteAllCookies();
+
+  await loginEmptyUsername(helper);
+  await helper.driver.manage().deleteAllCookies();
+
+  await loginWrongPassword(helper);
+  await helper.driver.manage().deleteAllCookies();
+
+  await loginCorrect(helper);
+  await helper.driver.manage().deleteAllCookies();
+
+  await welcomeWorks(helper);
+  await helper.driver.manage().deleteAllCookies();
+
+  await imprintWorks(helper);
+  await helper.driver.manage().deleteAllCookies();
+
+  await privacyWorks(helper);
+  await helper.driver.manage().deleteAllCookies();
+
+  await logoutWorks(helper);
+  await helper.driver.manage().deleteAllCookies();
+
+  await checkNotLoggedInUsers(helper);
+  await helper.driver.manage().deleteAllCookies();
+
+  await checkNotLoggedInProjects(helper);
+  await helper.driver.manage().deleteAllCookies();
+});

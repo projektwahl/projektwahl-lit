@@ -80,40 +80,60 @@ export const PwProjectUsers = setupHmr(
             <th class="table-cell-hover p-0" scope="col">
               ${pwOrder({
                 url: "/api/v1/users",
-                name: `${this.name}_eq`,
+                name: ["sorting", `${this.name}_eq`],
+                orderBy: `${this.name}_eq`,
                 prefix: this.prefix,
                 title: "",
                 value: this.projectId,
+                get: (o) => o.sorting,
+                set: (o, v) => (o.sorting = v),
+                initial,
+                defaultValue: [],
               })}
             </th>
 
             <th class="table-cell-hover p-0" scope="col">
               ${pwOrder({
                 url: "/api/v1/users",
-                name: "id",
+                name: ["sorting", "id"],
+                orderBy: "id",
                 prefix: this.prefix,
                 title: msg("ID"),
                 value: null,
+                get: (o) => o.sorting,
+                set: (o, v) => (o.sorting = v),
+                initial,
+                defaultValue: [],
               })}
             </th>
 
             <th class="table-cell-hover p-0" scope="col">
               ${pwOrder({
                 url: "/api/v1/users",
-                name: "username",
+                name: ["sorting", "username"],
+                orderBy: "username",
                 prefix: this.prefix,
                 title: msg("Name"),
                 value: null,
+                get: (o) => o.sorting,
+                set: (o, v) => (o.sorting = v),
+                initial,
+                defaultValue: [],
               })}
             </th>
 
             <th class="table-cell-hover p-0" scope="col">
               ${pwOrder({
                 url: "/api/v1/users",
-                name: "type",
+                name: ["sorting", "type"],
+                orderBy: "type",
                 prefix: this.prefix,
                 title: msg("Type"),
                 value: null,
+                get: (o) => o.sorting,
+                set: (o, v) => (o.sorting = v),
+                initial,
+                defaultValue: [],
               })}
             </th>
           </tr>

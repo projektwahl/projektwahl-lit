@@ -44,7 +44,10 @@ void (async () => {
       } as const)`INSERT INTO users_with_deleted (username, password_hash, type) VALUES ('admin', ${hash}, 'admin') ON CONFLICT (username) DO UPDATE SET "group" = "users_with_deleted"."group" RETURNING id;`
     )[0];
 
-    if (process.env.NODE_ENV === "development") {
+    if (
+      process.env.NODE_ENV === "development" ||
+      process.env.NODE_ENV === "testing"
+    ) {
       const projects = await typedSql(sql, {
         types: [23],
         columns: {
@@ -61,7 +64,7 @@ void (async () => {
           deleted: 16,
           last_updated_by: 23,
         },
-      } as const)`INSERT INTO projects (title, info, place, costs, min_age, max_age, min_participants, max_participants, random_assignments, last_updated_by) (SELECT generate_series, '', '', 0, 5, 13, 5, 20, FALSE, ${admin.id} FROM generate_series(20, 30)) RETURNING *;`;
+      } as const)`INSERT INTO projects (title, info, place, costs, min_age, max_age, min_participants, max_participants, random_assignments, last_updated_by) (SELECT generate_series, '', '', 0, 5, 13, 5, 20, FALSE, ${admin.id} FROM generate_series(1, 100)) RETURNING *;`;
 
       // take care to set this value to project_count * min_participants <= user_count <= project_count * max_participants
       for (let i = 0; i < 1000; i++) {

@@ -42,6 +42,7 @@ import type { MyRequest } from "./express.js";
 import { choicesHandler } from "./routes/choices/index.js";
 import { updateChoiceHandler } from "./routes/choices/create-or-update.js";
 import { z, ZodIssueCode, ZodIssueOptionalMessage } from "zod";
+import { sleep } from "../client/utils.js";
 
 // https://github.com/colinhacks/zod/blob/master/src/ZodError.ts
 type ErrorMapCtx = {
@@ -189,7 +190,8 @@ export async function serverHandler(
   const url = new URL(request.url, BASE_URL);
 
   if (
-    process.env.NODE_ENV === "development" &&
+    (process.env.NODE_ENV === "development" ||
+      process.env.NODE_ENV === "testing") &&
     (url.pathname === "/favicon.ico" || url.pathname === "/robots.txt")
   ) {
     response.writeHead(404, {
@@ -197,7 +199,8 @@ export async function serverHandler(
     });
     response.end();
   } else if (
-    process.env.NODE_ENV === "development" &&
+    (process.env.NODE_ENV === "development" ||
+      process.env.NODE_ENV === "testing") &&
     url.pathname === "/api/v1/hmr"
   ) {
     response.writeHead(200, {
@@ -217,6 +220,10 @@ export async function serverHandler(
       })();
     }
   } else if (url.pathname.startsWith("/api")) {
+    if (process.env.NODE_ENV === "testing") {
+      await sleep(500);
+    }
+
     switch (url.pathname) {
       case "/api/v1/login":
         await loginHandler(url, request, response);
@@ -257,7 +264,10 @@ export async function serverHandler(
         });
         response.end();
     }
-  } else if (process.env.NODE_ENV === "development") {
+  } else if (
+    process.env.NODE_ENV === "development" ||
+    process.env.NODE_ENV === "testing"
+  ) {
     // TODO FIXME AUDIT
     // curl --insecure --path-as-is -v `${process.env.BASE_URL}/../src/index.js`
     const { resolve: loaderResolve, load: loaderLoad } = await import(
