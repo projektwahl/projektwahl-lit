@@ -104,12 +104,12 @@ class FormTester {
 
     const loadingIndicator = await this.helper.driver.wait(
       until.elementLocated(By.css(".spinner-grow")),
-      2000,
+      10000,
       "spinner 1"
     );
     await this.helper.driver.wait(
       until.stalenessOf(loadingIndicator),
-      2000,
+      10000,
       "loading indicator 1"
     );
   }
@@ -198,6 +198,7 @@ class Helper {
 
 async function runTest(testFunction: (helper: Helper) => Promise<void>) {
   const builder = new Builder()
+    .usingServer("http://localhost:9515")
     .forBrowser("firefox")
     .withCapabilities(Capabilities.firefox().set("acceptInsecureCerts", true))
     .withCapabilities(
@@ -219,15 +220,6 @@ async function runTest(testFunction: (helper: Helper) => Promise<void>) {
   await driver.manage().window().setRect({
     width: 1000,
     height: 1000,
-  });
-
-  // @ts-expect-error wrong typings2
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-call
-  await driver.setNetworkConditions({
-    offline: false,
-    latency: 200, // Additional latency (ms).
-    download_throughput: 1000000, // Maximal aggregated download throughput.
-    upload_throughput: 1000000, // Maximal aggregated upload throughput.
   });
 
   try {
@@ -382,15 +374,6 @@ async function logoutWorks(helper: Helper) {
 async function createUserAllFields(helper: Helper) {
   await loginCorrect(helper);
 
-  // @ts-expect-error wrong typings2
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-call
-  await helper.driver.setNetworkConditions({
-    offline: false,
-    latency: 200, // Additional latency (ms).
-    download_throughput: 1000000, // Maximal aggregated download throughput.
-    upload_throughput: 1000000, // Maximal aggregated upload throughput.
-  });
-
   await helper.openNavbar();
   await helper.click(
     await helper.driver.findElement(By.css(`a[href="/users"]`))
@@ -419,13 +402,13 @@ async function createUserAllFields(helper: Helper) {
   );
   const loadingIndicator1 = await helper.driver.wait(
     until.elementLocated(By.css(".spinner-grow")),
-    2000,
-    "spinner 1 1"
+    10000,
+    "spinner 1 4"
   );
   await helper.driver.wait(
     until.stalenessOf(loadingIndicator1),
-    2000,
-    "loading indicator 1 2"
+    10000,
+    "loading indicator 1 7"
   );
   form = await helper.form("pw-user-create");
   assert.equal(await form.getField("0,username"), username);
@@ -477,15 +460,6 @@ async function createProjectAllFields(helper: Helper) {
   await loginCorrect(helper);
   await helper.openNavbar();
 
-  // @ts-expect-error wrong typings2
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-call
-  await helper.driver.setNetworkConditions({
-    offline: false,
-    latency: 200, // Additional latency (ms).
-    download_throughput: 1000000, // Maximal aggregated download throughput.
-    upload_throughput: 1000000, // Maximal aggregated upload throughput.
-  });
-
   await helper.click(
     await helper.driver.findElement(By.css(`a[href="/projects"]`))
   );
@@ -521,12 +495,12 @@ async function createProjectAllFields(helper: Helper) {
   );
   const loadingIndicator1 = await helper.driver.wait(
     until.elementLocated(By.css(".spinner-grow")),
-    2000,
+    10000,
     "spinner 1 1"
   );
   await helper.driver.wait(
     until.stalenessOf(loadingIndicator1),
-    2000,
+    10000,
     "loading indicator 1 2"
   );
   form = await helper.form("pw-project-create");
