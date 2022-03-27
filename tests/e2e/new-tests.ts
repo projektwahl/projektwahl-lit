@@ -217,7 +217,7 @@ async function runTest(
     );
 
   if (browser === "chrome") {
-    builder.usingServer("http://localhost:9515")
+    builder.usingServer("http://localhost:9515");
   }
 
   if (process.env.CI) {
@@ -597,17 +597,23 @@ async function checkNotLoggedInProjects(helper: Helper) {
   assert.match(await alert.getText(), /Nicht angemeldet!/);
 }
 
-await runTestAllBrowsers(createProjectAllFields);
-await runTestAllBrowsers(createUserAllFields);
-await runTestAllBrowsers(checkNotLoggedInUsers);
-await runTestAllBrowsers(checkNotLoggedInProjects);
-await runTestAllBrowsers(loginEmptyUsernameAndPassword);
-await runTestAllBrowsers(loginWrongUsername);
-await runTestAllBrowsers(loginEmptyPassword);
-await runTestAllBrowsers(loginEmptyUsername);
-await runTestAllBrowsers(loginWrongPassword);
-await runTestAllBrowsers(loginCorrect);
-await runTestAllBrowsers(welcomeWorks);
-await runTestAllBrowsers(imprintWorks);
-await runTestAllBrowsers(privacyWorks);
-await runTestAllBrowsers(logoutWorks);
+await Promise.all([
+  runTestAllBrowsers(createProjectAllFields),
+  runTestAllBrowsers(createUserAllFields),
+  runTestAllBrowsers(checkNotLoggedInUsers),
+  runTestAllBrowsers(checkNotLoggedInProjects),
+]);
+await Promise.all([
+  await runTestAllBrowsers(loginEmptyUsernameAndPassword),
+  await runTestAllBrowsers(loginWrongUsername),
+  await runTestAllBrowsers(loginEmptyPassword),
+  await runTestAllBrowsers(loginEmptyUsername),
+]);
+await Promise.all([
+  await runTestAllBrowsers(loginWrongPassword),
+  await runTestAllBrowsers(loginCorrect),
+  await runTestAllBrowsers(welcomeWorks),
+  await runTestAllBrowsers(imprintWorks),
+  await runTestAllBrowsers(privacyWorks),
+  await runTestAllBrowsers(logoutWorks),
+]);
