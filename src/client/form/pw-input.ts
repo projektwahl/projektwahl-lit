@@ -189,7 +189,10 @@ export abstract class PwInput<
 
   override connectedCallback() {
     super.connectedCallback();
-    this.addEventListener("input", this.mypwinputchangeDispatcher);
+    this.addEventListener(
+      this.type === "select" ? "change" : "input",
+      this.mypwinputchangeDispatcher
+    );
     let curr: HTMLElement | null = this.parentElement;
     while (!(curr === null || curr instanceof PwForm)) {
       curr = curr.parentElement;
@@ -199,6 +202,14 @@ export abstract class PwInput<
     }
     // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
     this.pwForm = curr;
+  }
+
+  override disconnectedCallback() {
+    super.disconnectedCallback();
+    this.removeEventListener(
+      this.type === "select" ? "change" : "input",
+      this.mypwinputchangeDispatcher
+    );
   }
 
   protected willUpdate(_changedProperties: Map<PropertyKey, unknown>): void {
@@ -219,11 +230,6 @@ export abstract class PwInput<
         this.initial !== undefined ? undefined : this.defaultValue
       );
     }
-  }
-
-  override disconnectedCallback() {
-    super.disconnectedCallback();
-    this.removeEventListener("input", this.mypwinputchangeDispatcher);
   }
 
   override render() {
@@ -271,8 +277,10 @@ export abstract class PwInput<
           type=${ifDefined(this.type !== "textarea" ? this.type : undefined)}
           name=${this.name}
           .value=${ifDefined(
-            this.type !== "checkbox" && this.type !== "textarea"
-              ? live(this.inputValue)
+            this.type !== "checkbox" &&
+              this.type !== "textarea" &&
+              this.type !== "select"
+              ? live(this.inputValue ?? "")
               : undefined
           )}
           ?checked=${ifDefined(
@@ -311,7 +319,7 @@ export abstract class PwInput<
                 (o) =>
                   html`<option
                     ?selected=${live(this.inputValue === o.value)}
-                    value=${o.value}
+                    .value=${o.value}
                   >
                     ${o.text}
                   </option>`
