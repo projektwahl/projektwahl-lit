@@ -91,4 +91,6 @@ await (async () => {
   });
 
   await sql.end();
+
+  console.log("setup done");
 })();

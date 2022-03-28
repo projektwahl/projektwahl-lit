@@ -441,7 +441,10 @@ export class PwApp extends PwElement {
         <main class="flex-shrink-0 pb-3">
           ${this._apiTask.render({
             complete: (v) => v,
-            error: (e) => e,
+            error: (e) => {
+              console.error(e);
+              return e;
+            },
             pending: () => noChange,
           })}
         </main>
