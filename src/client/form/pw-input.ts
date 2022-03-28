@@ -227,12 +227,16 @@ export abstract class PwInput<
   }
 
   override render() {
-    console.log("pw-input rerender");
+    console.log(
+      `pw-input rerender ${this.name} ${this.type} ${this.inputValue}`
+    );
     if (this.label === undefined || this.task === undefined) {
       throw new Error(msg("component not fully initialized"));
     }
 
     if (!this.hasUpdated) {
+      console.log(`pw-input !hasUpdated`);
+
       // the input value contains the value that is shown to the user
       this.inputValue =
         this.initial !== undefined ? this.get(this.initial) : this.defaultValue;
@@ -268,15 +272,13 @@ export abstract class PwInput<
           ${ref(this.input)}
           type=${ifDefined(this.type !== "textarea" ? this.type : undefined)}
           name=${this.name}
-          .value=${live(
-            ifDefined(
-              this.type !== "checkbox" && this.type !== "textarea"
-                ? this.inputValue
-                : undefined
-            )
+          .value=${ifDefined(
+            this.type !== "checkbox" && this.type !== "textarea"
+              ? live(this.inputValue)
+              : undefined
           )}
-          ?checked=${live(
-            ifDefined(this.type === "checkbox" ? this.inputValue : undefined)
+          ?checked=${ifDefined(
+            this.type === "checkbox" ? live(this.inputValue) : undefined
           )}
           class="${
             this.type === "checkbox" ? "form-check-input" : "form-control"
