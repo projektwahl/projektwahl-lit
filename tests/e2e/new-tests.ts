@@ -37,6 +37,7 @@ import {
 import chrome from "selenium-webdriver/chrome.js";
 import firefox from "selenium-webdriver/firefox.js";
 import { sql } from "../../src/server/database.js";
+import { setup } from "../../src/server/setup-internal.js";
 
 if (!process.env["BASE_URL"]) {
   console.error("BASE_URL not set!");
@@ -57,7 +58,7 @@ class FormTester {
     this.form = form;
   }
 
-  async setField(name: string, value: string) {
+  async resetField(name: string, value: string) {
     const element = await this.form.findElement(
       By.css(`input[name="${name}"]`)
     );
@@ -65,12 +66,17 @@ class FormTester {
     await element.sendKeys(value);
   }
 
+  async setField(name: string, value: string) {
+    const element = await this.form.findElement(
+      By.css(`input[name="${name}"]`)
+    );
+    await element.sendKeys(value);
+  }
+
   async setTextareaField(name: string, value: string) {
     const element = await this.form.findElement(
       By.css(`textarea[name="${name}"]`)
     );
-    await element.click();
-    await element.clear();
     await element.click();
     await element.sendKeys(value);
   }
@@ -203,25 +209,40 @@ class Helper {
 async function runTestAllBrowsers(
   testFunction: (helper: Helper) => Promise<void>
 ) {
-  await Promise.all([
-    runTest("firefox", testFunction),
-    //runTest("chrome", testFunction),
-  ]);
+  //await Promise.all([
+  // TODO FIXME running in parallel fails to load the modules in firefox. Don't know whats wrong
+  await runTest("chrome", testFunction);
+  await runTest("firefox", testFunction);
+  //]);
 }
 
 async function runTest(
   browser: "firefox" | "chrome",
   testFunction: (helper: Helper) => Promise<void>
 ) {
+  await sql`DROP TABLE IF EXISTS settings, sessions, choices_history, projects_history, users_history, choices, users_with_deleted, projects_with_deleted CASCADE;`;
+  await sql.begin(async (tsql) => {
+    await tsql.file("src/server/setup.sql");
+  });
+  await setup();
+
   // https://github.com/mozilla/geckodriver/issues/882
-  const builder = new Builder()
-    .disableEnvironmentOverrides()
-    .withCapabilities(
-      new Capabilities().setAcceptInsecureCerts(true).setBrowserName(browser)
+  const builder = new Builder().disableEnvironmentOverrides();
+
+  if (browser === "firefox") {
+    builder.withCapabilities(
+      Capabilities.firefox()
+        .setAcceptInsecureCerts(true)
+        .setBrowserName("firefox")
     );
+  }
 
   if (browser === "chrome") {
-    builder.usingServer("http://localhost:9515");
+    builder
+      .withCapabilities(
+        new Capabilities().setAcceptInsecureCerts(true).setBrowserName("chrome")
+      )
+      .usingServer("http://localhost:9515");
   }
 
   if (process.env.CI) {
@@ -430,7 +451,7 @@ async function createUserAllFields(helper: Helper) {
   assert.equal((await form.getCheckboxField("0,deleted")) === "true", deleted);
 
   const username2 = `username${crypto.getRandomValues(new Uint32Array(1))[0]}`;
-  await form.setField("0,username", username2);
+  await form.resetField("0,username", username2);
   await form.submitSuccess();
 
   await helper.click(
@@ -512,7 +533,7 @@ async function createProjectAllFields(helper: Helper) {
   assert.equal((await form.getCheckboxField("deleted")) === "true", deleted);
 
   const title2 = `title${Math.random()}`;
-  await form.setField("title", title2);
+  await form.resetField("title", title2);
   await form.submitSuccess();
 
   await helper.click(
@@ -789,12 +810,6 @@ async function checkUsersFilteringWorks(helper: Helper) {
 
 // TODO better would be some kind of queing system where a ready browser takes the next task
 
-await sql`DROP TABLE IF EXISTS settings, sessions, choices_history, projects_history, users_history, choices, users_with_deleted, projects_with_deleted CASCADE;`;
-await sql.begin(async (tsql) => {
-  await tsql.file("src/server/setup.sql");
-});
-await import("../../src/server/setup.js");
-
 await runTestAllBrowsers(async (helper) => {
   await checkUsersFilteringWorks(helper);
   await helper.driver.manage().deleteAllCookies();
@@ -850,3 +865,5 @@ await runTestAllBrowsers(async (helper) => {
   await checkNotLoggedInProjects(helper);
   await helper.driver.manage().deleteAllCookies();
 });
+
+await sql.end();
