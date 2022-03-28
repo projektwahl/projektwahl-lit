@@ -207,10 +207,11 @@ class Helper {
 async function runTestAllBrowsers(
   testFunction: (helper: Helper) => Promise<void>
 ) {
-  await Promise.all([
-    runTest("firefox", testFunction),
-    //runTest("chrome", testFunction),
-  ]);
+  //await Promise.all([
+  // TODO FIXME running in parallel fails to load the modules in firefox. Don't know whats wrong
+  await runTest("chrome", testFunction);
+  await runTest("firefox", testFunction);
+  //]);
 }
 
 async function runTest(
@@ -218,14 +219,22 @@ async function runTest(
   testFunction: (helper: Helper) => Promise<void>
 ) {
   // https://github.com/mozilla/geckodriver/issues/882
-  const builder = new Builder()
-    .disableEnvironmentOverrides()
-    .withCapabilities(
-      new Capabilities().setAcceptInsecureCerts(true).setBrowserName(browser)
+  const builder = new Builder().disableEnvironmentOverrides();
+
+  if (browser === "firefox") {
+    builder.withCapabilities(
+      Capabilities.firefox()
+        .setAcceptInsecureCerts(true)
+        .setBrowserName("firefox")
     );
+  }
 
   if (browser === "chrome") {
-    builder.usingServer("http://localhost:9515");
+    builder
+      .withCapabilities(
+        new Capabilities().setAcceptInsecureCerts(true).setBrowserName("chrome")
+      )
+      .usingServer("http://localhost:9515");
   }
 
   if (process.env.CI) {
