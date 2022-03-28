@@ -61,6 +61,7 @@ class FormTester {
     const element = await this.form.findElement(
       By.css(`input[name="${name}"]`)
     );
+    await element.clear();
     await element.sendKeys(value);
   }
 
