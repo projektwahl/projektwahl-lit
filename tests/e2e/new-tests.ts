@@ -36,6 +36,7 @@ import {
 } from "selenium-webdriver";
 import chrome from "selenium-webdriver/chrome.js";
 import firefox from "selenium-webdriver/firefox.js";
+import { sql } from "../../src/server/database.js";
 
 if (!process.env["BASE_URL"]) {
   console.error("BASE_URL not set!");
@@ -573,7 +574,7 @@ const randomFromArray = function <T>(array: T[]): T {
 };
 
 async function checkProjectSortingWorks(helper: Helper) {
-  for (let j = 0; j < 10; j++) {
+  for (let j = 0; j < 5; j++) {
     await loginCorrect(helper);
     await helper.openNavbar();
 
@@ -631,64 +632,68 @@ async function checkProjectSortingWorks(helper: Helper) {
 }
 
 async function checkUsersSortingWorks(helper: Helper) {
-  for (let j = 0; j < 2; j++) {
-    await loginCorrect(helper);
-    await helper.openNavbar();
+  await loginCorrect(helper);
+  await helper.openNavbar();
 
-    await helper.click(
-      await helper.driver.findElement(By.css(`a[href="/users"]`))
+  await helper.click(
+    await helper.driver.findElement(By.css(`a[href="/users"]`))
+  );
+  await helper.form("pw-users");
+
+  for (let i = 0; i < Math.random() * 10; i++) {
+    const randomOrderButton = randomFromArray(
+      await helper.driver.findElements(By.css("pw-order button"))
     );
-    await helper.form("pw-users");
-
-    for (let i = 0; i < Math.random() * 10; i++) {
-      const randomOrderButton = randomFromArray(
-        await helper.driver.findElements(By.css("pw-order button"))
-      );
-      await randomOrderButton.click();
-    }
-
-    const rows = [];
-
-    for (;;) {
-      await helper.waitUntilLoaded();
-
-      const thisRows = await helper.driver.findElements(
-        By.css('tbody tr th[scope="row"]')
-      );
-      const thisRowsText = await Promise.all(
-        thisRows.map((r) => r.getText().then((v) => Number(v)))
-      );
-
-      console.log(thisRowsText);
-
-      rows.push(...thisRowsText);
-
-      const nextPage = await helper.driver.findElement(
-        By.css('a[aria-label="next page"]')
-      );
-
-      if (!((await nextPage.getAttribute("aria-disabled")) === "false")) {
-        break;
-      }
-
-      await helper.click(nextPage);
-    }
-
-    console.log("end");
-
-    // TODO FIXME reset database before every run so this works
-    assert.equal(1001, rows.length);
-
-    console.log(rows.sort((a, b) => a - b));
-
-    assert.deepEqual(
-      Array.from({ length: rows.length }, (_, i) => i + 1),
-      rows
-    );
+    await randomOrderButton.click();
   }
+
+  const rows = [];
+
+  for (;;) {
+    await helper.waitUntilLoaded();
+
+    const thisRows = await helper.driver.findElements(
+      By.css('tbody tr th[scope="row"]')
+    );
+    const thisRowsText = await Promise.all(
+      thisRows.map((r) => r.getText().then((v) => Number(v)))
+    );
+
+    console.log(thisRowsText);
+
+    rows.push(...thisRowsText);
+
+    const nextPage = await helper.driver.findElement(
+      By.css('a[aria-label="next page"]')
+    );
+
+    if (!((await nextPage.getAttribute("aria-disabled")) === "false")) {
+      break;
+    }
+
+    await helper.click(nextPage);
+  }
+
+  console.log("end");
+
+  // TODO FIXME reset database before every run so this works
+  assert.equal(501, rows.length);
+
+  console.log(rows.sort((a, b) => a - b));
+
+  assert.deepEqual(
+    Array.from({ length: rows.length }, (_, i) => i + 1),
+    rows
+  );
 }
 
 // TODO better would be some kind of queing system where a ready browser takes the next task
+
+await sql`DROP TABLE IF EXISTS settings, sessions, choices_history, projects_history, users_history, choices, users_with_deleted, projects_with_deleted CASCADE;`;
+await sql.begin(async (tsql) => {
+  await tsql.file("src/server/setup.sql");
+});
+await import("../../src/server/setup.js");
 
 await runTestAllBrowsers(async (helper) => {
   await checkProjectSortingWorks(helper);

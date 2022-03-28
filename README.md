@@ -59,12 +59,15 @@ PORT=8443 BASE_URL=https://localhost:8443 DATABASE_URL=postgres://projektwahl:pr
 ```bash
 ln -s $PWD/pre-commit .git/hooks/pre-commit
 
+sudo --user postgres psql --command='DROP DATABASE moritz;' --command='CREATE DATABASE moritz;'
+
 psql --username=moritz
 ALTER DATABASE projektwahl SET default_transaction_isolation = 'serializable';
 ALTER DATABASE projektwahl SET default_transaction_read_only = true;
+
 psql --username=moritz < src/server/setup.sql
 
-NODE_ENV=development npm run setup
+NODE_ENV=development BASE_URL=https://localhost:8443 DATABASE_HOST=/run/postgresql DATABASE_URL=postgres://moritz@localhost/moritz npm run setup
 
 NODE_ENV=development npm run evaluate
 
@@ -82,10 +85,6 @@ NODE_ENV=development PORT=8443 BASE_URL=https://localhost:8443 CREDENTIALS_DIREC
 ```
 psql --username=projektwahl --host=projektwahl
 ```
-
-## Firefox
-
-`about:config`: `layout.css.constructable-stylesheets.enabled = true`
 
 ## Security
 
@@ -106,5 +105,3 @@ This application will probably never work without JavaScript as this would requi
 ```
 npx license-checker --production --summary
 ```
-
-node node_modules/@lit/localize-tools/bin/lit-localize.js
