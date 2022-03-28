@@ -219,6 +219,12 @@ async function runTest(
   browser: "firefox" | "chrome",
   testFunction: (helper: Helper) => Promise<void>
 ) {
+  await sql`DROP TABLE IF EXISTS settings, sessions, choices_history, projects_history, users_history, choices, users_with_deleted, projects_with_deleted CASCADE;`;
+  await sql.begin(async (tsql) => {
+    await tsql.file("src/server/setup.sql");
+  });
+  await import("../../src/server/setup.js");
+
   // https://github.com/mozilla/geckodriver/issues/882
   const builder = new Builder().disableEnvironmentOverrides();
 
@@ -802,12 +808,6 @@ async function checkUsersFilteringWorks(helper: Helper) {
 }
 
 // TODO better would be some kind of queing system where a ready browser takes the next task
-
-await sql`DROP TABLE IF EXISTS settings, sessions, choices_history, projects_history, users_history, choices, users_with_deleted, projects_with_deleted CASCADE;`;
-await sql.begin(async (tsql) => {
-  await tsql.file("src/server/setup.sql");
-});
-await import("../../src/server/setup.js");
 
 await runTestAllBrowsers(async (helper) => {
   await checkUsersFilteringWorks(helper);
