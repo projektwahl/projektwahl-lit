@@ -80,6 +80,18 @@ NODE_ENV=development PORT=8443 BASE_URL=https://localhost:8443 CREDENTIALS_DIREC
 # https://localhost:8443/
 ```
 
+## Testing
+
+```
+chromedriver
+
+NODE_ENV=testing PORT=8443 BASE_URL=https://localhost:8443 CREDENTIALS_DIRECTORY=$PWD DATABASE_HOST=/run/postgresql DATABASE_URL=postgres://moritz@localhost/moritz npm run server
+
+NODE_ENV=testing PORT=8443 BASE_URL=https://localhost:8443 CREDENTIALS_DIRECTORY=$PWD DATABASE_HOST=/run/postgresql DATABASE_URL=postgres://moritz@localhost/moritz npm run test
+
+
+```
+
 ## Database access
 
 ```
