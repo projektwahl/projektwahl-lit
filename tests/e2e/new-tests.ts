@@ -57,11 +57,17 @@ class FormTester {
     this.form = form;
   }
 
+  async resetField(name: string, value: string) {
+    const element = await this.form.findElement(
+      By.css(`input[name="${name}"]`)
+    );
+    await element.sendKeys(value);
+  }
+
   async setField(name: string, value: string) {
     const element = await this.form.findElement(
       By.css(`input[name="${name}"]`)
     );
-    await element.clear();
     await element.sendKeys(value);
   }
 
@@ -69,8 +75,6 @@ class FormTester {
     const element = await this.form.findElement(
       By.css(`textarea[name="${name}"]`)
     );
-    await element.click();
-    await element.clear();
     await element.click();
     await element.sendKeys(value);
   }
@@ -430,7 +434,7 @@ async function createUserAllFields(helper: Helper) {
   assert.equal((await form.getCheckboxField("0,deleted")) === "true", deleted);
 
   const username2 = `username${crypto.getRandomValues(new Uint32Array(1))[0]}`;
-  await form.setField("0,username", username2);
+  await form.resetField("0,username", username2);
   await form.submitSuccess();
 
   await helper.click(
@@ -512,7 +516,7 @@ async function createProjectAllFields(helper: Helper) {
   assert.equal((await form.getCheckboxField("deleted")) === "true", deleted);
 
   const title2 = `title${Math.random()}`;
-  await form.setField("title", title2);
+  await form.resetField("title", title2);
   await form.submitSuccess();
 
   await helper.click(
