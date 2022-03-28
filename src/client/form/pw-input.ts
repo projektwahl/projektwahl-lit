@@ -334,7 +334,7 @@ export abstract class PwInput<
         : undefined
     }
     ${
-      this.resettable
+      this.resettable && !this.disabled
         ? html`<button
             @click=${() => {
               console.log("reset");
