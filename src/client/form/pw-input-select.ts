@@ -124,6 +124,13 @@ export class PwInputSelect<
           this.defaultValue;
     console.log("ONCHANGE");
     this.set(this.pwForm.formData, this.inputValue);
+
+    this.input.value?.dispatchEvent(
+      new CustomEvent("refreshentitylist", {
+        bubbles: true,
+        composed: true,
+      })
+    );
   };
 }
 
