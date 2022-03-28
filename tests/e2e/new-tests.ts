@@ -37,6 +37,7 @@ import {
 import chrome from "selenium-webdriver/chrome.js";
 import firefox from "selenium-webdriver/firefox.js";
 import { sql } from "../../src/server/database.js";
+import { setup } from "../../src/server/setup-internal.js";
 
 if (!process.env["BASE_URL"]) {
   console.error("BASE_URL not set!");
@@ -223,7 +224,7 @@ async function runTest(
   await sql.begin(async (tsql) => {
     await tsql.file("src/server/setup.sql");
   });
-  await import("../../src/server/setup.js");
+  await setup();
 
   // https://github.com/mozilla/geckodriver/issues/882
   const builder = new Builder().disableEnvironmentOverrides();
@@ -864,3 +865,5 @@ await runTestAllBrowsers(async (helper) => {
   await checkNotLoggedInProjects(helper);
   await helper.driver.manage().deleteAllCookies();
 });
+
+await sql.end();
