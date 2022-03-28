@@ -205,7 +205,7 @@ async function runTestAllBrowsers(
 ) {
   await Promise.all([
     runTest("firefox", testFunction),
-    runTest("chrome", testFunction),
+    //runTest("chrome", testFunction),
   ]);
 }
 
@@ -687,6 +687,106 @@ async function checkUsersSortingWorks(helper: Helper) {
   );
 }
 
+async function checkUsersPaginationLimitWorks(helper: Helper) {
+  for (const entityType of ["users", "projects"]) {
+    await loginCorrect(helper);
+    await helper.openNavbar();
+
+    await helper.click(
+      await helper.driver.findElement(By.css(`a[href="/${entityType}"]`))
+    );
+    await helper.form(`pw-${entityType}`);
+
+    await (
+      await helper.driver.findElement(
+        By.css('select[name="paginationLimit"] option[value="100"]')
+      )
+    ).click();
+
+    const rows = [];
+
+    for (;;) {
+      await helper.waitUntilLoaded();
+
+      const thisRows = await helper.driver.findElements(
+        By.css('tbody tr th[scope="row"]')
+      );
+      const thisRowsText = await Promise.all(
+        thisRows.map((r) => r.getText().then((v) => Number(v)))
+      );
+
+      assert.ok(thisRowsText.length <= 100);
+
+      console.log(thisRowsText);
+
+      rows.push(...thisRowsText);
+
+      const nextPage = await helper.driver.findElement(
+        By.css('a[aria-label="next page"]')
+      );
+
+      if (!((await nextPage.getAttribute("aria-disabled")) === "false")) {
+        break;
+      }
+
+      await helper.click(nextPage);
+    }
+
+    console.log("end");
+
+    assert.equal(entityType === "users" ? 501 : 100, rows.length);
+
+    console.log(rows.sort((a, b) => a - b));
+
+    assert.deepEqual(
+      Array.from({ length: rows.length }, (_, i) => i + 1),
+      rows
+    );
+  }
+}
+
+async function checkUsersFilteringWorks(helper: Helper) {
+  await loginCorrect(helper);
+  await helper.openNavbar();
+
+  await helper.click(
+    await helper.driver.findElement(By.css(`a[href="/users"]`))
+  );
+  await helper.form("pw-users");
+
+  await (
+    await helper.driver.findElement(
+      By.css('select[name="filters,type"] option[value="admin"]')
+    )
+  ).click();
+
+  const rows = [];
+
+  await helper.waitUntilLoaded();
+
+  const thisRows = await helper.driver.findElements(
+    By.css('tbody tr th[scope="row"]')
+  );
+  const thisRowsText = await Promise.all(
+    thisRows.map((r) => r.getText().then((v) => Number(v)))
+  );
+
+  console.log(thisRowsText);
+
+  rows.push(...thisRowsText);
+
+  console.log("end");
+
+  assert.equal(1, rows.length);
+
+  console.log(rows.sort((a, b) => a - b));
+
+  assert.deepEqual(
+    Array.from({ length: rows.length }, (_, i) => i + 1),
+    rows
+  );
+}
+
 // TODO better would be some kind of queing system where a ready browser takes the next task
 
 await sql`DROP TABLE IF EXISTS settings, sessions, choices_history, projects_history, users_history, choices, users_with_deleted, projects_with_deleted CASCADE;`;
@@ -696,6 +796,12 @@ await sql.begin(async (tsql) => {
 await import("../../src/server/setup.js");
 
 await runTestAllBrowsers(async (helper) => {
+  await checkUsersFilteringWorks(helper);
+  await helper.driver.manage().deleteAllCookies();
+
+  await checkUsersPaginationLimitWorks(helper);
+  await helper.driver.manage().deleteAllCookies();
+
   await checkProjectSortingWorks(helper);
   await helper.driver.manage().deleteAllCookies();
 

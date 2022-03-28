@@ -100,6 +100,7 @@ export class PwInputText<
     const val = this.input.value.value as T;
 
     this.inputValue = val === "" ? this.defaultValue : val;
+
     this.set(this.pwForm.formData, this.inputValue);
 
     this.input.value?.dispatchEvent(
