@@ -227,9 +227,7 @@ export abstract class PwInput<
   }
 
   override render() {
-    console.log(
-      `pw-input rerender ${this.name} ${this.type} ${this.inputValue}`
-    );
+    console.log(`pw-input rerender`);
     if (this.label === undefined || this.task === undefined) {
       throw new Error(msg("component not fully initialized"));
     }

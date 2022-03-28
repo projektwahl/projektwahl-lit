@@ -99,8 +99,6 @@ export class PwInputText<
     // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
     const val = this.input.value.value as T;
 
-    console.log(`VAL ${val}, DEFAULT ${this.defaultValue}`);
-
     this.inputValue = val === "" ? this.defaultValue : val;
 
     this.set(this.pwForm.formData, this.inputValue);
