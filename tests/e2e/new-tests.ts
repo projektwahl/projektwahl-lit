@@ -73,6 +73,16 @@ class FormTester {
     await element.sendKeys(value);
   }
 
+  async resetTextareaField(name: string, value: string) {
+    const element = await this.form.findElement(
+      By.css(`textarea[name="${name}"]`)
+    );
+    await element.click();
+    await element.clear();
+    await element.click();
+    await element.sendKeys(value);
+  }
+
   async setTextareaField(name: string, value: string) {
     const element = await this.form.findElement(
       By.css(`textarea[name="${name}"]`)
@@ -238,11 +248,10 @@ async function runTest(
   }
 
   if (browser === "chrome") {
-    builder
-      .withCapabilities(
-        new Capabilities().setAcceptInsecureCerts(true).setBrowserName("chrome")
-      )
-      .usingServer("http://localhost:9515");
+    builder.withCapabilities(
+      new Capabilities().setAcceptInsecureCerts(true).setBrowserName("chrome")
+    );
+    //.usingServer("http://localhost:9515");
   }
 
   if (process.env.CI) {
@@ -564,6 +573,45 @@ async function createProjectAllFields(helper: Helper) {
     random_assignments
   );
   assert.equal((await form.getCheckboxField("deleted")) === "true", deleted);
+
+  // click edit button
+  await helper.click(
+    await helper.driver.findElement(
+      By.css(`a[href="/projects/edit/${id}"]`)
+    )
+  );
+  await helper.waitUntilLoaded();
+
+  form = await helper.form("pw-project-create");
+
+  await form.resetField("title", "");
+  await form.resetTextareaField("info", "");
+  await form.resetField("place", "");
+  await form.resetField("costs", "");
+  await form.resetField("min_age", "");
+  await form.resetField("max_age", "");
+  await form.resetField("min_participants", "");
+  await form.resetField("max_participants", "");
+  await form.checkField("random_assignments", false);
+  await form.checkField("deleted", false);
+  await form.submitSuccess();
+
+
+  form = await helper.form("pw-project-create");
+  assert.equal(await form.getField("title"), "");
+  assert.equal(await form.getField("info"), "");
+  assert.equal(await form.getField("place"), "");
+  assert.equal(await form.getField("costs"), "");
+  assert.equal(await form.getField("min_age"), "");
+  assert.equal(await form.getField("max_age"), "");
+  assert.equal(await form.getField("min_participants"), "");
+  assert.equal(await form.getField("max_participants"), "");
+  assert.equal(
+    (await form.getCheckboxField("random_assignments")) === "true",
+    false
+  );
+  assert.equal((await form.getCheckboxField("deleted")) === "true", false);
+
 }
 
 async function checkNotLoggedInUsers(helper: Helper) {
@@ -811,7 +859,7 @@ async function checkUsersFilteringWorks(helper: Helper) {
 // TODO better would be some kind of queing system where a ready browser takes the next task
 
 await runTestAllBrowsers(async (helper) => {
-  await checkUsersFilteringWorks(helper);
+  /* await checkUsersFilteringWorks(helper);
   await helper.driver.manage().deleteAllCookies();
 
   await checkUsersPaginationLimitWorks(helper);
@@ -822,13 +870,13 @@ await runTestAllBrowsers(async (helper) => {
 
   await checkUsersSortingWorks(helper);
   await helper.driver.manage().deleteAllCookies();
-
+*/
   await createProjectAllFields(helper);
   await helper.driver.manage().deleteAllCookies();
 
   await createUserAllFields(helper);
   await helper.driver.manage().deleteAllCookies();
-
+  /*
   await loginEmptyUsernameAndPassword(helper);
   await helper.driver.manage().deleteAllCookies();
 
@@ -864,6 +912,7 @@ await runTestAllBrowsers(async (helper) => {
 
   await checkNotLoggedInProjects(helper);
   await helper.driver.manage().deleteAllCookies();
+*/
 });
 
 await sql.end();
