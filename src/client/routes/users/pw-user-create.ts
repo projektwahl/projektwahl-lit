@@ -183,6 +183,8 @@ class PwUserCreate extends PwForm<"/api/v1/users/create-or-update"> {
                 @submit=${async (event: Event) => {
                   event.preventDefault();
 
+                  console.log("SUBMIT");
+
                   await this._task.run();
                 }}
               >
