@@ -69,7 +69,8 @@ class FormTester {
       By.css(`input[name="${name}"]`)
     );
     // really? https://github.com/w3c/webdriver/issues/1630
-    await element.sendKeys(Key.chord(Key.CONTROL, "a"), Key.BACK_SPACE, value);
+    await element.sendKeys(Key.chord(Key.CONTROL, "a"), Key.BACK_SPACE);
+    await element.sendKeys(value);
   }
 
   async setField(name: string, value: string) {
@@ -84,7 +85,8 @@ class FormTester {
       By.css(`textarea[name="${name}"]`)
     );
     await element.click();
-    await element.sendKeys(Key.chord(Key.CONTROL, "a"), Key.BACK_SPACE, value);
+    await element.sendKeys(Key.chord(Key.CONTROL, "a"), Key.BACK_SPACE);
+    await element.sendKeys(value);
   }
 
   async setTextareaField(name: string, value: string) {
@@ -225,8 +227,8 @@ async function runTestAllBrowsers(
 ) {
   //await Promise.all([
   // TODO FIXME running in parallel fails to load the modules in firefox. Don't know whats wrong
-  await runTest("chrome", testFunction);
   await runTest("firefox", testFunction);
+  await runTest("chrome", testFunction);
   //]);
 }
 
@@ -512,7 +514,35 @@ async function createUserAllFields(helper: Helper) {
   assert.equal((await form.getCheckboxField("0,away")) === "true", away);
   assert.equal((await form.getCheckboxField("0,deleted")) === "true", deleted);
 
-  //await helper.driver.sleep(1000)
+  // click edit button
+  await helper.click(
+    await helper.driver.findElement(By.css(`a[href="/users/edit/${id}"]`))
+  );
+  await helper.waitUntilLoaded();
+
+  form = await helper.form("pw-user-create");
+
+  await form.resetField("0,username", "");
+  await form.resetField("0,openid_id", "");
+  await form.resetField("0,group", "");
+  await form.resetField("0,age", "");
+  await form.checkField("0,away", false);
+  await form.checkField("0,deleted", false);
+  assert.deepStrictEqual(
+    [["0,username", "Text muss mindestens 1 Zeichen haben"]],
+    await form.submitFailure()
+  );
+
+  await form.setField("0,username", username);
+  await form.submitSuccess();
+
+  form = await helper.form("pw-user-create");
+  assert.equal(await form.getField("0,username"), username);
+  assert.equal(await form.getField("0,openid_id"), "");
+  assert.equal(await form.getField("0,group"), "");
+  assert.equal(await form.getField("0,age"), "");
+  assert.equal((await form.getCheckboxField("0,away")) === "true", false);
+  assert.equal((await form.getCheckboxField("0,deleted")) === "true", false);
 }
 
 async function createProjectAllFields(helper: Helper) {
@@ -570,6 +600,7 @@ async function createProjectAllFields(helper: Helper) {
 
   const title2 = `title${Math.random()}`;
   await form.resetField("title", title2);
+
   await form.submitSuccess();
 
   await helper.click(
