@@ -30,6 +30,7 @@ import {
   Builder,
   By,
   Capabilities,
+  Key,
   logging,
   until,
   WebDriver,
@@ -67,8 +68,8 @@ class FormTester {
     const element = await this.form.findElement(
       By.css(`input[name="${name}"]`)
     );
-    await element.clear();
-    await element.sendKeys(value);
+    // really? https://github.com/w3c/webdriver/issues/1630
+    await element.sendKeys(Key.chord(Key.CONTROL, "a"), Key.BACK_SPACE, value);
   }
 
   async setField(name: string, value: string) {
@@ -83,9 +84,7 @@ class FormTester {
       By.css(`textarea[name="${name}"]`)
     );
     await element.click();
-    await element.clear();
-    await element.click();
-    await element.sendKeys(value);
+    await element.sendKeys(Key.chord(Key.CONTROL, "a"), Key.BACK_SPACE, value);
   }
 
   async setTextareaField(name: string, value: string) {
@@ -318,17 +317,21 @@ async function runTest(
         });
     */
   } catch (error) {
+    try {
+      // Needed for Chrome. Firefox throws here, will not implement.
+      // https://github.com/mozilla/geckodriver/issues/284
+      const entries = await driver.manage().logs().get(logging.Type.BROWSER);
+      console.log(entries);
+      entries.forEach(function (entry) {
+        console.log("[%s] %s", entry.level.name, entry.message);
+      });
+    } catch (error) {}
+
     console.error(error);
     const screenshot = await driver.takeScreenshot();
     await writeFile("screenshot.png", screenshot, "base64");
 
     throw error;
-  } finally {
-    const entries = await driver.manage().logs().get(logging.Type.BROWSER);
-    console.log(entries);
-    entries.forEach(function (entry) {
-      console.log("[%s] %s", entry.level.name, entry.message);
-    });
   }
 }
 
