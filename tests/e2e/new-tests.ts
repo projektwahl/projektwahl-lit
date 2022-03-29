@@ -30,12 +30,15 @@ import {
   Builder,
   By,
   Capabilities,
+  Key,
+  logging,
   until,
   WebDriver,
   WebElement,
 } from "selenium-webdriver";
 import chrome from "selenium-webdriver/chrome.js";
 import firefox from "selenium-webdriver/firefox.js";
+import { installConsoleHandler } from "selenium-webdriver/lib/logging.js";
 import { sql } from "../../src/server/database.js";
 import { setup } from "../../src/server/setup-internal.js";
 
@@ -62,7 +65,8 @@ class FormTester {
     const element = await this.form.findElement(
       By.css(`input[name="${name}"]`)
     );
-    await element.clear();
+    // really? https://github.com/w3c/webdriver/issues/1630
+    await element.sendKeys(Key.chord(Key.CONTROL, "a"), Key.BACK_SPACE);
     await element.sendKeys(value);
   }
 
@@ -70,6 +74,15 @@ class FormTester {
     const element = await this.form.findElement(
       By.css(`input[name="${name}"]`)
     );
+    await element.sendKeys(value);
+  }
+
+  async resetTextareaField(name: string, value: string) {
+    const element = await this.form.findElement(
+      By.css(`textarea[name="${name}"]`)
+    );
+    await element.click();
+    await element.sendKeys(Key.chord(Key.CONTROL, "a"), Key.BACK_SPACE);
     await element.sendKeys(value);
   }
 
@@ -211,8 +224,8 @@ async function runTestAllBrowsers(
 ) {
   //await Promise.all([
   // TODO FIXME running in parallel fails to load the modules in firefox. Don't know whats wrong
-  await runTest("chrome", testFunction);
   await runTest("firefox", testFunction);
+  await runTest("chrome", testFunction);
   //]);
 }
 
@@ -229,20 +242,32 @@ async function runTest(
   // https://github.com/mozilla/geckodriver/issues/882
   const builder = new Builder().disableEnvironmentOverrides();
 
+  const prefs = new logging.Preferences();
+  prefs.setLevel(logging.Type.BROWSER, logging.Level.DEBUG);
+
+  // https://www.selenium.dev/selenium/docs/api/javascript/module/selenium-webdriver/lib/logging.html
+  installConsoleHandler();
+  logging.getLogger().setLevel(logging.Level.ALL);
+  logging.getLogger("webdriver.http").setLevel(logging.Level.OFF);
+  logging.getLogger("webdriver.http.Executor").setLevel(logging.Level.OFF);
+
   if (browser === "firefox") {
     builder.withCapabilities(
       Capabilities.firefox()
         .setAcceptInsecureCerts(true)
         .setBrowserName("firefox")
+        .setLoggingPrefs(prefs)
     );
   }
 
   if (browser === "chrome") {
-    builder
-      .withCapabilities(
-        new Capabilities().setAcceptInsecureCerts(true).setBrowserName("chrome")
-      )
-      .usingServer("http://localhost:9515");
+    builder.withCapabilities(
+      new Capabilities()
+        .setAcceptInsecureCerts(true)
+        .setBrowserName("chrome")
+        .setLoggingPrefs(prefs)
+    );
+    //.usingServer("http://localhost:9515");
   }
 
   if (process.env.CI) {
@@ -291,6 +316,18 @@ async function runTest(
         });
     */
   } catch (error) {
+    try {
+      // Needed for Chrome. Firefox throws here, will not implement.
+      // https://github.com/mozilla/geckodriver/issues/284
+      const entries = await driver.manage().logs().get(logging.Type.BROWSER);
+      console.log(entries);
+      entries.forEach(function (entry) {
+        console.log("[%s] %s", entry.level.name, entry.message);
+      });
+    } catch (error) {
+      // ignore
+    }
+
     console.error(error);
     const screenshot = await driver.takeScreenshot();
     await writeFile("screenshot.png", screenshot, "base64");
@@ -476,7 +513,35 @@ async function createUserAllFields(helper: Helper) {
   assert.equal((await form.getCheckboxField("0,away")) === "true", away);
   assert.equal((await form.getCheckboxField("0,deleted")) === "true", deleted);
 
-  //await helper.driver.sleep(1000)
+  // click edit button
+  await helper.click(
+    await helper.driver.findElement(By.css(`a[href="/users/edit/${id}"]`))
+  );
+  await helper.waitUntilLoaded();
+
+  form = await helper.form("pw-user-create");
+
+  await form.resetField("0,username", "");
+  await form.resetField("0,openid_id", "");
+  await form.resetField("0,group", "");
+  await form.resetField("0,age", "");
+  await form.checkField("0,away", false);
+  await form.checkField("0,deleted", false);
+  assert.deepStrictEqual(
+    [["0,username", "Text muss mindestens 1 Zeichen haben"]],
+    await form.submitFailure()
+  );
+
+  await form.setField("0,username", username);
+  await form.submitSuccess();
+
+  form = await helper.form("pw-user-create");
+  assert.equal(await form.getField("0,username"), username);
+  assert.equal(await form.getField("0,openid_id"), "");
+  assert.equal(await form.getField("0,group"), "");
+  assert.equal(await form.getField("0,age"), "");
+  assert.equal((await form.getCheckboxField("0,away")) === "true", false);
+  assert.equal((await form.getCheckboxField("0,deleted")) === "true", false);
 }
 
 async function createProjectAllFields(helper: Helper) {
@@ -534,6 +599,7 @@ async function createProjectAllFields(helper: Helper) {
 
   const title2 = `title${Math.random()}`;
   await form.resetField("title", title2);
+
   await form.submitSuccess();
 
   await helper.click(
@@ -564,6 +630,41 @@ async function createProjectAllFields(helper: Helper) {
     random_assignments
   );
   assert.equal((await form.getCheckboxField("deleted")) === "true", deleted);
+
+  // click edit button
+  await helper.click(
+    await helper.driver.findElement(By.css(`a[href="/projects/edit/${id}"]`))
+  );
+  await helper.waitUntilLoaded();
+
+  form = await helper.form("pw-project-create");
+
+  await form.resetField("title", "");
+  await form.resetTextareaField("info", "");
+  await form.resetField("place", "");
+  await form.resetField("costs", "");
+  await form.resetField("min_age", "");
+  await form.resetField("max_age", "");
+  await form.resetField("min_participants", "");
+  await form.resetField("max_participants", "");
+  await form.checkField("random_assignments", false);
+  await form.checkField("deleted", false);
+  await form.submitSuccess();
+
+  form = await helper.form("pw-project-create");
+  assert.equal(await form.getField("title"), "");
+  assert.equal(await form.getField("info"), "");
+  assert.equal(await form.getField("place"), "");
+  assert.equal(await form.getField("costs"), "");
+  assert.equal(await form.getField("min_age"), "");
+  assert.equal(await form.getField("max_age"), "");
+  assert.equal(await form.getField("min_participants"), "");
+  assert.equal(await form.getField("max_participants"), "");
+  assert.equal(
+    (await form.getCheckboxField("random_assignments")) === "true",
+    false
+  );
+  assert.equal((await form.getCheckboxField("deleted")) === "true", false);
 }
 
 async function checkNotLoggedInUsers(helper: Helper) {
