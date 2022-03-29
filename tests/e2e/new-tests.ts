@@ -38,10 +38,7 @@ import {
 } from "selenium-webdriver";
 import chrome from "selenium-webdriver/chrome.js";
 import firefox from "selenium-webdriver/firefox.js";
-import {
-  getLogger,
-  installConsoleHandler,
-} from "selenium-webdriver/lib/logging.js";
+import { installConsoleHandler } from "selenium-webdriver/lib/logging.js";
 import { sql } from "../../src/server/database.js";
 import { setup } from "../../src/server/setup-internal.js";
 
@@ -327,7 +324,9 @@ async function runTest(
       entries.forEach(function (entry) {
         console.log("[%s] %s", entry.level.name, entry.message);
       });
-    } catch (error) {}
+    } catch (error) {
+      // ignore
+    }
 
     console.error(error);
     const screenshot = await driver.takeScreenshot();
@@ -913,7 +912,7 @@ async function checkUsersFilteringWorks(helper: Helper) {
 // TODO better would be some kind of queing system where a ready browser takes the next task
 
 await runTestAllBrowsers(async (helper) => {
-  /* await checkUsersFilteringWorks(helper);
+  await checkUsersFilteringWorks(helper);
   await helper.driver.manage().deleteAllCookies();
 
   await checkUsersPaginationLimitWorks(helper);
@@ -924,13 +923,13 @@ await runTestAllBrowsers(async (helper) => {
 
   await checkUsersSortingWorks(helper);
   await helper.driver.manage().deleteAllCookies();
-*/
+
   await createProjectAllFields(helper);
   await helper.driver.manage().deleteAllCookies();
 
   await createUserAllFields(helper);
   await helper.driver.manage().deleteAllCookies();
-  /*
+
   await loginEmptyUsernameAndPassword(helper);
   await helper.driver.manage().deleteAllCookies();
 
@@ -966,7 +965,6 @@ await runTestAllBrowsers(async (helper) => {
 
   await checkNotLoggedInProjects(helper);
   await helper.driver.manage().deleteAllCookies();
-*/
 });
 
 await sql.end();
