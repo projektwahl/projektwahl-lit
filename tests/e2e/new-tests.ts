@@ -30,12 +30,17 @@ import {
   Builder,
   By,
   Capabilities,
+  logging,
   until,
   WebDriver,
   WebElement,
 } from "selenium-webdriver";
 import chrome from "selenium-webdriver/chrome.js";
 import firefox from "selenium-webdriver/firefox.js";
+import {
+  getLogger,
+  installConsoleHandler,
+} from "selenium-webdriver/lib/logging.js";
 import { sql } from "../../src/server/database.js";
 import { setup } from "../../src/server/setup-internal.js";
 
@@ -239,17 +244,30 @@ async function runTest(
   // https://github.com/mozilla/geckodriver/issues/882
   const builder = new Builder().disableEnvironmentOverrides();
 
+  const prefs = new logging.Preferences();
+  prefs.setLevel(logging.Type.BROWSER, logging.Level.DEBUG);
+
+  // https://www.selenium.dev/selenium/docs/api/javascript/module/selenium-webdriver/lib/logging.html
+  installConsoleHandler();
+  logging.getLogger().setLevel(logging.Level.ALL);
+  logging.getLogger("webdriver.http").setLevel(logging.Level.OFF);
+  logging.getLogger("webdriver.http.Executor").setLevel(logging.Level.OFF);
+
   if (browser === "firefox") {
     builder.withCapabilities(
       Capabilities.firefox()
         .setAcceptInsecureCerts(true)
         .setBrowserName("firefox")
+        .setLoggingPrefs(prefs)
     );
   }
 
   if (browser === "chrome") {
     builder.withCapabilities(
-      new Capabilities().setAcceptInsecureCerts(true).setBrowserName("chrome")
+      new Capabilities()
+        .setAcceptInsecureCerts(true)
+        .setBrowserName("chrome")
+        .setLoggingPrefs(prefs)
     );
     //.usingServer("http://localhost:9515");
   }
@@ -305,6 +323,12 @@ async function runTest(
     await writeFile("screenshot.png", screenshot, "base64");
 
     throw error;
+  } finally {
+    const entries = await driver.manage().logs().get(logging.Type.BROWSER);
+    console.log(entries);
+    entries.forEach(function (entry) {
+      console.log("[%s] %s", entry.level.name, entry.message);
+    });
   }
 }
 
@@ -576,9 +600,7 @@ async function createProjectAllFields(helper: Helper) {
 
   // click edit button
   await helper.click(
-    await helper.driver.findElement(
-      By.css(`a[href="/projects/edit/${id}"]`)
-    )
+    await helper.driver.findElement(By.css(`a[href="/projects/edit/${id}"]`))
   );
   await helper.waitUntilLoaded();
 
@@ -596,7 +618,6 @@ async function createProjectAllFields(helper: Helper) {
   await form.checkField("deleted", false);
   await form.submitSuccess();
 
-
   form = await helper.form("pw-project-create");
   assert.equal(await form.getField("title"), "");
   assert.equal(await form.getField("info"), "");
@@ -611,7 +632,6 @@ async function createProjectAllFields(helper: Helper) {
     false
   );
   assert.equal((await form.getCheckboxField("deleted")) === "true", false);
-
 }
 
 async function checkNotLoggedInUsers(helper: Helper) {
