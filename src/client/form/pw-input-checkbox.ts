@@ -110,6 +110,13 @@ export class PwInputCheckbox<
       throw new Error();
     }
 
+    console.log(
+      "CHECKBOX CHANGE",
+      this.input.value.checked,
+      this.trueValue,
+      this.falseValue
+    );
+
     this.inputValue = this.input.value.checked
       ? this.trueValue
       : this.falseValue;
