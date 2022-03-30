@@ -569,11 +569,11 @@ async function createProjectAllFields(helper: Helper) {
   await form.setField("title", title);
   await form.setTextareaField("info", info);
   await form.setField("place", place);
-  await form.setField("costs", `${costs}`);
-  await form.setField("min_age", `${min_age}`);
-  await form.setField("max_age", `${max_age}`);
-  await form.setField("min_participants", `${min_participants}`);
-  await form.setField("max_participants", `${max_participants}`);
+  await form.resetField("costs", `${costs}`);
+  await form.resetField("min_age", `${min_age}`);
+  await form.resetField("max_age", `${max_age}`);
+  await form.resetField("min_participants", `${min_participants}`);
+  await form.resetField("max_participants", `${max_participants}`);
   await form.checkField("random_assignments", random_assignments);
   await form.checkField("deleted", deleted);
   await form.submitSuccess();
