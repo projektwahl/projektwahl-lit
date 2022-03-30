@@ -655,11 +655,12 @@ async function createProjectAllFields(helper: Helper) {
   assert.equal(await form.getField("title"), "");
   assert.equal(await form.getField("info"), "");
   assert.equal(await form.getField("place"), "");
-  assert.equal(await form.getField("costs"), "");
-  assert.equal(await form.getField("min_age"), "");
-  assert.equal(await form.getField("max_age"), "");
-  assert.equal(await form.getField("min_participants"), "");
-  assert.equal(await form.getField("max_participants"), "");
+  // defaults
+  assert.equal(await form.getField("costs"), "0");
+  assert.equal(await form.getField("min_age"), "5");
+  assert.equal(await form.getField("max_age"), "13");
+  assert.equal(await form.getField("min_participants"), "5");
+  assert.equal(await form.getField("max_participants"), "15");
   assert.equal(
     (await form.getCheckboxField("random_assignments")) === "true",
     false
