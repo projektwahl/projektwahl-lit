@@ -318,7 +318,7 @@ export abstract class PwInput<
                 (o) => o.value,
                 (o) =>
                   html`<option
-                    ?selected=${live(this.inputValue === o.value)}
+                    .selected=${live(this.inputValue === o.value)}
                     .value=${o.value}
                   >
                     ${o.text}

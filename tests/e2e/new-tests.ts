@@ -924,14 +924,17 @@ async function resettingUserWorks(helper: Helper) {
   let form = await helper.form("pw-user-create");
   const username = `username${crypto.getRandomValues(new Uint32Array(1))[0]}`;
   const email = `email${Math.random()}`.substring(0, 15);
-  const group = `group${Math.random()}`.substring(0, 15);
-  const age = Math.floor(Math.random() * 10);
   const away = Math.random() > 0.5 ? true : false;
   const deleted = Math.random() > 0.5 ? true : false;
   await form.setField("0,username", username);
   await form.setField("0,openid_id", email);
-  await form.setField("0,group", group);
-  await form.setField("0,age", `${age}`);
+
+  await (
+    await helper.driver.findElement(
+      By.css('select[name="0,type"] option[value="admin"]')
+    )
+  ).click();
+
   await form.checkField("0,away", away);
   await form.checkField("0,deleted", deleted);
   await form.submitSuccess();
@@ -945,8 +948,11 @@ async function resettingUserWorks(helper: Helper) {
   // clear all fields (TODO set to random values (also empty))
   await form.resetField("0,username", "");
   await form.resetField("0,openid_id", "");
-  await form.resetField("0,group", "");
-  await form.resetField("0,age", "");
+  await (
+    await helper.driver.findElement(
+      By.css('select[name="0,type"] option[value="helper"]')
+    )
+  ).click();
   await form.checkField("0,away", false);
   await form.checkField("0,deleted", false);
 
@@ -956,15 +962,14 @@ async function resettingUserWorks(helper: Helper) {
       await helper.driver.findElements(
         By.css('button[class="btn btn-outline-secondary"]')
       )
-    ).map((elem) => elem.click())
+    ).map((elem) => helper.click(elem))
   );
 
   // check what resetting worked
   form = await helper.form("pw-user-create");
   assert.equal(await form.getField("0,username"), username);
   assert.equal(await form.getField("0,openid_id"), email);
-  assert.equal(await form.getField("0,group"), group);
-  assert.equal(await form.getField("0,age"), `${age}`);
+  assert.equal(await form.getField("0,type"), "admin");
   assert.equal((await form.getCheckboxField("0,away")) === "true", away);
   assert.equal((await form.getCheckboxField("0,deleted")) === "true", deleted);
 }
@@ -974,8 +979,6 @@ async function resettingUserWorks(helper: Helper) {
 await runTestAllBrowsers(async (helper) => {
   await resettingUserWorks(helper);
   await helper.driver.manage().deleteAllCookies();
-
-  return;
 
   await checkUsersFilteringWorks(helper);
   await helper.driver.manage().deleteAllCookies();
