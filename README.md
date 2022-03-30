@@ -65,7 +65,7 @@ psql --username=moritz
 ALTER DATABASE projektwahl SET default_transaction_isolation = 'serializable';
 ALTER DATABASE projektwahl SET default_transaction_read_only = true;
 
-psql --username=moritz < src/server/setup.sql
+psql --single-transaction --username=moritz < src/server/setup.sql
 
 NODE_ENV=development BASE_URL=https://localhost:8443 DATABASE_HOST=/run/postgresql DATABASE_URL=postgres://moritz@localhost/moritz npm run setup
 

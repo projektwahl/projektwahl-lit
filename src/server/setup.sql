@@ -21,8 +21,6 @@ SPDX-License-Identifier: AGPL-3.0-or-later
 SPDX-FileCopyrightText: 2021 Moritz Hedtke <Moritz.Hedtke@t-online.de>
 */
 
-BEGIN READ WRITE;
-
 -- if you remove this you get a CVE for free - so don't. (because the triggers can have race conditions then)
 -- https://www.postgresql.org/docs/current/transaction-iso.html
 -- currently done in the setup instructions and not automatically here
@@ -63,8 +61,6 @@ CREATE TABLE IF NOT EXISTS projects_history (
   last_updated_by INTEGER
 );
 
--- https://wiki.postgresql.org/wiki/Audit_trigger
--- TODO FIXME If you want this audit log to be trustworthy, your app should run with a role that has at most USAGE to the audit schema and SELECT rights to audit.logged_actions. Most importantly, your app must not connect with a superuser role and must not own the tables it uses. Create your app's schema with a different user to the one your app runs as, and GRANT your app the minimum rights it needs.
 CREATE OR REPLACE FUNCTION log_history_projects() RETURNS TRIGGER AS $body$
 DECLARE
   d RECORD;
@@ -82,7 +78,6 @@ SECURITY DEFINER
 SET search_path = public;
 
 REVOKE ALL ON FUNCTION log_history_projects() FROM PUBLIC;
--- GRANT EXECUTE ON FUNCTION check_password(uname TEXT, pass TEXT) TO admins;
 
 DROP TRIGGER IF EXISTS projects_audit_insert_delete ON projects_with_deleted;
 
@@ -115,8 +110,8 @@ CREATE TABLE IF NOT EXISTS users_with_deleted (
   age INTEGER,
   away BOOLEAN NOT NULL DEFAULT FALSE,
   password_changed BOOLEAN NOT NULL DEFAULT FALSE,
-  force_in_project_id INTEGER, -- this should still be stored here even with openid as we can't join on it otherwise
-  computed_in_project_id INTEGER, -- this should still be stored here even with openid as we can't join on it otherwise
+  force_in_project_id INTEGER,
+  computed_in_project_id INTEGER,
   deleted BOOLEAN NOT NULL DEFAULT FALSE,
   last_updated_by INTEGER
 );
@@ -134,8 +129,8 @@ CREATE TABLE IF NOT EXISTS users_history (
   age INTEGER,
   away BOOLEAN NOT NULL DEFAULT FALSE,
   password_changed BOOLEAN NOT NULL DEFAULT FALSE,
-  force_in_project_id INTEGER, -- this should still be stored here even with openid as we can't join on it otherwise
-  computed_in_project_id INTEGER, -- this should still be stored here even with openid as we can't join on it otherwise
+  force_in_project_id INTEGER,
+  computed_in_project_id INTEGER,
   deleted BOOLEAN NOT NULL DEFAULT FALSE,
   last_updated_by INTEGER
 );
@@ -423,12 +418,45 @@ BEGIN
 END;
 $body$ LANGUAGE plpgsql;
 
+-- warning: Copy pasta from above
+CREATE OR REPLACE FUNCTION check_users_force_in_project() RETURNS TRIGGER AS $body$
+BEGIN
+  IF (SELECT COUNT(*) FROM users_with_deleted WHERE id = NEW.last_updated_by AND type = 'admin') = 1 THEN
+    RETURN NEW;
+  END IF;
+  IF (SELECT COUNT(*) FROM users_with_deleted WHERE id = NEW.last_updated_by AND type = 'helper') != 1 THEN
+    RAISE EXCEPTION 'Nur Lehrer und Admins dürfen dies ändern!';
+  END IF;
+  IF (NEW.force_in_project_id IS NULL) THEN
+    IF (SELECT COUNT(*) FROM users_with_deleted AS voter INNER JOIN users_with_deleted AS helper ON voter.id = OLD.id AND voter.type = 'voter' AND voter.force_in_project_id IS NOT NULL AND helper.id = NEW.last_updated_by AND helper.type = 'helper' AND helper.force_in_project_id = voter.force_in_project_id) != 1 THEN
+      RAISE EXCEPTION 'Sie dürfen nur aus Ihrem eigenen Projekt Mitglieder entfernen!';
+    END IF;
+  ELSE
+    IF (SELECT COUNT(*) FROM users_with_deleted AS voter INNER JOIN users_with_deleted AS helper ON voter.id = OLD.id AND voter.type = 'voter' AND voter.force_in_project_id IS NULL AND helper.id = NEW.last_updated_by AND helper.type = 'helper' AND helper.force_in_project_id = NEW.force_in_project_id) != 1 THEN
+      RAISE EXCEPTION 'Sie dürfen nur in Ihr eigenes Projekt Mitglieder hinzufügen!';
+    END IF;
+  END IF;
+  RETURN NEW;
+END;
+$body$ LANGUAGE plpgsql;
+
 DROP TRIGGER IF EXISTS trigger_check_users_project_leader_id1 ON users_with_deleted;
 
 CREATE TRIGGER trigger_check_users_project_leader_id1
 BEFORE UPDATE OF project_leader_id ON users_with_deleted
 FOR EACH ROW
 EXECUTE FUNCTION check_users_project_leader_id1();
+
+
+
+
+DROP TRIGGER IF EXISTS trigger_check_users_force_in_project ON users_with_deleted;
+
+CREATE TRIGGER trigger_check_users_force_in_project
+BEFORE UPDATE OF force_in_project_id ON users_with_deleted
+FOR EACH ROW
+EXECUTE FUNCTION check_users_force_in_project();
+
 
 
 
@@ -446,7 +474,7 @@ DROP TRIGGER IF EXISTS trigger_check_users_project_leader_id2 ON users_with_dele
 
 -- SECURITY: Update columns if you add/change some
 CREATE TRIGGER trigger_check_users_project_leader_id2
-BEFORE UPDATE OF id, username, openid_id, password_hash, type, "group", age, away, password_changed, force_in_project_id, computed_in_project_id, deleted ON users_with_deleted
+BEFORE UPDATE OF id, username, openid_id, password_hash, type, "group", age, away, password_changed, computed_in_project_id, deleted ON users_with_deleted
 FOR EACH ROW
 EXECUTE FUNCTION check_users_project_leader_id2();
 
@@ -485,5 +513,3 @@ EXECUTE FUNCTION check_users_project_leader_id3();
 
 
 INSERT INTO settings (id, election_running) VALUES (1, false) ON CONFLICT DO NOTHING;
-
-COMMIT;

@@ -237,7 +237,7 @@ export const PwProjectCreate = setupHmr(
                     set: (o, v) => (o.costs = v),
                     task: this._task,
                     initial: this.initial?.data,
-                    defaultValue: undefined,
+                    defaultValue: 0,
                     resettable: this.initial !== undefined,
                   })}
                   ${pwInputNumber<
@@ -253,7 +253,7 @@ export const PwProjectCreate = setupHmr(
                     set: (o, v) => (o.min_age = v),
                     task: this._task,
                     initial: this.initial?.data,
-                    defaultValue: undefined,
+                    defaultValue: 5,
                     resettable: this.initial !== undefined,
                   })}
                   ${pwInputNumber<
@@ -269,7 +269,7 @@ export const PwProjectCreate = setupHmr(
                     set: (o, v) => (o.max_age = v),
                     task: this._task,
                     initial: this.initial?.data,
-                    defaultValue: undefined,
+                    defaultValue: 13,
                     resettable: this.initial !== undefined,
                   })}
                   ${pwInputNumber<
@@ -285,7 +285,7 @@ export const PwProjectCreate = setupHmr(
                     set: (o, v) => (o.min_participants = v),
                     task: this._task,
                     initial: this.initial?.data,
-                    defaultValue: undefined,
+                    defaultValue: 5,
                     resettable: this.initial !== undefined,
                   })}
                   ${pwInputNumber<
@@ -301,9 +301,13 @@ export const PwProjectCreate = setupHmr(
                     set: (o, v) => (o.max_participants = v),
                     task: this._task,
                     initial: this.initial?.data,
-                    defaultValue: undefined,
+                    defaultValue: 15,
                     resettable: this.initial !== undefined,
                   })}
+                  <div class="form-text mb-3">
+                    Bitte erstellen Sie keine Projekte mit mehr als 15 möglichen
+                    Teilnehmenden.
+                  </div>
                   ${pwInputCheckbox<
                     "/api/v1/projects/create" | "/api/v1/projects/update",
                     boolean | undefined
