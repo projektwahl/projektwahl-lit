@@ -936,7 +936,7 @@ async function resettingUserWorks(helper: Helper) {
   await form.checkField("0,deleted", deleted);
   await form.submitSuccess();
   await helper.driver.wait(until.urlContains("/users/edit/"), 2000);
-  const id = (await helper.driver.getCurrentUrl()).substring(
+  (await helper.driver.getCurrentUrl()).substring(
     "https://localhost:8443/users/edit/".length
   );
   await helper.waitUntilLoaded();
@@ -956,9 +956,7 @@ async function resettingUserWorks(helper: Helper) {
       await helper.driver.findElements(
         By.css('button[class="btn btn-outline-secondary"]')
       )
-    ).map((elem) => {
-      elem.click();
-    })
+    ).map((elem) => elem.click())
   );
 
   // check what resetting worked
