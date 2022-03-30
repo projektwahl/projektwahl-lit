@@ -190,7 +190,7 @@ export abstract class PwInput<
   override connectedCallback() {
     super.connectedCallback();
     this.addEventListener(
-      this.type === "select" ? "change" : "input",
+      this.type === "select" || this.type === "checkbox" ? "change" : "input",
       this.mypwinputchangeDispatcher
     );
     let curr: HTMLElement | null = this.parentElement;
@@ -207,7 +207,7 @@ export abstract class PwInput<
   override disconnectedCallback() {
     super.disconnectedCallback();
     this.removeEventListener(
-      this.type === "select" ? "change" : "input",
+      this.type === "select" || this.type === "checkbox" ? "change" : "input",
       this.mypwinputchangeDispatcher
     );
   }
@@ -283,7 +283,7 @@ export abstract class PwInput<
               ? live(this.inputValue ?? "")
               : undefined
           )}
-          ?checked=${ifDefined(
+          .checked=${ifDefined(
             this.type === "checkbox" ? live(this.inputValue) : undefined
           )}
           class="${
@@ -345,7 +345,7 @@ export abstract class PwInput<
       this.resettable && !this.disabled
         ? html`<button
             @click=${() => {
-              console.log("reset");
+              console.log("reset", this.get(this.initial));
               this.inputValue =
                 this.initial !== undefined
                   ? this.get(this.initial)
