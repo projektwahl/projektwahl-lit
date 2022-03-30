@@ -977,9 +977,6 @@ async function resettingUserWorks(helper: Helper) {
 // TODO better would be some kind of queing system where a ready browser takes the next task
 
 await runTestAllBrowsers(async (helper) => {
-  await resettingUserWorks(helper);
-  await helper.driver.manage().deleteAllCookies();
-
   await checkUsersFilteringWorks(helper);
   await helper.driver.manage().deleteAllCookies();
 
@@ -996,6 +993,9 @@ await runTestAllBrowsers(async (helper) => {
   await helper.driver.manage().deleteAllCookies();
 
   await createUserAllFields(helper);
+  await helper.driver.manage().deleteAllCookies();
+
+  await resettingUserWorks(helper);
   await helper.driver.manage().deleteAllCookies();
 
   await loginEmptyUsernameAndPassword(helper);
