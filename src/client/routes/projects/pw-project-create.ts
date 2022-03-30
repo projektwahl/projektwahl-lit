@@ -304,6 +304,10 @@ export const PwProjectCreate = setupHmr(
                     defaultValue: 15,
                     resettable: this.initial !== undefined,
                   })}
+                  <div class="form-text mb-3">
+                    Bitte erstellen Sie keine Projekte mit mehr als 15 möglichen
+                    Teilnehmenden.
+                  </div>
                   ${pwInputCheckbox<
                     "/api/v1/projects/create" | "/api/v1/projects/update",
                     boolean | undefined
