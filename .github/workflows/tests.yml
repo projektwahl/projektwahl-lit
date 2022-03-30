@@ -47,7 +47,7 @@ jobs:
       - run: ./node_modules/@dev.mohe/argon2/build.sh /opt/hostedtoolcache/node/$(node -v | cut -c2-)/x64/include/node
       - run: npm run build
       - run: openssl req -x509 -newkey rsa:2048 -nodes -sha256 -subj '/CN=localhost' -keyout key.pem -out cert.pem
-      - run: psql postgres://projektwahl:projektwahl@localhost/projektwahl < src/server/setup.sql
+      - run: psql --single-transaction postgres://projektwahl:projektwahl@localhost/projektwahl < src/server/setup.sql
       - run: NODE_ENV=development DATABASE_URL=postgres://projektwahl:projektwahl@localhost/projektwahl npm run setup
       - run: |
           NODE_ENV=testing PORT=8443 BASE_URL=https://localhost:8443 DATABASE_URL=postgres://projektwahl:projektwahl@localhost/projektwahl CREDENTIALS_DIRECTORY=$PWD npm run server &

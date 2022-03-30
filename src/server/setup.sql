@@ -21,8 +21,6 @@ SPDX-License-Identifier: AGPL-3.0-or-later
 SPDX-FileCopyrightText: 2021 Moritz Hedtke <Moritz.Hedtke@t-online.de>
 */
 
-BEGIN READ WRITE;
-
 -- if you remove this you get a CVE for free - so don't. (because the triggers can have race conditions then)
 -- https://www.postgresql.org/docs/current/transaction-iso.html
 -- currently done in the setup instructions and not automatically here
@@ -515,5 +513,3 @@ EXECUTE FUNCTION check_users_project_leader_id3();
 
 
 INSERT INTO settings (id, election_running) VALUES (1, false) ON CONFLICT DO NOTHING;
-
-COMMIT;

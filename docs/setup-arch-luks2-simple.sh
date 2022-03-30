@@ -340,8 +340,8 @@ npm run build
 
 
 
-sudo -u projektwahl_staging_admin psql --db projektwahl_staging < src/server/setup.sql
-sudo -u projektwahl_production_admin psql --db projektwahl_production < src/server/setup.sql
+sudo -u projektwahl_staging_admin psql --single-transaction --db projektwahl_staging < src/server/setup.sql
+sudo -u projektwahl_production_admin psql --single-transaction --db projektwahl_production < src/server/setup.sql
 
 
 
