@@ -125,7 +125,7 @@ CREATE TABLE IF NOT EXISTS users_history (
   openid_id VARCHAR(256),
   type user_type NOT NULL,
   project_leader_id INTEGER, -- TODO FIXME maybe m:n as somebody could theoretically be leader in multiple projects?
-  "group" VARCHAR(16),
+  "group" VARCHAR(64),
   age INTEGER,
   away BOOLEAN NOT NULL DEFAULT FALSE,
   password_changed BOOLEAN NOT NULL DEFAULT FALSE,
