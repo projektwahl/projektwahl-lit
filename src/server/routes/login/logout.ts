@@ -31,7 +31,6 @@ export const logoutHandler = requestHandler(
     if (session_id) {
       await sql.begin("READ WRITE", async (tsql) => {
         return await typedSql(tsql, {
-          types: [17],
           columns: {},
         } as const)`DELETE FROM sessions WHERE session_id = ${session_id}`;
       });

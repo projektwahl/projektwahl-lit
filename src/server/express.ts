@@ -99,7 +99,6 @@ export function requestHandler<P extends keyof typeof routes>(
             await retryableBegin("READ WRITE", async (sql) => {
               //await typedSql(sql, {})`DELETE FROM sessions WHERE CURRENT_TIMESTAMP >= updated_at + interval '24 hours' AND session_id != ${session_id} `
               return await typedSql(sql, {
-                types: [17],
                 columns: {
                   id: 23,
                   type: null, // custom enum

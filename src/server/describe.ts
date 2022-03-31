@@ -85,7 +85,7 @@ export function typedSql<
 }
 
 // https://github.com/porsager/postgres/blob/rewrite/src/types.js
-type DescriptionTypes<T> = {
+export type DescriptionTypes<T> = {
   -readonly [K in keyof T]: T[K] extends 23 | 701
     ? number
     : T[K] extends 1043

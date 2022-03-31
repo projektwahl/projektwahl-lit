@@ -66,7 +66,6 @@ export const openidRedirectHandler = requestHandler(
 
       const dbUser = (
         await typedSql(sql, {
-          types: [25],
           columns: {
             id: 23,
             username: 1043,
@@ -114,7 +113,6 @@ export const openidRedirectHandler = requestHandler(
 
       await sql.begin("READ WRITE", async (tsql) => {
         return await typedSql(tsql, {
-          types: [23, 17],
           columns: {},
         } as const)`INSERT INTO sessions (user_id, session_id) VALUES (${dbUser.id}, ${session_id})`;
       });
