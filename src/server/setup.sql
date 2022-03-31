@@ -428,11 +428,11 @@ BEGIN
     RAISE EXCEPTION 'Nur Lehrer und Admins dürfen dies ändern!';
   END IF;
   IF (NEW.force_in_project_id IS NULL) THEN
-    IF (SELECT COUNT(*) FROM users_with_deleted AS voter INNER JOIN users_with_deleted AS helper ON voter.id = OLD.id AND voter.type = 'voter' AND voter.force_in_project_id IS NOT NULL AND helper.id = NEW.last_updated_by AND helper.type = 'helper' AND helper.force_in_project_id = voter.force_in_project_id) != 1 THEN
+    IF (SELECT COUNT(*) FROM users_with_deleted AS voter INNER JOIN users_with_deleted AS helper ON voter.id = OLD.id AND voter.type = 'voter' AND voter.force_in_project_id IS NOT NULL AND helper.id = NEW.last_updated_by AND helper.type = 'helper' AND helper.project_leader_id = voter.force_in_project_id) != 1 THEN
       RAISE EXCEPTION 'Sie dürfen nur aus Ihrem eigenen Projekt Mitglieder entfernen!';
     END IF;
   ELSE
-    IF (SELECT COUNT(*) FROM users_with_deleted AS voter INNER JOIN users_with_deleted AS helper ON voter.id = OLD.id AND voter.type = 'voter' AND voter.force_in_project_id IS NULL AND helper.id = NEW.last_updated_by AND helper.type = 'helper' AND helper.force_in_project_id = NEW.force_in_project_id) != 1 THEN
+    IF (SELECT COUNT(*) FROM users_with_deleted AS voter INNER JOIN users_with_deleted AS helper ON voter.id = OLD.id AND voter.type = 'voter' AND voter.force_in_project_id IS NULL AND helper.id = NEW.last_updated_by AND helper.type = 'helper' AND helper.project_leader_id = NEW.force_in_project_id) != 1 THEN
       RAISE EXCEPTION 'Sie dürfen nur in Ihr eigenes Projekt Mitglieder hinzufügen!';
     END IF;
   END IF;
