@@ -21,10 +21,9 @@ SPDX-License-Identifier: AGPL-3.0-or-later
 SPDX-FileCopyrightText: 2021 Moritz Hedtke <Moritz.Hedtke@t-online.de>
 */
 import "../../form/pw-input.js";
-import { Task, TaskStatus } from "@lit-labs/task";
+import { Task } from "@lit-labs/task";
 import { html } from "lit";
-import { myFetch, sleep } from "../../utils.js";
-import { createRef, ref } from "lit/directives/ref.js";
+import { myFetch } from "../../utils.js";
 import { msg } from "@lit/localize";
 import { bootstrapCss } from "../../index.js";
 import type { routes, ResponseType } from "../../../lib/routes.js";

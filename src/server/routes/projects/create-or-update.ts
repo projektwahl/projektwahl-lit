@@ -264,10 +264,7 @@ export function createOrUpdateProjectsHandler<
           return returnValue;
         } else {
           // TODO FIXME do this everywhere else / unify
-          const returnValue: [
-            OutgoingHttpHeaders,
-            ResponseType<"/api/v1/users/create-or-update">
-          ] = [
+          const returnValue: [OutgoingHttpHeaders, ResponseType<P>] = [
             {
               "content-type": "text/json; charset=utf-8",
               ":status": 200,
