@@ -277,9 +277,7 @@ export abstract class PwInput<
           type=${ifDefined(this.type !== "textarea" ? this.type : undefined)}
           name=${this.name}
           .value=${ifDefined(
-            this.type !== "checkbox" &&
-              this.type !== "textarea" &&
-              this.type !== "select"
+            this.type !== "checkbox" && this.type !== "select"
               ? live(this.inputValue ?? "")
               : undefined
           )}
@@ -324,8 +322,6 @@ export abstract class PwInput<
                     ${o.text}
                   </option>`
               )
-            : this.type === "textarea"
-            ? this.inputValue
             : undefined
         }</${
       this.type === "select"
