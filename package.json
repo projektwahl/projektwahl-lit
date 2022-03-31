@@ -25,7 +25,7 @@
     "lint:fix": "docker build -t getting-started . && docker run --mount type=bind,source=\"$(pwd)\"/tests,target=/opt/projektwahl-lit/tests --mount type=bind,source=\"$(pwd)\"/src,target=/opt/projektwahl-lit/src -it getting-started npm run lint:fix",
     "evaluate": "node --experimental-loader ./src/loader.js --enable-source-maps ./src/server/routes/evaluate/index.ts",
     "setup": "node --experimental-loader ./src/loader.js --enable-source-maps ./src/server/setup.ts",
-    "server": "node --experimental-loader ./src/loader.js --enable-source-maps --experimental-import-meta-resolve ./src/server/index.ts",
+    "server": "node  --conditions=development --experimental-loader ./src/loader.js --enable-source-maps --experimental-import-meta-resolve ./src/server/index.ts",
     "localize-extract": "mkdir -p src/client/generated && docker build -t getting-started . && docker run --mount type=bind,source=\"$(pwd)\"/xliff,target=/opt/projektwahl-lit/xliff -it getting-started npm run localize-extract",
     "localize-build": "mkdir -p src/client/generated && docker build -t getting-started . && docker run --mount type=bind,source=\"$(pwd)\"/src/client/generated,target=/opt/projektwahl-lit/src/client/generated -it getting-started npm run localize-build",
     "typecheck": "tsc",
