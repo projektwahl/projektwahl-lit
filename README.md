@@ -96,6 +96,8 @@ NODE_ENV=testing PORT=8443 BASE_URL=https://localhost:8443 CREDENTIALS_DIRECTORY
 
 ```
 psql --username=projektwahl --host=projektwahl
+
+# sudo tail -f /var/lib/postgresql/14/log/postgresql-2022-03-31_201007.log
 ```
 
 ## Security
