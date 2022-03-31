@@ -117,6 +117,8 @@ class PwChoices<X extends string> extends PwEntityList<"/api/v1/choices", X> {
             })}
           </th>
 
+          <th class="table-cell-hover" scope="col">Jahrgang</th>
+
           <th class="table-cell-hover p-0" scope="col">
             ${pwOrder({
               url: "/api/v1/choices",
@@ -165,6 +167,8 @@ class PwChoices<X extends string> extends PwEntityList<"/api/v1/choices", X> {
               resettable: false,
             })}
           </th>
+
+          <th scope="col"></th>
 
           <th scope="col">
             ${pwInputNumber<"/api/v1/choices", number | undefined | null>({
@@ -236,6 +240,7 @@ class PwChoices<X extends string> extends PwEntityList<"/api/v1/choices", X> {
                           >`}
                     </p>
                   </td>
+                  <td>${value.min_age} - ${value.max_age}</td>
                   <td>
                     <pw-rank-select .choice=${value}></pw-rank-select>
                   </td>
