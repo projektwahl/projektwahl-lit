@@ -130,9 +130,9 @@ export const openidRedirectHandler = requestHandler(
           `lax_id=${session_id_unhashed}; Secure; SameSite=Lax; Path=/; HttpOnly; Max-Age=${
             48 * 60 * 60
           };`,
-          `username=${
+          `username=${encodeURIComponent(
             dbUser.username
-          }; Secure; SameSite=Strict; Path=/; Max-Age=${48 * 60 * 60};`,
+          )}; Secure; SameSite=Strict; Path=/; Max-Age=${48 * 60 * 60};`,
           `type=${dbUser.type}; Secure; Path=/; SameSite=Lax; Max-Age=${
             48 * 60 * 60
           };`,

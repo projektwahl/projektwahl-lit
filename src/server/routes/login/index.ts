@@ -160,9 +160,9 @@ export const loginHandler = requestHandler(
         `lax_id=${session_id_unhashed}; Secure; Path=/; SameSite=Lax; HttpOnly; Max-Age=${
           48 * 60 * 60
         };`,
-        `username=${dbUser.username}; Secure; Path=/; SameSite=Lax; Max-Age=${
-          48 * 60 * 60
-        };`,
+        `username=${encodeURIComponent(
+          dbUser.username
+        )}; Secure; Path=/; SameSite=Lax; Max-Age=${48 * 60 * 60};`,
         `type=${dbUser.type}; Secure; Path=/; SameSite=Lax; Max-Age=${
           48 * 60 * 60
         };`,
