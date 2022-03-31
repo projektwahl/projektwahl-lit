@@ -262,6 +262,30 @@ export function createOrUpdateProjectsHandler<
             },
           ];
           return returnValue;
+        } else {
+          // TODO FIXME do this everywhere else / unify
+          const returnValue: [
+            OutgoingHttpHeaders,
+            ResponseType<"/api/v1/users/create-or-update">
+          ] = [
+            {
+              "content-type": "text/json; charset=utf-8",
+              ":status": 200,
+            },
+            {
+              success: false as const,
+              error: {
+                issues: [
+                  {
+                    code: ZodIssueCode.custom,
+                    path: [error.column_name ?? "database"],
+                    message: `${error.message}`,
+                  },
+                ],
+              },
+            },
+          ];
+          return returnValue;
         }
       }
       console.error(error);

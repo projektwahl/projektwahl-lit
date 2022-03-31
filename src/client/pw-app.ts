@@ -243,6 +243,7 @@ export class PwApp extends PwElement {
           return msg(html`Not Found`);
         }
       } catch (error) {
+        console.error(error);
         return html`<div class="alert alert-danger" role="alert">
           ${msg(str`Error: ${error}`)}
         </div>`;
