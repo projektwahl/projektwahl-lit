@@ -1017,9 +1017,9 @@ async function resettingProjectWorks(helper: Helper) {
   form = await helper.form("pw-project-create");
 
   // clear all fields (TODO set to random values (also empty))
-  await form.setField("title", "");
-  await form.setTextareaField("info", "");
-  await form.setField("place", "");
+  await form.resetField("title", "");
+  await form.resetTextareaField("info", "");
+  await form.resetField("place", "");
   await form.resetField("costs", ``);
   await form.resetField("min_age", ``);
   await form.resetField("max_age", ``);
