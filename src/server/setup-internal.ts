@@ -94,9 +94,12 @@ export async function setup() {
         const user = (
           await typedSql(sql, {
             columns: { id: 23 },
-          } as const)`INSERT INTO users (username, type, "group", age, last_updated_by) VALUES (${chance.name()}, 'voter', ${chance.profession()}, ${chance.integer(
-            { min: 5, max: 13 }
-          )}, ${admin.id}) ON CONFLICT DO NOTHING RETURNING users.id;`
+          } as const)`INSERT INTO users (username, type, "group", age, last_updated_by) VALUES (${chance.name(
+            { middle: true }
+          )}, 'voter', ${chance.profession()}, ${chance.integer({
+            min: 5,
+            max: 13,
+          })}, ${admin.id}) RETURNING users.id;`
         )[0];
 
         chance.shuffle(projects);
@@ -107,7 +110,7 @@ export async function setup() {
                 columns: {},
               } as const)`INSERT INTO choices (user_id, project_id, rank) VALUES (${
                 user.id
-              }, ${projects[j]["id"]}, ${j + 1}) ON CONFLICT DO NOTHING;`;
+              }, ${projects[j]["id"]}, ${j + 1});`;
             });
           } catch (error) {
             console.error("jo", error);

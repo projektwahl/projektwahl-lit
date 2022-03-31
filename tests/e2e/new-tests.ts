@@ -857,14 +857,14 @@ async function checkUsersPaginationLimitWorks(helper: Helper) {
 
     console.log("end");
 
-    assert.equal(entityType === "users" ? 501 : 100, rows.length);
-
     console.log(rows.sort((a, b) => a - b));
 
     assert.deepEqual(
       Array.from({ length: rows.length }, (_, i) => i + 1),
       rows
     );
+
+    assert.equal(entityType === "users" ? 501 : 100, rows.length);
   }
 }
 
