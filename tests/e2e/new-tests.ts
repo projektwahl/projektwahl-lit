@@ -1054,9 +1054,107 @@ async function resettingProjectWorks(helper: Helper) {
   assert.equal((await form.getCheckboxField("deleted")) === "true", deleted);
 }
 
+async function resettingProjectWorks2(helper: Helper) {
+  for (const doRefresh of [true, false]) {
+    await loginCorrect(helper);
+
+    await helper.openNavbar();
+    await helper.click(
+      await helper.driver.findElement(By.css(`a[href="/projects"]`))
+    );
+
+    await helper.form("pw-projects");
+    await helper.click(
+      await helper.driver.findElement(By.css(`a[href="/projects/create"]`))
+    );
+    let form = await helper.form("pw-project-create");
+    const title = `title${Math.random()}`;
+    const info = `info${Math.random()}`;
+    const place = `place${Math.random()}`;
+    const costs = Math.floor(Math.random() * 10);
+    const min_age = Math.floor(Math.random() * 10);
+    const max_age = Math.floor(Math.random() * 10);
+    const min_participants = Math.floor(Math.random() * 10) + 1;
+    const max_participants = Math.floor(Math.random() * 10) + 1;
+    const random_assignments = Math.random() > 0.5 ? true : false;
+    const deleted = Math.random() > 0.5 ? true : false;
+    await form.setField("title", title);
+    await form.setTextareaField("info", info);
+    await form.setField("place", place);
+    await form.resetField("costs", `${costs}`);
+    await form.resetField("min_age", `${min_age}`);
+    await form.resetField("max_age", `${max_age}`);
+    await form.resetField("min_participants", `${min_participants}`);
+    await form.resetField("max_participants", `${max_participants}`);
+    await form.checkField("random_assignments", random_assignments);
+    await form.checkField("deleted", deleted);
+    await form.submitSuccess();
+    await helper.driver.wait(until.urlContains("/projects/edit/"), 2000);
+    (await helper.driver.getCurrentUrl()).substring(
+      "https://localhost:8443/projects/edit/".length
+    );
+    await helper.waitUntilLoaded();
+    form = await helper.form("pw-project-create");
+
+    // clear all fields (TODO set to random values (also empty))
+    await form.resetField("title", "");
+    await form.resetTextareaField("info", "");
+    await form.resetField("place", "");
+    await form.resetField("costs", ``);
+    await form.resetField("min_age", ``);
+    await form.resetField("max_age", ``);
+    await form.resetField("min_participants", ``);
+    await form.resetField("max_participants", ``);
+    await form.checkField("random_assignments", false);
+    await form.checkField("deleted", false);
+
+    // added
+    await form.submitSuccess();
+
+    if (doRefresh) {
+      await helper.driver.navigate().refresh();
+      form = await helper.form("pw-project-create");
+    }
+
+    // TODO click all reset buttons
+    await Promise.all(
+      (
+        await helper.driver.findElements(
+          By.css('button[class="btn btn-outline-secondary"]')
+        )
+      ).map((elem) => helper.click(elem))
+    );
+
+    // check what resetting worked
+    form = await helper.form("pw-project-create");
+    assert.equal(await form.getField("title"), "");
+    assert.equal(await form.getField("info"), "");
+    assert.equal(await form.getField("place"), "");
+    // defaults
+    assert.equal(await form.getField("costs"), "0");
+    assert.equal(await form.getField("min_age"), "5");
+    assert.equal(await form.getField("max_age"), "13");
+    assert.equal(await form.getField("min_participants"), "5");
+    assert.equal(await form.getField("max_participants"), "15");
+    assert.equal(
+      (await form.getCheckboxField("random_assignments")) === "true",
+      false
+    );
+    assert.equal((await form.getCheckboxField("deleted")) === "true", false);
+  }
+}
+
 // TODO better would be some kind of queing system where a ready browser takes the next task
 
 await runTestAllBrowsers(async (helper) => {
+  await resettingProjectWorks2(helper);
+  await helper.driver.manage().deleteAllCookies();
+
+  return;
+
+  await resettingProjectWorks(helper);
+  await helper.driver.manage().deleteAllCookies();
+
   await checkUsersFilteringWorks(helper);
   await helper.driver.manage().deleteAllCookies();
 
@@ -1073,9 +1171,6 @@ await runTestAllBrowsers(async (helper) => {
   await helper.driver.manage().deleteAllCookies();
 
   await createUserAllFields(helper);
-  await helper.driver.manage().deleteAllCookies();
-
-  await resettingProjectWorks(helper);
   await helper.driver.manage().deleteAllCookies();
 
   await resettingUserWorks(helper);
