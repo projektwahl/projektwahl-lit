@@ -36,7 +36,6 @@ export const loginHandler = requestHandler(
   "/api/v1/login",
   async function (body) {
     const r = await typedSql(sql, {
-      types: [25],
       columns: {
         id: 23,
         username: 1043,
@@ -126,7 +125,6 @@ export const loginHandler = requestHandler(
     if (needsRehash) {
       await sql.begin("READ WRITE", async (tsql) => {
         return await typedSql(tsql, {
-          types: [1043, 23],
           columns: {},
         } as const)`UPDATE users SET password_hash = ${newHash} WHERE id = ${dbUser.id}`;
       });
@@ -144,7 +142,6 @@ export const loginHandler = requestHandler(
 
     await sql.begin("READ WRITE", async (tsql) => {
       return await typedSql(tsql, {
-        types: [23, 17],
         columns: {},
       } as const)`INSERT INTO sessions (user_id, session_id) VALUES (${dbUser.id}, ${session_id})`;
     });
@@ -160,9 +157,9 @@ export const loginHandler = requestHandler(
         `lax_id=${session_id_unhashed}; Secure; Path=/; SameSite=Lax; HttpOnly; Max-Age=${
           48 * 60 * 60
         };`,
-        `username=${dbUser.username}; Secure; Path=/; SameSite=Lax; Max-Age=${
-          48 * 60 * 60
-        };`,
+        `username=${encodeURIComponent(
+          dbUser.username
+        )}; Secure; Path=/; SameSite=Lax; Max-Age=${48 * 60 * 60};`,
         `type=${dbUser.type}; Secure; Path=/; SameSite=Lax; Max-Age=${
           48 * 60 * 60
         };`,

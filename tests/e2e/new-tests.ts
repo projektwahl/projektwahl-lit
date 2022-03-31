@@ -822,7 +822,7 @@ async function checkUsersPaginationLimitWorks(helper: Helper) {
 
     await (
       await helper.driver.findElement(
-        By.css('select[name="paginationLimit"] option[value="100"]')
+        By.css('select[name="paginationLimit"] option[value="50"]')
       )
     ).click();
 
@@ -838,7 +838,7 @@ async function checkUsersPaginationLimitWorks(helper: Helper) {
         thisRows.map((r) => r.getText().then((v) => Number(v)))
       );
 
-      assert.ok(thisRowsText.length <= 100);
+      assert.ok(thisRowsText.length <= 50);
 
       console.log(thisRowsText);
 
@@ -857,14 +857,14 @@ async function checkUsersPaginationLimitWorks(helper: Helper) {
 
     console.log("end");
 
-    assert.equal(entityType === "users" ? 501 : 100, rows.length);
-
     console.log(rows.sort((a, b) => a - b));
 
     assert.deepEqual(
       Array.from({ length: rows.length }, (_, i) => i + 1),
       rows
     );
+
+    assert.equal(entityType === "users" ? 501 : 100, rows.length);
   }
 }
 

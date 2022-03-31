@@ -21,17 +21,11 @@ SPDX-License-Identifier: AGPL-3.0-or-later
 SPDX-FileCopyrightText: 2021 Moritz Hedtke <Moritz.Hedtke@t-online.de>
 */
 import { sql } from "./database.js";
-import { typedSql } from "./describe.js";
+import { DescriptionTypes, typedSql } from "./describe.js";
 import { hashPassword } from "./password.js";
+import { Chance } from "chance";
 
-const shuffleArray = <T>(array: T[]) => {
-  for (let i = array.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    const temp = array[i];
-    array[i] = array[j];
-    array[j] = temp;
-  }
-};
+const chance = new Chance(1234);
 
 export async function setup() {
   await sql.begin("READ WRITE", async (sql) => {
@@ -39,7 +33,6 @@ export async function setup() {
 
     const admin = (
       await typedSql(sql, {
-        types: [1043],
         columns: { id: 23 },
       } as const)`INSERT INTO users_with_deleted (username, password_hash, type) VALUES ('admin', ${hash}, 'admin') ON CONFLICT (username) DO UPDATE SET "group" = "users_with_deleted"."group" RETURNING id;`
     )[0];
@@ -48,43 +41,80 @@ export async function setup() {
       process.env.NODE_ENV === "development" ||
       process.env.NODE_ENV === "testing"
     ) {
-      const projects = await typedSql(sql, {
-        types: [23],
-        columns: {
-          id: 23,
-          title: 1043,
-          info: 1043,
-          place: 1043,
-          costs: 701,
-          min_age: 23,
-          max_age: 23,
-          min_participants: 23,
-          max_participants: 23,
-          random_assignments: 16,
-          deleted: 16,
-          last_updated_by: 23,
-        },
-      } as const)`INSERT INTO projects (title, info, place, costs, min_age, max_age, min_participants, max_participants, random_assignments, last_updated_by) (SELECT generate_series, '', '', 0, 5, 13, 5, 20, FALSE, ${admin.id} FROM generate_series(1, 100)) RETURNING *;`;
+      const projects: DescriptionTypes<{
+        readonly id: 23;
+        readonly title: 1043;
+        readonly info: 1043;
+        readonly place: 1043;
+        readonly costs: 701;
+        readonly min_age: 23;
+        readonly max_age: 23;
+        readonly min_participants: 23;
+        readonly max_participants: 23;
+        readonly random_assignments: 16;
+        readonly deleted: 16;
+        readonly last_updated_by: 23;
+      }>[] = [];
+      for (let i = 0; i < 100; i++) {
+        const project = (
+          await typedSql(sql, {
+            columns: {
+              id: 23,
+              title: 1043,
+              info: 1043,
+              place: 1043,
+              costs: 701,
+              min_age: 23,
+              max_age: 23,
+              min_participants: 23,
+              max_participants: 23,
+              random_assignments: 16,
+              deleted: 16,
+              last_updated_by: 23,
+            },
+          } as const)`INSERT INTO projects (title, info, place, costs, min_age, max_age, min_participants, max_participants, random_assignments, last_updated_by) (SELECT ${chance.sentence(
+            { punctuation: false, words: 3 }
+          )}, ${chance.paragraph()}, ${chance.address()}, ${chance.integer({
+            min: 0,
+            max: 10,
+          })}, ${chance.integer({ min: 5, max: 9 })}, ${chance.integer({
+            min: 9,
+            max: 13,
+          })}, ${chance.integer({ min: 5, max: 10 })}, ${chance.integer({
+            min: 10,
+            max: 15,
+          })}, ${chance.bool({ likelihood: 90 })}, ${admin.id}) RETURNING *;`
+        )[0];
+
+        projects.push(project);
+      }
 
       // take care to set this value to project_count * min_participants <= user_count <= project_count * max_participants
       for (let i = 0; i < 500; i++) {
         const user = (
           await typedSql(sql, {
-            types: [1043, 23],
             columns: { id: 23 },
-          } as const)`INSERT INTO users (username, type, "group", age, last_updated_by) VALUES (${`user${Math.random()}`}, 'voter', 'a', 10, ${
-            admin.id
-          }) ON CONFLICT DO NOTHING RETURNING users.id;`
+          } as const)`INSERT INTO users (username, type, "group", age, last_updated_by) VALUES (${chance.name(
+            { middle: true }
+          )}, 'voter', ${chance.profession()}, ${chance.integer({
+            min: 5,
+            max: 13,
+          })}, ${admin.id}) RETURNING users.id;`
         )[0];
 
-        shuffleArray(projects);
-        for (let j = 0; j < 5 + Math.random() * 3 - 1.5; j++) {
-          await typedSql(sql, {
-            types: [23, 23, 23],
-            columns: {},
-          } as const)`INSERT INTO choices (user_id, project_id, rank) VALUES (${
-            user.id
-          }, ${projects[j]["id"]}, ${j + 1});`;
+        chance.shuffle(projects);
+        for (let j = 0; j < chance.integer({ min: 0, max: 7 }); j++) {
+          try {
+            await sql.savepoint("test", async (ssql) => {
+              await typedSql(ssql, {
+                columns: {},
+              } as const)`INSERT INTO choices (user_id, project_id, rank) VALUES (${
+                user.id
+              }, ${projects[j]["id"]}, ${j + 1});`;
+            });
+          } catch (error) {
+            console.error("jo", error);
+          }
         }
       }
     }

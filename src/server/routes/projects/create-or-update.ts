@@ -36,7 +36,6 @@ export const createProjectsHandler = createOrUpdateProjectsHandler(
     loggedInUser: Exclude<z.infer<typeof userSchema>, undefined>
   ) => {
     const res = await typedSql(sql, {
-      types: [1043, 1043, 1043, 701, 23, 23, 23, 23, 16, 16, 23, 23],
       columns: { id: 23 },
     } as const)`INSERT INTO projects_with_deleted (title, info, place, costs, min_age, max_age, min_participants, max_participants, random_assignments, deleted, last_updated_by)
             (SELECT 
@@ -58,7 +57,6 @@ export const createProjectsHandler = createOrUpdateProjectsHandler(
     // TODO FIXME make this in sql directly
     if (loggedInUser.type === "helper") {
       await typedSql(sql, {
-        types: [23, 23],
         columns: {},
       } as const)`UPDATE users_with_deleted SET project_leader_id = ${res[0].id} WHERE project_leader_id IS NULL AND id = ${loggedInUser.id}`;
     }
@@ -75,10 +73,6 @@ export const updateProjectsHandler = createOrUpdateProjectsHandler(
     loggedInUser: Exclude<z.infer<typeof userSchema>, undefined>
   ) => {
     const finalQuery = typedSql(sql, {
-      types: [
-        16, 1043, 16, 1043, 16, 1043, 16, 701, 16, 23, 16, 23, 16, 23, 16, 23,
-        16, 16, 16, 16, 23, 23, 23, 23,
-      ],
       columns: { id: 23 },
     } as const)`UPDATE projects_with_deleted SET
     "title" = CASE WHEN ${project.title !== undefined} THEN ${
@@ -256,6 +250,27 @@ export function createOrUpdateProjectsHandler<
                     code: ZodIssueCode.custom,
                     path: ["username"],
                     message: "Nutzer mit diesem Namen existiert bereits!",
+                  },
+                ],
+              },
+            },
+          ];
+          return returnValue;
+        } else {
+          // TODO FIXME do this everywhere else / unify
+          const returnValue: [OutgoingHttpHeaders, ResponseType<P>] = [
+            {
+              "content-type": "text/json; charset=utf-8",
+              ":status": 200,
+            },
+            {
+              success: false as const,
+              error: {
+                issues: [
+                  {
+                    code: ZodIssueCode.custom,
+                    path: [error.column_name ?? "database"],
+                    message: `${error.message}`,
                   },
                 ],
               },

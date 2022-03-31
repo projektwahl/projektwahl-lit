@@ -38,9 +38,18 @@ import {
 import { pwInputCheckbox } from "../../form/pw-input-checkbox.js";
 import { pwInputNumber } from "../../form/pw-input-number.js";
 import { pwInputText } from "../../form/pw-input-text.js";
+import type { entityRoutes } from "../../../lib/routes.js";
+import type { z } from "zod";
+
+const defaultValue: z.infer<typeof entityRoutes["/api/v1/users"]["request"]> = {
+  sorting: [],
+  filters: {},
+  paginationDirection: "forwards",
+  paginationLimit: 100,
+};
 
 export const pwProjectUsers = async (url: URL, prefix: string) => {
-  const result = await taskFunction("/api/v1/users", url, prefix);
+  const result = await taskFunction("/api/v1/users", url, prefix, defaultValue);
   return html`<pw-project-users
     .initial=${result}
     prefix=${prefix}
@@ -58,6 +67,12 @@ export const PwProjectUsers = setupHmr(
       };
     }
 
+    constructor() {
+      super();
+
+      this.defaultValue = defaultValue;
+    }
+
     name!: "project_leader_id" | "force_in_project_id";
 
     projectId!: number;
@@ -71,7 +86,8 @@ export const PwProjectUsers = setupHmr(
         const data = parseRequestWithPrefix(
           this.url,
           this.prefix,
-          this.history.url
+          this.history.url,
+          defaultValue
         );
 
         const initial = data[this.prefix];

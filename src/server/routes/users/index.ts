@@ -109,8 +109,9 @@ export const usersHandler = requestHandler(
           })`;
         },
         {
-          id: (q, o) =>
-            sql`id ${sql.unsafe(
+          id: (q, o) => {
+            //console.log(`JOJOJOJ ${q} ${o}`);
+            return sql`id ${sql.unsafe(
               o === "backwards"
                 ? q === "ASC"
                   ? "DESC"
@@ -118,7 +119,8 @@ export const usersHandler = requestHandler(
                 : q === "ASC"
                 ? "ASC"
                 : "DESC"
-            )}`,
+            )}`;
+          },
           type: (q, o) =>
             sql`type ${sql.unsafe(
               o === "backwards"

@@ -21,10 +21,9 @@ SPDX-License-Identifier: AGPL-3.0-or-later
 SPDX-FileCopyrightText: 2021 Moritz Hedtke <Moritz.Hedtke@t-online.de>
 */
 import "../../form/pw-input.js";
-import { Task, TaskStatus } from "@lit-labs/task";
+import { Task } from "@lit-labs/task";
 import { html } from "lit";
 import { myFetch } from "../../utils.js";
-import { createRef, ref } from "lit/directives/ref.js";
 import { msg } from "@lit/localize";
 import { bootstrapCss } from "../../index.js";
 import type { routes, ResponseType } from "../../../lib/routes.js";
@@ -52,16 +51,18 @@ class PwRankSelect extends PwElement {
     typeof routes["/api/v1/choices"]["response"]
   >["entities"][number];
 
-  form: import("lit/directives/ref").Ref<HTMLFormElement>;
+  disabled: boolean;
 
   constructor() {
     super();
 
-    this.form = createRef();
+    this.disabled = false;
 
     this._task = new Task<[number], ResponseType<"/api/v1/choices/update">>(
       this,
       async (args: [number]) => {
+        this.disabled = true;
+
         const result = await myFetch<"/api/v1/choices/update">(
           "POST",
           "/api/v1/choices/update",
@@ -72,7 +73,7 @@ class PwRankSelect extends PwElement {
           {}
         );
 
-        this.form.value?.dispatchEvent(
+        this.dispatchEvent(
           new CustomEvent("refreshentitylist", {
             bubbles: true,
             composed: true,
@@ -84,9 +85,15 @@ class PwRankSelect extends PwElement {
     );
   }
 
+  protected willUpdate(changedProperties: Map<PropertyKey, unknown>): void {
+    if (changedProperties.has("choice")) {
+      this.disabled = false;
+    }
+  }
+
   render() {
     return html` ${bootstrapCss}
-      <form ${ref(this.form)}>
+      <form>
         ${this._task.render({
           complete: (data) => {
             if (!data.success) {
@@ -110,9 +117,9 @@ class PwRankSelect extends PwElement {
             @click=${async () => {
               await this._task.run([1]);
             }}
-            ?disabled=${this._task.status === TaskStatus.PENDING}
+            ?disabled=${this.disabled}
             type="button"
-            class="btn ${this._task.status === TaskStatus.PENDING
+            class="btn ${this.disabled
               ? "btn-secondary"
               : this.choice.rank == 1
               ? "btn-primary"
@@ -124,9 +131,9 @@ class PwRankSelect extends PwElement {
             @click=${async () => {
               await this._task.run([2]);
             }}
-            ?disabled=${this._task.status === TaskStatus.PENDING}
+            ?disabled=${this.disabled}
             type="button"
-            class="btn ${this._task.status === TaskStatus.PENDING
+            class="btn ${this.disabled
               ? "btn-secondary"
               : this.choice.rank == 2
               ? "btn-primary"
@@ -138,9 +145,9 @@ class PwRankSelect extends PwElement {
             @click=${async () => {
               await this._task.run([3]);
             }}
-            ?disabled=${this._task.status === TaskStatus.PENDING}
+            ?disabled=${this.disabled}
             type="button"
-            class="btn ${this._task.status === TaskStatus.PENDING
+            class="btn ${this.disabled
               ? "btn-secondary"
               : this.choice.rank == 3
               ? "btn-primary"
@@ -152,9 +159,9 @@ class PwRankSelect extends PwElement {
             @click=${async () => {
               await this._task.run([4]);
             }}
-            ?disabled=${this._task.status === TaskStatus.PENDING}
+            ?disabled=${this.disabled}
             type="button"
-            class="btn ${this._task.status === TaskStatus.PENDING
+            class="btn ${this.disabled
               ? "btn-secondary"
               : this.choice.rank == 4
               ? "btn-primary"
@@ -166,9 +173,9 @@ class PwRankSelect extends PwElement {
             @click=${async () => {
               await this._task.run([5]);
             }}
-            ?disabled=${this._task.status === TaskStatus.PENDING}
+            ?disabled=${this.disabled}
             type="button"
-            class="btn ${this._task.status === TaskStatus.PENDING
+            class="btn ${this.disabled
               ? "btn-secondary"
               : this.choice.rank == 5
               ? "btn-primary"
@@ -180,9 +187,9 @@ class PwRankSelect extends PwElement {
             @click=${async () => {
               await this._task.run([0]);
             }}
-            ?disabled=${this._task.status === TaskStatus.PENDING}
+            ?disabled=${this.disabled}
             type="button"
-            class="btn ${this._task.status === TaskStatus.PENDING
+            class="btn ${this.disabled
               ? "btn-secondary"
               : this.choice.rank == null
               ? "btn-primary"

@@ -20,7 +20,7 @@ https://github.com/projektwahl/projektwahl-lit
 SPDX-License-Identifier: AGPL-3.0-or-later
 SPDX-FileCopyrightText: 2021 Moritz Hedtke <Moritz.Hedtke@t-online.de>
 */
-import type postgres from "postgres";
+import postgres from "postgres";
 import { sql } from "../../database.js";
 import { requestHandler } from "../../express.js";
 import type { OutgoingHttpHeaders } from "node:http";
@@ -34,12 +34,10 @@ export const updateChoiceHandler = createOrUpdateChoiceHandler(
     // Only allow updating your own choices. Later we could allow the admin to update somebody else's choices.
     if (choice.rank === null) {
       return await typedSql(sql, {
-        types: [23, 23],
         columns: {},
       } as const)`DELETE FROM choices WHERE user_id = ${loggedInUser.id} AND project_id = ${choice.project_id}`;
     } else {
       return await typedSql(sql, {
-        types: [23, 23, 23, 23],
         columns: {},
       } as const)`INSERT INTO choices (user_id, project_id, rank) VALUES (${loggedInUser.id}, ${choice.project_id}, ${choice.rank}) ON CONFLICT (user_id, project_id) DO UPDATE SET rank = ${choice.rank};`;
     }
@@ -122,6 +120,31 @@ export function createOrUpdateChoiceHandler<P extends "/api/v1/choices/update">(
       ];
     } catch (error: unknown) {
       console.error(error);
+      if (error instanceof postgres.PostgresError) {
+        // TODO FIXME do this everywhere else / unify
+        const returnValue: [
+          OutgoingHttpHeaders,
+          ResponseType<"/api/v1/users/create-or-update">
+        ] = [
+          {
+            "content-type": "text/json; charset=utf-8",
+            ":status": 200,
+          },
+          {
+            success: false as const,
+            error: {
+              issues: [
+                {
+                  code: ZodIssueCode.custom,
+                  path: [error.column_name ?? "database"],
+                  message: `${error.message}`,
+                },
+              ],
+            },
+          },
+        ];
+        return returnValue;
+      }
       const returnValue: [OutgoingHttpHeaders, ResponseType<P>] = [
         {
           "content-type": "text/json; charset=utf-8",

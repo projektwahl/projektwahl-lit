@@ -31,7 +31,7 @@ type NullableObject<Type> = {
 export function typedSql<
   Q extends readonly (number | null)[],
   R extends { [column: string]: number | null }
->(sql: Sql<Record<string, never>>, description: { types: Q; columns: R }) {
+>(sql: Sql<Record<string, never>>, description: { /*types: Q;*/ columns: R }) {
   return async function test(
     template: TemplateStringsArray,
     ...args: NullableObject<DescriptionTypes<Q>>
@@ -58,11 +58,11 @@ export function typedSql<
         columns: computed_column_types,
       };
 
-      for (let i = 0; i < description.types.length; i++) {
+      /*for (let i = 0; i < description.types.length; i++) {
         if (description.types[i] === null) {
           computed_description.types[i] = null;
         }
-      }
+      }*/
 
       for (const [key, value] of Object.entries(description.columns)) {
         if (value === null) {
@@ -72,7 +72,8 @@ export function typedSql<
 
       // console.log(computed_description);
 
-      deepStrictEqual(computed_description, description);
+      // warning: types not checked any more
+      deepStrictEqual(computed_description.columns, description.columns);
 
       // @ts-expect-error unknown
       return await sql<DescriptionTypes<R>[]>(template, ...args).execute();
@@ -84,7 +85,7 @@ export function typedSql<
 }
 
 // https://github.com/porsager/postgres/blob/rewrite/src/types.js
-type DescriptionTypes<T> = {
+export type DescriptionTypes<T> = {
   -readonly [K in keyof T]: T[K] extends 23 | 701
     ? number
     : T[K] extends 1043

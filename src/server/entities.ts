@@ -122,7 +122,7 @@ export async function fetchData<R extends keyof typeof entityRoutes>(
     return [
       sql`,`,
       // @ts-expect-error bruh
-      sql`${orderByQueries[v0](v1, query.paginationCursor, v2)}`,
+      sql`${orderByQueries[v0](v1, query.paginationDirection, v2)}`,
     ];
   })
     .slice(1)
@@ -147,7 +147,8 @@ export async function fetchData<R extends keyof typeof entityRoutes>(
             // @ts-expect-error this seems impossible to type - we probably need to unify this to the indexed type before
             sql`${paginationCursor ? paginationCursor[value[0]] : null} ${
               index === part.length - 1
-                ? value[1] === "ASC"
+                ? (value[1] === "ASC") !==
+                  (query.paginationDirection === "backwards")
                   ? sql`<`
                   : sql`>`
                 : sql`IS NOT DISTINCT FROM`

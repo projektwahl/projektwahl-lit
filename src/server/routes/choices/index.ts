@@ -107,7 +107,10 @@ export const choicesHandler = requestHandler(
           }) WHERE (${!query.filters.id} OR id = ${
           query.filters.id ?? null
         }) AND title LIKE ${"%" + (query.filters.title ?? "") + "%"}
-             AND info LIKE ${"%" + (query.filters.info ?? "") + "%"}`;
+             AND info LIKE ${"%" + (query.filters.info ?? "") + "%"}
+             AND (${!query.filters.rank} OR rank = ${
+          query.filters.rank ?? null
+        })`;
       },
       {
         // TODO FIXME nulls first/last

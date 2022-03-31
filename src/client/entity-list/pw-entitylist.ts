@@ -62,12 +62,13 @@ export const parseRequestWithPrefix = <
 >(
   apiUrl: P,
   prefix: PREFIX,
-  url: URL
+  url: URL,
+  defaultValue: z.infer<typeof entityRoutes[P]["request"]>
 ): parseRequestWithPrefixType<PREFIX>[P] => {
   const schema: parseRequestWithPrefixSchemaType<PREFIX>[P] = z
     .object({})
     // @ts-expect-error wrong typings I assume
-    .setKey(prefix, entityRoutes[apiUrl]["request"].default({ filters: {} }))
+    .setKey(prefix, entityRoutes[apiUrl]["request"].default(defaultValue))
     .passthrough();
   const data: parseRequestWithPrefixType<PREFIX>[P] = mappedFunctionCall(
     schema,
@@ -86,12 +87,13 @@ export const taskFunction = async <
 >(
   apiUrl: P,
   url: URL,
-  prefix: PREFIX
+  prefix: PREFIX,
+  defaultValue: z.infer<typeof entityRoutes[P]["request"]>
 ) => {
   const result = await myFetch<P>(
     "GET",
     apiUrl,
-    parseRequestWithPrefix(apiUrl, prefix, url)[prefix],
+    parseRequestWithPrefix(apiUrl, prefix, url, defaultValue)[prefix],
     {}
   );
   return result;
@@ -135,6 +137,8 @@ export class PwEntityList<
     }
   `;
 
+  defaultValue!: z.infer<typeof entityRoutes[P]["request"]>;
+
   get title(): string {
     throw new Error("not implemented");
   }
@@ -177,7 +181,8 @@ export class PwEntityList<
         const data = parseRequestWithPrefix(
           this.url,
           this.prefix,
-          this.history.url
+          this.history.url,
+          this.defaultValue
         );
 
         HistoryController.goto(
@@ -216,9 +221,12 @@ export class PwEntityList<
 
     if (!this.hasUpdated) {
       this.formData =
-        parseRequestWithPrefix(this.url, this.prefix, this.history.url)[
-          this.prefix
-        ] ?? {};
+        parseRequestWithPrefix(
+          this.url,
+          this.prefix,
+          this.history.url,
+          this.defaultValue
+        )[this.prefix] ?? {};
 
       void this._task.run();
     }

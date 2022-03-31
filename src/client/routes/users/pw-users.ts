@@ -35,10 +35,22 @@ import { pwInputNumber } from "../../form/pw-input-number.js";
 import { pwInputText } from "../../form/pw-input-text.js";
 import { pwInputSelect } from "../../form/pw-input-select.js";
 import type { z } from "zod";
-import type { routes } from "../../../lib/routes.js";
+import type { entityRoutes, routes } from "../../../lib/routes.js";
+
+const defaultValue: z.infer<typeof entityRoutes["/api/v1/users"]["request"]> = {
+  sorting: [],
+  filters: {},
+  paginationDirection: "forwards",
+  paginationLimit: 100,
+};
 
 export const pwUsers = async (url: URL) => {
-  const result = await taskFunction("/api/v1/users", url, "users");
+  const result = await taskFunction(
+    "/api/v1/users",
+    url,
+    "users",
+    defaultValue
+  );
   return html`<pw-users .initial=${result} prefix="users"></pw-users>`;
 };
 
@@ -57,6 +69,8 @@ export class PwUsers<X extends string> extends PwEntityList<
     super();
 
     this.url = "/api/v1/users";
+
+    this.defaultValue = defaultValue;
   }
 
   override get title() {
@@ -85,7 +99,8 @@ export class PwUsers<X extends string> extends PwEntityList<
       const data = parseRequestWithPrefix(
         this.url,
         this.prefix,
-        this.history.url
+        this.history.url,
+        defaultValue
       );
 
       const initial = data[this.prefix];
