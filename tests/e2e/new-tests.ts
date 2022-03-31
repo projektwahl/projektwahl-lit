@@ -294,10 +294,6 @@ async function runTest(
 
     // TODO FIXME editing the project leaders + members
 
-    // TODO test pagination
-
-    // TODO test sorting
-
     // TODO FIXME voting
 
     // TODO test openid
@@ -826,45 +822,49 @@ async function checkUsersPaginationLimitWorks(helper: Helper) {
       )
     ).click();
 
-    const rows = [];
+    await helper.waitUntilLoaded();
 
-    for (;;) {
-      await helper.waitUntilLoaded();
+    for (const direction of ["next", "previous"]) {
+      const rows = [];
 
-      const thisRows = await helper.driver.findElements(
-        By.css('tbody tr th[scope="row"]')
-      );
-      const thisRowsText = await Promise.all(
-        thisRows.map((r) => r.getText().then((v) => Number(v)))
-      );
+      for (;;) {
+        const thisRows = await helper.driver.findElements(
+          By.css('tbody tr th[scope="row"]')
+        );
+        const thisRowsText = await Promise.all(
+          thisRows.map((r) => r.getText().then((v) => Number(v)))
+        );
 
-      assert.ok(thisRowsText.length <= 50);
+        assert.ok(thisRowsText.length <= 50);
 
-      console.log(thisRowsText);
+        console.log(thisRowsText);
 
-      rows.push(...thisRowsText);
+        rows.push(...thisRowsText);
 
-      const nextPage = await helper.driver.findElement(
-        By.css('a[aria-label="next page"]')
-      );
+        const nextPage = await helper.driver.findElement(
+          By.css(`a[aria-label="${direction} page"]`)
+        );
 
-      if (!((await nextPage.getAttribute("aria-disabled")) === "false")) {
-        break;
+        if (!((await nextPage.getAttribute("aria-disabled")) === "false")) {
+          break;
+        }
+
+        await helper.click(nextPage);
+
+        await helper.waitUntilLoaded();
       }
 
-      await helper.click(nextPage);
+      console.log("end");
+
+      console.log(rows.sort((a, b) => a - b));
+
+      assert.deepEqual(
+        Array.from({ length: rows.length }, (_, i) => i + 1),
+        rows
+      );
+
+      assert.equal(entityType === "users" ? 501 : 100, rows.length);
     }
-
-    console.log("end");
-
-    console.log(rows.sort((a, b) => a - b));
-
-    assert.deepEqual(
-      Array.from({ length: rows.length }, (_, i) => i + 1),
-      rows
-    );
-
-    assert.equal(entityType === "users" ? 501 : 100, rows.length);
   }
 }
 
