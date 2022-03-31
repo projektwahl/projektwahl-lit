@@ -36,9 +36,24 @@ import { animate } from "@lit-labs/motion";
 import { repeat } from "lit/directives/repeat.js";
 import { pwInputNumber } from "../../form/pw-input-number.js";
 import { pwInputText } from "../../form/pw-input-text.js";
+import type { z } from "zod";
+import type { entityRoutes } from "../../../lib/routes.js";
+
+const defaultValue: z.infer<typeof entityRoutes["/api/v1/choices"]["request"]> =
+  {
+    sorting: [["rank", "ASC", null]],
+    filters: {},
+    paginationDirection: "forwards",
+    paginationLimit: 100,
+  };
 
 export const pwChoices = async (url: URL) => {
-  const result = await taskFunction("/api/v1/choices", url, "choices");
+  const result = await taskFunction(
+    "/api/v1/choices",
+    url,
+    "choices",
+    defaultValue
+  );
   return html`<pw-choices .initial=${result} prefix="choices"></pw-choices>`;
 };
 
@@ -47,6 +62,8 @@ class PwChoices<X extends string> extends PwEntityList<"/api/v1/choices", X> {
     super();
 
     this.url = "/api/v1/choices";
+
+    this.defaultValue = defaultValue;
   }
 
   override get title() {
@@ -62,7 +79,8 @@ class PwChoices<X extends string> extends PwEntityList<"/api/v1/choices", X> {
       const data = parseRequestWithPrefix(
         this.url,
         this.prefix,
-        this.history.url
+        this.history.url,
+        defaultValue
       );
 
       const initial = data[this.prefix];
