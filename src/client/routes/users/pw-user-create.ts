@@ -165,7 +165,7 @@ class PwUserCreate extends PwForm<"/api/v1/users/create-or-update"> {
         throw new Error(msg("component not fully initialized"));
       }
 
-      console.log("bro ", this.typeRef.value?.inputValue);
+      //console.log("bro ", this.typeRef.value?.inputValue);
 
       return html`
         ${bootstrapCss}
@@ -183,7 +183,7 @@ class PwUserCreate extends PwForm<"/api/v1/users/create-or-update"> {
                 @submit=${async (event: Event) => {
                   event.preventDefault();
 
-                  console.log("SUBMIT");
+                  //console.log("SUBMIT");
 
                   await this._task.run();
                 }}

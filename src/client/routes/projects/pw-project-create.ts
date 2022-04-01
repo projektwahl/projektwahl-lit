@@ -171,7 +171,7 @@ export const PwProjectCreate = setupHmr(
                   @submit=${async (event: Event) => {
                     event.preventDefault();
 
-                    console.log("SUBMIT");
+                    //console.log("SUBMIT");
 
                     await this._task.run();
                   }}

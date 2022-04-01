@@ -221,7 +221,7 @@ export abstract class PwInput<
         this.initial !== undefined ? this.get(this.initial) : this.defaultValue;
 
       // TODO FIXME this may create an infinite loop if the initial is always changing
-      console.log("BUG: potential infinite loop pw-input initial updated.");
+      //console.log("BUG: potential infinite loop pw-input initial updated.");
 
       // in case this is an update set the value to undefined as it wasn't changed yet.
       this.set(
@@ -239,7 +239,7 @@ export abstract class PwInput<
     }
 
     if (!this.hasUpdated) {
-      console.log(`pw-input !hasUpdated`);
+      //console.log(`pw-input !hasUpdated`);
 
       // the input value contains the value that is shown to the user
       this.inputValue =
@@ -341,7 +341,7 @@ export abstract class PwInput<
       this.resettable && !this.disabled
         ? html`<button
             @click=${() => {
-              console.log("reset", this.get(this.initial));
+              //console.log("reset", this.get(this.initial));
               this.inputValue =
                 this.initial !== undefined
                   ? this.get(this.initial)
@@ -351,7 +351,7 @@ export abstract class PwInput<
                 // @ts-expect-error tmp error
                 this.initial !== undefined ? undefined : this.defaultValue
               );
-              console.log(this.pwForm.formData);
+              //console.log(this.pwForm.formData);
               this.requestUpdate();
             }}
             class="btn btn-outline-secondary"

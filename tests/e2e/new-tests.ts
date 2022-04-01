@@ -224,8 +224,8 @@ async function runTestAllBrowsers(
 ) {
   //await Promise.all([
   // TODO FIXME running in parallel fails to load the modules in firefox. Don't know whats wrong
-  await runTest("firefox", testFunction);
   await runTest("chrome", testFunction);
+  await runTest("firefox", testFunction);
   //]);
 }
 
@@ -1055,7 +1055,7 @@ async function resettingProjectWorks(helper: Helper) {
 }
 
 async function resettingProjectWorks2(helper: Helper) {
-  for (const doRefresh of [true, false]) {
+  for (const doRefresh of [false, true]) {
     await loginCorrect(helper);
 
     await helper.openNavbar();

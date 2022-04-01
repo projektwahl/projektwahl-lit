@@ -201,7 +201,7 @@ export class PwEntityList<
 
         const result = await myFetch<P>("GET", this.url, this.formData, {});
 
-        console.log("result", result);
+        //console.log("result", result);
 
         return result;
       },
@@ -210,7 +210,7 @@ export class PwEntityList<
   }
 
   override render() {
-    console.log(`rerender pw-entitylist ${this.url} ${Math.random()}`);
+    //console.log(`rerender pw-entitylist ${this.url} ${Math.random()}`);
     if (this.prefix === undefined) {
       throw new Error("prefix not set");
     }
@@ -232,10 +232,10 @@ export class PwEntityList<
     }
 
     // this looks equal, so maybe lit tasks is buggy?
-    console.log(this.body);
+    //console.log(this.body);
 
     // the task data is wrong
-    console.log("taskk", this._task);
+    //console.log("taskk", this._task);
 
     return html`
       ${bootstrapCss}

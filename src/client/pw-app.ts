@@ -230,7 +230,7 @@ export class PwApp extends PwElement {
       keyof typeof pages | undefined
       //HistoryState
     ]) => {
-      console.log("nextPage");
+      //console.log("nextPage");
       if (!this.hasUpdated) {
         if (this.initial) {
           return this.initial;
@@ -290,7 +290,7 @@ export class PwApp extends PwElement {
   }
 
   override render() {
-    console.log(`rerender pw-app ${Math.random()}`);
+    //console.log(`rerender pw-app ${Math.random()}`);
     return html`
       ${bootstrapCss}
       <style>
