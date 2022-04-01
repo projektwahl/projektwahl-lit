@@ -94,9 +94,9 @@ export async function setup() {
         const user = (
           await typedSql(sql, {
             columns: { id: 23 },
-          } as const)`INSERT INTO users (username, type, "group", age, password_hash, last_updated_by) VALUES (${
-            chance.name({ prefix: true, suffix: true })
-          }, 'voter', ${chance.profession()}, ${chance.integer({
+          } as const)`INSERT INTO users (username, type, "group", age, password_hash, last_updated_by) VALUES (${chance.name(
+            { prefix: true, suffix: true }
+          )}, 'voter', ${chance.profession()}, ${chance.integer({
             min: 5,
             max: 13,
           })}, ${hash}, ${admin.id}) RETURNING users.id;`

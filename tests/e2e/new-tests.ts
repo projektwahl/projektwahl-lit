@@ -187,8 +187,10 @@ class Helper {
   }
 
   async waitUntilLoaded() {
-    const loadingIndicator = await this.driver.findElement(
-      By.css(".spinner-grow")
+    const loadingIndicator = await this.driver.wait(
+      until.elementLocated(By.css(".spinner-grow")),
+      5000,
+      `.spinner-grow not found`
     );
 
     await this.driver.wait(
@@ -1149,11 +1151,30 @@ async function resettingProjectWorks2(helper: Helper) {
 async function testVotingWorks(helper: Helper) {
   await helper.driver.get(`${BASE_URL}/login`);
   const formTester = await helper.form("pw-login");
-  await formTester.setField("username", "Louise Bess Lawson");
+  await formTester.setField("username", "Dr. Dustin Allison M.D.");
   await formTester.setField("password", "changeme");
   await formTester.submitSuccess();
 
-  throw 1;
+  await helper.openNavbar();
+  await helper.click(
+    await helper.driver.findElement(By.css(`a[href="/vote"]`))
+  );
+
+  await helper.waitUntilLoaded();
+
+  const row = await helper.driver.findElement(
+    By.css(`th p a[href="/projects/view/${4}"]`)
+  );
+
+  console.log(row);
+
+  const buttons = await row.findElements(
+    By.xpath("../../../td/pw-rank-select/form/div/button")
+  );
+
+  await buttons[0].click();
+
+  await helper.waitUntilLoaded();
 }
 
 // TODO better would be some kind of queing system where a ready browser takes the next task
