@@ -466,7 +466,7 @@ export const PwProjectCreate = setupHmr(
             throw error;
           },
           initial: () => html`initial`,
-          pending: () => html`${noChange}`,
+          pending: () => noChange,
         })}`;
     }
   }

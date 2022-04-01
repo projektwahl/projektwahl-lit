@@ -1125,6 +1125,8 @@ async function resettingProjectWorks2(helper: Helper) {
       ).map((elem) => helper.click(elem))
     );
 
+    await helper.waitUntilLoaded();
+
     // check what resetting worked
     form = await helper.form("pw-project-create");
     assert.equal(await form.getField("title"), "");

@@ -212,6 +212,17 @@ export class PwOrder<
     );
   };
 
+  protected willUpdate(changedProperties: Map<PropertyKey, unknown>): void {
+    if (changedProperties.has("initial")) {
+      // the input value contains the value that is shown to the user
+      this.inputValue =
+        this.initial !== undefined ? this.get(this.initial) : this.defaultValue;
+
+      // in case this is an update set the value to undefined as it wasn't changed yet.
+      this.set(this.pwForm.formData, this.inputValue);
+    }
+  }
+
   override render() {
     if (
       this.title === undefined ||
@@ -219,16 +230,6 @@ export class PwOrder<
       this.prefix === undefined
     ) {
       throw new Error(msg("component not fully initialized"));
-    }
-
-    // stolen from pw-input.ts
-    if (!this.hasUpdated) {
-      // the input value contains the value that is shown to the user
-      this.inputValue =
-        this.initial !== undefined ? this.get(this.initial) : this.defaultValue;
-
-      // in case this is an update set the value to undefined as it wasn't changed yet.
-      this.set(this.pwForm.formData, this.inputValue);
     }
 
     return html`

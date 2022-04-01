@@ -212,8 +212,8 @@ export abstract class PwInput<
     );
   }
 
-  protected willUpdate(_changedProperties: Map<PropertyKey, unknown>): void {
-    if (this.resettable && _changedProperties.has("initial")) {
+  protected willUpdate(changedProperties: Map<PropertyKey, unknown>): void {
+    if (changedProperties.has("initial")) {
       // this is a "hack" so that rerendering with new initial data resets the resettable fields.
 
       // the input value contains the value that is shown to the user
@@ -227,7 +227,11 @@ export abstract class PwInput<
       this.set(
         this.pwForm.formData,
         // @ts-expect-error tmp error
-        this.initial !== undefined ? undefined : this.defaultValue
+        this.resettable
+          ? this.initial !== undefined
+            ? undefined
+            : this.defaultValue
+          : this.inputValue
       );
     }
   }
@@ -236,21 +240,6 @@ export abstract class PwInput<
     //console.log(`pw-input rerender`);
     if (this.label === undefined || this.task === undefined) {
       throw new Error(msg("component not fully initialized"));
-    }
-
-    if (!this.hasUpdated) {
-      //console.log(`pw-input !hasUpdated`);
-
-      // the input value contains the value that is shown to the user
-      this.inputValue =
-        this.initial !== undefined ? this.get(this.initial) : this.defaultValue;
-
-      // in case this is an update set the value to undefined as it wasn't changed yet.
-      this.set(
-        this.pwForm.formData,
-        // @ts-expect-error tmp error
-        this.resettable ? undefined : this.inputValue
-      );
     }
 
     // https://getbootstrap.com/docs/5.1/forms/validation/
