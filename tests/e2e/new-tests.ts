@@ -1207,8 +1207,6 @@ await runTestAllBrowsers(async (helper) => {
   await testVotingWorks(helper);
   await helper.driver.manage().deleteAllCookies();
 
-  return;
-
   await checkUsersFilteringWorks(helper);
   await helper.driver.manage().deleteAllCookies();
 
