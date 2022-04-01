@@ -1125,7 +1125,7 @@ async function resettingProjectWorks2(helper: Helper) {
       ).map((elem) => helper.click(elem))
     );
 
-    await helper.driver.sleep(2000)
+    await helper.driver.sleep(2000);
 
     // check what resetting worked
     form = await helper.form("pw-project-create");
@@ -1149,12 +1149,6 @@ async function resettingProjectWorks2(helper: Helper) {
 // TODO better would be some kind of queing system where a ready browser takes the next task
 
 await runTestAllBrowsers(async (helper) => {
-  await resettingProjectWorks2(helper);
-  await helper.driver.manage().deleteAllCookies();
-
-  await resettingProjectWorks(helper);
-  await helper.driver.manage().deleteAllCookies();
-
   await checkUsersFilteringWorks(helper);
   await helper.driver.manage().deleteAllCookies();
 
@@ -1165,6 +1159,12 @@ await runTestAllBrowsers(async (helper) => {
   await helper.driver.manage().deleteAllCookies();
 
   await checkUsersSortingWorks(helper);
+  await helper.driver.manage().deleteAllCookies();
+
+  await resettingProjectWorks2(helper);
+  await helper.driver.manage().deleteAllCookies();
+
+  await resettingProjectWorks(helper);
   await helper.driver.manage().deleteAllCookies();
 
   await createProjectAllFields(helper);
