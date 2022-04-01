@@ -1162,17 +1162,23 @@ async function testVotingWorks(helper: Helper) {
 
   await helper.waitUntilLoaded();
 
-  const row = await helper.driver.findElement(
-    By.css(`th p a[href="/projects/view/${4}"]`)
-  );
+  await helper.driver
+    .findElement(
+      By.xpath(
+        `//th/p/a[@href="/projects/view/${4}"]/../../../td/pw-rank-select/form/div/button[1]`
+      )
+    )
+    .click();
 
-  console.log(row);
+  await helper.waitUntilLoaded();
 
-  const buttons = await row.findElements(
-    By.xpath("../../../td/pw-rank-select/form/div/button")
-  );
-
-  await buttons[0].click();
+  await helper.driver
+    .findElement(
+      By.xpath(
+        `//th/p/a[@href="/projects/view/${1}"]/../../../td/pw-rank-select/form/div/button[1]`
+      )
+    )
+    .click();
 
   await helper.waitUntilLoaded();
 }
