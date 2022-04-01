@@ -1172,6 +1172,12 @@ async function testVotingWorks(helper: Helper) {
 
   await helper.waitUntilLoaded();
 
+  const alerts1 = await helper.driver.findElements(
+    By.css('div[class="alert alert-danger"]')
+  );
+
+  assert.equal(alerts1.length, 0);
+
   await helper.driver
     .findElement(
       By.xpath(
@@ -1181,6 +1187,18 @@ async function testVotingWorks(helper: Helper) {
     .click();
 
   await helper.waitUntilLoaded();
+
+  const alerts2 = await helper.driver.findElements(
+    By.css('div[class="alert alert-danger"]')
+  );
+
+  assert.equal(alerts2.length, 1);
+
+  assert.equal(
+    await alerts2[0].getText(),
+    "Some errors occurred!\n" +
+      "database: Der Nutzer passt nicht in die Altersbegrenzung des Projekts!"
+  );
 }
 
 // TODO better would be some kind of queing system where a ready browser takes the next task
