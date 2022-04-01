@@ -94,12 +94,12 @@ export async function setup() {
         const user = (
           await typedSql(sql, {
             columns: { id: 23 },
-          } as const)`INSERT INTO users (username, type, "group", age, last_updated_by) VALUES (${chance.name(
-            { middle: true }
-          )}, 'voter', ${chance.profession()}, ${chance.integer({
+          } as const)`INSERT INTO users (username, type, "group", age, password_hash, last_updated_by) VALUES (${
+            "jo" + chance.integer()
+          }, 'voter', ${chance.profession()}, ${chance.integer({
             min: 5,
             max: 13,
-          })}, ${admin.id}) RETURNING users.id;`
+          })}, ${hash}, ${admin.id}) RETURNING users.id;`
         )[0];
 
         chance.shuffle(projects);
