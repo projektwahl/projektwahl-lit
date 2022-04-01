@@ -961,7 +961,7 @@ async function resettingUserWorks(helper: Helper) {
   await Promise.all(
     (
       await helper.driver.findElements(
-        By.css('button[class="btn btn-outline-secondary"]')
+        By.css('button[class="btn btn-outline-secondary"] svg')
       )
     ).map((elem) => helper.click(elem))
   );
@@ -1120,7 +1120,7 @@ async function resettingProjectWorks2(helper: Helper) {
     await Promise.all(
       (
         await helper.driver.findElements(
-          By.css('button[class="btn btn-outline-secondary"]')
+          By.css('button[class="btn btn-outline-secondary"] svg')
         )
       ).map((elem) => helper.click(elem))
     );
