@@ -20,7 +20,7 @@ https://github.com/projektwahl/projektwahl-lit
 SPDX-License-Identifier: AGPL-3.0-or-later
 SPDX-FileCopyrightText: 2021 Moritz Hedtke <Moritz.Hedtke@t-online.de>
 */
-import { html } from "lit";
+import { html, noChange } from "lit";
 import "../../form/pw-form.js";
 import { Task } from "@lit-labs/task";
 import { myFetch } from "../../utils.js";
@@ -117,6 +117,17 @@ export const PwProjectCreate = setupHmr(
       | MinimalSafeParseError
       | undefined;
 
+    initialTask: Task<
+      [],
+      | z.SafeParseSuccess<
+          z.infer<
+            typeof routes["/api/v1/projects"]["response"]
+          >["entities"][number]
+        >
+      | MinimalSafeParseError
+      | undefined
+    >;
+
     constructor() {
       super();
 
@@ -138,9 +149,29 @@ export const PwProjectCreate = setupHmr(
 
         return result;
       });
+
+      // @ts-expect-error TODO fix this
+      this.initialTask = new Task(
+        this,
+        async () => {
+          if (!this.hasUpdated) {
+            if (this.initial !== undefined) {
+              return this.initial;
+            }
+          }
+
+          if (this.initial?.success) {
+            return await taskFunction([this.initial?.data.id]);
+          } else {
+            return undefined;
+          }
+        },
+        () => []
+      );
     }
 
     override render() {
+      // TODO FIXME do this in the initialTask thingy
       if (!this.hasUpdated) {
         // @ts-expect-error impossible
         this.formData = {
@@ -150,272 +181,293 @@ export const PwProjectCreate = setupHmr(
         };
       }
 
-      if (this.initial === undefined || this.initial.success) {
-        if (this.actionText === undefined) {
-          throw new Error(msg("component not fully initialized"));
-        }
+      return html` <div
+          style="position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 1337;"
+        >
+          ${this._task.render({
+            pending: () => html`<div
+              class="spinner-grow text-primary"
+              role="status"
+            >
+              <span class="visually-hidden">${msg("Loading...")}</span>
+            </div>`,
+          })}
+        </div>
 
-        return html`
-          ${bootstrapCss}
-          <main class="container">
-            <h1 class="text-center">${this.actionText}</h1>
+        ${this.initialTask.render({
+          complete: (value) => {
+            if (value === undefined || value?.success) {
+              if (this.actionText === undefined) {
+                throw new Error(msg("component not fully initialized"));
+              }
 
-            <div class="row justify-content-center">
-              <div class="col-md-7 col-lg-8">
-                ${this.getErrors()}
+              return html`
+                ${bootstrapCss}
+                <main class="container">
+                  <h1 class="text-center">${this.actionText}</h1>
 
-                <form
-                  ${ref(this.form)}
-                  method="POST"
-                  action="/no-javascript"
-                  @submit=${async (event: Event) => {
-                    event.preventDefault();
+                  <div class="row justify-content-center">
+                    <div class="col-md-7 col-lg-8">
+                      ${this.getErrors()}
 
-                    console.log("SUBMIT");
+                      <form
+                        ${ref(this.form)}
+                        method="POST"
+                        action="/no-javascript"
+                        @submit=${async (event: Event) => {
+                          event.preventDefault();
 
-                    await this._task.run();
-                  }}
-                >
-                  ${pwInputText<
-                    "/api/v1/projects/create" | "/api/v1/projects/update",
-                    string | undefined
-                  >({
-                    url: this.url,
-                    type: "text",
-                    disabled: this.disabled,
-                    label: msg("Title"),
-                    name: ["title"],
-                    get: (o) => o.title,
-                    set: (o, v) => (o.title = v),
-                    task: this._task,
-                    initial: this.initial?.data,
-                    defaultValue: "",
-                    resettable: this.initial !== undefined,
-                  })}
-                  ${pwInputText<
-                    "/api/v1/projects/create" | "/api/v1/projects/update",
-                    string | undefined
-                  >({
-                    url: this.url,
-                    type: "textarea",
-                    disabled: this.disabled,
-                    label: msg("Info"),
-                    name: ["info"],
-                    get: (o) => o.info,
-                    set: (o, v) => (o.info = v),
-                    task: this._task,
-                    initial: this.initial?.data,
-                    defaultValue: "",
-                    resettable: this.initial !== undefined,
-                  })}
-                  ${pwInputText<
-                    "/api/v1/projects/create" | "/api/v1/projects/update",
-                    string | undefined
-                  >({
-                    url: this.url,
-                    type: "text",
-                    disabled: this.disabled,
-                    label: msg("Place"),
-                    name: ["place"],
-                    get: (o) => o.place,
-                    set: (o, v) => (o.place = v),
-                    task: this._task,
-                    initial: this.initial?.data,
-                    defaultValue: "",
-                    resettable: this.initial !== undefined,
-                  })}
-                  ${pwInputNumber<
-                    "/api/v1/projects/create" | "/api/v1/projects/update",
-                    number | undefined
-                  >({
-                    url: this.url,
-                    type: "number",
-                    disabled: this.disabled,
-                    label: msg("Costs"),
-                    name: ["costs"],
-                    get: (o) => o.costs,
-                    set: (o, v) => (o.costs = v),
-                    task: this._task,
-                    initial: this.initial?.data,
-                    defaultValue: 0,
-                    resettable: this.initial !== undefined,
-                  })}
-                  ${pwInputNumber<
-                    "/api/v1/projects/create" | "/api/v1/projects/update",
-                    number | undefined
-                  >({
-                    url: this.url,
-                    type: "number",
-                    disabled: this.disabled,
-                    label: msg("Minimum age"),
-                    name: ["min_age"],
-                    get: (o) => o.min_age,
-                    set: (o, v) => (o.min_age = v),
-                    task: this._task,
-                    initial: this.initial?.data,
-                    defaultValue: 5,
-                    resettable: this.initial !== undefined,
-                  })}
-                  ${pwInputNumber<
-                    "/api/v1/projects/create" | "/api/v1/projects/update",
-                    number | undefined
-                  >({
-                    url: this.url,
-                    type: "number",
-                    disabled: this.disabled,
-                    label: msg("Maximum age"),
-                    name: ["max_age"],
-                    get: (o) => o.max_age,
-                    set: (o, v) => (o.max_age = v),
-                    task: this._task,
-                    initial: this.initial?.data,
-                    defaultValue: 13,
-                    resettable: this.initial !== undefined,
-                  })}
-                  ${pwInputNumber<
-                    "/api/v1/projects/create" | "/api/v1/projects/update",
-                    number | undefined
-                  >({
-                    url: this.url,
-                    type: "number",
-                    disabled: this.disabled,
-                    label: msg("Minimum participants"),
-                    name: ["min_participants"],
-                    get: (o) => o.min_participants,
-                    set: (o, v) => (o.min_participants = v),
-                    task: this._task,
-                    initial: this.initial?.data,
-                    defaultValue: 5,
-                    resettable: this.initial !== undefined,
-                  })}
-                  ${pwInputNumber<
-                    "/api/v1/projects/create" | "/api/v1/projects/update",
-                    number | undefined
-                  >({
-                    url: this.url,
-                    type: "number",
-                    disabled: this.disabled,
-                    label: msg("Maximum participants"),
-                    name: ["max_participants"],
-                    get: (o) => o.max_participants,
-                    set: (o, v) => (o.max_participants = v),
-                    task: this._task,
-                    initial: this.initial?.data,
-                    defaultValue: 15,
-                    resettable: this.initial !== undefined,
-                  })}
-                  <div class="form-text mb-3">
-                    Bitte erstellen Sie keine Projekte mit mehr als 15 möglichen
-                    Teilnehmenden.
-                  </div>
-                  ${pwInputCheckbox<
-                    "/api/v1/projects/create" | "/api/v1/projects/update",
-                    boolean | undefined
-                  >({
-                    url: this.url,
-                    type: "checkbox",
-                    trueValue: true,
-                    falseValue: false,
-                    defaultValue: true,
-                    disabled: this.disabled,
-                    label: msg("Allow random assignments"),
-                    name: ["random_assignments"],
-                    get: (o) => o.random_assignments,
-                    set: (o, v) => (o.random_assignments = v),
-                    task: this._task,
-                    initial: this.initial?.data,
-                    resettable: this.initial !== undefined,
-                  })}
-                  ${pwInputCheckbox<
-                    "/api/v1/projects/create" | "/api/v1/projects/update",
-                    boolean | undefined
-                  >({
-                    url: this.url,
-                    type: "checkbox",
-                    trueValue: true,
-                    falseValue: false,
-                    defaultValue: false,
-                    disabled: this.disabled,
-                    label: msg("Mark this project as deleted"),
-                    name: ["deleted"],
-                    get: (o) => o.deleted,
-                    set: (o, v) => (o.deleted = v),
-                    task: this._task,
-                    initial: this.initial?.data,
-                    resettable: this.initial !== undefined,
-                  })}
-                  ${!this.disabled
-                    ? html`
+                          //console.log("SUBMIT");
+
+                          await this._task.run();
+
+                          // we need to wait for submission
+
+                          await this.initialTask.run();
+                        }}
+                      >
+                        ${pwInputText<
+                          "/api/v1/projects/create" | "/api/v1/projects/update",
+                          string | undefined
+                        >({
+                          url: this.url,
+                          type: "text",
+                          disabled: this.disabled,
+                          label: msg("Title"),
+                          name: ["title"],
+                          get: (o) => o.title,
+                          set: (o, v) => (o.title = v),
+                          task: this._task,
+                          initial: value?.data,
+                          defaultValue: "",
+                          resettable: value !== undefined,
+                        })}
+                        ${pwInputText<
+                          "/api/v1/projects/create" | "/api/v1/projects/update",
+                          string | undefined
+                        >({
+                          url: this.url,
+                          type: "textarea",
+                          disabled: this.disabled,
+                          label: msg("Info"),
+                          name: ["info"],
+                          get: (o) => o.info,
+                          set: (o, v) => (o.info = v),
+                          task: this._task,
+                          initial: value?.data,
+                          defaultValue: "",
+                          resettable: value !== undefined,
+                        })}
+                        ${pwInputText<
+                          "/api/v1/projects/create" | "/api/v1/projects/update",
+                          string | undefined
+                        >({
+                          url: this.url,
+                          type: "text",
+                          disabled: this.disabled,
+                          label: msg("Place"),
+                          name: ["place"],
+                          get: (o) => o.place,
+                          set: (o, v) => (o.place = v),
+                          task: this._task,
+                          initial: value?.data,
+                          defaultValue: "",
+                          resettable: value !== undefined,
+                        })}
+                        ${pwInputNumber<
+                          "/api/v1/projects/create" | "/api/v1/projects/update",
+                          number | undefined
+                        >({
+                          url: this.url,
+                          type: "number",
+                          disabled: this.disabled,
+                          label: msg("Costs"),
+                          name: ["costs"],
+                          get: (o) => o.costs,
+                          set: (o, v) => (o.costs = v),
+                          task: this._task,
+                          initial: value?.data,
+                          defaultValue: 0,
+                          resettable: value !== undefined,
+                        })}
+                        ${pwInputNumber<
+                          "/api/v1/projects/create" | "/api/v1/projects/update",
+                          number | undefined
+                        >({
+                          url: this.url,
+                          type: "number",
+                          disabled: this.disabled,
+                          label: msg("Minimum age"),
+                          name: ["min_age"],
+                          get: (o) => o.min_age,
+                          set: (o, v) => (o.min_age = v),
+                          task: this._task,
+                          initial: value?.data,
+                          defaultValue: 5,
+                          resettable: value !== undefined,
+                        })}
+                        ${pwInputNumber<
+                          "/api/v1/projects/create" | "/api/v1/projects/update",
+                          number | undefined
+                        >({
+                          url: this.url,
+                          type: "number",
+                          disabled: this.disabled,
+                          label: msg("Maximum age"),
+                          name: ["max_age"],
+                          get: (o) => o.max_age,
+                          set: (o, v) => (o.max_age = v),
+                          task: this._task,
+                          initial: value?.data,
+                          defaultValue: 13,
+                          resettable: value !== undefined,
+                        })}
+                        ${pwInputNumber<
+                          "/api/v1/projects/create" | "/api/v1/projects/update",
+                          number | undefined
+                        >({
+                          url: this.url,
+                          type: "number",
+                          disabled: this.disabled,
+                          label: msg("Minimum participants"),
+                          name: ["min_participants"],
+                          get: (o) => o.min_participants,
+                          set: (o, v) => (o.min_participants = v),
+                          task: this._task,
+                          initial: value?.data,
+                          defaultValue: 5,
+                          resettable: value !== undefined,
+                        })}
+                        ${pwInputNumber<
+                          "/api/v1/projects/create" | "/api/v1/projects/update",
+                          number | undefined
+                        >({
+                          url: this.url,
+                          type: "number",
+                          disabled: this.disabled,
+                          label: msg("Maximum participants"),
+                          name: ["max_participants"],
+                          get: (o) => o.max_participants,
+                          set: (o, v) => (o.max_participants = v),
+                          task: this._task,
+                          initial: value?.data,
+                          defaultValue: 15,
+                          resettable: value !== undefined,
+                        })}
+                        <div class="form-text mb-3">
+                          Bitte erstellen Sie keine Projekte mit mehr als 15
+                          möglichen Teilnehmenden.
+                        </div>
+                        ${pwInputCheckbox<
+                          "/api/v1/projects/create" | "/api/v1/projects/update",
+                          boolean | undefined
+                        >({
+                          url: this.url,
+                          type: "checkbox",
+                          trueValue: true,
+                          falseValue: false,
+                          defaultValue: true,
+                          disabled: this.disabled,
+                          label: msg("Allow random assignments"),
+                          name: ["random_assignments"],
+                          get: (o) => o.random_assignments,
+                          set: (o, v) => (o.random_assignments = v),
+                          task: this._task,
+                          initial: value?.data,
+                          resettable: value !== undefined,
+                        })}
+                        ${pwInputCheckbox<
+                          "/api/v1/projects/create" | "/api/v1/projects/update",
+                          boolean | undefined
+                        >({
+                          url: this.url,
+                          type: "checkbox",
+                          trueValue: true,
+                          falseValue: false,
+                          defaultValue: false,
+                          disabled: this.disabled,
+                          label: msg("Mark this project as deleted"),
+                          name: ["deleted"],
+                          get: (o) => o.deleted,
+                          set: (o, v) => (o.deleted = v),
+                          task: this._task,
+                          initial: value?.data,
+                          resettable: value !== undefined,
+                        })}
+                        ${!this.disabled
+                          ? html`
+                              <button
+                                type="submit"
+                                ?disabled=${this._task.render({
+                                  pending: () => true,
+                                  complete: () => false,
+                                  initial: () => false,
+                                })}
+                                class="btn btn-primary"
+                              >
+                                ${this.actionText}
+                              </button>
+                            `
+                          : html`<a
+                              class="btn btn-secondary"
+                              @click=${aClick}
+                              href="/projects/edit/${value?.data.id}"
+                              role="button"
+                              >Edit project</a
+                            >`}
                         <button
-                          type="submit"
-                          ?disabled=${this._task.render({
-                            pending: () => true,
-                            complete: () => false,
-                            initial: () => false,
-                          })}
-                          class="btn btn-primary"
+                          type="button"
+                          class="btn btn-secondary"
+                          @click=${() => window.history.back()}
                         >
-                          ${this.actionText}
+                          ${msg(`Back`)}
                         </button>
-                      `
-                    : html`<a
-                        class="btn btn-secondary"
-                        @click=${aClick}
-                        href="/projects/edit/${this.initial?.data.id}"
-                        role="button"
-                        >Edit project</a
-                      >`}
-                  <button
-                    type="button"
-                    class="btn btn-secondary"
-                    @click=${() => window.history.back()}
-                  >
-                    ${msg(`Back`)}
-                  </button>
 
-                  <!-- Projektleitende -->
-                  <!-- TODO FIXME view only -->
-                  ${this.initial
-                    ? html`<pw-project-users
-                        projectId=${this.initial.data.id}
-                        name=${"project_leader_id"}
-                        title=${msg("Project leaders")}
-                        prefix="leaders"
-                      ></pw-project-users>`
-                    : html``}
-                  ${this.initial
-                    ? html`<pw-project-users
-                        projectId=${this.initial.data.id}
-                        name=${"force_in_project_id"}
-                        title=${msg("Guaranteed project members")}
-                        prefix="members"
-                      ></pw-project-users>`
-                    : html``}
-                </form>
+                        <!-- Projektleitende -->
+                        <!-- TODO FIXME view only -->
+                        ${value
+                          ? html`<pw-project-users
+                              projectId=${value.data.id}
+                              name=${"project_leader_id"}
+                              title=${msg("Project leaders")}
+                              prefix="leaders"
+                            ></pw-project-users>`
+                          : html``}
+                        ${value
+                          ? html`<pw-project-users
+                              projectId=${value.data.id}
+                              name=${"force_in_project_id"}
+                              title=${msg("Guaranteed project members")}
+                              prefix="members"
+                            ></pw-project-users>`
+                          : html``}
+                      </form>
+                    </div>
+                  </div>
+                </main>
+              `;
+            } else {
+              return html`${bootstrapCss}
+              <main class="container">
+                <h1 class="text-center">${this.actionText}</h1>
+                
+                <div class="alert alert-danger" role="alert">
+                ${msg("Some errors occurred!")}<br />
+                ${value?.error.issues.map(
+                  (issue) => html` ${issue.path}: ${issue.message}<br /> `
+                )}
               </div>
-            </div>
-          </main>
-        `;
-      } else {
-        /*const errors = Object.entries(data.error)
-          .filter(([k]) => !this.getCurrentInputElements().includes(k))
-          .map(([k, v]) => html`${k}: ${v}<br />`);*/
-        if (this.initial.error.issues.length > 0) {
-          return html`${bootstrapCss}
-          <main class="container">
-            <h1 class="text-center">${this.actionText}</h1>
-            
-            <div class="alert alert-danger" role="alert">
-            ${msg("Some errors occurred!")}<br />
-            ${this.initial.error.issues.map(
-              (issue) => html` ${issue.path}: ${issue.message}<br /> `
-            )}
-          </div>
-          
-          </div>
-        </main>`;
-        }
-      }
+              
+              </div>
+            </main>`;
+            }
+          },
+          error: (error) => {
+            throw error;
+          },
+          initial: () => html`initial`,
+          pending: () => noChange,
+        })}`;
     }
   }
 );
