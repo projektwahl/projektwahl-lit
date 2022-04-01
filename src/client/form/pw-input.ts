@@ -213,6 +213,7 @@ export abstract class PwInput<
   }
 
   protected willUpdate(changedProperties: Map<PropertyKey, unknown>): void {
+    console.log("PW_INPUT", changedProperties);
     if (changedProperties.has("initial")) {
       // this is a "hack" so that rerendering with new initial data resets the resettable fields.
 
@@ -240,6 +241,26 @@ export abstract class PwInput<
     //console.log(`pw-input rerender`);
     if (this.label === undefined || this.task === undefined) {
       throw new Error(msg("component not fully initialized"));
+    }
+
+    if (!this.hasUpdated) {
+      // TODO FIXME updated from above
+      this.inputValue =
+        this.initial !== undefined ? this.get(this.initial) : this.defaultValue;
+
+      // TODO FIXME this may create an infinite loop if the initial is always changing
+      //console.log("BUG: potential infinite loop pw-input initial updated.");
+
+      // in case this is an update set the value to undefined as it wasn't changed yet.
+      this.set(
+        this.pwForm.formData,
+        // @ts-expect-error tmp error
+        this.resettable
+          ? this.initial !== undefined
+            ? undefined
+            : this.defaultValue
+          : this.inputValue
+      );
     }
 
     // https://getbootstrap.com/docs/5.1/forms/validation/
