@@ -797,7 +797,6 @@ async function checkUsersSortingWorks(helper: Helper) {
 
   console.log("end");
 
-  // TODO FIXME reset database before every run so this works
   assert.equal(501, rows.length);
 
   console.log(rows.sort((a, b) => a - b));
@@ -1162,13 +1161,13 @@ async function testVotingWorks(helper: Helper) {
 
   await helper.waitUntilLoaded();
 
-  await helper.driver
-    .findElement(
+  await helper.click(
+    helper.driver.findElement(
       By.xpath(
         `//th/p/a[@href="/projects/view/${4}"]/../../../td/pw-rank-select/form/div/button[1]`
       )
     )
-    .click();
+  );
 
   await helper.waitUntilLoaded();
 
@@ -1178,13 +1177,13 @@ async function testVotingWorks(helper: Helper) {
 
   assert.equal(alerts1.length, 0);
 
-  await helper.driver
-    .findElement(
+  await helper.click(
+    helper.driver.findElement(
       By.xpath(
-        `//th/p/a[@href="/projects/view/${1}"]/../../../td/pw-rank-select/form/div/button[1]`
+        `//th/p/a[@href="/projects/view/${2}"]/../../../td/pw-rank-select/form/div/button[1]`
       )
     )
-    .click();
+  );
 
   await helper.waitUntilLoaded();
 
@@ -1296,11 +1295,6 @@ async function testHelperCreatesProjectWithProjectLeadersAndMembers(
 // TODO better would be some kind of queing system where a ready browser takes the next task
 
 await runTestAllBrowsers(async (helper) => {
-  await testHelperCreatesProjectWithProjectLeadersAndMembers(helper);
-  await helper.driver.manage().deleteAllCookies();
-
-  return;
-
   await testVotingWorks(helper);
   await helper.driver.manage().deleteAllCookies();
 
@@ -1314,6 +1308,9 @@ await runTestAllBrowsers(async (helper) => {
   await helper.driver.manage().deleteAllCookies();
 
   await checkUsersSortingWorks(helper);
+  await helper.driver.manage().deleteAllCookies();
+
+  await testHelperCreatesProjectWithProjectLeadersAndMembers(helper);
   await helper.driver.manage().deleteAllCookies();
 
   await resettingProjectWorks2(helper);
