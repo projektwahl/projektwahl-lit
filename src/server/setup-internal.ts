@@ -25,9 +25,9 @@ import { DescriptionTypes, typedSql } from "./describe.js";
 import { hashPassword } from "./password.js";
 import { Chance } from "chance";
 
-const chance = new Chance(1234);
-
 export async function setup() {
+  const chance = new Chance(1234);
+
   await sql.begin("READ WRITE", async (sql) => {
     const hash = await hashPassword("changeme");
 
@@ -94,12 +94,12 @@ export async function setup() {
         const user = (
           await typedSql(sql, {
             columns: { id: 23 },
-          } as const)`INSERT INTO users (username, type, "group", age, last_updated_by) VALUES (${chance.name(
-            { middle: true }
+          } as const)`INSERT INTO users (username, type, "group", age, password_hash, last_updated_by) VALUES (${chance.name(
+            { prefix: true, suffix: true }
           )}, 'voter', ${chance.profession()}, ${chance.integer({
             min: 5,
             max: 13,
-          })}, ${admin.id}) RETURNING users.id;`
+          })}, ${hash}, ${admin.id}) RETURNING users.id;`
         )[0];
 
         chance.shuffle(projects);
