@@ -1206,7 +1206,7 @@ async function testHelperCreatesProjectWithProjectLeadersAndMembers(
 ) {
   await helper.driver.get(`${BASE_URL}/login`);
   const formTester = await helper.form("pw-login");
-  await formTester.setField("username", "Mr. Elmer Adams M.D.");
+  await formTester.setField("username", "Mr. Jerry Howard B.TECH");
   await formTester.setField("password", "changeme");
   await formTester.submitSuccess();
 
@@ -1255,7 +1255,7 @@ async function testHelperCreatesProjectWithProjectLeadersAndMembers(
     await helper.driver.wait(
       until.elementLocated(
         By.xpath(
-          `//th/p/a[@href="/users/view/${4}"]/../../../td/pw-project-user-checkbox/form/input`
+          `//th/p/a[@href="/users/view/${2}"]/../../../td/pw-project-user-checkbox/form/input`
         )
       ),
       1000
@@ -1269,6 +1269,28 @@ async function testHelperCreatesProjectWithProjectLeadersAndMembers(
   );
 
   assert.equal(alerts1.length, 0);
+
+  // this is a new project so nobody has voted it yet so obviously there can't be any collisions
+
+  // but we can try to add another teacher
+  await helper.click(
+    await helper.driver.wait(
+      until.elementLocated(
+        By.xpath(
+          `//th/p/a[@href="/users/view/${4}"]/../../../td/pw-project-user-checkbox/form/input`
+        )
+      ),
+      1000
+    )
+  );
+
+  await helper.waitUntilLoaded();
+
+  const alerts2 = await helper.driver.findElements(
+    By.css('div[class="alert alert-danger"]')
+  );
+
+  assert.equal(alerts2.length, 1);
 }
 
 // TODO better would be some kind of queing system where a ready browser takes the next task

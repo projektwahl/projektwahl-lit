@@ -105,7 +105,7 @@ export async function setup() {
         )[0];
 
         projects = chance.shuffle(projects);
-        for (let j = 0; j < chance.integer({ min: 0, max: 7 }); j++) {
+        for (let j = 0; j < chance.integer({ min: 0, max: 25 }); j++) {
           try {
             await sql.savepoint("test", async (ssql) => {
               await typedSql(ssql, {
