@@ -797,14 +797,14 @@ async function checkUsersSortingWorks(helper: Helper) {
 
   console.log("end");
 
-  assert.equal(501, rows.length);
-
   console.log(rows.sort((a, b) => a - b));
 
   assert.deepEqual(
     Array.from({ length: rows.length }, (_, i) => i + 1),
     rows
   );
+
+  assert.equal(501, rows.length);
 }
 
 async function checkUsersPaginationLimitWorks(helper: Helper) {
