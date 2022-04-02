@@ -1206,9 +1206,47 @@ async function testHelperCreatesProjectWithProjectLeadersAndMembers(
 ) {
   await helper.driver.get(`${BASE_URL}/login`);
   const formTester = await helper.form("pw-login");
-  await formTester.setField("username", "admin");
+  await formTester.setField("username", "Mr. Elmer Adams M.D.");
   await formTester.setField("password", "changeme");
   await formTester.submitSuccess();
+
+  await helper.openNavbar();
+  await helper.click(
+    await helper.driver.findElement(By.css(`a[href="/projects"]`))
+  );
+
+  await helper.form("pw-projects");
+  await helper.click(
+    await helper.driver.findElement(By.css(`a[href="/projects/create"]`))
+  );
+  let form = await helper.form("pw-project-create");
+  const title = `title${Math.random()}`;
+  const info = `info${Math.random()}`;
+  const place = `place${Math.random()}`;
+  const costs = Math.floor(Math.random() * 10);
+  const min_age = Math.floor(Math.random() * 10);
+  const max_age = Math.floor(Math.random() * 10);
+  const min_participants = Math.floor(Math.random() * 10) + 1;
+  const max_participants = Math.floor(Math.random() * 10) + 1;
+  const random_assignments = Math.random() > 0.5 ? true : false;
+  const deleted = Math.random() > 0.5 ? true : false;
+  await form.setField("title", title);
+  await form.setTextareaField("info", info);
+  await form.setField("place", place);
+  await form.resetField("costs", `${costs}`);
+  await form.resetField("min_age", `${min_age}`);
+  await form.resetField("max_age", `${max_age}`);
+  await form.resetField("min_participants", `${min_participants}`);
+  await form.resetField("max_participants", `${max_participants}`);
+  await form.checkField("random_assignments", random_assignments);
+  await form.checkField("deleted", deleted);
+  await form.submitSuccess();
+  await helper.driver.wait(until.urlContains("/projects/edit/"), 2000);
+  (await helper.driver.getCurrentUrl()).substring(
+    "https://localhost:8443/projects/edit/".length
+  );
+  await helper.waitUntilLoaded();
+  form = await helper.form("pw-project-create");
 }
 
 // TODO better would be some kind of queing system where a ready browser takes the next task
@@ -1216,6 +1254,8 @@ async function testHelperCreatesProjectWithProjectLeadersAndMembers(
 await runTestAllBrowsers(async (helper) => {
   await testHelperCreatesProjectWithProjectLeadersAndMembers(helper);
   await helper.driver.manage().deleteAllCookies();
+
+  return;
 
   await testVotingWorks(helper);
   await helper.driver.manage().deleteAllCookies();

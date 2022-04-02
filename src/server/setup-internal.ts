@@ -96,7 +96,7 @@ export async function setup() {
             columns: { id: 23 },
           } as const)`INSERT INTO users (username, type, "group", age, password_hash, last_updated_by) VALUES (${chance.name(
             { prefix: true, suffix: true }
-          )}, 'voter', ${chance.profession()}, ${chance.integer({
+          )}, ${chance.bool() ? "voter" : "helper"}, ${chance.profession()}, ${chance.integer({
             min: 5,
             max: 13,
           })}, ${hash}, ${admin.id}) RETURNING users.id;`
