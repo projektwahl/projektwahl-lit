@@ -41,7 +41,7 @@ export async function setup() {
       process.env.NODE_ENV === "development" ||
       process.env.NODE_ENV === "testing"
     ) {
-      const projects: DescriptionTypes<{
+      let projects: DescriptionTypes<{
         readonly id: 23;
         readonly title: 1043;
         readonly info: 1043;
@@ -96,14 +96,16 @@ export async function setup() {
             columns: { id: 23 },
           } as const)`INSERT INTO users (username, type, "group", age, password_hash, last_updated_by) VALUES (${chance.name(
             { prefix: true, suffix: true }
-          )}, 'voter', ${chance.profession()}, ${chance.integer({
+          )}, ${
+            chance.bool() ? "voter" : "helper"
+          }, ${chance.profession()}, ${chance.integer({
             min: 5,
             max: 13,
           })}, ${hash}, ${admin.id}) RETURNING users.id;`
         )[0];
 
-        chance.shuffle(projects);
-        for (let j = 0; j < chance.integer({ min: 0, max: 7 }); j++) {
+        projects = chance.shuffle(projects);
+        for (let j = 0; j < chance.integer({ min: 0, max: 25 }); j++) {
           try {
             await sql.savepoint("test", async (ssql) => {
               await typedSql(ssql, {
