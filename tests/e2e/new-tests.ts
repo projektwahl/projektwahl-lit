@@ -1201,9 +1201,22 @@ async function testVotingWorks(helper: Helper) {
   );
 }
 
+async function testHelperCreatesProjectWithProjectLeadersAndMembers(
+  helper: Helper
+) {
+  await helper.driver.get(`${BASE_URL}/login`);
+  const formTester = await helper.form("pw-login");
+  await formTester.setField("username", "admin");
+  await formTester.setField("password", "changeme");
+  await formTester.submitSuccess();
+}
+
 // TODO better would be some kind of queing system where a ready browser takes the next task
 
 await runTestAllBrowsers(async (helper) => {
+  await testHelperCreatesProjectWithProjectLeadersAndMembers(helper);
+  await helper.driver.manage().deleteAllCookies();
+
   await testVotingWorks(helper);
   await helper.driver.manage().deleteAllCookies();
 
