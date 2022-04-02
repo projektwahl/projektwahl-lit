@@ -1252,11 +1252,12 @@ async function testHelperCreatesProjectWithProjectLeadersAndMembers(
   //await helper.waitUntilLoaded();
 
   await helper.click(
-    await helper.driver
-    .wait(
-      until.elementLocated(By.xpath(
-        `//th/p/a[@href="/users/view/${4}"]/../../../td/pw-project-user-checkbox/form/input`
-      )),
+    await helper.driver.wait(
+      until.elementLocated(
+        By.xpath(
+          `//th/p/a[@href="/users/view/${4}"]/../../../td/pw-project-user-checkbox/form/input`
+        )
+      ),
       1000
     )
   );
