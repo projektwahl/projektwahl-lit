@@ -1295,6 +1295,9 @@ async function testHelperCreatesProjectWithProjectLeadersAndMembers(
 // TODO better would be some kind of queing system where a ready browser takes the next task
 
 await runTestAllBrowsers(async (helper) => {
+  await checkUsersSortingWorks(helper);
+  await helper.driver.manage().deleteAllCookies();
+
   await testVotingWorks(helper);
   await helper.driver.manage().deleteAllCookies();
 
@@ -1305,9 +1308,6 @@ await runTestAllBrowsers(async (helper) => {
   await helper.driver.manage().deleteAllCookies();
 
   await checkProjectSortingWorks(helper);
-  await helper.driver.manage().deleteAllCookies();
-
-  await checkUsersSortingWorks(helper);
   await helper.driver.manage().deleteAllCookies();
 
   await testHelperCreatesProjectWithProjectLeadersAndMembers(helper);
