@@ -1247,6 +1247,24 @@ async function testHelperCreatesProjectWithProjectLeadersAndMembers(
   );
   await helper.waitUntilLoaded();
   form = await helper.form("pw-project-create");
+
+  await helper.waitUntilLoaded();
+  //await helper.waitUntilLoaded();
+
+  await helper.click(await helper.driver
+    .findElement(
+      By.xpath(
+        `//pw-project-user-checkbox`
+      )
+    ))
+
+  /*await helper.waitUntilLoaded();
+
+  const alerts1 = await helper.driver.findElements(
+    By.css('div[class="alert alert-danger"]')
+  );
+
+  assert.equal(alerts1.length, 0);*/
 }
 
 // TODO better would be some kind of queing system where a ready browser takes the next task
