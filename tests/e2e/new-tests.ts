@@ -187,8 +187,10 @@ class Helper {
   }
 
   async waitUntilLoaded() {
-    const loadingIndicator = await this.driver.findElement(
-      By.css(".spinner-grow")
+    const loadingIndicator = await this.driver.wait(
+      until.elementLocated(By.css(".spinner-grow")),
+      5000,
+      `.spinner-grow not found`
     );
 
     await this.driver.wait(
@@ -1146,9 +1148,65 @@ async function resettingProjectWorks2(helper: Helper) {
   }
 }
 
+async function testVotingWorks(helper: Helper) {
+  await helper.driver.get(`${BASE_URL}/login`);
+  const formTester = await helper.form("pw-login");
+  await formTester.setField("username", "Dr. Dustin Allison M.D.");
+  await formTester.setField("password", "changeme");
+  await formTester.submitSuccess();
+
+  await helper.openNavbar();
+  await helper.click(
+    await helper.driver.findElement(By.css(`a[href="/vote"]`))
+  );
+
+  await helper.waitUntilLoaded();
+
+  await helper.driver
+    .findElement(
+      By.xpath(
+        `//th/p/a[@href="/projects/view/${4}"]/../../../td/pw-rank-select/form/div/button[1]`
+      )
+    )
+    .click();
+
+  await helper.waitUntilLoaded();
+
+  const alerts1 = await helper.driver.findElements(
+    By.css('div[class="alert alert-danger"]')
+  );
+
+  assert.equal(alerts1.length, 0);
+
+  await helper.driver
+    .findElement(
+      By.xpath(
+        `//th/p/a[@href="/projects/view/${1}"]/../../../td/pw-rank-select/form/div/button[1]`
+      )
+    )
+    .click();
+
+  await helper.waitUntilLoaded();
+
+  const alerts2 = await helper.driver.findElements(
+    By.css('div[class="alert alert-danger"]')
+  );
+
+  assert.equal(alerts2.length, 1);
+
+  assert.equal(
+    await alerts2[0].getText(),
+    "Some errors occurred!\n" +
+      "database: Der Nutzer passt nicht in die Altersbegrenzung des Projekts!"
+  );
+}
+
 // TODO better would be some kind of queing system where a ready browser takes the next task
 
 await runTestAllBrowsers(async (helper) => {
+  await testVotingWorks(helper);
+  await helper.driver.manage().deleteAllCookies();
+
   await checkUsersFilteringWorks(helper);
   await helper.driver.manage().deleteAllCookies();
 
