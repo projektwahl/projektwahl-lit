@@ -41,7 +41,7 @@ export async function setup() {
       process.env.NODE_ENV === "development" ||
       process.env.NODE_ENV === "testing"
     ) {
-      const projects: DescriptionTypes<{
+      let projects: DescriptionTypes<{
         readonly id: 23;
         readonly title: 1043;
         readonly info: 1043;
@@ -104,7 +104,7 @@ export async function setup() {
           })}, ${hash}, ${admin.id}) RETURNING users.id;`
         )[0];
 
-        chance.shuffle(projects);
+        projects = chance.shuffle(projects);
         for (let j = 0; j < chance.integer({ min: 0, max: 7 }); j++) {
           try {
             await sql.savepoint("test", async (ssql) => {
