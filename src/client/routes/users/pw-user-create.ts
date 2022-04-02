@@ -275,7 +275,7 @@ class PwUserCreate extends PwForm<"/api/v1/users/create-or-update"> {
                       set: (o, v) => (o[0].age = v),
                       task: this._task,
                       initial: this.initial?.data,
-                      defaultValue: undefined,
+                      defaultValue: null,
                       resettable: this.initial !== undefined,
                     })}`
                   : undefined}
