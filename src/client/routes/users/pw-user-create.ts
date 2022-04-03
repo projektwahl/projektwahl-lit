@@ -20,7 +20,7 @@ https://github.com/projektwahl/projektwahl-lit
 SPDX-License-Identifier: AGPL-3.0-or-later
 SPDX-FileCopyrightText: 2021 Moritz Hedtke <Moritz.Hedtke@t-online.de>
 */
-import { html } from "lit";
+import { html, noChange } from "lit";
 import "../../form/pw-form.js";
 import { Task } from "@lit-labs/task";
 import { myFetch } from "../../utils.js";
@@ -28,8 +28,7 @@ import { PwForm } from "../../form/pw-form.js";
 import { HistoryController } from "../../history-controller.js";
 import { msg } from "@lit/localize";
 import "../../form/pw-input.js";
-import {
-  routes,
+import type {
   MinimalSafeParseError,
   updateUserAction,
 } from "../../../lib/routes.js";
@@ -89,6 +88,12 @@ class PwUserCreate extends PwForm<"/api/v1/users/create-or-update"> {
           return true;
         },
       },
+      _initialTask: {
+        state: true,
+        hasChanged: () => {
+          return true;
+        },
+      },
       type: { state: true },
       initial: { attribute: false },
     };
@@ -108,6 +113,13 @@ class PwUserCreate extends PwForm<"/api/v1/users/create-or-update"> {
     | MinimalSafeParseError
     | undefined;
 
+  initialTask: Task<
+    [],
+    | z.SafeParseSuccess<z.infer<typeof updateUserAction>[]>
+    | MinimalSafeParseError
+    | undefined
+  >;
+
   typeRef!: Ref<
     PwInputSelect<
       "/api/v1/users/create-or-update",
@@ -117,10 +129,6 @@ class PwUserCreate extends PwForm<"/api/v1/users/create-or-update"> {
 
   constructor() {
     super();
-
-    routes["/api/v1/users/create-or-update"]["request"]["element"][
-      "options"
-    ].get("voter");
 
     this.url = "/api/v1/users/create-or-update";
 
@@ -141,6 +149,25 @@ class PwUserCreate extends PwForm<"/api/v1/users/create-or-update"> {
       }
       return result;
     });
+
+    // @ts-expect-error TODO fix this
+    this.initialTask = new Task(
+      this,
+      async () => {
+        if (!this.hasUpdated) {
+          if (this.initial !== undefined) {
+            return this.initial;
+          }
+        }
+
+        if (this.initial?.success) {
+          return await taskFunction([this.initial?.data[0].id]);
+        } else {
+          return undefined;
+        }
+      },
+      () => []
+    );
 
     this.typeRef = createRef();
   }
@@ -167,224 +194,249 @@ class PwUserCreate extends PwForm<"/api/v1/users/create-or-update"> {
 
       //console.log("bro ", this.typeRef.value?.inputValue);
 
-      return html`
-        ${bootstrapCss}
-        <main class="container">
-          <h1 class="text-center">${this.actionText}</h1>
+      return html` <div
+          style="position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 1337;"
+        >
+          ${this._task.render({
+            pending: () => html`<div
+              class="spinner-grow text-primary"
+              role="status"
+            >
+              <span class="visually-hidden">${msg("Loading...")}</span>
+            </div>`,
+          })}
+        </div>
 
-          <div class="row justify-content-center">
-            <div class="col-md-7 col-lg-8">
-              ${this.getErrors()}
+        ${this.initialTask.render({
+          complete: (value) => {
+            if (value === undefined || value?.success) {
+              if (this.actionText === undefined) {
+                throw new Error(msg("component not fully initialized"));
+              }
 
-              <form
-                ${ref(this.form)}
-                method="POST"
-                action="/no-javascript"
-                @submit=${async (event: Event) => {
-                  event.preventDefault();
+              return html`
+                <main class="container">
+                  <h1 class="text-center">${this.actionText}</h1>
 
-                  //console.log("SUBMIT");
+                  <div class="row justify-content-center">
+                    <div class="col-md-7 col-lg-8">
+                      ${this.getErrors()}
 
-                  await this._task.run();
-                }}
-              >
-                ${pwInputText<
-                  "/api/v1/users/create-or-update",
-                  string | undefined
-                >({
-                  url: this.url,
-                  type: "text",
-                  disabled: this.disabled,
-                  label: msg("Username"),
-                  name: [0, "username"],
-                  get: (o) => o[0].username,
-                  set: (o, v) => (o[0].username = v),
-                  task: this._task,
-                  initial: this.initial?.data,
-                  defaultValue: "",
-                  resettable: this.initial !== undefined,
-                })}
-                ${pwInputText<
-                  "/api/v1/users/create-or-update",
-                  string | null | undefined
-                >({
-                  url: this.url,
-                  type: "text",
-                  disabled: this.disabled,
-                  label: msg("Third-party email address"),
-                  name: [0, "openid_id"],
-                  get: (o) => o[0].openid_id,
-                  set: (o, v) => (o[0].openid_id = v),
-                  task: this._task,
-                  initial: this.initial?.data,
-                  defaultValue: null,
-                  resettable: this.initial !== undefined,
-                })}
-                ${pwInputSelect<
-                  "/api/v1/users/create-or-update",
-                  "voter" | "helper" | "admin" | undefined
-                >({
-                  url: this.url,
-                  type: "select",
-                  disabled: this.disabled,
-                  label: msg("User type"),
-                  name: [0, "type"],
-                  get: (o) => o[0].type,
-                  set: (o, v) => {
-                    o[0].type = v;
-                    this.requestUpdate(); // hack to update on this
-                  },
-                  options: [
-                    { value: "voter", text: "Schüler" },
-                    { value: "helper", text: "Helfer" },
-                    { value: "admin", text: "Admin" },
-                  ],
-                  task: this._task,
-                  initial: this.initial?.data,
-                  defaultValue: "voter",
-                  resettable: this.initial !== undefined,
-                  pwRef: this.typeRef,
-                })}
-                ${this.typeRef.value?.inputValue === "voter"
-                  ? html`${pwInputText<
-                      "/api/v1/users/create-or-update",
-                      string | null | undefined
-                    >({
-                      url: this.url,
-                      type: "text",
-                      disabled: this.disabled,
-                      label: msg("Group"),
-                      name: [0, "group"],
-                      get: (o) => o[0].group,
-                      set: (o, v) => (o[0].group = v),
-                      task: this._task,
-                      initial: this.initial?.data,
-                      defaultValue: "",
-                      resettable: this.initial !== undefined,
-                    })}
-                    ${pwInputNumber<
-                      "/api/v1/users/create-or-update",
-                      number | undefined | null
-                    >({
-                      url: this.url,
-                      type: "number",
-                      disabled: this.disabled,
-                      label: msg("Age"),
-                      name: [0, "age"],
-                      get: (o) => o[0].age,
-                      set: (o, v) => (o[0].age = v),
-                      task: this._task,
-                      initial: this.initial?.data,
-                      defaultValue: null,
-                      resettable: this.initial !== undefined,
-                    })}`
-                  : undefined}
-                ${!this.disabled
-                  ? html`
-                      ${pwInputText<
-                        "/api/v1/users/create-or-update",
-                        string | undefined
-                      >({
-                        url: this.url,
-                        type: "password",
-                        disabled: this.disabled,
-                        label: msg("Password"),
-                        name: [0, "password"],
-                        get: (o) => o[0].password,
-                        set: (o, v) => (o[0].password = v),
-                        task: this._task,
-                        autocomplete: "new-password",
-                        initial: this.initial?.data,
-                        defaultValue: "",
-                        resettable: this.initial !== undefined,
-                      })}
-                    `
-                  : undefined}
-                ${pwInputCheckbox<
-                  "/api/v1/users/create-or-update",
-                  boolean | undefined
-                >({
-                  url: this.url,
-                  type: "checkbox",
-                  trueValue: true,
-                  falseValue: false,
-                  defaultValue: false,
-                  disabled: this.disabled,
-                  label: msg("Away"),
-                  name: [0, "away"],
-                  get: (o) => o[0].away,
-                  set: (o, v) => (o[0].away = v),
-                  task: this._task,
-                  initial: this.initial?.data,
-                  resettable: this.initial !== undefined,
-                })}
-                ${pwInputCheckbox<
-                  "/api/v1/users/create-or-update",
-                  boolean | undefined
-                >({
-                  url: this.url,
-                  type: "checkbox",
-                  trueValue: true,
-                  falseValue: false,
-                  defaultValue: false,
-                  disabled: this.disabled,
-                  label: msg("Mark this user as deleted"),
-                  name: [0, "deleted"],
-                  get: (o) => o[0].deleted,
-                  set: (o, v) => (o[0].deleted = v),
-                  task: this._task,
-                  initial: this.initial?.data,
-                  resettable: this.initial !== undefined,
-                })}
-                ${!this.disabled
-                  ? html`
-                      <button
-                        type="submit"
-                        ?disabled=${this._task.render({
-                          pending: () => true,
-                          complete: () => false,
-                          initial: () => false,
-                        })}
-                        class="btn btn-primary"
+                      <form
+                        ${ref(this.form)}
+                        method="POST"
+                        action="/no-javascript"
+                        @submit=${async (event: Event) => {
+                          event.preventDefault();
+
+                          //console.log("SUBMIT");
+
+                          await this._task.run();
+                        }}
                       >
-                        ${this.actionText}
-                      </button>
-                    `
-                  : html`<a
-                      class="btn btn-secondary"
-                      href="/users/edit/${this.initial?.data[0].id}"
-                      @click=${aClick}
-                      role="button"
-                      >Edit user</a
-                    >`}
-                <button
-                  type="button"
-                  class="btn btn-secondary"
-                  @click=${() => window.history.back()}
-                >
-                  ${msg(`Back`)}
-                </button>
-              </form>
-            </div>
-          </div>
-        </main>
-      `;
-    } else {
-      if (this.initial.error.issues.length > 0) {
-        return html`${bootstrapCss}
-            <main class="container">
-              <h1 class="text-center">${this.actionText}</h1>
+                        ${pwInputText<
+                          "/api/v1/users/create-or-update",
+                          string | undefined
+                        >({
+                          url: this.url,
+                          type: "text",
+                          disabled: this.disabled,
+                          label: msg("Username"),
+                          name: [0, "username"],
+                          get: (o) => o[0].username,
+                          set: (o, v) => (o[0].username = v),
+                          task: this._task,
+                          defaultValue: "",
+                          initial: value?.data,
+                          resettable: value !== undefined,
+                        })}
+                        ${pwInputText<
+                          "/api/v1/users/create-or-update",
+                          string | null | undefined
+                        >({
+                          url: this.url,
+                          type: "text",
+                          disabled: this.disabled,
+                          label: msg("Third-party email address"),
+                          name: [0, "openid_id"],
+                          get: (o) => o[0].openid_id,
+                          set: (o, v) => (o[0].openid_id = v),
+                          task: this._task,
+                          defaultValue: null,
+                          initial: value?.data,
+                          resettable: value !== undefined,
+                        })}
+                        ${pwInputSelect<
+                          "/api/v1/users/create-or-update",
+                          "voter" | "helper" | "admin" | undefined
+                        >({
+                          url: this.url,
+                          type: "select",
+                          disabled: this.disabled,
+                          label: msg("User type"),
+                          name: [0, "type"],
+                          get: (o) => o[0].type,
+                          set: (o, v) => {
+                            o[0].type = v;
+                            this.requestUpdate(); // hack to update on this
+                          },
+                          options: [
+                            { value: "voter", text: "Schüler" },
+                            { value: "helper", text: "Helfer" },
+                            { value: "admin", text: "Admin" },
+                          ],
+                          task: this._task,
+                          defaultValue: "voter",
+                          pwRef: this.typeRef,
+                          initial: value?.data,
+                          resettable: value !== undefined,
+                        })}
+                        ${this.typeRef.value?.inputValue === "voter"
+                          ? html`${pwInputText<
+                              "/api/v1/users/create-or-update",
+                              string | null | undefined
+                            >({
+                              url: this.url,
+                              type: "text",
+                              disabled: this.disabled,
+                              label: msg("Group"),
+                              name: [0, "group"],
+                              get: (o) => o[0].group,
+                              set: (o, v) => (o[0].group = v),
+                              task: this._task,
+                              defaultValue: "",
+                              initial: value?.data,
+                              resettable: value !== undefined,
+                            })}
+                            ${pwInputNumber<
+                              "/api/v1/users/create-or-update",
+                              number | undefined | null
+                            >({
+                              url: this.url,
+                              type: "number",
+                              disabled: this.disabled,
+                              label: msg("Age"),
+                              name: [0, "age"],
+                              get: (o) => o[0].age,
+                              set: (o, v) => (o[0].age = v),
+                              task: this._task,
+                              defaultValue: null,
+                              initial: value?.data,
+                              resettable: value !== undefined,
+                            })}`
+                          : undefined}
+                        ${!this.disabled
+                          ? html`
+                              ${pwInputText<
+                                "/api/v1/users/create-or-update",
+                                string | undefined
+                              >({
+                                url: this.url,
+                                type: "password",
+                                disabled: this.disabled,
+                                label: msg("Password"),
+                                name: [0, "password"],
+                                get: (o) => o[0].password,
+                                set: (o, v) => (o[0].password = v),
+                                task: this._task,
+                                autocomplete: "new-password",
+                                defaultValue: "",
+                                initial: value?.data,
+                                resettable: value !== undefined,
+                              })}
+                            `
+                          : undefined}
+                        ${pwInputCheckbox<
+                          "/api/v1/users/create-or-update",
+                          boolean | undefined
+                        >({
+                          url: this.url,
+                          type: "checkbox",
+                          trueValue: true,
+                          falseValue: false,
+                          defaultValue: false,
+                          disabled: this.disabled,
+                          label: msg("Away"),
+                          name: [0, "away"],
+                          get: (o) => o[0].away,
+                          set: (o, v) => (o[0].away = v),
+                          task: this._task,
+                          initial: value?.data,
+                          resettable: value !== undefined,
+                        })}
+                        ${pwInputCheckbox<
+                          "/api/v1/users/create-or-update",
+                          boolean | undefined
+                        >({
+                          url: this.url,
+                          type: "checkbox",
+                          trueValue: true,
+                          falseValue: false,
+                          defaultValue: false,
+                          disabled: this.disabled,
+                          label: msg("Mark this user as deleted"),
+                          name: [0, "deleted"],
+                          get: (o) => o[0].deleted,
+                          set: (o, v) => (o[0].deleted = v),
+                          task: this._task,
+                          initial: value?.data,
+                          resettable: value !== undefined,
+                        })}
+                        ${!this.disabled
+                          ? html`
+                              <button
+                                type="submit"
+                                ?disabled=${this._task.render({
+                                  pending: () => true,
+                                  complete: () => false,
+                                  initial: () => false,
+                                })}
+                                class="btn btn-primary"
+                              >
+                                ${this.actionText}
+                              </button>
+                            `
+                          : html`<a
+                              class="btn btn-secondary"
+                              href="/users/edit/${this.initial?.data[0].id}"
+                              @click=${aClick}
+                              role="button"
+                              >Edit user</a
+                            >`}
+                        <button
+                          type="button"
+                          class="btn btn-secondary"
+                          @click=${() => window.history.back()}
+                        >
+                          ${msg(`Back`)}
+                        </button>
+                      </form>
+                    </div>
+                  </div>
+                </main>
+              `;
+            } else {
+              return html`${bootstrapCss}
+              <main class="container">
+                <h1 class="text-center">${this.actionText}</h1>
+                
+                <div class="alert alert-danger" role="alert">
+                ${msg("Some errors occurred!")}<br />
+                ${value?.error.issues.map(
+                  (issue) => html` ${issue.path}: ${issue.message}<br /> `
+                )}
+              </div>
               
-              <div class="alert alert-danger" role="alert">
-              ${msg("Some errors occurred!")}<br />
-              ${this.initial.error.issues.map(
-                (issue) => html` ${issue.path}: ${issue.message}<br /> `
-              )}
-            </div>
-            
-            </div>
-          </main>`;
-      }
+              </div>
+            </main>`;
+            }
+          },
+          error: (error) => {
+            throw error;
+          },
+          initial: () => html`initial`,
+          pending: () => noChange,
+        })}`;
     }
   }
 }
