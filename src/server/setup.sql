@@ -497,19 +497,3 @@ CREATE TRIGGER trigger_check_users_project_leader_id3
 BEFORE INSERT ON users_with_deleted
 FOR EACH ROW
 EXECUTE FUNCTION check_users_project_leader_id3();
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-INSERT INTO settings (id, election_running) VALUES (1, false) ON CONFLICT DO NOTHING;
