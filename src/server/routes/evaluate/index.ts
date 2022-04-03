@@ -218,20 +218,23 @@ export async function evaluate() {
   const lp = new CPLEXLP();
   await lp.setup();
 
-  const choices = z.array(rawChoice).parse(
-    await sql.file("src/server/routes/evaluate/calculate.sql", [], {
-      cache: false,
-    })
-  );
+  const [choices, projects, users] = await sql.begin(async (tsql) => {
+    const choices = z.array(rawChoice).parse(
+      await tsql.file("src/server/routes/evaluate/calculate.sql", [], {
+        cache: false,
+      })
+    );
 
-  // TODO FIXME database transaction to ensure consistent view of data
-  const projects = await typedSql(sql, {
-    columns: { id: 23, min_participants: 23, max_participants: 23 },
-  } as const)`SELECT id, min_participants, max_participants FROM projects;`;
+    // TODO FIXME database transaction to ensure consistent view of data
+    const projects = await typedSql(tsql, {
+      columns: { id: 23, min_participants: 23, max_participants: 23 },
+    } as const)`SELECT id, min_participants, max_participants FROM projects;`;
 
-  const users = await typedSql(sql, {
-    columns: { id: 23, project_leader_id: 23 },
-  } as const)`SELECT id, project_leader_id FROM present_voters ORDER BY id;`;
+    const users = await typedSql(tsql, {
+      columns: { id: 23, project_leader_id: 23 },
+    } as const)`SELECT id, project_leader_id FROM present_voters ORDER BY id;`;
+    return [choices, projects, users];
+  });
 
   // lodash types are just trash do this yourself
   const choicesGroupedByProject = groupByNumber(choices, (v) => v.project_id);
