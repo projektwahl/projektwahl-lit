@@ -41,7 +41,7 @@ export const PwEvaluation = setupHmr(
           </p>
 
           <p>
-            Fangen wir mit den Grundlagen an: Die Wahl einer Person ist gültig, wenn genau fünf Projekte gewählt wurden und dabei die Altersbeschränkung eingehalten wurde (dies ist aktuell immer der Fall). Personen, die nicht gültig gewählt haben, können allen Projekten zugewiesen werden, die von der Altersbeschränkung her passen. Man kann nicht ein Projekt wählen, in dem man Projektleiter ist.
+            Fangen wir mit den Grundlagen an: Die Wahl einer Person ist gültig, wenn genau fünf Projekte gewählt wurden und dabei die Altersbeschränkung eingehalten wurde (dies ist aktuell immer der Fall). Personen, die nicht gültig gewählt haben, können allen Projekten zugewiesen werden, die von der Altersbeschränkung her passen (und solche zufälligen Zuweisungen erlauben). Man kann nicht ein Projekt wählen, in dem man Projektleiter ist.
           </p>
 
           <p>
@@ -49,7 +49,19 @@ export const PwEvaluation = setupHmr(
           </p>
 
           <p>
-            Der Kern des nun folgenden Algorithmus ist es, die Summe der Punktzahlen von allen Personen zusammen zu maximieren.
+            Der Kern des nun folgenden Algorithmus ist es, die Summe der Punktzahlen von allen Personen zusammen zu maximieren. Dafür wird eine sehr großes Gleichungssystem erstellt und dieses dann automatisch (per Hand, sehr witzig) gelöst.
+          </p>
+
+          <p>
+            Wenn ein Projekt zustandekommt, in dem man Projektleiter ist, kommt man logischerweise in dieses Projekt. Ansonsten kommt man logischerweise in genau *ein* Projekt. Man kann natürlich nur in existierende Projekte kommen (hoffentlich).
+          </p>
+
+          <p>
+            Kommen wir nun zum komplizierteren Teil: In jedem Projekt müssen eigentlich die Mindestteilnehmer und Maximalteilnehmer eingehalten werden. Wenn dies nicht möglich ist, kann das Projekt normalerweise nicht stattfinden.
+          </p>
+
+          <p>
+            Wenn es jetzt jedoch keine mögliche Zuordnung mit diesen Einschränkungen geben würde (was schon vorgekommen ist), dann erhält man vom Algorithmus ein sehr "hilfreiches" "Es existiert keine Lösung des Gleichungssystems". Da man damit wenig anfangen kann und vor allem nicht weiß, bei welchem Projekt man am Besten die Einschränkungen lockert, gibt es ein sehr unfavorisiertes Überbelegen oder Unterbelegen von Projekten. Dadurch sieht man dann, bei welchen Projekten man am Besten die Größe ändert. Wenn dies nicht möglich ist, kann man (bald) für einzelne Projekte dies verhindern.
           </p>
         </div>
       `;

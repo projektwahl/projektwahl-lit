@@ -253,10 +253,6 @@ export async function evaluate() {
     );
   }
 
-  // overloaded projects should make this way worse
-  // maybe in the constraints to choice1 + choice2 + choice3 + overload <= max_participants
-  // then put overload in here. This *should* work (but probably doesn't)
-
   for (const project of projects) {
     await lp.maximize(-9000, `project_overloaded_${project.id}`);
     await lp.maximize(-9000, `project_underloaded_${project.id}`);
