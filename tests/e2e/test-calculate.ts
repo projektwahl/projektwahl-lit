@@ -68,12 +68,29 @@ export async function test1() {
 // ignore for now - this creates an invalid file
 // test1()
 
+
 export async function test2() {
   await reset();
   const p0 = await project();
   const u0 = await user(5);
-  await vote(p0, u0, 1);
+  //await vote(p0, u0, 1);
   await evaluate();
 }
 
-await test2();
+// ignore for now - less than five projects
+//await test2();
+
+
+export async function test3() {
+    await reset();
+    const p0 = await project();
+    const p1 = await project();
+    const p2 = await project();
+    const p3 = await project();
+    const p4 = await project();
+    const u0 = await user(5);
+    //await vote(p0, u0, 1);
+    await evaluate();
+}
+
+await test3();
