@@ -69,8 +69,6 @@ psql --single-transaction --username=moritz < src/server/setup.sql
 
 NODE_ENV=development BASE_URL=https://localhost:8443 DATABASE_HOST=/run/postgresql DATABASE_URL=postgres://moritz@localhost/moritz npm run setup
 
-NODE_ENV=development npm run evaluate
-
 nano $CREDENTIALS_DIRECTORY/openid_client_secret
 
 NODE_ENV=development PORT=8443 BASE_URL=https://localhost:8443 OPENID_URL=openid_url CLIENT_ID=client_id  CREDENTIALS_DIRECTORY=$PWD npm run server
@@ -78,6 +76,12 @@ NODE_ENV=development PORT=8443 BASE_URL=https://localhost:8443 OPENID_URL=openid
 NODE_ENV=development PORT=8443 BASE_URL=https://localhost:8443 CREDENTIALS_DIRECTORY=$PWD DATABASE_HOST=/run/postgresql DATABASE_URL=postgres://moritz@localhost/moritz npm run server
 
 # https://localhost:8443/
+
+
+
+
+
+NODE_ENV=development CREDENTIALS_DIRECTORY=$PWD DATABASE_HOST=/run/postgresql DATABASE_URL=postgres://moritz@localhost/moritz npm run evaluate
 ```
 
 ## Testing

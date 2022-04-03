@@ -214,146 +214,147 @@ export const rank2points = (rank: number) => {
   }
 };
 
-const lp = new CPLEXLP();
-await lp.setup();
+export async function evaluate() {
+  const lp = new CPLEXLP();
+  await lp.setup();
 
-const choices = z.array(rawChoice).parse(
-  await sql.file("src/server/routes/evaluate/calculate.sql", [], {
-    cache: false,
-  })
-);
-
-// TODO FIXME database transaction to ensure consistent view of data
-const projects = await typedSql(sql, {
-  columns: { id: 23, min_participants: 23, max_participants: 23 },
-} as const)`SELECT id, min_participants, max_participants FROM projects;`;
-
-const users = await typedSql(sql, {
-  columns: { id: 23, project_leader_id: 23 },
-} as const)`SELECT id, project_leader_id FROM present_voters ORDER BY id;`;
-
-// lodash types are just trash do this yourself
-const choicesGroupedByProject = groupByNumber(choices, (v) => v.project_id);
-
-const choicesGroupedByUser = groupByNumber(choices, (v) => v.user_id);
-
-await lp.startMaximize();
-
-for (const choice of choices) {
-  await lp.maximize(
-    rank2points(choice.rank),
-    `choice_${choice.user_id}_${choice.project_id}`
+  const choices = z.array(rawChoice).parse(
+    await sql.file("src/server/routes/evaluate/calculate.sql", [], {
+      cache: false,
+    })
   );
-}
 
-// overloaded projects should make this way worse
-// maybe in the constraints to choice1 + choice2 + choice3 + overload <= max_participants
-// then put overload in here. This *should* work (but probably doesn't)
+  // TODO FIXME database transaction to ensure consistent view of data
+  const projects = await typedSql(sql, {
+    columns: { id: 23, min_participants: 23, max_participants: 23 },
+  } as const)`SELECT id, min_participants, max_participants FROM projects;`;
 
-for (const project of projects) {
-  await lp.maximize(-9000, `project_overloaded_${project.id}`);
-  await lp.maximize(-9000, `project_underloaded_${project.id}`);
-}
+  const users = await typedSql(sql, {
+    columns: { id: 23, project_leader_id: 23 },
+  } as const)`SELECT id, project_leader_id FROM present_voters ORDER BY id;`;
 
-await lp.startConstraints();
+  // lodash types are just trash do this yourself
+  const choicesGroupedByProject = groupByNumber(choices, (v) => v.project_id);
 
-// only in one project or project leader
-for (const groupedChoice of Object.entries(choicesGroupedByUser)) {
-  const a = groupedChoice[1].map<[number, string]>((choice) => [
-    1,
-    `choice_${choice.user_id}_${choice.project_id}`,
-  ]);
-  const user = users.find((u) => u.id == Number(groupedChoice[0]));
+  const choicesGroupedByUser = groupByNumber(choices, (v) => v.user_id);
 
-  const b: [number, string][] = user?.project_leader_id
-    ? [[1, `project_leader_${user.project_leader_id}`]]
-    : [];
-  await lp.constraint(
-    `only_in_one_project_${groupedChoice[0]}`,
-    0,
-    [...a, ...b],
-    1
-  );
-}
+  await lp.startMaximize();
 
-// only in project if it exists
-for (const choice of choices) {
-  await lp.constraint(
-    `project_must_exist_${choice.user_id}_${choice.project_id}`,
-    0,
-    [
-      [1, `choice_${choice.user_id}_${choice.project_id}`],
-      [1, `project_not_exists_${choice.project_id}`],
-    ],
-    1
-  );
-}
+  for (const choice of choices) {
+    await lp.maximize(
+      rank2points(choice.rank),
+      `choice_${choice.user_id}_${choice.project_id}`
+    );
+  }
 
-// either project leader or project does not exist
-for (const user of users) {
-  if (user.project_leader_id === null) continue;
-  await lp.constraint(
-    `either_project_leader_or_project_not_exists_${user.id}`,
-    0,
-    [
-      [1, `project_leader_${user.id}`],
-      [1, `project_not_exists_${user.project_leader_id}`],
-    ],
-    1
-  );
-}
+  // overloaded projects should make this way worse
+  // maybe in the constraints to choice1 + choice2 + choice3 + overload <= max_participants
+  // then put overload in here. This *should* work (but probably doesn't)
 
-// project size matches
-for (const project of projects) {
-  await lp.constraint(
-    `project_max_size_${project.id}`,
-    0,
-    [
-      ...(choicesGroupedByProject[project.id] || []).map<[number, string]>(
-        (choice) => [1, `choice_${choice.user_id}_${choice.project_id}`]
-      ),
-      [-1, `project_overloaded_${project.id}`],
-    ],
-    project.max_participants
-  );
-}
+  for (const project of projects) {
+    await lp.maximize(-9000, `project_overloaded_${project.id}`);
+    await lp.maximize(-9000, `project_underloaded_${project.id}`);
+  }
 
-await lp.startBounds();
+  await lp.startConstraints();
 
-for (const project of projects) {
-  await lp.bound(0, `project_overloaded_${project.id}`, null);
-  await lp.bound(0, `project_underloaded_${project.id}`, null);
-}
+  // only in one project or project leader
+  for (const groupedChoice of Object.entries(choicesGroupedByUser)) {
+    const a = groupedChoice[1].map<[number, string]>((choice) => [
+      1,
+      `choice_${choice.user_id}_${choice.project_id}`,
+    ]);
+    const user = users.find((u) => u.id == Number(groupedChoice[0]));
 
-await lp.startVariables();
+    const b: [number, string][] = user?.project_leader_id
+      ? [[1, `project_leader_${user.project_leader_id}`]]
+      : [];
+    await lp.constraint(
+      `only_in_one_project_${groupedChoice[0]}`,
+      0,
+      [...a, ...b],
+      1
+    );
+  }
 
-for (const project of projects) {
-  await lp.variable(`project_overloaded_${project.id}`);
-  await lp.variable(`project_underloaded_${project.id}`);
-}
+  // only in project if it exists
+  for (const choice of choices) {
+    await lp.constraint(
+      `project_must_exist_${choice.user_id}_${choice.project_id}`,
+      0,
+      [
+        [1, `choice_${choice.user_id}_${choice.project_id}`],
+        [1, `project_not_exists_${choice.project_id}`],
+      ],
+      1
+    );
+  }
 
-await lp.startBinaryVariables();
+  // either project leader or project does not exist
+  for (const user of users) {
+    if (user.project_leader_id === null) continue;
+    await lp.constraint(
+      `either_project_leader_or_project_not_exists_${user.id}`,
+      0,
+      [
+        [1, `project_leader_${user.id}`],
+        [1, `project_not_exists_${user.project_leader_id}`],
+      ],
+      1
+    );
+  }
 
-for (const choice of choices) {
-  await lp.binaryVariable(`choice_${choice.user_id}_${choice.project_id}`);
-}
+  // project size matches
+  for (const project of projects) {
+    await lp.constraint(
+      `project_max_size_${project.id}`,
+      0,
+      [
+        ...(choicesGroupedByProject[project.id] || []).map<[number, string]>(
+          (choice) => [1, `choice_${choice.user_id}_${choice.project_id}`]
+        ),
+        [-1, `project_overloaded_${project.id}`],
+      ],
+      project.max_participants
+    );
+  }
 
-// TODO FIXME remove this completely as its implied by the project_not_exists
-for (const user of users) {
-  await lp.binaryVariable(`project_leader_${user.id}`);
-}
+  await lp.startBounds();
 
-for (const project of projects) {
-  await lp.binaryVariable(`project_not_exists_${project.id}`);
-}
+  for (const project of projects) {
+    await lp.bound(0, `project_overloaded_${project.id}`, null);
+    await lp.bound(0, `project_underloaded_${project.id}`, null);
+  }
 
-const results = await lp.calculate();
+  await lp.startVariables();
 
-for (const result of results) {
-  console.log(result);
-}
+  for (const project of projects) {
+    await lp.variable(`project_overloaded_${project.id}`);
+    await lp.variable(`project_underloaded_${project.id}`);
+  }
 
-/*
+  await lp.startBinaryVariables();
+
+  for (const choice of choices) {
+    await lp.binaryVariable(`choice_${choice.user_id}_${choice.project_id}`);
+  }
+
+  // TODO FIXME remove this completely as its implied by the project_not_exists
+  for (const user of users) {
+    await lp.binaryVariable(`project_leader_${user.id}`);
+  }
+
+  for (const project of projects) {
+    await lp.binaryVariable(`project_not_exists_${project.id}`);
+  }
+
+  const results = await lp.calculate();
+
+  for (const result of results) {
+    console.log(result);
+  }
+
+  /*
 for (const result of results
   .filter(([name]) => name.startsWith("choice_"))
   .map(([name, value]) => {
@@ -368,4 +369,5 @@ for (const result of results
   }
 }*/
 
-await sql.end();
+  await sql.end();
+}
