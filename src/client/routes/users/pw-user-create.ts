@@ -402,7 +402,7 @@ class PwUserCreate extends PwForm<"/api/v1/users/create-or-update"> {
                             `
                           : html`<a
                               class="btn btn-secondary"
-                              href="/users/edit/${this.initial?.data[0].id}"
+                              href="/users/edit/${value?.data[0].id}"
                               @click=${aClick}
                               role="button"
                               >Edit user</a
