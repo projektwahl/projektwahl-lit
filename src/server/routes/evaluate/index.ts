@@ -236,7 +236,10 @@ export async function evaluate() {
     return [choices, projects, users];
   });
 
-  // lodash types are just trash do this yourself
+  console.log("choices: ", choices)
+  console.log("projects: ", projects)
+  console.log("users: ", users)
+
   const choicesGroupedByProject = groupByNumber(choices, (v) => v.project_id);
 
   const choicesGroupedByUser = groupByNumber(choices, (v) => v.user_id);
@@ -344,7 +347,9 @@ export async function evaluate() {
 
   // TODO FIXME remove this completely as its implied by the project_not_exists
   for (const user of users) {
-    await lp.binaryVariable(`project_leader_${user.id}`);
+    if (user.project_leader_id) {
+      await lp.binaryVariable(`project_leader_${user.id}`);
+    }
   }
 
   for (const project of projects) {
