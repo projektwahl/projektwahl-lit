@@ -534,6 +534,9 @@ async function createUserAllFields(helper: Helper) {
   await form.submitSuccess();
 
   form = await helper.form("pw-user-create");
+
+  await helper.driver.sleep(2000);
+
   assert.equal(await form.getField("0,username"), username);
   assert.equal(await form.getField("0,openid_id"), "");
   assert.equal(await form.getField("0,group"), "");
@@ -797,14 +800,14 @@ async function checkUsersSortingWorks(helper: Helper) {
 
   console.log("end");
 
-  assert.equal(501, rows.length);
-
   console.log(rows.sort((a, b) => a - b));
 
   assert.deepEqual(
     Array.from({ length: rows.length }, (_, i) => i + 1),
     rows
   );
+
+  assert.equal(501, rows.length);
 }
 
 async function checkUsersPaginationLimitWorks(helper: Helper) {
@@ -1055,6 +1058,81 @@ async function resettingProjectWorks(helper: Helper) {
   assert.equal((await form.getCheckboxField("deleted")) === "true", deleted);
 }
 
+async function resettingUserWorks2(helper: Helper) {
+  for (const doRefresh of [true, false]) {
+    await loginCorrect(helper);
+
+    await helper.openNavbar();
+    await helper.click(
+      await helper.driver.findElement(By.css(`a[href="/users"]`))
+    );
+
+    await helper.form("pw-users");
+    await helper.click(
+      await helper.driver.findElement(By.css(`a[href="/users/create"]`))
+    );
+    let form = await helper.form("pw-user-create");
+    const username = `username${crypto.getRandomValues(new Uint32Array(1))[0]}`;
+    const email = `email${Math.random()}`.substring(0, 15);
+    const group = `group${Math.random()}`.substring(0, 15);
+    const age = Math.floor(Math.random() * 10);
+    const away = Math.random() > 0.5 ? true : false;
+    const deleted = Math.random() > 0.5 ? true : false;
+    await form.setField("0,username", username);
+    await form.setField("0,openid_id", email);
+    await form.setField("0,group", group);
+    await form.setField("0,age", `${age}`);
+    await form.checkField("0,away", away);
+    await form.checkField("0,deleted", deleted);
+    await form.submitSuccess();
+    await helper.driver.wait(until.urlContains("/users/edit/"), 2000);
+    (await helper.driver.getCurrentUrl()).substring(
+      "https://localhost:8443/users/edit/".length
+    );
+    await helper.waitUntilLoaded();
+    form = await helper.form("pw-user-create");
+
+    // clear all fields (TODO set to random values (also empty))
+    const username2 = `username${
+      crypto.getRandomValues(new Uint32Array(1))[0]
+    }`;
+    await form.resetField("0,username", username2);
+    await form.resetField("0,openid_id", "");
+    await form.resetField("0,group", "");
+    await form.resetField("0,age", "");
+    await form.checkField("0,away", false);
+    await form.checkField("0,deleted", false);
+
+    // added
+    await form.submitSuccess();
+
+    if (doRefresh) {
+      await helper.driver.navigate().refresh();
+      form = await helper.form("pw-user-create");
+    }
+
+    // TODO click all reset buttons
+    await Promise.all(
+      (
+        await helper.driver.findElements(
+          By.css('div button[class="btn btn-outline-secondary"]')
+        )
+      ).map((elem) => helper.click(elem))
+    );
+
+    await helper.driver.sleep(2000);
+
+    // check what resetting worked
+    form = await helper.form("pw-user-create");
+    assert.equal(await form.getField("0,username"), username2);
+    assert.equal(await form.getField("0,openid_id"), "");
+    assert.equal(await form.getField("0,group"), "");
+    assert.equal(await form.getField("0,age"), "");
+    assert.equal((await form.getCheckboxField("0,away")) === "true", false);
+    assert.equal((await form.getCheckboxField("0,deleted")) === "true", false);
+  }
+}
+
 async function resettingProjectWorks2(helper: Helper) {
   for (const doRefresh of [false, true]) {
     await loginCorrect(helper);
@@ -1295,6 +1373,9 @@ async function testHelperCreatesProjectWithProjectLeadersAndMembers(
 // TODO better would be some kind of queing system where a ready browser takes the next task
 
 await runTestAllBrowsers(async (helper) => {
+  await checkUsersSortingWorks(helper);
+  await helper.driver.manage().deleteAllCookies();
+
   await testVotingWorks(helper);
   await helper.driver.manage().deleteAllCookies();
 
@@ -1307,10 +1388,13 @@ await runTestAllBrowsers(async (helper) => {
   await checkProjectSortingWorks(helper);
   await helper.driver.manage().deleteAllCookies();
 
-  await checkUsersSortingWorks(helper);
+  await testHelperCreatesProjectWithProjectLeadersAndMembers(helper);
   await helper.driver.manage().deleteAllCookies();
 
-  await testHelperCreatesProjectWithProjectLeadersAndMembers(helper);
+  await resettingUserWorks2(helper);
+  await helper.driver.manage().deleteAllCookies();
+
+  await resettingUserWorks(helper);
   await helper.driver.manage().deleteAllCookies();
 
   await resettingProjectWorks2(helper);
@@ -1323,9 +1407,6 @@ await runTestAllBrowsers(async (helper) => {
   await helper.driver.manage().deleteAllCookies();
 
   await createUserAllFields(helper);
-  await helper.driver.manage().deleteAllCookies();
-
-  await resettingUserWorks(helper);
   await helper.driver.manage().deleteAllCookies();
 
   await loginEmptyUsernameAndPassword(helper);

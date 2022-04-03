@@ -29,6 +29,8 @@ export async function setup() {
   const chance = new Chance(1234);
 
   await sql.begin("READ WRITE", async (sql) => {
+    await sql`INSERT INTO settings (id, election_running) VALUES (1, false) ON CONFLICT DO NOTHING;`;
+
     const hash = await hashPassword("changeme");
 
     const admin = (
