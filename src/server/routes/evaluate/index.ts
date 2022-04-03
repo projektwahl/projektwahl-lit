@@ -375,49 +375,59 @@ export async function evaluate() {
     console.log(result);
   }
 
-for (const result of results
-  .filter(([name]) => name.startsWith("project_overloaded"))
-  .map(([name, value]) => {
-    return [parseInt(name.split("_")[2]), value];
-  })) {
-  if (result[1] > 0) {
-    console.log(`WARNING: PROJECT OVERLOADED: project ${result[0]} with ${result[1]} people too much`);
+  for (const result of results
+    .filter(([name]) => name.startsWith("project_overloaded"))
+    .map(([name, value]) => {
+      return [parseInt(name.split("_")[2]), value];
+    })) {
+    if (result[1] > 0) {
+      console.log(
+        `WARNING: PROJECT OVERLOADED: project ${result[0]} with ${result[1]} people too much`
+      );
+    }
   }
-}
 
-for (const result of results
-  .filter(([name]) => name.startsWith("project_underloaded"))
-  .map(([name, value]) => {
-    return [parseInt(name.split("_")[2]), value];
-  })) {
-  if (result[1] > 0) {
-    console.log(`WARNING: PROJECT UNDERLOADED: project ${result[0]} with ${result[1]} people too few`);
+  for (const result of results
+    .filter(([name]) => name.startsWith("project_underloaded"))
+    .map(([name, value]) => {
+      return [parseInt(name.split("_")[2]), value];
+    })) {
+    if (result[1] > 0) {
+      console.log(
+        `WARNING: PROJECT UNDERLOADED: project ${result[0]} with ${result[1]} people too few`
+      );
+    }
   }
-}
 
-for (const result of results
-  .filter(([name]) => name.startsWith("project_not_exists"))
-  .map(([name, value]) => {
-    return [parseInt(name.split("_")[3]), value];
-  })) {
-  if (result[1] != 0) {
-    console.log(`WARNING: PROJECT NOT EXISTS: project ${result[0]}`);
+  for (const result of results
+    .filter(([name]) => name.startsWith("project_not_exists"))
+    .map(([name, value]) => {
+      return [parseInt(name.split("_")[3]), value];
+    })) {
+    if (result[1] != 0) {
+      console.log(`WARNING: PROJECT NOT EXISTS: project ${result[0]}`);
+    }
   }
-}
-  
-for (const result of results
-  .filter(([name]) => name.startsWith("choice_"))
-  .map(([name, value]) => {
-    return [parseInt(name.split("_")[1]), parseInt(name.split("_")[2]), value];
-  })) {
-  // TODO FIXME optimize
-  const choice = choices.find(
-    (c) => c.user_id == result[0] && c.project_id == result[1]
-  )!;
-  if (result[2] != 0) {
-    console.log(`user: ${choice.user_id}, project: ${choice.project_id}, rank: ${choice.rank}`);
+
+  for (const result of results
+    .filter(([name]) => name.startsWith("choice_"))
+    .map(([name, value]) => {
+      return [
+        parseInt(name.split("_")[1]),
+        parseInt(name.split("_")[2]),
+        value,
+      ];
+    })) {
+    // TODO FIXME optimize
+    const choice = choices.find(
+      (c) => c.user_id == result[0] && c.project_id == result[1]
+    )!;
+    if (result[2] != 0) {
+      console.log(
+        `user: ${choice.user_id}, project: ${choice.project_id}, rank: ${choice.rank}`
+      );
+    }
   }
-}
 
   await sql.end();
 }
