@@ -236,9 +236,9 @@ export async function evaluate() {
     return [choices, projects, users];
   });
 
-  console.log("choices: ", choices)
-  console.log("projects: ", projects)
-  console.log("users: ", users)
+  console.log("choices: ", choices);
+  console.log("projects: ", projects);
+  console.log("users: ", users);
 
   const choicesGroupedByProject = groupByNumber(choices, (v) => v.project_id);
 
@@ -321,6 +321,7 @@ export async function evaluate() {
           (choice) => [1, `choice_${choice.user_id}_${choice.project_id}`]
         ),
         [1, `project_underloaded_${project.id}`],
+        [project.min_participants, `project_not_exists_${project.id}`],
       ],
       1000000
     );
@@ -333,10 +334,13 @@ export async function evaluate() {
           (choice) => [1, `choice_${choice.user_id}_${choice.project_id}`]
         ),
         [-1, `project_overloaded_${project.id}`],
+        [project.max_participants, `project_not_exists_${project.id}`],
       ],
       project.max_participants
     );
   }
+
+  // TODO FIXME not underloaded/overloaded if project does not exist
 
   await lp.startBounds();
 
