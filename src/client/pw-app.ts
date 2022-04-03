@@ -91,6 +91,10 @@ const pages = {
     await import("./routes/pw-imprint.js");
     return html`<pw-imprint></pw-imprint>`;
   },
+  "^/evaluation$": async () => {
+    await import("./routes/pw-evaluation.js");
+    return html`<pw-evaluation></pw-evaluation>`;
+  },
   "^/$": async () => {
     await import("./routes/pw-welcome.js");
     return html`<pw-welcome></pw-welcome>`;
