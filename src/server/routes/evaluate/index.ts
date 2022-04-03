@@ -277,7 +277,7 @@ export async function evaluate() {
       : [];
     await lp.constraint(
       `only_in_one_project_${groupedChoice[0]}`,
-      0,
+      1,
       [...a, ...b],
       1
     );
@@ -312,6 +312,19 @@ export async function evaluate() {
 
   // project size matches
   for (const project of projects) {
+    // TODO FIXME project not exists
+    await lp.constraint(
+      `project_min_size_${project.id}`,
+      project.min_participants,
+      [
+        ...(choicesGroupedByProject[project.id] || []).map<[number, string]>(
+          (choice) => [1, `choice_${choice.user_id}_${choice.project_id}`]
+        ),
+        [1, `project_underloaded_${project.id}`],
+      ],
+      1000000
+    );
+
     await lp.constraint(
       `project_max_size_${project.id}`,
       0,
