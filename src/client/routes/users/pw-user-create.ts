@@ -232,6 +232,10 @@ class PwUserCreate extends PwForm<"/api/v1/users/create-or-update"> {
                           //console.log("SUBMIT");
 
                           await this._task.run();
+
+                          // we need to wait for submission
+
+                          await this.initialTask.run();
                         }}
                       >
                         ${pwInputText<

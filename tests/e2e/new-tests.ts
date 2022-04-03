@@ -1370,9 +1370,6 @@ async function testHelperCreatesProjectWithProjectLeadersAndMembers(
 // TODO better would be some kind of queing system where a ready browser takes the next task
 
 await runTestAllBrowsers(async (helper) => {
-  await resettingUserWorks2(helper);
-  await helper.driver.manage().deleteAllCookies();
-
   await checkUsersSortingWorks(helper);
   await helper.driver.manage().deleteAllCookies();
 
@@ -1391,6 +1388,12 @@ await runTestAllBrowsers(async (helper) => {
   await testHelperCreatesProjectWithProjectLeadersAndMembers(helper);
   await helper.driver.manage().deleteAllCookies();
 
+  await resettingUserWorks2(helper);
+  await helper.driver.manage().deleteAllCookies();
+
+  await resettingUserWorks(helper);
+  await helper.driver.manage().deleteAllCookies();
+
   await resettingProjectWorks2(helper);
   await helper.driver.manage().deleteAllCookies();
 
@@ -1401,9 +1404,6 @@ await runTestAllBrowsers(async (helper) => {
   await helper.driver.manage().deleteAllCookies();
 
   await createUserAllFields(helper);
-  await helper.driver.manage().deleteAllCookies();
-
-  await resettingUserWorks(helper);
   await helper.driver.manage().deleteAllCookies();
 
   await loginEmptyUsernameAndPassword(helper);
