@@ -264,7 +264,7 @@ export async function evaluate() {
 
   await lp.startConstraints();
 
-  // only in one project or project leader
+  // exactly in one project or project leader
   for (const groupedChoice of Object.entries(choicesGroupedByUser)) {
     const a = groupedChoice[1].map<[number, string]>((choice) => [
       1,
@@ -379,7 +379,36 @@ export async function evaluate() {
     console.log(result);
   }
 
-  /*
+for (const result of results
+  .filter(([name]) => name.startsWith("project_overloaded"))
+  .map(([name, value]) => {
+    return [parseInt(name.split("_")[2]), value];
+  })) {
+  if (result[1] > 0) {
+    console.log(`WARNING: PROJECT OVERLOADED: project ${result[0]} with ${result[1]} people too much`);
+  }
+}
+
+for (const result of results
+  .filter(([name]) => name.startsWith("project_underloaded"))
+  .map(([name, value]) => {
+    return [parseInt(name.split("_")[2]), value];
+  })) {
+  if (result[1] > 0) {
+    console.log(`WARNING: PROJECT UNDERLOADED: project ${result[0]} with ${result[1]} people too few`);
+  }
+}
+
+for (const result of results
+  .filter(([name]) => name.startsWith("project_not_exists"))
+  .map(([name, value]) => {
+    return [parseInt(name.split("_")[3]), value];
+  })) {
+  if (result[1] != 0) {
+    console.log(`WARNING: PROJECT NOT EXISTS: project ${result[0]}`);
+  }
+}
+  
 for (const result of results
   .filter(([name]) => name.startsWith("choice_"))
   .map(([name, value]) => {
@@ -389,10 +418,10 @@ for (const result of results
   const choice = choices.find(
     (c) => c.user_id == result[0] && c.project_id == result[1]
   )!;
-  if (result[2] == 1) {
-    console.log(`${choice.user_id} ${choice.project_id}: ${choice.rank}`);
+  if (result[2] != 0) {
+    console.log(`user: ${choice.user_id}, project: ${choice.project_id}, rank: ${choice.rank}`);
   }
-}*/
+}
 
   await sql.end();
 }
