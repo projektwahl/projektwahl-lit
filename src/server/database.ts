@@ -29,6 +29,7 @@ if (!process.env["DATABASE_URL"]) {
 
 export const sql = postgres(process.env["DATABASE_URL"], {
   host: process.env["DATABASE_HOST"],
+  onnotice: () => {}, // TODO FIXME
   /*debug: (conn, query, params) => {
     console.log(conn, query, params);
   }, */ // this seems to be a MAJOR performance issue

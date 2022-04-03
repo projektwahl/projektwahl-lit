@@ -59,6 +59,15 @@ export async function vote(project_id: number, user_id: number, rank: number) {
   await sql`INSERT INTO choices (user_id, project_id, rank) VALUES (${user_id}, ${project_id}, ${rank});`;
 }
 
+export async function test0() {
+  await reset();
+  await user(5);
+  await evaluate();
+}
+
+// ignore for now - this creates an invalid file
+// await test0()
+
 export async function test1() {
   await reset();
   await project();
@@ -76,8 +85,7 @@ export async function test2() {
   await evaluate();
 }
 
-// ignore for now - less than five projects
-//await test2();
+await test2();
 
 export async function test3() {
   await reset();
@@ -91,3 +99,15 @@ export async function test3() {
 }
 
 await test3();
+
+export async function test4() {
+  await reset();
+  const p0 = await project();
+  const u0 = await user(5);
+  await vote(p0, u0, 1);
+  await evaluate();
+}
+
+await test4();
+
+await sql.end();

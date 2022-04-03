@@ -428,6 +428,4 @@ export async function evaluate() {
       );
     }
   }
-
-  await sql.end();
 }
