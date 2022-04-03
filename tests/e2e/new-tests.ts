@@ -535,7 +535,7 @@ async function createUserAllFields(helper: Helper) {
 
   form = await helper.form("pw-user-create");
 
-  await helper.driver.sleep(2000)
+  await helper.driver.sleep(2000);
 
   assert.equal(await form.getField("0,username"), username);
   assert.equal(await form.getField("0,openid_id"), "");
