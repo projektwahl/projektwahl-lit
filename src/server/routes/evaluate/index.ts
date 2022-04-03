@@ -375,12 +375,25 @@ export async function evaluate() {
     console.log(result);
   }
 
+  const finalOutput: {
+    overloaded: [number, number][];
+    underloaded: [number, number][];
+    notexists: number[];
+    choices: [number, number, number][];
+  } = {
+    overloaded: [],
+    underloaded: [],
+    notexists: [],
+    choices: [],
+  };
+
   for (const result of results
     .filter(([name]) => name.startsWith("project_overloaded"))
-    .map(([name, value]) => {
+    .map<[number, number]>(([name, value]) => {
       return [parseInt(name.split("_")[2]), value];
     })) {
     if (result[1] > 0) {
+      finalOutput.overloaded.push(result);
       console.log(
         `WARNING: PROJECT OVERLOADED: project ${result[0]} with ${result[1]} people too much`
       );
@@ -389,10 +402,11 @@ export async function evaluate() {
 
   for (const result of results
     .filter(([name]) => name.startsWith("project_underloaded"))
-    .map(([name, value]) => {
+    .map<[number, number]>(([name, value]) => {
       return [parseInt(name.split("_")[2]), value];
     })) {
     if (result[1] > 0) {
+      finalOutput.underloaded.push(result);
       console.log(
         `WARNING: PROJECT UNDERLOADED: project ${result[0]} with ${result[1]} people too few`
       );
@@ -401,17 +415,18 @@ export async function evaluate() {
 
   for (const result of results
     .filter(([name]) => name.startsWith("project_not_exists"))
-    .map(([name, value]) => {
+    .map<[number, number]>(([name, value]) => {
       return [parseInt(name.split("_")[3]), value];
     })) {
     if (result[1] != 0) {
+      finalOutput.notexists.push(result[0]);
       console.log(`WARNING: PROJECT NOT EXISTS: project ${result[0]}`);
     }
   }
 
   for (const result of results
     .filter(([name]) => name.startsWith("choice_"))
-    .map(([name, value]) => {
+    .map<[number, number, number]>(([name, value]) => {
       return [
         parseInt(name.split("_")[1]),
         parseInt(name.split("_")[2]),
@@ -423,9 +438,14 @@ export async function evaluate() {
       (c) => c.user_id == result[0] && c.project_id == result[1]
     )!;
     if (result[2] != 0) {
+      finalOutput.choices.push([result[0], result[1], choice.rank]);
       console.log(
         `user: ${choice.user_id}, project: ${choice.project_id}, rank: ${choice.rank}`
       );
     }
   }
+
+  console.log(finalOutput);
+
+  return finalOutput;
 }

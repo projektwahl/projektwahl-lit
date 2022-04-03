@@ -23,6 +23,7 @@ SPDX-FileCopyrightText: 2021 Moritz Hedtke <Moritz.Hedtke@t-online.de>
 import { sql } from "../../src/server/database.js";
 import { Chance } from "chance";
 import { evaluate } from "../../src/server/routes/evaluate/index.js";
+import { deepEqual } from "assert/strict";
 
 const chance = new Chance();
 
@@ -62,7 +63,7 @@ export async function vote(project_id: number, user_id: number, rank: number) {
 export async function test0() {
   await reset();
   await user(5);
-  await evaluate();
+  deepEqual(await evaluate(), {});
 }
 
 // ignore for now - this creates an invalid file
@@ -71,7 +72,7 @@ export async function test0() {
 export async function test1() {
   await reset();
   await project();
-  await evaluate();
+  deepEqual(await evaluate(), {});
 }
 
 // ignore for now - this creates an invalid file
@@ -82,7 +83,12 @@ export async function test2() {
   const p0 = await project();
   const u0 = await user(5);
   //await vote(p0, u0, 1);
-  await evaluate();
+  deepEqual(await evaluate(), {
+    overloaded: [],
+    underloaded: [[1, 4]],
+    notexists: [],
+    choices: [[1, 1, 0]],
+  });
 }
 
 await test2();
