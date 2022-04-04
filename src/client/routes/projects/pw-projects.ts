@@ -55,7 +55,10 @@ export const pwProjects = async (url: URL) => {
   return html`<pw-projects .initial=${result} prefix="projects"></pw-projects>`;
 };
 
-export class PwProjects<X extends string> extends PwEntityList<"/api/v1/projects", X> {
+export class PwProjects<X extends string> extends PwEntityList<
+  "/api/v1/projects",
+  X
+> {
   constructor() {
     super();
 

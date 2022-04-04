@@ -41,7 +41,9 @@ import type { entityRoutes, routes } from "../../../lib/routes.js";
 import type { z } from "zod";
 import { PwProjects } from "../projects/pw-projects.js";
 
-const defaultValue: z.infer<typeof entityRoutes["/api/v1/projects"]["request"]> = {
+const defaultValue: z.infer<
+  typeof entityRoutes["/api/v1/projects"]["request"]
+> = {
   sorting: [],
   filters: {},
   paginationDirection: "forwards",
@@ -49,7 +51,12 @@ const defaultValue: z.infer<typeof entityRoutes["/api/v1/projects"]["request"]> 
 };
 
 export const pwUserProjects = async (url: URL, prefix: string) => {
-  const result = await taskFunction("/api/v1/projects", url, prefix, defaultValue);
+  const result = await taskFunction(
+    "/api/v1/projects",
+    url,
+    prefix,
+    defaultValue
+  );
   return html`<pw-user-projects
     .initial=${result}
     prefix=${prefix}
@@ -76,8 +83,8 @@ export const PwUserProjects = setupHmr(
     name!: "project_leader_id" | "force_in_project_id";
 
     user!: z.infer<
-    typeof routes["/api/v1/users"]["response"]
-  >["entities"][number];
+      typeof routes["/api/v1/users"]["response"]
+    >["entities"][number];
 
     override get buttons() {
       return html``;
@@ -164,7 +171,9 @@ export const PwUserProjects = setupHmr(
                 name: ["filters", "id"],
                 get: (o) => o.filters.id == this.user[this.name],
                 set: (o, v) =>
-                  (o.filters.id = v ? (this.user[this.name] ?? undefined) : undefined),
+                  (o.filters.id = v
+                    ? this.user[this.name] ?? undefined
+                    : undefined),
                 task: this._task,
                 type: "checkbox",
                 trueValue: true,
@@ -253,7 +262,9 @@ export const PwUserProjects = setupHmr(
                     <p>
                       ${value.deleted
                         ? html`<del
-                            ><a @click=${aClick} href="/projects/view/${value.id}"
+                            ><a
+                              @click=${aClick}
+                              href="/projects/view/${value.id}"
                               >${value.id}</a
                             ></del
                           >`
@@ -268,7 +279,9 @@ export const PwUserProjects = setupHmr(
                     <p>
                       ${value.deleted
                         ? html`<del
-                            ><a @click=${aClick} href="/projects/view/${value.id}"
+                            ><a
+                              @click=${aClick}
+                              href="/projects/view/${value.id}"
                               >${value.title}</a
                             ></del
                           >`
