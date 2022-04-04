@@ -247,6 +247,7 @@ export const PwProjectUsers = setupHmr(
                 (value) => html`<tr>
                   <td>
                     <pw-project-user-checkbox
+                      type="checkbox"
                       projectId=${this.projectId}
                       .user=${value}
                       name=${this.name}
