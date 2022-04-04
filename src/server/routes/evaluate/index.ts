@@ -23,12 +23,29 @@ SPDX-FileCopyrightText: 2021 Moritz Hedtke <Moritz.Hedtke@t-online.de>
 import { FileHandle, mkdtemp, open, readFile } from "node:fs/promises";
 import path from "node:path";
 import os from "node:os";
-import { constants } from "node:fs";
+import { constants, OpenMode, PathLike } from "node:fs";
 import { execFile } from "node:child_process";
 import { sql } from "../../database.js";
 import { rawChoice } from "../../../lib/routes.js";
 import { z } from "zod";
 import { typedSql } from "../../describe.js";
+import type { Abortable } from "node:events";
+
+async function readFileWithBacktrace(
+  path: PathLike | FileHandle,
+  options:
+    | ({
+        encoding: BufferEncoding;
+        flag?: OpenMode | undefined;
+      } & Abortable)
+    | BufferEncoding
+): Promise<string> {
+  try {
+    return await readFile(path, options);
+  } catch (error) {
+    throw new Error(String(error));
+  }
+}
 
 const groupByNumber = <T>(
   data: T[],
@@ -87,23 +104,33 @@ export class CPLEXLP {
     constraints: [number, string][],
     max: number | null
   ) => {
-    if (min !== null) {
-      await this.fileHandle.write(`\nmin_${name}: `);
+    if (min !== null && min === max) {
+      await this.fileHandle.write(`\neq_${name}: `);
       for (const constraint of constraints) {
         await this.fileHandle.write(
           ` ${constraint[0] < 0 ? "" : "+"}${constraint[0]} ${constraint[1]}`
         );
       }
-      await this.fileHandle.write(` >= ${min}`);
-    }
-    if (max !== null) {
-      await this.fileHandle.write(`\nmax_${name}: `);
-      for (const constraint of constraints) {
-        await this.fileHandle.write(
-          ` ${constraint[0] < 0 ? "" : "+"}${constraint[0]} ${constraint[1]}`
-        );
+      await this.fileHandle.write(` = ${min}`);
+    } else {
+      if (min !== null) {
+        await this.fileHandle.write(`\nmin_${name}: `);
+        for (const constraint of constraints) {
+          await this.fileHandle.write(
+            ` ${constraint[0] < 0 ? "" : "+"}${constraint[0]} ${constraint[1]}`
+          );
+        }
+        await this.fileHandle.write(` >= ${min}`);
       }
-      await this.fileHandle.write(` <= ${max}`);
+      if (max !== null) {
+        await this.fileHandle.write(`\nmax_${name}: `);
+        for (const constraint of constraints) {
+          await this.fileHandle.write(
+            ` ${constraint[0] < 0 ? "" : "+"}${constraint[0]} ${constraint[1]}`
+          );
+        }
+        await this.fileHandle.write(` <= ${max}`);
+      }
     }
   };
 
@@ -171,7 +198,7 @@ export class CPLEXLP {
     }
 
     const solution = (
-      await readFile(this.solutionPath, { encoding: "utf8" })
+      await readFileWithBacktrace(this.solutionPath, { encoding: "utf8" })
     ).split(/\r?\n/);
 
     const solutionFinal = Object.fromEntries(
@@ -214,158 +241,240 @@ export const rank2points = (rank: number) => {
   }
 };
 
-const lp = new CPLEXLP();
-await lp.setup();
+export async function evaluate() {
+  const lp = new CPLEXLP();
+  await lp.setup();
 
-const choices = z.array(rawChoice).parse(
-  await sql.file("src/server/routes/evaluate/calculate.sql", [], {
-    cache: false,
-  })
-);
+  const [choices, projects, users] = await sql.begin(async (tsql) => {
+    const choices = z.array(rawChoice).parse(
+      await tsql.file("src/server/routes/evaluate/calculate.sql", [], {
+        cache: false,
+      })
+    );
 
-// TODO FIXME database transaction to ensure consistent view of data
-const projects = await typedSql(sql, {
-  columns: { id: 23, min_participants: 23, max_participants: 23 },
-} as const)`SELECT id, min_participants, max_participants FROM projects;`;
+    const projects = await typedSql(tsql, {
+      columns: { id: 23, min_participants: 23, max_participants: 23 },
+    } as const)`SELECT id, min_participants, max_participants FROM projects;`;
 
-const users = await typedSql(sql, {
-  columns: { id: 23, project_leader_id: 23 },
-} as const)`SELECT id, project_leader_id FROM present_voters ORDER BY id;`;
+    const users = await typedSql(tsql, {
+      columns: { id: 23, project_leader_id: 23 },
+    } as const)`SELECT id, project_leader_id FROM present_voters ORDER BY id;`;
+    return [choices, projects, users];
+  });
 
-// lodash types are just trash do this yourself
-const choicesGroupedByProject = groupByNumber(choices, (v) => v.project_id);
+  console.log("choices: ", choices);
+  console.log("projects: ", projects);
+  console.log("users: ", users);
 
-const choicesGroupedByUser = groupByNumber(choices, (v) => v.user_id);
+  const choicesGroupedByProject = groupByNumber(choices, (v) => v.project_id);
 
-await lp.startMaximize();
+  const choicesGroupedByUser = groupByNumber(choices, (v) => v.user_id);
 
-for (const choice of choices) {
-  await lp.maximize(
-    rank2points(choice.rank),
-    `choice_${choice.user_id}_${choice.project_id}`
-  );
-}
+  await lp.startMaximize();
 
-// overloaded projects should make this way worse
-// maybe in the constraints to choice1 + choice2 + choice3 + overload <= max_participants
-// then put overload in here. This *should* work (but probably doesn't)
-
-for (const project of projects) {
-  await lp.maximize(-9000, `project_overloaded_${project.id}`);
-  await lp.maximize(-9000, `project_underloaded_${project.id}`);
-}
-
-await lp.startConstraints();
-
-// only in one project or project leader
-for (const groupedChoice of Object.entries(choicesGroupedByUser)) {
-  const a = groupedChoice[1].map<[number, string]>((choice) => [
-    1,
-    `choice_${choice.user_id}_${choice.project_id}`,
-  ]);
-  const user = users.find((u) => u.id == Number(groupedChoice[0]));
-
-  const b: [number, string][] = user?.project_leader_id
-    ? [[1, `project_leader_${user.project_leader_id}`]]
-    : [];
-  await lp.constraint(
-    `only_in_one_project_${groupedChoice[0]}`,
-    0,
-    [...a, ...b],
-    1
-  );
-}
-
-// only in project if it exists
-for (const choice of choices) {
-  await lp.constraint(
-    `project_must_exist_${choice.user_id}_${choice.project_id}`,
-    0,
-    [
-      [1, `choice_${choice.user_id}_${choice.project_id}`],
-      [1, `project_not_exists_${choice.project_id}`],
-    ],
-    1
-  );
-}
-
-// either project leader or project does not exist
-for (const user of users) {
-  if (user.project_leader_id === null) continue;
-  await lp.constraint(
-    `either_project_leader_or_project_not_exists_${user.id}`,
-    0,
-    [
-      [1, `project_leader_${user.id}`],
-      [1, `project_not_exists_${user.project_leader_id}`],
-    ],
-    1
-  );
-}
-
-// project size matches
-for (const project of projects) {
-  await lp.constraint(
-    `project_max_size_${project.id}`,
-    0,
-    [
-      ...(choicesGroupedByProject[project.id] || []).map<[number, string]>(
-        (choice) => [1, `choice_${choice.user_id}_${choice.project_id}`]
-      ),
-      [-1, `project_overloaded_${project.id}`],
-    ],
-    project.max_participants
-  );
-}
-
-await lp.startBounds();
-
-for (const project of projects) {
-  await lp.bound(0, `project_overloaded_${project.id}`, null);
-  await lp.bound(0, `project_underloaded_${project.id}`, null);
-}
-
-await lp.startVariables();
-
-for (const project of projects) {
-  await lp.variable(`project_overloaded_${project.id}`);
-  await lp.variable(`project_underloaded_${project.id}`);
-}
-
-await lp.startBinaryVariables();
-
-for (const choice of choices) {
-  await lp.binaryVariable(`choice_${choice.user_id}_${choice.project_id}`);
-}
-
-// TODO FIXME remove this completely as its implied by the project_not_exists
-for (const user of users) {
-  await lp.binaryVariable(`project_leader_${user.id}`);
-}
-
-for (const project of projects) {
-  await lp.binaryVariable(`project_not_exists_${project.id}`);
-}
-
-const results = await lp.calculate();
-
-for (const result of results) {
-  console.log(result);
-}
-
-/*
-for (const result of results
-  .filter(([name]) => name.startsWith("choice_"))
-  .map(([name, value]) => {
-    return [parseInt(name.split("_")[1]), parseInt(name.split("_")[2]), value];
-  })) {
-  // TODO FIXME optimize
-  const choice = choices.find(
-    (c) => c.user_id == result[0] && c.project_id == result[1]
-  )!;
-  if (result[2] == 1) {
-    console.log(`${choice.user_id} ${choice.project_id}: ${choice.rank}`);
+  for (const choice of choices) {
+    await lp.maximize(
+      rank2points(choice.rank),
+      `choice_${choice.user_id}_${choice.project_id}`
+    );
   }
-}*/
 
-await sql.end();
+  for (const project of projects) {
+    await lp.maximize(-9000, `project_overloaded_${project.id}`);
+    await lp.maximize(-9000, `project_underloaded_${project.id}`);
+  }
+
+  await lp.startConstraints();
+
+  // exactly in one project or project leader
+  for (const groupedChoice of Object.entries(choicesGroupedByUser)) {
+    const a = groupedChoice[1].map<[number, string]>((choice) => [
+      1,
+      `choice_${choice.user_id}_${choice.project_id}`,
+    ]);
+    const user = users.find((u) => u.id == Number(groupedChoice[0]));
+
+    const b: [number, string][] = user?.project_leader_id
+      ? [[1, `project_leader_${user.project_leader_id}`]]
+      : [];
+    await lp.constraint(
+      `only_in_one_project_${groupedChoice[0]}`,
+      1,
+      [...a, ...b],
+      1
+    );
+  }
+
+  // only in project if it exists
+  for (const choice of choices) {
+    await lp.constraint(
+      `project_must_exist_${choice.user_id}_${choice.project_id}`,
+      null, // always greater than 0
+      [
+        [1, `choice_${choice.user_id}_${choice.project_id}`],
+        [1, `project_not_exists_${choice.project_id}`],
+      ],
+      1
+    );
+  }
+
+  // either project leader or project does not exist
+  for (const user of users) {
+    if (user.project_leader_id === null) continue;
+    await lp.constraint(
+      `either_project_leader_or_project_not_exists_${user.id}`,
+      0,
+      [
+        [1, `project_leader_${user.id}`],
+        [1, `project_not_exists_${user.project_leader_id}`],
+      ],
+      1
+    );
+  }
+
+  // project size matches
+  for (const project of projects) {
+    // TODO FIXME project not exists
+    await lp.constraint(
+      `project_min_size_${project.id}`,
+      project.min_participants,
+      [
+        ...(choicesGroupedByProject[project.id] || []).map<[number, string]>(
+          (choice) => [1, `choice_${choice.user_id}_${choice.project_id}`]
+        ),
+        [1, `project_underloaded_${project.id}`],
+        [project.min_participants, `project_not_exists_${project.id}`],
+      ],
+      null
+    );
+
+    await lp.constraint(
+      `project_max_size_${project.id}`,
+      0,
+      [
+        ...(choicesGroupedByProject[project.id] || []).map<[number, string]>(
+          (choice) => [1, `choice_${choice.user_id}_${choice.project_id}`]
+        ),
+        [-1, `project_overloaded_${project.id}`],
+        [project.max_participants, `project_not_exists_${project.id}`],
+      ],
+      project.max_participants
+    );
+  }
+
+  // TODO FIXME not underloaded/overloaded if project does not exist
+
+  await lp.startBounds();
+
+  for (const project of projects) {
+    await lp.bound(0, `project_overloaded_${project.id}`, null);
+    await lp.bound(0, `project_underloaded_${project.id}`, null);
+  }
+
+  await lp.startVariables();
+
+  for (const project of projects) {
+    await lp.variable(`project_overloaded_${project.id}`);
+    await lp.variable(`project_underloaded_${project.id}`);
+  }
+
+  await lp.startBinaryVariables();
+
+  for (const choice of choices) {
+    await lp.binaryVariable(`choice_${choice.user_id}_${choice.project_id}`);
+  }
+
+  // TODO FIXME remove this completely as its implied by the project_not_exists
+  for (const user of users) {
+    if (user.project_leader_id) {
+      await lp.binaryVariable(`project_leader_${user.id}`);
+    }
+  }
+
+  for (const project of projects) {
+    await lp.binaryVariable(`project_not_exists_${project.id}`);
+  }
+
+  const results = await lp.calculate();
+
+  for (const result of results) {
+    console.log(result);
+  }
+
+  const finalOutput: {
+    overloaded: [number, number][];
+    underloaded: [number, number][];
+    notexists: number[];
+    choices: [number, number, number][];
+  } = {
+    overloaded: [],
+    underloaded: [],
+    notexists: [],
+    choices: [],
+  };
+
+  for (const result of results
+    .filter(([name]) => name.startsWith("project_overloaded"))
+    .map<[number, number]>(([name, value]) => {
+      return [parseInt(name.split("_")[2]), value];
+    })) {
+    if (result[1] > 0) {
+      finalOutput.overloaded.push(result);
+      console.log(
+        `WARNING: PROJECT OVERLOADED: project ${result[0]} with ${result[1]} people too much`
+      );
+    }
+  }
+
+  for (const result of results
+    .filter(([name]) => name.startsWith("project_underloaded"))
+    .map<[number, number]>(([name, value]) => {
+      return [parseInt(name.split("_")[2]), value];
+    })) {
+    if (result[1] > 0) {
+      finalOutput.underloaded.push(result);
+      console.log(
+        `WARNING: PROJECT UNDERLOADED: project ${result[0]} with ${result[1]} people too few`
+      );
+    }
+  }
+
+  for (const result of results
+    .filter(([name]) => name.startsWith("project_not_exists"))
+    .map<[number, number]>(([name, value]) => {
+      return [parseInt(name.split("_")[3]), value];
+    })) {
+    if (result[1] != 0) {
+      finalOutput.notexists.push(result[0]);
+      console.log(`WARNING: PROJECT NOT EXISTS: project ${result[0]}`);
+    }
+  }
+
+  for (const result of results
+    .filter(([name]) => name.startsWith("choice_"))
+    .map<[number, number, number]>(([name, value]) => {
+      return [
+        parseInt(name.split("_")[1]),
+        parseInt(name.split("_")[2]),
+        value,
+      ];
+    })) {
+    // TODO FIXME optimize
+    const choice = choices.find(
+      (c) => c.user_id == result[0] && c.project_id == result[1]
+    );
+    if (!choice) {
+      throw new Error("something went wrong. couldn't find that choice");
+    }
+    if (result[2] != 0) {
+      finalOutput.choices.push([result[0], result[1], choice.rank]);
+      console.log(
+        `user: ${choice.user_id}, project: ${choice.project_id}, rank: ${choice.rank}`
+      );
+    }
+  }
+
+  console.log(finalOutput);
+
+  return finalOutput;
+}
