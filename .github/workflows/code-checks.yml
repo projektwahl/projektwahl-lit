@@ -35,6 +35,6 @@ jobs:
       - run: npm run typecheck
       - run: npm run lint
       - run: npm run localize-extract
-      - run: git checkout -- package.json
+      - run: git checkout -- package.json package-lock.json
       - run: git update-index --refresh
       - run: git diff-index --quiet HEAD --
