@@ -66,7 +66,7 @@ class PwProjectUserCheckbox extends PwElement {
 
   input: import("lit/directives/ref").Ref<HTMLElement>;
 
-  type!: "radio" | "checkbox"
+  type!: "radio" | "checkbox";
 
   constructor() {
     super();

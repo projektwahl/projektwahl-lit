@@ -418,11 +418,28 @@ class PwUserCreate extends PwForm<"/api/v1/users/create-or-update"> {
 
                         ${value?.data[0].action == "update"
                           ? html`<pw-user-projects
-                              .user=${value?.data[0]}
-                              name=${"project_leader_id"}
-                              title=${msg("Project leaders")}
-                              prefix="leaders"
-                            ></pw-user-projects>`
+                                @refreshentitylist=${() => {
+                                  // TODO FIXME this may let you loose data?
+                                  // I think it doesnt but not sure
+                                  void this.initialTask.run();
+                                }}
+                                .user=${value?.data[0]}
+                                name=${"project_leader_id"}
+                                title=${msg("Project leader in")}
+                                prefix="leaders"
+                              ></pw-user-projects>
+
+                              <pw-user-projects
+                                @refreshentitylist=${() => {
+                                  // TODO FIXME this may let you loose data?
+                                  // I think it doesnt but not sure
+                                  void this.initialTask.run();
+                                }}
+                                .user=${value?.data[0]}
+                                name=${"force_in_project_id"}
+                                title=${msg("Guaranteed project member in")}
+                                prefix="members"
+                              ></pw-user-projects>`
                           : undefined}
                       </form>
                     </div>

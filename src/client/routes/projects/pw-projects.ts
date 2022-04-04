@@ -59,6 +59,13 @@ export class PwProjects<X extends string> extends PwEntityList<
   "/api/v1/projects",
   X
 > {
+  static override get properties() {
+    return {
+      ...super.properties,
+      title: { type: String },
+    };
+  }
+
   constructor() {
     super();
 
