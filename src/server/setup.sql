@@ -516,4 +516,4 @@ DROP POLICY IF EXISTS users_voters_only_project_leaders ON users_with_deleted;
 
 -- SET projektwahl.type = 
 
-CREATE POLICY users_voters_only_project_leaders ON users_with_deleted FOR ALL TO PUBLIC USING (current_setting('projektwahl.type') IS DISTINCT FROM 'voter' OR project_leader_id IS NOT NULL);
+CREATE POLICY users_voters_only_project_leaders ON users_with_deleted FOR ALL TO PUBLIC USING (current_setting('projektwahl.type') IN ('root', 'admin', 'helper') OR project_leader_id IS NOT NULL);
