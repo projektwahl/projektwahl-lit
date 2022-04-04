@@ -40,6 +40,7 @@ import { PwInputSelect, pwInputSelect } from "../../form/pw-input-select.js";
 import { pwInputNumber } from "../../form/pw-input-number.js";
 import { pwInputCheckbox } from "../../form/pw-input-checkbox.js";
 import { aClick } from "../../pw-a.js";
+import "./pw-user-projects.js";
 
 export async function pwUser(id: number, viewOnly = false) {
   const result = await taskFunction([id]);
@@ -414,6 +415,13 @@ class PwUserCreate extends PwForm<"/api/v1/users/create-or-update"> {
                         >
                           ${msg(`Back`)}
                         </button>
+
+                        ${this.formData[0].action == "update" ? html`<pw-user-projects
+                              .user=${this.formData[0]}
+                              name=${"project_leader_id"}
+                              title=${msg("Project leaders")}
+                              prefix="leaders"
+                            ></pw-user-projects>` : undefined}
                       </form>
                     </div>
                   </div>

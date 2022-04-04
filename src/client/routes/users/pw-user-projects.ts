@@ -25,7 +25,7 @@ import "../../entity-list/pw-order.js";
 import { html } from "lit";
 import { noChange } from "lit";
 import { msg } from "@lit/localize";
-import "./pw-user-project-checkbox.js";
+import "../projects/pw-project-user-checkbox.js";
 import "../../form/pw-input.js";
 import { setupHmr } from "../../hmr.js";
 import { aClick } from "../../pw-a.js";
@@ -37,7 +37,7 @@ import {
 import { pwInputCheckbox } from "../../form/pw-input-checkbox.js";
 import { pwInputNumber } from "../../form/pw-input-number.js";
 import { pwInputText } from "../../form/pw-input-text.js";
-import type { entityRoutes } from "../../../lib/routes.js";
+import type { entityRoutes, routes } from "../../../lib/routes.js";
 import type { z } from "zod";
 import { PwProjects } from "../projects/pw-projects.js";
 
@@ -62,7 +62,7 @@ export const PwUserProjects = setupHmr(
     static override get properties() {
       return {
         ...super.properties,
-        userId: { type: Number },
+        user: { attribute: false },
         name: { type: String },
       };
     }
@@ -75,7 +75,9 @@ export const PwUserProjects = setupHmr(
 
     name!: "project_leader_id" | "force_in_project_id";
 
-    userId!: number;
+    user!: z.infer<
+    typeof routes["/api/v1/users"]["response"]
+  >["entities"][number];
 
     override get buttons() {
       return html``;
@@ -100,7 +102,7 @@ export const PwUserProjects = setupHmr(
                 orderBy: `${this.name}_eq`,
                 prefix: this.prefix,
                 title: "",
-                value: this.userId,
+                value: this.user[this.name],
                 get: (o) => o.sorting,
                 set: (o, v) => (o.sorting = v),
                 initial,
@@ -160,9 +162,9 @@ export const PwUserProjects = setupHmr(
                 url: this.url,
                 label: null,
                 name: ["filters", "id"],
-                get: (o) => o.filters.id == this.userId,
+                get: (o) => o.filters.id == this.user[this.name],
                 set: (o, v) =>
-                  (o.filters.id = v ? this.userId : undefined),
+                  (o.filters.id = v ? (this.user[this.name] ?? undefined) : undefined),
                 task: this._task,
                 type: "checkbox",
                 trueValue: true,
@@ -241,11 +243,11 @@ export const PwUserProjects = setupHmr(
             ? result.data.entities.map(
                 (value) => html`<tr>
                   <td>
-                    <pw-user-project-checkbox
-                      userId=${this.userId}
-                      .project=${value}
+                    <pw-project-user-checkbox
+                      projectId=${value.id}
+                      .user=${value}
                       name=${this.name}
-                    ></pw-user-project-checkbox>
+                    ></pw-project-user-checkbox>
                   </td>
                   <th scope="row">
                     <p>
