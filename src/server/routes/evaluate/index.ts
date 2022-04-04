@@ -87,7 +87,7 @@ export class CPLEXLP {
     constraints: [number, string][],
     max: number | null
   ) => {
-    if (min === max) {
+    if (min !== null && min === max) {
       await this.fileHandle.write(`\neq_${name}: `);
       for (const constraint of constraints) {
         await this.fileHandle.write(
@@ -235,7 +235,6 @@ export async function evaluate() {
       })
     );
 
-    // TODO FIXME database transaction to ensure consistent view of data
     const projects = await typedSql(tsql, {
       columns: { id: 23, min_participants: 23, max_participants: 23 },
     } as const)`SELECT id, min_participants, max_participants FROM projects;`;
@@ -446,7 +445,10 @@ export async function evaluate() {
     // TODO FIXME optimize
     const choice = choices.find(
       (c) => c.user_id == result[0] && c.project_id == result[1]
-    )!;
+    );
+    if (!choice) {
+      throw new Error("something went wrong. couldn't find that choice");
+    }
     if (result[2] != 0) {
       finalOutput.choices.push([result[0], result[1], choice.rank]);
       console.log(

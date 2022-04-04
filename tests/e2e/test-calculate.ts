@@ -24,6 +24,7 @@ import { sql } from "../../src/server/database.js";
 import { Chance } from "chance";
 import { evaluate } from "../../src/server/routes/evaluate/index.js";
 import { deepEqual } from "assert/strict";
+import { typedSql } from "../../src/server/describe.js";
 
 const chance = new Chance();
 
@@ -37,20 +38,24 @@ export async function reset() {
 }
 
 export async function project(
-  min_participants: number = 5,
-  max_participants: number = 15,
-  min_age: number = 5,
-  max_age: number = 13,
-  random_assignments: boolean = true
-) {
+  min_participants = 5,
+  max_participants = 15,
+  min_age = 5,
+  max_age = 13,
+  random_assignments = true
+): Promise<number> {
   return (
-    await sql`INSERT INTO projects (title, info, place, costs, min_age, max_age, min_participants, max_participants, random_assignments, last_updated_by) VALUES (${chance.sentence()}, '', '', 0, ${min_age}, ${max_age}, ${min_participants}, ${max_participants}, ${random_assignments}, NULL) RETURNING projects.id;`
+    await typedSql(sql, {
+      columns: { id: 23 },
+    } as const)`INSERT INTO projects (title, info, place, costs, min_age, max_age, min_participants, max_participants, random_assignments, last_updated_by) VALUES (${chance.sentence()}, '', '', 0, ${min_age}, ${max_age}, ${min_participants}, ${max_participants}, ${random_assignments}, NULL) RETURNING projects.id;`
   )[0].id;
 }
 
-export async function user(age: number) {
+export async function user(age: number): Promise<number> {
   return (
-    await sql`INSERT INTO users (username, type, "group", age, last_updated_by) VALUES (${chance.name(
+    await typedSql(sql, {
+      columns: { id: 23 },
+    } as const)`INSERT INTO users (username, type, "group", age, last_updated_by) VALUES (${chance.name(
       { prefix: true, suffix: true }
     )}, 'voter', '', ${age}, NULL) RETURNING users.id;`
   )[0].id;
@@ -60,29 +65,28 @@ export async function vote(project_id: number, user_id: number, rank: number) {
   await sql`INSERT INTO choices (user_id, project_id, rank) VALUES (${user_id}, ${project_id}, ${rank});`;
 }
 
-export async function test0() {
+export async function test_only_one_user() {
   await reset();
-  await user(5);
+  const _u1 = await user(5);
   deepEqual(await evaluate(), {});
 }
 
 // ignore for now - this creates an invalid file
-// await test0()
+// await test_only_one_user()
 
-export async function test1() {
+export async function test_only_one_project() {
   await reset();
-  await project();
+  const _p1 = await project();
   deepEqual(await evaluate(), {});
 }
 
 // ignore for now - this creates an invalid file
-// test1()
+// test_only_one_project()
 
-export async function test2() {
+export async function test_one_project_one_user_correct_age() {
   await reset();
-  const p0 = await project();
-  const u0 = await user(5);
-  //await vote(p0, u0, 1);
+  const _p1 = await project();
+  const _u1 = await user(5);
   deepEqual(await evaluate(), {
     overloaded: [],
     underloaded: [[1, 4]],
@@ -91,29 +95,68 @@ export async function test2() {
   });
 }
 
-await test2();
+await test_one_project_one_user_correct_age();
 
-export async function test3() {
+export async function test_one_project_one_user_wrong_age() {
   await reset();
-  const p0 = await project();
+  const _p1 = await project();
+  const _u1 = await user(4);
+  // TODO FIXME HERE IS A BUG: IF NO PROJECTS ARE FOUND FOR A USER WITH THEIR AGE
+  // we need to show an error
+  //deepEqual(await evaluate(), { });
+}
+
+await test_one_project_one_user_wrong_age();
+
+export async function test_five_projects_one_user() {
+  await reset();
+  const _p1 = await project();
+  const _p2 = await project();
+  const _p3 = await project();
+  const _p4 = await project();
+  const _p5 = await project();
+  const _u1 = await user(5);
+  deepEqual(await evaluate(), {
+    overloaded: [],
+    underloaded: [[5, 4]],
+    notexists: [1, 2, 3, 4],
+    choices: [[1, 5, 0]],
+  });
+}
+
+await test_five_projects_one_user();
+
+export async function test_one_user_one_project_voted_incorrectly() {
+  await reset();
   const p1 = await project();
-  const p2 = await project();
-  const p3 = await project();
-  const p4 = await project();
-  const u0 = await user(5);
-  await evaluate();
+  const u1 = await user(5);
+  await vote(p1, u1, 1);
+  deepEqual(await evaluate(), {
+    overloaded: [],
+    underloaded: [[1, 4]],
+    notexists: [],
+    choices: [[1, 1, 0]], // see the rank 0 here
+  });
 }
 
-await test3();
+await test_one_user_one_project_voted_incorrectly();
 
-export async function test4() {
+export async function test_five_projects_one_user_voted_correctly() {
   await reset();
-  const p0 = await project();
-  const u0 = await user(5);
-  await vote(p0, u0, 1);
-  await evaluate();
+  const _p1 = await project();
+  const _p2 = await project();
+  const _p3 = await project();
+  const _p4 = await project();
+  const _p5 = await project();
+  const _u1 = await user(5);
+  deepEqual(await evaluate(), {
+    overloaded: [],
+    underloaded: [[5, 4]],
+    notexists: [1, 2, 3, 4],
+    choices: [[1, 5, 0]],
+  });
 }
 
-await test4();
+await test_five_projects_one_user_voted_correctly();
 
 await sql.end();

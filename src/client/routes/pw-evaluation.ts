@@ -20,7 +20,6 @@ https://github.com/projektwahl/projektwahl-lit
 SPDX-License-Identifier: AGPL-3.0-or-later
 SPDX-FileCopyrightText: 2021 Moritz Hedtke <Moritz.Hedtke@t-online.de>
 */
-import { msg } from "@lit/localize";
 import { html } from "lit";
 import { setupHmr } from "../hmr.js";
 import { bootstrapCss } from "../index.js";
@@ -41,6 +40,8 @@ export const PwEvaluation = setupHmr(
             hier überzeugen möchte, kann im
             <a
               href="https://github.com/projektwahl/projektwahl-lit/blob/main/src/server/routes/evaluate/index.ts"
+              target="_blank"
+              rel="noopener"
               >Quellcode</a
             >
             nachschauen. Leider kann man nicht überprüfen, ob dieser Code auch
@@ -69,15 +70,15 @@ export const PwEvaluation = setupHmr(
           <p>
             Der Kern des nun folgenden Algorithmus ist es, die Summe der
             Punktzahlen von allen Personen zusammen zu maximieren. Dafür wird
-            eine sehr großes Gleichungssystem erstellt und dieses dann
+            ein sehr großes Gleichungssystem erstellt und dieses dann
             automatisch (per Hand, sehr witzig) gelöst.
           </p>
 
           <p>
             Wenn ein Projekt zustandekommt, in dem man Projektleiter ist, kommt
             man logischerweise in dieses Projekt. Ansonsten kommt man
-            logischerweise in genau *ein* Projekt. Man kann natürlich nur in
-            existierende Projekte kommen (hoffentlich).
+            logischerweise in genau <b>ein</b> Projekt. Man kann natürlich nur
+            in existierende Projekte kommen (hoffentlich).
           </p>
 
           <p>
@@ -90,7 +91,7 @@ export const PwEvaluation = setupHmr(
           <p>
             Wenn es jetzt jedoch keine mögliche Zuordnung mit diesen
             Einschränkungen geben würde (was schon vorgekommen ist), dann erhält
-            man vom Algorithmus ein sehr "hilfreiches" "Es existiert keine
+            man vom Algorithmus ein sehr "hilfreiches": "Es existiert keine
             Lösung des Gleichungssystems". Da man damit wenig anfangen kann und
             vor allem nicht weiß, bei welchem Projekt man am Besten die
             Einschränkungen lockert, gibt es ein sehr unfavorisiertes
@@ -108,12 +109,17 @@ export const PwEvaluation = setupHmr(
           <p>Kommen wir nun zu ein paar Beispielen:</p>
 
           <p>
-            Beispiel 1 (test3 im Code): Es gibt fünf Projekte mit
-            Mindestteilnehmeranzahl fünf und eine Person, die nicht gewählt hat.
-            Der Algorithmus wählt dann ein zufälliges Projekt und weist die
-            Person diesem zu (da Altersbeschränkung etc. eingehalten ist).
-            Dieses hat dann 4 Personen zu wenig, sodass dies als Hinweis
-            angezeigt wird.
+            Beispiel 1 (<a
+              href="https://github.com/projektwahl/projektwahl-lit/blob/c2e3f2a93ba3c12a27c8aeaae13e57dc2932d54a/tests/e2e/test-calculate.ts#L96"
+              target="_blank"
+              rel="noopener"
+              >test3</a
+            >
+            im Code): Es gibt fünf Projekte mit Mindestteilnehmeranzahl fünf und
+            eine Person, die nicht gewählt hat. Der Algorithmus wählt dann ein
+            zufälliges Projekt und weist die Person diesem zu (da
+            Altersbeschränkung etc. eingehalten ist). Dieses hat dann 4 Personen
+            zu wenig, sodass dies als Hinweis angezeigt wird.
           </p>
 
           <p>Beispiel 2:</p>
