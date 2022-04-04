@@ -416,9 +416,9 @@ class PwUserCreate extends PwForm<"/api/v1/users/create-or-update"> {
                           ${msg(`Back`)}
                         </button>
 
-                        ${this.formData[0].action == "update"
+                        ${value?.data[0].action == "update"
                           ? html`<pw-user-projects
-                              .user=${this.formData[0]}
+                              .user=${value?.data[0]}
                               name=${"project_leader_id"}
                               title=${msg("Project leaders")}
                               prefix="leaders"

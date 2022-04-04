@@ -91,6 +91,10 @@ export const PwUserProjects = setupHmr(
     }
 
     override get head() {
+      if (this.user === undefined) {
+        throw new Error("this.user not set");
+      }
+
       try {
         const data = parseRequestWithPrefix(
           this.url,
@@ -253,8 +257,8 @@ export const PwUserProjects = setupHmr(
                 (value) => html`<tr>
                   <td>
                     <pw-project-user-checkbox
-                      projectId=${value.id}
-                      .user=${value}
+                      .projectId=${value.id}
+                      .user=${this.user}
                       name=${this.name}
                     ></pw-project-user-checkbox>
                   </td>
