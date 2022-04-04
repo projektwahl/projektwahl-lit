@@ -28,7 +28,7 @@ jobs:
           cache: "npm"
       - run: ls -R /opt/hostedtoolcache/node/
       - run: cp dangerous-package.json package.json
-      - run: npm ci
+      - run: npm install
       - run: npm run format:check
       - run: ./node_modules/@dev.mohe/argon2/build.sh /opt/hostedtoolcache/node/$(node -v | cut -c2-)/x64/include/node
       - run: npm run build
