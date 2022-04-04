@@ -143,17 +143,22 @@ await test_one_user_one_project_voted_incorrectly();
 
 export async function test_five_projects_one_user_voted_correctly() {
   await reset();
-  const _p1 = await project();
-  const _p2 = await project();
-  const _p3 = await project();
-  const _p4 = await project();
-  const _p5 = await project();
-  const _u1 = await user(5);
+  const p1 = await project();
+  const p2 = await project();
+  const p3 = await project();
+  const p4 = await project();
+  const p5 = await project();
+  const u1 = await user(5);
+  await vote(p1, u1, 4);
+  await vote(p2, u1, 5);
+  await vote(p3, u1, 3);
+  await vote(p4, u1, 1);
+  await vote(p5, u1, 2);
   deepEqual(await evaluate(), {
     overloaded: [],
-    underloaded: [[5, 4]],
-    notexists: [1, 2, 3, 4],
-    choices: [[1, 5, 0]],
+    underloaded: [[4, 4]],
+    notexists: [1, 2, 3, 5],
+    choices: [[1, 4, 1]],
   });
 }
 
