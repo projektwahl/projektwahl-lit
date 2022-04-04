@@ -93,6 +93,7 @@ export const createOrUpdateUsersHandler = requestHandler(
     try {
       const row = (
         await sql.begin("READ WRITE", async (tsql) => {
+          await sql`SET LOCAL projektwahl.type = ${loggedInUser?.type ?? null}`;
           const results = [];
           for (const user of users) {
             if ("id" in user) {

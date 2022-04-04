@@ -97,6 +97,7 @@ export function requestHandler<P extends keyof typeof routes>(
           // @ts-expect-error todo fixme
           user = (
             await retryableBegin("READ WRITE", async (sql) => {
+              await sql`SET LOCAL projektwahl.type = ${user?.type ?? null}`;
               //await typedSql(sql, {})`DELETE FROM sessions WHERE CURRENT_TIMESTAMP >= updated_at + interval '24 hours' AND session_id != ${session_id} `
               return await typedSql(sql, {
                 columns: {

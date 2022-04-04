@@ -124,6 +124,8 @@ export const loginHandler = requestHandler(
 
     if (needsRehash) {
       await sql.begin("READ WRITE", async (tsql) => {
+        await sql`SET LOCAL projektwahl.type = ${dbUser.id}`;
+
         return await typedSql(tsql, {
           columns: {},
         } as const)`UPDATE users SET password_hash = ${newHash} WHERE id = ${dbUser.id}`;
@@ -141,6 +143,7 @@ export const loginHandler = requestHandler(
     );
 
     await sql.begin("READ WRITE", async (tsql) => {
+      await sql`SET LOCAL projektwahl.type = ${dbUser.id}`;
       return await typedSql(tsql, {
         columns: {},
       } as const)`INSERT INTO sessions (user_id, session_id) VALUES (${dbUser.id}, ${session_id})`;

@@ -105,6 +105,7 @@ export function createOrUpdateChoiceHandler<P extends "/api/v1/choices/update">(
 
     try {
       await sql.begin("READ WRITE", async (sql) => {
+        await sql`SET LOCAL projektwahl.type = ${loggedInUser.type}`;
         return await dbquery(sql, choice, loggedInUser);
       });
 
