@@ -75,13 +75,13 @@ class PwUserProjectCheckbox extends PwElement {
     this.input = createRef();
 
     this._task = new Task(this, async () => {
-      const result = await myFetch<"/api/v1/projects/update">(
+      const result = await myFetch<"/api/v1/users/update">(
         "POST",
-        "/api/v1/projects/update",
+        "/api/v1/users/update",
           {
             id: this.project.id,
             [this.name]:
-              this.project[this.name] === this.userId ? null : this.projectId,
+              this.project[this.name] === this.userId ? null : this.userId,
           },
         {}
       );

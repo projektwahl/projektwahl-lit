@@ -25,8 +25,7 @@ import "../../entity-list/pw-order.js";
 import { html } from "lit";
 import { noChange } from "lit";
 import { msg } from "@lit/localize";
-import { PwUsers } from "./pw-users.js";
-import "./pw-project-user-checkbox.js";
+import "./pw-user-project-checkbox.js";
 import "../../form/pw-input.js";
 import { setupHmr } from "../../hmr.js";
 import { aClick } from "../../pw-a.js";
@@ -160,10 +159,10 @@ export const PwUserProjects = setupHmr(
               ${pwInputCheckbox<"/api/v1/projects", boolean | undefined>({
                 url: this.url,
                 label: null,
-                name: ["filters", this.name],
-                get: (o) => o.filters[this.name] == this.userId,
+                name: ["filters", "id"],
+                get: (o) => o.filters.id == this.userId,
                 set: (o, v) =>
-                  (o.filters[this.name] = v ? this.userId : null),
+                  (o.filters.id = v ? this.userId : undefined),
                 task: this._task,
                 type: "checkbox",
                 trueValue: true,
@@ -242,11 +241,11 @@ export const PwUserProjects = setupHmr(
             ? result.data.entities.map(
                 (value) => html`<tr>
                   <td>
-                    <pw-project-user-checkbox
+                    <pw-user-project-checkbox
                       userId=${this.userId}
                       .project=${value}
                       name=${this.name}
-                    ></pw-project-user-checkbox>
+                    ></pw-user-project-checkbox>
                   </td>
                   <th scope="row">
                     <p>
