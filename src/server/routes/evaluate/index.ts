@@ -87,23 +87,33 @@ export class CPLEXLP {
     constraints: [number, string][],
     max: number | null
   ) => {
-    if (min !== null) {
-      await this.fileHandle.write(`\nmin_${name}: `);
+    if (min === max) {
+      await this.fileHandle.write(`\neq_${name}: `);
       for (const constraint of constraints) {
         await this.fileHandle.write(
           ` ${constraint[0] < 0 ? "" : "+"}${constraint[0]} ${constraint[1]}`
         );
       }
-      await this.fileHandle.write(` >= ${min}`);
-    }
-    if (max !== null) {
-      await this.fileHandle.write(`\nmax_${name}: `);
-      for (const constraint of constraints) {
-        await this.fileHandle.write(
-          ` ${constraint[0] < 0 ? "" : "+"}${constraint[0]} ${constraint[1]}`
-        );
+      await this.fileHandle.write(` = ${min}`);
+    } else {
+      if (min !== null) {
+        await this.fileHandle.write(`\nmin_${name}: `);
+        for (const constraint of constraints) {
+          await this.fileHandle.write(
+            ` ${constraint[0] < 0 ? "" : "+"}${constraint[0]} ${constraint[1]}`
+          );
+        }
+        await this.fileHandle.write(` >= ${min}`);
       }
-      await this.fileHandle.write(` <= ${max}`);
+      if (max !== null) {
+        await this.fileHandle.write(`\nmax_${name}: `);
+        for (const constraint of constraints) {
+          await this.fileHandle.write(
+            ` ${constraint[0] < 0 ? "" : "+"}${constraint[0]} ${constraint[1]}`
+          );
+        }
+        await this.fileHandle.write(` <= ${max}`);
+      }
     }
   };
 
@@ -283,7 +293,7 @@ export async function evaluate() {
   for (const choice of choices) {
     await lp.constraint(
       `project_must_exist_${choice.user_id}_${choice.project_id}`,
-      0,
+      null, // always greater than 0
       [
         [1, `choice_${choice.user_id}_${choice.project_id}`],
         [1, `project_not_exists_${choice.project_id}`],
@@ -319,7 +329,7 @@ export async function evaluate() {
         [1, `project_underloaded_${project.id}`],
         [project.min_participants, `project_not_exists_${project.id}`],
       ],
-      1000000
+      null
     );
 
     await lp.constraint(
