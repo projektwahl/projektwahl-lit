@@ -40,6 +40,7 @@ import { PwInputSelect, pwInputSelect } from "../../form/pw-input-select.js";
 import { pwInputNumber } from "../../form/pw-input-number.js";
 import { pwInputCheckbox } from "../../form/pw-input-checkbox.js";
 import { aClick } from "../../pw-a.js";
+import "./pw-user-projects.js";
 
 export async function pwUser(id: number, viewOnly = false) {
   const result = await taskFunction([id]);
@@ -414,6 +415,32 @@ class PwUserCreate extends PwForm<"/api/v1/users/create-or-update"> {
                         >
                           ${msg(`Back`)}
                         </button>
+
+                        ${value?.data[0].action == "update"
+                          ? html`<pw-user-projects
+                                @refreshentitylist=${() => {
+                                  // TODO FIXME this may let you loose data?
+                                  // I think it doesnt but not sure
+                                  void this.initialTask.run();
+                                }}
+                                .user=${value?.data[0]}
+                                name=${"project_leader_id"}
+                                title=${msg("Project leader in")}
+                                prefix="leaders"
+                              ></pw-user-projects>
+
+                              <pw-user-projects
+                                @refreshentitylist=${() => {
+                                  // TODO FIXME this may let you loose data?
+                                  // I think it doesnt but not sure
+                                  void this.initialTask.run();
+                                }}
+                                .user=${value?.data[0]}
+                                name=${"force_in_project_id"}
+                                title=${msg("Guaranteed project member in")}
+                                prefix="members"
+                              ></pw-user-projects>`
+                          : undefined}
                       </form>
                     </div>
                   </div>

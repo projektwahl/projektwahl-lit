@@ -25,8 +25,7 @@ import "../../entity-list/pw-order.js";
 import { html } from "lit";
 import { noChange } from "lit";
 import { msg } from "@lit/localize";
-import { PwUsers } from "../users/pw-users.js";
-import "./pw-project-user-checkbox.js";
+import "../projects/pw-project-user-checkbox.js";
 import "../../form/pw-input.js";
 import { setupHmr } from "../../hmr.js";
 import { aClick } from "../../pw-a.js";
@@ -38,31 +37,39 @@ import {
 import { pwInputCheckbox } from "../../form/pw-input-checkbox.js";
 import { pwInputNumber } from "../../form/pw-input-number.js";
 import { pwInputText } from "../../form/pw-input-text.js";
-import type { entityRoutes } from "../../../lib/routes.js";
+import type { entityRoutes, routes } from "../../../lib/routes.js";
 import type { z } from "zod";
+import { PwProjects } from "../projects/pw-projects.js";
 
-const defaultValue: z.infer<typeof entityRoutes["/api/v1/users"]["request"]> = {
+const defaultValue: z.infer<
+  typeof entityRoutes["/api/v1/projects"]["request"]
+> = {
   sorting: [],
   filters: {},
   paginationDirection: "forwards",
   paginationLimit: 100,
 };
 
-export const pwProjectUsers = async (url: URL, prefix: string) => {
-  const result = await taskFunction("/api/v1/users", url, prefix, defaultValue);
-  return html`<pw-project-users
+export const pwUserProjects = async (url: URL, prefix: string) => {
+  const result = await taskFunction(
+    "/api/v1/projects",
+    url,
+    prefix,
+    defaultValue
+  );
+  return html`<pw-user-projects
     .initial=${result}
     prefix=${prefix}
-  ></pw-project-users>`;
+  ></pw-user-projects>`;
 };
 
-export const PwProjectUsers = setupHmr(
-  "PwProjectUsers",
-  class PwProjectUsers<X extends string> extends PwUsers<X> {
+export const PwUserProjects = setupHmr(
+  "PwUserProjects",
+  class PwUserProjects<X extends string> extends PwProjects<X> {
     static override get properties() {
       return {
         ...super.properties,
-        projectId: { type: Number },
+        user: { attribute: false },
         name: { type: String },
       };
     }
@@ -75,13 +82,19 @@ export const PwProjectUsers = setupHmr(
 
     name!: "project_leader_id" | "force_in_project_id";
 
-    projectId!: number;
+    user!: z.infer<
+      typeof routes["/api/v1/users"]["response"]
+    >["entities"][number];
 
     override get buttons() {
       return html``;
     }
 
     override get head() {
+      if (this.user === undefined) {
+        throw new Error("this.user not set");
+      }
+
       try {
         const data = parseRequestWithPrefix(
           this.url,
@@ -95,12 +108,12 @@ export const PwProjectUsers = setupHmr(
         return html`<tr>
             <th class="table-cell-hover p-0" scope="col">
               ${pwOrder({
-                url: "/api/v1/users",
+                url: "/api/v1/projects",
                 name: ["sorting", `${this.name}_eq`],
                 orderBy: `${this.name}_eq`,
                 prefix: this.prefix,
                 title: "",
-                value: this.projectId,
+                value: this.user[this.name],
                 get: (o) => o.sorting,
                 set: (o, v) => (o.sorting = v),
                 initial,
@@ -110,7 +123,7 @@ export const PwProjectUsers = setupHmr(
 
             <th class="table-cell-hover p-0" scope="col">
               ${pwOrder({
-                url: "/api/v1/users",
+                url: "/api/v1/projects",
                 name: ["sorting", "id"],
                 orderBy: "id",
                 prefix: this.prefix,
@@ -125,11 +138,11 @@ export const PwProjectUsers = setupHmr(
 
             <th class="table-cell-hover p-0" scope="col">
               ${pwOrder({
-                url: "/api/v1/users",
-                name: ["sorting", "username"],
-                orderBy: "username",
+                url: "/api/v1/projects",
+                name: ["sorting", "title"],
+                orderBy: "title",
                 prefix: this.prefix,
-                title: msg("Name"),
+                title: msg("Title"),
                 value: null,
                 get: (o) => o.sorting,
                 set: (o, v) => (o.sorting = v),
@@ -140,11 +153,11 @@ export const PwProjectUsers = setupHmr(
 
             <th class="table-cell-hover p-0" scope="col">
               ${pwOrder({
-                url: "/api/v1/users",
-                name: ["sorting", "type"],
-                orderBy: "type",
+                url: "/api/v1/projects",
+                name: ["sorting", "info"],
+                orderBy: "info",
                 prefix: this.prefix,
-                title: msg("Type"),
+                title: msg("Info"),
                 value: null,
                 get: (o) => o.sorting,
                 set: (o, v) => (o.sorting = v),
@@ -156,13 +169,15 @@ export const PwProjectUsers = setupHmr(
 
           <tr>
             <th scope="col">
-              ${pwInputCheckbox<"/api/v1/users", boolean | undefined>({
+              ${pwInputCheckbox<"/api/v1/projects", boolean | undefined>({
                 url: this.url,
                 label: null,
-                name: ["filters", this.name],
-                get: (o) => o.filters[this.name] == this.projectId,
+                name: ["filters", "id"],
+                get: (o) => o.filters.id == this.user[this.name],
                 set: (o, v) =>
-                  (o.filters[this.name] = v ? this.projectId : null),
+                  (o.filters.id = v
+                    ? this.user[this.name] ?? undefined
+                    : undefined),
                 task: this._task,
                 type: "checkbox",
                 trueValue: true,
@@ -174,7 +189,7 @@ export const PwProjectUsers = setupHmr(
             </th>
 
             <th scope="col">
-              ${pwInputNumber<"/api/v1/users", number | undefined>({
+              ${pwInputNumber<"/api/v1/projects", number | undefined>({
                 enabled: true,
                 url: this.url,
                 label: null,
@@ -190,13 +205,13 @@ export const PwProjectUsers = setupHmr(
             </th>
 
             <th scope="col">
-              ${pwInputText<"/api/v1/users", string | undefined>({
+              ${pwInputText<"/api/v1/projects", string | undefined>({
                 enabled: true,
                 url: this.url,
                 label: null,
-                name: ["filters", "username"],
-                get: (o) => o.filters.username,
-                set: (o, v) => (o.filters.username = v),
+                name: ["filters", "title"],
+                get: (o) => o.filters.title,
+                set: (o, v) => (o.filters.title = v),
                 task: this._task,
                 type: "text",
                 initial,
@@ -206,24 +221,19 @@ export const PwProjectUsers = setupHmr(
             </th>
 
             <th scope="col">
-              ${
-                /*TODO FIXME use zod to verify the actual value? also change this to select*/ pwInputText<
-                  "/api/v1/users",
-                  "voter" | "helper" | "admin" | undefined
-                >({
-                  enabled: true,
-                  url: this.url,
-                  label: null,
-                  name: ["filters", "type"],
-                  get: (o) => o.filters.type,
-                  set: (o, v) => (o.filters.type = v),
-                  task: this._task,
-                  type: "text",
-                  defaultValue: undefined,
-                  initial,
-                  resettable: false,
-                })
-              }
+              ${pwInputText<"/api/v1/projects", string | undefined>({
+                enabled: true,
+                url: this.url,
+                label: null,
+                name: ["filters", "info"],
+                get: (o) => o.filters.info,
+                set: (o, v) => (o.filters.info = v),
+                task: this._task,
+                type: "text",
+                initial,
+                defaultValue: undefined,
+                resettable: false,
+              })}
             </th>
 
             <th scope="col"></th>
@@ -247,9 +257,9 @@ export const PwProjectUsers = setupHmr(
                 (value) => html`<tr>
                   <td>
                     <pw-project-user-checkbox
-                      type="checkbox"
-                      projectId=${this.projectId}
-                      .user=${value}
+                      type="radio"
+                      .projectId=${value.id}
+                      .user=${this.user}
                       name=${this.name}
                     ></pw-project-user-checkbox>
                   </td>
@@ -257,13 +267,15 @@ export const PwProjectUsers = setupHmr(
                     <p>
                       ${value.deleted
                         ? html`<del
-                            ><a @click=${aClick} href="/users/view/${value.id}"
+                            ><a
+                              @click=${aClick}
+                              href="/projects/view/${value.id}"
                               >${value.id}</a
                             ></del
                           >`
                         : html`<a
                             @click=${aClick}
-                            href="/users/view/${value.id}"
+                            href="/projects/view/${value.id}"
                             >${value.id}</a
                           >`}
                     </p>
@@ -272,22 +284,24 @@ export const PwProjectUsers = setupHmr(
                     <p>
                       ${value.deleted
                         ? html`<del
-                            ><a @click=${aClick} href="/users/view/${value.id}"
-                              >${value.username}</a
+                            ><a
+                              @click=${aClick}
+                              href="/projects/view/${value.id}"
+                              >${value.title}</a
                             ></del
                           >`
                         : html`<a
                             @click=${aClick}
-                            href="/users/view/${value.id}"
-                            >${value.username}</a
+                            href="/projects/view/${value.id}"
+                            >${value.title}</a
                           >`}
                     </p>
                   </td>
                   <td>
                     <p>
                       ${value.deleted
-                        ? html`<del>${value.type}</del>`
-                        : html`${value.type}`}
+                        ? html`<del>${value.info}</del>`
+                        : html`${value.info}`}
                     </p>
                   </td>
                 </tr>`
@@ -302,4 +316,4 @@ export const PwProjectUsers = setupHmr(
   }
 );
 
-customElements.define("pw-project-users", PwProjectUsers);
+customElements.define("pw-user-projects", PwUserProjects);

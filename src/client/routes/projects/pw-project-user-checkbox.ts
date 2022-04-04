@@ -46,6 +46,7 @@ class PwProjectUserCheckbox extends PwElement {
       projectId: { type: Number },
       url: { type: String },
       name: { type: String },
+      type: { type: String },
     };
   }
 
@@ -64,6 +65,8 @@ class PwProjectUserCheckbox extends PwElement {
   form: import("lit/directives/ref").Ref<HTMLFormElement>;
 
   input: import("lit/directives/ref").Ref<HTMLElement>;
+
+  type!: "radio" | "checkbox";
 
   constructor() {
     super();
@@ -125,7 +128,9 @@ class PwProjectUserCheckbox extends PwElement {
           @change=${async () => {
             await this._task.run();
           }}
-          type="checkbox"
+          name=${this.name}
+          type=${this.type}
+          value=${this.projectId}
           ?disabled=${this._task.status === TaskStatus.PENDING}
           .checked=${live(this.user[this.name] === this.projectId)}
           class="form-check-input"

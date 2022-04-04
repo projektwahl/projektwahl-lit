@@ -55,7 +55,17 @@ export const pwProjects = async (url: URL) => {
   return html`<pw-projects .initial=${result} prefix="projects"></pw-projects>`;
 };
 
-class PwProjects<X extends string> extends PwEntityList<"/api/v1/projects", X> {
+export class PwProjects<X extends string> extends PwEntityList<
+  "/api/v1/projects",
+  X
+> {
+  static override get properties() {
+    return {
+      ...super.properties,
+      title: { type: String },
+    };
+  }
+
   constructor() {
     super();
 
