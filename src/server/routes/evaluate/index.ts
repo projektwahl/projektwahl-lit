@@ -23,12 +23,29 @@ SPDX-FileCopyrightText: 2021 Moritz Hedtke <Moritz.Hedtke@t-online.de>
 import { FileHandle, mkdtemp, open, readFile } from "node:fs/promises";
 import path from "node:path";
 import os from "node:os";
-import { constants } from "node:fs";
+import { constants, OpenMode, PathLike } from "node:fs";
 import { execFile } from "node:child_process";
 import { sql } from "../../database.js";
 import { rawChoice } from "../../../lib/routes.js";
 import { z } from "zod";
 import { typedSql } from "../../describe.js";
+import type { Abortable } from "node:events";
+
+async function readFileWithBacktrace(
+  path: PathLike | FileHandle,
+  options:
+    | ({
+        encoding: BufferEncoding;
+        flag?: OpenMode | undefined;
+      } & Abortable)
+    | BufferEncoding
+): Promise<string> {
+  try {
+    return await readFile(path, options);
+  } catch (error) {
+    throw new Error(String(error));
+  }
+}
 
 const groupByNumber = <T>(
   data: T[],
@@ -181,7 +198,7 @@ export class CPLEXLP {
     }
 
     const solution = (
-      await readFile(this.solutionPath, { encoding: "utf8" })
+      await readFileWithBacktrace(this.solutionPath, { encoding: "utf8" })
     ).split(/\r?\n/);
 
     const solutionFinal = Object.fromEntries(
