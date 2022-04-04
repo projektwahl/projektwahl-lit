@@ -114,6 +114,22 @@
 <trans-unit id="s461237cd996d9d4a">
   <source>Schüler</source>
 </trans-unit>
+<trans-unit id="s199f5853f4e718f7">
+  <source>Projects</source>
+  <target>Projekte</target>
+</trans-unit>
+<trans-unit id="sfb43be2359ccab14">
+  <source>Create project</source>
+  <target>Projekt erstellen</target>
+</trans-unit>
+<trans-unit id="s99f110d27e30b289">
+  <source>Title</source>
+  <target>Titel</target>
+</trans-unit>
+<trans-unit id="s2063a9d17c280fe5">
+  <source>Info</source>
+  <target>Info</target>
+</trans-unit>
 <trans-unit id="s88608c78750c1b37">
   <source>View account</source>
   <target>Account anzeigen</target>
@@ -148,24 +164,14 @@
 <trans-unit id="sc16e00a7a8b2fde2">
   <source>Back</source>
 </trans-unit>
+<trans-unit id="s4ab27d95f4466996">
+  <source>Project leader in</source>
+</trans-unit>
+<trans-unit id="s1987d6c1bbe105e3">
+  <source>Guaranteed project member in</source>
+</trans-unit>
 <trans-unit id="s5daa9183e1169f88">
   <source>.json Datei</source>
-</trans-unit>
-<trans-unit id="s199f5853f4e718f7">
-  <source>Projects</source>
-  <target>Projekte</target>
-</trans-unit>
-<trans-unit id="sfb43be2359ccab14">
-  <source>Create project</source>
-  <target>Projekt erstellen</target>
-</trans-unit>
-<trans-unit id="s99f110d27e30b289">
-  <source>Title</source>
-  <target>Titel</target>
-</trans-unit>
-<trans-unit id="s2063a9d17c280fe5">
-  <source>Info</source>
-  <target>Info</target>
 </trans-unit>
 <trans-unit id="s3e9c025477abb23d">
   <source>View project</source>
