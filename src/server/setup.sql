@@ -497,3 +497,23 @@ CREATE TRIGGER trigger_check_users_project_leader_id3
 BEFORE INSERT ON users_with_deleted
 FOR EACH ROW
 EXECUTE FUNCTION check_users_project_leader_id3();
+
+
+
+
+
+ALTER TABLE users_with_deleted ENABLE ROW LEVEL SECURITY;
+
+
+-- only for local testing
+-- ALTER TABLE users_with_deleted FORCE ROW LEVEL SECURITY;
+
+DROP POLICY IF EXISTS users_voters_only_project_leaders ON users_with_deleted;
+
+-- CREATE POLICY users_voters_only_project_leaders ON users_with_deleted AS RESTRICTIVE FOR ALL TO PUBLIC WITH CHECK ((SELECT type FROM users_with_deleted WHERE id = current_setting('projektwahl_user')::int) IS DISTINCT FROM 'helper' OR project_leader_id IS NOT NULL);
+
+
+
+-- SET projektwahl.type = 
+
+CREATE POLICY users_voters_only_project_leaders ON users_with_deleted FOR ALL TO PUBLIC USING (current_setting('projektwahl.type') IS DISTINCT FROM 'voter' OR project_leader_id IS NOT NULL);

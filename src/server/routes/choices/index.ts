@@ -85,6 +85,7 @@ export const choicesHandler = requestHandler(
     }
 
     return await fetchData<"/api/v1/choices">(
+      loggedInUser,
       "/api/v1/choices" as const,
       query,
       (query) => {

@@ -56,31 +56,10 @@ export const usersHandler = requestHandler(
         ];
       return returnValue;
     }
-    if (!(loggedInUser?.type === "admin" || loggedInUser?.type === "helper")) {
-      const returnValue: [OutgoingHttpHeaders, ResponseType<"/api/v1/users">] =
-        [
-          {
-            "content-type": "text/json; charset=utf-8",
-            ":status": 403,
-          },
-          {
-            success: false as const,
-            error: {
-              issues: [
-                {
-                  code: ZodIssueCode.custom,
-                  path: ["forbidden"],
-                  message: "Unzureichende Berechtigung!",
-                },
-              ],
-            },
-          },
-        ];
-      return returnValue;
-    }
 
     const ret: [OutgoingHttpHeaders, ResponseType<"/api/v1/users">] =
       await fetchData<"/api/v1/users">(
+        loggedInUser,
         "/api/v1/users" as const,
         query,
         (query) => {

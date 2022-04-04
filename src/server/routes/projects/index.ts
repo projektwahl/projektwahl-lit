@@ -91,6 +91,7 @@ export const projectsHandler = requestHandler(
     }
 
     return await fetchData<"/api/v1/projects">(
+      loggedInUser,
       "/api/v1/projects" as const,
       query,
       (query) => {
