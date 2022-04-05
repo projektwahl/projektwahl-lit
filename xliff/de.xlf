@@ -258,7 +258,7 @@
   <target>Wahl</target>
 </trans-unit>
 <trans-unit id="s2667d13ee670a19d">
-  <source>Logout <x id="0" equiv-text="${this.username}"/></source>
+  <source>Logout <x id="0" equiv-text="${this.userController.username}"/></source>
   <target><x id="0" equiv-text="${this.username}"/> abmelden</target>
 </trans-unit>
 <trans-unit id="sfebb69bee8b5102d">
