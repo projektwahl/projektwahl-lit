@@ -59,8 +59,8 @@ npm run build
 
 
 sudo -u postgres psql
-CREATE ROLE projektwahl_staging LOGIN;
-CREATE ROLE projektwahl_staging_admin LOGIN;
+CREATE ROLE projektwahl_staging LOGIN PASSWORD 'projektwahl'; -- CHANGE/REMOVE THIS PASSWORD
+CREATE ROLE projektwahl_staging_admin LOGIN PASSWORD 'projektwahl'; -- CHANGE/REMOVE THIS PASSWORD
 CREATE DATABASE projektwahl_staging OWNER projektwahl_staging_admin;
 
 sudo -u postgres psql --db projektwahl_staging
@@ -103,7 +103,7 @@ sudo -u projektwahl_staging NODE_ENV=development PORT=8443 BASE_URL=https://loca
 ```
 sudo -u projektwahl_staging NODE_ENV=testing PORT=8443 BASE_URL=https://localhost:8443 CREDENTIALS_DIRECTORY=$PWD DATABASE_HOST=/run/postgresql DATABASE_URL=postgres://projektwahl_staging@localhost/projektwahl_staging npm run server
 
-sudo -u projektwahl_staging_admin NODE_ENV=testing PORT=8443 BASE_URL=https://localhost:8443 CREDENTIALS_DIRECTORY=$PWD DATABASE_HOST=/run/postgresql DATABASE_URL=postgres://projektwahl_staging_admin@localhost/projektwahl_staging npm run test
+NODE_ENV=testing PORT=8443 BASE_URL=https://localhost:8443 CREDENTIALS_DIRECTORY=$PWD DATABASE_HOST=/run/postgresql DATABASE_URL=postgres://projektwahl_staging_admin:projektwahl@localhost/projektwahl_staging npm run test
 
 
 ```
