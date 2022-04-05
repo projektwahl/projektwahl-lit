@@ -119,7 +119,7 @@ export async function setup() {
               }, ${projects[j]["id"]}, ${j + 1});`;
             });
           } catch (error) {
-            console.error("jo", error);
+            //console.error("jo", error);
           }
         }
       }

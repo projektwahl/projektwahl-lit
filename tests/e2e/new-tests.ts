@@ -239,10 +239,21 @@ async function runTest(
   browser: "firefox" | "chrome",
   testFunction: (helper: Helper) => Promise<void>
 ) {
-  console.log((await exec('sudo -u projektwahl_staging_admin psql --db projektwahl_staging --command="TRUNCATE TABLE settings, sessions, choices_history, projects_history, users_history, choices, users_with_deleted, projects_with_deleted;"', {
+  console.log((await exec('sudo -u projektwahl_staging_admin psql --db projektwahl_staging --command="DROP TABLE IF EXISTS settings, sessions, choices_history, projects_history, users_history, choices, users_with_deleted, projects_with_deleted CASCADE;"', {
     maxBuffer: 1000*1000*1000
   })).stderr);
-  //console.log(await exec('sudo -u projektwahl_staging_admin psql --single-transaction --db projektwahl_staging < src/server/setup.sql'))
+  console.log(await exec('sudo -u projektwahl_staging_admin psql --single-transaction --db projektwahl_staging < src/server/setup.sql'))
+  console.log(await exec(`sudo -u projektwahl_staging_admin psql --db projektwahl_staging --command="ALTER DATABASE projektwahl_staging SET default_transaction_isolation = 'serializable';
+  GRANT SELECT,INSERT,UPDATE ON users_with_deleted TO projektwahl_staging;
+  GRANT SELECT,INSERT,UPDATE ON users TO projektwahl_staging;
+  GRANT SELECT,INSERT,UPDATE ON projects_with_deleted TO projektwahl_staging;
+  GRANT SELECT,INSERT,UPDATE ON projects TO projektwahl_staging;
+  GRANT SELECT,INSERT,UPDATE ON choices TO projektwahl_staging;
+  GRANT INSERT ON settings TO projektwahl_staging;
+  GRANT SELECT,INSERT,UPDATE,DELETE ON sessions TO projektwahl_staging;
+  ALTER VIEW users OWNER TO projektwahl_staging;
+  ALTER VIEW present_voters OWNER TO projektwahl_staging;
+  ALTER VIEW projects OWNER TO projektwahl_staging;"`))
   console.log((await exec('sudo -u projektwahl_staging NODE_ENV=development DATABASE_HOST=/run/postgresql DATABASE_URL=postgres://projektwahl_staging@localhost/projektwahl_staging npm run setup', {
     maxBuffer: 1000*1000*1000
   })).stderr)
