@@ -46,11 +46,11 @@ jobs:
       - run: npm run build
       - run: openssl req -x509 -newkey rsa:2048 -nodes -sha256 -subj '/CN=localhost' -keyout key.pem -out cert.pem
       - run: |
-          sudo -u postgres psql --command="CREATE ROLE projektwahl_staging LOGIN PASSWORD 'projektwahl';
+          psql postgres://projektwahl:projektwahl@localhost/projektwahl --command="CREATE ROLE projektwahl_staging LOGIN PASSWORD 'projektwahl';
           CREATE ROLE projektwahl_staging_admin LOGIN PASSWORD 'projektwahl';
           CREATE DATABASE projektwahl_staging OWNER projektwahl_staging_admin;"
       - run: |
-          sudo -u postgres psql --db projektwahl_staging --command="REVOKE CREATE ON SCHEMA public FROM PUBLIC;"
+          psql postgres://projektwahl:projektwahl@localhost/projektwahl_staging --command="REVOKE CREATE ON SCHEMA public FROM PUBLIC;"
       - run: psql --single-transaction postgres://projektwahl_staging_admin:projektwahl@localhost/projektwahl_staging < src/server/setup.sql
       - run: |
           psql postgres://projektwahl_staging_admin:projektwahl@localhost/projektwahl_staging --command="ALTER DATABASE projektwahl_staging SET default_transaction_isolation = 'serializable';
