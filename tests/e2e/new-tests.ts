@@ -132,7 +132,7 @@ class FormTester {
       By.css('div[class="alert alert-danger"]')
     );
 
-    assert.equal(alerts.length, 0);
+    assert.equal(alerts, []);
   }
 
   async submitFailure() {
