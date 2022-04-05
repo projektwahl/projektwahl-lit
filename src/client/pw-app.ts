@@ -24,7 +24,6 @@ import { html, noChange, ReactiveElement, TemplateResult } from "lit";
 import { bootstrapCss } from "./index.js";
 import { HistoryController, HistoryState } from "./history-controller.js";
 import { aClick } from "./pw-a.js";
-import jscookie from "js-cookie";
 import { myFetch } from "./utils.js";
 import { Task } from "@lit-labs/task";
 import { msg, str } from "@lit/localize";

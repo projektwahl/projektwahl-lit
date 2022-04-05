@@ -39,10 +39,10 @@ export class LoggedInUserController implements ReactiveController {
     this.type = jscookie.get("type");
   }
 
-  updateloginstate() {
+  updateloginstate = () => {
     this.username = jscookie.get("username");
     this.type = jscookie.get("type");
-  }
+  };
 
   hostConnected() {
     if ("BroadcastChannel" in window) {
