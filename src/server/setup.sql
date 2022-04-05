@@ -27,8 +27,6 @@ SPDX-FileCopyrightText: 2021 Moritz Hedtke <Moritz.Hedtke@t-online.de>
 -- ALTER DATABASE projektwahl SET default_transaction_isolation = 'serializable';
 -- ALTER DATABASE projektwahl SET default_transaction_read_only = true;
 
-REVOKE CREATE ON SCHEMA public FROM PUBLIC;
-
 -- TODO FIXME at some point create the tables based on the zod definitions? so min/max etc. are checked correctly?
 CREATE TABLE IF NOT EXISTS projects_with_deleted (
   id INT GENERATED ALWAYS AS IDENTITY PRIMARY KEY NOT NULL,

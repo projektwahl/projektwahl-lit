@@ -235,8 +235,8 @@ async function runTest(
   browser: "firefox" | "chrome",
   testFunction: (helper: Helper) => Promise<void>
 ) {
-  await sql`DROP TABLE IF EXISTS settings, sessions, choices_history, projects_history, users_history, choices, users_with_deleted, projects_with_deleted CASCADE;`;
-  await sql.begin(async (tsql) => {
+  await sql.begin("READ WRITE", async (tsql) => {
+    await tsql`DROP TABLE IF EXISTS settings, sessions, choices_history, projects_history, users_history, choices, users_with_deleted, projects_with_deleted CASCADE;`;
     await tsql.file("src/server/setup.sql");
   });
   await setup();

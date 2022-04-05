@@ -306,6 +306,12 @@ CREATE DATABASE projektwahl_staging OWNER projektwahl_staging_admin;
 CREATE DATABASE projektwahl_production OWNER projektwahl_production_admin;
 
 
+sudo -u postgres psql --db projektwahl_staging
+SET default_transaction_read_only = false;
+REVOKE CREATE ON SCHEMA public FROM PUBLIC;
+
+
+
 ssh -A moritz@aes.selfmade4u.de -p 2121
 sudo useradd -m projektwahl_staging
 sudo useradd -m projektwahl_staging_admin

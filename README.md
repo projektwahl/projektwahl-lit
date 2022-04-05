@@ -32,9 +32,9 @@ This software is licensed under the GNU Affero General Public License v3.0 or an
 ## Requirements
 
 - **Remove/Adapt https://github.com/projektwahl/projektwahl-lit/blob/main/src/client/routes/pw-privacy.ts and https://github.com/projektwahl/projektwahl-lit/blob/main/src/client/routes/pw-imprint.ts**
-- Node 16/17
+- Node 16+
 - npm
-- Postgresql database
+- Postgresql database 13+
 - OpenID credentials (optional)
 
 ## Important notes
@@ -44,10 +44,44 @@ To ensure data security you need two users to access the database. One privilege
 ## Production environment
 
 ```bash
+sudo -u postgres psql
+CREATE ROLE projektwahl_staging LOGIN;
+CREATE ROLE projektwahl_staging_admin LOGIN;
+CREATE DATABASE projektwahl_staging OWNER projektwahl_staging_admin;
+
+sudo useradd -m projektwahl_staging
+sudo useradd -m projektwahl_staging_admin
+
+
+sudo -u postgres psql --db projektwahl_staging
+SET default_transaction_read_only = false;
+REVOKE CREATE ON SCHEMA public FROM PUBLIC;
+
+
+sudo -u projektwahl_staging_admin psql --single-transaction --db projektwahl_staging < src/server/setup.sql
+
+
+
+sudo -u projektwahl_staging_admin psql --db projektwahl_staging
+SET default_transaction_read_only = false;
+ALTER DATABASE projektwahl_staging SET default_transaction_isolation = 'serializable';
+ALTER DATABASE projektwahl_staging SET default_transaction_read_only = true;
+GRANT SELECT,INSERT,UPDATE ON users_with_deleted TO projektwahl_staging;
+GRANT SELECT,INSERT,UPDATE ON users TO projektwahl_staging;
+GRANT SELECT,INSERT,UPDATE ON projects_with_deleted TO projektwahl_staging;
+GRANT SELECT,INSERT,UPDATE ON projects TO projektwahl_staging;
+GRANT SELECT,INSERT,UPDATE ON choices TO projektwahl_staging;
+GRANT SELECT,INSERT,UPDATE,DELETE ON sessions TO projektwahl_staging;
+
+
+
+
 git clone https://github.com/projektwahl/projektwahl-lit.git
 cd projektwahl-lit/
 npm ci --ignore-scripts --omit=optional
-openssl req -x509 -newkey rsa:2048 -nodes -sha256 -subj '/CN=localhost' -keyout key.pem -out cert.pem
+touch key.pem cert.pem
+chown projektwahl_staging key.pem cert.pem 
+sudo -u projektwahl_staging openssl req -x509 -newkey rsa:2048 -nodes -sha256 -subj '/CN=localhost' -keyout key.pem -out cert.pem
 ./node_modules/@dev.mohe/argon2/build.sh /usr/include/node/
 npm run localize-build
 npm run build
@@ -71,13 +105,13 @@ ALTER DATABASE projektwahl SET default_transaction_read_only = true;
 
 psql --single-transaction --username=moritz < src/server/setup.sql
 
-NODE_ENV=development BASE_URL=https://localhost:8443 DATABASE_HOST=/run/postgresql DATABASE_URL=postgres://moritz@localhost/moritz npm run setup
+NODE_ENV=development BASE_URL=https://localhost:8443 DATABASE_HOST=/run/postgresql DATABASE_URL=postgres://projektwahl_staging:projektwahl_staging@localhost/projektwahl_staging npm run setup
 
 nano $CREDENTIALS_DIRECTORY/openid_client_secret
 
-NODE_ENV=development PORT=8443 BASE_URL=https://localhost:8443 OPENID_URL=openid_url CLIENT_ID=client_id  CREDENTIALS_DIRECTORY=$PWD npm run server
+NODE_ENV=development PORT=8443 BASE_URL=https://localhost:8443 OPENID_URL=openid_url CLIENT_ID=client_id CREDENTIALS_DIRECTORY=$PWD npm run server
 # or
-NODE_ENV=development PORT=8443 BASE_URL=https://localhost:8443 CREDENTIALS_DIRECTORY=$PWD DATABASE_HOST=/run/postgresql DATABASE_URL=postgres://moritz@localhost/moritz npm run server
+NODE_ENV=development PORT=8443 BASE_URL=https://localhost:8443 CREDENTIALS_DIRECTORY=$PWD DATABASE_HOST=/run/postgresql DATABASE_URL=postgres://projektwahl_staging:projektwahl_staging@localhost/projektwahl_staging npm run server
 
 # https://localhost:8443/
 
@@ -85,7 +119,7 @@ NODE_ENV=development PORT=8443 BASE_URL=https://localhost:8443 CREDENTIALS_DIREC
 
 
 
-NODE_ENV=development CREDENTIALS_DIRECTORY=$PWD DATABASE_HOST=/run/postgresql DATABASE_URL=postgres://moritz@localhost/moritz npm run evaluate
+NODE_ENV=development CREDENTIALS_DIRECTORY=$PWD DATABASE_HOST=/run/postgresql DATABASE_URL=postgres://projektwahl_staging:projektwahl_staging@localhost/projektwahl_staging npm run evaluate
 ```
 
 ## Testing
@@ -93,9 +127,9 @@ NODE_ENV=development CREDENTIALS_DIRECTORY=$PWD DATABASE_HOST=/run/postgresql DA
 ```
 chromedriver
 
-NODE_ENV=testing PORT=8443 BASE_URL=https://localhost:8443 CREDENTIALS_DIRECTORY=$PWD DATABASE_HOST=/run/postgresql DATABASE_URL=postgres://moritz@localhost/moritz npm run server
+NODE_ENV=testing PORT=8443 BASE_URL=https://localhost:8443 CREDENTIALS_DIRECTORY=$PWD DATABASE_HOST=/run/postgresql DATABASE_URL=postgres://projektwahl_staging:projektwahl_staging@localhost/projektwahl_staging npm run server
 
-NODE_ENV=testing PORT=8443 BASE_URL=https://localhost:8443 CREDENTIALS_DIRECTORY=$PWD DATABASE_HOST=/run/postgresql DATABASE_URL=postgres://moritz@localhost/moritz npm run test
+NODE_ENV=testing PORT=8443 BASE_URL=https://localhost:8443 CREDENTIALS_DIRECTORY=$PWD DATABASE_HOST=/run/postgresql DATABASE_URL=postgres://projektwahl_staging:projektwahl_staging@localhost/projektwahl_staging npm run test
 
 
 ```
