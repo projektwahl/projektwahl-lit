@@ -58,10 +58,6 @@ npm run localize-build
 npm run build
 
 
-
-
-
-
 sudo -u postgres psql
 CREATE ROLE projektwahl_staging LOGIN;
 CREATE ROLE projektwahl_staging_admin LOGIN;
@@ -72,7 +68,6 @@ REVOKE CREATE ON SCHEMA public FROM PUBLIC;
 
 
 sudo -u projektwahl_staging_admin psql --single-transaction --db projektwahl_staging < src/server/setup.sql
-
 
 
 sudo -u projektwahl_staging_admin psql --db projektwahl_staging
@@ -88,11 +83,10 @@ ALTER VIEW users OWNER TO projektwahl_staging;
 ALTER VIEW present_voters OWNER TO projektwahl_staging;
 ALTER VIEW projects OWNER TO projektwahl_staging;
 
-sudo -u projektwahl_staging ENVIRONMENT=development DATABASE_HOST=/run/postgresql DATABASE_URL=postgres://projektwahl_staging:projektwahl_staging@localhost/projektwahl_staging npm run setup
+sudo -u projektwahl_staging ENVIRONMENT=development DATABASE_HOST=/run/postgresql DATABASE_URL=postgres://projektwahl_staging@localhost/projektwahl_staging npm run setup
 
 
-
-PORT=8443 BASE_URL=https://localhost:8443 DATABASE_URL=postgres://projektwahl:projektwahl@projektwahl/projektwahl CREDENTIALS_DIRECTORY=$PWD node  --enable-source-maps dist/server.js
+PORT=8443 BASE_URL=https://localhost:8443 DATABASE_URL=postgres://projektwahl@projektwahl/projektwahl CREDENTIALS_DIRECTORY=$PWD node  --enable-source-maps dist/server.js
 
 ```
 
@@ -101,30 +95,15 @@ PORT=8443 BASE_URL=https://localhost:8443 DATABASE_URL=postgres://projektwahl:pr
 ```bash
 ln -s $PWD/pre-commit .git/hooks/pre-commit
 
-
-nano $CREDENTIALS_DIRECTORY/openid_client_secret
-
-NODE_ENV=development PORT=8443 BASE_URL=https://localhost:8443 OPENID_URL=openid_url CLIENT_ID=client_id CREDENTIALS_DIRECTORY=$PWD npm run server
-# or
-NODE_ENV=development PORT=8443 BASE_URL=https://localhost:8443 CREDENTIALS_DIRECTORY=$PWD DATABASE_HOST=/run/postgresql DATABASE_URL=postgres://projektwahl_staging:projektwahl_staging@localhost/projektwahl_staging npm run server
-
-# https://localhost:8443/
-
-
-
-
-
-NODE_ENV=development CREDENTIALS_DIRECTORY=$PWD DATABASE_HOST=/run/postgresql DATABASE_URL=postgres://projektwahl_staging:projektwahl_staging@localhost/projektwahl_staging npm run evaluate
+sudo -u projektwahl_staging NODE_ENV=development PORT=8443 BASE_URL=https://localhost:8443 CREDENTIALS_DIRECTORY=$PWD DATABASE_HOST=/run/postgresql DATABASE_URL=postgres://projektwahl_staging@localhost/projektwahl_staging npm run server
 ```
 
 ## Testing
 
 ```
-chromedriver
+sudo -u projektwahl_staging NODE_ENV=testing PORT=8443 BASE_URL=https://localhost:8443 CREDENTIALS_DIRECTORY=$PWD DATABASE_HOST=/run/postgresql DATABASE_URL=postgres://projektwahl_staging@localhost/projektwahl_staging npm run server
 
-NODE_ENV=testing PORT=8443 BASE_URL=https://localhost:8443 CREDENTIALS_DIRECTORY=$PWD DATABASE_HOST=/run/postgresql DATABASE_URL=postgres://projektwahl_staging:projektwahl_staging@localhost/projektwahl_staging npm run server
-
-NODE_ENV=testing PORT=8443 BASE_URL=https://localhost:8443 CREDENTIALS_DIRECTORY=$PWD DATABASE_HOST=/run/postgresql DATABASE_URL=postgres://projektwahl_staging:projektwahl_staging@localhost/projektwahl_staging npm run test
+sudo -u projektwahl_staging_admin NODE_ENV=testing PORT=8443 BASE_URL=https://localhost:8443 CREDENTIALS_DIRECTORY=$PWD DATABASE_HOST=/run/postgresql DATABASE_URL=postgres://projektwahl_staging_admin@localhost/projektwahl_staging npm run test
 
 
 ```
