@@ -78,8 +78,8 @@ export function typedSql<
       // @ts-expect-error unknown
       return await sql<DescriptionTypes<R>[]>(template, ...args).execute();
     } catch (error) {
-      //console.error(err);
-      throw err;
+      console.error(err);
+      throw error;
     }
   };
 }
