@@ -93,7 +93,9 @@ export const createOrUpdateUsersHandler = requestHandler(
     try {
       const row = (
         await sql.begin("READ WRITE", async (tsql) => {
-          await sql`SELECT set_config('projektwahl.type', ${loggedInUser?.type ?? null}, true);`;
+          await sql`SELECT set_config('projektwahl.type', ${
+            loggedInUser?.type ?? null
+          }, true);`;
           const results = [];
           for (const user of users) {
             if ("id" in user) {

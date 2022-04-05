@@ -112,7 +112,9 @@ export const openidRedirectHandler = requestHandler(
       );
 
       await sql.begin("READ WRITE", async (tsql) => {
-        await sql`SELECT set_config('projektwahl.type', ${dbUser?.type ?? null}, true);`;
+        await sql`SELECT set_config('projektwahl.type', ${
+          dbUser?.type ?? null
+        }, true);`;
         return await typedSql(tsql, {
           columns: {},
         } as const)`INSERT INTO sessions (user_id, session_id) VALUES (${dbUser.id}, ${session_id})`;
