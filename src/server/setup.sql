@@ -500,13 +500,10 @@ EXECUTE FUNCTION check_users_project_leader_id3();
 
 
 
-
-
 ALTER TABLE users_with_deleted ENABLE ROW LEVEL SECURITY;
 
-
--- only for local testing
--- ALTER TABLE users_with_deleted FORCE ROW LEVEL SECURITY;
+-- only for local testing (enabled to be secure by default)
+ALTER TABLE users_with_deleted FORCE ROW LEVEL SECURITY;
 
 DROP POLICY IF EXISTS users_voters_only_project_leaders ON users_with_deleted;
 

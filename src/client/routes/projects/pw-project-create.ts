@@ -36,6 +36,7 @@ import { pwInputText } from "../../form/pw-input-text.js";
 import { pwInputNumber } from "../../form/pw-input-number.js";
 import { pwInputCheckbox } from "../../form/pw-input-checkbox.js";
 import { aClick } from "../../pw-a.js";
+import { LoggedInUserController } from "../../user-controller.js";
 
 export async function pwProject(id: number, viewOnly = false) {
   const result = await taskFunction([id]);
@@ -128,8 +129,12 @@ export const PwProjectCreate = setupHmr(
       | undefined
     >;
 
+    userController: LoggedInUserController;
+
     constructor() {
       super();
+
+      this.userController = new LoggedInUserController(this);
 
       /**
        * @override
@@ -433,7 +438,9 @@ export const PwProjectCreate = setupHmr(
                               prefix="leaders"
                             ></pw-project-users>`
                           : html``}
-                        ${value
+                        ${value &&
+                        (this.userController.type === "admin" ||
+                          this.userController.type === "helper")
                           ? html`<pw-project-users
                               projectId=${value.data.id}
                               name=${"force_in_project_id"}

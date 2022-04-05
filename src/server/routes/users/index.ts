@@ -63,15 +63,20 @@ export const usersHandler = requestHandler(
         "/api/v1/users" as const,
         query,
         (query) => {
+          // TODO FIXME voters shouldn't be allowed to select some of this here
           return sql`SELECT "id",
             "type",
             "username",
-            "openid_id",
+            ${loggedInUser.type === "admin" ? `"openid_id",` : ``}
             "group",
             "age",
             "away",
             "project_leader_id",
-            "force_in_project_id",
+            ${
+              loggedInUser.type === "admin" || loggedInUser.type === "helper"
+                ? `"force_in_project_id",`
+                : ``
+            }
             "deleted" FROM users_with_deleted WHERE (${!query.filters
               .id} OR id = ${query.filters.id ?? null}) AND username LIKE ${
             "%" + (query.filters.username ?? "") + "%"

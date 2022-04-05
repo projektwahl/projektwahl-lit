@@ -56,6 +56,7 @@ import { configureLocalization } from "@lit/localize";
 import { sourceLocale, targetLocales } from "./generated/locales.js";
 import * as templates_de from "./generated/de.js";
 import { PwElement } from "./pw-element.js";
+import { LoggedInUserController } from "./user-controller.js";
 
 export const { getLocale, setLocale } = configureLocalization({
   sourceLocale,
@@ -114,7 +115,7 @@ const pages = {
   "^/users/create$": async () => {
     await import("./routes/users/pw-user-create.js");
     return html`<pw-user-create
-      uri="/api/v1/users/create-or-update"
+      .url=${"/api/v1/users/create-or-update"}
     ></pw-user-create>`;
   },
   "^/users/import$": async () => {
@@ -186,7 +187,6 @@ export class PwApp extends PwElement {
   navbarOpen: boolean;
 
   private popstateListener: (this: Window, ev: PopStateEvent) => void;
-  private updateloginstate: (this: Window, ev: Event) => void;
 
   protected _apiTask!: Task<
     [keyof typeof pages | undefined /*, HistoryState*/],
@@ -198,11 +198,7 @@ export class PwApp extends PwElement {
     //HistoryState
   ]) => Promise<TemplateResult>;
 
-  username: string | undefined;
-
-  type: string | undefined;
-
-  bc!: BroadcastChannel;
+  userController: LoggedInUserController;
 
   private navigateListener: (
     this: Window,
@@ -213,18 +209,12 @@ export class PwApp extends PwElement {
     super.connectedCallback();
     window.addEventListener("popstate", this.popstateListener);
     window.addEventListener("navigate", this.navigateListener);
-    if ("BroadcastChannel" in window) {
-      this.bc = new BroadcastChannel("updateloginstate");
-      this.bc.addEventListener("message", this.updateloginstate);
-    }
   }
 
   override disconnectedCallback(): void {
     super.disconnectedCallback();
     window.removeEventListener("popstate", this.popstateListener);
     window.removeEventListener("navigate", this.navigateListener);
-    this.bc.removeEventListener("message", this.updateloginstate);
-    this.bc.close();
   }
 
   constructor() {
@@ -262,17 +252,11 @@ export class PwApp extends PwElement {
       HistoryController.goto(url, state, true); // TODO FIXME don't pushstate here at all
     };
 
-    this.username = jscookie.get("username");
-    this.type = jscookie.get("type");
-
-    this.updateloginstate = () => {
-      this.username = jscookie.get("username");
-      this.type = jscookie.get("type");
-    };
-
     this.navbarOpen = false;
 
     this.history = new HistoryController(this, /.*/);
+
+    this.userController = new LoggedInUserController(this);
 
     this.navigateListener = () => {
       this.navbarOpen = false;
@@ -342,7 +326,8 @@ export class PwApp extends PwElement {
                       >${msg("Home")}</a
                     >
                   </li>
-                  ${this.type === "admin" || this.type === "helper"
+                  ${this.userController.type === "admin" ||
+                  this.userController.type === "helper"
                     ? html`<li class="nav-item">
                         <a
                           @click=${aClick}
@@ -356,7 +341,8 @@ export class PwApp extends PwElement {
                         >
                       </li>`
                     : ``}
-                  ${this.type === "admin" || this.type === "helper"
+                  ${this.userController.type === "admin" ||
+                  this.userController.type === "helper"
                     ? html`<li>
                         <a
                           @click=${aClick}
@@ -370,7 +356,7 @@ export class PwApp extends PwElement {
                         >
                       </li>`
                     : ``}
-                  ${this.type === "voter"
+                  ${this.userController.type === "voter"
                     ? html`<li>
                         <a
                           @click=${aClick}
@@ -386,7 +372,7 @@ export class PwApp extends PwElement {
                     : ``}
                 </ul>
                 <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
-                  ${this.username
+                  ${this.userController.username
                     ? html`<li class="nav-item">
                         <a
                           @click=${async (e: Event) => {
@@ -409,7 +395,9 @@ export class PwApp extends PwElement {
                           }}
                           class="nav-link"
                           href="/logout"
-                          >${msg(str`Logout ${this.username}`)}</a
+                          >${msg(
+                            str`Logout ${this.userController.username}`
+                          )}</a
                         >
                       </li>`
                     : html` <li class="nav-item">
