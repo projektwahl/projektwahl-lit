@@ -307,7 +307,11 @@ CREATE DATABASE projektwahl_production OWNER projektwahl_production_admin;
 
 
 sudo -u postgres psql --db projektwahl_staging
-SET default_transaction_read_only = false;
+REVOKE CREATE ON SCHEMA public FROM PUBLIC;
+
+
+
+sudo -u postgres psql --db projektwahl_production
 REVOKE CREATE ON SCHEMA public FROM PUBLIC;
 
 
@@ -353,9 +357,7 @@ sudo -u projektwahl_production_admin psql --single-transaction --db projektwahl_
 
 # maintenance:
 sudo -u projektwahl_staging_admin psql --db projektwahl_staging
-SET default_transaction_read_only = false;
 ALTER DATABASE projektwahl_staging SET default_transaction_isolation = 'serializable';
-ALTER DATABASE projektwahl_staging SET default_transaction_read_only = true;
 GRANT SELECT,INSERT,UPDATE ON users_with_deleted TO projektwahl_staging;
 GRANT SELECT,INSERT,UPDATE ON users TO projektwahl_staging;
 GRANT SELECT,INSERT,UPDATE ON projects_with_deleted TO projektwahl_staging;
@@ -363,13 +365,14 @@ GRANT SELECT,INSERT,UPDATE ON projects TO projektwahl_staging;
 GRANT SELECT,INSERT,UPDATE ON choices TO projektwahl_staging;
 GRANT INSERT ON settings TO projektwahl_staging;
 GRANT SELECT,INSERT,UPDATE,DELETE ON sessions TO projektwahl_staging;
+ALTER VIEW users OWNER TO projektwahl_staging;
+ALTER VIEW present_voters OWNER TO projektwahl_staging;
+ALTER VIEW projects OWNER TO projektwahl_staging;
 
 
 
 sudo -u projektwahl_production_admin psql --db projektwahl_production
-SET default_transaction_read_only = false;
 ALTER DATABASE projektwahl_production SET default_transaction_isolation = 'serializable';
-ALTER DATABASE projektwahl_production SET default_transaction_read_only = true;
 GRANT SELECT,INSERT,UPDATE ON users_with_deleted TO projektwahl_production;
 GRANT SELECT,INSERT,UPDATE ON users TO projektwahl_production;
 GRANT SELECT,INSERT,UPDATE ON projects_with_deleted TO projektwahl_production;
@@ -377,6 +380,9 @@ GRANT SELECT,INSERT,UPDATE ON projects TO projektwahl_production;
 GRANT SELECT,INSERT,UPDATE ON choices TO projektwahl_production;
 GRANT INSERT ON settings TO projektwahl_production;
 GRANT SELECT,INSERT,UPDATE,DELETE ON sessions TO projektwahl_production;
+ALTER VIEW users OWNER TO projektwahl_production;
+ALTER VIEW present_voters OWNER TO projektwahl_production;
+ALTER VIEW projects OWNER TO projektwahl_production;
 
 
 
