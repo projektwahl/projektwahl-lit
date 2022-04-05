@@ -93,6 +93,9 @@ export const createOrUpdateUsersHandler = requestHandler(
     try {
       const row = (
         await sql.begin("READ WRITE", async (tsql) => {
+          await tsql`SELECT set_config('projektwahl.type', ${
+            loggedInUser?.type ?? null
+          }, true);`;
           const results = [];
           for (const user of users) {
             if ("id" in user) {
@@ -131,7 +134,7 @@ export const createOrUpdateUsersHandler = requestHandler(
               // TODO FIXME (found using fuzzer) if this tries to update a nonexisting user we should return an error
               results.push(await finalQuery);
             } else {
-              const query = typedSql(sql, {
+              const query = typedSql(tsql, {
                 columns: {
                   id: 23,
                   project_leader_id: 23,

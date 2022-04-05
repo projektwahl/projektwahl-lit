@@ -41,18 +41,33 @@ jobs:
         with:
           node-version: ${{ matrix.node-version }}
           cache: "npm"
-      - run: ls -R /opt/hostedtoolcache/node/
-      - run: cp dangerous-package.json package.json
-      - run: npm install
+      - run: npm ci
       - run: ./node_modules/@dev.mohe/argon2/build.sh /opt/hostedtoolcache/node/$(node -v | cut -c2-)/x64/include/node
       - run: npm run build
       - run: openssl req -x509 -newkey rsa:2048 -nodes -sha256 -subj '/CN=localhost' -keyout key.pem -out cert.pem
-      - run: psql --single-transaction postgres://projektwahl:projektwahl@localhost/projektwahl < src/server/setup.sql
-      - run: NODE_ENV=development DATABASE_URL=postgres://projektwahl:projektwahl@localhost/projektwahl npm run setup
       - run: |
-          NODE_ENV=testing PORT=8443 BASE_URL=https://localhost:8443 DATABASE_URL=postgres://projektwahl:projektwahl@localhost/projektwahl CREDENTIALS_DIRECTORY=$PWD npm run server &
+          psql postgres://projektwahl:projektwahl@localhost/projektwahl --command="CREATE ROLE projektwahl_staging LOGIN PASSWORD 'projektwahl';
+          CREATE ROLE projektwahl_staging_admin LOGIN PASSWORD 'projektwahl';"
+      - run: |
+          psql postgres://projektwahl:projektwahl@localhost/projektwahl --command="CREATE DATABASE projektwahl_staging OWNER projektwahl_staging_admin"
+      - run: psql --single-transaction postgres://projektwahl_staging_admin:projektwahl@localhost/projektwahl_staging < src/server/setup.sql
+      - run: |
+          psql postgres://projektwahl:projektwahl@localhost/projektwahl_staging --command="ALTER DATABASE projektwahl_staging SET default_transaction_isolation = 'serializable';
+          GRANT SELECT,INSERT,UPDATE ON users_with_deleted TO projektwahl_staging;
+          GRANT SELECT,INSERT,UPDATE ON users TO projektwahl_staging;
+          GRANT SELECT,INSERT,UPDATE ON projects_with_deleted TO projektwahl_staging;
+          GRANT SELECT,INSERT,UPDATE ON projects TO projektwahl_staging;
+          GRANT SELECT,INSERT,UPDATE ON choices TO projektwahl_staging;
+          GRANT INSERT ON settings TO projektwahl_staging;
+          GRANT SELECT,INSERT,UPDATE,DELETE ON sessions TO projektwahl_staging;
+          ALTER VIEW users OWNER TO projektwahl_staging;
+          ALTER VIEW present_voters OWNER TO projektwahl_staging;
+          ALTER VIEW projects OWNER TO projektwahl_staging;"
+      - run: NODE_ENV=development DATABASE_URL=postgres://projektwahl_staging:projektwahl@localhost/projektwahl_staging npm run setup
+      - run: |
+          NODE_ENV=testing PORT=8443 BASE_URL=https://localhost:8443 DATABASE_URL=postgres://projektwahl_staging:projektwahl@localhost/projektwahl_staging CREDENTIALS_DIRECTORY=$PWD npm run server &
           chromedriver &
-          sleep 2 && NODE_ENV=testing DATABASE_URL=postgres://projektwahl:projektwahl@localhost/projektwahl BASE_URL=https://localhost:8443 npm test
+          sleep 2 && NODE_ENV=testing DATABASE_URL=postgres://projektwahl_staging:projektwahl@localhost/projektwahl_staging BASE_URL=https://localhost:8443 npm test
       - name: Archive test screenshots
         if: always()
         uses: actions/upload-artifact@v3

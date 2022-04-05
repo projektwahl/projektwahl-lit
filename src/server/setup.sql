@@ -305,6 +305,7 @@ CREATE TABLE IF NOT EXISTS settings (
   election_running BOOLEAN NOT NULL
 );
 
+-- TODO FIXME these don't have row level security (let them owned by projektwahl_staging) then this shoudl work
 CREATE OR REPLACE VIEW users AS SELECT * FROM users_with_deleted WHERE NOT deleted;
 
 CREATE OR REPLACE VIEW projects AS SELECT * FROM projects_with_deleted WHERE NOT deleted;
@@ -328,7 +329,11 @@ BEGIN
   END IF;
   RETURN NEW;
 END;
-$body$ LANGUAGE plpgsql;
+$body$ LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = public;
+
+REVOKE ALL ON FUNCTION check_choices_age() FROM PUBLIC;
 
 DROP TRIGGER IF EXISTS trigger_check_choices_age ON choices;
 
@@ -347,7 +352,11 @@ BEGIN
   END IF;
   RETURN NEW;
 END;
-$test2$ LANGUAGE plpgsql;
+$test2$ LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = public;
+
+REVOKE ALL ON FUNCTION update_project_check_choices_age() FROM PUBLIC;
 
 DROP TRIGGER IF EXISTS trigger_update_project_check_choices_age ON projects_with_deleted;
 
@@ -364,7 +373,11 @@ BEGIN
   END IF;
   RETURN NEW;
 END;
-$test3$ LANGUAGE plpgsql;
+$test3$ LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = public;
+
+REVOKE ALL ON FUNCTION check_project_leader_voted_own_project() FROM PUBLIC;
 
 DROP TRIGGER IF EXISTS trigger_check_project_leader_voted_own_project ON users_with_deleted;
 
@@ -381,7 +394,11 @@ BEGIN
   END IF;
   RETURN NEW;
 END;
-$test4$ LANGUAGE plpgsql;
+$test4$ LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = public;
+
+REVOKE ALL ON FUNCTION check_project_leader_choices() FROM PUBLIC;
 
 DROP TRIGGER IF EXISTS trigger_check_project_leader_choices ON choices;
 
@@ -416,7 +433,11 @@ BEGIN
   END IF;
   RETURN NEW;
 END;
-$body$ LANGUAGE plpgsql;
+$body$ LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = public;
+
+REVOKE ALL ON FUNCTION check_users_project_leader_id1() FROM PUBLIC;
 
 -- warning: Copy pasta from above
 CREATE OR REPLACE FUNCTION check_users_force_in_project() RETURNS TRIGGER AS $body$
@@ -438,7 +459,11 @@ BEGIN
   END IF;
   RETURN NEW;
 END;
-$body$ LANGUAGE plpgsql;
+$body$ LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = public;
+
+REVOKE ALL ON FUNCTION check_users_force_in_project() FROM PUBLIC;
 
 DROP TRIGGER IF EXISTS trigger_check_users_project_leader_id1 ON users_with_deleted;
 
@@ -468,7 +493,11 @@ BEGIN
   END IF;
   RETURN NEW;
 END;
-$body$ LANGUAGE plpgsql;
+$body$ LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = public;
+
+REVOKE ALL ON FUNCTION check_users_project_leader_id2() FROM PUBLIC;
 
 DROP TRIGGER IF EXISTS trigger_check_users_project_leader_id2 ON users_with_deleted;
 
@@ -489,7 +518,11 @@ BEGIN
   END IF;
   RETURN NEW;
 END;
-$body$ LANGUAGE plpgsql;
+$body$ LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = public;
+
+REVOKE ALL ON FUNCTION check_users_project_leader_id3() FROM PUBLIC;
 
 DROP TRIGGER IF EXISTS trigger_check_users_project_leader_id3 ON users_with_deleted;
 
@@ -497,3 +530,16 @@ CREATE TRIGGER trigger_check_users_project_leader_id3
 BEFORE INSERT ON users_with_deleted
 FOR EACH ROW
 EXECUTE FUNCTION check_users_project_leader_id3();
+
+
+ALTER TABLE users_with_deleted ENABLE ROW LEVEL SECURITY;
+
+DROP POLICY IF EXISTS users_voters_only_project_leaders ON users_with_deleted;
+
+-- CREATE POLICY users_voters_only_project_leaders ON users_with_deleted AS RESTRICTIVE FOR ALL TO PUBLIC WITH CHECK ((SELECT type FROM users_with_deleted WHERE id = current_setting('projektwahl_user')::int) IS DISTINCT FROM 'helper' OR project_leader_id IS NOT NULL);
+
+
+
+-- SET projektwahl.type = 
+
+CREATE POLICY users_voters_only_project_leaders ON users_with_deleted FOR ALL TO PUBLIC USING (current_setting('projektwahl.type') IN ('root', 'admin', 'helper') OR project_leader_id IS NOT NULL);

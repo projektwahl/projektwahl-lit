@@ -23,7 +23,7 @@ SPDX-FileCopyrightText: 2021 Moritz Hedtke <Moritz.Hedtke@t-online.de>
 import type { OutgoingHttpHeaders } from "node:http2";
 import type { PendingQuery, Row } from "postgres";
 import type { z } from "zod";
-import type { entityRoutes, ResponseType } from "../lib/routes.js";
+import type { entityRoutes, ResponseType, userSchema } from "../lib/routes.js";
 import { sql } from "./database.js";
 import { unsafe2 } from "./sql/index.js";
 import { mappedFunctionCall2, mappedIndexing } from "../lib/result.js";
@@ -96,6 +96,7 @@ type entitiesType8 = {
 };
 
 export async function fetchData<R extends keyof typeof entityRoutes>(
+  loggedInUser: Exclude<z.infer<typeof userSchema>, undefined>,
   path: R,
   query: entitiesType0[R],
   sqlQuery: (query: entitiesType0[R]) => PendingQuery<Row[]>,
@@ -133,9 +134,12 @@ export async function fetchData<R extends keyof typeof entityRoutes>(
 
   let sqlResult;
   if (!paginationCursor) {
-    sqlResult = await sql`${sql`(${sqlQuery(
-      query
-    )} ORDER BY ${orderByQuery} LIMIT ${query.paginationLimit + 1})`}`;
+    sqlResult = await sql.begin(async (tsql) => {
+      await tsql`SELECT set_config('projektwahl.type', ${loggedInUser.type}, true);`;
+      return await tsql`${sql`(${sqlQuery(
+        query
+      )} ORDER BY ${orderByQuery} LIMIT ${query.paginationLimit + 1})`}`;
+    });
   } else {
     const queries = sorting.map((value, index) => {
       const part = sorting.slice(0, index + 1);
@@ -165,16 +169,19 @@ export async function fetchData<R extends keyof typeof entityRoutes>(
       })`;
     });
 
-    if (queries.length == 1) {
-      sqlResult = await sql`${queries[0]}`;
-    } else {
-      sqlResult = await sql`${queries
-        .flatMap((v) => [sql`\nUNION ALL\n`, v])
-        .slice(1)
-        .reduce((prev, curr) => sql`${prev}${curr}`)} LIMIT ${
-        query.paginationLimit + 1
-      }`;
-    }
+    await sql.begin(async (tsql) => {
+      await tsql`SELECT set_config('projektwahl.type', ${loggedInUser.type}, true);`;
+      if (queries.length == 1) {
+        sqlResult = await tsql`${queries[0]}`;
+      } else {
+        sqlResult = await tsql`${queries
+          .flatMap((v) => [sql`\nUNION ALL\n`, v])
+          .slice(1)
+          .reduce((prev, curr) => sql`${prev}${curr}`)} LIMIT ${
+          query.paginationLimit + 1
+        }`;
+      }
+    });
   }
 
   //const entitiesSchema = entitySchema["response"]["shape"]["entities"];

@@ -96,9 +96,10 @@ export function requestHandler<P extends keyof typeof routes>(
           const session_id_ = session_id;
           // @ts-expect-error todo fixme
           user = (
-            await retryableBegin("READ WRITE", async (sql) => {
+            await retryableBegin("READ WRITE", async (tsql) => {
+              await tsql`SELECT set_config('projektwahl.type', 'root', true);`;
               //await typedSql(sql, {})`DELETE FROM sessions WHERE CURRENT_TIMESTAMP >= updated_at + interval '24 hours' AND session_id != ${session_id} `
-              return await typedSql(sql, {
+              return await typedSql(tsql, {
                 columns: {
                   id: 23,
                   type: null, // custom enum

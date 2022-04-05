@@ -56,43 +56,27 @@ export const usersHandler = requestHandler(
         ];
       return returnValue;
     }
-    if (!(loggedInUser?.type === "admin" || loggedInUser?.type === "helper")) {
-      const returnValue: [OutgoingHttpHeaders, ResponseType<"/api/v1/users">] =
-        [
-          {
-            "content-type": "text/json; charset=utf-8",
-            ":status": 403,
-          },
-          {
-            success: false as const,
-            error: {
-              issues: [
-                {
-                  code: ZodIssueCode.custom,
-                  path: ["forbidden"],
-                  message: "Unzureichende Berechtigung!",
-                },
-              ],
-            },
-          },
-        ];
-      return returnValue;
-    }
 
     const ret: [OutgoingHttpHeaders, ResponseType<"/api/v1/users">] =
       await fetchData<"/api/v1/users">(
+        loggedInUser,
         "/api/v1/users" as const,
         query,
         (query) => {
+          // TODO FIXME voters shouldn't be allowed to select some of this here
           return sql`SELECT "id",
             "type",
             "username",
-            "openid_id",
+            ${loggedInUser.type === "admin" ? sql`"openid_id",` : sql``}
             "group",
             "age",
             "away",
             "project_leader_id",
-            "force_in_project_id",
+            ${
+              loggedInUser.type === "admin" || loggedInUser.type === "helper"
+                ? sql`"force_in_project_id",`
+                : sql``
+            }
             "deleted" FROM users_with_deleted WHERE (${!query.filters
               .id} OR id = ${query.filters.id ?? null}) AND username LIKE ${
             "%" + (query.filters.username ?? "") + "%"
@@ -100,8 +84,10 @@ export const usersHandler = requestHandler(
            AND (${!query.filters.project_leader_id} OR project_leader_id = ${
             query.filters.project_leader_id ?? null
           })
-           AND (${!query.filters
-             .force_in_project_id} OR force_in_project_id = ${
+           AND (${
+             !query.filters.force_in_project_id ||
+             !(loggedInUser.type === "admin" || loggedInUser.type === "helper")
+           } OR force_in_project_id = ${
             query.filters.force_in_project_id ?? null
           })
             AND (${!query.filters.type} OR type = ${
