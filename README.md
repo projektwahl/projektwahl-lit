@@ -74,7 +74,12 @@ GRANT SELECT,INSERT,UPDATE ON choices TO projektwahl_staging;
 GRANT INSERT ON settings TO projektwahl_staging;
 GRANT SELECT,INSERT,UPDATE,DELETE ON sessions TO projektwahl_staging;
 
-
+sudo -u postgres psql --db projektwahl_staging
+SET default_transaction_read_only = false;
+GRANT projektwahl_staging TO projektwahl_staging_admin;
+ALTER VIEW users OWNER TO projektwahl_staging;
+ALTER VIEW present_voters OWNER TO projektwahl_staging;
+ALTER VIEW projects OWNER TO projektwahl_staging;
 
 
 git clone https://github.com/projektwahl/projektwahl-lit.git

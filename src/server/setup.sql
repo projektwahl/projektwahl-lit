@@ -305,6 +305,7 @@ CREATE TABLE IF NOT EXISTS settings (
   election_running BOOLEAN NOT NULL
 );
 
+-- TODO FIXME these don't have row level security (let them owned by projektwahl_staging) then this shoudl work
 CREATE OR REPLACE VIEW users AS SELECT * FROM users_with_deleted WHERE NOT deleted;
 
 CREATE OR REPLACE VIEW projects AS SELECT * FROM projects_with_deleted WHERE NOT deleted;
