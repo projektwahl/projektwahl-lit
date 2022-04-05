@@ -37,6 +37,10 @@ This software is licensed under the GNU Affero General Public License v3.0 or an
 - Postgresql database
 - OpenID credentials (optional)
 
+## Important notes
+
+To ensure data security you need two users to access the database. One privileged user and one unprivileged user. The privileged user is not subject to row level security and is used for e.g. triggers and the unprivileged user is subject to row level security. If you don't use two users then unprivileged clients like voters can read all users.
+
 ## Production environment
 
 ```bash
