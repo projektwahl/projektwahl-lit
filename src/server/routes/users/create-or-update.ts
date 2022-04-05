@@ -93,7 +93,7 @@ export const createOrUpdateUsersHandler = requestHandler(
     try {
       const row = (
         await sql.begin("READ WRITE", async (tsql) => {
-          await sql`SELECT set_config('projektwahl.type', ${
+          await tsql`SELECT set_config('projektwahl.type', ${
             loggedInUser?.type ?? null
           }, true);`;
           const results = [];

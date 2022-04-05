@@ -230,6 +230,24 @@ export const updateUserAction = rawUserSchema
   })
   .strict();
 
+export const returnUsers = rawUserSchema
+  .pick({
+    id: true,
+    type: true,
+    username: true,
+    openid_id: true,
+    group: true,
+    age: true,
+    away: true,
+    project_leader_id: true,
+    force_in_project_id: true,
+    deleted: true,
+  })
+  .partial({
+    openid_id: true,
+    force_in_project_id: true,
+  });
+
 // TODO FIXME possible strict by default?
 export const routes = {
   "/api/v1/logout": {
@@ -355,9 +373,9 @@ export const routes = {
     ),
     response: z
       .object({
-        entities: z.array(users(rawUserSchema)),
-        previousCursor: users(rawUserSchema).nullable(),
-        nextCursor: users(rawUserSchema).nullable(),
+        entities: z.array(users(returnUsers)),
+        previousCursor: users(returnUsers).nullable(),
+        nextCursor: users(returnUsers).nullable(),
       })
       .strict(),
   },

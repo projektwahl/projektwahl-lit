@@ -112,7 +112,7 @@ export const openidRedirectHandler = requestHandler(
       );
 
       await sql.begin("READ WRITE", async (tsql) => {
-        await sql`SELECT set_config('projektwahl.type', ${
+        await tsql`SELECT set_config('projektwahl.type', ${
           dbUser?.type ?? null
         }, true);`;
         return await typedSql(tsql, {

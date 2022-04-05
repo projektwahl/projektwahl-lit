@@ -104,9 +104,9 @@ export function createOrUpdateChoiceHandler<P extends "/api/v1/choices/update">(
     }
 
     try {
-      await sql.begin("READ WRITE", async (sql) => {
-        await sql`SELECT set_config('projektwahl.type', ${loggedInUser.type}, true);`;
-        return await dbquery(sql, choice, loggedInUser);
+      await sql.begin("READ WRITE", async (tsql) => {
+        await tsql`SELECT set_config('projektwahl.type', ${loggedInUser.type}, true);`;
+        return await dbquery(tsql, choice, loggedInUser);
       });
 
       return [

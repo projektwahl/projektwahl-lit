@@ -246,7 +246,7 @@ export async function evaluate() {
   await lp.setup();
 
   const [choices, projects, users] = await sql.begin(async (tsql) => {
-    await sql`SELECT set_config('projektwahl.type', 'root', true);`;
+    await tsql`SELECT set_config('projektwahl.type', 'root', true);`;
 
     const choices = z.array(rawChoice).parse(
       await tsql.file("src/server/routes/evaluate/calculate.sql", [], {

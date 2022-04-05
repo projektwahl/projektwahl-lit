@@ -28,15 +28,15 @@ import { Chance } from "chance";
 export async function setup() {
   const chance = new Chance(1234);
 
-  await sql.begin("READ WRITE", async (sql) => {
-    await sql`SELECT set_config('projektwahl.type', 'root', true);`;
+  await sql.begin("READ WRITE", async (tsql) => {
+    await tsql`SELECT set_config('projektwahl.type', 'root', true);`;
 
-    await sql`INSERT INTO settings (id, election_running) VALUES (1, false) ON CONFLICT DO NOTHING;`;
+    await tsql`INSERT INTO settings (id, election_running) VALUES (1, false) ON CONFLICT DO NOTHING;`;
 
     const hash = await hashPassword("changeme");
 
     const admin = (
-      await typedSql(sql, {
+      await typedSql(tsql, {
         columns: { id: 23 },
       } as const)`INSERT INTO users_with_deleted (username, password_hash, type) VALUES ('admin', ${hash}, 'admin') ON CONFLICT (username) DO UPDATE SET "group" = "users_with_deleted"."group" RETURNING id;`
     )[0];
@@ -61,7 +61,7 @@ export async function setup() {
       }>[] = [];
       for (let i = 0; i < 100; i++) {
         const project = (
-          await typedSql(sql, {
+          await typedSql(tsql, {
             columns: {
               id: 23,
               title: 1043,
@@ -96,7 +96,7 @@ export async function setup() {
       // take care to set this value to project_count * min_participants <= user_count <= project_count * max_participants
       for (let i = 0; i < 500; i++) {
         const user = (
-          await typedSql(sql, {
+          await typedSql(tsql, {
             columns: { id: 23 },
           } as const)`INSERT INTO users (username, type, "group", age, password_hash, last_updated_by) VALUES (${chance.name(
             { prefix: true, suffix: true }
@@ -111,7 +111,7 @@ export async function setup() {
         projects = chance.shuffle(projects);
         for (let j = 0; j < chance.integer({ min: 0, max: 25 }); j++) {
           try {
-            await sql.savepoint("test", async (ssql) => {
+            await tsql.savepoint("test", async (ssql) => {
               await typedSql(ssql, {
                 columns: {},
               } as const)`INSERT INTO choices (user_id, project_id, rank) VALUES (${

@@ -35,14 +35,17 @@ export const loginHandler = requestHandler(
   "POST",
   "/api/v1/login",
   async function (body) {
-    const r = await typedSql(sql, {
-      columns: {
-        id: 23,
-        username: 1043,
-        password_hash: 1043,
-        type: null, // custom enum
-      },
-    } as const)`SELECT id, username, password_hash, type FROM users WHERE username = ${body.username} LIMIT 1`;
+    const r = await sql.begin(async (tsql) => {
+      await tsql`SELECT set_config('projektwahl.type', 'root', true);`;
+      return await typedSql(tsql, {
+        columns: {
+          id: 23,
+          username: 1043,
+          password_hash: 1043,
+          type: null, // custom enum
+        },
+      } as const)`SELECT id, username, password_hash, type FROM users WHERE username = ${body.username} LIMIT 1`;
+    });
 
     const dbUser = r[0];
 
@@ -124,7 +127,7 @@ export const loginHandler = requestHandler(
 
     if (needsRehash) {
       await sql.begin("READ WRITE", async (tsql) => {
-        await sql`SELECT set_config('projektwahl.type', ${dbUser.id}, true);`;
+        await tsql`SELECT set_config('projektwahl.type', ${dbUser.id}, true);`;
 
         return await typedSql(tsql, {
           columns: {},
@@ -143,7 +146,7 @@ export const loginHandler = requestHandler(
     );
 
     await sql.begin("READ WRITE", async (tsql) => {
-      await sql`SELECT set_config('projektwahl.type', ${dbUser.id}, true);`;
+      await tsql`SELECT set_config('projektwahl.type', ${dbUser.id}, true);`;
       return await typedSql(tsql, {
         columns: {},
       } as const)`INSERT INTO sessions (user_id, session_id) VALUES (${dbUser.id}, ${session_id})`;

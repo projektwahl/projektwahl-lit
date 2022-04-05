@@ -67,15 +67,15 @@ export const usersHandler = requestHandler(
           return sql`SELECT "id",
             "type",
             "username",
-            ${loggedInUser.type === "admin" ? `"openid_id",` : ``}
+            ${loggedInUser.type === "admin" ? sql`"openid_id",` : sql``}
             "group",
             "age",
             "away",
             "project_leader_id",
             ${
               loggedInUser.type === "admin" || loggedInUser.type === "helper"
-                ? `"force_in_project_id",`
-                : ``
+                ? sql`"force_in_project_id",`
+                : sql``
             }
             "deleted" FROM users_with_deleted WHERE (${!query.filters
               .id} OR id = ${query.filters.id ?? null}) AND username LIKE ${
@@ -84,8 +84,10 @@ export const usersHandler = requestHandler(
            AND (${!query.filters.project_leader_id} OR project_leader_id = ${
             query.filters.project_leader_id ?? null
           })
-           AND (${!query.filters
-             .force_in_project_id} OR force_in_project_id = ${
+           AND (${
+             !query.filters.force_in_project_id ||
+             !(loggedInUser.type === "admin" || loggedInUser.type === "helper")
+           } OR force_in_project_id = ${
             query.filters.force_in_project_id ?? null
           })
             AND (${!query.filters.type} OR type = ${

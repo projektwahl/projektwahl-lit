@@ -134,9 +134,12 @@ export async function fetchData<R extends keyof typeof entityRoutes>(
 
   let sqlResult;
   if (!paginationCursor) {
-    sqlResult = await sql`${sql`(${sqlQuery(
-      query
-    )} ORDER BY ${orderByQuery} LIMIT ${query.paginationLimit + 1})`}`;
+    sqlResult = await sql.begin(async (tsql) => {
+      await tsql`SELECT set_config('projektwahl.type', ${loggedInUser.type}, true);`;
+      return await tsql`${sql`(${sqlQuery(
+        query
+      )} ORDER BY ${orderByQuery} LIMIT ${query.paginationLimit + 1})`}`;
+    });
   } else {
     const queries = sorting.map((value, index) => {
       const part = sorting.slice(0, index + 1);
