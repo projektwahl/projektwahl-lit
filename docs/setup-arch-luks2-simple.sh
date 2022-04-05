@@ -361,6 +361,7 @@ GRANT SELECT,INSERT,UPDATE ON users TO projektwahl_staging;
 GRANT SELECT,INSERT,UPDATE ON projects_with_deleted TO projektwahl_staging;
 GRANT SELECT,INSERT,UPDATE ON projects TO projektwahl_staging;
 GRANT SELECT,INSERT,UPDATE ON choices TO projektwahl_staging;
+GRANT INSERT ON settings TO projektwahl_staging;
 GRANT SELECT,INSERT,UPDATE,DELETE ON sessions TO projektwahl_staging;
 
 
@@ -374,6 +375,7 @@ GRANT SELECT,INSERT,UPDATE ON users TO projektwahl_production;
 GRANT SELECT,INSERT,UPDATE ON projects_with_deleted TO projektwahl_production;
 GRANT SELECT,INSERT,UPDATE ON projects TO projektwahl_production;
 GRANT SELECT,INSERT,UPDATE ON choices TO projektwahl_production;
+GRANT INSERT ON settings TO projektwahl_production;
 GRANT SELECT,INSERT,UPDATE,DELETE ON sessions TO projektwahl_production;
 
 

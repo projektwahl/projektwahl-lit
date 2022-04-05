@@ -71,6 +71,7 @@ GRANT SELECT,INSERT,UPDATE ON users TO projektwahl_staging;
 GRANT SELECT,INSERT,UPDATE ON projects_with_deleted TO projektwahl_staging;
 GRANT SELECT,INSERT,UPDATE ON projects TO projektwahl_staging;
 GRANT SELECT,INSERT,UPDATE ON choices TO projektwahl_staging;
+GRANT INSERT ON settings TO projektwahl_staging;
 GRANT SELECT,INSERT,UPDATE,DELETE ON sessions TO projektwahl_staging;
 
 
@@ -105,7 +106,7 @@ ALTER DATABASE projektwahl SET default_transaction_read_only = true;
 
 psql --single-transaction --username=moritz < src/server/setup.sql
 
-NODE_ENV=development BASE_URL=https://localhost:8443 DATABASE_HOST=/run/postgresql DATABASE_URL=postgres://projektwahl_staging:projektwahl_staging@localhost/projektwahl_staging npm run setup
+sudo -u projektwahl_staging NODE_ENV=development BASE_URL=https://localhost:8443 DATABASE_HOST=/run/postgresql DATABASE_URL=postgres://projektwahl_staging:projektwahl_staging@localhost/projektwahl_staging npm run setup
 
 nano $CREDENTIALS_DIRECTORY/openid_client_secret
 
