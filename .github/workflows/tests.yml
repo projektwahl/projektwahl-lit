@@ -52,9 +52,7 @@ jobs:
           psql postgres://projektwahl:projektwahl@localhost/projektwahl --command="CREATE DATABASE projektwahl_staging OWNER projektwahl_staging_admin"
       - run: psql --single-transaction postgres://projektwahl_staging_admin:projektwahl@localhost/projektwahl_staging < src/server/setup.sql
       - run: |
-          psql postgres://projektwahl:projektwahl@localhost/projektwahl_staging --command="REVOKE CREATE ON SCHEMA public FROM PUBLIC;"
-      - run: |
-          psql postgres://projektwahl_staging_admin:projektwahl@localhost/projektwahl_staging --command="ALTER DATABASE projektwahl_staging SET default_transaction_isolation = 'serializable';
+          psql postgres://projektwahl:projektwahl@localhost/projektwahl_staging --command="REVOKE CREATE ON SCHEMA public FROM PUBLIC; ALTER DATABASE projektwahl_staging SET default_transaction_isolation = 'serializable';
           GRANT SELECT,INSERT,UPDATE ON users_with_deleted TO projektwahl_staging;
           GRANT SELECT,INSERT,UPDATE ON users TO projektwahl_staging;
           GRANT SELECT,INSERT,UPDATE ON projects_with_deleted TO projektwahl_staging;
