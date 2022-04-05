@@ -260,7 +260,7 @@ async function runTest(
   console.log("3");
   console.log(
     (
-      await exec(`psql postgres://projektwahl_staging_admin:projektwahl@localhost/projektwahl_staging --command="ALTER DATABASE projektwahl_staging SET default_transaction_isolation = 'serializable';
+      await exec(`psql postgres://projektwahl:projektwahl@localhost/projektwahl_staging --command="ALTER DATABASE projektwahl_staging SET default_transaction_isolation = 'serializable';
   GRANT SELECT,INSERT,UPDATE ON users_with_deleted TO projektwahl_staging;
   GRANT SELECT,INSERT,UPDATE ON users TO projektwahl_staging;
   GRANT SELECT,INSERT,UPDATE ON projects_with_deleted TO projektwahl_staging;
