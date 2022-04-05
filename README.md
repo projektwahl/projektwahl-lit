@@ -83,7 +83,7 @@ ALTER VIEW users OWNER TO projektwahl_staging;
 ALTER VIEW present_voters OWNER TO projektwahl_staging;
 ALTER VIEW projects OWNER TO projektwahl_staging;
 
-sudo -u projektwahl_staging ENVIRONMENT=development DATABASE_HOST=/run/postgresql DATABASE_URL=postgres://projektwahl_staging@localhost/projektwahl_staging npm run setup
+sudo -u projektwahl_staging NODE_ENV=development DATABASE_HOST=/run/postgresql DATABASE_URL=postgres://projektwahl_staging@localhost/projektwahl_staging npm run setup
 
 
 PORT=8443 BASE_URL=https://localhost:8443 DATABASE_URL=postgres://projektwahl@projektwahl/projektwahl CREDENTIALS_DIRECTORY=$PWD node  --enable-source-maps dist/server.js

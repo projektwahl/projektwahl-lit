@@ -21,8 +21,10 @@ SPDX-License-Identifier: AGPL-3.0-or-later
 SPDX-FileCopyrightText: 2021 Moritz Hedtke <Moritz.Hedtke@t-online.de>
 */
 import assert from "assert/strict";
+import { exec as unpromisifiedExec } from "child_process";
 import { writeFile } from "fs/promises";
 import nodeCrypto from "node:crypto";
+import { promisify } from "node:util";
 // @ts-expect-error wrong typings
 const { webcrypto: crypto }: { webcrypto: Crypto } = nodeCrypto;
 
@@ -41,6 +43,8 @@ import firefox from "selenium-webdriver/firefox.js";
 import { installConsoleHandler } from "selenium-webdriver/lib/logging.js";
 import { sql } from "../../src/server/database.js";
 import { setup } from "../../src/server/setup-internal.js";
+
+const exec = promisify(unpromisifiedExec);
 
 if (!process.env["BASE_URL"]) {
   console.error("BASE_URL not set!");
@@ -235,11 +239,13 @@ async function runTest(
   browser: "firefox" | "chrome",
   testFunction: (helper: Helper) => Promise<void>
 ) {
-  await sql.begin("READ WRITE", async (tsql) => {
-    await tsql`DROP TABLE IF EXISTS settings, sessions, choices_history, projects_history, users_history, choices, users_with_deleted, projects_with_deleted CASCADE;`;
-    await tsql.file("src/server/setup.sql");
-  });
-  await setup();
+  console.log((await exec('sudo -u projektwahl_staging_admin psql --db projektwahl_staging --command="TRUNCATE TABLE settings, sessions, choices_history, projects_history, users_history, choices, users_with_deleted, projects_with_deleted;"', {
+    maxBuffer: 1000*1000*1000
+  })).stderr);
+  //console.log(await exec('sudo -u projektwahl_staging_admin psql --single-transaction --db projektwahl_staging < src/server/setup.sql'))
+  console.log((await exec('sudo -u projektwahl_staging NODE_ENV=development DATABASE_HOST=/run/postgresql DATABASE_URL=postgres://projektwahl_staging@localhost/projektwahl_staging npm run setup', {
+    maxBuffer: 1000*1000*1000
+  })).stderr)
 
   // https://github.com/mozilla/geckodriver/issues/882
   const builder = new Builder().disableEnvironmentOverrides();
