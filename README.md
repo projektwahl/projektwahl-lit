@@ -41,46 +41,11 @@ This software is licensed under the GNU Affero General Public License v3.0 or an
 
 To ensure data security you need two users to access the database. One privileged user and one unprivileged user. The privileged user is not subject to row level security and is used for e.g. triggers and the unprivileged user is subject to row level security. If you don't use two users then unprivileged clients like voters can read all users.
 
-## Production environment
+## Setup
 
 ```bash
-sudo -u postgres psql
-CREATE ROLE projektwahl_staging LOGIN;
-CREATE ROLE projektwahl_staging_admin LOGIN;
-CREATE DATABASE projektwahl_staging OWNER projektwahl_staging_admin;
-
 sudo useradd -m projektwahl_staging
 sudo useradd -m projektwahl_staging_admin
-
-
-sudo -u postgres psql --db projektwahl_staging
-SET default_transaction_read_only = false;
-REVOKE CREATE ON SCHEMA public FROM PUBLIC;
-
-
-sudo -u projektwahl_staging_admin psql --single-transaction --db projektwahl_staging < src/server/setup.sql
-
-
-
-sudo -u projektwahl_staging_admin psql --db projektwahl_staging
-SET default_transaction_read_only = false;
-ALTER DATABASE projektwahl_staging SET default_transaction_isolation = 'serializable';
-ALTER DATABASE projektwahl_staging SET default_transaction_read_only = true;
-GRANT SELECT,INSERT,UPDATE ON users_with_deleted TO projektwahl_staging;
-GRANT SELECT,INSERT,UPDATE ON users TO projektwahl_staging;
-GRANT SELECT,INSERT,UPDATE ON projects_with_deleted TO projektwahl_staging;
-GRANT SELECT,INSERT,UPDATE ON projects TO projektwahl_staging;
-GRANT SELECT,INSERT,UPDATE ON choices TO projektwahl_staging;
-GRANT INSERT ON settings TO projektwahl_staging;
-GRANT SELECT,INSERT,UPDATE,DELETE ON sessions TO projektwahl_staging;
-
-sudo -u postgres psql --db projektwahl_staging
-SET default_transaction_read_only = false;
-GRANT projektwahl_staging TO projektwahl_staging_admin;
-ALTER VIEW users OWNER TO projektwahl_staging;
-ALTER VIEW present_voters OWNER TO projektwahl_staging;
-ALTER VIEW projects OWNER TO projektwahl_staging;
-
 
 git clone https://github.com/projektwahl/projektwahl-lit.git
 cd projektwahl-lit/
@@ -92,7 +57,40 @@ sudo -u projektwahl_staging openssl req -x509 -newkey rsa:2048 -nodes -sha256 -s
 npm run localize-build
 npm run build
 
-DATABASE_URL=postgres://projektwahl:projektwahl@projektwahl/projektwahl node --enable-source-maps dist/setup.js
+
+
+
+
+
+sudo -u postgres psql
+CREATE ROLE projektwahl_staging LOGIN;
+CREATE ROLE projektwahl_staging_admin LOGIN;
+CREATE DATABASE projektwahl_staging OWNER projektwahl_staging_admin;
+
+sudo -u postgres psql --db projektwahl_staging
+REVOKE CREATE ON SCHEMA public FROM PUBLIC;
+
+
+sudo -u projektwahl_staging_admin psql --single-transaction --db projektwahl_staging < src/server/setup.sql
+
+
+
+sudo -u projektwahl_staging_admin psql --db projektwahl_staging
+ALTER DATABASE projektwahl_staging SET default_transaction_isolation = 'serializable';
+GRANT SELECT,INSERT,UPDATE ON users_with_deleted TO projektwahl_staging;
+GRANT SELECT,INSERT,UPDATE ON users TO projektwahl_staging;
+GRANT SELECT,INSERT,UPDATE ON projects_with_deleted TO projektwahl_staging;
+GRANT SELECT,INSERT,UPDATE ON projects TO projektwahl_staging;
+GRANT SELECT,INSERT,UPDATE ON choices TO projektwahl_staging;
+GRANT INSERT ON settings TO projektwahl_staging;
+GRANT SELECT,INSERT,UPDATE,DELETE ON sessions TO projektwahl_staging;
+ALTER VIEW users OWNER TO projektwahl_staging;
+ALTER VIEW present_voters OWNER TO projektwahl_staging;
+ALTER VIEW projects OWNER TO projektwahl_staging;
+
+sudo -u projektwahl_staging ENVIRONMENT=development DATABASE_HOST=/run/postgresql DATABASE_URL=postgres://projektwahl_staging:projektwahl_staging@localhost/projektwahl_staging npm run setup
+
+
 
 PORT=8443 BASE_URL=https://localhost:8443 DATABASE_URL=postgres://projektwahl:projektwahl@projektwahl/projektwahl CREDENTIALS_DIRECTORY=$PWD node  --enable-source-maps dist/server.js
 
@@ -103,15 +101,6 @@ PORT=8443 BASE_URL=https://localhost:8443 DATABASE_URL=postgres://projektwahl:pr
 ```bash
 ln -s $PWD/pre-commit .git/hooks/pre-commit
 
-sudo --user postgres psql --command='DROP DATABASE moritz;' --command='CREATE DATABASE moritz;'
-
-psql --username=moritz
-ALTER DATABASE projektwahl SET default_transaction_isolation = 'serializable';
-ALTER DATABASE projektwahl SET default_transaction_read_only = true;
-
-psql --single-transaction --username=moritz < src/server/setup.sql
-
-sudo -u projektwahl_staging NODE_ENV=development BASE_URL=https://localhost:8443 DATABASE_HOST=/run/postgresql DATABASE_URL=postgres://projektwahl_staging:projektwahl_staging@localhost/projektwahl_staging npm run setup
 
 nano $CREDENTIALS_DIRECTORY/openid_client_secret
 
