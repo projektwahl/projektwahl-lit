@@ -134,7 +134,7 @@ export const createOrUpdateUsersHandler = requestHandler(
               // TODO FIXME (found using fuzzer) if this tries to update a nonexisting user we should return an error
               results.push(await finalQuery);
             } else {
-              const query = typedSql(sql, {
+              const query = typedSql(tsql, {
                 columns: {
                   id: 23,
                   project_leader_id: 23,
