@@ -167,7 +167,7 @@ export async function fetchData<R extends keyof typeof entityRoutes>(
     });
 
     await sql.begin(async (tsql) => {
-      await tsql`SET LOCAL projektwahl.type = ${loggedInUser.type}`;
+      await tsql`SELECT set_config('projektwahl.type', ${loggedInUser.type}, true);`;
       if (queries.length == 1) {
         sqlResult = await tsql`${queries[0]}`;
       } else {

@@ -189,7 +189,7 @@ export function createOrUpdateProjectsHandler<
     try {
       const row: { id: number } = (
         await sql.begin("READ WRITE", async (sql) => {
-          await sql`SET LOCAL projektwahl.type = ${loggedInUser?.type ?? null}`;
+          await sql`SELECT set_config('projektwahl.type', ${loggedInUser?.type ?? null}, true);`;
           const result: { id: number }[] = await dbquery(
             sql,
             project,

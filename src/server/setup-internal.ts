@@ -29,7 +29,7 @@ export async function setup() {
   const chance = new Chance(1234);
 
   await sql.begin("READ WRITE", async (sql) => {
-    await sql`SET LOCAL projektwahl.type = 'root'`;
+    await sql`SELECT set_config('projektwahl.type', 'root', true);`;
 
     await sql`INSERT INTO settings (id, election_running) VALUES (1, false) ON CONFLICT DO NOTHING;`;
 

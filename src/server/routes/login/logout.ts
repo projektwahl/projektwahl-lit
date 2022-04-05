@@ -30,7 +30,7 @@ export const logoutHandler = requestHandler(
   async function (body, user, session_id) {
     if (session_id) {
       await sql.begin("READ WRITE", async (tsql) => {
-        await sql`SET LOCAL projektwahl.type = ${user?.type ?? null}`;
+        await sql`SELECT set_config('projektwahl.type', ${user?.type ?? null}, true);`;
         return await typedSql(tsql, {
           columns: {},
         } as const)`DELETE FROM sessions WHERE session_id = ${session_id}`;
