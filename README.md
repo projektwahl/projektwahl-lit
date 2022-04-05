@@ -51,7 +51,7 @@ git clone https://github.com/projektwahl/projektwahl-lit.git
 cd projektwahl-lit/
 npm ci --ignore-scripts --omit=optional
 touch key.pem cert.pem
-chown projektwahl_staging key.pem cert.pem 
+chown projektwahl_staging key.pem cert.pem
 sudo -u projektwahl_staging openssl req -x509 -newkey rsa:2048 -nodes -sha256 -subj '/CN=localhost' -keyout key.pem -out cert.pem
 ./node_modules/@dev.mohe/argon2/build.sh /usr/include/node/
 npm run localize-build

@@ -113,7 +113,7 @@ export const PwUserProjects = setupHmr(
                 orderBy: `${this.name}_eq`,
                 prefix: this.prefix,
                 title: "",
-                value: this.user[this.name],
+                value: this.user[this.name] ?? null,
                 get: (o) => o.sorting,
                 set: (o, v) => (o.sorting = v),
                 initial,

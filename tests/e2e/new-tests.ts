@@ -42,7 +42,6 @@ import chrome from "selenium-webdriver/chrome.js";
 import firefox from "selenium-webdriver/firefox.js";
 import { installConsoleHandler } from "selenium-webdriver/lib/logging.js";
 import { sql } from "../../src/server/database.js";
-import { setup } from "../../src/server/setup-internal.js";
 
 const exec = promisify(unpromisifiedExec);
 
