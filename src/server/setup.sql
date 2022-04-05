@@ -27,6 +27,8 @@ SPDX-FileCopyrightText: 2021 Moritz Hedtke <Moritz.Hedtke@t-online.de>
 -- ALTER DATABASE projektwahl SET default_transaction_isolation = 'serializable';
 -- ALTER DATABASE projektwahl SET default_transaction_read_only = true;
 
+REVOKE CREATE ON SCHEMA public FROM PUBLIC;
+
 -- TODO FIXME at some point create the tables based on the zod definitions? so min/max etc. are checked correctly?
 CREATE TABLE IF NOT EXISTS projects_with_deleted (
   id INT GENERATED ALWAYS AS IDENTITY PRIMARY KEY NOT NULL,
@@ -328,7 +330,11 @@ BEGIN
   END IF;
   RETURN NEW;
 END;
-$body$ LANGUAGE plpgsql;
+$body$ LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = public;
+
+REVOKE ALL ON FUNCTION check_choices_age() FROM PUBLIC;
 
 DROP TRIGGER IF EXISTS trigger_check_choices_age ON choices;
 
@@ -347,7 +353,11 @@ BEGIN
   END IF;
   RETURN NEW;
 END;
-$test2$ LANGUAGE plpgsql;
+$test2$ LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = public;
+
+REVOKE ALL ON FUNCTION update_project_check_choices_age() FROM PUBLIC;
 
 DROP TRIGGER IF EXISTS trigger_update_project_check_choices_age ON projects_with_deleted;
 
@@ -364,7 +374,11 @@ BEGIN
   END IF;
   RETURN NEW;
 END;
-$test3$ LANGUAGE plpgsql;
+$test3$ LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = public;
+
+REVOKE ALL ON FUNCTION check_project_leader_voted_own_project() FROM PUBLIC;
 
 DROP TRIGGER IF EXISTS trigger_check_project_leader_voted_own_project ON users_with_deleted;
 
@@ -381,7 +395,11 @@ BEGIN
   END IF;
   RETURN NEW;
 END;
-$test4$ LANGUAGE plpgsql;
+$test4$ LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = public;
+
+REVOKE ALL ON FUNCTION check_project_leader_choices() FROM PUBLIC;
 
 DROP TRIGGER IF EXISTS trigger_check_project_leader_choices ON choices;
 
@@ -416,7 +434,11 @@ BEGIN
   END IF;
   RETURN NEW;
 END;
-$body$ LANGUAGE plpgsql;
+$body$ LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = public;
+
+REVOKE ALL ON FUNCTION check_users_project_leader_id1() FROM PUBLIC;
 
 -- warning: Copy pasta from above
 CREATE OR REPLACE FUNCTION check_users_force_in_project() RETURNS TRIGGER AS $body$
@@ -438,7 +460,11 @@ BEGIN
   END IF;
   RETURN NEW;
 END;
-$body$ LANGUAGE plpgsql;
+$body$ LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = public;
+
+REVOKE ALL ON FUNCTION check_users_force_in_project() FROM PUBLIC;
 
 DROP TRIGGER IF EXISTS trigger_check_users_project_leader_id1 ON users_with_deleted;
 
@@ -468,7 +494,11 @@ BEGIN
   END IF;
   RETURN NEW;
 END;
-$body$ LANGUAGE plpgsql;
+$body$ LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = public;
+
+REVOKE ALL ON FUNCTION check_users_project_leader_id2() FROM PUBLIC;
 
 DROP TRIGGER IF EXISTS trigger_check_users_project_leader_id2 ON users_with_deleted;
 
@@ -489,7 +519,11 @@ BEGIN
   END IF;
   RETURN NEW;
 END;
-$body$ LANGUAGE plpgsql;
+$body$ LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = public;
+
+REVOKE ALL ON FUNCTION check_users_project_leader_id3() FROM PUBLIC;
 
 DROP TRIGGER IF EXISTS trigger_check_users_project_leader_id3 ON users_with_deleted;
 
@@ -499,11 +533,7 @@ FOR EACH ROW
 EXECUTE FUNCTION check_users_project_leader_id3();
 
 
-
 ALTER TABLE users_with_deleted ENABLE ROW LEVEL SECURITY;
-
--- only for local testing (enabled to be secure by default)
-ALTER TABLE users_with_deleted FORCE ROW LEVEL SECURITY;
 
 DROP POLICY IF EXISTS users_voters_only_project_leaders ON users_with_deleted;
 
