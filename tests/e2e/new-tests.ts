@@ -42,6 +42,9 @@ import chrome from "selenium-webdriver/chrome.js";
 import firefox from "selenium-webdriver/firefox.js";
 import { installConsoleHandler } from "selenium-webdriver/lib/logging.js";
 import { sql } from "../../src/server/database.js";
+import { Chance } from "chance";
+
+let chance: Chance.Chance;
 
 const exec = promisify(unpromisifiedExec);
 
@@ -238,6 +241,7 @@ async function runTest(
   browser: "firefox" | "chrome",
   testFunction: (helper: Helper) => Promise<void>
 ) {
+  chance = new Chance(1234);
   console.log("1");
   console.log(
     (
@@ -505,11 +509,11 @@ async function createUserAllFields(helper: Helper) {
   );
   let form = await helper.form("pw-user-create");
   const username = `username${crypto.getRandomValues(new Uint32Array(1))[0]}`;
-  const email = `email${Math.random()}`.substring(0, 15);
-  const group = `group${Math.random()}`.substring(0, 15);
-  const age = Math.floor(Math.random() * 10);
-  const away = Math.random() > 0.5 ? true : false;
-  const deleted = Math.random() > 0.5 ? true : false;
+  const email = `email${chance.integer()}`.substring(0, 15);
+  const group = `group${chance.integer()}`.substring(0, 15);
+  const age = chance.integer({ min: 0, max: 10 });
+  const away = chance.bool();
+  const deleted = chance.bool();
   await form.setField("0,username", username);
   await form.setField("0,openid_id", email);
   await form.setField("0,group", group);
@@ -602,16 +606,16 @@ async function createProjectAllFields(helper: Helper) {
     await helper.driver.findElement(By.css(`a[href="/projects/create"]`))
   );
   let form = await helper.form("pw-project-create");
-  const title = `title${Math.random()}`;
-  const info = `info${Math.random()}`;
-  const place = `place${Math.random()}`;
-  const costs = Math.floor(Math.random() * 10);
-  const min_age = Math.floor(Math.random() * 10);
-  const max_age = Math.floor(Math.random() * 10);
-  const min_participants = Math.floor(Math.random() * 10) + 1;
-  const max_participants = Math.floor(Math.random() * 10) + 1;
-  const random_assignments = Math.random() > 0.5 ? true : false;
-  const deleted = Math.random() > 0.5 ? true : false;
+  const title = `title${chance.integer()}`;
+  const info = `info${chance.integer()}`;
+  const place = `place${chance.integer()}`;
+  const costs = chance.integer({ min: 0, max: 10 });
+  const min_age = chance.integer({ min: 0, max: 10 });
+  const max_age = chance.integer({ min: 0, max: 10 });
+  const min_participants = chance.integer({ min: 1, max: 10 });
+  const max_participants = chance.integer({ min: 1, max: 10 });
+  const random_assignments = chance.bool();
+  const deleted = chance.bool();
   await form.setField("title", title);
   await form.setTextareaField("info", info);
   await form.setField("place", place);
@@ -643,7 +647,7 @@ async function createProjectAllFields(helper: Helper) {
   );
   assert.equal((await form.getCheckboxField("deleted")) === "true", deleted);
 
-  const title2 = `title${Math.random()}`;
+  const title2 = `title${chance.integer()}`;
   await form.resetField("title", title2);
 
   await form.submitSuccess();
@@ -739,7 +743,7 @@ async function checkNotLoggedInProjects(helper: Helper) {
 }
 
 const randomFromArray = function <T>(array: T[]): T {
-  return array[Math.floor(Math.random() * array.length)];
+  return array[chance.integer({ min: 0, max: array.length - 1 })];
 };
 
 async function checkProjectSortingWorks(helper: Helper) {
@@ -752,7 +756,7 @@ async function checkProjectSortingWorks(helper: Helper) {
     );
     await helper.form("pw-projects");
 
-    for (let i = 0; i < Math.random() * 10; i++) {
+    for (let i = 0; i < chance.integer({ min: 1, max: 10 }); i++) {
       const randomOrderButton = randomFromArray(
         await helper.driver.findElements(By.css("pw-order button"))
       );
@@ -809,7 +813,7 @@ async function checkUsersSortingWorks(helper: Helper) {
   );
   await helper.form("pw-users");
 
-  for (let i = 0; i < Math.random() * 10; i++) {
+  for (let i = 0; i < chance.integer({ min: 1, max: 10 }); i++) {
     const randomOrderButton = randomFromArray(
       await helper.driver.findElements(By.css("pw-order button"))
     );
@@ -972,10 +976,10 @@ async function resettingUserWorks(helper: Helper) {
     await helper.driver.findElement(By.css(`a[href="/users/create"]`))
   );
   let form = await helper.form("pw-user-create");
-  const username = `username${crypto.getRandomValues(new Uint32Array(1))[0]}`;
-  const email = `email${Math.random()}`.substring(0, 15);
-  const away = Math.random() > 0.5 ? true : false;
-  const deleted = Math.random() > 0.5 ? true : false;
+  const username = `username${chance.integer()}`;
+  const email = `email${chance.integer()}`.substring(0, 15);
+  const away = chance.bool();
+  const deleted = chance.bool();
   await form.setField("0,username", username);
   await form.setField("0,openid_id", email);
 
@@ -1037,16 +1041,16 @@ async function resettingProjectWorks(helper: Helper) {
     await helper.driver.findElement(By.css(`a[href="/projects/create"]`))
   );
   let form = await helper.form("pw-project-create");
-  const title = `title${Math.random()}`;
-  const info = `info${Math.random()}`;
-  const place = `place${Math.random()}`;
-  const costs = Math.floor(Math.random() * 10);
-  const min_age = Math.floor(Math.random() * 10);
-  const max_age = Math.floor(Math.random() * 10);
-  const min_participants = Math.floor(Math.random() * 10) + 1;
-  const max_participants = Math.floor(Math.random() * 10) + 1;
-  const random_assignments = Math.random() > 0.5 ? true : false;
-  const deleted = Math.random() > 0.5 ? true : false;
+  const title = `title${chance.integer()}`;
+  const info = `info${chance.integer()}`;
+  const place = `place${chance.integer()}`;
+  const costs = chance.integer({ min: 0, max: 10 });
+  const min_age = chance.integer({ min: 0, max: 10 });
+  const max_age = chance.integer({ min: 0, max: 10 });
+  const min_participants = chance.integer({ min: 1, max: 10 });
+  const max_participants = chance.integer({ min: 1, max: 10 });
+  const random_assignments = chance.bool();
+  const deleted = chance.bool();
   await form.setField("title", title);
   await form.setTextareaField("info", info);
   await form.setField("place", place);
@@ -1118,11 +1122,11 @@ async function resettingUserWorks2(helper: Helper) {
     );
     let form = await helper.form("pw-user-create");
     const username = `username${crypto.getRandomValues(new Uint32Array(1))[0]}`;
-    const email = `email${Math.random()}`.substring(0, 15);
-    const group = `group${Math.random()}`.substring(0, 15);
-    const age = Math.floor(Math.random() * 10);
-    const away = Math.random() > 0.5 ? true : false;
-    const deleted = Math.random() > 0.5 ? true : false;
+    const email = `email${chance.integer()}`.substring(0, 15);
+    const group = `group${chance.integer()}`.substring(0, 15);
+    const age = chance.integer({ min: 0, max: 10 });
+    const away = chance.bool();
+    const deleted = chance.bool();
     await form.setField("0,username", username);
     await form.setField("0,openid_id", email);
     await form.setField("0,group", group);
@@ -1192,16 +1196,16 @@ async function resettingProjectWorks2(helper: Helper) {
       await helper.driver.findElement(By.css(`a[href="/projects/create"]`))
     );
     let form = await helper.form("pw-project-create");
-    const title = `title${Math.random()}`;
-    const info = `info${Math.random()}`;
-    const place = `place${Math.random()}`;
-    const costs = Math.floor(Math.random() * 10);
-    const min_age = Math.floor(Math.random() * 10);
-    const max_age = Math.floor(Math.random() * 10);
-    const min_participants = Math.floor(Math.random() * 10) + 1;
-    const max_participants = Math.floor(Math.random() * 10) + 1;
-    const random_assignments = Math.random() > 0.5 ? true : false;
-    const deleted = Math.random() > 0.5 ? true : false;
+    const title = `title${chance.integer()}`;
+    const info = `info${chance.integer()}`;
+    const place = `place${chance.integer()}`;
+    const costs = chance.integer({ min: 0, max: 10 });
+    const min_age = chance.integer({ min: 0, max: 10 });
+    const max_age = chance.integer({ min: 0, max: 10 });
+    const min_participants = chance.integer({ min: 1, max: 10 });
+    const max_participants = chance.integer({ min: 1, max: 10 });
+    const random_assignments = chance.bool();
+    const deleted = chance.bool();
     await form.setField("title", title);
     await form.setTextareaField("info", info);
     await form.setField("place", place);
@@ -1342,16 +1346,16 @@ async function testHelperCreatesProjectWithProjectLeadersAndMembers(
     await helper.driver.findElement(By.css(`a[href="/projects/create"]`))
   );
   let form = await helper.form("pw-project-create");
-  const title = `title${Math.random()}`;
-  const info = `info${Math.random()}`;
-  const place = `place${Math.random()}`;
-  const costs = Math.floor(Math.random() * 10);
-  const min_age = Math.floor(Math.random() * 10);
-  const max_age = Math.floor(Math.random() * 10);
-  const min_participants = Math.floor(Math.random() * 10) + 1;
-  const max_participants = Math.floor(Math.random() * 10) + 1;
-  const random_assignments = Math.random() > 0.5 ? true : false;
-  const deleted = Math.random() > 0.5 ? true : false;
+  const title = `title${chance.integer()}`;
+  const info = `info${chance.integer()}`;
+  const place = `place${chance.integer()}`;
+  const costs = chance.integer({ min: 0, max: 10 });
+  const min_age = chance.integer({ min: 0, max: 10 });
+  const max_age = chance.integer({ min: 0, max: 10 });
+  const min_participants = chance.integer({ min: 1, max: 10 });
+  const max_participants = chance.integer({ min: 1, max: 10 });
+  const random_assignments = chance.bool();
+  const deleted = chance.bool();
   await form.setField("title", title);
   await form.setTextareaField("info", info);
   await form.setField("place", place);
