@@ -217,7 +217,7 @@ export abstract class PwInput<
     if (this.resettable && changedProperties.has("initial")) {
       // this is a "hack" so that rerendering with new initial data resets the resettable fields.
 
-      console.log("BUG FIXME: this gets executed when it shouldn'T")
+      console.log("BUG FIXME: this gets executed when it shouldn'T");
 
       // the input value contains the value that is shown to the user
       this.inputValue =

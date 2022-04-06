@@ -104,9 +104,9 @@ class FormTester {
     const element = await this.form.findElement(
       By.css(`input[name="${name}"]`)
     );
-    console.log("selected: ", await element.isSelected())
-    console.log("expected: ", value)
-    if (await element.isSelected() != value) {
+    console.log("selected: ", await element.isSelected());
+    console.log("expected: ", value);
+    if ((await element.isSelected()) != value) {
       await this.helper.click(element);
     }
   }
@@ -533,8 +533,8 @@ async function createUserAllFields(helper: Helper) {
   assert.equal(await form.getField("0,openid_id"), email);
   assert.equal(await form.getField("0,group"), group);
   assert.equal(await form.getField("0,age"), `${age}`);
-  assert.equal((await form.getCheckboxField("0,away")), away);
-  assert.equal((await form.getCheckboxField("0,deleted")), deleted);
+  assert.equal(await form.getCheckboxField("0,away"), away);
+  assert.equal(await form.getCheckboxField("0,deleted"), deleted);
 
   const username2 = `username${crypto.getRandomValues(new Uint32Array(1))[0]}`;
   await form.resetField("0,username", username2);
@@ -546,9 +546,9 @@ async function createUserAllFields(helper: Helper) {
 
   form = await helper.form("pw-users");
 
+  await form.checkField("filters,deleted", true);
   await form.setField("filters,id", id);
   await form.setField("filters,username", username2);
-  await form.checkField("filters,deleted", true);
 
   await helper.waitUntilLoaded();
 
@@ -560,8 +560,8 @@ async function createUserAllFields(helper: Helper) {
   assert.equal(await form.getField("0,openid_id"), email);
   assert.equal(await form.getField("0,group"), group);
   assert.equal(await form.getField("0,age"), `${age}`);
-  assert.equal((await form.getCheckboxField("0,away")), away);
-  assert.equal((await form.getCheckboxField("0,deleted")), deleted);
+  assert.equal(await form.getCheckboxField("0,away"), away);
+  assert.equal(await form.getCheckboxField("0,deleted"), deleted);
 
   // click edit button
   await helper.click(
@@ -593,8 +593,8 @@ async function createUserAllFields(helper: Helper) {
   assert.equal(await form.getField("0,openid_id"), "");
   assert.equal(await form.getField("0,group"), "");
   assert.equal(await form.getField("0,age"), "");
-  assert.equal((await form.getCheckboxField("0,away")), false);
-  assert.equal((await form.getCheckboxField("0,deleted")), false);
+  assert.equal(await form.getCheckboxField("0,away"), false);
+  assert.equal(await form.getCheckboxField("0,deleted"), false);
 }
 
 async function createProjectAllFields(helper: Helper) {
@@ -645,10 +645,10 @@ async function createProjectAllFields(helper: Helper) {
   assert.equal(await form.getField("min_participants"), `${min_participants}`);
   assert.equal(await form.getField("max_participants"), `${max_participants}`);
   assert.equal(
-    (await form.getCheckboxField("random_assignments")),
+    await form.getCheckboxField("random_assignments"),
     random_assignments
   );
-  assert.equal((await form.getCheckboxField("deleted")), deleted);
+  assert.equal(await form.getCheckboxField("deleted"), deleted);
 
   const title2 = `title${chance.integer()}`;
   await form.resetField("title", title2);
@@ -661,9 +661,9 @@ async function createProjectAllFields(helper: Helper) {
 
   form = await helper.form("pw-projects");
 
+  await form.checkField("filters,deleted", true);
   await form.setField("filters,id", id);
   await form.setField("filters,title", title2);
-  await form.checkField("filters,deleted", true);
 
   await helper.waitUntilLoaded();
 
@@ -680,10 +680,10 @@ async function createProjectAllFields(helper: Helper) {
   assert.equal(await form.getField("min_participants"), `${min_participants}`);
   assert.equal(await form.getField("max_participants"), `${max_participants}`);
   assert.equal(
-    (await form.getCheckboxField("random_assignments")),
+    await form.getCheckboxField("random_assignments"),
     random_assignments
   );
-  assert.equal((await form.getCheckboxField("deleted")), deleted);
+  assert.equal(await form.getCheckboxField("deleted"), deleted);
 
   // click edit button
   await helper.click(
@@ -715,11 +715,8 @@ async function createProjectAllFields(helper: Helper) {
   assert.equal(await form.getField("max_age"), "13");
   assert.equal(await form.getField("min_participants"), "5");
   assert.equal(await form.getField("max_participants"), "15");
-  assert.equal(
-    (await form.getCheckboxField("random_assignments")),
-    false
-  );
-  assert.equal((await form.getCheckboxField("deleted")), false);
+  assert.equal(await form.getCheckboxField("random_assignments"), false);
+  assert.equal(await form.getCheckboxField("deleted"), false);
 }
 
 async function checkNotLoggedInUsers(helper: Helper) {
@@ -1028,9 +1025,9 @@ async function resettingUserWorks(helper: Helper) {
   assert.equal(await form.getField("0,username"), username);
   assert.equal(await form.getField("0,openid_id"), email);
   assert.equal(await form.getField("0,type"), "admin");
-  assert.equal((await form.getCheckboxField("0,away")), away);
-  console.log((await form.getCheckboxField("0,deleted")))
-  assert.equal((await form.getCheckboxField("0,deleted")), deleted);
+  assert.equal(await form.getCheckboxField("0,away"), away);
+  console.log(await form.getCheckboxField("0,deleted"));
+  assert.equal(await form.getCheckboxField("0,deleted"), deleted);
 }
 
 async function resettingProjectWorks(helper: Helper) {
@@ -1106,10 +1103,10 @@ async function resettingProjectWorks(helper: Helper) {
   assert.equal(await form.getField("min_participants"), `${min_participants}`);
   assert.equal(await form.getField("max_participants"), `${max_participants}`);
   assert.equal(
-    (await form.getCheckboxField("random_assignments")),
+    await form.getCheckboxField("random_assignments"),
     random_assignments
   );
-  assert.equal((await form.getCheckboxField("deleted")), deleted);
+  assert.equal(await form.getCheckboxField("deleted"), deleted);
 }
 
 async function resettingUserWorks2(helper: Helper) {
@@ -1182,8 +1179,8 @@ async function resettingUserWorks2(helper: Helper) {
     assert.equal(await form.getField("0,openid_id"), "");
     assert.equal(await form.getField("0,group"), "");
     assert.equal(await form.getField("0,age"), "");
-    assert.equal((await form.getCheckboxField("0,away")), false);
-    assert.equal((await form.getCheckboxField("0,deleted")), false);
+    assert.equal(await form.getCheckboxField("0,away"), false);
+    assert.equal(await form.getCheckboxField("0,deleted"), false);
   }
 }
 
@@ -1271,11 +1268,8 @@ async function resettingProjectWorks2(helper: Helper) {
     assert.equal(await form.getField("max_age"), "13");
     assert.equal(await form.getField("min_participants"), "5");
     assert.equal(await form.getField("max_participants"), "15");
-    assert.equal(
-      (await form.getCheckboxField("random_assignments")),
-      false
-    );
-    assert.equal((await form.getCheckboxField("deleted")), false);
+    assert.equal(await form.getCheckboxField("random_assignments"), false);
+    assert.equal(await form.getCheckboxField("deleted"), false);
   }
 }
 
