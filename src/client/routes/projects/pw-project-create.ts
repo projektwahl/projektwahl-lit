@@ -176,7 +176,6 @@ export const PwProjectCreate = setupHmr(
     }
 
     override render() {
-      // TODO FIXME do this in the initialTask thingy
       if (!this.hasUpdated) {
         // @ts-expect-error impossible
         this.formData = {
@@ -221,8 +220,6 @@ export const PwProjectCreate = setupHmr(
                         action="/no-javascript"
                         @submit=${async (event: Event) => {
                           event.preventDefault();
-
-                          //console.log("SUBMIT");
 
                           await this._task.run();
 
