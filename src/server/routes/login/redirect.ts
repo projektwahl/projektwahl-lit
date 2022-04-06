@@ -64,17 +64,20 @@ export const openidRedirectHandler = requestHandler(
 
       //console.log(userinfo)
 
-      const dbUser = (
-        await typedSql(sql, {
-          columns: {
-            id: 23,
-            username: 1043,
-            type: null, // custom enum
-          },
-        } as const)`SELECT id, username, type FROM users WHERE openid_id = ${
-          result.claims().email ?? null
-        } LIMIT 1`
-      )[0];
+      const dbUser = await sql.begin(async (tsql) => {
+        await tsql`SELECT set_config('projektwahl.type', 'root', true);`;
+        return (
+          await typedSql(sql, {
+            columns: {
+              id: 23,
+              username: 1043,
+              type: null, // custom enum
+            },
+          } as const)`SELECT id, username, type FROM users WHERE openid_id = ${
+            result.claims().email ?? null
+          } LIMIT 1`
+        )[0];
+      });
 
       if (dbUser === undefined) {
         const returnValue: [
