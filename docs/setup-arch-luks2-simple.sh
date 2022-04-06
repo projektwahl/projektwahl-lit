@@ -308,12 +308,12 @@ CREATE DATABASE projektwahl_production OWNER projektwahl_production_admin;
 
 sudo -u postgres psql --db projektwahl_staging
 REVOKE CREATE ON SCHEMA public FROM PUBLIC;
-
+GRANT CREATE ON SCHEMA public TO projektwahl_staging_admin;
 
 
 sudo -u postgres psql --db projektwahl_production
 REVOKE CREATE ON SCHEMA public FROM PUBLIC;
-
+GRANT CREATE ON SCHEMA public TO projektwahl_production_admin;
 
 
 ssh -A moritz@aes.selfmade4u.de -p 2121
