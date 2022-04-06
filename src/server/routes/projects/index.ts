@@ -105,8 +105,11 @@ export const projectsHandler = requestHandler(
           "min_participants",
           "max_participants",
           "random_assignments",
-          "deleted" FROM projects_with_deleted WHERE (${!query.filters
-            .id} OR id = ${query.filters.id ?? null}) AND title LIKE ${
+          "deleted" FROM projects_with_deleted WHERE (${
+            query.filters.id === undefined
+          } OR id = ${query.filters.id ?? null}) AND (${
+          query.filters.deleted === undefined
+        } OR deleted = ${query.filters.deleted ?? null}) AND title LIKE ${
           "%" + (query.filters.title ?? "") + "%"
         }
              AND info  LIKE ${"%" + (query.filters.info ?? "") + "%"}`;

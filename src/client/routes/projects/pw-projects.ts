@@ -35,12 +35,16 @@ import { pwInputNumber } from "../../form/pw-input-number.js";
 import { pwInputText } from "../../form/pw-input-text.js";
 import type { entityRoutes } from "../../../lib/routes.js";
 import type { z } from "zod";
+import { pwInputCheckbox } from "../../form/pw-input-checkbox.js";
 
+// TODO FIXME this currently needs to be synced with the defaults in the pwInput stuff. Fix that.
 const defaultValue: z.infer<
   typeof entityRoutes["/api/v1/projects"]["request"]
 > = {
   sorting: [],
-  filters: {},
+  filters: {
+    deleted: false,
+  },
   paginationDirection: "forwards",
   paginationLimit: 100,
 };
@@ -146,6 +150,8 @@ export class PwProjects<X extends string> extends PwEntityList<
             })}
           </th>
 
+          <th class="table-cell-hover">${msg("Show deleted")}</th>
+
           <th class="table-cell-hover">${msg("Actions")}</th>
         </tr>
 
@@ -197,6 +203,21 @@ export class PwProjects<X extends string> extends PwEntityList<
               resettable: false,
             })}
           </th>
+
+          ${pwInputCheckbox<"/api/v1/projects">({
+            url: this.url,
+            label: null,
+            name: ["filters", "deleted"],
+            get: (o) => o.filters.deleted,
+            set: (o, v) => (o.filters.deleted = v),
+            task: this._task,
+            type: "checkbox",
+            trueValue: undefined,
+            falseValue: false,
+            defaultValue: undefined,
+            initial: initial,
+            resettable: false,
+          })}
 
           <th scope="col"></th>
         </tr>
@@ -259,6 +280,9 @@ export class PwProjects<X extends string> extends PwEntityList<
                         ? html`<del>${value.info}</del>`
                         : html`${value.info}`}
                     </p>
+                  </td>
+                  <td>
+                    <p>${value.deleted ? msg("deleted") : ""}</p>
                   </td>
                   <td>
                     <a

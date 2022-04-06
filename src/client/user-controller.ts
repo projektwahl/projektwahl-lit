@@ -42,7 +42,7 @@ export class LoggedInUserController implements ReactiveController {
   updateloginstate = () => {
     this.username = jscookie.get("username");
     this.type = jscookie.get("type");
-    this.host.requestUpdate()
+    this.host.requestUpdate();
   };
 
   hostConnected() {

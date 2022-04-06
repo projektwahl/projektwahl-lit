@@ -364,8 +364,7 @@ export const PwProjectCreate = setupHmr(
                           möglichen Teilnehmenden.
                         </div>
                         ${pwInputCheckbox<
-                          "/api/v1/projects/create" | "/api/v1/projects/update",
-                          boolean | undefined
+                          "/api/v1/projects/create" | "/api/v1/projects/update"
                         >({
                           url: this.url,
                           type: "checkbox",
@@ -382,8 +381,7 @@ export const PwProjectCreate = setupHmr(
                           resettable: value !== undefined,
                         })}
                         ${pwInputCheckbox<
-                          "/api/v1/projects/create" | "/api/v1/projects/update",
-                          boolean | undefined
+                          "/api/v1/projects/create" | "/api/v1/projects/update"
                         >({
                           url: this.url,
                           type: "checkbox",

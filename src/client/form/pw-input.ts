@@ -291,7 +291,7 @@ export abstract class PwInput<
               ? live(this.inputValue ?? "")
               : undefined
           )}
-          .checked=${ifDefined(
+          ?checked=${ifDefined(
             this.type === "checkbox" ? live(this.inputValue) : undefined
           )}
           class="${
