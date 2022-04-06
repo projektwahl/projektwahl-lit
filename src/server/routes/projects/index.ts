@@ -95,6 +95,9 @@ export const projectsHandler = requestHandler(
       "/api/v1/projects" as const,
       query,
       (query) => {
+        const { id, title, info, deleted, ...rest } = query.filters;
+        let _ = rest;
+        _ = 1; // ensure no property is missed - Don't use `{}` as a type. `{}` actually means "any non-nullish value".
         return sql`SELECT "id",
           "title",
           "info",
@@ -106,13 +109,11 @@ export const projectsHandler = requestHandler(
           "max_participants",
           "random_assignments",
           "deleted" FROM projects_with_deleted WHERE (${
-            query.filters.id === undefined
-          } OR id = ${query.filters.id ?? null}) AND (${
-          query.filters.deleted === undefined
-        } OR deleted = ${query.filters.deleted ?? null}) AND title LIKE ${
-          "%" + (query.filters.title ?? "") + "%"
-        }
-             AND info  LIKE ${"%" + (query.filters.info ?? "") + "%"}`;
+            id === undefined
+          } OR id = $id ?? null}) AND (${deleted === undefined} OR deleted = ${
+          deleted ?? null
+        }) AND title LIKE ${"%" + (title ?? "") + "%"}
+             AND info  LIKE ${"%" + (info ?? "") + "%"}`;
       },
       {
         id: (q, o) =>

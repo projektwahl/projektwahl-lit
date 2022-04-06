@@ -63,6 +63,17 @@ export const usersHandler = requestHandler(
         "/api/v1/users" as const,
         query,
         (query) => {
+          const {
+            id,
+            username,
+            type,
+            project_leader_id,
+            force_in_project_id,
+            deleted,
+            ...rest
+          } = query.filters;
+          let _ = rest;
+          _ = 1; // ensure no property is missed - Don't use `{}` as a type. `{}` actually means "any non-nullish value".
           return sql`SELECT "id",
             "type",
             "username",
@@ -77,25 +88,19 @@ export const usersHandler = requestHandler(
                 : sql``
             }
             "deleted" FROM users_with_deleted WHERE (${
-              query.filters.id === undefined
-            } OR id = ${query.filters.id ?? null}) AND username LIKE ${
-            "%" + (query.filters.username ?? "") + "%"
+              id === undefined
+            } OR id = ${id ?? null}) AND username LIKE ${
+            "%" + (username ?? "") + "%"
           }
-           AND (${
-             query.filters.project_leader_id === undefined
-           } OR project_leader_id = ${query.filters.project_leader_id ?? null})
-           AND (${query.filters.deleted === undefined} OR deleted = ${
-            query.filters.deleted ?? null
-          }) 
-          AND (${
-            query.filters.force_in_project_id === undefined ||
-            !(loggedInUser.type === "admin" || loggedInUser.type === "helper")
-          } OR force_in_project_id = ${
-            query.filters.force_in_project_id ?? null
+          AND (${project_leader_id === undefined} OR project_leader_id = ${
+            project_leader_id ?? null
           })
-            AND (${query.filters.type === undefined} OR type = ${
-            query.filters.type ?? null
-          })`;
+          AND (${deleted === undefined} OR deleted = ${deleted ?? null})
+          AND (${
+            force_in_project_id === undefined ||
+            !(loggedInUser.type === "admin" || loggedInUser.type === "helper")
+          } OR force_in_project_id = ${force_in_project_id ?? null})
+            AND (${type === undefined} OR type = ${type ?? null})`;
         },
         {
           id: (q, o) => {
