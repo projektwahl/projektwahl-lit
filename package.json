@@ -66,6 +66,11 @@
     "esbuild-linux-64": "^0.14.32"
   },
   "optionalDependencies": {
-    
+    "@typescript-eslint/eslint-plugin": "^5.15.0",
+    "eslint": "^8.11.0",
+     "eslint-config-prettier": "^8.5.0",
+     "prettier": "^2.6.0",
+     "@lit/localize-tools": "^0.6.1",
+     "purgecss": "^4.1.3"
   }
 }
