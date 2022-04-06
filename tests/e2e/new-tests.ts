@@ -104,7 +104,9 @@ class FormTester {
     const element = await this.form.findElement(
       By.css(`input[name="${name}"]`)
     );
-    if (((await element.getAttribute("checked")) === "true") != value) {
+    console.log("selected: ", await element.isSelected())
+    console.log("expected: ", value)
+    if (await element.isSelected() != value) {
       await this.helper.click(element);
     }
   }
@@ -546,6 +548,7 @@ async function createUserAllFields(helper: Helper) {
 
   await form.setField("filters,id", id);
   await form.setField("filters,username", username2);
+  await form.checkField("filters,deleted", true);
 
   await helper.waitUntilLoaded();
 
@@ -660,6 +663,7 @@ async function createProjectAllFields(helper: Helper) {
 
   await form.setField("filters,id", id);
   await form.setField("filters,title", title2);
+  await form.checkField("filters,deleted", true);
 
   await helper.waitUntilLoaded();
 
