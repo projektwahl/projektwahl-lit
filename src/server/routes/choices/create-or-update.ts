@@ -31,7 +31,7 @@ import { typedSql } from "../../describe.js";
 export const updateChoiceHandler = createOrUpdateChoiceHandler(
   "/api/v1/choices/update",
   async (sql, choice, loggedInUser) => {
-    // Only allow updating your own choices. Later we could allow the admin to update somebody else's choices.
+    // TODO FIXME Only allow updating your own choices. Later we could allow the admin to update somebody else's choices.
     if (choice.rank === null) {
       return await typedSql(sql, {
         columns: {},
@@ -122,7 +122,6 @@ export function createOrUpdateChoiceHandler<P extends "/api/v1/choices/update">(
     } catch (error: unknown) {
       console.error(error);
       if (error instanceof postgres.PostgresError) {
-        // TODO FIXME do this everywhere else / unify
         const returnValue: [
           OutgoingHttpHeaders,
           ResponseType<"/api/v1/users/create-or-update">

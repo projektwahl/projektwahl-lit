@@ -26,7 +26,7 @@ import type { PendingQuery, SerializableParameter, Sql } from "postgres";
 // stack traces are garbage
 export function typedSql<R extends { [column: string]: number | null }>(
   sql: Sql<Record<string, never>>,
-  description: { /*types: Q;*/ columns: R }
+  description: { columns: R }
 ) {
   return async function test(
     template: TemplateStringsArray,
@@ -53,21 +53,12 @@ export function typedSql<R extends { [column: string]: number | null }>(
         columns: computed_column_types,
       };
 
-      /*for (let i = 0; i < description.types.length; i++) {
-        if (description.types[i] === null) {
-          computed_description.types[i] = null;
-        }
-      }*/
-
       for (const [key, value] of Object.entries(description.columns)) {
         if (value === null) {
           computed_description.columns[key] = null;
         }
       }
 
-      // console.log(computed_description);
-
-      // warning: types not checked any more
       deepStrictEqual(computed_description.columns, description.columns);
 
       return await sql<DescriptionTypes<R>[]>(template, ...args).execute();
@@ -92,15 +83,3 @@ export type DescriptionTypes<T> = {
     ? string
     : unknown;
 };
-/*
-const results = await typedSql(
-  sql,
-  description
-)`SELECT * FROM users WHERE id = ${1} AND away = ${false}`;
-
-console.log(results);
-
-console.log(results[0].type);
-
-await sql.end();
-*/

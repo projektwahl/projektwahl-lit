@@ -29,10 +29,6 @@ import type { OutgoingHttpHeaders } from "node:http";
 import { ZodIssueCode } from "zod";
 import { typedSql } from "../../describe.js";
 
-// TODO FIXME somehow ensure all attributes are read here because this is an easy way to loose data
-// Also ensure create and update has the same attributes
-// TO IMPROVE this maybe return the full column and also read back that data at all places
-
 export const createOrUpdateUsersHandler = requestHandler(
   "POST",
   "/api/v1/users/create-or-update",
@@ -101,8 +97,6 @@ export const createOrUpdateUsersHandler = requestHandler(
             if ("id" in user) {
               // TODO FIXME client should send their old values so we can compare and show an error if there are conflicts
 
-              // TODO FIXME clean this up like in entities.ts
-
               const finalQuery = tsql`UPDATE users_with_deleted SET
   ${user.username !== undefined ? sql`"username" = ${user.username},` : sql``}
   ${
@@ -151,8 +145,6 @@ export const createOrUpdateUsersHandler = requestHandler(
               }, ${user.deleted ?? false}, ${
                 loggedInUser.id
               }) RETURNING id, project_leader_id, force_in_project_id;`;
-
-              //console.log(await query.describe())
 
               results.push(await query);
             }

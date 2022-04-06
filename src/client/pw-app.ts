@@ -27,8 +27,6 @@ import { myFetch } from "./utils.js";
 import { Task } from "@lit-labs/task";
 import { msg, str } from "@lit/localize";
 
-// TODO FIXME show more details if possible (maybe error page)
-// TODO FIXME do this inline in the main page? In case it doesnt load so even on old browsers some error is shown
 window.addEventListener("error", function (event: ErrorEvent) {
   console.error("window.error", event.error);
   alert(`unknown error: ${String(event)} ${String(event.error)}`);
@@ -63,23 +61,6 @@ export const { getLocale, setLocale } = configureLocalization({
   loadLocale: async () => templates_de,
 });
 void setLocale(window.LANGUAGE ?? "en");
-
-// TODO FIXME create a pw-app directive that can be awaited on the server side.
-// so we actually get server side rendering with datae
-/*
-export const pwApp = async (url: URL) => {
-  let page = await nextPage(url);
-  return html`<pw-app .initial=${Promise.resolve(page)}></pw-app>`;
-};
-*/
-/*
-function identity<
-  T extends {
-    [r: string]: (url: URL) => Promise<TemplateResult<any>>;
-  }
->(v: T) {
-  return v;
-}*/
 
 const pages = {
   "^/privacy$": async () => {
@@ -186,14 +167,10 @@ export class PwApp extends PwElement {
 
   private popstateListener: (this: Window, ev: PopStateEvent) => void;
 
-  protected _apiTask!: Task<
-    [keyof typeof pages | undefined /*, HistoryState*/],
-    TemplateResult
-  >;
+  protected _apiTask!: Task<[keyof typeof pages | undefined], TemplateResult>;
 
   nextPage: ([key]: [
     keyof typeof pages | undefined
-    //HistoryState
   ]) => Promise<TemplateResult>;
 
   userController: LoggedInUserController;
@@ -218,11 +195,7 @@ export class PwApp extends PwElement {
   constructor() {
     super();
 
-    this.nextPage = async ([key /*, _*/]: [
-      keyof typeof pages | undefined
-      //HistoryState
-    ]) => {
-      //console.log("nextPage");
+    this.nextPage = async ([key]: [keyof typeof pages | undefined]) => {
       if (!this.hasUpdated) {
         if (this.initial) {
           return this.initial;
@@ -266,17 +239,13 @@ export class PwApp extends PwElement {
         const _a: keyof typeof pages | undefined = Object.keys(pages).find(
           (k) => new RegExp(k).test(this.history.url.pathname)
         );
-        const _b: [keyof typeof pages | undefined /*, HistoryState*/] = [
-          _a,
-          //this.history.state,
-        ];
+        const _b: [keyof typeof pages | undefined] = [_a];
         return _b;
       },
     });
   }
 
   override render() {
-    //console.log(`rerender pw-app ${Math.random()}`);
     return html`
       <style>
         :host {

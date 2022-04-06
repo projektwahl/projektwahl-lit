@@ -34,6 +34,8 @@ export const choicesHandler = requestHandler(
     // helper is allowed to read the normal data
     // voter is allowed to read the normal data
 
+    // TODO FIXME voters should only be allowed to read their own choices
+
     if (!loggedInUser) {
       const returnValue: [
         OutgoingHttpHeaders,
@@ -114,7 +116,6 @@ export const choicesHandler = requestHandler(
         })`;
       },
       {
-        // TODO FIXME nulls first/last
         rank: (q, o) =>
           sql`rank ${sql.unsafe(
             o === "backwards"

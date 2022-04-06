@@ -58,8 +58,6 @@ async function setupClient() {
         client_secret,
         redirect_uris: [`${process.env.BASE_URL}/redirect`],
         response_types: ["code"],
-        // id_token_signed_response_alg (default "RS256")
-        // token_endpoint_auth_method (default "client_secret_basic")
       });
     } catch (error) {
       console.error(error);
@@ -68,5 +66,3 @@ async function setupClient() {
 }
 
 export { setupClient, client };
-
-// ${process.env.BASE_URL}/api/v1/openid-login

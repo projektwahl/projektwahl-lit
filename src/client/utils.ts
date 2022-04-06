@@ -21,7 +21,6 @@ SPDX-License-Identifier: AGPL-3.0-or-later
 SPDX-FileCopyrightText: 2021 Moritz Hedtke <Moritz.Hedtke@t-online.de>
 */
 
-//import { ZodIssueCode } from "zod";
 import { MinimalSafeParseError, ResponseType, routes } from "../lib/routes.js";
 import jscookie from "js-cookie";
 import type { z } from "zod";
@@ -101,7 +100,6 @@ export const myFetch = async <P extends keyof typeof routes>(
       }
       return c;
     } else {
-      // TODO FIXME
       // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
       return json as MinimalSafeParseError;
     }

@@ -56,7 +56,7 @@ const rawUserCommon = {
 export const rawUserSchema = z
   .object({
     type: z.enum(["voter", "helper", "admin"]),
-    // TODO FIXME use discriminated union (but then we have problems with .pick again)
+    // we can't use a discriminated union because it doesn't work with .pick()
     group: z.string().min(0).max(100).nullable(),
     age: z.number().min(0).max(200).nullable(),
     ...rawUserCommon,
@@ -162,7 +162,7 @@ const baseQuery = <
       paginationDirection: z
         .enum(["forwards", "backwards"])
         .default("forwards"),
-      paginationCursor: s.partial().nullish(), // if this is null the start is at start/end depending on paginationDirection
+      paginationCursor: s.partial().nullish(),
       filters: s.partial(),
       sorting: sorting,
       paginationLimit: z.number().default(10),
@@ -248,7 +248,6 @@ export const returnUsers = rawUserSchema
     force_in_project_id: true,
   });
 
-// TODO FIXME possible strict by default?
 export const routes = {
   "/api/v1/logout": {
     request: z.any(),

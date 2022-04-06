@@ -63,7 +63,6 @@ export const usersHandler = requestHandler(
         "/api/v1/users" as const,
         query,
         (query) => {
-          // TODO FIXME voters shouldn't be allowed to select some of this here
           return sql`SELECT "id",
             "type",
             "username",
@@ -100,7 +99,6 @@ export const usersHandler = requestHandler(
         },
         {
           id: (q, o) => {
-            //console.log(`JOJOJOJ ${q} ${o}`);
             return sql`id ${sql.unsafe(
               o === "backwards"
                 ? q === "ASC"

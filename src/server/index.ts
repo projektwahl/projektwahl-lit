@@ -129,9 +129,6 @@ if (
       process.env.NODE_ENV === "testing"
     ) {
       cluster.worker?.on("message", (message) => {
-        //let getConnections = promisify(server.getConnections).bind(server)
-        //console.log(await getConnections())
-
         if (message === "shutdown") {
           console.log(`[${cluster.worker?.id ?? "unknown"}] Shutting down`);
           server.close();
@@ -145,14 +142,6 @@ if (
 }
 
 //repl.start({})
-
-// https://learning-notes.mistermicheels.com/javascript/typescript/runtime-type-checking/
-// https://www.azavea.com/blog/2020/10/29/run-time-type-checking-in-typescript-with-io-ts/
-// io-ts
-// https://github.com/colinhacks/zod
-// https://trpc.io/
-// https://www.npmjs.com/package/zod#comparison
-// https://www.npmjs.com/package/yup
 
 /*
 process.on("SIGINT", () => {

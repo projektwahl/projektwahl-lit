@@ -49,8 +49,7 @@ export const loginHandler = requestHandler(
 
     const dbUser = r[0];
 
-    // TODO FIXME this is vulnerable to side channel attacks
-    // but maybe it's fine because we want to tell the user whether the account exists
+    // this intentionally tells the user whether the account exists
     if (dbUser === undefined) {
       const returnValue: [OutgoingHttpHeaders, ResponseType<"/api/v1/login">] =
         [
@@ -152,8 +151,7 @@ export const loginHandler = requestHandler(
       } as const)`INSERT INTO sessions (user_id, session_id) VALUES (${dbUser.id}, ${session_id})`;
     });
 
-    /** @type {import("node:http2").OutgoingHttpHeaders} */
-    const headers: import("node:http2").OutgoingHttpHeaders = {
+    const headers: OutgoingHttpHeaders = {
       "content-type": "text/json; charset=utf-8",
       ":status": 200,
       "set-cookie": [
