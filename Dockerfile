@@ -8,7 +8,7 @@ USER node
 RUN curl -OL https://github.com/mozilla/geckodriver/releases/download/v0.30.0/geckodriver-v0.30.0-linux64.tar.gz
 RUN tar xf geckodriver-v0.30.0-linux64.tar.gz
 #RUN apt-get update && apt-get full-upgrade && apt-get install -y nano
-COPY --chown=node:node /opt/projektwahl-lit/package.json
+COPY --chown=node:node package.json /opt/projektwahl-lit/package.json
 RUN npm install
 CMD ["/bin/bash"]
 COPY . .
