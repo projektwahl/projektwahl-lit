@@ -85,10 +85,13 @@ export const usersHandler = requestHandler(
            AND (${
              query.filters.project_leader_id === undefined
            } OR project_leader_id = ${query.filters.project_leader_id ?? null})
-           AND (${
-             query.filters.force_in_project_id === undefined ||
-             !(loggedInUser.type === "admin" || loggedInUser.type === "helper")
-           } OR force_in_project_id = ${
+           AND (${query.filters.deleted === undefined} OR deleted = ${
+            query.filters.deleted ?? null
+          }) 
+          AND (${
+            query.filters.force_in_project_id === undefined ||
+            !(loggedInUser.type === "admin" || loggedInUser.type === "helper")
+          } OR force_in_project_id = ${
             query.filters.force_in_project_id ?? null
           })
             AND (${query.filters.type === undefined} OR type = ${
