@@ -214,8 +214,10 @@ export abstract class PwInput<
 
   protected willUpdate(changedProperties: Map<PropertyKey, unknown>): void {
     console.log("PW_INPUT", changedProperties);
-    if (changedProperties.has("initial")) {
+    if (this.resettable && changedProperties.has("initial")) {
       // this is a "hack" so that rerendering with new initial data resets the resettable fields.
+
+      console.log("BUG FIXME: this gets executed when it shouldn'T");
 
       // the input value contains the value that is shown to the user
       this.inputValue =

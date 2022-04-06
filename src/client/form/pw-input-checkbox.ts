@@ -26,12 +26,9 @@ import type { routes } from "../../lib/routes.js";
 import { PwInput } from "./pw-input.js";
 
 // workaround see https://github.com/runem/lit-analyzer/issues/149#issuecomment-1006162839
-export function pwInputCheckbox<
-  P extends keyof typeof routes,
-  T extends boolean | undefined
->(
+export function pwInputCheckbox<P extends keyof typeof routes>(
   props: Pick<
-    PwInputCheckbox<P, T>,
+    PwInputCheckbox<P>,
     | "type"
     | "autocomplete"
     | "disabled"
@@ -91,19 +88,21 @@ export function pwInputCheckbox<
   ></pw-input-checkbox>`;
 }
 
-export class PwInputCheckbox<
-  P extends keyof typeof routes,
-  T extends boolean | undefined
-> extends PwInput<P, T, HTMLInputElement> {
+export class PwInputCheckbox<P extends keyof typeof routes> extends PwInput<
+  P,
+  boolean | undefined,
+  HTMLInputElement
+> {
   static override get properties() {
     return {
       trueValue: { attribute: false },
+      falseValue: { attribute: false },
       ...super.properties,
     };
   }
 
-  falseValue!: T;
-  trueValue!: T;
+  falseValue!: boolean | undefined;
+  trueValue!: boolean | undefined;
 
   mypwinputchangeDispatcher = () => {
     if (!this.input.value) {
@@ -117,10 +116,11 @@ export class PwInputCheckbox<
       this.falseValue
     );*/
 
-    this.inputValue = this.input.value.checked
-      ? this.trueValue
-      : this.falseValue;
-    this.set(this.pwForm.formData, this.inputValue);
+    this.inputValue = this.input.value.checked;
+    this.set(
+      this.pwForm.formData,
+      this.inputValue ? this.trueValue : this.falseValue
+    );
 
     this.input.value?.dispatchEvent(
       new CustomEvent("refreshentitylist", {

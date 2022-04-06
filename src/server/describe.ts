@@ -21,25 +21,20 @@ SPDX-License-Identifier: AGPL-3.0-or-later
 SPDX-FileCopyrightText: 2021 Moritz Hedtke <Moritz.Hedtke@t-online.de>
 */
 import { deepStrictEqual } from "assert";
-import type { Sql } from "postgres";
-
-type NullableObject<Type> = {
-  [Property in keyof Type]: Type[Property] | null;
-};
+import type { PendingQuery, SerializableParameter, Sql } from "postgres";
 
 // stack traces are garbage
-export function typedSql<
-  Q extends readonly (number | null)[],
-  R extends { [column: string]: number | null }
->(sql: Sql<Record<string, never>>, description: { /*types: Q;*/ columns: R }) {
+export function typedSql<R extends { [column: string]: number | null }>(
+  sql: Sql<Record<string, never>>,
+  description: { /*types: Q;*/ columns: R }
+) {
   return async function test(
     template: TemplateStringsArray,
-    ...args: NullableObject<DescriptionTypes<Q>>
+    ...args: (SerializableParameter | PendingQuery<any>)[]
   ) {
     const err = new Error();
     try {
       const { types: computed_query_types, columns: computed_column_types_1 } =
-        // @ts-expect-error unknown
         await sql(template, ...args).describe();
 
       const computed_column_types: {
@@ -75,7 +70,6 @@ export function typedSql<
       // warning: types not checked any more
       deepStrictEqual(computed_description.columns, description.columns);
 
-      // @ts-expect-error unknown
       return await sql<DescriptionTypes<R>[]>(template, ...args).execute();
     } catch (error) {
       console.error(err);

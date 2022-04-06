@@ -42,6 +42,9 @@ import chrome from "selenium-webdriver/chrome.js";
 import firefox from "selenium-webdriver/firefox.js";
 import { installConsoleHandler } from "selenium-webdriver/lib/logging.js";
 import { sql } from "../../src/server/database.js";
+import { Chance } from "chance";
+
+let chance: Chance.Chance;
 
 const exec = promisify(unpromisifiedExec);
 
@@ -101,7 +104,9 @@ class FormTester {
     const element = await this.form.findElement(
       By.css(`input[name="${name}"]`)
     );
-    if (((await element.getAttribute("checked")) === "true") != value) {
+    console.log("selected: ", await element.isSelected());
+    console.log("expected: ", value);
+    if ((await element.isSelected()) != value) {
       await this.helper.click(element);
     }
   }
@@ -115,7 +120,7 @@ class FormTester {
     const element = await this.form.findElement(
       By.css(`input[name="${name}"]`)
     );
-    return await element.getAttribute("checked");
+    return await element.isSelected();
   }
 
   private async submit() {
@@ -238,6 +243,7 @@ async function runTest(
   browser: "firefox" | "chrome",
   testFunction: (helper: Helper) => Promise<void>
 ) {
+  chance = new Chance(1234);
   console.log("1");
   console.log(
     (
@@ -359,7 +365,7 @@ async function runTest(
         });
     */
   } catch (error) {
-    try {
+    /*try {
       // Needed for Chrome. Firefox throws here, will not implement.
       // https://github.com/mozilla/geckodriver/issues/284
       const entries = await driver.manage().logs().get(logging.Type.BROWSER);
@@ -369,7 +375,7 @@ async function runTest(
       });
     } catch (error) {
       // ignore
-    }
+    }*/
 
     console.error(error);
     const screenshot = await driver.takeScreenshot();
@@ -505,11 +511,11 @@ async function createUserAllFields(helper: Helper) {
   );
   let form = await helper.form("pw-user-create");
   const username = `username${crypto.getRandomValues(new Uint32Array(1))[0]}`;
-  const email = `email${Math.random()}`.substring(0, 15);
-  const group = `group${Math.random()}`.substring(0, 15);
-  const age = Math.floor(Math.random() * 10);
-  const away = Math.random() > 0.5 ? true : false;
-  const deleted = Math.random() > 0.5 ? true : false;
+  const email = `email${chance.integer()}`.substring(0, 15);
+  const group = `group${chance.integer()}`.substring(0, 15);
+  const age = chance.integer({ min: 0, max: 10 });
+  const away = chance.bool();
+  const deleted = chance.bool();
   await form.setField("0,username", username);
   await form.setField("0,openid_id", email);
   await form.setField("0,group", group);
@@ -527,8 +533,8 @@ async function createUserAllFields(helper: Helper) {
   assert.equal(await form.getField("0,openid_id"), email);
   assert.equal(await form.getField("0,group"), group);
   assert.equal(await form.getField("0,age"), `${age}`);
-  assert.equal((await form.getCheckboxField("0,away")) === "true", away);
-  assert.equal((await form.getCheckboxField("0,deleted")) === "true", deleted);
+  assert.equal(await form.getCheckboxField("0,away"), away);
+  assert.equal(await form.getCheckboxField("0,deleted"), deleted);
 
   const username2 = `username${crypto.getRandomValues(new Uint32Array(1))[0]}`;
   await form.resetField("0,username", username2);
@@ -540,6 +546,7 @@ async function createUserAllFields(helper: Helper) {
 
   form = await helper.form("pw-users");
 
+  await form.checkField("filters,deleted", true);
   await form.setField("filters,id", id);
   await form.setField("filters,username", username2);
 
@@ -553,8 +560,8 @@ async function createUserAllFields(helper: Helper) {
   assert.equal(await form.getField("0,openid_id"), email);
   assert.equal(await form.getField("0,group"), group);
   assert.equal(await form.getField("0,age"), `${age}`);
-  assert.equal((await form.getCheckboxField("0,away")) === "true", away);
-  assert.equal((await form.getCheckboxField("0,deleted")) === "true", deleted);
+  assert.equal(await form.getCheckboxField("0,away"), away);
+  assert.equal(await form.getCheckboxField("0,deleted"), deleted);
 
   // click edit button
   await helper.click(
@@ -586,8 +593,8 @@ async function createUserAllFields(helper: Helper) {
   assert.equal(await form.getField("0,openid_id"), "");
   assert.equal(await form.getField("0,group"), "");
   assert.equal(await form.getField("0,age"), "");
-  assert.equal((await form.getCheckboxField("0,away")) === "true", false);
-  assert.equal((await form.getCheckboxField("0,deleted")) === "true", false);
+  assert.equal(await form.getCheckboxField("0,away"), false);
+  assert.equal(await form.getCheckboxField("0,deleted"), false);
 }
 
 async function createProjectAllFields(helper: Helper) {
@@ -602,16 +609,16 @@ async function createProjectAllFields(helper: Helper) {
     await helper.driver.findElement(By.css(`a[href="/projects/create"]`))
   );
   let form = await helper.form("pw-project-create");
-  const title = `title${Math.random()}`;
-  const info = `info${Math.random()}`;
-  const place = `place${Math.random()}`;
-  const costs = Math.floor(Math.random() * 10);
-  const min_age = Math.floor(Math.random() * 10);
-  const max_age = Math.floor(Math.random() * 10);
-  const min_participants = Math.floor(Math.random() * 10) + 1;
-  const max_participants = Math.floor(Math.random() * 10) + 1;
-  const random_assignments = Math.random() > 0.5 ? true : false;
-  const deleted = Math.random() > 0.5 ? true : false;
+  const title = `title${chance.integer()}`;
+  const info = `info${chance.integer()}`;
+  const place = `place${chance.integer()}`;
+  const costs = chance.integer({ min: 0, max: 10 });
+  const min_age = chance.integer({ min: 0, max: 10 });
+  const max_age = chance.integer({ min: 0, max: 10 });
+  const min_participants = chance.integer({ min: 1, max: 10 });
+  const max_participants = chance.integer({ min: 1, max: 10 });
+  const random_assignments = chance.bool();
+  const deleted = chance.bool();
   await form.setField("title", title);
   await form.setTextareaField("info", info);
   await form.setField("place", place);
@@ -638,12 +645,12 @@ async function createProjectAllFields(helper: Helper) {
   assert.equal(await form.getField("min_participants"), `${min_participants}`);
   assert.equal(await form.getField("max_participants"), `${max_participants}`);
   assert.equal(
-    (await form.getCheckboxField("random_assignments")) === "true",
+    await form.getCheckboxField("random_assignments"),
     random_assignments
   );
-  assert.equal((await form.getCheckboxField("deleted")) === "true", deleted);
+  assert.equal(await form.getCheckboxField("deleted"), deleted);
 
-  const title2 = `title${Math.random()}`;
+  const title2 = `title${chance.integer()}`;
   await form.resetField("title", title2);
 
   await form.submitSuccess();
@@ -654,6 +661,7 @@ async function createProjectAllFields(helper: Helper) {
 
   form = await helper.form("pw-projects");
 
+  await form.checkField("filters,deleted", true);
   await form.setField("filters,id", id);
   await form.setField("filters,title", title2);
 
@@ -672,10 +680,10 @@ async function createProjectAllFields(helper: Helper) {
   assert.equal(await form.getField("min_participants"), `${min_participants}`);
   assert.equal(await form.getField("max_participants"), `${max_participants}`);
   assert.equal(
-    (await form.getCheckboxField("random_assignments")) === "true",
+    await form.getCheckboxField("random_assignments"),
     random_assignments
   );
-  assert.equal((await form.getCheckboxField("deleted")) === "true", deleted);
+  assert.equal(await form.getCheckboxField("deleted"), deleted);
 
   // click edit button
   await helper.click(
@@ -707,11 +715,8 @@ async function createProjectAllFields(helper: Helper) {
   assert.equal(await form.getField("max_age"), "13");
   assert.equal(await form.getField("min_participants"), "5");
   assert.equal(await form.getField("max_participants"), "15");
-  assert.equal(
-    (await form.getCheckboxField("random_assignments")) === "true",
-    false
-  );
-  assert.equal((await form.getCheckboxField("deleted")) === "true", false);
+  assert.equal(await form.getCheckboxField("random_assignments"), false);
+  assert.equal(await form.getCheckboxField("deleted"), false);
 }
 
 async function checkNotLoggedInUsers(helper: Helper) {
@@ -739,7 +744,7 @@ async function checkNotLoggedInProjects(helper: Helper) {
 }
 
 const randomFromArray = function <T>(array: T[]): T {
-  return array[Math.floor(Math.random() * array.length)];
+  return array[chance.integer({ min: 0, max: array.length - 1 })];
 };
 
 async function checkProjectSortingWorks(helper: Helper) {
@@ -752,7 +757,7 @@ async function checkProjectSortingWorks(helper: Helper) {
     );
     await helper.form("pw-projects");
 
-    for (let i = 0; i < Math.random() * 10; i++) {
+    for (let i = 0; i < chance.integer({ min: 1, max: 10 }); i++) {
       const randomOrderButton = randomFromArray(
         await helper.driver.findElements(By.css("pw-order button"))
       );
@@ -809,7 +814,7 @@ async function checkUsersSortingWorks(helper: Helper) {
   );
   await helper.form("pw-users");
 
-  for (let i = 0; i < Math.random() * 10; i++) {
+  for (let i = 0; i < chance.integer({ min: 1, max: 10 }); i++) {
     const randomOrderButton = randomFromArray(
       await helper.driver.findElements(By.css("pw-order button"))
     );
@@ -972,10 +977,10 @@ async function resettingUserWorks(helper: Helper) {
     await helper.driver.findElement(By.css(`a[href="/users/create"]`))
   );
   let form = await helper.form("pw-user-create");
-  const username = `username${crypto.getRandomValues(new Uint32Array(1))[0]}`;
-  const email = `email${Math.random()}`.substring(0, 15);
-  const away = Math.random() > 0.5 ? true : false;
-  const deleted = Math.random() > 0.5 ? true : false;
+  const username = `username${chance.integer()}`;
+  const email = `email${chance.integer()}`.substring(0, 15);
+  const away = chance.bool();
+  const deleted = chance.bool();
   await form.setField("0,username", username);
   await form.setField("0,openid_id", email);
 
@@ -1020,8 +1025,9 @@ async function resettingUserWorks(helper: Helper) {
   assert.equal(await form.getField("0,username"), username);
   assert.equal(await form.getField("0,openid_id"), email);
   assert.equal(await form.getField("0,type"), "admin");
-  assert.equal((await form.getCheckboxField("0,away")) === "true", away);
-  assert.equal((await form.getCheckboxField("0,deleted")) === "true", deleted);
+  assert.equal(await form.getCheckboxField("0,away"), away);
+  console.log(await form.getCheckboxField("0,deleted"));
+  assert.equal(await form.getCheckboxField("0,deleted"), deleted);
 }
 
 async function resettingProjectWorks(helper: Helper) {
@@ -1037,16 +1043,16 @@ async function resettingProjectWorks(helper: Helper) {
     await helper.driver.findElement(By.css(`a[href="/projects/create"]`))
   );
   let form = await helper.form("pw-project-create");
-  const title = `title${Math.random()}`;
-  const info = `info${Math.random()}`;
-  const place = `place${Math.random()}`;
-  const costs = Math.floor(Math.random() * 10);
-  const min_age = Math.floor(Math.random() * 10);
-  const max_age = Math.floor(Math.random() * 10);
-  const min_participants = Math.floor(Math.random() * 10) + 1;
-  const max_participants = Math.floor(Math.random() * 10) + 1;
-  const random_assignments = Math.random() > 0.5 ? true : false;
-  const deleted = Math.random() > 0.5 ? true : false;
+  const title = `title${chance.integer()}`;
+  const info = `info${chance.integer()}`;
+  const place = `place${chance.integer()}`;
+  const costs = chance.integer({ min: 0, max: 10 });
+  const min_age = chance.integer({ min: 0, max: 10 });
+  const max_age = chance.integer({ min: 0, max: 10 });
+  const min_participants = chance.integer({ min: 1, max: 10 });
+  const max_participants = chance.integer({ min: 1, max: 10 });
+  const random_assignments = chance.bool();
+  const deleted = chance.bool();
   await form.setField("title", title);
   await form.setTextareaField("info", info);
   await form.setField("place", place);
@@ -1097,10 +1103,10 @@ async function resettingProjectWorks(helper: Helper) {
   assert.equal(await form.getField("min_participants"), `${min_participants}`);
   assert.equal(await form.getField("max_participants"), `${max_participants}`);
   assert.equal(
-    (await form.getCheckboxField("random_assignments")) === "true",
+    await form.getCheckboxField("random_assignments"),
     random_assignments
   );
-  assert.equal((await form.getCheckboxField("deleted")) === "true", deleted);
+  assert.equal(await form.getCheckboxField("deleted"), deleted);
 }
 
 async function resettingUserWorks2(helper: Helper) {
@@ -1118,11 +1124,11 @@ async function resettingUserWorks2(helper: Helper) {
     );
     let form = await helper.form("pw-user-create");
     const username = `username${crypto.getRandomValues(new Uint32Array(1))[0]}`;
-    const email = `email${Math.random()}`.substring(0, 15);
-    const group = `group${Math.random()}`.substring(0, 15);
-    const age = Math.floor(Math.random() * 10);
-    const away = Math.random() > 0.5 ? true : false;
-    const deleted = Math.random() > 0.5 ? true : false;
+    const email = `email${chance.integer()}`.substring(0, 15);
+    const group = `group${chance.integer()}`.substring(0, 15);
+    const age = chance.integer({ min: 0, max: 10 });
+    const away = chance.bool();
+    const deleted = chance.bool();
     await form.setField("0,username", username);
     await form.setField("0,openid_id", email);
     await form.setField("0,group", group);
@@ -1173,8 +1179,8 @@ async function resettingUserWorks2(helper: Helper) {
     assert.equal(await form.getField("0,openid_id"), "");
     assert.equal(await form.getField("0,group"), "");
     assert.equal(await form.getField("0,age"), "");
-    assert.equal((await form.getCheckboxField("0,away")) === "true", false);
-    assert.equal((await form.getCheckboxField("0,deleted")) === "true", false);
+    assert.equal(await form.getCheckboxField("0,away"), false);
+    assert.equal(await form.getCheckboxField("0,deleted"), false);
   }
 }
 
@@ -1192,16 +1198,16 @@ async function resettingProjectWorks2(helper: Helper) {
       await helper.driver.findElement(By.css(`a[href="/projects/create"]`))
     );
     let form = await helper.form("pw-project-create");
-    const title = `title${Math.random()}`;
-    const info = `info${Math.random()}`;
-    const place = `place${Math.random()}`;
-    const costs = Math.floor(Math.random() * 10);
-    const min_age = Math.floor(Math.random() * 10);
-    const max_age = Math.floor(Math.random() * 10);
-    const min_participants = Math.floor(Math.random() * 10) + 1;
-    const max_participants = Math.floor(Math.random() * 10) + 1;
-    const random_assignments = Math.random() > 0.5 ? true : false;
-    const deleted = Math.random() > 0.5 ? true : false;
+    const title = `title${chance.integer()}`;
+    const info = `info${chance.integer()}`;
+    const place = `place${chance.integer()}`;
+    const costs = chance.integer({ min: 0, max: 10 });
+    const min_age = chance.integer({ min: 0, max: 10 });
+    const max_age = chance.integer({ min: 0, max: 10 });
+    const min_participants = chance.integer({ min: 1, max: 10 });
+    const max_participants = chance.integer({ min: 1, max: 10 });
+    const random_assignments = chance.bool();
+    const deleted = chance.bool();
     await form.setField("title", title);
     await form.setTextareaField("info", info);
     await form.setField("place", place);
@@ -1262,11 +1268,8 @@ async function resettingProjectWorks2(helper: Helper) {
     assert.equal(await form.getField("max_age"), "13");
     assert.equal(await form.getField("min_participants"), "5");
     assert.equal(await form.getField("max_participants"), "15");
-    assert.equal(
-      (await form.getCheckboxField("random_assignments")) === "true",
-      false
-    );
-    assert.equal((await form.getCheckboxField("deleted")) === "true", false);
+    assert.equal(await form.getCheckboxField("random_assignments"), false);
+    assert.equal(await form.getCheckboxField("deleted"), false);
   }
 }
 
@@ -1342,16 +1345,16 @@ async function testHelperCreatesProjectWithProjectLeadersAndMembers(
     await helper.driver.findElement(By.css(`a[href="/projects/create"]`))
   );
   let form = await helper.form("pw-project-create");
-  const title = `title${Math.random()}`;
-  const info = `info${Math.random()}`;
-  const place = `place${Math.random()}`;
-  const costs = Math.floor(Math.random() * 10);
-  const min_age = Math.floor(Math.random() * 10);
-  const max_age = Math.floor(Math.random() * 10);
-  const min_participants = Math.floor(Math.random() * 10) + 1;
-  const max_participants = Math.floor(Math.random() * 10) + 1;
-  const random_assignments = Math.random() > 0.5 ? true : false;
-  const deleted = Math.random() > 0.5 ? true : false;
+  const title = `title${chance.integer()}`;
+  const info = `info${chance.integer()}`;
+  const place = `place${chance.integer()}`;
+  const costs = chance.integer({ min: 0, max: 10 });
+  const min_age = chance.integer({ min: 0, max: 10 });
+  const max_age = chance.integer({ min: 0, max: 10 });
+  const min_participants = chance.integer({ min: 1, max: 10 });
+  const max_participants = chance.integer({ min: 1, max: 10 });
+  const random_assignments = chance.bool();
+  const deleted = chance.bool();
   await form.setField("title", title);
   await form.setTextareaField("info", info);
   await form.setField("place", place);

@@ -169,7 +169,7 @@ export const PwUserProjects = setupHmr(
 
           <tr>
             <th scope="col">
-              ${pwInputCheckbox<"/api/v1/projects", boolean | undefined>({
+              ${pwInputCheckbox<"/api/v1/projects">({
                 url: this.url,
                 label: null,
                 name: ["filters", "id"],
@@ -181,7 +181,7 @@ export const PwUserProjects = setupHmr(
                 task: this._task,
                 type: "checkbox",
                 trueValue: true,
-                falseValue: false,
+                falseValue: undefined,
                 defaultValue: undefined,
                 initial: initial,
                 resettable: false,

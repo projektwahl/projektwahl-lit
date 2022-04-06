@@ -37,16 +37,13 @@ export const sql = postgres(process.env["DATABASE_URL"], {
   }, // this seems to be a MAJOR performance issue
 });
 
-export async function retryableBegin(
+export async function retryableBegin<T>(
   options: string,
-  cb: (
-    tsql: TransactionSql<Record<string, never>>
-  ) =>
-    | postgres.RowList<postgres.Row[]>
-    | Promise<postgres.RowList<postgres.Row[]>>
-): Promise<postgres.RowList<postgres.Row[]>> {
+  cb: (tsql: TransactionSql<Record<string, never>>) => Promise<T>
+): Promise<T> {
   for (;;) {
     try {
+      // @ts-expect-error wrong typings in deps
       return await sql.begin(options, cb);
     } catch (error) {
       if (error instanceof postgres.PostgresError && error.code === "40001") {

@@ -351,10 +351,7 @@ class PwUserCreate extends PwForm<"/api/v1/users/create-or-update"> {
                               })}
                             `
                           : undefined}
-                        ${pwInputCheckbox<
-                          "/api/v1/users/create-or-update",
-                          boolean | undefined
-                        >({
+                        ${pwInputCheckbox<"/api/v1/users/create-or-update">({
                           url: this.url,
                           type: "checkbox",
                           trueValue: true,
@@ -369,10 +366,7 @@ class PwUserCreate extends PwForm<"/api/v1/users/create-or-update"> {
                           initial: value?.data,
                           resettable: value !== undefined,
                         })}
-                        ${pwInputCheckbox<
-                          "/api/v1/users/create-or-update",
-                          boolean | undefined
-                        >({
+                        ${pwInputCheckbox<"/api/v1/users/create-or-update">({
                           url: this.url,
                           type: "checkbox",
                           trueValue: true,

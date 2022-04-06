@@ -171,7 +171,7 @@ export const createOrUpdateUsersHandler = requestHandler(
         },
         {
           success: true as const,
-          // @ts-expect-error need to fix typedSql for dynamic queries
+          // @ts-expect-error bruh
           data: row,
         },
       ];

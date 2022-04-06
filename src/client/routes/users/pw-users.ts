@@ -36,10 +36,13 @@ import { pwInputText } from "../../form/pw-input-text.js";
 import { pwInputSelect } from "../../form/pw-input-select.js";
 import type { z } from "zod";
 import type { entityRoutes, routes } from "../../../lib/routes.js";
+import { pwInputCheckbox } from "../../form/pw-input-checkbox.js";
 
 const defaultValue: z.infer<typeof entityRoutes["/api/v1/users"]["request"]> = {
   sorting: [],
-  filters: {},
+  filters: {
+    deleted: false,
+  },
   paginationDirection: "forwards",
   paginationLimit: 100,
 };
@@ -151,6 +154,8 @@ export class PwUsers<X extends string> extends PwEntityList<
             })}
           </th>
 
+          <th class="table-cell-hover">${msg("Show deleted")}</th>
+
           <th class="table-cell-hover">${msg("Actions")}</th>
         </tr>
 
@@ -215,6 +220,21 @@ export class PwUsers<X extends string> extends PwEntityList<
             })}
           </th>
 
+          ${pwInputCheckbox<"/api/v1/users">({
+            url: this.url,
+            label: null,
+            name: ["filters", "deleted"],
+            get: (o) => o.filters.deleted,
+            set: (o, v) => (o.filters.deleted = v),
+            task: this._task,
+            type: "checkbox",
+            trueValue: undefined,
+            falseValue: false,
+            defaultValue: undefined,
+            initial: initial,
+            resettable: false,
+          })}
+
           <th scope="col"></th>
         </tr>`;
     } catch (error) {
@@ -276,6 +296,9 @@ export class PwUsers<X extends string> extends PwEntityList<
                           ? msg("Lehrer")
                           : msg("Schüler")}`}
                   </p>
+                </td>
+                <td>
+                  <p>${value.deleted ? msg("deleted") : ""}</p>
                 </td>
                 <td>
                   <a

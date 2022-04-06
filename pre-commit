@@ -4,6 +4,6 @@
 set -ex
 reuse lint
 docker build -t getting-started .
-docker run getting-started npm run format:check
+npm run format:check
 docker run getting-started npm run typecheck
-docker run getting-started npm run lint
+npm run lint
