@@ -77,20 +77,21 @@ export const usersHandler = requestHandler(
                 ? sql`"force_in_project_id",`
                 : sql``
             }
-            "deleted" FROM users_with_deleted WHERE (${!query.filters
-              .id} OR id = ${query.filters.id ?? null}) AND username LIKE ${
+            "deleted" FROM users_with_deleted WHERE (${
+              query.filters.id === undefined
+            } OR id = ${query.filters.id ?? null}) AND username LIKE ${
             "%" + (query.filters.username ?? "") + "%"
           }
-           AND (${!query.filters.project_leader_id} OR project_leader_id = ${
-            query.filters.project_leader_id ?? null
-          })
            AND (${
-             !query.filters.force_in_project_id ||
+             query.filters.project_leader_id === undefined
+           } OR project_leader_id = ${query.filters.project_leader_id ?? null})
+           AND (${
+             query.filters.force_in_project_id === undefined ||
              !(loggedInUser.type === "admin" || loggedInUser.type === "helper")
            } OR force_in_project_id = ${
             query.filters.force_in_project_id ?? null
           })
-            AND (${!query.filters.type} OR type = ${
+            AND (${query.filters.type === undefined} OR type = ${
             query.filters.type ?? null
           })`;
         },

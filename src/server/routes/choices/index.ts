@@ -105,11 +105,11 @@ export const choicesHandler = requestHandler(
           "choices"."user_id"
           FROM projects LEFT OUTER JOIN choices ON (projects.id = choices.project_id AND choices.user_id = ${
             loggedInUser.id
-          }) WHERE (${!query.filters.id} OR id = ${
+          }) WHERE (${query.filters.id === undefined} OR id = ${
           query.filters.id ?? null
         }) AND title LIKE ${"%" + (query.filters.title ?? "") + "%"}
              AND info LIKE ${"%" + (query.filters.info ?? "") + "%"}
-             AND (${!query.filters.rank} OR rank = ${
+             AND (${query.filters.rank === undefined} OR rank = ${
           query.filters.rank ?? null
         })`;
       },
