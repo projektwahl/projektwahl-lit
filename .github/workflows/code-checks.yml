@@ -27,14 +27,12 @@ jobs:
           node-version: ${{ matrix.node-version }}
           cache: "npm"
       - run: ls -R /opt/hostedtoolcache/node/
-      - run: cp dangerous-package.json package.json
-      - run: npm install
+      - run: npm ci --ignore-scripts
       - run: npm run format:check
       - run: ./node_modules/@dev.mohe/argon2/build.sh /opt/hostedtoolcache/node/$(node -v | cut -c2-)/x64/include/node
       - run: npm run build
       - run: npm run typecheck
       - run: npm run lint
       - run: npm run localize-extract
-      - run: git checkout -- package.json package-lock.json
       - run: git update-index --refresh
       - run: git diff-index --quiet HEAD --

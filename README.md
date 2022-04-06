@@ -49,6 +49,8 @@ sudo useradd -m projektwahl_staging_admin
 
 git clone https://github.com/projektwahl/projektwahl-lit.git
 cd projektwahl-lit/
+
+# this is important as our optional dependencies are not audited in comparison to the other dependencies
 npm ci --ignore-scripts --omit=optional
 touch key.pem cert.pem
 chown projektwahl_staging key.pem cert.pem
