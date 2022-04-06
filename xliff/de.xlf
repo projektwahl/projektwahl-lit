@@ -101,6 +101,9 @@
   <source>Type</source>
   <target>Typ</target>
 </trans-unit>
+<trans-unit id="s62292f98fbd239c1">
+  <source>Show deleted</source>
+</trans-unit>
 <trans-unit id="s8af61807443f32a4">
   <source>Actions</source>
   <target>Aktionen</target>
@@ -113,6 +116,9 @@
 </trans-unit>
 <trans-unit id="s461237cd996d9d4a">
   <source>Schüler</source>
+</trans-unit>
+<trans-unit id="s1f25e1e20469a9ea">
+  <source>deleted</source>
 </trans-unit>
 <trans-unit id="s199f5853f4e718f7">
   <source>Projects</source>
