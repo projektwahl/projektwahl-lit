@@ -31,7 +31,13 @@ type NullableObject<Type> = {
 export function typedSql<
   Q extends readonly (number | null)[],
   R extends { [column: string]: number | null }
->(sql: Sql<Record<string, never>>, description: { /*types: Q;*/ columns: R }) {
+>(
+  sql: Sql<Record<string, never>>,
+  description: { /*types: Q;*/ columns: R }
+): (
+  template: TemplateStringsArray,
+  ...args: NullableObject<DescriptionTypes<Q>>
+) => Promise<DescriptionTypes<R>[]> {
   return async function test(
     template: TemplateStringsArray,
     ...args: NullableObject<DescriptionTypes<Q>>

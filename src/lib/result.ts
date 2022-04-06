@@ -131,7 +131,7 @@ type entitiesType4 = {
 
 export function mappedFunctionCall2<R extends keyof typeof entityRoutes, U>(
   array: entitiesType15[R],
-  functio: (v: entitiesType4[R]) => U
+  functio: (v: entitiesType4[R]) => ReadonlyArray<U>
 ): Array<U> {
   return array.flatMap(functio);
 }
