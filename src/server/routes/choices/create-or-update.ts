@@ -32,14 +32,17 @@ export const updateChoiceHandler = createOrUpdateChoiceHandler(
   "/api/v1/choices/update",
   async (sql, choice, loggedInUser) => {
     // TODO FIXME Only allow updating your own choices. Later we could allow the admin to update somebody else's choices.
+    const { project_id, rank, ...rest } = choice;
+    let _ = rest;
+    _ = 1; // ensure no property is missed - Don't use `{}` as a type. `{}` actually means "any non-nullish value".
     if (choice.rank === null) {
       return await typedSql(sql, {
         columns: {},
-      } as const)`DELETE FROM choices WHERE user_id = ${loggedInUser.id} AND project_id = ${choice.project_id}`;
+      } as const)`DELETE FROM choices WHERE user_id = ${loggedInUser.id} AND project_id = ${project_id}`;
     } else {
       return await typedSql(sql, {
         columns: {},
-      } as const)`INSERT INTO choices (user_id, project_id, rank) VALUES (${loggedInUser.id}, ${choice.project_id}, ${choice.rank}) ON CONFLICT (user_id, project_id) DO UPDATE SET rank = ${choice.rank};`;
+      } as const)`INSERT INTO choices (user_id, project_id, rank) VALUES (${loggedInUser.id}, ${project_id}, ${rank}) ON CONFLICT (user_id, project_id) DO UPDATE SET rank = ${rank};`;
     }
   }
 );

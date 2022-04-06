@@ -35,19 +35,34 @@ export const createProjectsHandler = createOrUpdateProjectsHandler(
     project,
     loggedInUser: Exclude<z.infer<typeof userSchema>, undefined>
   ) => {
+    const {
+      title,
+      info,
+      place,
+      costs,
+      min_age,
+      max_age,
+      min_participants,
+      max_participants,
+      random_assignments,
+      deleted,
+      ...rest
+    } = project;
+    let _ = rest;
+    _ = 1; // ensure no property is missed - Don't use `{}` as a type. `{}` actually means "any non-nullish value".
     const res = await typedSql(sql, {
       columns: { id: 23 },
     } as const)`INSERT INTO projects_with_deleted (title, info, place, costs, min_age, max_age, min_participants, max_participants, random_assignments, deleted, last_updated_by)
             (SELECT 
-    ${project.title ?? null},
-    ${project.info ?? null},
-    ${project.place ?? null},
-    ${project.costs ?? 0},
-    ${project.min_age ?? null},
-    ${project.max_age ?? null},
-    ${project.min_participants ?? null},
-    ${project.max_participants ?? null},
-    ${project.random_assignments ?? false}, ${project.deleted ?? false}, ${
+    ${title ?? null},
+    ${info ?? null},
+    ${place ?? null},
+    ${costs ?? 0},
+    ${min_age ?? null},
+    ${max_age ?? null},
+    ${min_participants ?? null},
+    ${max_participants ?? null},
+    ${random_assignments ?? false}, ${deleted ?? false}, ${
       loggedInUser.id
     } FROM users_with_deleted WHERE users_with_deleted.id = ${
       loggedInUser.id
@@ -72,53 +87,59 @@ export const updateProjectsHandler = createOrUpdateProjectsHandler(
     project,
     loggedInUser: Exclude<z.infer<typeof userSchema>, undefined>
   ) => {
+    const {
+      id,
+      title,
+      info,
+      place,
+      costs,
+      min_age,
+      max_age,
+      min_participants,
+      max_participants,
+      random_assignments,
+      deleted,
+      ...rest
+    } = project;
+    let _ = rest;
+    _ = 1; // ensure no property is missed - Don't use `{}` as a type. `{}` actually means "any non-nullish value".
     const finalQuery = typedSql(sql, {
       columns: { id: 23 },
     } as const)`UPDATE projects_with_deleted SET
-    "title" = CASE WHEN ${project.title !== undefined} THEN ${
-      project.title ?? null
+    "title" = CASE WHEN ${title !== undefined} THEN ${
+      title ?? null
     } ELSE "projects_with_deleted"."title" END,
-    "info" = CASE WHEN ${project.info !== undefined} THEN ${
-      project.info ?? null
+    "info" = CASE WHEN ${info !== undefined} THEN ${
+      info ?? null
     } ELSE "projects_with_deleted"."info" END,
-    "place" = CASE WHEN ${project.place !== undefined} THEN ${
-      project.place ?? null
+    "place" = CASE WHEN ${place !== undefined} THEN ${
+      place ?? null
     } ELSE "projects_with_deleted"."place" END,
-    "costs" = CASE WHEN ${project.costs !== undefined} THEN ${
-      project.costs ?? null
+    "costs" = CASE WHEN ${costs !== undefined} THEN ${
+      costs ?? null
     } ELSE "projects_with_deleted"."costs" END,
-    "min_age" = CASE WHEN ${project.min_age !== undefined} THEN ${
-      project.min_age ?? null
+    "min_age" = CASE WHEN ${min_age !== undefined} THEN ${
+      min_age ?? null
     } ELSE "projects_with_deleted"."min_age" END,
-    "max_age" = CASE WHEN ${project.max_age !== undefined} THEN ${
-      project.max_age ?? null
+    "max_age" = CASE WHEN ${max_age !== undefined} THEN ${
+      max_age ?? null
     } ELSE "projects_with_deleted"."max_age" END,
-    "min_participants" = CASE WHEN ${
-      project.min_participants !== undefined
-    } THEN ${
-      project.min_participants ?? null
+    "min_participants" = CASE WHEN ${min_participants !== undefined} THEN ${
+      min_participants ?? null
     } ELSE "projects_with_deleted"."min_participants" END,
-    "max_participants" = CASE WHEN ${
-      project.max_participants !== undefined
-    } THEN ${
-      project.max_participants ?? null
+    "max_participants" = CASE WHEN ${max_participants !== undefined} THEN ${
+      max_participants ?? null
     } ELSE "projects_with_deleted"."max_participants" END,
-    "random_assignments" = CASE WHEN ${
-      project.random_assignments !== undefined
-    } THEN ${
-      project.random_assignments ?? null
+    "random_assignments" = CASE WHEN ${random_assignments !== undefined} THEN ${
+      random_assignments ?? null
     } ELSE "projects_with_deleted"."random_assignments" END,
-    "deleted" = CASE WHEN ${project.deleted !== undefined} THEN ${
-      project.deleted ?? null
+    "deleted" = CASE WHEN ${deleted !== undefined} THEN ${
+      deleted ?? null
     } ELSE "projects_with_deleted"."deleted" END,
 last_updated_by = ${loggedInUser.id}
-FROM users_with_deleted WHERE projects_with_deleted.id = ${
-      project.id
-    } AND users_with_deleted.id = ${
+FROM users_with_deleted WHERE projects_with_deleted.id = ${id} AND users_with_deleted.id = ${
       loggedInUser.id
-    } AND (users_with_deleted.project_leader_id = ${
-      project.id
-    } AND users_with_deleted.type = 'helper' OR users_with_deleted.type = 'admin') RETURNING projects_with_deleted.id;`;
+    } AND (users_with_deleted.project_leader_id = ${id} AND users_with_deleted.type = 'helper' OR users_with_deleted.type = 'admin') RETURNING projects_with_deleted.id;`;
 
     return await finalQuery;
   }
