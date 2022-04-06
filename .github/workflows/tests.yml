@@ -67,7 +67,7 @@ jobs:
       - run: |
           NODE_ENV=testing PORT=8443 BASE_URL=https://localhost:8443 DATABASE_URL=postgres://projektwahl_staging:projektwahl@localhost/projektwahl_staging CREDENTIALS_DIRECTORY=$PWD npm run server &
           chromedriver &
-          sleep 2 && NODE_ENV=testing DATABASE_URL=postgres://projektwahl_staging:projektwahl@localhost/projektwahl_staging BASE_URL=https://localhost:8443 npm test
+          sleep 2 && NODE_ENV=testing DATABASE_URL=postgres://projektwahl_staging:projektwahl@localhost/projektwahl_staging BASE_URL=https://localhost:8443 npm test-internal
       - name: Archive test screenshots
         if: always()
         uses: actions/upload-artifact@v3
