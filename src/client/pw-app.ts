@@ -21,7 +21,6 @@ SPDX-License-Identifier: AGPL-3.0-or-later
 SPDX-FileCopyrightText: 2021 Moritz Hedtke <Moritz.Hedtke@t-online.de>
 */
 import { html, noChange, ReactiveElement, TemplateResult } from "lit";
-import { bootstrapCss } from "./index.js";
 import { HistoryController, HistoryState } from "./history-controller.js";
 import { aClick } from "./pw-a.js";
 import { myFetch } from "./utils.js";
@@ -279,7 +278,6 @@ export class PwApp extends PwElement {
   override render() {
     //console.log(`rerender pw-app ${Math.random()}`);
     return html`
-      ${bootstrapCss}
       <style>
         :host {
           height: 100vh;

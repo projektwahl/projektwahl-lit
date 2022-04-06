@@ -22,7 +22,6 @@ SPDX-FileCopyrightText: 2021 Moritz Hedtke <Moritz.Hedtke@t-online.de>
 */
 import { html } from "lit";
 import { setupHmr } from "../hmr.js";
-import { bootstrapCss } from "../index.js";
 import { PwElement } from "../pw-element.js";
 
 export const PwEvaluation = setupHmr(
@@ -30,8 +29,6 @@ export const PwEvaluation = setupHmr(
   class PwEvaluation extends PwElement {
     protected render() {
       return html`
-        ${bootstrapCss}
-
         <div class="container">
           <h1 class="text-center">Wie funktioniert die Auswertung?</h1>
 
@@ -121,8 +118,6 @@ export const PwEvaluation = setupHmr(
             Altersbeschränkung etc. eingehalten ist). Dieses hat dann 4 Personen
             zu wenig, sodass dies als Hinweis angezeigt wird.
           </p>
-
-          <p>Beispiel 2:</p>
         </div>
       `;
     }

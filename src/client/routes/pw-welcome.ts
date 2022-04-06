@@ -23,7 +23,6 @@ SPDX-FileCopyrightText: 2021 Moritz Hedtke <Moritz.Hedtke@t-online.de>
 import { msg } from "@lit/localize";
 import { html } from "lit";
 import { setupHmr } from "../hmr.js";
-import { bootstrapCss } from "../index.js";
 import { PwElement } from "../pw-element.js";
 
 export const PwWelcome = setupHmr(
@@ -31,8 +30,6 @@ export const PwWelcome = setupHmr(
   class PwWelcome extends PwElement {
     protected render() {
       return html`
-        ${bootstrapCss}
-
         <div class="container">
           <h1 class="text-center">${msg("Welcome")}</h1>
 

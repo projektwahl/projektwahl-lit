@@ -33,7 +33,6 @@ import type {
   updateUserAction,
 } from "../../../lib/routes.js";
 import type { z } from "zod";
-import { bootstrapCss } from "../../index.js";
 import { createRef, Ref, ref } from "lit/directives/ref.js";
 import { pwInputText } from "../../form/pw-input-text.js";
 import { PwInputSelect, pwInputSelect } from "../../form/pw-input-select.js";
@@ -108,7 +107,6 @@ class PwUserCreate extends PwForm<"/api/v1/users/create-or-update"> {
       : msg("Create account");
   }
 
-  // TODO FIXME I think this also needs to be a task and then we need to add loading state here.
   initial:
     | z.SafeParseSuccess<z.infer<typeof updateUserAction>[]>
     | MinimalSafeParseError
@@ -193,8 +191,6 @@ class PwUserCreate extends PwForm<"/api/v1/users/create-or-update"> {
         throw new Error(msg("component not fully initialized"));
       }
 
-      //console.log("bro ", this.typeRef.value?.inputValue);
-
       return html` <div
           style="position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 1337;"
         >
@@ -229,8 +225,6 @@ class PwUserCreate extends PwForm<"/api/v1/users/create-or-update"> {
                         action="/no-javascript"
                         @submit=${async (event: Event) => {
                           event.preventDefault();
-
-                          //console.log("SUBMIT");
 
                           await this._task.run();
 
@@ -441,7 +435,7 @@ class PwUserCreate extends PwForm<"/api/v1/users/create-or-update"> {
                 </main>
               `;
             } else {
-              return html`${bootstrapCss}
+              return html`
               <main class="container">
                 <h1 class="text-center">${this.actionText}</h1>
                 

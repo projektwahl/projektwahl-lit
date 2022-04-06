@@ -27,7 +27,6 @@ import { Task, TaskStatus } from "@lit-labs/task";
 import { entityRoutes, ResponseType } from "../../lib/routes.js";
 import { z } from "zod";
 import { PwForm } from "../form/pw-form.js";
-import { bootstrapCss } from "../index.js";
 import { msg } from "@lit/localize";
 import { ifDefined } from "lit/directives/if-defined.js";
 import { myFetch } from "../utils.js";
@@ -236,7 +235,6 @@ export class PwEntityList<
     //console.log("taskk", this._task);
 
     return html`
-      ${bootstrapCss}
       <main class="container">
         <h1 class="text-center">${this.title}</h1>
 

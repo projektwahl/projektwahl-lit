@@ -22,7 +22,6 @@ SPDX-FileCopyrightText: 2021 Moritz Hedtke <Moritz.Hedtke@t-online.de>
 */
 import { html, literal } from "lit/static-html.js";
 import { noChange } from "lit";
-import { bootstrapCss } from "../index.js";
 import { ifDefined } from "lit/directives/if-defined.js";
 import { msg } from "@lit/localize";
 import { createRef, Ref, ref } from "lit/directives/ref.js";
@@ -252,7 +251,7 @@ export abstract class PwInput<
     }
 
     return html`
-      ${bootstrapCss}
+      
       <div class="col mb-3">
       ${
         this.type !== "checkbox" && this.label !== null

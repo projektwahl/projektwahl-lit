@@ -28,7 +28,6 @@ import { PwForm } from "../../form/pw-form.js";
 import { HistoryController } from "../../history-controller.js";
 import { msg } from "@lit/localize";
 import "../../form/pw-input.js";
-import { bootstrapCss } from "../../index.js";
 import { ref } from "lit/directives/ref.js";
 import { pwInputText } from "../../form/pw-input-text.js";
 
@@ -91,7 +90,6 @@ class PwLogin extends PwForm<"/api/v1/login"> {
     }
 
     return html`
-      ${bootstrapCss}
       <main class="container">
         <h1 class="text-center">${this.actionText}</h1>
 
