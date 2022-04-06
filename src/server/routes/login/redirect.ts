@@ -67,7 +67,7 @@ export const openidRedirectHandler = requestHandler(
       const dbUser = await sql.begin(async (tsql) => {
         await tsql`SELECT set_config('projektwahl.type', 'root', true);`;
         return (
-          await typedSql(sql, {
+          await typedSql(tsql, {
             columns: {
               id: 23,
               username: 1043,
