@@ -112,91 +112,22 @@ class PwRankSelect extends PwElement {
         })}
 
         <div class="btn-group" role="group" aria-label="Basic example">
-          <!--TODO FIXME foreach?-->
-          <button
-            @click=${async () => {
-              await this._task.run([1]);
-            }}
-            ?disabled=${this.disabled}
-            type="button"
-            class="btn ${this.disabled
-              ? "btn-secondary"
-              : this.choice.rank == 1
-              ? "btn-primary"
-              : "btn-outline-primary"}"
-          >
-            1
-          </button>
-          <button
-            @click=${async () => {
-              await this._task.run([2]);
-            }}
-            ?disabled=${this.disabled}
-            type="button"
-            class="btn ${this.disabled
-              ? "btn-secondary"
-              : this.choice.rank == 2
-              ? "btn-primary"
-              : "btn-outline-primary"}"
-          >
-            2
-          </button>
-          <button
-            @click=${async () => {
-              await this._task.run([3]);
-            }}
-            ?disabled=${this.disabled}
-            type="button"
-            class="btn ${this.disabled
-              ? "btn-secondary"
-              : this.choice.rank == 3
-              ? "btn-primary"
-              : "btn-outline-primary"}"
-          >
-            3
-          </button>
-          <button
-            @click=${async () => {
-              await this._task.run([4]);
-            }}
-            ?disabled=${this.disabled}
-            type="button"
-            class="btn ${this.disabled
-              ? "btn-secondary"
-              : this.choice.rank == 4
-              ? "btn-primary"
-              : "btn-outline-primary"}"
-          >
-            4
-          </button>
-          <button
-            @click=${async () => {
-              await this._task.run([5]);
-            }}
-            ?disabled=${this.disabled}
-            type="button"
-            class="btn ${this.disabled
-              ? "btn-secondary"
-              : this.choice.rank == 5
-              ? "btn-primary"
-              : "btn-outline-primary"}"
-          >
-            5
-          </button>
-          <button
-            @click=${async () => {
-              await this._task.run([0]);
-            }}
-            ?disabled=${this.disabled}
-            type="button"
-            class="btn ${this.disabled
-              ? "btn-secondary"
-              : this.choice.rank == null
-              ? "btn-primary"
-              : "btn-outline-primary"}"
-          >
-            X
-          </button>
+          ${[1, 2, 3, 4, 5, 0].map(
+            (v) => html`<button
+              @click=${async () => {
+                await this._task.run([v]);
+              }}
+              ?disabled=${this.disabled}
+              type="button"
+              class="btn ${this.disabled
+                ? "btn-secondary"
+                : this.choice.rank === (v === 0 ? null : v)
+                ? "btn-primary"
+                : "btn-outline-primary"}"
+            >
+              ${v === 0 ? "X" : v}
+            </button>`
+          )}
         </div>
       </form>`;
   }

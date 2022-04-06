@@ -180,11 +180,6 @@ export abstract class PwInput<
     this.input = createRef();
   }
 
-  // because forms in shadow root are garbage
-  protected override createRenderRoot() {
-    return this;
-  }
-
   abstract mypwinputchangeDispatcher: () => void;
 
   override connectedCallback() {
@@ -217,14 +212,9 @@ export abstract class PwInput<
     if (this.resettable && changedProperties.has("initial")) {
       // this is a "hack" so that rerendering with new initial data resets the resettable fields.
 
-      console.log("BUG FIXME: this gets executed when it shouldn'T");
-
       // the input value contains the value that is shown to the user
       this.inputValue =
         this.initial !== undefined ? this.get(this.initial) : this.defaultValue;
-
-      // TODO FIXME this may create an infinite loop if the initial is always changing
-      //console.log("BUG: potential infinite loop pw-input initial updated.");
 
       // in case this is an update set the value to undefined as it wasn't changed yet.
       this.set(
@@ -240,7 +230,6 @@ export abstract class PwInput<
   }
 
   override render() {
-    //console.log(`pw-input rerender`);
     if (this.label === undefined || this.task === undefined) {
       throw new Error(msg("component not fully initialized"));
     }
@@ -249,9 +238,6 @@ export abstract class PwInput<
       // TODO FIXME updated from above
       this.inputValue =
         this.initial !== undefined ? this.get(this.initial) : this.defaultValue;
-
-      // TODO FIXME this may create an infinite loop if the initial is always changing
-      //console.log("BUG: potential infinite loop pw-input initial updated.");
 
       // in case this is an update set the value to undefined as it wasn't changed yet.
       this.set(
@@ -265,7 +251,6 @@ export abstract class PwInput<
       );
     }
 
-    // https://getbootstrap.com/docs/5.1/forms/validation/
     return html`
       ${bootstrapCss}
       <div class="col mb-3">
@@ -278,7 +263,6 @@ export abstract class PwInput<
       }
       <div class="${this.type !== "checkbox" ? "input-group" : ""}">
         <${
-          /** maybe this is the issue for live update? */
           this.type === "select"
             ? literal`select`
             : this.type === "textarea"
@@ -353,7 +337,6 @@ export abstract class PwInput<
       this.resettable && !this.disabled
         ? html`<button
             @click=${() => {
-              //console.log("reset", this.get(this.initial));
               this.inputValue =
                 this.initial !== undefined
                   ? this.get(this.initial)
@@ -363,7 +346,6 @@ export abstract class PwInput<
                 // @ts-expect-error tmp error
                 this.initial !== undefined ? undefined : this.defaultValue
               );
-              //console.log(this.pwForm.formData);
               this.requestUpdate();
             }}
             class="btn btn-outline-secondary"

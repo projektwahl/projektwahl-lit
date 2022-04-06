@@ -76,8 +76,6 @@ export const parseRequestWithPrefix = <
       decodeURIComponent(url.search == "" ? "{}" : url.search.substring(1))
     )
   );
-  /*const a: z.infer<z.ZodObject<{[k in PREFIX]: typeof entityRoutes[P]["request"]}, "strict", z.ZodTypeAny, {[k in PREFIX]:  z.infer<typeof entityRoutes[P]["request"]>}, Record<string, unknown>>>[PREFIX] = data[prefix];
-  const b: z.infer<typeof entityRoutes[P]["request"]> = a;*/
   return data;
 };
 
@@ -320,17 +318,7 @@ export class PwEntityList<
                     <a
                       @click=${async (e: Event) => {
                         e.preventDefault();
-                        /*
-                        if (!data[this.prefix]) {
-                          mappedIndexingSet(data, this.prefix, {
-                            filters: {},
-                            paginationDirection: "forwards",
-                            paginationLimit: 100,
-                            sorting: [],
-                            paginationCursor: null,
-                          });
-                        }
-*/
+
                         if (this._task.value?.success) {
                           this.formData.paginationCursor =
                             this._task.value?.data.previousCursor;
@@ -373,18 +361,6 @@ export class PwEntityList<
                     <a
                       @click=${async (e: Event) => {
                         e.preventDefault();
-
-                        /*
-                        if (!data[this.prefix]) {
-                          mappedIndexingSet(data, this.prefix, {
-                            filters: {},
-                            paginationDirection: "forwards",
-                            paginationLimit: 100,
-                            sorting: [],
-                            paginationCursor: null,
-                          });
-                        }
-*/
 
                         if (this._task.value?.success) {
                           this.formData.paginationCursor =
