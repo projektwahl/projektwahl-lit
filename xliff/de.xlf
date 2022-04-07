@@ -44,25 +44,9 @@
   <source>Third-party login</source>
   <target>Schulaccount-Anmeldung</target>
 </trans-unit>
-<trans-unit id="sc8da3cc71de63832">
-  <source>Login</source>
-  <target>Anmelden</target>
-</trans-unit>
-<trans-unit id="s0561a43eeaf34c64">
-  <source>Login with third party account</source>
-  <target>Mit Schulaccount anmelden</target>
-</trans-unit>
-<trans-unit id="s8bfdcea2687691c2">
-  <source>Login as guest</source>
-  <target>Als Gast anmelden</target>
-</trans-unit>
-<trans-unit id="s03f42eea72154959">
-  <source>Username</source>
-  <target>Accountname</target>
-</trans-unit>
-<trans-unit id="sf6e1665c7022a1f8">
-  <source>Password</source>
-  <target>Passwort</target>
+<trans-unit id="s416ccf81fded518c">
+  <source>sort by <x id="0" equiv-text="${this.title}"/></source>
+  <target>Nach <x id="0" equiv-text="${this.title}"/> sortieren</target>
 </trans-unit>
 <trans-unit id="s724828a10b3dd581">
   <source>navigation of user list</source>
@@ -76,58 +60,6 @@
   <source>next page</source>
   <target>Nächste Seite</target>
 </trans-unit>
-<trans-unit id="s416ccf81fded518c">
-  <source>sort by <x id="0" equiv-text="${this.title}"/></source>
-  <target>Nach <x id="0" equiv-text="${this.title}"/> sortieren</target>
-</trans-unit>
-<trans-unit id="s586d6bd2eca2da93">
-  <source>Users</source>
-  <target>Accounts</target>
-</trans-unit>
-<trans-unit id="s0c97387dc725a9e2">
-  <source>Create account</source>
-  <target>Account erstellen</target>
-</trans-unit>
-<trans-unit id="s49067479a7417f00">
-  <source>Import accounts</source>
-  <target>Accounts importieren</target>
-</trans-unit>
-<trans-unit id="s09240e07b5b8d640">
-  <source>ID</source>
-  <target>ID</target>
-</trans-unit>
-<trans-unit id="sef49aec68fd1dc66">
-  <source>Name</source>
-  <target>Name</target>
-</trans-unit>
-<trans-unit id="sd2223afb7d6b100d">
-  <source>Type</source>
-  <target>Typ</target>
-</trans-unit>
-<trans-unit id="s62292f98fbd239c1">
-  <source>Show deleted</source>
-  <target>gelöschte anzeigen</target>
-</trans-unit>
-<trans-unit id="s8af61807443f32a4">
-  <source>Actions</source>
-  <target>Aktionen</target>
-</trans-unit>
-<trans-unit id="saae1c70e168b45b4">
-  <source>Admin</source>
-  <target>Admin</target>
-</trans-unit>
-<trans-unit id="s38c268c406e1b02b">
-  <source>Lehrer</source>
-  <target>Lehrer</target>
-</trans-unit>
-<trans-unit id="s461237cd996d9d4a">
-  <source>Schüler</source>
-  <target>Schüler</target>
-</trans-unit>
-<trans-unit id="s1f25e1e20469a9ea">
-  <source>deleted</source>
-  <target>gelöscht</target>
-</trans-unit>
 <trans-unit id="s199f5853f4e718f7">
   <source>Projects</source>
   <target>Projekte</target>
@@ -135,6 +67,10 @@
 <trans-unit id="sfb43be2359ccab14">
   <source>Create project</source>
   <target>Projekt erstellen</target>
+</trans-unit>
+<trans-unit id="s09240e07b5b8d640">
+  <source>ID</source>
+  <target>ID</target>
 </trans-unit>
 <trans-unit id="s99f110d27e30b289">
   <source>Title</source>
@@ -144,6 +80,18 @@
   <source>Info</source>
   <target>Info</target>
 </trans-unit>
+<trans-unit id="s62292f98fbd239c1">
+  <source>Show deleted</source>
+  <target>gelöschte anzeigen</target>
+</trans-unit>
+<trans-unit id="s8af61807443f32a4">
+  <source>Actions</source>
+  <target>Aktionen</target>
+</trans-unit>
+<trans-unit id="s1f25e1e20469a9ea">
+  <source>deleted</source>
+  <target>gelöscht</target>
+</trans-unit>
 <trans-unit id="s88608c78750c1b37">
   <source>View account</source>
   <target>Account anzeigen</target>
@@ -151,6 +99,14 @@
 <trans-unit id="sa86d79c867c8f453">
   <source>Update account</source>
   <target>Account aktualisieren</target>
+</trans-unit>
+<trans-unit id="s0c97387dc725a9e2">
+  <source>Create account</source>
+  <target>Account erstellen</target>
+</trans-unit>
+<trans-unit id="s03f42eea72154959">
+  <source>Username</source>
+  <target>Accountname</target>
 </trans-unit>
 <trans-unit id="s7039d8b5b12742f7">
   <source>Third-party email address</source>
@@ -167,6 +123,10 @@
 <trans-unit id="sf9b8d419a00f04bc">
   <source>Age</source>
   <target>Jahrgang</target>
+</trans-unit>
+<trans-unit id="sf6e1665c7022a1f8">
+  <source>Password</source>
+  <target>Passwort</target>
 </trans-unit>
 <trans-unit id="sececb48b4688a29b">
   <source>Away</source>
@@ -187,6 +147,34 @@
 <trans-unit id="s1987d6c1bbe105e3">
   <source>Guaranteed project member in</source>
   <target>Garantierte Projektmitglieder</target>
+</trans-unit>
+<trans-unit id="s586d6bd2eca2da93">
+  <source>Users</source>
+  <target>Accounts</target>
+</trans-unit>
+<trans-unit id="s49067479a7417f00">
+  <source>Import accounts</source>
+  <target>Accounts importieren</target>
+</trans-unit>
+<trans-unit id="sef49aec68fd1dc66">
+  <source>Name</source>
+  <target>Name</target>
+</trans-unit>
+<trans-unit id="sd2223afb7d6b100d">
+  <source>Type</source>
+  <target>Typ</target>
+</trans-unit>
+<trans-unit id="saae1c70e168b45b4">
+  <source>Admin</source>
+  <target>Admin</target>
+</trans-unit>
+<trans-unit id="s38c268c406e1b02b">
+  <source>Lehrer</source>
+  <target>Lehrer</target>
+</trans-unit>
+<trans-unit id="s461237cd996d9d4a">
+  <source>Schüler</source>
+  <target>Schüler</target>
 </trans-unit>
 <trans-unit id="s5daa9183e1169f88">
   <source>.json Datei</source>
@@ -247,6 +235,18 @@
 <trans-unit id="s9841212bd35bac27">
   <source>Rank</source>
   <target>Priorität</target>
+</trans-unit>
+<trans-unit id="sc8da3cc71de63832">
+  <source>Login</source>
+  <target>Anmelden</target>
+</trans-unit>
+<trans-unit id="s0561a43eeaf34c64">
+  <source>Login with third party account</source>
+  <target>Mit Schulaccount anmelden</target>
+</trans-unit>
+<trans-unit id="s8bfdcea2687691c2">
+  <source>Login as guest</source>
+  <target>Als Gast anmelden</target>
 </trans-unit>
 <trans-unit id="hc66aaa662761137a">
   <source>Not Found</source>
