@@ -420,28 +420,27 @@ class PwUserCreate extends PwForm<"/api/v1/users/create-or-update"> {
 
                         ${value?.data[0].action == "update"
                           ? html`${pwUserProjects({
-                                refreshentitylist: () => {
-                                  // TODO FIXME this may let you loose data?
-                                  // I think it doesnt but not sure
-                                  void this.initialTask.run();
-                                },
-                                user: value?.data[0],
-                                name: "project_leader_id",
-                                title: msg("Project leader in"),
-                                prefix: "leaders"
-                              })}
-
-                              ${pwUserProjects({
-                                refreshentitylist: () => {
-                                  // TODO FIXME this may let you loose data?
-                                  // I think it doesnt but not sure
-                                  void this.initialTask.run();
-                                },
-                                user: value?.data[0],
-                                name: "force_in_project_id",
-                                title: msg("Guaranteed project member in"),
-                                prefix: "members"
-                              })}`
+                              refreshentitylist: () => {
+                                // TODO FIXME this may let you loose data?
+                                // I think it doesnt but not sure
+                                void this.initialTask.run();
+                              },
+                              user: value?.data[0],
+                              name: "project_leader_id",
+                              title: msg("Project leader in"),
+                              prefix: "leaders",
+                            })}
+                            ${pwUserProjects({
+                              refreshentitylist: () => {
+                                // TODO FIXME this may let you loose data?
+                                // I think it doesnt but not sure
+                                void this.initialTask.run();
+                              },
+                              user: value?.data[0],
+                              name: "force_in_project_id",
+                              title: msg("Guaranteed project member in"),
+                              prefix: "members",
+                            })}`
                           : undefined}
                       </form>
                     </div>

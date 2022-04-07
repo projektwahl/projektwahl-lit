@@ -258,7 +258,7 @@ class PwChoices<X extends string> extends PwEntityList<"/api/v1/choices", X> {
                   <td>
                     ${pwRankSelect({
                       // TODO FIXME this should error
-                      choice: value
+                      choice: value,
                     })}
                   </td>
                 </tr>`

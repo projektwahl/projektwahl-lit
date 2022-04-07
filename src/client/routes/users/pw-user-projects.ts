@@ -271,7 +271,7 @@ export class PwUserProjects<X extends string> extends PwProjects<X> {
                     type: "radio",
                     projectId: value.id,
                     user: this.user,
-                    name: this.name
+                    name: this.name,
                   })}
                 </td>
                 <th scope="row">

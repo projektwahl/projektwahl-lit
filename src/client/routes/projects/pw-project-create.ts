@@ -440,8 +440,9 @@ export class PwProjectCreate extends PwForm<
                             projectId: value.data.id,
                             name: "project_leader_id",
                             title: msg("Project leaders"),
-                            prefix: "leaders"
-                        }) : html``}
+                            prefix: "leaders",
+                          })
+                        : html``}
                       ${value &&
                       (this.userController.type === "admin" ||
                         this.userController.type === "helper")
@@ -449,8 +450,8 @@ export class PwProjectCreate extends PwForm<
                             projectId: value.data.id,
                             name: "force_in_project_id",
                             title: msg("Guaranteed project members"),
-                            prefix: "members"
-                        })
+                            prefix: "members",
+                          })
                         : html``}
                     </form>
                   </div>
