@@ -49,16 +49,6 @@ const defaultValue: z.infer<typeof entityRoutes["/api/v1/users"]["request"]> = {
   paginationLimit: 100,
 };
 
-export const pwProjectUsersPreloaded = async (url: URL, prefix: string) => {
-  const result = await taskFunction("/api/v1/users", url, prefix, defaultValue);
-  return pwProjectUsers({
-    // TODO FIXME
-    projectId: null,
-    initial: result,
-    prefix,
-  });
-};
-
 // workaround see https://github.com/runem/lit-analyzer/issues/149#issuecomment-1006162839
 export function pwProjectUsers<X extends string>(
   props: Pick<

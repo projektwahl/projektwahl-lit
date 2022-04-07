@@ -85,7 +85,7 @@ const taskFunction = async ([id]: [number]) => {
       success: true as const,
       data:
         response.data.entities.length == 1
-          ? [{ action: "update", ...response.data.entities[0] }]
+          ? [{ action: "update" as const, ...response.data.entities[0] }]
           : [],
     };
   }
@@ -163,7 +163,6 @@ class PwUserCreate extends PwForm<"/api/v1/users/create-or-update"> {
       return result;
     });
 
-    // @ts-expect-error TODO fix this
     this.initialTask = new Task(
       this,
       async () => {

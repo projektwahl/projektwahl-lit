@@ -52,20 +52,6 @@ const defaultValue: z.infer<
   paginationLimit: 100,
 };
 
-export const pwUserProjectsPreloaded = async (url: URL, prefix: string) => {
-  const result = await taskFunction(
-    "/api/v1/projects",
-    url,
-    prefix,
-    defaultValue
-  );
-  return pwUserProjects({
-    user: undefined, // TODO FIXME
-    initial: result,
-    prefix: prefix,
-  });
-};
-
 // workaround see https://github.com/runem/lit-analyzer/issues/149#issuecomment-1006162839
 export function pwUserProjects<X extends string>(
   props: Pick<PwUserProjects<X>, "initial" | "prefix" | "user"> & {
