@@ -33,14 +33,9 @@ import { PwElement } from "../../pw-element.js";
 
 // workaround see https://github.com/runem/lit-analyzer/issues/149#issuecomment-1006162839
 export function pwProjectUserCheckbox(
-  props: Pick<
-    PwProjectUserCheckbox,
-    never
-  >
+  props: Pick<PwProjectUserCheckbox, never>
 ) {
-  const {
-    ...rest
-  } = props;
+  const { ...rest } = props;
   let _ = rest;
   _ = 1; // ensure no property is missed - Don't use `{}` as a type. `{}` actually means "any non-nullish value".
   return html`<pw-project-user-checkbox></pw-project-user-checkbox>`;

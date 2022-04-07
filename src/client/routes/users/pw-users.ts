@@ -56,28 +56,18 @@ export const pwUsersPreloaded = async (url: URL) => {
   );
   return pwUsers({
     initial: result,
-    prefix: "users"
+    prefix: "users",
   });
 };
 
 // workaround see https://github.com/runem/lit-analyzer/issues/149#issuecomment-1006162839
 export function pwUsers<X extends string>(
-  props: Pick<
-    PwUsers<X>,
-    "initial" | "prefix"
-  >
+  props: Pick<PwUsers<X>, "initial" | "prefix">
 ) {
-  const {
-    initial,
-    prefix,
-    ...rest
-  } = props;
+  const { initial, prefix, ...rest } = props;
   let _ = rest;
   _ = 1; // ensure no property is missed - Don't use `{}` as a type. `{}` actually means "any non-nullish value".
-  return html`<pw-users
-  .initial=${initial}
-  .prefix=${prefix}
-  ></pw-users>`;
+  return html`<pw-users .initial=${initial} .prefix=${prefix}></pw-users>`;
 }
 
 export class PwUsers<X extends string> extends PwEntityList<

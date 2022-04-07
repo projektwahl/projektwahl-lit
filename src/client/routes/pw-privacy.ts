@@ -24,15 +24,8 @@ import { html } from "lit";
 import { PwElement } from "../pw-element.js";
 
 // workaround see https://github.com/runem/lit-analyzer/issues/149#issuecomment-1006162839
-export function pwPrivacy(
-  props: Pick<
-    PwPrivacy,
-    never
-  >
-) {
-  const {
-    ...rest
-  } = props;
+export function pwPrivacy(props: Pick<PwPrivacy, never>) {
+  const { ...rest } = props;
   let _ = rest;
   _ = 1; // ensure no property is missed - Don't use `{}` as a type. `{}` actually means "any non-nullish value".
   return html`<pw-privacy></pw-privacy>`;

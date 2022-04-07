@@ -65,272 +65,261 @@ export const pwUserProjectsPreloaded = async (url: URL, prefix: string) => {
 
 // workaround see https://github.com/runem/lit-analyzer/issues/149#issuecomment-1006162839
 export function pwUserProjects<X extends string>(
-  props: Pick<
-    PwProjects<X>,
-    "initial" | "prefix"
-  >
+  props: Pick<PwProjects<X>, "initial" | "prefix">
 ) {
-  const {
-    initial,
-    prefix,
-    ...rest
-  } = props;
+  const { initial, prefix, ...rest } = props;
   let _ = rest;
   _ = 1; // ensure no property is missed - Don't use `{}` as a type. `{}` actually means "any non-nullish value".
   return html`<pw-user-projects
-  .initial=${initial}
-  .prefix=${prefix}
+    .initial=${initial}
+    .prefix=${prefix}
   ></pw-user-projects>`;
 }
 
 export class PwUserProjects<X extends string> extends PwProjects<X> {
-    static override get properties() {
-      return {
-        ...super.properties,
-        user: { attribute: false },
-        name: { type: String },
-      };
+  static override get properties() {
+    return {
+      ...super.properties,
+      user: { attribute: false },
+      name: { type: String },
+    };
+  }
+
+  constructor() {
+    super();
+
+    this.defaultValue = defaultValue;
+  }
+
+  name!: "project_leader_id" | "force_in_project_id";
+
+  user!: z.infer<
+    typeof routes["/api/v1/users"]["response"]
+  >["entities"][number];
+
+  override get buttons() {
+    return html``;
+  }
+
+  override get head() {
+    if (this.user === undefined) {
+      throw new Error("this.user not set");
     }
 
-    constructor() {
-      super();
+    try {
+      const data = parseRequestWithPrefix(
+        this.url,
+        this.prefix,
+        this.history.url,
+        defaultValue
+      );
 
-      this.defaultValue = defaultValue;
-    }
+      const initial = data[this.prefix];
 
-    name!: "project_leader_id" | "force_in_project_id";
+      return html`<tr>
+          <th class="table-cell-hover p-0" scope="col">
+            ${pwOrder({
+              url: "/api/v1/projects",
+              name: ["sorting", `${this.name}_eq`],
+              orderBy: `${this.name}_eq`,
+              prefix: this.prefix,
+              title: "",
+              value: this.user[this.name] ?? null,
+              get: (o) => o.sorting,
+              set: (o, v) => (o.sorting = v),
+              initial,
+              defaultValue: [],
+            })}
+          </th>
 
-    user!: z.infer<
-      typeof routes["/api/v1/users"]["response"]
-    >["entities"][number];
+          <th class="table-cell-hover p-0" scope="col">
+            ${pwOrder({
+              url: "/api/v1/projects",
+              name: ["sorting", "id"],
+              orderBy: "id",
+              prefix: this.prefix,
+              title: msg("ID"),
+              value: null,
+              get: (o) => o.sorting,
+              set: (o, v) => (o.sorting = v),
+              initial,
+              defaultValue: [],
+            })}
+          </th>
 
-    override get buttons() {
-      return html``;
-    }
+          <th class="table-cell-hover p-0" scope="col">
+            ${pwOrder({
+              url: "/api/v1/projects",
+              name: ["sorting", "title"],
+              orderBy: "title",
+              prefix: this.prefix,
+              title: msg("Title"),
+              value: null,
+              get: (o) => o.sorting,
+              set: (o, v) => (o.sorting = v),
+              initial,
+              defaultValue: [],
+            })}
+          </th>
 
-    override get head() {
-      if (this.user === undefined) {
-        throw new Error("this.user not set");
-      }
+          <th class="table-cell-hover p-0" scope="col">
+            ${pwOrder({
+              url: "/api/v1/projects",
+              name: ["sorting", "info"],
+              orderBy: "info",
+              prefix: this.prefix,
+              title: msg("Info"),
+              value: null,
+              get: (o) => o.sorting,
+              set: (o, v) => (o.sorting = v),
+              initial,
+              defaultValue: [],
+            })}
+          </th>
+        </tr>
 
-      try {
-        const data = parseRequestWithPrefix(
-          this.url,
-          this.prefix,
-          this.history.url,
-          defaultValue
-        );
+        <tr>
+          <th scope="col">
+            ${pwInputCheckbox<"/api/v1/projects">({
+              url: this.url,
+              label: null,
+              name: ["filters", "id"],
+              get: (o) => o.filters.id == this.user[this.name],
+              set: (o, v) =>
+                (o.filters.id = v
+                  ? this.user[this.name] ?? undefined
+                  : undefined),
+              task: this._task,
+              type: "checkbox",
+              trueValue: true,
+              falseValue: undefined,
+              defaultValue: undefined,
+              initial: initial,
+              resettable: false,
+            })}
+          </th>
 
-        const initial = data[this.prefix];
+          <th scope="col">
+            ${pwInputNumber<"/api/v1/projects", number | undefined>({
+              enabled: true,
+              url: this.url,
+              label: null,
+              name: ["filters", "id"],
+              get: (o) => o.filters.id,
+              set: (o, v) => (o.filters.id = v),
+              task: this._task,
+              type: "number",
+              defaultValue: undefined,
+              initial,
+              resettable: false,
+            })}
+          </th>
 
-        return html`<tr>
-            <th class="table-cell-hover p-0" scope="col">
-              ${pwOrder({
-                url: "/api/v1/projects",
-                name: ["sorting", `${this.name}_eq`],
-                orderBy: `${this.name}_eq`,
-                prefix: this.prefix,
-                title: "",
-                value: this.user[this.name] ?? null,
-                get: (o) => o.sorting,
-                set: (o, v) => (o.sorting = v),
-                initial,
-                defaultValue: [],
-              })}
-            </th>
+          <th scope="col">
+            ${pwInputText<"/api/v1/projects", string | undefined>({
+              enabled: true,
+              url: this.url,
+              label: null,
+              name: ["filters", "title"],
+              get: (o) => o.filters.title,
+              set: (o, v) => (o.filters.title = v),
+              task: this._task,
+              type: "text",
+              initial,
+              defaultValue: undefined,
+              resettable: false,
+            })}
+          </th>
 
-            <th class="table-cell-hover p-0" scope="col">
-              ${pwOrder({
-                url: "/api/v1/projects",
-                name: ["sorting", "id"],
-                orderBy: "id",
-                prefix: this.prefix,
-                title: msg("ID"),
-                value: null,
-                get: (o) => o.sorting,
-                set: (o, v) => (o.sorting = v),
-                initial,
-                defaultValue: [],
-              })}
-            </th>
+          <th scope="col">
+            ${pwInputText<"/api/v1/projects", string | undefined>({
+              enabled: true,
+              url: this.url,
+              label: null,
+              name: ["filters", "info"],
+              get: (o) => o.filters.info,
+              set: (o, v) => (o.filters.info = v),
+              task: this._task,
+              type: "text",
+              initial,
+              defaultValue: undefined,
+              resettable: false,
+            })}
+          </th>
 
-            <th class="table-cell-hover p-0" scope="col">
-              ${pwOrder({
-                url: "/api/v1/projects",
-                name: ["sorting", "title"],
-                orderBy: "title",
-                prefix: this.prefix,
-                title: msg("Title"),
-                value: null,
-                get: (o) => o.sorting,
-                set: (o, v) => (o.sorting = v),
-                initial,
-                defaultValue: [],
-              })}
-            </th>
-
-            <th class="table-cell-hover p-0" scope="col">
-              ${pwOrder({
-                url: "/api/v1/projects",
-                name: ["sorting", "info"],
-                orderBy: "info",
-                prefix: this.prefix,
-                title: msg("Info"),
-                value: null,
-                get: (o) => o.sorting,
-                set: (o, v) => (o.sorting = v),
-                initial,
-                defaultValue: [],
-              })}
-            </th>
-          </tr>
-
-          <tr>
-            <th scope="col">
-              ${pwInputCheckbox<"/api/v1/projects">({
-                url: this.url,
-                label: null,
-                name: ["filters", "id"],
-                get: (o) => o.filters.id == this.user[this.name],
-                set: (o, v) =>
-                  (o.filters.id = v
-                    ? this.user[this.name] ?? undefined
-                    : undefined),
-                task: this._task,
-                type: "checkbox",
-                trueValue: true,
-                falseValue: undefined,
-                defaultValue: undefined,
-                initial: initial,
-                resettable: false,
-              })}
-            </th>
-
-            <th scope="col">
-              ${pwInputNumber<"/api/v1/projects", number | undefined>({
-                enabled: true,
-                url: this.url,
-                label: null,
-                name: ["filters", "id"],
-                get: (o) => o.filters.id,
-                set: (o, v) => (o.filters.id = v),
-                task: this._task,
-                type: "number",
-                defaultValue: undefined,
-                initial,
-                resettable: false,
-              })}
-            </th>
-
-            <th scope="col">
-              ${pwInputText<"/api/v1/projects", string | undefined>({
-                enabled: true,
-                url: this.url,
-                label: null,
-                name: ["filters", "title"],
-                get: (o) => o.filters.title,
-                set: (o, v) => (o.filters.title = v),
-                task: this._task,
-                type: "text",
-                initial,
-                defaultValue: undefined,
-                resettable: false,
-              })}
-            </th>
-
-            <th scope="col">
-              ${pwInputText<"/api/v1/projects", string | undefined>({
-                enabled: true,
-                url: this.url,
-                label: null,
-                name: ["filters", "info"],
-                get: (o) => o.filters.info,
-                set: (o, v) => (o.filters.info = v),
-                task: this._task,
-                type: "text",
-                initial,
-                defaultValue: undefined,
-                resettable: false,
-              })}
-            </th>
-
-            <th scope="col"></th>
-          </tr>`;
-      } catch (error) {
-        console.error(error);
-        return html`<div class="alert alert-danger" role="alert">
-          Ungültige URL! Bitte melden Sie diesen Fehler.
-        </div>`;
-      }
-    }
-
-    override get body() {
-      return html`${this._task.render({
-        pending: () => {
-          return noChange;
-        },
-        complete: (result) => {
-          return result.success
-            ? result.data.entities.map(
-                (value) => html`<tr>
-                  <td>
-                    <pw-project-user-checkbox
-                      type="radio"
-                      .projectId=${value.id}
-                      .user=${this.user}
-                      name=${this.name}
-                    ></pw-project-user-checkbox>
-                  </td>
-                  <th scope="row">
-                    <p>
-                      ${value.deleted
-                        ? html`<del
-                            ><a
-                              @click=${aClick}
-                              href="/projects/view/${value.id}"
-                              >${value.id}</a
-                            ></del
-                          >`
-                        : html`<a
-                            @click=${aClick}
-                            href="/projects/view/${value.id}"
-                            >${value.id}</a
-                          >`}
-                    </p>
-                  </th>
-                  <td>
-                    <p>
-                      ${value.deleted
-                        ? html`<del
-                            ><a
-                              @click=${aClick}
-                              href="/projects/view/${value.id}"
-                              >${value.title}</a
-                            ></del
-                          >`
-                        : html`<a
-                            @click=${aClick}
-                            href="/projects/view/${value.id}"
-                            >${value.title}</a
-                          >`}
-                    </p>
-                  </td>
-                  <td>
-                    <p>
-                      ${value.deleted
-                        ? html`<del>${value.info}</del>`
-                        : html`${value.info}`}
-                    </p>
-                  </td>
-                </tr>`
-              )
-            : result.error;
-        },
-        initial: () => {
-          return html`initial state`;
-        },
-      })}`;
+          <th scope="col"></th>
+        </tr>`;
+    } catch (error) {
+      console.error(error);
+      return html`<div class="alert alert-danger" role="alert">
+        Ungültige URL! Bitte melden Sie diesen Fehler.
+      </div>`;
     }
   }
+
+  override get body() {
+    return html`${this._task.render({
+      pending: () => {
+        return noChange;
+      },
+      complete: (result) => {
+        return result.success
+          ? result.data.entities.map(
+              (value) => html`<tr>
+                <td>
+                  <pw-project-user-checkbox
+                    type="radio"
+                    .projectId=${value.id}
+                    .user=${this.user}
+                    name=${this.name}
+                  ></pw-project-user-checkbox>
+                </td>
+                <th scope="row">
+                  <p>
+                    ${value.deleted
+                      ? html`<del
+                          ><a @click=${aClick} href="/projects/view/${value.id}"
+                            >${value.id}</a
+                          ></del
+                        >`
+                      : html`<a
+                          @click=${aClick}
+                          href="/projects/view/${value.id}"
+                          >${value.id}</a
+                        >`}
+                  </p>
+                </th>
+                <td>
+                  <p>
+                    ${value.deleted
+                      ? html`<del
+                          ><a @click=${aClick} href="/projects/view/${value.id}"
+                            >${value.title}</a
+                          ></del
+                        >`
+                      : html`<a
+                          @click=${aClick}
+                          href="/projects/view/${value.id}"
+                          >${value.title}</a
+                        >`}
+                  </p>
+                </td>
+                <td>
+                  <p>
+                    ${value.deleted
+                      ? html`<del>${value.info}</del>`
+                      : html`${value.info}`}
+                  </p>
+                </td>
+              </tr>`
+            )
+          : result.error;
+      },
+      initial: () => {
+        return html`initial state`;
+      },
+    })}`;
+  }
+}
 
 customElements.define("pw-user-projects", PwUserProjects);
