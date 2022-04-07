@@ -193,17 +193,21 @@ class Helper {
   }
 
   async waitUntilLoaded() {
-    const loadingIndicator = await this.driver.wait(
-      until.elementLocated(By.css(".spinner-grow")),
-      5000,
-      `.spinner-grow not found`
-    );
+    try {
+      const loadingIndicator = await this.driver.wait(
+        until.elementLocated(By.css(".spinner-grow")),
+        5000,
+        `.spinner-grow not found`
+      );
 
-    await this.driver.wait(
-      until.stalenessOf(loadingIndicator),
-      10000,
-      "waitUntilLoaded"
-    );
+      await this.driver.wait(
+        until.stalenessOf(loadingIndicator),
+        10000,
+        "waitUntilLoaded"
+      );
+    } catch (error) {
+      throw new Error("spinner-grow failed");
+    }
   }
 
   async waitElem(name: string) {
@@ -1371,7 +1375,8 @@ async function testHelperCreatesProjectWithProjectLeadersAndMembers(
   await helper.waitUntilLoaded();
   form = await helper.form("pw-project-create");
 
-  await helper.waitUntilLoaded();
+  await helper.driver.sleep(5000);
+  //await helper.waitUntilLoaded();
   //await helper.waitUntilLoaded();
 
   await helper.click(

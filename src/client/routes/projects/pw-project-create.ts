@@ -108,6 +108,22 @@ export class PwProjectCreate extends PwForm<
     };
   }
 
+  protected willUpdate(changedProperties: Map<PropertyKey, unknown>): void {
+    super.willUpdate(changedProperties)
+    if (this.hasUpdated && changedProperties.has("initial")) {
+      console.log("THIS HERE2", this.initial);
+
+      // because fields are resettable we need to set this to undefined
+
+      // @ts-expect-error impossible
+      this.formData = {
+        ...(this.initial?.success
+          ? { id: this.initial.data.id }
+          : { id: undefined }), // TODO FIXME
+      };
+    }
+  }
+
   override get actionText() {
     return this.disabled
       ? msg("View project")
@@ -166,6 +182,7 @@ export class PwProjectCreate extends PwForm<
       this,
       async () => {
         if (!this.hasUpdated) {
+          // TODO FIXME normally this undefined data here would be sent
           if (this.initial !== undefined) {
             return this.initial;
           }
@@ -183,7 +200,10 @@ export class PwProjectCreate extends PwForm<
 
   override render() {
     if (!this.hasUpdated) {
+      console.log("THIS HERE", this.initial);
       // @ts-expect-error impossible
+
+      // TODO FIXME maybe replace by hidden input?
       this.formData = {
         ...(this.initial?.success
           ? { id: this.initial.data.id }
@@ -245,6 +265,7 @@ export class PwProjectCreate extends PwForm<
                         get: (o) => o.title,
                         set: (o, v) => (o.title = v),
                         task: this._task,
+                        // setting it like this is probably suboptimal as resettable is probably not working like that
                         initial: value?.data,
                         defaultValue: "",
                         resettable: value !== undefined,
