@@ -61,23 +61,20 @@ export function pwProjectCreate(
 }
 
 const taskFunction = async ([id]: [number]) => {
-  const [_, response] = await Promise.all([
-    import("../projects/pw-project-users.js"),
-    await myFetch<"/api/v1/projects">(
-      "GET",
-      `/api/v1/projects`,
-      {
-        filters: {
-          id,
-        },
-        paginationCursor: null,
-        paginationDirection: "forwards",
-        paginationLimit: 100,
-        sorting: [],
+  const response = await myFetch<"/api/v1/projects">(
+    "GET",
+    `/api/v1/projects`,
+    {
+      filters: {
+        id,
       },
-      {}
-    ),
-  ]);
+      paginationCursor: null,
+      paginationDirection: "forwards",
+      paginationLimit: 100,
+      sorting: [],
+    },
+    {}
+  );
   if (response.success) {
     return {
       success: true as const,
