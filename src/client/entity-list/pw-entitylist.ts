@@ -111,7 +111,7 @@ export class PwEntityList<
       },
       initial: { attribute: false },
       debouncedUrl: { state: true },
-      prefix: { type: String },
+      prefix: { attribute: false },
     };
   }
 

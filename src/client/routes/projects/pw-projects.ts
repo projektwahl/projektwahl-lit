@@ -49,15 +49,38 @@ const defaultValue: z.infer<
   paginationLimit: 100,
 };
 
-export const pwProjects = async (url: URL) => {
+export const pwProjectsPreloaded = async (url: URL) => {
   const result = await taskFunction(
     "/api/v1/projects",
     url,
     "projects",
     defaultValue
   );
-  return html`<pw-projects .initial=${result} prefix="projects"></pw-projects>`;
+  return pwProjects({
+    initial: result,
+    prefix: "projects",
+  });
 };
+
+// workaround see https://github.com/runem/lit-analyzer/issues/149#issuecomment-1006162839
+export function pwProjects<X extends string>(
+  props: Pick<
+    PwProjects<X>,
+    "initial" | "prefix"
+  >
+) {
+  const {
+    initial,
+    prefix,
+    ...rest
+  } = props;
+  let _ = rest;
+  _ = 1; // ensure no property is missed - Don't use `{}` as a type. `{}` actually means "any non-nullish value".
+  return html`<pw-projects
+  .initial=${initial}
+  .prefix=${prefix}
+  ></pw-projects>`;
+}
 
 export class PwProjects<X extends string> extends PwEntityList<
   "/api/v1/projects",

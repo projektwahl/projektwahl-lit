@@ -43,11 +43,32 @@ import "./pw-user-projects.js";
 
 export async function pwUser(id: number, viewOnly = false) {
   const result = await taskFunction([id]);
-  // TODO FIXME the types aren't checked correctly here - maybe they are with lit-analyzer
+  return pwUserCreate({
+    disabled: viewOnly,
+    initial: result,
+    url: "/api/v1/users/create-or-update"
+  });
+}
+
+// workaround see https://github.com/runem/lit-analyzer/issues/149#issuecomment-1006162839
+export function pwUserCreate(
+  props: Pick<
+    PwUserCreate,
+    "disabled" | "initial" | "url"
+  >
+) {
+  const {
+    disabled,
+    initial,
+    url,
+    ...rest
+  } = props;
+  let _ = rest;
+  _ = 1; // ensure no property is missed - Don't use `{}` as a type. `{}` actually means "any non-nullish value".
   return html`<pw-user-create
-    ?disabled=${viewOnly}
-    .initial=${result}
-    uri="/api/v1/users/create-or-update"
+  ?disabled=${disabled}
+  .initial=${initial}
+  .url=${url}
   ></pw-user-create>`;
 }
 

@@ -37,13 +37,34 @@ import { pwInputCheckbox } from "../../form/pw-input-checkbox.js";
 import { aClick } from "../../pw-a.js";
 import { LoggedInUserController } from "../../user-controller.js";
 
-export async function pwProject(id: number, viewOnly = false) {
+export async function pwProjectCreatePreloaded(id: number, viewOnly = false) {
   const result = await taskFunction([id]);
-  // TODO FIXME typecheck
+  return pwProjectCreate({
+    disabled: viewOnly,
+    initial: result,
+    url: "/api/v1/projects/update",
+  })
+}
+
+// workaround see https://github.com/runem/lit-analyzer/issues/149#issuecomment-1006162839
+export function pwProjectCreate(
+  props: Pick<
+    PwProjectCreate,
+    "disabled" | "initial" | "url"
+  >
+) {
+  const {
+    disabled,
+    initial,
+    url,
+    ...rest
+  } = props;
+  let _ = rest;
+  _ = 1; // ensure no property is missed - Don't use `{}` as a type. `{}` actually means "any non-nullish value".
   return html`<pw-project-create
-    ?disabled=${viewOnly}
-    .initial=${result}
-    .url=${"/api/v1/projects/update"}
+  ?disabled=${disabled}
+  .initial=${initial}
+  .url=${url}
   ></pw-project-create>`;
 }
 
@@ -74,9 +95,7 @@ const taskFunction = async ([id]: [number]) => {
   return response;
 };
 
-export const PwProjectCreate = setupHmr(
-  "PwProjectCreate",
-  class PwProjectCreate extends PwForm<
+export class PwProjectCreate extends PwForm<
     "/api/v1/projects/create" | "/api/v1/projects/update"
   > {
     static override get properties() {
@@ -470,6 +489,5 @@ export const PwProjectCreate = setupHmr(
         })}`;
     }
   }
-);
 
 customElements.define("pw-project-create", PwProjectCreate);

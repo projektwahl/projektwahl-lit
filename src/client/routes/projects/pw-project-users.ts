@@ -49,17 +49,35 @@ const defaultValue: z.infer<typeof entityRoutes["/api/v1/users"]["request"]> = {
   paginationLimit: 100,
 };
 
-export const pwProjectUsers = async (url: URL, prefix: string) => {
+export const pwProjectUsersPreloaded = async (url: URL, prefix: string) => {
   const result = await taskFunction("/api/v1/users", url, prefix, defaultValue);
-  return html`<pw-project-users
-    .initial=${result}
-    prefix=${prefix}
-  ></pw-project-users>`;
+  return pwProjectUsers({
+    initial: result,
+    prefix
+  });
 };
 
-export const PwProjectUsers = setupHmr(
-  "PwProjectUsers",
-  class PwProjectUsers<X extends string> extends PwUsers<X> {
+// workaround see https://github.com/runem/lit-analyzer/issues/149#issuecomment-1006162839
+export function pwProjectUsers<X extends string>(
+  props: Pick<
+    PwProjectUsers<X>,
+    "initial" | "prefix"
+  >
+) {
+  const {
+    initial,
+    prefix,
+    ...rest
+  } = props;
+  let _ = rest;
+  _ = 1; // ensure no property is missed - Don't use `{}` as a type. `{}` actually means "any non-nullish value".
+  return html`<pw-project-users
+  .initial=${initial}
+  .prefix=${prefix}
+  ></pw-project-users>`;
+}
+
+export class PwProjectUsers<X extends string> extends PwUsers<X> {
     static override get properties() {
       return {
         ...super.properties,
@@ -308,6 +326,5 @@ export const PwProjectUsers = setupHmr(
       })}`;
     }
   }
-);
 
 customElements.define("pw-project-users", PwProjectUsers);

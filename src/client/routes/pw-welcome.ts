@@ -25,9 +25,23 @@ import { html } from "lit";
 import { setupHmr } from "../hmr.js";
 import { PwElement } from "../pw-element.js";
 
-export const PwWelcome = setupHmr(
-  "PwWelcome",
-  class PwWelcome extends PwElement {
+// workaround see https://github.com/runem/lit-analyzer/issues/149#issuecomment-1006162839
+export function pwWelcome(
+  props: Pick<
+    PwWelcome,
+    never
+  >
+) {
+  const {
+    ...rest
+  } = props;
+  let _ = rest;
+  _ = 1; // ensure no property is missed - Don't use `{}` as a type. `{}` actually means "any non-nullish value".
+  return html`<pw-welcome></pw-welcome>`;
+}
+
+
+export class PwWelcome extends PwElement {
     protected render() {
       return html`
         <div class="container">
@@ -76,6 +90,5 @@ export const PwWelcome = setupHmr(
       `;
     }
   }
-);
 
 customElements.define("pw-welcome", PwWelcome);

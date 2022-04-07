@@ -24,9 +24,22 @@ import { html } from "lit";
 import { setupHmr } from "../hmr.js";
 import { PwElement } from "../pw-element.js";
 
-export const PwImprint = setupHmr(
-  "PwImprint",
-  class PwImprint extends PwElement {
+// workaround see https://github.com/runem/lit-analyzer/issues/149#issuecomment-1006162839
+export function pwImprint(
+  props: Pick<
+    PwImprint,
+    never
+  >
+) {
+  const {
+    ...rest
+  } = props;
+  let _ = rest;
+  _ = 1; // ensure no property is missed - Don't use `{}` as a type. `{}` actually means "any non-nullish value".
+  return html`<pw-imprint></pw-imprint>`;
+}
+
+export class PwImprint extends PwElement {
     protected render() {
       return html`
         <div class="container">
@@ -44,6 +57,5 @@ export const PwImprint = setupHmr(
       `;
     }
   }
-);
 
 customElements.define("pw-imprint", PwImprint);

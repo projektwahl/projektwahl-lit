@@ -150,6 +150,25 @@ const pages = {
   },
 };
 
+
+// workaround see https://github.com/runem/lit-analyzer/issues/149#issuecomment-1006162839
+export function pwApp(
+  props: Pick<
+    PwApp,
+    never
+  >
+) {
+  const {
+    
+    ...rest
+  } = props;
+  let _ = rest;
+  _ = 1; // ensure no property is missed - Don't use `{}` as a type. `{}` actually means "any non-nullish value".
+  return html`<pw-app
+   
+  ></pw-app>`;
+}
+
 export class PwApp extends PwElement {
   static override get properties() {
     return {

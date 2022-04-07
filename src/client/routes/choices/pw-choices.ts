@@ -47,15 +47,35 @@ const defaultValue: z.infer<typeof entityRoutes["/api/v1/choices"]["request"]> =
     paginationLimit: 100,
   };
 
-export const pwChoices = async (url: URL) => {
+export const pwChoicesPreloaded = async (url: URL) => {
   const result = await taskFunction(
     "/api/v1/choices",
     url,
     "choices",
     defaultValue
   );
-  return html`<pw-choices .initial=${result} prefix="choices"></pw-choices>`;
+  return pwChoices({
+    initial: result,
+    prefix: "choices",
+  });
 };
+
+// workaround see https://github.com/runem/lit-analyzer/issues/149#issuecomment-1006162839
+export function pwChoices<X extends string>(
+  props: Pick<
+    PwChoices<X>,
+    "initial" | "prefix"
+  >
+) {
+  const {
+    initial,
+    prefix,
+    ...rest
+  } = props;
+  let _ = rest;
+  _ = 1; // ensure no property is missed - Don't use `{}` as a type. `{}` actually means "any non-nullish value".
+  return html`<pw-choices .initial=${initial} .prefix=${prefix}></pw-choices>`;
+}
 
 class PwChoices<X extends string> extends PwEntityList<"/api/v1/choices", X> {
   constructor() {
