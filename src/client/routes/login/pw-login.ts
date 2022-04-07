@@ -32,7 +32,9 @@ import { ref } from "lit/directives/ref.js";
 import { pwInputText } from "../../form/pw-input-text.js";
 
 // workaround see https://github.com/runem/lit-analyzer/issues/149#issuecomment-1006162839
-export function pwLogin(props: Pick<PwLogin, never>) {
+export function pwLogin(
+  props: Record<string, never> // Pick<PwLogin, never>
+) {
   const { ...rest } = props;
   let _ = rest;
   _ = 1; // ensure no property is missed - Don't use `{}` as a type. `{}` actually means "any non-nullish value".

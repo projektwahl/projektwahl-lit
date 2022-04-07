@@ -153,7 +153,9 @@ const pages = {
 };
 
 // workaround see https://github.com/runem/lit-analyzer/issues/149#issuecomment-1006162839
-export function pwApp(props: Pick<PwApp, never>) {
+export function pwApp(
+  props: Record<string, never> // Pick<PwApp, never>
+) {
   const { ...rest } = props;
   let _ = rest;
   _ = 1; // ensure no property is missed - Don't use `{}` as a type. `{}` actually means "any non-nullish value".

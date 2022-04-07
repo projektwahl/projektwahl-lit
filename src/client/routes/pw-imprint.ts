@@ -24,7 +24,9 @@ import { html } from "lit";
 import { PwElement } from "../pw-element.js";
 
 // workaround see https://github.com/runem/lit-analyzer/issues/149#issuecomment-1006162839
-export function pwImprint(props: Pick<PwImprint, never>) {
+export function pwImprint(
+  props: Record<string, never> // Pick<PwImprint, never>
+) {
   const { ...rest } = props;
   let _ = rest;
   _ = 1; // ensure no property is missed - Don't use `{}` as a type. `{}` actually means "any non-nullish value".

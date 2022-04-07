@@ -31,7 +31,9 @@ import "../../form/pw-input.js";
 import { z } from "zod";
 
 // workaround see https://github.com/runem/lit-analyzer/issues/149#issuecomment-1006162839
-export function pwRedirect(props: Pick<PwRedirect, never>) {
+export function pwRedirect(
+  props: Record<string, never> // Pick<PwRedirect, never>
+) {
   const { ...rest } = props;
   let _ = rest;
   _ = 1; // ensure no property is missed - Don't use `{}` as a type. `{}` actually means "any non-nullish value".
