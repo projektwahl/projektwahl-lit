@@ -151,11 +151,13 @@ const project = rawProjectSchema.pick({
 const baseQuery = <
   T1 extends { [k: string]: ZodTypeAny },
   T2 extends ZodTypeAny,
+  T3 extends ZodTypeAny,
   UnknownKeys extends UnknownKeysParam = "strip",
   Catchall extends ZodTypeAny = ZodTypeAny
 >(
   s: ZodObject<T1, UnknownKeys, Catchall>,
-  sorting: T2
+  sorting: T2,
+  filters: T3
 ) => {
   return {
     request: z
@@ -164,8 +166,8 @@ const baseQuery = <
           .enum(["forwards", "backwards"])
           .default("forwards"),
         paginationCursor: s.nullish(),
-        filters: s.partial(),
-        sorting: sorting,
+        filters,
+        sorting,
         paginationLimit: z.number().default(10),
       })
       .strict(),
@@ -376,7 +378,18 @@ export const routes = {
           ]),
         ])
       )
-      .default([])
+      .default([]),
+    rawUserSchema
+      .pick({
+        id: true,
+        username: true,
+        type: true,
+        project_leader_id: true,
+        force_in_project_id: true,
+        deleted: true,
+      })
+      .strict()
+      .partial()
   ),
   "/api/v1/projects": baseQuery(
     rawProjectSchema, // project
@@ -410,7 +423,16 @@ export const routes = {
           ]),
         ])
       )
-      .default([])
+      .default([]),
+    rawProjectSchema
+      .pick({
+        id: true,
+        title: true,
+        info: true,
+        deleted: true,
+      })
+      .strict()
+      .partial()
   ),
   "/api/v1/choices": baseQuery(
     rawChoiceNullable.merge(rawProjectSchema), // choices
@@ -434,7 +456,17 @@ export const routes = {
           ]),
         ])
       )
-      .default([])
+      .default([]),
+    rawChoiceNullable
+      .merge(rawProjectSchema)
+      .pick({
+        id: true,
+        title: true,
+        info: true,
+        rank: true,
+      })
+      .strict()
+      .partial()
   ),
   "/api/v1/choices/update": {
     request: rawChoiceNullable
