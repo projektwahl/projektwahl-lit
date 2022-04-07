@@ -82,7 +82,7 @@ const taskFunction = async ([id]: [number]) => {
   );
   if (response.success) {
     return {
-      success: true,
+      success: true as const,
       data:
         response.data.entities.length == 1
           ? [{ action: "update", ...response.data.entities[0] }]

@@ -61,12 +61,17 @@ export const pwProjectUsersPreloaded = async (url: URL, prefix: string) => {
 
 // workaround see https://github.com/runem/lit-analyzer/issues/149#issuecomment-1006162839
 export function pwProjectUsers<X extends string>(
-  props: Pick<PwProjectUsers<X>, "initial" | "prefix" | "projectId">
+  props: Pick<
+    PwProjectUsers<X>,
+    "initial" | "prefix" | "projectId" | "name" | "title"
+  >
 ) {
-  const { initial, prefix, projectId, ...rest } = props;
+  const { initial, prefix, projectId, name, title, ...rest } = props;
   let _ = rest;
   _ = 1; // ensure no property is missed - Don't use `{}` as a type. `{}` actually means "any non-nullish value".
   return html`<pw-project-users
+    title=${title}
+    name=${name}
     projectId=${projectId}
     .initial=${initial}
     .prefix=${prefix}

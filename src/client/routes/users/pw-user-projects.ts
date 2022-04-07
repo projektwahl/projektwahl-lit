@@ -40,6 +40,8 @@ import { pwInputText } from "../../form/pw-input-text.js";
 import type { entityRoutes, routes } from "../../../lib/routes.js";
 import type { z } from "zod";
 import { PwProjects } from "../projects/pw-projects.js";
+import { ifDefined } from "lit/directives/if-defined";
+import { pwProjectUserCheckbox } from "../projects/pw-project-user-checkbox.js";
 
 const defaultValue: z.infer<
   typeof entityRoutes["/api/v1/projects"]["request"]
@@ -58,6 +60,7 @@ export const pwUserProjectsPreloaded = async (url: URL, prefix: string) => {
     defaultValue
   );
   return pwUserProjects({
+    user: undefined, // TODO FIXME
     initial: result,
     prefix: prefix,
   });
@@ -65,12 +68,16 @@ export const pwUserProjectsPreloaded = async (url: URL, prefix: string) => {
 
 // workaround see https://github.com/runem/lit-analyzer/issues/149#issuecomment-1006162839
 export function pwUserProjects<X extends string>(
-  props: Pick<PwProjects<X>, "initial" | "prefix">
+  props: Pick<PwUserProjects<X>, "initial" | "prefix" | "user"> & {
+    refreshentitylist?: () => void;
+  }
 ) {
-  const { initial, prefix, ...rest } = props;
+  const { initial, prefix, refreshentitylist, user, ...rest } = props;
   let _ = rest;
   _ = 1; // ensure no property is missed - Don't use `{}` as a type. `{}` actually means "any non-nullish value".
   return html`<pw-user-projects
+    .user=${user}
+    @refreshentitylist=${refreshentitylist}
     .initial=${initial}
     .prefix=${prefix}
   ></pw-user-projects>`;

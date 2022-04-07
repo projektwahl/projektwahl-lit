@@ -156,7 +156,7 @@ export class PwEntityList<
     return "blub";
   }
 
-  initial: ResponseType<P> | undefined;
+  initial?: ResponseType<P>;
 
   protected history;
 

@@ -81,7 +81,7 @@ const taskFunction = async ([id]: [number]) => {
   ]);
   if (response.success) {
     return {
-      success: true,
+      success: true as const,
       data: response.data.entities[0],
     };
   }
@@ -166,7 +166,6 @@ export class PwProjectCreate extends PwForm<
       return result;
     });
 
-    // @ts-expect-error TODO fix this
     this.initialTask = new Task(
       this,
       async () => {
