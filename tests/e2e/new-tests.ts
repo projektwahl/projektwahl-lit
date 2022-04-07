@@ -104,8 +104,6 @@ class FormTester {
     const element = await this.form.findElement(
       By.css(`input[name="${name}"]`)
     );
-    console.log("selected: ", await element.isSelected());
-    console.log("expected: ", value);
     if ((await element.isSelected()) != value) {
       await this.helper.click(element);
     }

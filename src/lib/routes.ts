@@ -191,24 +191,6 @@ export const updateUserAction = rawUserSchema
   })
   .strict();
 
-export const returnUsers = rawUserSchema
-  .pick({
-    id: true,
-    type: true,
-    username: true,
-    openid_id: true,
-    group: true,
-    age: true,
-    away: true,
-    project_leader_id: true,
-    force_in_project_id: true,
-    deleted: true,
-  })
-  .partial({
-    openid_id: true,
-    force_in_project_id: true,
-  });
-
 export const routes = {
   "/api/v1/logout": {
     request: z.any(),
@@ -297,7 +279,23 @@ export const routes = {
     response: z.object({}).extend({ id: z.number() }).strict(),
   },
   "/api/v1/users": baseQuery(
-    rawUserSchema, // users(returnUsers)
+    rawUserSchema
+      .pick({
+        id: true,
+        type: true,
+        username: true,
+        openid_id: true,
+        group: true,
+        age: true,
+        away: true,
+        project_leader_id: true,
+        force_in_project_id: true,
+        deleted: true,
+      })
+      .partial({
+        openid_id: true,
+        force_in_project_id: true,
+      }),
     z
       .array(
         z.union([
@@ -342,7 +340,19 @@ export const routes = {
       .partial()
   ),
   "/api/v1/projects": baseQuery(
-    rawProjectSchema, // project
+    rawProjectSchema.pick({
+      id: true,
+      title: true,
+      info: true,
+      place: true,
+      costs: true,
+      min_age: true,
+      max_age: true,
+      min_participants: true,
+      max_participants: true,
+      random_assignments: true,
+      deleted: true,
+    }),
     z
       .array(
         z.union([
@@ -385,7 +395,21 @@ export const routes = {
       .partial()
   ),
   "/api/v1/choices": baseQuery(
-    rawChoiceNullable.merge(rawProjectSchema), // choices
+    rawChoiceNullable.merge(
+      rawProjectSchema.pick({
+        id: true,
+        title: true,
+        info: true,
+        place: true,
+        costs: true,
+        min_age: true,
+        max_age: true,
+        min_participants: true,
+        max_participants: true,
+        random_assignments: true,
+        deleted: true,
+      })
+    ),
     z
       .array(
         z.union([

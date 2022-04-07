@@ -110,7 +110,7 @@ export const projectsHandler = requestHandler(
           "random_assignments",
           "deleted" FROM projects_with_deleted WHERE (${
             id === undefined
-          } OR id = $id ?? null}) AND (${deleted === undefined} OR deleted = ${
+          } OR id = ${id ?? null}) AND (${deleted === undefined} OR deleted = ${
           deleted ?? null
         }) AND title LIKE ${"%" + (title ?? "") + "%"}
              AND info  LIKE ${"%" + (info ?? "") + "%"}`;
