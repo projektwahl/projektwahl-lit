@@ -31,6 +31,8 @@ import "../../form/pw-input.js";
 import type {
   MinimalSafeParseError,
   updateUserAction,
+  ResponseType,
+  routes,
 } from "../../../lib/routes.js";
 import type { z } from "zod";
 import { createRef, Ref, ref } from "lit/directives/ref.js";
@@ -65,7 +67,14 @@ export function pwUserCreate(
   ></pw-user-create>`;
 }
 
-const taskFunction = async ([id]: [number]) => {
+const taskFunction = async ([id]: [number]): Promise<
+  | MinimalSafeParseError
+  | z.SafeParseSuccess<
+      (z.infer<
+        typeof routes["/api/v1/users"]["response"]
+      >["entities"][number] & { action: "update" })[]
+    >
+> => {
   const response = await myFetch<"/api/v1/users">(
     "GET",
     `/api/v1/users`,
@@ -122,13 +131,21 @@ class PwUserCreate extends PwForm<"/api/v1/users/create-or-update"> {
   }
 
   initial:
-    | z.SafeParseSuccess<z.infer<typeof updateUserAction>[]>
+    | z.SafeParseSuccess<
+        (z.infer<
+          typeof routes["/api/v1/users"]["response"]
+        >["entities"][number] & { action: "update" })[]
+      >
     | MinimalSafeParseError
     | undefined;
 
   initialTask: Task<
     [],
-    | z.SafeParseSuccess<z.infer<typeof updateUserAction>[]>
+    | z.SafeParseSuccess<
+        (z.infer<
+          typeof routes["/api/v1/users"]["response"]
+        >["entities"][number] & { action: "update" })[]
+      >
     | MinimalSafeParseError
     | undefined
   >;

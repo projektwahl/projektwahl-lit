@@ -54,14 +54,20 @@ const defaultValue: z.infer<
 
 // workaround see https://github.com/runem/lit-analyzer/issues/149#issuecomment-1006162839
 export function pwUserProjects<X extends string>(
-  props: Pick<PwUserProjects<X>, "initial" | "prefix" | "user"> & {
+  props: Pick<
+    PwUserProjects<X>,
+    "initial" | "prefix" | "user" | "name" | "title"
+  > & {
     refreshentitylist?: () => void;
   }
 ) {
-  const { initial, prefix, refreshentitylist, user, ...rest } = props;
+  const { initial, prefix, refreshentitylist, user, name, title, ...rest } =
+    props;
   let _ = rest;
   _ = 1; // ensure no property is missed - Don't use `{}` as a type. `{}` actually means "any non-nullish value".
   return html`<pw-user-projects
+    title=${title}
+    name=${name}
     .user=${user}
     @refreshentitylist=${refreshentitylist}
     .initial=${initial}
