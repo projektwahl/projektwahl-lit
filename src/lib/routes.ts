@@ -157,17 +157,26 @@ const baseQuery = <
   s: ZodObject<T1, UnknownKeys, Catchall>,
   sorting: T2
 ) => {
-  return z
-    .object({
-      paginationDirection: z
-        .enum(["forwards", "backwards"])
-        .default("forwards"),
-      paginationCursor: s.partial().nullish(),
-      filters: s.partial(),
-      sorting: sorting,
-      paginationLimit: z.number().default(10),
-    })
-    .strict();
+  return {
+    request: z
+      .object({
+        paginationDirection: z
+          .enum(["forwards", "backwards"])
+          .default("forwards"),
+        paginationCursor: s.nullish(),
+        filters: s.partial(),
+        sorting: sorting,
+        paginationLimit: z.number().default(10),
+      })
+      .strict(),
+    response: z
+      .object({
+        entities: z.array(s),
+        previousCursor: s.nullable(),
+        nextCursor: s.nullable(),
+      })
+      .strict(),
+  };
 };
 
 const choices = rawChoiceNullable.merge(
@@ -335,125 +344,98 @@ export const routes = {
       .strict(),
     response: z.object({}).extend({ id: z.number() }).strict(),
   },
-  "/api/v1/users": {
-    request: baseQuery(
-      rawUserSchema,
-      z
-        .array(
-          z.union([
-            z.tuple([
-              z.literal("id" as const),
-              z.enum(["ASC", "DESC"] as const),
-              z.null(),
-            ]),
-            z.tuple([
-              z.literal("username" as const),
-              z.enum(["ASC", "DESC"] as const),
-              z.null(),
-            ]),
-            z.tuple([
-              z.literal("type" as const),
-              z.enum(["ASC", "DESC"] as const),
-              z.null(),
-            ]),
-            z.tuple([
-              z.literal("project_leader_id_eq" as const),
-              z.enum(["ASC", "DESC"] as const),
-              z.number(),
-            ]),
-            z.tuple([
-              z.literal("force_in_project_id_eq" as const),
-              z.enum(["ASC", "DESC"] as const),
-              z.number(),
-            ]),
-          ])
-        )
-        .default([])
-    ),
-    response: z
-      .object({
-        entities: z.array(users(returnUsers)),
-        previousCursor: users(returnUsers).nullable(),
-        nextCursor: users(returnUsers).nullable(),
-      })
-      .strict(),
-  },
-  "/api/v1/projects": {
-    request: baseQuery(
-      rawProjectSchema,
-      z
-        .array(
-          z.union([
-            z.tuple([
-              z.literal("id" as const),
-              z.enum(["ASC", "DESC"] as const),
-              z.null(),
-            ]),
-            z.tuple([
-              z.literal("title" as const),
-              z.enum(["ASC", "DESC"] as const),
-              z.null(),
-            ]),
-            z.tuple([
-              z.literal("info" as const),
-              z.enum(["ASC", "DESC"] as const),
-              z.null(),
-            ]),
-            z.tuple([
-              z.literal("project_leader_id_eq" as const),
-              z.enum(["ASC", "DESC"] as const),
-              z.number(),
-            ]),
-            z.tuple([
-              z.literal("force_in_project_id_eq" as const),
-              z.enum(["ASC", "DESC"] as const),
-              z.number(),
-            ]),
-          ])
-        )
-        .default([])
-    ),
-    response: z
-      .object({
-        entities: z.array(project),
-        previousCursor: project.nullable(),
-        nextCursor: project.nullable(),
-      })
-      .strict(),
-  },
-  "/api/v1/choices": {
-    request: baseQuery(
-      rawChoiceNullable.merge(rawProjectSchema),
-      z
-        .array(
-          z.union([
-            z.tuple([
-              z.literal("id" as const),
-              z.enum(["ASC", "DESC"] as const),
-              z.null(),
-            ]),
-            z.tuple([
-              z.literal("title" as const),
-              z.enum(["ASC", "DESC"] as const),
-              z.null(),
-            ]),
-            z.tuple([
-              z.literal("rank" as const),
-              z.enum(["ASC", "DESC"] as const),
-              z.null(),
-            ]),
-          ])
-        )
-        .default([])
-    ),
-    response: z
-      .object({
-        entities: z.array(choices),
-        previousCursor: choices.nullable(),
-        nextCursor: choices.nullable(),
-      })
-      .strict(),
-  },
+  "/api/v1/users": baseQuery(
+    rawUserSchema, // users(returnUsers)
+    z
+      .array(
+        z.union([
+          z.tuple([
+            z.literal("id" as const),
+            z.enum(["ASC", "DESC"] as const),
+            z.null(),
+          ]),
+          z.tuple([
+            z.literal("username" as const),
+            z.enum(["ASC", "DESC"] as const),
+            z.null(),
+          ]),
+          z.tuple([
+            z.literal("type" as const),
+            z.enum(["ASC", "DESC"] as const),
+            z.null(),
+          ]),
+          z.tuple([
+            z.literal("project_leader_id_eq" as const),
+            z.enum(["ASC", "DESC"] as const),
+            z.number(),
+          ]),
+          z.tuple([
+            z.literal("force_in_project_id_eq" as const),
+            z.enum(["ASC", "DESC"] as const),
+            z.number(),
+          ]),
+        ])
+      )
+      .default([])
+  ),
+  "/api/v1/projects": baseQuery(
+    rawProjectSchema, // project
+    z
+      .array(
+        z.union([
+          z.tuple([
+            z.literal("id" as const),
+            z.enum(["ASC", "DESC"] as const),
+            z.null(),
+          ]),
+          z.tuple([
+            z.literal("title" as const),
+            z.enum(["ASC", "DESC"] as const),
+            z.null(),
+          ]),
+          z.tuple([
+            z.literal("info" as const),
+            z.enum(["ASC", "DESC"] as const),
+            z.null(),
+          ]),
+          z.tuple([
+            z.literal("project_leader_id_eq" as const),
+            z.enum(["ASC", "DESC"] as const),
+            z.number(),
+          ]),
+          z.tuple([
+            z.literal("force_in_project_id_eq" as const),
+            z.enum(["ASC", "DESC"] as const),
+            z.number(),
+          ]),
+        ])
+      )
+      .default([])
+  ),
+  "/api/v1/choices": baseQuery(
+    rawChoiceNullable.merge(rawProjectSchema), // choices
+    z
+      .array(
+        z.union([
+          z.tuple([
+            z.literal("id" as const),
+            z.enum(["ASC", "DESC"] as const),
+            z.null(),
+          ]),
+          z.tuple([
+            z.literal("title" as const),
+            z.enum(["ASC", "DESC"] as const),
+            z.null(),
+          ]),
+          z.tuple([
+            z.literal("rank" as const),
+            z.enum(["ASC", "DESC"] as const),
+            z.null(),
+          ]),
+        ])
+      )
+      .default([])
+  ),
   "/api/v1/choices/update": {
     request: rawChoiceNullable
       .pick({
