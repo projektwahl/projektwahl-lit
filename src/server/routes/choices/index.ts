@@ -34,6 +34,8 @@ export const choicesHandler = requestHandler(
     // helper is allowed to read the normal data
     // voter is allowed to read the normal data
 
+    // TODO FIXME voters should only be allowed to read their own choices
+
     if (!loggedInUser) {
       const returnValue: [
         OutgoingHttpHeaders,
@@ -89,6 +91,9 @@ export const choicesHandler = requestHandler(
       "/api/v1/choices" as const,
       query,
       (query) => {
+        const { id, title, info, rank, ...rest } = query.filters;
+        let _ = rest;
+        _ = 1; // ensure no property is missed - Don't use `{}` as a type. `{}` actually means "any non-nullish value".
         return sql`SELECT "id",
           "title",
           "info",
@@ -105,16 +110,13 @@ export const choicesHandler = requestHandler(
           "choices"."user_id"
           FROM projects LEFT OUTER JOIN choices ON (projects.id = choices.project_id AND choices.user_id = ${
             loggedInUser.id
-          }) WHERE (${query.filters.id === undefined} OR id = ${
-          query.filters.id ?? null
-        }) AND title LIKE ${"%" + (query.filters.title ?? "") + "%"}
-             AND info LIKE ${"%" + (query.filters.info ?? "") + "%"}
-             AND (${query.filters.rank === undefined} OR rank = ${
-          query.filters.rank ?? null
-        })`;
+          }) WHERE (${id === undefined} OR id = ${id ?? null}) AND title LIKE ${
+          "%" + (title ?? "") + "%"
+        }
+             AND info LIKE ${"%" + (info ?? "") + "%"}
+             AND (${rank === undefined} OR rank = ${rank ?? null})`;
       },
       {
-        // TODO FIXME nulls first/last
         rank: (q, o) =>
           sql`rank ${sql.unsafe(
             o === "backwards"

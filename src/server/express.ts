@@ -144,8 +144,6 @@ export function requestHandler<P extends keyof typeof routes>(
             response.end(stringified);
           });
         } else {
-          // https://github.com/colinhacks/zod/blob/master/ERROR_HANDLING.md
-
           response.writeHead(200, {
             ...defaultHeaders,
             "content-type": "text/json; charset=utf-8",

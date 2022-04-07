@@ -20,6 +20,7 @@ https://github.com/projektwahl/projektwahl-lit
 SPDX-License-Identifier: AGPL-3.0-or-later
 SPDX-FileCopyrightText: 2021 Moritz Hedtke <Moritz.Hedtke@t-online.de>
 */
+import type { OutgoingHttpHeaders } from "node:http2";
 import { requestHandler } from "../../express.js";
 import { client } from "./openid-client.js";
 
@@ -39,15 +40,12 @@ export const openidLoginHandler = requestHandler(
       throw new Error("OpenID not configured!");
     }
 
-    // https://github.com/projektwahl/projektwahl-sveltekit/blob/work/src/routes/login/index.json.ts
-    // https://github.com/projektwahl/projektwahl-sveltekit/blob/work/src/routes/redirect/index.ts_old
     const url = client.authorizationUrl({
       redirect_uri: `${process.env.BASE_URL}/redirect`,
       scope: "openid email",
     });
 
-    /** @type {import("node:http2").OutgoingHttpHeaders} */
-    const headers: import("node:http2").OutgoingHttpHeaders = {
+    const headers: OutgoingHttpHeaders = {
       "content-type": "text/json; charset=utf-8",
       ":status": 302,
       location: url,

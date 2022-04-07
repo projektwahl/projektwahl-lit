@@ -38,8 +38,9 @@ import {
 import { pwInputCheckbox } from "../../form/pw-input-checkbox.js";
 import { pwInputNumber } from "../../form/pw-input-number.js";
 import { pwInputText } from "../../form/pw-input-text.js";
-import type { entityRoutes } from "../../../lib/routes.js";
+import type { entityRoutes, routes } from "../../../lib/routes.js";
 import type { z } from "zod";
+import { pwInputSelect } from "../../form/pw-input-select.js";
 
 const defaultValue: z.infer<typeof entityRoutes["/api/v1/users"]["request"]> = {
   sorting: [],
@@ -206,24 +207,31 @@ export const PwProjectUsers = setupHmr(
             </th>
 
             <th scope="col">
-              ${
-                /*TODO FIXME use zod to verify the actual value? also change this to select*/ pwInputText<
-                  "/api/v1/users",
-                  "voter" | "helper" | "admin" | undefined
-                >({
-                  enabled: true,
-                  url: this.url,
-                  label: null,
-                  name: ["filters", "type"],
-                  get: (o) => o.filters.type,
-                  set: (o, v) => (o.filters.type = v),
-                  task: this._task,
-                  type: "text",
-                  defaultValue: undefined,
-                  initial,
-                  resettable: false,
-                })
-              }
+              ${pwInputSelect<
+                "/api/v1/users",
+                z.infer<
+                  typeof routes["/api/v1/users"]["request"]
+                >["filters"]["type"]
+              >({
+                url: this.url,
+                type: "select",
+                disabled: this.disabled,
+                enabled: true,
+                label: null,
+                name: ["filters", "type"],
+                get: (o) => o.filters.type,
+                set: (o, v) => (o.filters.type = v),
+                options: [
+                  { value: undefined, text: "Alle" },
+                  { value: "voter", text: "Schüler" },
+                  { value: "helper", text: "Helfer" },
+                  { value: "admin", text: "Admin" },
+                ],
+                task: this._task,
+                initial,
+                defaultValue: undefined,
+                resettable: false,
+              })}
             </th>
 
             <th scope="col"></th>

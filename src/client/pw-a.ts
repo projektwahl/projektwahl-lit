@@ -24,7 +24,6 @@ import { HistoryController } from "./history-controller.js";
 
 // TODO FIXME https://lit.dev/docs/components/events/#shadowdom-retargeting just use the approach shown there
 
-// TODO FIXME or maybe make this a Lit Element Directive
 export const aClick = (event: MouseEvent) => {
   event.preventDefault();
   if (!(event.target instanceof Element)) {

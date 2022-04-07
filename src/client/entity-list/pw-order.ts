@@ -21,7 +21,6 @@ SPDX-License-Identifier: AGPL-3.0-or-later
 SPDX-FileCopyrightText: 2021 Moritz Hedtke <Moritz.Hedtke@t-online.de>
 */
 import { html } from "lit";
-import { bootstrapCss } from "../index.js";
 import { HistoryController } from "../history-controller.js";
 import { msg, str } from "@lit/localize";
 import type { entityRoutes } from "../../lib/routes.js";
@@ -104,8 +103,6 @@ export function pwOrder<P extends keyof typeof entityRoutes, X extends string>(
   ></pw-order>`;
 }
 
-// TODO FIXME with prefix this doesnt work
-// TODO FIXME paginationLimit also doesnt work with this
 export class PwOrder<
   P extends keyof typeof entityRoutes,
   X extends string
@@ -123,11 +120,6 @@ export class PwOrder<
       prefix: { attribute: false },
       orderBy: { attribute: false },
     };
-  }
-
-  // because forms in shadow root are garbage
-  protected override createRenderRoot() {
-    return this;
   }
 
   prefix!: X;
@@ -212,6 +204,7 @@ export class PwOrder<
     );
   };
 
+  // TODO FIXME we're not able to reset this so move this somewhere else
   protected willUpdate(changedProperties: Map<PropertyKey, unknown>): void {
     if (changedProperties.has("initial")) {
       // the input value contains the value that is shown to the user
@@ -233,7 +226,6 @@ export class PwOrder<
     }
 
     return html`
-      ${bootstrapCss}
       <button
         @click=${this.mypwinputchangeDispatcher}
         name="${this.orderBy.toString()}"

@@ -140,8 +140,6 @@ const myErrorMap: z.ZodErrorMap = (
 };
 z.setErrorMap(myErrorMap);
 
-//const startTime = Date.now();
-
 export async function* getDirs(dir: string): AsyncIterable<string> {
   yield dir;
   const dirents = await readdir(dir, { withFileTypes: true });
@@ -185,7 +183,7 @@ const BASE_URL = new URL(process.env.BASE_URL);
 
 export async function serverHandler(
   request: MyRequest,
-  response: /*ServerResponse |*/ Http2ServerResponse
+  response: Http2ServerResponse
 ) {
   const url = new URL(request.url, BASE_URL);
 
@@ -268,8 +266,6 @@ export async function serverHandler(
     process.env.NODE_ENV === "development" ||
     process.env.NODE_ENV === "testing"
   ) {
-    // TODO FIXME AUDIT
-    // curl --insecure --path-as-is -v `${process.env.BASE_URL}/../src/index.js`
     const { resolve: loaderResolve, load: loaderLoad } = await import(
       "../loader.js"
     );
@@ -284,8 +280,6 @@ export async function serverHandler(
       filename.startsWith(join(baseUrl, "/node_modules/")) ||
       filename.startsWith(join(baseUrl, "/lit/"))
     ) {
-      // TODO FIXME caching (server+clientside)
-
       try {
         const resolved = await loaderResolve(
           filename,
@@ -386,26 +380,12 @@ export async function serverHandler(
           }
         };
 
-        // Note: This is not a conformant accept-encoding parser.
-        // See https://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.3
-        /*if (/\bbr\b/.test(acceptEncoding)) {
-          response.writeHead(200, {
-            ...defaultHeaders,
-            "content-type": `${contentType}; charset=utf-8`,
-            //"cache-control": "public, max-age=604800, immutable",
-            vary: "accept-encoding",
-            "content-encoding": "br",
-          });
-          pipeline(raw, zlib.createBrotliCompress(), response, onError);
-        } else {*/
         response.writeHead(200, {
           ...defaultHeaders,
           "content-type": `${contentType}; charset=utf-8`,
-          //"cache-control": "public, max-age=604800, immutable",
           vary: "accept-encoding",
         });
         pipeline(raw, response, onError);
-        //}
       } catch (error) {
         console.error(error);
         response.writeHead(404, {
@@ -449,21 +429,11 @@ export async function serverHandler(
     </body>
   </html>
   `;
-      // ${await pwApp(url)}
-
-      // current issue: https://github.com/lit/lit/issues/2329
-
-      // TODO FIXME IMPORTANT this doesn't work for parallel rendering
-      // TODO FIXME SECURITY THE DOMAIN NEEDS TO BE FORCED TO OUR VALUE OTHERWISE THIS IS PRONE TO ATTACKS
-      //window.location.href = url;
-      //const ssrResult = render(contents);
 
       response.writeHead(200, {
         ...defaultHeaders,
         "content-type": "text/html; charset=utf-8",
       });
-      //Readable.from(ssrResult).pipe(stream)
-      //stream.end()
 
       response.end(rawContents);
     }

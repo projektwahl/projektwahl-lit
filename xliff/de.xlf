@@ -34,6 +34,7 @@
   <source> Also lieber "Ich mag fliegende Autos." anstatt
                 "Moritz1234!".<x id="0" equiv-text="&lt;br>"/>Du kannst auch einen Passwort-Manager
                 verwenden, z.B.</source>
+  <target>Also lieber "Ich mag fliegende Autos." anstatt "Moritz1234!".<x id="0" equiv-text="&lt;br>"/>Du kannst auch einen Passwort-Manager verwenden, z.B.</target>
 </trans-unit>
 <trans-unit id="s1dc79c57a4bab199">
   <source>Bitwarden</source>
@@ -41,6 +42,7 @@
 </trans-unit>
 <trans-unit id="s0a8c18046fb2a0f6">
   <source>Third-party login</source>
+  <target>Schulaccount-Anmeldung</target>
 </trans-unit>
 <trans-unit id="sc8da3cc71de63832">
   <source>Login</source>
@@ -88,6 +90,7 @@
 </trans-unit>
 <trans-unit id="s49067479a7417f00">
   <source>Import accounts</source>
+  <target>Accounts importieren</target>
 </trans-unit>
 <trans-unit id="s09240e07b5b8d640">
   <source>ID</source>
@@ -103,6 +106,7 @@
 </trans-unit>
 <trans-unit id="s62292f98fbd239c1">
   <source>Show deleted</source>
+  <target>gelöschte anzeigen</target>
 </trans-unit>
 <trans-unit id="s8af61807443f32a4">
   <source>Actions</source>
@@ -110,15 +114,19 @@
 </trans-unit>
 <trans-unit id="saae1c70e168b45b4">
   <source>Admin</source>
+  <target>Admin</target>
 </trans-unit>
 <trans-unit id="s38c268c406e1b02b">
   <source>Lehrer</source>
+  <target>Lehrer</target>
 </trans-unit>
 <trans-unit id="s461237cd996d9d4a">
   <source>Schüler</source>
+  <target>Schüler</target>
 </trans-unit>
 <trans-unit id="s1f25e1e20469a9ea">
   <source>deleted</source>
+  <target>gelöscht</target>
 </trans-unit>
 <trans-unit id="s199f5853f4e718f7">
   <source>Projects</source>
@@ -146,6 +154,7 @@
 </trans-unit>
 <trans-unit id="s7039d8b5b12742f7">
   <source>Third-party email address</source>
+  <target>Schul-Email-Adresse</target>
 </trans-unit>
 <trans-unit id="s9f9492d30a96b9c6">
   <source>User type</source>
@@ -169,15 +178,19 @@
 </trans-unit>
 <trans-unit id="sc16e00a7a8b2fde2">
   <source>Back</source>
+  <target>Zurück</target>
 </trans-unit>
 <trans-unit id="s4ab27d95f4466996">
   <source>Project leader in</source>
+  <target>Projektleitend in</target>
 </trans-unit>
 <trans-unit id="s1987d6c1bbe105e3">
   <source>Guaranteed project member in</source>
+  <target>Garantierte Projektmitglieder</target>
 </trans-unit>
 <trans-unit id="s5daa9183e1169f88">
   <source>.json Datei</source>
+  <target>.json Datei</target>
 </trans-unit>
 <trans-unit id="s3e9c025477abb23d">
   <source>View project</source>
@@ -265,7 +278,7 @@
 </trans-unit>
 <trans-unit id="s2667d13ee670a19d">
   <source>Logout <x id="0" equiv-text="${this.userController.username}"/></source>
-  <target><x id="0" equiv-text="${this.username}"/> abmelden</target>
+  <target><x id="0" equiv-text="${this.userController.username}"/> abmelden</target>
 </trans-unit>
 <trans-unit id="sfebb69bee8b5102d">
   <source>Source code</source>

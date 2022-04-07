@@ -27,7 +27,6 @@ import { Task, TaskStatus } from "@lit-labs/task";
 import { entityRoutes, ResponseType } from "../../lib/routes.js";
 import { z } from "zod";
 import { PwForm } from "../form/pw-form.js";
-import { bootstrapCss } from "../index.js";
 import { msg } from "@lit/localize";
 import { ifDefined } from "lit/directives/if-defined.js";
 import { myFetch } from "../utils.js";
@@ -76,8 +75,6 @@ export const parseRequestWithPrefix = <
       decodeURIComponent(url.search == "" ? "{}" : url.search.substring(1))
     )
   );
-  /*const a: z.infer<z.ZodObject<{[k in PREFIX]: typeof entityRoutes[P]["request"]}, "strict", z.ZodTypeAny, {[k in PREFIX]:  z.infer<typeof entityRoutes[P]["request"]>}, Record<string, unknown>>>[PREFIX] = data[prefix];
-  const b: z.infer<typeof entityRoutes[P]["request"]> = a;*/
   return data;
 };
 
@@ -238,7 +235,6 @@ export class PwEntityList<
     //console.log("taskk", this._task);
 
     return html`
-      ${bootstrapCss}
       <main class="container">
         <h1 class="text-center">${this.title}</h1>
 
@@ -320,17 +316,7 @@ export class PwEntityList<
                     <a
                       @click=${async (e: Event) => {
                         e.preventDefault();
-                        /*
-                        if (!data[this.prefix]) {
-                          mappedIndexingSet(data, this.prefix, {
-                            filters: {},
-                            paginationDirection: "forwards",
-                            paginationLimit: 100,
-                            sorting: [],
-                            paginationCursor: null,
-                          });
-                        }
-*/
+
                         if (this._task.value?.success) {
                           this.formData.paginationCursor =
                             this._task.value?.data.previousCursor;
@@ -373,18 +359,6 @@ export class PwEntityList<
                     <a
                       @click=${async (e: Event) => {
                         e.preventDefault();
-
-                        /*
-                        if (!data[this.prefix]) {
-                          mappedIndexingSet(data, this.prefix, {
-                            filters: {},
-                            paginationDirection: "forwards",
-                            paginationLimit: 100,
-                            sorting: [],
-                            paginationCursor: null,
-                          });
-                        }
-*/
 
                         if (this._task.value?.success) {
                           this.formData.paginationCursor =

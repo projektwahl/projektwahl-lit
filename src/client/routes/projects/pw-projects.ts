@@ -236,7 +236,6 @@ export class PwProjects<X extends string> extends PwEntityList<
           return noChange;
         },
         complete: (result) => {
-          //console.log("COMPLETE", result);
           return result.success
             ? result.data.entities.map(
                 (value) => html`<tr>

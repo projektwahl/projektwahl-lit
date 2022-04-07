@@ -22,7 +22,6 @@ SPDX-FileCopyrightText: 2021 Moritz Hedtke <Moritz.Hedtke@t-online.de>
 */
 import { html } from "lit";
 import { setupHmr } from "../hmr.js";
-import { bootstrapCss } from "../index.js";
 import { PwElement } from "../pw-element.js";
 
 export const PwImprint = setupHmr(
@@ -30,8 +29,6 @@ export const PwImprint = setupHmr(
   class PwImprint extends PwElement {
     protected render() {
       return html`
-        ${bootstrapCss}
-
         <div class="container">
           <h1 class="text-center">Impressum</h1>
 

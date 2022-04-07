@@ -61,14 +61,6 @@ class PwForm<P extends keyof typeof routes> extends PwElement {
     this.errors = createRef();
   }
 
-  connectedCallback(): void {
-    super.connectedCallback();
-  }
-
-  disconnectedCallback(): void {
-    super.disconnectedCallback();
-  }
-
   getErrors() {
     return html`${this._task.render({
         complete: (data) => {

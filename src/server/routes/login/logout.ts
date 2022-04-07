@@ -20,6 +20,7 @@ https://github.com/projektwahl/projektwahl-lit
 SPDX-License-Identifier: AGPL-3.0-or-later
 SPDX-FileCopyrightText: 2021 Moritz Hedtke <Moritz.Hedtke@t-online.de>
 */
+import type { OutgoingHttpHeaders } from "node:http2";
 import { sql } from "../../database.js";
 import { typedSql } from "../../describe.js";
 import { requestHandler } from "../../express.js";
@@ -39,8 +40,7 @@ export const logoutHandler = requestHandler(
       });
     }
 
-    /** @type {import("node:http2").OutgoingHttpHeaders} */
-    const headers: import("node:http2").OutgoingHttpHeaders = {
+    const headers: OutgoingHttpHeaders = {
       "content-type": "text/json; charset=utf-8",
       ":status": 200,
       "set-cookie": [

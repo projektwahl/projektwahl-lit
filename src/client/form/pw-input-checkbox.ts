@@ -109,13 +109,6 @@ export class PwInputCheckbox<P extends keyof typeof routes> extends PwInput<
       throw new Error();
     }
 
-    /*console.log(
-      "CHECKBOX CHANGE",
-      this.input.value.checked,
-      this.trueValue,
-      this.falseValue
-    );*/
-
     this.inputValue = this.input.value.checked;
     this.set(
       this.pwForm.formData,

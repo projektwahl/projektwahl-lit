@@ -30,7 +30,6 @@ import { msg } from "@lit/localize";
 import type { z } from "zod";
 import type { routes, MinimalSafeParseError } from "../../../lib/routes.js";
 import { setupHmr } from "../../hmr.js";
-import { bootstrapCss } from "../../index.js";
 import { ref } from "lit/directives/ref.js";
 import { pwInputText } from "../../form/pw-input-text.js";
 import { pwInputNumber } from "../../form/pw-input-number.js";
@@ -176,7 +175,6 @@ export const PwProjectCreate = setupHmr(
     }
 
     override render() {
-      // TODO FIXME do this in the initialTask thingy
       if (!this.hasUpdated) {
         // @ts-expect-error impossible
         this.formData = {
@@ -207,7 +205,6 @@ export const PwProjectCreate = setupHmr(
               }
 
               return html`
-                ${bootstrapCss}
                 <main class="container">
                   <h1 class="text-center">${this.actionText}</h1>
 
@@ -221,8 +218,6 @@ export const PwProjectCreate = setupHmr(
                         action="/no-javascript"
                         @submit=${async (event: Event) => {
                           event.preventDefault();
-
-                          //console.log("SUBMIT");
 
                           await this._task.run();
 
@@ -452,7 +447,7 @@ export const PwProjectCreate = setupHmr(
                 </main>
               `;
             } else {
-              return html`${bootstrapCss}
+              return html`
               <main class="container">
                 <h1 class="text-center">${this.actionText}</h1>
                 

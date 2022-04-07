@@ -41,9 +41,6 @@ export const openidRedirectHandler = requestHandler(
     // USE single tenant as for all others we need permissions
     // https://portal.azure.com/
 
-    // https://github.com/projektwahl/projektwahl-sveltekit/blob/work/src/routes/login/index.json.ts
-    // https://github.com/projektwahl/projektwahl-sveltekit/blob/work/src/routes/redirect/index.ts_old
-
     if (!process.env.BASE_URL) {
       throw new Error("BASE_URL not set");
     }
@@ -57,12 +54,6 @@ export const openidRedirectHandler = requestHandler(
         `${process.env.BASE_URL}/redirect`,
         data
       );
-
-      //console.log(result.claims());
-
-      //const userinfo = await client.userinfo(result, {});
-
-      //console.log(userinfo)
 
       const dbUser = await sql.begin(async (tsql) => {
         await tsql`SELECT set_config('projektwahl.type', 'root', true);`;
@@ -123,8 +114,7 @@ export const openidRedirectHandler = requestHandler(
         } as const)`INSERT INTO sessions (user_id, session_id) VALUES (${dbUser.id}, ${session_id})`;
       });
 
-      /** @type {import("node:http2").OutgoingHttpHeaders} */
-      const responseHeaders: import("node:http2").OutgoingHttpHeaders = {
+      const responseHeaders: OutgoingHttpHeaders = {
         ":status": 200,
         "content-type": "text/json; charset=utf-8",
         "set-cookie": [

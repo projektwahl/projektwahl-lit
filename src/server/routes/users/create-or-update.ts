@@ -29,10 +29,6 @@ import type { OutgoingHttpHeaders } from "node:http";
 import { ZodIssueCode } from "zod";
 import { typedSql } from "../../describe.js";
 
-// TODO FIXME somehow ensure all attributes are read here because this is an easy way to loose data
-// Also ensure create and update has the same attributes
-// TO IMPROVE this maybe return the full column and also read back that data at all places
-
 export const createOrUpdateUsersHandler = requestHandler(
   "POST",
   "/api/v1/users/create-or-update",
@@ -98,42 +94,69 @@ export const createOrUpdateUsersHandler = requestHandler(
           }, true);`;
           const results = [];
           for (const user of users) {
-            if ("id" in user) {
+            if (user.action === "update") {
               // TODO FIXME client should send their old values so we can compare and show an error if there are conflicts
-
-              // TODO FIXME clean this up like in entities.ts
+              const {
+                id,
+                action: _action,
+                age,
+                away,
+                deleted,
+                force_in_project_id,
+                group,
+                openid_id,
+                password,
+                project_leader_id,
+                type,
+                username,
+                ...rest
+              } = user;
+              let _ = rest;
+              _ = 1; // ensure no property is missed - Don't use `{}` as a type. `{}` actually means "any non-nullish value".
 
               const finalQuery = tsql`UPDATE users_with_deleted SET
-  ${user.username !== undefined ? sql`"username" = ${user.username},` : sql``}
+  ${username !== undefined ? sql`"username" = ${username},` : sql``}
+  ${openid_id !== undefined ? sql`"openid_id" = ${openid_id},` : sql``}
+  ${type !== undefined ? sql`"type" = ${type},` : sql``}
+  ${group !== undefined ? sql`"group" = ${group},` : sql``}
+  ${age !== undefined ? sql`age = ${age},` : sql``}
+  ${away !== undefined ? sql`"away" = ${away},` : sql``}
   ${
-    user.openid_id !== undefined ? sql`"openid_id" = ${user.openid_id},` : sql``
-  }
-  ${user.type !== undefined ? sql`"type" = ${user.type},` : sql``}
-  ${user.group !== undefined ? sql`"group" = ${user.group},` : sql``}
-  ${user.age !== undefined ? sql`age = ${user.age},` : sql``}
-  ${user.away !== undefined ? sql`"away" = ${user.away},` : sql``}
-  ${
-    user.project_leader_id !== undefined
-      ? sql`"project_leader_id" = ${user.project_leader_id},`
+    project_leader_id !== undefined
+      ? sql`"project_leader_id" = ${project_leader_id},`
       : sql``
   }
   ${
-    user.force_in_project_id !== undefined
-      ? sql`"force_in_project_id" = ${user.force_in_project_id},`
+    force_in_project_id !== undefined
+      ? sql`"force_in_project_id" = ${force_in_project_id},`
       : sql``
   }
-  ${user.deleted !== undefined ? sql`"deleted" = ${user.deleted},` : sql``}
+  ${deleted !== undefined ? sql`"deleted" = ${deleted},` : sql``}
   ${
-    user.password !== undefined
-      ? sql`"password_hash" = ${await hashPassword(user.password)},`
+    password !== undefined
+      ? sql`"password_hash" = ${await hashPassword(password)},`
       : sql``
   }
   "last_updated_by" = ${loggedInUser.id}
 
-  WHERE id = ${user.id} RETURNING id, project_leader_id, force_in_project_id;`;
+  WHERE id = ${id} RETURNING id, project_leader_id, force_in_project_id;`;
               // TODO FIXME (found using fuzzer) if this tries to update a nonexisting user we should return an error
               results.push(await finalQuery);
             } else {
+              const {
+                action: _action,
+                age,
+                away,
+                deleted,
+                group,
+                openid_id,
+                password,
+                type,
+                username,
+                ...rest
+              } = user;
+              let _ = rest;
+              _ = 1; // ensure no property is missed - Don't use `{}` as a type. `{}` actually means "any non-nullish value".
               const query = typedSql(tsql, {
                 columns: {
                   id: 23,
@@ -141,18 +164,14 @@ export const createOrUpdateUsersHandler = requestHandler(
                   force_in_project_id: 23,
                 },
               } as const)`INSERT INTO users_with_deleted (username, openid_id, password_hash, type, "group", age, away, deleted, last_updated_by) VALUES (${
-                user.username ?? null
-              }, ${user.openid_id ?? null}, ${
-                user.password ? await hashPassword(user.password) : null
-              }, ${user.type ?? null}, ${
-                user.type === "voter" ? user.group ?? null : null
-              }, ${user.type === "voter" ? user.age ?? null : null}, ${
-                user.away ?? false
-              }, ${user.deleted ?? false}, ${
+                username ?? null
+              }, ${openid_id ?? null}, ${
+                password ? await hashPassword(password) : null
+              }, ${type ?? null}, ${type === "voter" ? group ?? null : null}, ${
+                type === "voter" ? age ?? null : null
+              }, ${away ?? false}, ${deleted ?? false}, ${
                 loggedInUser.id
               }) RETURNING id, project_leader_id, force_in_project_id;`;
-
-              //console.log(await query.describe())
 
               results.push(await query);
             }

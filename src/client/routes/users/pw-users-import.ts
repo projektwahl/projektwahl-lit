@@ -28,7 +28,6 @@ import { PwForm } from "../../form/pw-form.js";
 import { HistoryController } from "../../history-controller.js";
 import { msg } from "@lit/localize";
 import "../../form/pw-input.js";
-import { bootstrapCss } from "../../index.js";
 import { ref } from "lit/directives/ref.js";
 import { pwInputFile } from "../../form/pw-input-file.js";
 
@@ -56,8 +55,6 @@ class PwUsersImport extends PwForm<"/api/v1/users/create-or-update"> {
     super();
 
     this._task = new Task(this, async () => {
-      // TODO FIXME check that file upload succeeded
-
       // @ts-expect-error impossible
       // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
       const fileContents = await this.formData.file;
@@ -89,7 +86,6 @@ class PwUsersImport extends PwForm<"/api/v1/users/create-or-update"> {
     }
 
     return html`
-      ${bootstrapCss}
       <main class="container">
         <h1 class="text-center">${this.actionText}</h1>
 

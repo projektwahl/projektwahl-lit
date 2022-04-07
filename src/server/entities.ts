@@ -25,7 +25,6 @@ import type { PendingQuery, Row } from "postgres";
 import type { z } from "zod";
 import type { entityRoutes, ResponseType, userSchema } from "../lib/routes.js";
 import { sql } from "./database.js";
-import { unsafe2 } from "./sql/index.js";
 import { mappedFunctionCall2, mappedIndexing } from "../lib/result.js";
 
 // Mapped Types
@@ -101,12 +100,6 @@ export async function fetchData<R extends keyof typeof entityRoutes>(
   query: entitiesType0[R],
   sqlQuery: (query: entitiesType0[R]) => PendingQuery<Row[]>,
   orderByQueries: entitiesType8[R]
-  /*{
-          id: "nulls-first",
-          type: "nulls-first",
-          username: "nulls-first",
-          password_hash: "nulls-first",
-        },*/
 ): Promise<[OutgoingHttpHeaders, ResponseType<R>]> {
   const sorting: entitiesType15[R] = mappedIndexing(query, "sorting");
 
@@ -114,7 +107,6 @@ export async function fetchData<R extends keyof typeof entityRoutes>(
     sorting.push(["id", "ASC", null]);
   }
 
-  // TODO FIXME flatmap with the mappedfunctincall?
   const orderByQuery = mappedFunctionCall2(sorting, (v: entitiesType4[R]) => {
     const v0: entitiesType6[R] = mappedIndexing<entitiesType4, R, 0>(v, 0);
     // @ts-expect-error bruh
@@ -156,7 +148,7 @@ export async function fetchData<R extends keyof typeof entityRoutes>(
                   ? sql`<`
                   : sql`>`
                 : sql`IS NOT DISTINCT FROM`
-            } ${unsafe2(value[0] ?? null)}`,
+            } ${sql.unsafe(value[0] ?? null)}`,
           ];
         })
         .slice(1)
@@ -184,15 +176,11 @@ export async function fetchData<R extends keyof typeof entityRoutes>(
     });
   }
 
-  //const entitiesSchema = entitySchema["response"]["shape"]["entities"];
-
   // would be great to stream the results but they are post processed below
 
   let entities: z.infer<entitiesType[R]["response"]>["entities"] =
     // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
     sqlResult as unknown as z.infer<entitiesType[R]["response"]>["entities"];
-
-  // https://github.com/projektwahl/projektwahl-sveltekit/blob/work/src/lib/list-entities.ts#L30
 
   let nextCursor: z.infer<entitiesType[R]["response"]>["nextCursor"] = null;
   let previousCursor: z.infer<entitiesType[R]["response"]>["previousCursor"] =

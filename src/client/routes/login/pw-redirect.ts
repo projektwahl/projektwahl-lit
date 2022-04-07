@@ -28,7 +28,6 @@ import { PwForm } from "../../form/pw-form.js";
 import { HistoryController } from "../../history-controller.js";
 import { msg } from "@lit/localize";
 import "../../form/pw-input.js";
-import { bootstrapCss } from "../../index.js";
 import { z } from "zod";
 
 class PwRedirect extends PwForm<"/api/v1/redirect"> {
@@ -92,7 +91,6 @@ class PwRedirect extends PwForm<"/api/v1/redirect"> {
     }
 
     return html`
-      ${bootstrapCss}
       <main class="container">
         <h1 class="text-center">${this.actionText}</h1>
 
