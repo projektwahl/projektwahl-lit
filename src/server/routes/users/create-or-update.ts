@@ -94,11 +94,11 @@ export const createOrUpdateUsersHandler = requestHandler(
           }, true);`;
           const results = [];
           for (const user of users) {
-            if ("id" in user) {
+            if (user.action === "update") {
               // TODO FIXME client should send their old values so we can compare and show an error if there are conflicts
               const {
                 id,
-                action,
+                action: _action,
                 age,
                 away,
                 deleted,
@@ -144,7 +144,7 @@ export const createOrUpdateUsersHandler = requestHandler(
               results.push(await finalQuery);
             } else {
               const {
-                action,
+                action: _action,
                 age,
                 away,
                 deleted,

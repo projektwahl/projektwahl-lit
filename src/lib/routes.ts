@@ -114,40 +114,6 @@ export const entities = <
     })
   );
 
-const users = <
-  T extends { [k: string]: ZodTypeAny },
-  UnknownKeys extends UnknownKeysParam = "strip",
-  Catchall extends ZodTypeAny = ZodTypeAny
->(
-  s: ZodObject<T, UnknownKeys, Catchall>
-) =>
-  s.pick({
-    id: true,
-    openid_id: true,
-    type: true,
-    username: true,
-    group: true,
-    age: true,
-    away: true,
-    project_leader_id: true,
-    force_in_project_id: true,
-    deleted: true,
-  });
-
-const project = rawProjectSchema.pick({
-  id: true,
-  title: true,
-  info: true,
-  place: true,
-  costs: true,
-  min_age: true,
-  max_age: true,
-  min_participants: true,
-  max_participants: true,
-  random_assignments: true,
-  deleted: true,
-});
-
 const baseQuery = <
   T1 extends { [k: string]: ZodTypeAny },
   T2 extends ZodTypeAny,
@@ -180,22 +146,6 @@ const baseQuery = <
       .strict(),
   };
 };
-
-const choices = rawChoiceNullable.merge(
-  rawProjectSchema.pick({
-    id: true,
-    title: true,
-    info: true,
-    place: true,
-    costs: true,
-    min_age: true,
-    max_age: true,
-    min_participants: true,
-    max_participants: true,
-    random_assignments: true,
-    deleted: true,
-  })
-);
 
 export const createUserAction = rawUserSchema
   .pick({
