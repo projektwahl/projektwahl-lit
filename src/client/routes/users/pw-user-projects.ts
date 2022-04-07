@@ -267,12 +267,12 @@ export class PwUserProjects<X extends string> extends PwProjects<X> {
           ? result.data.entities.map(
               (value) => html`<tr>
                 <td>
-                  <pw-project-user-checkbox
-                    type="radio"
-                    .projectId=${value.id}
-                    .user=${this.user}
-                    name=${this.name}
-                  ></pw-project-user-checkbox>
+                  ${pwProjectUserCheckbox({
+                    type: "radio",
+                    projectId: value.id,
+                    user: this.user,
+                    name: this.name
+                  })}
                 </td>
                 <th scope="row">
                   <p>

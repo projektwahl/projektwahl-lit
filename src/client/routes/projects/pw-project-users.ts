@@ -52,6 +52,8 @@ const defaultValue: z.infer<typeof entityRoutes["/api/v1/users"]["request"]> = {
 export const pwProjectUsersPreloaded = async (url: URL, prefix: string) => {
   const result = await taskFunction("/api/v1/users", url, prefix, defaultValue);
   return pwProjectUsers({
+    // TODO FIXME
+    projectId: null,
     initial: result,
     prefix,
   });
@@ -59,12 +61,13 @@ export const pwProjectUsersPreloaded = async (url: URL, prefix: string) => {
 
 // workaround see https://github.com/runem/lit-analyzer/issues/149#issuecomment-1006162839
 export function pwProjectUsers<X extends string>(
-  props: Pick<PwProjectUsers<X>, "initial" | "prefix">
+  props: Pick<PwProjectUsers<X>, "initial" | "prefix" | "projectId">
 ) {
-  const { initial, prefix, ...rest } = props;
+  const { initial, prefix, projectId, ...rest } = props;
   let _ = rest;
   _ = 1; // ensure no property is missed - Don't use `{}` as a type. `{}` actually means "any non-nullish value".
   return html`<pw-project-users
+    projectId=${projectId}
     .initial=${initial}
     .prefix=${prefix}
   ></pw-project-users>`;

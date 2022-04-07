@@ -36,6 +36,7 @@ import { pwInputNumber } from "../../form/pw-input-number.js";
 import { pwInputCheckbox } from "../../form/pw-input-checkbox.js";
 import { aClick } from "../../pw-a.js";
 import { LoggedInUserController } from "../../user-controller.js";
+import { pwProjectUsers } from "../projects/pw-project-users.js";
 
 export async function pwProjectCreatePreloaded(id: number, viewOnly = false) {
   const result = await taskFunction([id]);
@@ -435,22 +436,21 @@ export class PwProjectCreate extends PwForm<
                       <!-- Projektleitende -->
                       <!-- TODO FIXME view only -->
                       ${value
-                        ? html`<pw-project-users
-                            projectId=${value.data.id}
-                            name=${"project_leader_id"}
-                            title=${msg("Project leaders")}
-                            prefix="leaders"
-                          ></pw-project-users>`
-                        : html``}
+                        ? pwProjectUsers({
+                            projectId: value.data.id,
+                            name: "project_leader_id",
+                            title: msg("Project leaders"),
+                            prefix: "leaders"
+                        }) : html``}
                       ${value &&
                       (this.userController.type === "admin" ||
                         this.userController.type === "helper")
-                        ? html`<pw-project-users
-                            projectId=${value.data.id}
-                            name=${"force_in_project_id"}
-                            title=${msg("Guaranteed project members")}
-                            prefix="members"
-                          ></pw-project-users>`
+                        ? pwProjectUsers({
+                            projectId: value.data.id,
+                            name: "force_in_project_id",
+                            title: msg("Guaranteed project members"),
+                            prefix: "members"
+                        })
                         : html``}
                     </form>
                   </div>

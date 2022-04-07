@@ -40,6 +40,7 @@ import { pwInputNumber } from "../../form/pw-input-number.js";
 import { pwInputCheckbox } from "../../form/pw-input-checkbox.js";
 import { aClick } from "../../pw-a.js";
 import "./pw-user-projects.js";
+import { pwUserProjects } from "./pw-user-projects.js";
 
 export async function pwUserCreatePreloaded(id: number, viewOnly = false) {
   const result = await taskFunction([id]);
@@ -418,29 +419,29 @@ class PwUserCreate extends PwForm<"/api/v1/users/create-or-update"> {
                         </button>
 
                         ${value?.data[0].action == "update"
-                          ? html`<pw-user-projects
-                                @refreshentitylist=${() => {
+                          ? html`${pwUserProjects({
+                                refreshentitylist: () => {
                                   // TODO FIXME this may let you loose data?
                                   // I think it doesnt but not sure
                                   void this.initialTask.run();
-                                }}
-                                .user=${value?.data[0]}
-                                name=${"project_leader_id"}
-                                title=${msg("Project leader in")}
-                                prefix="leaders"
-                              ></pw-user-projects>
+                                },
+                                user: value?.data[0],
+                                name: "project_leader_id",
+                                title: msg("Project leader in"),
+                                prefix: "leaders"
+                              })}
 
-                              <pw-user-projects
-                                @refreshentitylist=${() => {
+                              ${pwUserProjects({
+                                refreshentitylist: () => {
                                   // TODO FIXME this may let you loose data?
                                   // I think it doesnt but not sure
                                   void this.initialTask.run();
-                                }}
-                                .user=${value?.data[0]}
-                                name=${"force_in_project_id"}
-                                title=${msg("Guaranteed project member in")}
-                                prefix="members"
-                              ></pw-user-projects>`
+                                },
+                                user: value?.data[0],
+                                name: "force_in_project_id",
+                                title: msg("Guaranteed project member in"),
+                                prefix: "members"
+                              })}`
                           : undefined}
                       </form>
                     </div>

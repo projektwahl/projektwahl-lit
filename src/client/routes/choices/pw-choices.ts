@@ -38,6 +38,7 @@ import { pwInputNumber } from "../../form/pw-input-number.js";
 import { pwInputText } from "../../form/pw-input-text.js";
 import type { z } from "zod";
 import type { entityRoutes } from "../../../lib/routes.js";
+import { pwRankSelect } from "./pw-rank-select.js";
 
 const defaultValue: z.infer<typeof entityRoutes["/api/v1/choices"]["request"]> =
   {
@@ -255,7 +256,10 @@ class PwChoices<X extends string> extends PwEntityList<"/api/v1/choices", X> {
                   </td>
                   <td>${value.min_age} - ${value.max_age}</td>
                   <td>
-                    <pw-rank-select .choice=${value}></pw-rank-select>
+                    ${pwRankSelect({
+                      // TODO FIXME this should error
+                      choice: value
+                    })}
                   </td>
                 </tr>`
               )
