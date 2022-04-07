@@ -41,7 +41,7 @@ import { pwInputCheckbox } from "../../form/pw-input-checkbox.js";
 import { aClick } from "../../pw-a.js";
 import "./pw-user-projects.js";
 
-export async function pwUser(id: number, viewOnly = false) {
+export async function pwUserCreatePreloaded(id: number, viewOnly = false) {
   const result = await taskFunction([id]);
   return pwUserCreate({
     disabled: viewOnly,

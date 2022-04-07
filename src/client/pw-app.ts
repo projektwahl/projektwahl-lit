@@ -53,6 +53,17 @@ import { sourceLocale, targetLocales } from "./generated/locales.js";
 import * as templates_de from "./generated/de.js";
 import { PwElement } from "./pw-element.js";
 import { LoggedInUserController } from "./user-controller.js";
+import { pwPrivacy } from "./routes/pw-privacy.js";
+import { pwImprint } from "./routes/pw-imprint.js";
+import { pwEvaluation } from "./routes/pw-evaluation.js";
+import { pwWelcome } from "./routes/pw-welcome.js";
+import { pwRedirect } from "./routes/login/pw-redirect.js";
+import { pwUserCreate, pwUserCreatePreloaded } from "./routes/users/pw-user-create.js";
+import { pwUsersPreloaded } from "./routes/users/pw-users.js";
+import { pwUsersImport } from "./routes/users/pw-users-import.js";
+import { pwProjectsPreloaded } from "./routes/projects/pw-projects.js";
+import { pwProjectCreate, pwProjectCreatePreloaded } from "./routes/projects/pw-project-create.js";
+import { pwChoicesPreloaded } from "./routes/choices/pw-choices.js";
 
 export const { getLocale, setLocale } = configureLocalization({
   sourceLocale,
@@ -65,88 +76,75 @@ void setLocale(window.LANGUAGE ?? "en");
 const pages = {
   "^/privacy$": async () => {
     await import("./routes/pw-privacy.js");
-    return html`<pw-privacy></pw-privacy>`;
+    return pwPrivacy({});
   },
   "^/imprint$": async () => {
     await import("./routes/pw-imprint.js");
-    return html`<pw-imprint></pw-imprint>`;
+    return pwImprint({});
   },
   "^/evaluation$": async () => {
     await import("./routes/pw-evaluation.js");
-    return html`<pw-evaluation></pw-evaluation>`;
+    return pwEvaluation({});
   },
   "^/$": async () => {
     await import("./routes/pw-welcome.js");
-    return html`<pw-welcome></pw-welcome>`;
+    return pwWelcome({});
   },
   "^/redirect$": async () => {
     await import("./routes/login/pw-redirect.js");
-    return html`<pw-redirect></pw-redirect>`;
+    return pwRedirect({});
   },
   "^/login$": async () => {
     const { pwLogin } = await import("./routes/login/pw-login.js");
-    return pwLogin();
+    return pwLogin({});
   },
   "^/users$": async (url: URL) => {
     const { pwUsers } = await import("./routes/users/pw-users.js");
-    return await pwUsers(url);
+    return await pwUsersPreloaded(url);
   },
   "^/users/create$": async () => {
     await import("./routes/users/pw-user-create.js");
-    return html`<pw-user-create
-      .url=${"/api/v1/users/create-or-update"}
-    ></pw-user-create>`;
+    return pwUserCreate({url: "/api/v1/users/create-or-update"})
   },
   "^/users/import$": async () => {
     await import("./routes/users/pw-users-import.js");
-    return html`<pw-users-import
-      uri="/api/v1/users/create-or-update"
-    ></pw-users-import>`;
+    return pwUsersImport({
+      // TODO FIXME this should error as that attribute is not available
+      uri: "/api/v1/users/create-or-update"
+    })
   },
   "^/users/edit/\\d+$": async (url: URL) => {
-    const { pwUser } = await import("./routes/users/pw-user-create.js");
-    return await pwUser(
+    return await pwUserCreatePreloaded(
       Number(url.pathname.match(/^\/users\/edit\/(\d+)$/)?.[1])
     );
   },
   "^/users/view/\\d+$": async (url: URL) => {
-    const { pwUser } = await import("./routes/users/pw-user-create.js");
-    return await pwUser(
+    return await pwUserCreatePreloaded(
       Number(url.pathname.match(/^\/users\/view\/(\d+)$/)?.[1]),
       true
     );
   },
   "^/projects$": async (url: URL) => {
-    const { pwProjects } = await import("./routes/projects/pw-projects.js");
-    return await pwProjects(url);
+    return await pwProjectsPreloaded(url);
   },
   "^/projects/create$": async () => {
-    await import("./routes/projects/pw-project-create.js");
-    await import("./routes/projects/pw-project-users.js");
-    return html`<pw-project-create
-      .url=${"/api/v1/projects/create"}
-    ></pw-project-create>`;
+    return pwProjectCreate({
+      url: "/api/v1/projects/create"
+    })
   },
   "^/projects/edit/\\d+$": async (url: URL) => {
-    const { pwProject } = await import(
-      "./routes/projects/pw-project-create.js"
-    );
-    return await pwProject(
+    return await pwProjectCreatePreloaded(
       Number(url.pathname.match(/^\/projects\/edit\/(\d+)$/)?.[1])
     );
   },
   "^/projects/view/\\d+$": async (url: URL) => {
-    const { pwProject } = await import(
-      "./routes/projects/pw-project-create.js"
-    );
-    return await pwProject(
+    return await pwProjectCreatePreloaded(
       Number(url.pathname.match(/^\/projects\/view\/(\d+)$/)?.[1]),
       true
     );
   },
   "^/vote$": async (url: URL) => {
-    const { pwChoices } = await import("./routes/choices/pw-choices.js");
-    return await pwChoices(url);
+    return await pwChoicesPreloaded(url);
   },
 };
 
