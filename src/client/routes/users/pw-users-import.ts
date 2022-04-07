@@ -32,20 +32,17 @@ import { ref } from "lit/directives/ref.js";
 import { pwInputFile } from "../../form/pw-input-file.js";
 
 // workaround see https://github.com/runem/lit-analyzer/issues/149#issuecomment-1006162839
-export function pwUsersImport(
-  props: Record<string, never> // Pick<PwUsersImport, never>
-) {
-  const { ...rest } = props;
+export function pwUsersImport(props: Pick<PwUsersImport, "url">) {
+  const { url, ...rest } = props;
   let _ = rest;
   _ = 1; // ensure no property is missed - Don't use `{}` as a type. `{}` actually means "any non-nullish value".
-  return html`<pw-users-import></pw-users-import>`;
+  return html`<pw-users-import .url=${url}></pw-users-import>`;
 }
 
 class PwUsersImport extends PwForm<"/api/v1/users/create-or-update"> {
   static get properties() {
     return {
       ...super.properties,
-      uri: { type: String },
       _task: {
         state: true,
         hasChanged: () => {

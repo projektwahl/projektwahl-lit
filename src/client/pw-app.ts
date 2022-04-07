@@ -111,8 +111,7 @@ const pages = {
   },
   "^/users/import$": () => {
     return pwUsersImport({
-      // TODO FIXME this should error as that attribute is not available
-      uri: "/api/v1/users/create-or-update",
+      url: "/api/v1/users/create-or-update",
     });
   },
   "^/users/edit/\\d+$": async (url: URL) => {
@@ -157,8 +156,8 @@ export function pwApp(
   props: Record<string, never> // Pick<PwApp, never>
 ) {
   const { ...rest } = props;
-  let _ = rest;
-  _ = 1; // ensure no property is missed - Don't use `{}` as a type. `{}` actually means "any non-nullish value".
+  const _: Record<string, never> = rest;
+  //_ = 1; // ensure no property is missed - Don't use `{}` as a type. `{}` actually means "any non-nullish value".
   return html`<pw-app></pw-app>`;
 }
 
