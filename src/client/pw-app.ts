@@ -81,35 +81,35 @@ export const { getLocale, setLocale } = configureLocalization({
 void setLocale(window.LANGUAGE ?? "en");
 
 const pages = {
-  "^/privacy$": async () => {
+  "^/privacy$": () => {
     return pwPrivacy({});
   },
-  "^/imprint$": async () => {
+  "^/imprint$": () => {
     return pwImprint({});
   },
-  "^/evaluation$": async () => {
+  "^/evaluation$": () => {
     return pwEvaluation({});
   },
-  "^/$": async () => {
+  "^/$": () => {
     return pwWelcome({});
   },
-  "^/redirect$": async () => {
+  "^/redirect$": () => {
     return pwRedirect({});
   },
-  "^/login$": async () => {
+  "^/login$": () => {
     return pwLogin({});
   },
   "^/users$": async (url: URL) => {
     return await pwUsersPreloaded(url);
   },
-  "^/users/create$": async () => {
+  "^/users/create$": () => {
     return pwUserCreate({
       url: "/api/v1/users/create-or-update",
       disabled: false,
       initial: undefined,
     });
   },
-  "^/users/import$": async () => {
+  "^/users/import$": () => {
     return pwUsersImport({
       // TODO FIXME this should error as that attribute is not available
       uri: "/api/v1/users/create-or-update",
@@ -129,7 +129,7 @@ const pages = {
   "^/projects$": async (url: URL) => {
     return await pwProjectsPreloaded(url);
   },
-  "^/projects/create$": async () => {
+  "^/projects/create$": () => {
     return pwProjectCreate({
       url: "/api/v1/projects/create",
       disabled: false,

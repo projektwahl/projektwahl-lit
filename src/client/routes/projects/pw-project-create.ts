@@ -29,7 +29,6 @@ import { HistoryController } from "../../history-controller.js";
 import { msg } from "@lit/localize";
 import type { z } from "zod";
 import type { routes, MinimalSafeParseError } from "../../../lib/routes.js";
-import { setupHmr } from "../../hmr.js";
 import { ref } from "lit/directives/ref.js";
 import { pwInputText } from "../../form/pw-input-text.js";
 import { pwInputNumber } from "../../form/pw-input-number.js";

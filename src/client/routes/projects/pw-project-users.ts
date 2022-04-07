@@ -28,13 +28,9 @@ import { msg } from "@lit/localize";
 import { PwUsers } from "../users/pw-users.js";
 import "./pw-project-user-checkbox.js";
 import "../../form/pw-input.js";
-import { setupHmr } from "../../hmr.js";
 import { aClick } from "../../pw-a.js";
 import { pwOrder } from "../../entity-list/pw-order.js";
-import {
-  parseRequestWithPrefix,
-  taskFunction,
-} from "../../entity-list/pw-entitylist.js";
+import { parseRequestWithPrefix } from "../../entity-list/pw-entitylist.js";
 import { pwInputCheckbox } from "../../form/pw-input-checkbox.js";
 import { pwInputNumber } from "../../form/pw-input-number.js";
 import { pwInputText } from "../../form/pw-input-text.js";

@@ -27,20 +27,15 @@ import { noChange } from "lit";
 import { msg } from "@lit/localize";
 import "../projects/pw-project-user-checkbox.js";
 import "../../form/pw-input.js";
-import { setupHmr } from "../../hmr.js";
 import { aClick } from "../../pw-a.js";
 import { pwOrder } from "../../entity-list/pw-order.js";
-import {
-  parseRequestWithPrefix,
-  taskFunction,
-} from "../../entity-list/pw-entitylist.js";
+import { parseRequestWithPrefix } from "../../entity-list/pw-entitylist.js";
 import { pwInputCheckbox } from "../../form/pw-input-checkbox.js";
 import { pwInputNumber } from "../../form/pw-input-number.js";
 import { pwInputText } from "../../form/pw-input-text.js";
 import type { entityRoutes, routes } from "../../../lib/routes.js";
 import type { z } from "zod";
 import { PwProjects } from "../projects/pw-projects.js";
-import { ifDefined } from "lit/directives/if-defined";
 import { pwProjectUserCheckbox } from "../projects/pw-project-user-checkbox.js";
 
 const defaultValue: z.infer<

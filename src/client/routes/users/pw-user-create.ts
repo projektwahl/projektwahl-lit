@@ -28,12 +28,7 @@ import { PwForm } from "../../form/pw-form.js";
 import { HistoryController } from "../../history-controller.js";
 import { msg } from "@lit/localize";
 import "../../form/pw-input.js";
-import type {
-  MinimalSafeParseError,
-  updateUserAction,
-  ResponseType,
-  routes,
-} from "../../../lib/routes.js";
+import type { MinimalSafeParseError, routes } from "../../../lib/routes.js";
 import type { z } from "zod";
 import { createRef, Ref, ref } from "lit/directives/ref.js";
 import { pwInputText } from "../../form/pw-input-text.js";
