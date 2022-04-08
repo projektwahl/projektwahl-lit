@@ -252,67 +252,73 @@ export class PwUserProjects<X extends string> extends PwProjects<X> {
   }
 
   override get body() {
-    return html`${this._task.render({
-      pending: () => {
-        return noChange;
-      },
-      complete: (result) => {
-        return result.success
-          ? result.data.entities.map(
-              (value) => html`<tr>
-                <td>
-                  ${pwProjectUserCheckbox({
-                    type: "radio",
-                    projectId: value.id,
-                    user: this.user,
-                    name: this.name,
-                  })}
-                </td>
-                <th scope="row">
-                  <p>
-                    ${value.deleted
-                      ? html`<del
-                          ><a @click=${aClick} href="/projects/view/${value.id}"
+    return html`<tbody>
+      ${this._task.render({
+        pending: () => {
+          return noChange;
+        },
+        complete: (result) => {
+          return result.success
+            ? result.data.entities.map(
+                (value) => html`<tr>
+                  <td>
+                    ${pwProjectUserCheckbox({
+                      type: "radio",
+                      projectId: value.id,
+                      user: this.user,
+                      name: this.name,
+                    })}
+                  </td>
+                  <th scope="row">
+                    <p>
+                      ${value.deleted
+                        ? html`<del
+                            ><a
+                              @click=${aClick}
+                              href="/projects/view/${value.id}"
+                              >${value.id}</a
+                            ></del
+                          >`
+                        : html`<a
+                            @click=${aClick}
+                            href="/projects/view/${value.id}"
                             >${value.id}</a
-                          ></del
-                        >`
-                      : html`<a
-                          @click=${aClick}
-                          href="/projects/view/${value.id}"
-                          >${value.id}</a
-                        >`}
-                  </p>
-                </th>
-                <td>
-                  <p>
-                    ${value.deleted
-                      ? html`<del
-                          ><a @click=${aClick} href="/projects/view/${value.id}"
+                          >`}
+                    </p>
+                  </th>
+                  <td>
+                    <p>
+                      ${value.deleted
+                        ? html`<del
+                            ><a
+                              @click=${aClick}
+                              href="/projects/view/${value.id}"
+                              >${value.title}</a
+                            ></del
+                          >`
+                        : html`<a
+                            @click=${aClick}
+                            href="/projects/view/${value.id}"
                             >${value.title}</a
-                          ></del
-                        >`
-                      : html`<a
-                          @click=${aClick}
-                          href="/projects/view/${value.id}"
-                          >${value.title}</a
-                        >`}
-                  </p>
-                </td>
-                <td>
-                  <p>
-                    ${value.deleted
-                      ? html`<del>${value.info}</del>`
-                      : html`${value.info}`}
-                  </p>
-                </td>
-              </tr>`
-            )
-          : result.error;
-      },
-      initial: () => {
-        return html`initial state`;
-      },
-    })}`;
+                          >`}
+                    </p>
+                  </td>
+                  <td>
+                    <p>
+                      ${value.deleted
+                        ? html`<del>${value.info}</del>`
+                        : html`${value.info}`}
+                    </p>
+                  </td>
+                </tr>`
+              )
+            : result.error;
+        },
+        initial: () => {
+          return html`initial state`;
+        },
+      })}
+    </tbody>`;
   }
 }
 

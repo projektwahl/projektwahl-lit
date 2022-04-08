@@ -250,7 +250,7 @@ export class PwProjects<X extends string> extends PwEntityList<
     }
   }
   override get body() {
-    return html`
+    return html`<tbody>
       ${this._task.render({
         pending: () => {
           return noChange;
@@ -332,7 +332,7 @@ export class PwProjects<X extends string> extends PwEntityList<
           return html`initial state`;
         },
       })}
-    `;
+    </tbody>`;
   }
 }
 

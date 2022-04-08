@@ -291,9 +291,7 @@ export class PwEntityList<
               <thead>
                 ${this.head}
               </thead>
-              <tbody>
-                ${this.body}
-              </tbody>
+              ${this.body}
             </table>
           </div>
         </form>

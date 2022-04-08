@@ -110,10 +110,10 @@ class PwChoices<X extends string> extends PwEntityList<"/api/v1/choices", X> {
             .map((e) => e.rank)
             .filter((r) => r !== null);
           const ranks1 = ranks.filter((r) => r === 1).length;
-          const ranks2 = ranks.filter((r) => r === 1).length;
-          const ranks3 = ranks.filter((r) => r === 1).length;
-          const ranks4 = ranks.filter((r) => r === 1).length;
-          const ranks5 = ranks.filter((r) => r === 1).length;
+          const ranks2 = ranks.filter((r) => r === 2).length;
+          const ranks3 = ranks.filter((r) => r === 3).length;
+          const ranks4 = ranks.filter((r) => r === 4).length;
+          const ranks5 = ranks.filter((r) => r === 5).length;
           return {
             success: true as const,
             data: [ranks1, ranks2, ranks3, ranks4, ranks5] as const,
@@ -122,7 +122,7 @@ class PwChoices<X extends string> extends PwEntityList<"/api/v1/choices", X> {
 
         return result;
       },
-      args: () => []
+      args: () => [],
     });
   }
 
@@ -147,6 +147,18 @@ class PwChoices<X extends string> extends PwEntityList<"/api/v1/choices", X> {
                   ${value.data[0] !== 1
                     ? `${value.data[0]} anstatt einer Erstwahl!`
                     : undefined}
+                  ${value.data[1] !== 1
+                    ? `${value.data[1]} anstatt einer Zweitwahl!`
+                    : undefined}
+                  ${value.data[2] !== 1
+                    ? `${value.data[2]} anstatt einer Drittwahl!`
+                    : undefined}
+                  ${value.data[3] !== 1
+                    ? `${value.data[3]} anstatt einer Viertwahl!`
+                    : undefined}
+                  ${value.data[4] !== 1
+                    ? `${value.data[4]} anstatt einer Fünftwahl!`
+                    : undefined}
                 </div>
               `;
             }
@@ -156,7 +168,9 @@ class PwChoices<X extends string> extends PwEntityList<"/api/v1/choices", X> {
             </div>`;
           }
         },
-        initial: () => ``,
+        initial: () => html`<div class="alert alert-primary" role="alert">
+          Wird geladen...
+        </div>`,
         pending: () => noChange,
         error: (error) => html`<div class="alert alert-danger" role="alert">
           ${msg(str`Error: ${error}`)}
@@ -298,66 +312,71 @@ class PwChoices<X extends string> extends PwEntityList<"/api/v1/choices", X> {
     }
   }
   override get body() {
-    return html`
-      ${this._task.render({
-        pending: () => {
-          return noChange;
-        },
-        complete: (result) => {
-          return result.success
-            ? repeat(
-                result.data.entities,
-                (value) => value.id,
-                (value) => html`<tr ${animate()}>
-                  <th scope="row">
-                    <p>
-                      ${value.deleted
-                        ? html`<del
-                            ><a
+    return html`<tbody
+        @refreshentitylist=${async () => {
+          await this.correctlyVotedTask.run();
+        }}
+      >
+        ${this._task.render({
+          pending: () => {
+            return noChange;
+          },
+          complete: (result) => {
+            return result.success
+              ? repeat(
+                  result.data.entities,
+                  (value) => value.id,
+                  (value) => html`<tr ${animate()}>
+                    <th scope="row">
+                      <p>
+                        ${value.deleted
+                          ? html`<del
+                              ><a
+                                @click=${aClick}
+                                href="/projects/view/${value.id}"
+                                >${value.id}</a
+                              ></del
+                            >`
+                          : html`<a
                               @click=${aClick}
                               href="/projects/view/${value.id}"
                               >${value.id}</a
-                            ></del
-                          >`
-                        : html`<a
-                            @click=${aClick}
-                            href="/projects/view/${value.id}"
-                            >${value.id}</a
-                          >`}
-                    </p>
-                  </th>
-                  <td>
-                    <p>
-                      ${value.deleted
-                        ? html`<del
-                            ><a
+                            >`}
+                      </p>
+                    </th>
+                    <td>
+                      <p>
+                        ${value.deleted
+                          ? html`<del
+                              ><a
+                                @click=${aClick}
+                                href="/projects/view/${value.id}"
+                                >${value.title}</a
+                              ></del
+                            >`
+                          : html`<a
                               @click=${aClick}
                               href="/projects/view/${value.id}"
                               >${value.title}</a
-                            ></del
-                          >`
-                        : html`<a
-                            @click=${aClick}
-                            href="/projects/view/${value.id}"
-                            >${value.title}</a
-                          >`}
-                    </p>
-                  </td>
-                  <td>${value.min_age} - ${value.max_age}</td>
-                  <td>
-                    ${pwRankSelect({
-                      choice: value,
-                    })}
-                  </td>
-                </tr>`
-              )
-            : undefined;
-        },
-        initial: () => {
-          return html`initial state`;
-        },
-      })}
-    `;
+                            >`}
+                      </p>
+                    </td>
+                    <td>${value.min_age} - ${value.max_age}</td>
+                    <td>
+                      ${pwRankSelect({
+                        choice: value,
+                      })}
+                    </td>
+                  </tr>`
+                )
+              : undefined;
+          },
+          initial: () => {
+            return html`initial state`;
+          },
+        })}
+      </tbody>
+      b`;
   }
 }
 
