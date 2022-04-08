@@ -85,7 +85,9 @@ class PwChoices<X extends string> extends PwEntityList<"/api/v1/choices", X> {
   }
 
   override get buttons() {
-    return html``;
+    return html`<div class="alert alert-success w-100" role="alert">
+      Korrekt gewählt!
+    </div> `;
   }
 
   override get head() {

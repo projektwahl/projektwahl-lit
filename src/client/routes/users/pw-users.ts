@@ -94,20 +94,24 @@ export class PwUsers<X extends string> extends PwEntityList<
   }
 
   override get buttons() {
-    return html` <a
-        @click=${aClick}
-        class="btn btn-primary mr-1 mb-1"
-        href="/users/create"
-        role="button"
-        >${msg("Create account")}</a
-      >
-      <a
-        @click=${aClick}
-        class="btn btn-primary mr-1 mb-1"
-        href="/users/${`import`}"
-        role="button"
-        >${msg("Import accounts")}</a
-      >`;
+    return html`<div class="row justify-content-start">
+      <div class="col-auto">
+        <a
+          @click=${aClick}
+          class="btn btn-primary mr-1 mb-1"
+          href="/users/create"
+          role="button"
+          >${msg("Create account")}</a
+        >
+        <a
+          @click=${aClick}
+          class="btn btn-primary mr-1 mb-1"
+          href="/users/${`import`}"
+          role="button"
+          >${msg("Import accounts")}</a
+        >
+      </div>
+    </div>`;
   }
 
   override get head() {
