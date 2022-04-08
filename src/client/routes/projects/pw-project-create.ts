@@ -211,7 +211,7 @@ export class PwProjectCreate extends PwForm<
               throw new Error(msg("component not fully initialized"));
             }
 
-            if (value?.data === undefined) {
+            if (this.projectId !== null && value?.data === undefined) {
               return html`<main class="container">
               <h1 class="text-center">${this.actionText}</h1>
               
