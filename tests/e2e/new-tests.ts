@@ -1345,6 +1345,9 @@ async function testVotingWorks(helper: Helper) {
     )
   );
 
+  await helper.driver.sleep(2000)
+
+  await helper.waitUntilLoaded();
   await helper.waitUntilLoaded();
 
   const alerts2 = await helper.driver.findElements(
@@ -1456,8 +1459,10 @@ async function testHelperCreatesProjectWithProjectLeadersAndMembers(
 // TODO better would be some kind of queing system where a ready browser takes the next task
 
 await runTestAllBrowsers(async (helper) => {
-  await createUserAllFields(helper);
+
+  await testVotingWorks(helper);
   await helper.driver.manage().deleteAllCookies();
+
   return;
   await checkUsersSortingWorks(helper);
   await helper.driver.manage().deleteAllCookies();
