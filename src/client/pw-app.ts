@@ -132,6 +132,7 @@ const pages = {
     return pwProjectCreate({
       url: "/api/v1/projects/create",
       disabled: false,
+      projectId: null,
     });
   },
   "^/projects/edit/\\d+$": (url: URL) => {

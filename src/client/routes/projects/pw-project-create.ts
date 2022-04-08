@@ -56,7 +56,7 @@ export function pwProjectCreate(
   let _ = rest;
   _ = 1; // ensure no property is missed - Don't use `{}` as a type. `{}` actually means "any non-nullish value".
   return html`<pw-project-create
-    projectId=${ifDefined(projectId)}
+    .projectId=${projectId}
     ?disabled=${disabled}
     .url=${url}
   ></pw-project-create>`;
@@ -106,7 +106,7 @@ export class PwProjectCreate extends PwForm<
         },
       },
       type: { state: true },
-      projectId: { type: Number },
+      projectId: { attribute: false },
     };
   }
 
@@ -114,10 +114,10 @@ export class PwProjectCreate extends PwForm<
     super.willUpdate(changedProperties);
     if (changedProperties.has("projectId")) {
       // because fields are resettable we need to set this to undefined
-      console.log("JOJOJOJOJO", changedProperties.get("projectId"))
-      console.log("JIJIJIJIJIJ", this.projectId)
+      console.log("JOJOJOJOJO", changedProperties.get("projectId"));
+      console.log("JIJIJIJIJIJ", this.projectId);
 
-      if (this.projectId) {
+      if (this.projectId !== null) {
         this.formData = {
           id: this.projectId,
         };
@@ -131,15 +131,15 @@ export class PwProjectCreate extends PwForm<
   override get actionText() {
     return this.disabled
       ? msg("View project")
-      : this.projectId !== undefined
+      : this.projectId !== null
       ? msg("Update project")
       : msg("Create project");
   }
 
-  projectId?: number;
+  projectId!: number | null;
 
   initialTask: Task<
-    [],
+    [number | null],
     | z.SafeParseSuccess<
         z.infer<
           typeof routes["/api/v1/projects"]["response"]
@@ -178,13 +178,13 @@ export class PwProjectCreate extends PwForm<
     this.initialTask = new Task(
       this,
       async () => {
-        if (this.projectId) {
+        if (this.projectId !== null) {
           return await taskFunction([this.projectId]);
         } else {
           return undefined;
         }
       },
-      () => []
+      () => [this.projectId]
     );
   }
 
@@ -204,8 +204,8 @@ export class PwProjectCreate extends PwForm<
 
       ${this.initialTask.render({
         complete: (value) => {
-          console.log("FORMDATA", this.formData)
-          console.log("INITIAL", value)
+          console.log("FORMDATA", this.formData);
+          console.log("INITIAL", value);
 
           if (value === undefined || value?.success) {
             if (this.actionText === undefined) {
@@ -478,17 +478,17 @@ export class PwProjectCreate extends PwForm<
         pending: () => noChange,
       })}
       <div
-          style="position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 1337;"
-        >
-          ${this.initialTask.render({
-            pending: () => html`<div
-              class="spinner-grow text-primary"
-              role="status"
-            >
-              <span class="visually-hidden">${msg("Loading...")}</span>
-            </div>`,
-          })}
-        </div>`;
+        style="position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 1337;"
+      >
+        ${this.initialTask.render({
+          pending: () => html`<div
+            class="spinner-grow text-primary"
+            role="status"
+          >
+            <span class="visually-hidden">${msg("Loading...")}</span>
+          </div>`,
+        })}
+      </div>`;
   }
 }
 
