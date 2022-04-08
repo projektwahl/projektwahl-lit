@@ -148,6 +148,8 @@ class FormTester {
     );
 
     assert.deepEqual(alerts, []);
+
+    await this.helper.waitUntilLoaded();
   }
 
   async submitFailure() {
@@ -237,7 +239,9 @@ class Helper {
   }
 
   async form(name: string) {
-    return new FormTester(this, await this.waitElem(name));
+    const formElement = await this.waitElem(name);
+    await this.waitUntilLoaded();
+    return new FormTester(this, formElement);
   }
 
   async openNavbar() {
@@ -569,7 +573,9 @@ async function createUserAllFields(helper: Helper) {
   form = await helper.form("pw-users");
 
   await form.checkField("filters,deleted", true);
+  await helper.waitUntilLoaded();
   await form.setField("filters,id", id);
+  await helper.waitUntilLoaded();
   await form.setField("filters,username", username2);
 
   await helper.waitUntilLoaded();
