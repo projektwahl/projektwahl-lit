@@ -132,16 +132,15 @@ const pages = {
     return pwProjectCreate({
       url: "/api/v1/projects/create",
       disabled: false,
-      initial: undefined,
     });
   },
-  "^/projects/edit/\\d+$": async (url: URL) => {
-    return await pwProjectCreatePreloaded(
+  "^/projects/edit/\\d+$": (url: URL) => {
+    return pwProjectCreatePreloaded(
       Number(url.pathname.match(/^\/projects\/edit\/(\d+)$/)?.[1])
     );
   },
-  "^/projects/view/\\d+$": async (url: URL) => {
-    return await pwProjectCreatePreloaded(
+  "^/projects/view/\\d+$": (url: URL) => {
+    return pwProjectCreatePreloaded(
       Number(url.pathname.match(/^\/projects\/view\/(\d+)$/)?.[1]),
       true
     );

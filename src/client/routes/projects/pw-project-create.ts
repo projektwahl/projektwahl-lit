@@ -36,26 +36,28 @@ import { pwInputCheckbox } from "../../form/pw-input-checkbox.js";
 import { aClick } from "../../pw-a.js";
 import { LoggedInUserController } from "../../user-controller.js";
 import { pwProjectUsers } from "../projects/pw-project-users.js";
+import { ifDefined } from "lit/directives/if-defined.js";
 
-export async function pwProjectCreatePreloaded(id: number, viewOnly = false) {
-  const result = await taskFunction([id]);
+export function pwProjectCreatePreloaded(id: number, viewOnly = false) {
+  //const result = await taskFunction([id]);
   return pwProjectCreate({
     disabled: viewOnly,
-    initial: result,
+    //initial: result,
+    projectId: id,
     url: "/api/v1/projects/update",
   });
 }
 
 // workaround see https://github.com/runem/lit-analyzer/issues/149#issuecomment-1006162839
 export function pwProjectCreate(
-  props: Pick<PwProjectCreate, "disabled" | "initial" | "url">
+  props: Pick<PwProjectCreate, "disabled" | "url" | "projectId">
 ) {
-  const { disabled, initial, url, ...rest } = props;
+  const { disabled, url, projectId, ...rest } = props;
   let _ = rest;
   _ = 1; // ensure no property is missed - Don't use `{}` as a type. `{}` actually means "any non-nullish value".
   return html`<pw-project-create
+    projectId=${ifDefined(projectId)}
     ?disabled=${disabled}
-    .initial=${initial}
     .url=${url}
   ></pw-project-create>`;
 }
@@ -104,42 +106,37 @@ export class PwProjectCreate extends PwForm<
         },
       },
       type: { state: true },
-      initial: { attribute: false },
+      projectId: { type: Number },
     };
   }
 
   protected willUpdate(changedProperties: Map<PropertyKey, unknown>): void {
-    super.willUpdate(changedProperties)
-    if (this.hasUpdated && changedProperties.has("initial")) {
-      console.log("THIS HERE2", this.initial);
-
+    super.willUpdate(changedProperties);
+    if (changedProperties.has("projectId")) {
       // because fields are resettable we need to set this to undefined
+      console.log("JOJOJOJOJO", changedProperties.get("projectId"))
+      console.log("JIJIJIJIJIJ", this.projectId)
 
-      // @ts-expect-error impossible
-      this.formData = {
-        ...(this.initial?.success
-          ? { id: this.initial.data.id }
-          : { id: undefined }), // TODO FIXME
-      };
+      if (this.projectId) {
+        this.formData = {
+          id: this.projectId,
+        };
+      } else {
+        // @ts-expect-error bruh
+        this.formData = {};
+      }
     }
   }
 
   override get actionText() {
     return this.disabled
       ? msg("View project")
-      : this.initial
+      : this.projectId !== undefined
       ? msg("Update project")
       : msg("Create project");
   }
 
-  initial:
-    | z.SafeParseSuccess<
-        z.infer<
-          typeof routes["/api/v1/projects"]["response"]
-        >["entities"][number]
-      >
-    | MinimalSafeParseError
-    | undefined;
+  projectId?: number;
 
   initialTask: Task<
     [],
@@ -181,15 +178,8 @@ export class PwProjectCreate extends PwForm<
     this.initialTask = new Task(
       this,
       async () => {
-        if (!this.hasUpdated) {
-          // TODO FIXME normally this undefined data here would be sent
-          if (this.initial !== undefined) {
-            return this.initial;
-          }
-        }
-
-        if (this.initial?.success) {
-          return await taskFunction([this.initial?.data.id]);
+        if (this.projectId) {
+          return await taskFunction([this.projectId]);
         } else {
           return undefined;
         }
@@ -199,18 +189,6 @@ export class PwProjectCreate extends PwForm<
   }
 
   override render() {
-    if (!this.hasUpdated) {
-      console.log("THIS HERE", this.initial);
-      // @ts-expect-error impossible
-
-      // TODO FIXME maybe replace by hidden input?
-      this.formData = {
-        ...(this.initial?.success
-          ? { id: this.initial.data.id }
-          : { id: undefined }), // TODO FIXME
-      };
-    }
-
     return html` <div
         style="position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 1337;"
       >
@@ -226,6 +204,9 @@ export class PwProjectCreate extends PwForm<
 
       ${this.initialTask.render({
         complete: (value) => {
+          console.log("FORMDATA", this.formData)
+          console.log("INITIAL", value)
+
           if (value === undefined || value?.success) {
             if (this.actionText === undefined) {
               throw new Error(msg("component not fully initialized"));
@@ -493,9 +474,21 @@ export class PwProjectCreate extends PwForm<
         error: (error) => {
           throw error;
         },
-        initial: () => html`initial`,
+        initial: () => html``,
         pending: () => noChange,
-      })}`;
+      })}
+      <div
+          style="position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 1337;"
+        >
+          ${this.initialTask.render({
+            pending: () => html`<div
+              class="spinner-grow text-primary"
+              role="status"
+            >
+              <span class="visually-hidden">${msg("Loading...")}</span>
+            </div>`,
+          })}
+        </div>`;
   }
 }
 
