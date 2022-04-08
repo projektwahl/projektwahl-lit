@@ -173,7 +173,8 @@ export const defaultHeaders = {
   "x-content-type-options": "nosniff",
   "x-frame-options": "DENY",
   "cache-control": "private, no-cache",
-  "Content-Security-Policy": "default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self' data:; frame-ancestors 'none'; form-action 'none'"
+  "Content-Security-Policy":
+    "default-src 'none'; connect-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; frame-ancestors 'none'; form-action 'none'",
 };
 
 if (!process.env.BASE_URL) {

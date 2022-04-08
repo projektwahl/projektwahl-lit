@@ -389,9 +389,7 @@ export class PwApp extends PwElement {
           </nav>
         </header>
 
-        <div
-          class="fully-centered"
-        >
+        <div class="fully-centered">
           ${this._apiTask.render({
             pending: () => html`<div
               class="spinner-grow text-primary"

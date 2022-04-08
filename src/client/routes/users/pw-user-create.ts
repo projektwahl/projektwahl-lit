@@ -207,9 +207,7 @@ class PwUserCreate extends PwForm<"/api/v1/users/create-or-update"> {
       throw new Error(msg("component not fully initialized"));
     }
 
-    return html` <div
-        class="fully-centered"
-      >
+    return html` <div class="fully-centered">
         ${this._task.render({
           pending: () => html`<div
             class="spinner-grow text-primary"
@@ -487,9 +485,7 @@ class PwUserCreate extends PwForm<"/api/v1/users/create-or-update"> {
         initial: () => html``,
         pending: () => noChange,
       })}
-      <div
-        class="fully-centered"
-      >
+      <div class="fully-centered">
         ${this.initialTask.render({
           pending: () => html`<div
             class="spinner-grow text-primary"

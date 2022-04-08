@@ -1334,6 +1334,7 @@ async function testVotingWorks(helper: Helper) {
   );
 
   await helper.waitUntilLoaded();
+  await helper.waitUntilLoaded();
 
   await helper.click(
     helper.driver.findElement(

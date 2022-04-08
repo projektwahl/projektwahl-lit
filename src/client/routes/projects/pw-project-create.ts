@@ -188,9 +188,7 @@ export class PwProjectCreate extends PwForm<
   }
 
   override render() {
-    return html` <div
-            class="fully-centered"
-      >
+    return html` <div class="fully-centered">
         ${this._task.render({
           pending: () => html`<div
             class="spinner-grow text-primary"
@@ -211,7 +209,11 @@ export class PwProjectCreate extends PwForm<
               throw new Error(msg("component not fully initialized"));
             }
 
-            if (this.projectId !== null && value?.data === undefined) {
+            if (
+              this.projectId !== null &&
+              value !== undefined &&
+              value.data === undefined
+            ) {
               return html`<main class="container">
               <h1 class="text-center">${this.actionText}</h1>
               
@@ -492,9 +494,7 @@ export class PwProjectCreate extends PwForm<
         initial: () => html``,
         pending: () => noChange,
       })}
-      <div
-      class="fully-centered"
-      >
+      <div class="fully-centered">
         ${this.initialTask.render({
           pending: () => html`<div
             class="spinner-grow text-primary"
