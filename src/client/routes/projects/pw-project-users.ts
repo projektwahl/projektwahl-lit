@@ -250,63 +250,69 @@ export class PwProjectUsers<X extends string> extends PwUsers<X> {
   }
 
   override get body() {
-    return html`${this._task.render({
-      pending: () => {
-        return noChange;
-      },
-      complete: (result) => {
-        return result.success
-          ? result.data.entities.map(
-              (value) => html`<tr>
-                <td>
-                  <pw-project-user-checkbox
-                    type="checkbox"
-                    projectId=${this.projectId}
-                    .user=${value}
-                    name=${this.name}
-                  ></pw-project-user-checkbox>
-                </td>
-                <th scope="row">
-                  <p>
-                    ${value.deleted
-                      ? html`<del
-                          ><a @click=${aClick} href="/users/view/${value.id}"
+    return html`<tbody>
+      ${this._task.render({
+        pending: () => {
+          return noChange;
+        },
+        complete: (result) => {
+          return result.success
+            ? result.data.entities.map(
+                (value) => html`<tr>
+                  <td>
+                    <pw-project-user-checkbox
+                      type="checkbox"
+                      projectId=${this.projectId}
+                      .user=${value}
+                      name=${this.name}
+                    ></pw-project-user-checkbox>
+                  </td>
+                  <th scope="row">
+                    <p>
+                      ${value.deleted
+                        ? html`<del
+                            ><a @click=${aClick} href="/users/view/${value.id}"
+                              >${value.id}</a
+                            ></del
+                          >`
+                        : html`<a
+                            @click=${aClick}
+                            href="/users/view/${value.id}"
                             >${value.id}</a
-                          ></del
-                        >`
-                      : html`<a @click=${aClick} href="/users/view/${value.id}"
-                          >${value.id}</a
-                        >`}
-                  </p>
-                </th>
-                <td>
-                  <p>
-                    ${value.deleted
-                      ? html`<del
-                          ><a @click=${aClick} href="/users/view/${value.id}"
+                          >`}
+                    </p>
+                  </th>
+                  <td>
+                    <p>
+                      ${value.deleted
+                        ? html`<del
+                            ><a @click=${aClick} href="/users/view/${value.id}"
+                              >${value.username}</a
+                            ></del
+                          >`
+                        : html`<a
+                            @click=${aClick}
+                            href="/users/view/${value.id}"
                             >${value.username}</a
-                          ></del
-                        >`
-                      : html`<a @click=${aClick} href="/users/view/${value.id}"
-                          >${value.username}</a
-                        >`}
-                  </p>
-                </td>
-                <td>
-                  <p>
-                    ${value.deleted
-                      ? html`<del>${value.type}</del>`
-                      : html`${value.type}`}
-                  </p>
-                </td>
-              </tr>`
-            )
-          : result.error;
-      },
-      initial: () => {
-        return html`initial state`;
-      },
-    })}`;
+                          >`}
+                    </p>
+                  </td>
+                  <td>
+                    <p>
+                      ${value.deleted
+                        ? html`<del>${value.type}</del>`
+                        : html`${value.type}`}
+                    </p>
+                  </td>
+                </tr>`
+              )
+            : result.error;
+        },
+        initial: () => {
+          return html`initial state`;
+        },
+      })}
+    </tbody>`;
   }
 }
 

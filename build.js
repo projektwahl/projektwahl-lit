@@ -85,6 +85,16 @@ let version_short = (
 
 {
   let { stdout, stderr } = await exec(
+    //"purgecss --css node_modules/bootstrap/dist/css/bootstrap.css --content dist/*.js --output dist/bootstrap.min.css --font-face --keyframes --variables"
+    "cp src/client/main.css dist/"
+  );
+
+  console.log(stdout);
+  console.log(stderr);
+}
+
+{
+  let { stdout, stderr } = await exec(
     "cp node_modules/bootstrap/dist/css/bootstrap.min.css.map dist/"
   );
 
@@ -151,11 +161,7 @@ const index = `<!DOCTYPE html>
 SPDX-License-Identifier: AGPL-3.0-or-later
 SPDX-FileCopyrightText: 2021 Moritz Hedtke <Moritz.Hedtke@t-online.de>
 -->
-    <style>
-      body {
-        overflow-y: scroll;
-      }
-    </style>
+    <link rel="stylesheet" href="/dist/main.css">
     <link
       href="/dist/bootstrap_${bootstrapHash}.min.css"
       rel="stylesheet"
@@ -168,7 +174,7 @@ SPDX-FileCopyrightText: 2021 Moritz Hedtke <Moritz.Hedtke@t-online.de>
     <link rel="icon" type="image/png" sizes="16x16" href="/dist/favicon-16x16.png">
     <link rel="manifest" href="/dist/site.webmanifest">
   </head>
-  <body style="height: 100vh;">
+  <body class="height-100">
     <script
       type="module"
       src="/dist/pw-app_${pwAppHash}.js"

@@ -108,9 +108,7 @@ class PwRedirect extends PwForm<"/api/v1/redirect"> {
           <div class="col-md-7 col-lg-8">
             ${this.getErrors()}
 
-            <div
-              style="position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 1337;"
-            >
+            <div class="fully-centered">
               ${this._task.render({
                 pending: () => html`<div
                   class="spinner-grow text-primary"

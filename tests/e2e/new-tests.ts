@@ -297,7 +297,7 @@ async function runTest(
   GRANT SELECT,INSERT,UPDATE ON users TO projektwahl_staging;
   GRANT SELECT,INSERT,UPDATE ON projects_with_deleted TO projektwahl_staging;
   GRANT SELECT,INSERT,UPDATE ON projects TO projektwahl_staging;
-  GRANT SELECT,INSERT,UPDATE ON choices TO projektwahl_staging;
+  GRANT SELECT,INSERT,UPDATE,DELETE ON choices TO projektwahl_staging;
   GRANT INSERT ON settings TO projektwahl_staging;
   GRANT SELECT,INSERT,UPDATE,DELETE ON sessions TO projektwahl_staging;
   ALTER VIEW users OWNER TO projektwahl_staging;
@@ -1333,6 +1333,7 @@ async function testVotingWorks(helper: Helper) {
     await helper.driver.findElement(By.css(`a[href="/vote"]`))
   );
 
+  await helper.waitUntilLoaded();
   await helper.waitUntilLoaded();
 
   await helper.click(

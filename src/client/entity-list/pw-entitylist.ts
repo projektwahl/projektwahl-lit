@@ -245,9 +245,7 @@ export class PwEntityList<
           }}
           @submit=${(e: Event) => e.preventDefault()}
         >
-          <div class="row justify-content-start">
-            <div class="col-auto">${this.buttons}</div>
-          </div>
+          ${this.buttons}
 
           <div class="row justify-content-end">
             <div class="col-4">
@@ -293,9 +291,7 @@ export class PwEntityList<
               <thead>
                 ${this.head}
               </thead>
-              <tbody>
-                ${this.body}
-              </tbody>
+              ${this.body}
             </table>
           </div>
         </form>

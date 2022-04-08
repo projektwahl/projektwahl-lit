@@ -99,13 +99,17 @@ export class PwProjects<X extends string> extends PwEntityList<
   }
 
   override get buttons() {
-    return html` <a
-      @click=${aClick}
-      class="btn btn-primary"
-      href="/projects/create"
-      role="button"
-      >${msg("Create project")}</a
-    >`;
+    return html`<div class="row justify-content-start">
+      <div class="col-auto">
+        <a
+          @click=${aClick}
+          class="btn btn-primary"
+          href="/projects/create"
+          role="button"
+          >${msg("Create project")}</a
+        >
+      </div>
+    </div>`;
   }
 
   override get head() {
@@ -246,7 +250,7 @@ export class PwProjects<X extends string> extends PwEntityList<
     }
   }
   override get body() {
-    return html`
+    return html`<tbody>
       ${this._task.render({
         pending: () => {
           return noChange;
@@ -328,7 +332,7 @@ export class PwProjects<X extends string> extends PwEntityList<
           return html`initial state`;
         },
       })}
-    `;
+    </tbody>`;
   }
 }
 
