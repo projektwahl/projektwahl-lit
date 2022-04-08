@@ -23,6 +23,16 @@ SPDX-FileCopyrightText: 2021 Moritz Hedtke <Moritz.Hedtke@t-online.de>
 import { html } from "lit";
 import { PwElement } from "../pw-element.js";
 
+// workaround see https://github.com/runem/lit-analyzer/issues/149#issuecomment-1006162839
+export function pwPrivacy(
+  props: Record<string, never> // Pick<PwPrivacy, never>
+) {
+  const { ...rest } = props;
+  const _: Record<string, never> = rest;
+  //_ = 1; // ensure no property is missed - Don't use `{}` as a type. `{}` actually means "any non-nullish value".
+  return html`<pw-privacy></pw-privacy>`;
+}
+
 export class PwPrivacy extends PwElement {
   protected render() {
     return html`

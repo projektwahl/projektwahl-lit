@@ -21,29 +21,35 @@ SPDX-License-Identifier: AGPL-3.0-or-later
 SPDX-FileCopyrightText: 2021 Moritz Hedtke <Moritz.Hedtke@t-online.de>
 */
 import { html } from "lit";
-import { setupHmr } from "../hmr.js";
 import { PwElement } from "../pw-element.js";
 
-export const PwImprint = setupHmr(
-  "PwImprint",
-  class PwImprint extends PwElement {
-    protected render() {
-      return html`
-        <div class="container">
-          <h1 class="text-center">Impressum</h1>
+// workaround see https://github.com/runem/lit-analyzer/issues/149#issuecomment-1006162839
+export function pwImprint(
+  props: Record<string, never> // Pick<PwImprint, never>
+) {
+  const { ...rest } = props;
+  const _: Record<string, never> = rest;
+  //_ = 1; // ensure no property is missed - Don't use `{}` as a type. `{}` actually means "any non-nullish value".
+  return html`<pw-imprint></pw-imprint>`;
+}
 
-          <h2>Angaben gemäß § 5 TMG</h2>
-          <address>
-            Moritz Hedtke<br />
-            Anne-Frank-Straße 10<br />
-            64354 Reinheim<br />
-            Telefon: +49 (0) 6162 2918<br />
-            E-Mail: Moritz.Hedtke@t-online.de
-          </address>
-        </div>
-      `;
-    }
+export class PwImprint extends PwElement {
+  protected render() {
+    return html`
+      <div class="container">
+        <h1 class="text-center">Impressum</h1>
+
+        <h2>Angaben gemäß § 5 TMG</h2>
+        <address>
+          Moritz Hedtke<br />
+          Anne-Frank-Straße 10<br />
+          64354 Reinheim<br />
+          Telefon: +49 (0) 6162 2918<br />
+          E-Mail: Moritz.Hedtke@t-online.de
+        </address>
+      </div>
+    `;
   }
-);
+}
 
 customElements.define("pw-imprint", PwImprint);

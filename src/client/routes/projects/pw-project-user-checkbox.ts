@@ -31,6 +31,21 @@ import type { z } from "zod";
 import { live } from "lit/directives/live.js";
 import { PwElement } from "../../pw-element.js";
 
+// workaround see https://github.com/runem/lit-analyzer/issues/149#issuecomment-1006162839
+export function pwProjectUserCheckbox(
+  props: Pick<PwProjectUserCheckbox, "type" | "projectId" | "user" | "name">
+) {
+  const { type, projectId, user, name, ...rest } = props;
+  let _ = rest;
+  _ = 1; // ensure no property is missed - Don't use `{}` as a type. `{}` actually means "any non-nullish value".
+  return html`<pw-project-user-checkbox
+    type=${type}
+    projectId=${projectId}
+    .user=${user}
+    name=${name}
+  ></pw-project-user-checkbox>`;
+}
+
 class PwProjectUserCheckbox extends PwElement {
   static override get properties() {
     return {

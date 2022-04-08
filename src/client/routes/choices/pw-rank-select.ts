@@ -29,6 +29,14 @@ import type { routes, ResponseType } from "../../../lib/routes.js";
 import type { z } from "zod";
 import { PwElement } from "../../pw-element.js";
 
+// workaround see https://github.com/runem/lit-analyzer/issues/149#issuecomment-1006162839
+export function pwRankSelect(props: Pick<PwRankSelect, "choice">) {
+  const { choice, ...rest } = props;
+  let _ = rest;
+  _ = 1; // ensure no property is missed - Don't use `{}` as a type. `{}` actually means "any non-nullish value".
+  return html`<pw-rank-select .choice=${choice}></pw-rank-select>`;
+}
+
 class PwRankSelect extends PwElement {
   static override get properties() {
     return {

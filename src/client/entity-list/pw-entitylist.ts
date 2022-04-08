@@ -111,7 +111,7 @@ export class PwEntityList<
       },
       initial: { attribute: false },
       debouncedUrl: { state: true },
-      prefix: { type: String },
+      prefix: { attribute: false },
     };
   }
 
@@ -156,7 +156,7 @@ export class PwEntityList<
     return "blub";
   }
 
-  initial: ResponseType<P> | undefined;
+  initial?: ResponseType<P>;
 
   protected history;
 

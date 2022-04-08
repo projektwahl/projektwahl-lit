@@ -68,6 +68,7 @@ class FormTester {
   }
 
   async resetField(name: string, value: string) {
+    await this.helper.ensureNothingLoading();
     const element = await this.form.findElement(
       By.css(`input[name="${name}"]`)
     );
@@ -77,6 +78,7 @@ class FormTester {
   }
 
   async setField(name: string, value: string) {
+    await this.helper.ensureNothingLoading();
     const element = await this.form.findElement(
       By.css(`input[name="${name}"]`)
     );
@@ -84,6 +86,7 @@ class FormTester {
   }
 
   async resetTextareaField(name: string, value: string) {
+    await this.helper.ensureNothingLoading();
     const element = await this.form.findElement(
       By.css(`textarea[name="${name}"]`)
     );
@@ -93,6 +96,7 @@ class FormTester {
   }
 
   async setTextareaField(name: string, value: string) {
+    await this.helper.ensureNothingLoading();
     const element = await this.form.findElement(
       By.css(`textarea[name="${name}"]`)
     );
@@ -101,6 +105,7 @@ class FormTester {
   }
 
   async checkField(name: string, value: boolean) {
+    await this.helper.ensureNothingLoading();
     const element = await this.form.findElement(
       By.css(`input[name="${name}"]`)
     );
@@ -110,11 +115,13 @@ class FormTester {
   }
 
   async getField(name: string) {
+    await this.helper.ensureNothingLoading();
     const element = await this.form.findElement(By.css(`*[name="${name}"]`));
     return await element.getAttribute("value");
   }
 
   async getCheckboxField(name: string) {
+    await this.helper.ensureNothingLoading();
     const element = await this.form.findElement(
       By.css(`input[name="${name}"]`)
     );
@@ -122,6 +129,7 @@ class FormTester {
   }
 
   private async submit() {
+    await this.helper.ensureNothingLoading();
     const submitButton = await this.form.findElement(
       By.css('button[type="submit"]')
     );
@@ -132,6 +140,7 @@ class FormTester {
   }
 
   async submitSuccess() {
+    await this.helper.ensureNothingLoading();
     await this.submit();
 
     const alerts = await this.helper.driver.findElements(
@@ -139,9 +148,12 @@ class FormTester {
     );
 
     assert.deepEqual(alerts, []);
+
+    await this.helper.waitUntilLoaded();
   }
 
   async submitFailure() {
+    await this.helper.ensureNothingLoading();
     await this.submit();
 
     const alert = await this.helper.driver.findElement(
@@ -149,6 +161,7 @@ class FormTester {
     );
 
     assert.match(await alert.getText(), /Some errors occurred./);
+    await this.helper.waitUntilLoaded();
     return this.getErrors();
   }
 
@@ -188,22 +201,34 @@ class Helper {
     this.driver = driver;
   }
 
+  async ensureNothingLoading() {
+    try {
+      await this.driver.findElement(By.css(".spinner-grow"));
+    } catch (error) {
+      return;
+    }
+    throw new Error("something is still loading. This may be a bug");
+  }
+
   async click(element: WebElement) {
+    await this.ensureNothingLoading();
     await this.driver.executeScript(`arguments[0].click()`, element);
   }
 
   async waitUntilLoaded() {
-    const loadingIndicator = await this.driver.wait(
-      until.elementLocated(By.css(".spinner-grow")),
-      5000,
-      `.spinner-grow not found`
-    );
+    try {
+      const loadingIndicators = await this.driver.findElements(
+        By.css(".spinner-grow")
+      );
 
-    await this.driver.wait(
-      until.stalenessOf(loadingIndicator),
-      10000,
-      "waitUntilLoaded"
-    );
+      await Promise.all(
+        loadingIndicators.map((e) =>
+          this.driver.wait(until.stalenessOf(e), 10000, "waitUntilLoaded")
+        )
+      );
+    } catch (error) {
+      throw new Error("spinner-grow failed");
+    }
   }
 
   async waitElem(name: string) {
@@ -215,10 +240,13 @@ class Helper {
   }
 
   async form(name: string) {
-    return new FormTester(this, await this.waitElem(name));
+    const formElement = await this.waitElem(name);
+    await this.waitUntilLoaded();
+    return new FormTester(this, formElement);
   }
 
   async openNavbar() {
+    await this.ensureNothingLoading();
     const navbarButton = this.driver.findElement(
       By.css("button.navbar-toggler")
     );
@@ -522,11 +550,15 @@ async function createUserAllFields(helper: Helper) {
   await form.checkField("0,deleted", deleted);
   await form.submitSuccess();
   await helper.driver.wait(until.urlContains("/users/edit/"), 2000);
-  const id = (await helper.driver.getCurrentUrl()).substring(
-    "https://localhost:8443/users/edit/".length
-  );
+  const id = (await helper.driver.getCurrentUrl()).match(
+    /\/users\/edit\/(\d+)/
+  )?.[1];
+  if (!id) {
+    assert.fail("id not found in url");
+  }
   await helper.waitUntilLoaded();
   form = await helper.form("pw-user-create");
+  await helper.waitUntilLoaded();
   assert.equal(await form.getField("0,username"), username);
   assert.equal(await form.getField("0,openid_id"), email);
   assert.equal(await form.getField("0,group"), group);
@@ -538,6 +570,7 @@ async function createUserAllFields(helper: Helper) {
   await form.resetField("0,username", username2);
   await form.submitSuccess();
 
+  // back
   await helper.click(
     await helper.driver.findElement(By.css(`button[class="btn btn-secondary"]`))
   );
@@ -545,7 +578,9 @@ async function createUserAllFields(helper: Helper) {
   form = await helper.form("pw-users");
 
   await form.checkField("filters,deleted", true);
+  await helper.waitUntilLoaded();
   await form.setField("filters,id", id);
+  await helper.waitUntilLoaded();
   await form.setField("filters,username", username2);
 
   await helper.waitUntilLoaded();
@@ -554,6 +589,8 @@ async function createUserAllFields(helper: Helper) {
   await helper.click(await helper.driver.findElement(By.css(`td p a`)));
 
   form = await helper.form("pw-user-create");
+  await helper.waitUntilLoaded();
+
   assert.equal(await form.getField("0,username"), username2);
   assert.equal(await form.getField("0,openid_id"), email);
   assert.equal(await form.getField("0,group"), group);
@@ -629,9 +666,12 @@ async function createProjectAllFields(helper: Helper) {
   await form.checkField("deleted", deleted);
   await form.submitSuccess();
   await helper.driver.wait(until.urlContains("/projects/edit/"), 2000);
-  const id = (await helper.driver.getCurrentUrl()).substring(
-    "https://localhost:8443/projects/edit/".length
-  );
+  const id = (await helper.driver.getCurrentUrl()).match(
+    /\/projects\/edit\/(\d+)/
+  )?.[1];
+  if (!id) {
+    assert.fail("id not found in url");
+  }
   await helper.waitUntilLoaded();
   form = await helper.form("pw-project-create");
   assert.equal(await form.getField("title"), title);
@@ -660,7 +700,10 @@ async function createProjectAllFields(helper: Helper) {
   form = await helper.form("pw-projects");
 
   await form.checkField("filters,deleted", true);
+  await helper.waitUntilLoaded();
   await form.setField("filters,id", id);
+  await helper.waitUntilLoaded();
+
   await form.setField("filters,title", title2);
 
   await helper.waitUntilLoaded();
@@ -669,6 +712,9 @@ async function createProjectAllFields(helper: Helper) {
   await helper.click(await helper.driver.findElement(By.css(`td p a`)));
 
   form = await helper.form("pw-project-create");
+
+  await helper.waitUntilLoaded();
+
   assert.equal(await form.getField("title"), title2);
   assert.equal(await form.getField("info"), info);
   assert.equal(await form.getField("place"), place);
@@ -1160,6 +1206,8 @@ async function resettingUserWorks2(helper: Helper) {
       form = await helper.form("pw-user-create");
     }
 
+    await helper.waitUntilLoaded();
+
     // TODO click all reset buttons
     await Promise.all(
       (
@@ -1244,6 +1292,8 @@ async function resettingProjectWorks2(helper: Helper) {
       form = await helper.form("pw-project-create");
     }
 
+    await helper.waitUntilLoaded();
+
     // TODO click all reset buttons
     await Promise.all(
       (
@@ -1309,6 +1359,9 @@ async function testVotingWorks(helper: Helper) {
     )
   );
 
+  await helper.driver.sleep(2000);
+
+  await helper.waitUntilLoaded();
   await helper.waitUntilLoaded();
 
   const alerts2 = await helper.driver.findElements(
@@ -1371,7 +1424,8 @@ async function testHelperCreatesProjectWithProjectLeadersAndMembers(
   await helper.waitUntilLoaded();
   form = await helper.form("pw-project-create");
 
-  await helper.waitUntilLoaded();
+  await helper.driver.sleep(5000);
+  //await helper.waitUntilLoaded();
   //await helper.waitUntilLoaded();
 
   await helper.click(
@@ -1406,6 +1460,8 @@ async function testHelperCreatesProjectWithProjectLeadersAndMembers(
       1000
     )
   );
+
+  await helper.driver.sleep(2000);
 
   await helper.waitUntilLoaded();
 

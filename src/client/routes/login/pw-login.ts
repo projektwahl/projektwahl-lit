@@ -31,6 +31,16 @@ import "../../form/pw-input.js";
 import { ref } from "lit/directives/ref.js";
 import { pwInputText } from "../../form/pw-input-text.js";
 
+// workaround see https://github.com/runem/lit-analyzer/issues/149#issuecomment-1006162839
+export function pwLogin(
+  props: Record<string, never> // Pick<PwLogin, never>
+) {
+  const { ...rest } = props;
+  const _: Record<string, never> = rest;
+  //_ = 1; // ensure no property is missed - Don't use `{}` as a type. `{}` actually means "any non-nullish value".
+  return html`<pw-login></pw-login>`;
+}
+
 class PwLogin extends PwForm<"/api/v1/login"> {
   static override get properties() {
     return {
@@ -163,9 +173,5 @@ class PwLogin extends PwForm<"/api/v1/login"> {
 }
 
 customElements.define("pw-login", PwLogin);
-
-export const pwLogin = (): import("lit").TemplateResult => {
-  return html`<pw-login></pw-login>`;
-};
 
 export { PwLogin };

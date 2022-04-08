@@ -30,6 +30,16 @@ import { msg } from "@lit/localize";
 import "../../form/pw-input.js";
 import { z } from "zod";
 
+// workaround see https://github.com/runem/lit-analyzer/issues/149#issuecomment-1006162839
+export function pwRedirect(
+  props: Record<string, never> // Pick<PwRedirect, never>
+) {
+  const { ...rest } = props;
+  const _: Record<string, never> = rest;
+  //_ = 1; // ensure no property is missed - Don't use `{}` as a type. `{}` actually means "any non-nullish value".
+  return html`<pw-redirect></pw-redirect>`;
+}
+
 class PwRedirect extends PwForm<"/api/v1/redirect"> {
   static override get properties() {
     return {
