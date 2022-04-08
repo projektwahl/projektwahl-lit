@@ -106,7 +106,7 @@ const pages = {
     return pwUserCreate({
       url: "/api/v1/users/create-or-update",
       disabled: false,
-      initial: undefined,
+      userId: null,
     });
   },
   "^/users/import$": () => {
@@ -114,13 +114,13 @@ const pages = {
       url: "/api/v1/users/create-or-update",
     });
   },
-  "^/users/edit/\\d+$": async (url: URL) => {
-    return await pwUserCreatePreloaded(
+  "^/users/edit/\\d+$": (url: URL) => {
+    return pwUserCreatePreloaded(
       Number(url.pathname.match(/^\/users\/edit\/(\d+)$/)?.[1])
     );
   },
-  "^/users/view/\\d+$": async (url: URL) => {
-    return await pwUserCreatePreloaded(
+  "^/users/view/\\d+$": (url: URL) => {
+    return pwUserCreatePreloaded(
       Number(url.pathname.match(/^\/users\/view\/(\d+)$/)?.[1]),
       true
     );

@@ -36,7 +36,6 @@ import { pwInputCheckbox } from "../../form/pw-input-checkbox.js";
 import { aClick } from "../../pw-a.js";
 import { LoggedInUserController } from "../../user-controller.js";
 import { pwProjectUsers } from "../projects/pw-project-users.js";
-import { ifDefined } from "lit/directives/if-defined.js";
 
 export function pwProjectCreatePreloaded(id: number, viewOnly = false) {
   //const result = await taskFunction([id]);

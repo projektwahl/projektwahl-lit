@@ -39,25 +39,25 @@ import { aClick } from "../../pw-a.js";
 import "./pw-user-projects.js";
 import { pwUserProjects } from "./pw-user-projects.js";
 
-export async function pwUserCreatePreloaded(id: number, viewOnly = false) {
-  const result = await taskFunction([id]);
+export function pwUserCreatePreloaded(id: number, viewOnly = false) {
+  //const result = await taskFunction([id]);
   return pwUserCreate({
     disabled: viewOnly,
-    initial: result,
+    userId: id,
     url: "/api/v1/users/create-or-update",
   });
 }
 
 // workaround see https://github.com/runem/lit-analyzer/issues/149#issuecomment-1006162839
 export function pwUserCreate(
-  props: Pick<PwUserCreate, "disabled" | "initial" | "url">
+  props: Pick<PwUserCreate, "disabled" | "userId" | "url">
 ) {
-  const { disabled, initial, url, ...rest } = props;
+  const { disabled, userId, url, ...rest } = props;
   let _ = rest;
   _ = 1; // ensure no property is missed - Don't use `{}` as a type. `{}` actually means "any non-nullish value".
   return html`<pw-user-create
     ?disabled=${disabled}
-    .initial=${initial}
+    .userId=${userId}
     .url=${url}
   ></pw-user-create>`;
 }
@@ -113,29 +113,22 @@ class PwUserCreate extends PwForm<"/api/v1/users/create-or-update"> {
         },
       },
       type: { state: true },
-      initial: { attribute: false },
+      userId: { attribute: false },
     };
   }
 
   override get actionText() {
     return this.disabled
       ? msg("View account")
-      : this.initial
+      : this.userId !== null
       ? msg("Update account")
       : msg("Create account");
   }
 
-  initial:
-    | z.SafeParseSuccess<
-        (z.infer<
-          typeof routes["/api/v1/users"]["response"]
-        >["entities"][number] & { action: "update" })[]
-      >
-    | MinimalSafeParseError
-    | undefined;
+  userId!: number | null;
 
   initialTask: Task<
-    [],
+    [number | null],
     | z.SafeParseSuccess<
         (z.infer<
           typeof routes["/api/v1/users"]["response"]
@@ -178,288 +171,286 @@ class PwUserCreate extends PwForm<"/api/v1/users/create-or-update"> {
     this.initialTask = new Task(
       this,
       async () => {
-        if (!this.hasUpdated) {
-          if (this.initial !== undefined) {
-            return this.initial;
-          }
-        }
-
-        if (this.initial?.success) {
-          return await taskFunction([this.initial?.data[0].id]);
+        if (this.userId !== null) {
+          return await taskFunction([this.userId]);
         } else {
           return undefined;
         }
       },
-      () => []
+      () => [this.userId]
     );
 
     this.typeRef = createRef();
   }
 
+  protected willUpdate(changedProperties: Map<PropertyKey, unknown>): void {
+    super.willUpdate(changedProperties);
+    if (changedProperties.has("userId")) {
+      // because fields are resettable we need to set this to undefined
+
+      if (this.userId !== null) {
+        this.formData = [
+          {
+            action: "update",
+            id: this.userId,
+          },
+        ];
+      } else {
+        // @ts-expect-error bruh
+        this.formData = [{ action: "create" }];
+      }
+    }
+  }
+
   override render() {
-    if (!this.hasUpdated) {
-      this.formData = [
-        // @ts-expect-error impossible
-        this.initial?.success
-          ? {
-              action: "update",
-              project_leader_id: undefined,
-              force_in_project_id: undefined,
-              id: this.initial.data[0].id,
-            }
-          : { action: "create" },
-      ];
+    if (this.actionText === undefined) {
+      throw new Error(msg("component not fully initialized"));
     }
 
-    if (this.initial === undefined || this.initial.success) {
-      if (this.actionText === undefined) {
-        throw new Error(msg("component not fully initialized"));
-      }
+    return html` <div
+        style="position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 1337;"
+      >
+        ${this._task.render({
+          pending: () => html`<div
+            class="spinner-grow text-primary"
+            role="status"
+          >
+            <span class="visually-hidden">${msg("Loading...")}</span>
+          </div>`,
+        })}
+      </div>
 
-      return html` <div
-          style="position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 1337;"
-        >
-          ${this._task.render({
-            pending: () => html`<div
-              class="spinner-grow text-primary"
-              role="status"
-            >
-              <span class="visually-hidden">${msg("Loading...")}</span>
-            </div>`,
-          })}
-        </div>
+      ${this.initialTask.render({
+        complete: (value) => {
+          if (value === undefined || value?.success) {
+            if (this.actionText === undefined) {
+              throw new Error(msg("component not fully initialized"));
+            }
 
-        ${this.initialTask.render({
-          complete: (value) => {
-            if (value === undefined || value?.success) {
-              if (this.actionText === undefined) {
-                throw new Error(msg("component not fully initialized"));
-              }
+            return html`
+              <main class="container">
+                <h1 class="text-center">${this.actionText}</h1>
 
-              return html`
-                <main class="container">
-                  <h1 class="text-center">${this.actionText}</h1>
+                <div class="row justify-content-center">
+                  <div class="col-md-7 col-lg-8">
+                    ${this.getErrors()}
 
-                  <div class="row justify-content-center">
-                    <div class="col-md-7 col-lg-8">
-                      ${this.getErrors()}
+                    <form
+                      ${ref(this.form)}
+                      method="POST"
+                      action="/no-javascript"
+                      @submit=${async (event: Event) => {
+                        event.preventDefault();
 
-                      <form
-                        ${ref(this.form)}
-                        method="POST"
-                        action="/no-javascript"
-                        @submit=${async (event: Event) => {
-                          event.preventDefault();
+                        await this._task.run();
 
-                          await this._task.run();
+                        // we need to wait for submission
 
-                          // we need to wait for submission
-
-                          await this.initialTask.run();
-                        }}
-                      >
-                        ${pwInputText<
-                          "/api/v1/users/create-or-update",
-                          string | undefined
-                        >({
-                          url: this.url,
-                          type: "text",
-                          disabled: this.disabled,
-                          label: msg("Username"),
-                          name: [0, "username"],
-                          get: (o) => o[0].username,
-                          set: (o, v) => (o[0].username = v),
-                          task: this._task,
-                          defaultValue: "",
-                          initial: value?.data,
-                          resettable: value !== undefined,
-                        })}
-                        ${pwInputText<
-                          "/api/v1/users/create-or-update",
-                          string | null | undefined
-                        >({
-                          url: this.url,
-                          type: "text",
-                          disabled: this.disabled,
-                          label: msg("Third-party email address"),
-                          name: [0, "openid_id"],
-                          get: (o) => o[0].openid_id,
-                          set: (o, v) => (o[0].openid_id = v),
-                          task: this._task,
-                          defaultValue: null,
-                          initial: value?.data,
-                          resettable: value !== undefined,
-                        })}
-                        ${pwInputSelect<
-                          "/api/v1/users/create-or-update",
-                          "voter" | "helper" | "admin" | undefined
-                        >({
-                          url: this.url,
-                          type: "select",
-                          disabled: this.disabled,
-                          label: msg("User type"),
-                          name: [0, "type"],
-                          get: (o) => o[0].type,
-                          set: (o, v) => {
-                            o[0].type = v;
-                            this.requestUpdate(); // hack to update on this
-                          },
-                          options: [
-                            { value: "voter", text: "Schüler" },
-                            { value: "helper", text: "Helfer" },
-                            { value: "admin", text: "Admin" },
-                          ],
-                          task: this._task,
-                          defaultValue: "voter",
-                          pwRef: this.typeRef,
-                          initial: value?.data,
-                          resettable: value !== undefined,
-                        })}
-                        ${this.typeRef.value?.inputValue === "voter"
-                          ? html`${pwInputText<
+                        await this.initialTask.run();
+                      }}
+                    >
+                      ${pwInputText<
+                        "/api/v1/users/create-or-update",
+                        string | undefined
+                      >({
+                        url: this.url,
+                        type: "text",
+                        disabled: this.disabled,
+                        label: msg("Username"),
+                        name: [0, "username"],
+                        get: (o) => o[0].username,
+                        set: (o, v) => (o[0].username = v),
+                        task: this._task,
+                        defaultValue: "",
+                        initial: value?.data,
+                        resettable: value !== undefined,
+                      })}
+                      ${pwInputText<
+                        "/api/v1/users/create-or-update",
+                        string | null | undefined
+                      >({
+                        url: this.url,
+                        type: "text",
+                        disabled: this.disabled,
+                        label: msg("Third-party email address"),
+                        name: [0, "openid_id"],
+                        get: (o) => o[0].openid_id,
+                        set: (o, v) => (o[0].openid_id = v),
+                        task: this._task,
+                        defaultValue: null,
+                        initial: value?.data,
+                        resettable: value !== undefined,
+                      })}
+                      ${pwInputSelect<
+                        "/api/v1/users/create-or-update",
+                        "voter" | "helper" | "admin" | undefined
+                      >({
+                        url: this.url,
+                        type: "select",
+                        disabled: this.disabled,
+                        label: msg("User type"),
+                        name: [0, "type"],
+                        get: (o) => o[0].type,
+                        set: (o, v) => {
+                          o[0].type = v;
+                          this.requestUpdate(); // hack to update on this
+                        },
+                        options: [
+                          { value: "voter", text: "Schüler" },
+                          { value: "helper", text: "Helfer" },
+                          { value: "admin", text: "Admin" },
+                        ],
+                        task: this._task,
+                        defaultValue: "voter",
+                        pwRef: this.typeRef,
+                        initial: value?.data,
+                        resettable: value !== undefined,
+                      })}
+                      ${this.typeRef.value?.inputValue === "voter"
+                        ? html`${pwInputText<
+                            "/api/v1/users/create-or-update",
+                            string | null | undefined
+                          >({
+                            url: this.url,
+                            type: "text",
+                            disabled: this.disabled,
+                            label: msg("Group"),
+                            name: [0, "group"],
+                            get: (o) => o[0].group,
+                            set: (o, v) => (o[0].group = v),
+                            task: this._task,
+                            defaultValue: "",
+                            initial: value?.data,
+                            resettable: value !== undefined,
+                          })}
+                          ${pwInputNumber<
+                            "/api/v1/users/create-or-update",
+                            number | undefined | null
+                          >({
+                            url: this.url,
+                            type: "number",
+                            disabled: this.disabled,
+                            label: msg("Age"),
+                            name: [0, "age"],
+                            get: (o) => o[0].age,
+                            set: (o, v) => (o[0].age = v),
+                            task: this._task,
+                            defaultValue: null,
+                            initial: value?.data,
+                            resettable: value !== undefined,
+                          })}`
+                        : undefined}
+                      ${!this.disabled
+                        ? html`
+                            ${pwInputText<
                               "/api/v1/users/create-or-update",
-                              string | null | undefined
+                              string | undefined
                             >({
                               url: this.url,
-                              type: "text",
+                              type: "password",
                               disabled: this.disabled,
-                              label: msg("Group"),
-                              name: [0, "group"],
-                              get: (o) => o[0].group,
-                              set: (o, v) => (o[0].group = v),
+                              label: msg("Password"),
+                              name: [0, "password"],
+                              get: (o) => o[0].password,
+                              set: (o, v) => (o[0].password = v),
                               task: this._task,
+                              autocomplete: "new-password",
                               defaultValue: "",
                               initial: value?.data,
                               resettable: value !== undefined,
                             })}
-                            ${pwInputNumber<
-                              "/api/v1/users/create-or-update",
-                              number | undefined | null
-                            >({
-                              url: this.url,
-                              type: "number",
-                              disabled: this.disabled,
-                              label: msg("Age"),
-                              name: [0, "age"],
-                              get: (o) => o[0].age,
-                              set: (o, v) => (o[0].age = v),
-                              task: this._task,
-                              defaultValue: null,
-                              initial: value?.data,
-                              resettable: value !== undefined,
-                            })}`
-                          : undefined}
-                        ${!this.disabled
-                          ? html`
-                              ${pwInputText<
-                                "/api/v1/users/create-or-update",
-                                string | undefined
-                              >({
-                                url: this.url,
-                                type: "password",
-                                disabled: this.disabled,
-                                label: msg("Password"),
-                                name: [0, "password"],
-                                get: (o) => o[0].password,
-                                set: (o, v) => (o[0].password = v),
-                                task: this._task,
-                                autocomplete: "new-password",
-                                defaultValue: "",
-                                initial: value?.data,
-                                resettable: value !== undefined,
+                          `
+                        : undefined}
+                      ${pwInputCheckbox<"/api/v1/users/create-or-update">({
+                        url: this.url,
+                        type: "checkbox",
+                        trueValue: true,
+                        falseValue: false,
+                        defaultValue: false,
+                        disabled: this.disabled,
+                        label: msg("Away"),
+                        name: [0, "away"],
+                        get: (o) => o[0].away,
+                        set: (o, v) => (o[0].away = v),
+                        task: this._task,
+                        initial: value?.data,
+                        resettable: value !== undefined,
+                      })}
+                      ${pwInputCheckbox<"/api/v1/users/create-or-update">({
+                        url: this.url,
+                        type: "checkbox",
+                        trueValue: true,
+                        falseValue: false,
+                        defaultValue: false,
+                        disabled: this.disabled,
+                        label: msg("Mark this user as deleted"),
+                        name: [0, "deleted"],
+                        get: (o) => o[0].deleted,
+                        set: (o, v) => (o[0].deleted = v),
+                        task: this._task,
+                        initial: value?.data,
+                        resettable: value !== undefined,
+                      })}
+                      ${!this.disabled
+                        ? html`
+                            <button
+                              type="submit"
+                              ?disabled=${this._task.render({
+                                pending: () => true,
+                                complete: () => false,
+                                initial: () => false,
                               })}
-                            `
-                          : undefined}
-                        ${pwInputCheckbox<"/api/v1/users/create-or-update">({
-                          url: this.url,
-                          type: "checkbox",
-                          trueValue: true,
-                          falseValue: false,
-                          defaultValue: false,
-                          disabled: this.disabled,
-                          label: msg("Away"),
-                          name: [0, "away"],
-                          get: (o) => o[0].away,
-                          set: (o, v) => (o[0].away = v),
-                          task: this._task,
-                          initial: value?.data,
-                          resettable: value !== undefined,
-                        })}
-                        ${pwInputCheckbox<"/api/v1/users/create-or-update">({
-                          url: this.url,
-                          type: "checkbox",
-                          trueValue: true,
-                          falseValue: false,
-                          defaultValue: false,
-                          disabled: this.disabled,
-                          label: msg("Mark this user as deleted"),
-                          name: [0, "deleted"],
-                          get: (o) => o[0].deleted,
-                          set: (o, v) => (o[0].deleted = v),
-                          task: this._task,
-                          initial: value?.data,
-                          resettable: value !== undefined,
-                        })}
-                        ${!this.disabled
-                          ? html`
-                              <button
-                                type="submit"
-                                ?disabled=${this._task.render({
-                                  pending: () => true,
-                                  complete: () => false,
-                                  initial: () => false,
-                                })}
-                                class="btn btn-primary"
-                              >
-                                ${this.actionText}
-                              </button>
-                            `
-                          : html`<a
-                              class="btn btn-secondary"
-                              href="/users/edit/${value?.data[0].id}"
-                              @click=${aClick}
-                              role="button"
-                              >Edit user</a
-                            >`}
-                        <button
-                          type="button"
-                          class="btn btn-secondary"
-                          @click=${() => window.history.back()}
-                        >
-                          ${msg(`Back`)}
-                        </button>
+                              class="btn btn-primary"
+                            >
+                              ${this.actionText}
+                            </button>
+                          `
+                        : html`<a
+                            class="btn btn-secondary"
+                            href="/users/edit/${value?.data[0].id}"
+                            @click=${aClick}
+                            role="button"
+                            >Edit user</a
+                          >`}
+                      <button
+                        type="button"
+                        class="btn btn-secondary"
+                        @click=${() => window.history.back()}
+                      >
+                        ${msg(`Back`)}
+                      </button>
 
-                        ${value?.data[0].action == "update"
-                          ? html`${pwUserProjects({
-                              refreshentitylist: () => {
-                                // TODO FIXME this may let you loose data?
-                                // I think it doesnt but not sure
-                                void this.initialTask.run();
-                              },
-                              user: value?.data[0],
-                              name: "project_leader_id",
-                              title: msg("Project leader in"),
-                              prefix: "leaders",
-                            })}
-                            ${pwUserProjects({
-                              refreshentitylist: () => {
-                                // TODO FIXME this may let you loose data?
-                                // I think it doesnt but not sure
-                                void this.initialTask.run();
-                              },
-                              user: value?.data[0],
-                              name: "force_in_project_id",
-                              title: msg("Guaranteed project member in"),
-                              prefix: "members",
-                            })}`
-                          : undefined}
-                      </form>
-                    </div>
+                      ${value?.data[0].action == "update"
+                        ? html`${pwUserProjects({
+                            refreshentitylist: () => {
+                              // TODO FIXME this may let you loose data?
+                              // I think it doesnt but not sure
+                              void this.initialTask.run();
+                            },
+                            user: value?.data[0],
+                            name: "project_leader_id",
+                            title: msg("Project leader in"),
+                            prefix: "leaders",
+                          })}
+                          ${pwUserProjects({
+                            refreshentitylist: () => {
+                              // TODO FIXME this may let you loose data?
+                              // I think it doesnt but not sure
+                              void this.initialTask.run();
+                            },
+                            user: value?.data[0],
+                            name: "force_in_project_id",
+                            title: msg("Guaranteed project member in"),
+                            prefix: "members",
+                          })}`
+                        : undefined}
+                    </form>
                   </div>
-                </main>
-              `;
-            } else {
-              return html`
+                </div>
+              </main>
+            `;
+          } else {
+            return html`
               <main class="container">
                 <h1 class="text-center">${this.actionText}</h1>
                 
@@ -472,15 +463,26 @@ class PwUserCreate extends PwForm<"/api/v1/users/create-or-update"> {
               
               </div>
             </main>`;
-            }
-          },
-          error: (error) => {
-            throw error;
-          },
-          initial: () => html`initial`,
-          pending: () => noChange,
-        })}`;
-    }
+          }
+        },
+        error: (error) => {
+          throw error;
+        },
+        initial: () => html``,
+        pending: () => noChange,
+      })}
+      <div
+        style="position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 1337;"
+      >
+        ${this.initialTask.render({
+          pending: () => html`<div
+            class="spinner-grow text-primary"
+            role="status"
+          >
+            <span class="visually-hidden">${msg("Loading...")}</span>
+          </div>`,
+        })}
+      </div>`;
   }
 }
 
