@@ -227,6 +227,19 @@ class PwUserCreate extends PwForm<"/api/v1/users/create-or-update"> {
               throw new Error(msg("component not fully initialized"));
             }
 
+            if (value?.data.length === 0) {
+              return html`<main class="container">
+              <h1 class="text-center">${this.actionText}</h1>
+              
+              <div class="alert alert-danger" role="alert">
+              ${msg("Account nicht gefunden!")}<br />
+            
+            </div>
+            
+            </div>
+          </main>`;
+            }
+
             return html`
               <main class="container">
                 <h1 class="text-center">${this.actionText}</h1>

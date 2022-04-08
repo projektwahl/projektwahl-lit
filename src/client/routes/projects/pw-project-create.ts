@@ -211,6 +211,19 @@ export class PwProjectCreate extends PwForm<
               throw new Error(msg("component not fully initialized"));
             }
 
+            if (value?.data === undefined) {
+              return html`<main class="container">
+              <h1 class="text-center">${this.actionText}</h1>
+              
+              <div class="alert alert-danger" role="alert">
+              ${msg("Projekt nicht gefunden!")}<br />
+            
+            </div>
+            
+            </div>
+          </main>`;
+            }
+
             return html`
               <main class="container">
                 <h1 class="text-center">${this.actionText}</h1>
