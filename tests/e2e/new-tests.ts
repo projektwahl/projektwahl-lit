@@ -200,11 +200,11 @@ class Helper {
 
   async ensureNothingLoading() {
     try {
-      await this.driver.findElement(By.css(".spinner-grow"));
-      throw new Error("something is still loading. This may be a bug");
+      await this.driver.findElement(By.css(".spinner-grow"));      
     } catch (error) {
-      // do nothing
+      return;
     }
+    throw new Error("something is still loading. This may be a bug");
   }
 
   async click(element: WebElement) {
@@ -552,6 +552,7 @@ async function createUserAllFields(helper: Helper) {
   );
   await helper.waitUntilLoaded();
   form = await helper.form("pw-user-create");
+  await helper.waitUntilLoaded();
   assert.equal(await form.getField("0,username"), username);
   assert.equal(await form.getField("0,openid_id"), email);
   assert.equal(await form.getField("0,group"), group);
@@ -579,6 +580,8 @@ async function createUserAllFields(helper: Helper) {
   await helper.click(await helper.driver.findElement(By.css(`td p a`)));
 
   form = await helper.form("pw-user-create");
+  await helper.waitUntilLoaded();
+
   assert.equal(await form.getField("0,username"), username2);
   assert.equal(await form.getField("0,openid_id"), email);
   assert.equal(await form.getField("0,group"), group);
@@ -1448,6 +1451,11 @@ async function testHelperCreatesProjectWithProjectLeadersAndMembers(
 // TODO better would be some kind of queing system where a ready browser takes the next task
 
 await runTestAllBrowsers(async (helper) => {
+
+
+  await createUserAllFields(helper);
+  await helper.driver.manage().deleteAllCookies();
+return;
   await checkUsersSortingWorks(helper);
   await helper.driver.manage().deleteAllCookies();
 
