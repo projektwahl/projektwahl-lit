@@ -313,70 +313,69 @@ class PwChoices<X extends string> extends PwEntityList<"/api/v1/choices", X> {
   }
   override get body() {
     return html`<tbody
-        @refreshentitylist=${async () => {
-          await this.correctlyVotedTask.run();
-        }}
-      >
-        ${this._task.render({
-          pending: () => {
-            return noChange;
-          },
-          complete: (result) => {
-            return result.success
-              ? repeat(
-                  result.data.entities,
-                  (value) => value.id,
-                  (value) => html`<tr ${animate()}>
-                    <th scope="row">
-                      <p>
-                        ${value.deleted
-                          ? html`<del
-                              ><a
-                                @click=${aClick}
-                                href="/projects/view/${value.id}"
-                                >${value.id}</a
-                              ></del
-                            >`
-                          : html`<a
+      @refreshentitylist=${async () => {
+        await this.correctlyVotedTask.run();
+      }}
+    >
+      ${this._task.render({
+        pending: () => {
+          return noChange;
+        },
+        complete: (result) => {
+          return result.success
+            ? repeat(
+                result.data.entities,
+                (value) => value.id,
+                (value) => html`<tr ${animate()}>
+                  <th scope="row">
+                    <p>
+                      ${value.deleted
+                        ? html`<del
+                            ><a
                               @click=${aClick}
                               href="/projects/view/${value.id}"
                               >${value.id}</a
-                            >`}
-                      </p>
-                    </th>
-                    <td>
-                      <p>
-                        ${value.deleted
-                          ? html`<del
-                              ><a
-                                @click=${aClick}
-                                href="/projects/view/${value.id}"
-                                >${value.title}</a
-                              ></del
-                            >`
-                          : html`<a
+                            ></del
+                          >`
+                        : html`<a
+                            @click=${aClick}
+                            href="/projects/view/${value.id}"
+                            >${value.id}</a
+                          >`}
+                    </p>
+                  </th>
+                  <td>
+                    <p>
+                      ${value.deleted
+                        ? html`<del
+                            ><a
                               @click=${aClick}
                               href="/projects/view/${value.id}"
                               >${value.title}</a
-                            >`}
-                      </p>
-                    </td>
-                    <td>${value.min_age} - ${value.max_age}</td>
-                    <td>
-                      ${pwRankSelect({
-                        choice: value,
-                      })}
-                    </td>
-                  </tr>`
-                )
-              : undefined;
-          },
-          initial: () => {
-            return html`initial state`;
-          },
-        })}
-      </tbody>
-      b`;
+                            ></del
+                          >`
+                        : html`<a
+                            @click=${aClick}
+                            href="/projects/view/${value.id}"
+                            >${value.title}</a
+                          >`}
+                    </p>
+                  </td>
+                  <td>${value.min_age} - ${value.max_age}</td>
+                  <td>
+                    ${pwRankSelect({
+                      choice: value,
+                    })}
+                  </td>
+                </tr>`
+              )
+            : undefined;
+        },
+        initial: () => {
+          return html`initial state`;
+        },
+      })}
+    </tbody> `;
   }
 }
 
