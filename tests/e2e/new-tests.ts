@@ -200,7 +200,7 @@ class Helper {
 
   async ensureNothingLoading() {
     try {
-      await this.driver.findElement(By.css(".spinner-grow"));      
+      await this.driver.findElement(By.css(".spinner-grow"));
     } catch (error) {
       return;
     }
@@ -214,16 +214,14 @@ class Helper {
 
   async waitUntilLoaded() {
     try {
-      const loadingIndicator = await this.driver.wait(
-        until.elementLocated(By.css(".spinner-grow")),
-        5000,
-        `.spinner-grow not found`
+      const loadingIndicators = await this.driver.findElements(
+        By.css(".spinner-grow")
       );
 
-      await this.driver.wait(
-        until.stalenessOf(loadingIndicator),
-        10000,
-        "waitUntilLoaded"
+      await Promise.all(
+        loadingIndicators.map((e) =>
+          this.driver.wait(until.stalenessOf(e), 10000, "waitUntilLoaded")
+        )
       );
     } catch (error) {
       throw new Error("spinner-grow failed");
@@ -1451,11 +1449,9 @@ async function testHelperCreatesProjectWithProjectLeadersAndMembers(
 // TODO better would be some kind of queing system where a ready browser takes the next task
 
 await runTestAllBrowsers(async (helper) => {
-
-
   await createUserAllFields(helper);
   await helper.driver.manage().deleteAllCookies();
-return;
+  return;
   await checkUsersSortingWorks(helper);
   await helper.driver.manage().deleteAllCookies();
 
