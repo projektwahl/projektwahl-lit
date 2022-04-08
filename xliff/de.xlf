@@ -104,6 +104,9 @@
   <source>Create account</source>
   <target>Account erstellen</target>
 </trans-unit>
+<trans-unit id="sd77ecad6065c6311">
+  <source>Account nicht gefunden!</source>
+</trans-unit>
 <trans-unit id="s03f42eea72154959">
   <source>Username</source>
   <target>Accountname</target>
@@ -188,6 +191,9 @@
   <source>Update project</source>
   <target>Projekt aktualisieren</target>
 </trans-unit>
+<trans-unit id="s9b28032b240c4cfb">
+  <source>Projekt nicht gefunden!</source>
+</trans-unit>
 <trans-unit id="s13b3f5afa0862d1c">
   <source>Place</source>
   <target>Ort/Raum</target>
@@ -232,6 +238,10 @@
   <source>Choices</source>
   <target>Wahl</target>
 </trans-unit>
+<trans-unit id="s879f3dab73cde287">
+  <source>Error: <x id="0" equiv-text="${value.error}"/></source>
+  <target>Fehler: <x id="0" equiv-text="${error}"/></target>
+</trans-unit>
 <trans-unit id="s9841212bd35bac27">
   <source>Rank</source>
   <target>Priorität</target>
@@ -251,10 +261,6 @@
 <trans-unit id="hc66aaa662761137a">
   <source>Not Found</source>
   <target>Nicht gefunden</target>
-</trans-unit>
-<trans-unit id="s879f3dab73cde287">
-  <source>Error: <x id="0" equiv-text="${error}"/></source>
-  <target>Fehler: <x id="0" equiv-text="${error}"/></target>
 </trans-unit>
 <trans-unit id="sb57e557f2fef10c2">
   <source>Projektwahl</source>
