@@ -178,7 +178,7 @@ class PwChoices<X extends string> extends PwEntityList<"/api/v1/choices", X> {
       })}
 
       <div
-        style="position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 1337;"
+      class="fully-centered"
       >
         ${this.correctlyVotedTask.render({
           pending: () => html`<div

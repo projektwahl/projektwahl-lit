@@ -258,12 +258,6 @@ export class PwApp extends PwElement {
 
   override render() {
     return html`
-      <style>
-        :host {
-          height: 100vh;
-          display: block;
-        }
-      </style>
       <div class="d-flex flex-column h-100">
         <header>
           <nav
@@ -396,7 +390,7 @@ export class PwApp extends PwElement {
         </header>
 
         <div
-          style="position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 1337;"
+          class="fully-centered"
         >
           ${this._apiTask.render({
             pending: () => html`<div

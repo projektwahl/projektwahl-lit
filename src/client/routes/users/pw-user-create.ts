@@ -208,7 +208,7 @@ class PwUserCreate extends PwForm<"/api/v1/users/create-or-update"> {
     }
 
     return html` <div
-        style="position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 1337;"
+        class="fully-centered"
       >
         ${this._task.render({
           pending: () => html`<div
@@ -488,7 +488,7 @@ class PwUserCreate extends PwForm<"/api/v1/users/create-or-update"> {
         pending: () => noChange,
       })}
       <div
-        style="position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 1337;"
+        class="fully-centered"
       >
         ${this.initialTask.render({
           pending: () => html`<div

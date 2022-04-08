@@ -173,6 +173,7 @@ export const defaultHeaders = {
   "x-content-type-options": "nosniff",
   "x-frame-options": "DENY",
   "cache-control": "private, no-cache",
+  "Content-Security-Policy": "default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self' data:; frame-ancestors 'none'; form-action 'none'"
 };
 
 if (!process.env.BASE_URL) {
@@ -405,11 +406,7 @@ export async function serverHandler(
   SPDX-License-Identifier: AGPL-3.0-or-later
   SPDX-FileCopyrightText: 2021 Moritz Hedtke <Moritz.Hedtke@t-online.de>
   -->
-      <style>
-        body {
-          overflow-y: scroll;
-        }
-      </style>
+      <link rel="stylesheet" href="/src/client/main.css">
       <link
         href="/node_modules/bootstrap/dist/css/bootstrap.css"
         rel="stylesheet"
@@ -418,7 +415,7 @@ export async function serverHandler(
   
       <title>Projektwahl</title>
     </head>
-    <body style="height: 100vh;">
+    <body class="height-100">
       <script
         type="module"
         src="/src/client/pw-app.js"
@@ -454,11 +451,6 @@ export async function serverHandler(
   SPDX-License-Identifier: AGPL-3.0-or-later
   SPDX-FileCopyrightText: 2021 Moritz Hedtke <Moritz.Hedtke@t-online.de>
   -->
-      <style>
-        body {
-          overflow-y: scroll;
-        }
-      </style>
   
       <title>Projektwahl</title>
     </head>
