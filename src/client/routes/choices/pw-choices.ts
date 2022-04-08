@@ -25,7 +25,7 @@ import "../../form/pw-form.js";
 import { html } from "lit";
 import { noChange } from "lit";
 import { aClick } from "../../pw-a.js";
-import { msg } from "@lit/localize";
+import { msg, str } from "@lit/localize";
 import {
   parseRequestWithPrefix,
   PwEntityList,
@@ -37,8 +37,13 @@ import { repeat } from "lit/directives/repeat.js";
 import { pwInputNumber } from "../../form/pw-input-number.js";
 import { pwInputText } from "../../form/pw-input-text.js";
 import type { z } from "zod";
-import type { entityRoutes } from "../../../lib/routes.js";
+import type {
+  entityRoutes,
+  MinimalSafeParseError,
+} from "../../../lib/routes.js";
 import { pwRankSelect } from "./pw-rank-select.js";
+import { myFetch } from "../../utils.js";
+import { Task } from "@lit-labs/task";
 
 const defaultValue: z.infer<typeof entityRoutes["/api/v1/choices"]["request"]> =
   {
@@ -72,12 +77,53 @@ export function pwChoices<X extends string>(
 }
 
 class PwChoices<X extends string> extends PwEntityList<"/api/v1/choices", X> {
+  correctlyVotedTask: Task<
+    [],
+    | z.SafeParseSuccess<readonly [number, number, number, number, number]>
+    | MinimalSafeParseError
+  >;
+
   constructor() {
     super();
 
     this.url = "/api/v1/choices";
 
     this.defaultValue = defaultValue;
+
+    this.correctlyVotedTask = new Task(this, {
+      task: async () => {
+        const result = await myFetch<"/api/v1/choices">(
+          "GET",
+          "/api/v1/choices",
+          {
+            filters: {},
+            paginationDirection: "forwards",
+            paginationLimit: 6,
+            paginationCursor: null,
+            sorting: [["rank", "ASC", null]],
+          },
+          {}
+        );
+
+        if (result.success) {
+          const ranks = result.data.entities
+            .map((e) => e.rank)
+            .filter((r) => r !== null);
+          const ranks1 = ranks.filter((r) => r === 1).length;
+          const ranks2 = ranks.filter((r) => r === 1).length;
+          const ranks3 = ranks.filter((r) => r === 1).length;
+          const ranks4 = ranks.filter((r) => r === 1).length;
+          const ranks5 = ranks.filter((r) => r === 1).length;
+          return {
+            success: true as const,
+            data: [ranks1, ranks2, ranks3, ranks4, ranks5] as const,
+          };
+        }
+
+        return result;
+      },
+      args: () => []
+    });
   }
 
   override get title() {
@@ -85,9 +131,50 @@ class PwChoices<X extends string> extends PwEntityList<"/api/v1/choices", X> {
   }
 
   override get buttons() {
-    return html`<div class="alert alert-success w-100" role="alert">
-      Korrekt gewählt!
-    </div> `;
+    return html`${this.correctlyVotedTask.render({
+        complete: (value) => {
+          if (value.success) {
+            if (value.data.every((v) => v === 1)) {
+              return html`
+                <div class="alert alert-success w-100" role="alert">
+                  Korrekt gewählt!
+                </div>
+              `;
+            } else {
+              return html`
+                <div class="alert alert-danger w-100" role="alert">
+                  Falsch gewählt!
+                  ${value.data[0] !== 1
+                    ? `${value.data[0]} anstatt einer Erstwahl!`
+                    : undefined}
+                </div>
+              `;
+            }
+          } else {
+            return html`<div class="alert alert-danger" role="alert">
+              ${msg(str`Error: ${value.error}`)}
+            </div>`;
+          }
+        },
+        initial: () => ``,
+        pending: () => noChange,
+        error: (error) => html`<div class="alert alert-danger" role="alert">
+          ${msg(str`Error: ${error}`)}
+        </div>`,
+      })}
+
+      <div
+        style="position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 1337;"
+      >
+        ${this.correctlyVotedTask.render({
+          pending: () => html`<div
+            class="spinner-grow text-primary"
+            role="status"
+          >
+            <span class="visually-hidden">${msg("Loading...")}</span>
+          </div>`,
+        })}
+      </div>`;
   }
 
   override get head() {
@@ -259,7 +346,6 @@ class PwChoices<X extends string> extends PwEntityList<"/api/v1/choices", X> {
                   <td>${value.min_age} - ${value.max_age}</td>
                   <td>
                     ${pwRankSelect({
-                      // TODO FIXME this should error
                       choice: value,
                     })}
                   </td>
