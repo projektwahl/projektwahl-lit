@@ -230,7 +230,10 @@ export class PwProjectCreate extends PwForm<
 
                         // we need to wait for submission
 
-                        await this.initialTask.run();
+                        // only reset if this actually updated
+                        if (this._task.value?.success) {
+                          await this.initialTask.run();
+                        }
                       }}
                     >
                       ${pwInputText<
