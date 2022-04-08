@@ -553,7 +553,9 @@ async function createUserAllFields(helper: Helper) {
   const id = (await helper.driver.getCurrentUrl()).match(
     /\/users\/edit\/(\d+)/
   )?.[1];
-  console.log("IDDDDD", id);
+  if (!id) {
+    assert.fail("id not found in url");
+  }
   await helper.waitUntilLoaded();
   form = await helper.form("pw-user-create");
   await helper.waitUntilLoaded();
@@ -667,6 +669,9 @@ async function createProjectAllFields(helper: Helper) {
   const id = (await helper.driver.getCurrentUrl()).match(
     /\/projects\/edit\/(\d+)/
   )?.[1];
+  if (!id) {
+    assert.fail("id not found in url");
+  }
   await helper.waitUntilLoaded();
   form = await helper.form("pw-project-create");
   assert.equal(await form.getField("title"), title);
