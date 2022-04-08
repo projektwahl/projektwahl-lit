@@ -161,6 +161,7 @@ class FormTester {
     );
 
     assert.match(await alert.getText(), /Some errors occurred./);
+    await this.helper.waitUntilLoaded();
     return this.getErrors();
   }
 
@@ -549,9 +550,8 @@ async function createUserAllFields(helper: Helper) {
   await form.checkField("0,deleted", deleted);
   await form.submitSuccess();
   await helper.driver.wait(until.urlContains("/users/edit/"), 2000);
-  const id = (await helper.driver.getCurrentUrl()).substring(
-    "https://localhost:8443/users/edit/".length
-  );
+  const id = (await helper.driver.getCurrentUrl()).match(/\/users\/edit\/(\d+)/)?.[1];
+  console.log("IDDDDD", id)
   await helper.waitUntilLoaded();
   form = await helper.form("pw-user-create");
   await helper.waitUntilLoaded();
@@ -566,6 +566,7 @@ async function createUserAllFields(helper: Helper) {
   await form.resetField("0,username", username2);
   await form.submitSuccess();
 
+  // back
   await helper.click(
     await helper.driver.findElement(By.css(`button[class="btn btn-secondary"]`))
   );
