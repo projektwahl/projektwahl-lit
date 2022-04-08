@@ -550,8 +550,10 @@ async function createUserAllFields(helper: Helper) {
   await form.checkField("0,deleted", deleted);
   await form.submitSuccess();
   await helper.driver.wait(until.urlContains("/users/edit/"), 2000);
-  const id = (await helper.driver.getCurrentUrl()).match(/\/users\/edit\/(\d+)/)?.[1];
-  console.log("IDDDDD", id)
+  const id = (await helper.driver.getCurrentUrl()).match(
+    /\/users\/edit\/(\d+)/
+  )?.[1];
+  console.log("IDDDDD", id);
   await helper.waitUntilLoaded();
   form = await helper.form("pw-user-create");
   await helper.waitUntilLoaded();
@@ -662,9 +664,9 @@ async function createProjectAllFields(helper: Helper) {
   await form.checkField("deleted", deleted);
   await form.submitSuccess();
   await helper.driver.wait(until.urlContains("/projects/edit/"), 2000);
-  const id = (await helper.driver.getCurrentUrl()).substring(
-    "https://localhost:8443/projects/edit/".length
-  );
+  const id = (await helper.driver.getCurrentUrl()).match(
+    /\/projects\/edit\/(\d+)/
+  )?.[1];
   await helper.waitUntilLoaded();
   form = await helper.form("pw-project-create");
   assert.equal(await form.getField("title"), title);
@@ -693,7 +695,10 @@ async function createProjectAllFields(helper: Helper) {
   form = await helper.form("pw-projects");
 
   await form.checkField("filters,deleted", true);
+  await helper.waitUntilLoaded();
   await form.setField("filters,id", id);
+  await helper.waitUntilLoaded();
+
   await form.setField("filters,title", title2);
 
   await helper.waitUntilLoaded();
@@ -1196,6 +1201,8 @@ async function resettingUserWorks2(helper: Helper) {
       form = await helper.form("pw-user-create");
     }
 
+    await helper.waitUntilLoaded();
+
     // TODO click all reset buttons
     await Promise.all(
       (
@@ -1280,6 +1287,8 @@ async function resettingProjectWorks2(helper: Helper) {
       form = await helper.form("pw-project-create");
     }
 
+    await helper.waitUntilLoaded();
+
     // TODO click all reset buttons
     await Promise.all(
       (
@@ -1345,7 +1354,7 @@ async function testVotingWorks(helper: Helper) {
     )
   );
 
-  await helper.driver.sleep(2000)
+  await helper.driver.sleep(2000);
 
   await helper.waitUntilLoaded();
   await helper.waitUntilLoaded();
@@ -1447,6 +1456,8 @@ async function testHelperCreatesProjectWithProjectLeadersAndMembers(
     )
   );
 
+  await helper.driver.sleep(2000);
+
   await helper.waitUntilLoaded();
 
   const alerts2 = await helper.driver.findElements(
@@ -1459,11 +1470,6 @@ async function testHelperCreatesProjectWithProjectLeadersAndMembers(
 // TODO better would be some kind of queing system where a ready browser takes the next task
 
 await runTestAllBrowsers(async (helper) => {
-
-  await testVotingWorks(helper);
-  await helper.driver.manage().deleteAllCookies();
-
-  return;
   await checkUsersSortingWorks(helper);
   await helper.driver.manage().deleteAllCookies();
 
