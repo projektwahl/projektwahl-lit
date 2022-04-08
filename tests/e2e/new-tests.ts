@@ -68,6 +68,7 @@ class FormTester {
   }
 
   async resetField(name: string, value: string) {
+    await this.helper.ensureNothingLoading();
     const element = await this.form.findElement(
       By.css(`input[name="${name}"]`)
     );
@@ -77,6 +78,7 @@ class FormTester {
   }
 
   async setField(name: string, value: string) {
+    await this.helper.ensureNothingLoading();
     const element = await this.form.findElement(
       By.css(`input[name="${name}"]`)
     );
@@ -84,6 +86,7 @@ class FormTester {
   }
 
   async resetTextareaField(name: string, value: string) {
+    await this.helper.ensureNothingLoading();
     const element = await this.form.findElement(
       By.css(`textarea[name="${name}"]`)
     );
@@ -93,6 +96,7 @@ class FormTester {
   }
 
   async setTextareaField(name: string, value: string) {
+    await this.helper.ensureNothingLoading();
     const element = await this.form.findElement(
       By.css(`textarea[name="${name}"]`)
     );
@@ -101,6 +105,7 @@ class FormTester {
   }
 
   async checkField(name: string, value: boolean) {
+    await this.helper.ensureNothingLoading();
     const element = await this.form.findElement(
       By.css(`input[name="${name}"]`)
     );
@@ -110,11 +115,13 @@ class FormTester {
   }
 
   async getField(name: string) {
+    await this.helper.ensureNothingLoading();
     const element = await this.form.findElement(By.css(`*[name="${name}"]`));
     return await element.getAttribute("value");
   }
 
   async getCheckboxField(name: string) {
+    await this.helper.ensureNothingLoading();
     const element = await this.form.findElement(
       By.css(`input[name="${name}"]`)
     );
@@ -122,6 +129,7 @@ class FormTester {
   }
 
   private async submit() {
+    await this.helper.ensureNothingLoading();
     const submitButton = await this.form.findElement(
       By.css('button[type="submit"]')
     );
@@ -132,6 +140,7 @@ class FormTester {
   }
 
   async submitSuccess() {
+    await this.helper.ensureNothingLoading();
     await this.submit();
 
     const alerts = await this.helper.driver.findElements(
@@ -142,6 +151,7 @@ class FormTester {
   }
 
   async submitFailure() {
+    await this.helper.ensureNothingLoading();
     await this.submit();
 
     const alert = await this.helper.driver.findElement(
@@ -188,7 +198,17 @@ class Helper {
     this.driver = driver;
   }
 
+  async ensureNothingLoading() {
+    try {
+      await this.driver.findElement(By.css(".spinner-grow"));
+      throw new Error("something is still loading. This may be a bug");
+    } catch (error) {
+      // do nothing
+    }
+  }
+
   async click(element: WebElement) {
+    await this.ensureNothingLoading();
     await this.driver.executeScript(`arguments[0].click()`, element);
   }
 
@@ -223,6 +243,7 @@ class Helper {
   }
 
   async openNavbar() {
+    await this.ensureNothingLoading();
     const navbarButton = this.driver.findElement(
       By.css("button.navbar-toggler")
     );
@@ -673,6 +694,9 @@ async function createProjectAllFields(helper: Helper) {
   await helper.click(await helper.driver.findElement(By.css(`td p a`)));
 
   form = await helper.form("pw-project-create");
+
+  await helper.waitUntilLoaded();
+
   assert.equal(await form.getField("title"), title2);
   assert.equal(await form.getField("info"), info);
   assert.equal(await form.getField("place"), place);
