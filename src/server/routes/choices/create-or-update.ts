@@ -31,7 +31,9 @@ import { typedSql } from "../../describe.js";
 export const updateChoiceHandler = createOrUpdateChoiceHandler(
   "/api/v1/choices/update",
   async (sql, choice, loggedInUser) => {
-    // TODO FIXME Only allow updating your own choices. Later we could allow the admin to update somebody else's choices.
+    // this only allows updating your own choice as we use the logged in user id.
+    // Also in createOrUpdateChoiceHandler we check that you're a voter.
+
     const { project_id, rank, ...rest } = choice;
     let _ = rest;
     _ = 1; // ensure no property is missed - Don't use `{}` as a type. `{}` actually means "any non-nullish value".

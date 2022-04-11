@@ -135,6 +135,8 @@ CREATE TABLE IF NOT EXISTS users_history (
   last_updated_by INTEGER
 );
 
+-- We do this here and not in the table creation because we have self-referential foreign keys.
+
 ALTER TABLE projects_with_deleted ADD FOREIGN KEY (last_updated_by)
     REFERENCES users_with_deleted(id)
     ON UPDATE RESTRICT
@@ -305,7 +307,7 @@ CREATE TABLE IF NOT EXISTS settings (
   election_running BOOLEAN NOT NULL
 );
 
--- TODO FIXME these don't have row level security (let them owned by projektwahl_staging) then this shoudl work
+-- warning: if we replace our row level security by users this will break. view are always executed as their owner. I think postgresql 14 fixes that.
 CREATE OR REPLACE VIEW users AS SELECT * FROM users_with_deleted WHERE NOT deleted;
 
 CREATE OR REPLACE VIEW projects AS SELECT * FROM projects_with_deleted WHERE NOT deleted;
@@ -489,7 +491,7 @@ EXECUTE FUNCTION check_users_force_in_project();
 CREATE OR REPLACE FUNCTION check_users_project_leader_id2() RETURNS TRIGGER AS $body$
 BEGIN
   IF (SELECT COUNT(*) FROM users_with_deleted WHERE id = NEW.last_updated_by AND type = 'admin') != 1 THEN
-    RAISE EXCEPTION 'Lehrer dürfen Schüler nur Projektleiter oder Mitglieder ihrer eigenen Projekte ändern.';
+    RAISE EXCEPTION 'Lehrer dürfen nur Projektleiter oder Mitglieder ihrer eigenen Projekte ändern.';
   END IF;
   RETURN NEW;
 END;
@@ -531,15 +533,8 @@ BEFORE INSERT ON users_with_deleted
 FOR EACH ROW
 EXECUTE FUNCTION check_users_project_leader_id3();
 
-
 ALTER TABLE users_with_deleted ENABLE ROW LEVEL SECURITY;
 
 DROP POLICY IF EXISTS users_voters_only_project_leaders ON users_with_deleted;
-
--- CREATE POLICY users_voters_only_project_leaders ON users_with_deleted AS RESTRICTIVE FOR ALL TO PUBLIC WITH CHECK ((SELECT type FROM users_with_deleted WHERE id = current_setting('projektwahl_user')::int) IS DISTINCT FROM 'helper' OR project_leader_id IS NOT NULL);
-
-
-
--- SET projektwahl.type = 
 
 CREATE POLICY users_voters_only_project_leaders ON users_with_deleted FOR ALL TO PUBLIC USING (current_setting('projektwahl.type') IN ('root', 'admin', 'helper') OR project_leader_id IS NOT NULL);

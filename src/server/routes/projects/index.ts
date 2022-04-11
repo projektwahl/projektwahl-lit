@@ -31,6 +31,7 @@ export const projectsHandler = requestHandler(
   "GET",
   "/api/v1/projects",
   async function (query, loggedInUser) {
+    // admin is allowed to read anything
     // helper is allowed to read the normal data
     // voter is allowed to read the normal data
 

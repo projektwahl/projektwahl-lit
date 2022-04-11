@@ -157,6 +157,7 @@ export function createOrUpdateProjectsHandler<
 ) {
   // TODO FIXME create or update multiple
   return requestHandler("POST", path, async function (project, loggedInUser) {
+    // admin is allowed to change any project
     // helper is allowed to create projects and change their own projects
     // voter is not allowed to do anything
 
