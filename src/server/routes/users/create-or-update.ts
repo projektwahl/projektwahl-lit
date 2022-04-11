@@ -167,7 +167,7 @@ export const createOrUpdateUsersHandler = requestHandler(
               } as const)`INSERT INTO users_with_deleted (username, openid_id, password_hash, type, "group", age, away, deleted, last_updated_by) VALUES (${
                 username ?? null
               }, ${openid_id ?? null}, ${
-                password ? await hashPassword(password) : null
+                password !== undefined ? await hashPassword(password) : null
               }, ${type ?? null}, ${type === "voter" ? group ?? null : null}, ${
                 type === "voter" ? age ?? null : null
               }, ${away ?? false}, ${deleted ?? false}, ${
