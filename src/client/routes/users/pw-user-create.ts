@@ -369,7 +369,7 @@ class PwUserCreate extends PwForm<"/api/v1/users/create-or-update"> {
                               set: (o, v) => (o[0].password = v),
                               task: this._task,
                               autocomplete: "new-password",
-                              defaultValue: "",
+                              defaultValue: undefined,
                               initial: value?.data,
                               resettable: value !== undefined,
                             })}
