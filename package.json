@@ -70,7 +70,7 @@
     "lit-analyzer": "^1.2.1",
     "@lit/localize-tools": "^0.6.1",
     "@typescript-eslint/eslint-plugin": "^5.15.0",
-    "eslint": "^8.11.0",
+    "eslint": "^8.13.0",
     "eslint-config-prettier": "^8.5.0",
     "prettier": "^2.6.0",
     "purgecss": "^4.1.3"
