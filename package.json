@@ -67,7 +67,6 @@
     "typescript": "^4.6.3"
   },
   "optionalDependencies": {
-    "lit-analyzer": "^1.2.1",
     "@lit/localize-tools": "^0.6.1",
     "@typescript-eslint/eslint-plugin": "^5.15.0",
     "eslint": "^8.11.0",
