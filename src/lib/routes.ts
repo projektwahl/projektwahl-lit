@@ -164,7 +164,7 @@ export const createUserAction = rawUserSchema
     away: true,
   })
   .extend({
-    password: z.string().optional(),
+    password: z.string().min(1).optional(),
     action: z.literal("create"),
   })
   .strict();
@@ -182,7 +182,7 @@ export const updateUserAction = rawUserSchema
     deleted: true,
   })
   .extend({
-    password: z.string(),
+    password: z.string().min(1),
   })
   .partial()
   .extend({
