@@ -63,9 +63,9 @@ jobs:
           ALTER VIEW users OWNER TO projektwahl_staging;
           ALTER VIEW present_voters OWNER TO projektwahl_staging;
           ALTER VIEW projects OWNER TO projektwahl_staging;"
-      - run: NODE_ENV=development DATABASE_URL=postgres://projektwahl_staging:projektwahl@localhost/projektwahl_staging npm run setup
+      - run: NODE_ENV=development DATABASE_URL=postgres://projektwahl_staging:projektwahl@localhost/projektwahl_staging node --enable-source-maps dist/setup.js
       - run: |
-          NODE_ENV=testing PORT=8443 BASE_URL=https://localhost:8443 DATABASE_URL=postgres://projektwahl_staging:projektwahl@localhost/projektwahl_staging CREDENTIALS_DIRECTORY=$PWD npm run server &
+          NODE_ENV=testing PORT=8443 BASE_URL=https://localhost:8443 DATABASE_URL=postgres://projektwahl_staging:projektwahl@localhost/projektwahl_staging CREDENTIALS_DIRECTORY=$PWD node --enable-source-maps dist/server.js &
           chromedriver &
           sleep 2 && NODE_ENV=testing DATABASE_URL=postgres://projektwahl_staging:projektwahl@localhost/projektwahl_staging BASE_URL=https://localhost:8443 npm run test-internal
       - name: Archive test screenshots
