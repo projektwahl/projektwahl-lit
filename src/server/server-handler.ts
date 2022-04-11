@@ -365,11 +365,6 @@ export async function serverHandler(
         raw.push(contents); // the string you want
         raw.push(null); // indicates end-of-file basically - the end of the stream
 
-        let acceptEncoding = request.headers["accept-encoding"];
-        if (!acceptEncoding) {
-          acceptEncoding = "";
-        }
-
         const onError = (err: NodeJS.ErrnoException | null) => {
           if (err) {
             // If an error occurs, there's not much we can do because

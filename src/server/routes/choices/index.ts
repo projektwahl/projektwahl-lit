@@ -31,10 +31,7 @@ export const choicesHandler = requestHandler(
   "GET",
   "/api/v1/choices",
   async function (query, loggedInUser) {
-    // helper is allowed to read the normal data
-    // voter is allowed to read the normal data
-
-    // TODO FIXME voters should only be allowed to read their own choices
+    // voter is allowed to read their own choices because we select based on their user id.
 
     if (!loggedInUser) {
       const returnValue: [

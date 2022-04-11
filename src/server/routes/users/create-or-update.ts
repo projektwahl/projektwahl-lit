@@ -33,7 +33,8 @@ export const createOrUpdateUsersHandler = requestHandler(
   "POST",
   "/api/v1/users/create-or-update",
   async function (users, loggedInUser) {
-    // helper is allowed to set voters as away (TODO implement)
+    // admin is allowed to do anything
+    // helper is not allowed to do anything (TODO implement allowing setting voters as away)
     // voter is not allowed to do anything
 
     if (!loggedInUser) {
@@ -61,7 +62,7 @@ export const createOrUpdateUsersHandler = requestHandler(
       return returnValue;
     }
 
-    if (!(loggedInUser?.type === "admin" || loggedInUser?.type === "helper")) {
+    if (!(loggedInUser?.type === "admin"/* || loggedInUser?.type === "helper"*/)) {
       const returnValue: [
         OutgoingHttpHeaders,
         ResponseType<"/api/v1/users/create-or-update">

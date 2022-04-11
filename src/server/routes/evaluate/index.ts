@@ -41,6 +41,7 @@ async function readFileWithBacktrace(
     | BufferEncoding
 ): Promise<string> {
   try {
+    // nodejs is too stupid to create a backtrace here (there is an open issue about that)
     return await readFile(path, options);
   } catch (error) {
     throw new Error(String(error));

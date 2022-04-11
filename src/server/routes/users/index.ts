@@ -31,8 +31,9 @@ export const usersHandler = requestHandler(
   "GET",
   "/api/v1/users",
   async function (query, loggedInUser) {
+    // admin is allowed to read anything
     // helper is allowed to read the normal data
-    // voter is not allowed to do anything
+    // voter is allowed to read users who are project leaders (see row level security)
 
     if (!loggedInUser) {
       const returnValue: [OutgoingHttpHeaders, ResponseType<"/api/v1/users">] =
