@@ -182,7 +182,7 @@ export const updateUserAction = rawUserSchema
     deleted: true,
   })
   .extend({
-    password: z.string().min(1),
+    password: z.string().min(1).optional(),
   })
   .partial()
   .extend({
