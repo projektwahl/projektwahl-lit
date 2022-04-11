@@ -1321,6 +1321,30 @@ async function resettingProjectWorks2(helper: Helper) {
   }
 }
 
+async function checkUserOrProjectNotFound(helper: Helper) {
+  await loginCorrect(helper);
+
+  await helper.driver.get(`${BASE_URL}/projects/edit/34234`);
+
+  await helper.waitUntilLoaded();
+
+  const alert1 = await helper.driver.findElement(
+    By.css('div[class="alert alert-danger"]')
+  );
+
+  assert.match(await alert1.getText(), /Projekt nicht gefunden!/);
+
+  await helper.driver.get(`${BASE_URL}/users/edit/34234`);
+
+  await helper.waitUntilLoaded();
+
+  const alert2 = await helper.driver.findElement(
+    By.css('div[class="alert alert-danger"]')
+  );
+
+  assert.match(await alert2.getText(), /Account nicht gefunden!/);
+}
+
 async function testVotingWorks(helper: Helper) {
   await helper.driver.get(`${BASE_URL}/login`);
   const formTester = await helper.form("pw-login");
@@ -1476,6 +1500,9 @@ async function testHelperCreatesProjectWithProjectLeadersAndMembers(
 // TODO better would be some kind of queing system where a ready browser takes the next task
 
 await runTestAllBrowsers(async (helper) => {
+  await checkUserOrProjectNotFound(helper);
+  await helper.driver.manage().deleteAllCookies();
+
   await checkUsersSortingWorks(helper);
   await helper.driver.manage().deleteAllCookies();
 
