@@ -205,6 +205,14 @@ export const routes = {
       .strict(),
     response: z.object({}).strict(),
   },
+  "/api/v1/sudo": {
+    request: z
+      .object({
+        id: z.number(),
+      })
+      .strict(),
+    response: z.object({}).strict(),
+  },
   "/api/v1/openid-login": {
     request: z.any(),
     response: z.object({}).strict(),
