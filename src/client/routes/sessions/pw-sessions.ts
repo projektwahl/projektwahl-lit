@@ -25,10 +25,7 @@ import { html } from "lit";
 import { noChange } from "lit";
 import { aClick } from "../../pw-a.js";
 import { msg } from "@lit/localize";
-import {
-  parseRequestWithPrefix,
-  PwEntityList,
-} from "../../entity-list/pw-entitylist.js";
+import { PwEntityList } from "../../entity-list/pw-entitylist.js";
 import { taskFunction } from "../../entity-list/pw-entitylist.js";
 import type { z } from "zod";
 import type { entityRoutes } from "../../../lib/routes.js";
