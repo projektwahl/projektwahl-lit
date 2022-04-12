@@ -65,10 +65,10 @@ async function hashPasswordWithSalt(
         name: "PBKDF2",
         salt: salt,
         iterations: 1200000,
-        hash: "SHA-512",
+        hash: "SHA-256",
       },
       keyMaterial,
-      512
+      256
     )
   );
 }

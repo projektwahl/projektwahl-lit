@@ -258,6 +258,9 @@
   <source>Login as guest</source>
   <target>Als Gast anmelden</target>
 </trans-unit>
+<trans-unit id="s5c18cae48b93138c">
+  <source>Sessions</source>
+</trans-unit>
 <trans-unit id="hc66aaa662761137a">
   <source>Not Found</source>
   <target>Nicht gefunden</target>

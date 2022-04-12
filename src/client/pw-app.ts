@@ -71,6 +71,7 @@ import {
 } from "./routes/projects/pw-project-create.js";
 import { pwChoicesPreloaded } from "./routes/choices/pw-choices.js";
 import { pwLogin } from "./routes/login/pw-login.js";
+import { pwSessionsPreloaded } from "./routes/sessions/pw-sessions.js";
 
 export const { getLocale, setLocale } = configureLocalization({
   sourceLocale,
@@ -148,6 +149,9 @@ const pages = {
   },
   "^/vote$": async (url: URL) => {
     return await pwChoicesPreloaded(url);
+  },
+  "^/sessions$": async (url: URL) => {
+    return await pwSessionsPreloaded(url);
   },
 };
 

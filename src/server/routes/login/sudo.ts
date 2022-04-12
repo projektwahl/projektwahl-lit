@@ -24,17 +24,60 @@ import { ZodIssueCode } from "zod";
 import type { ResponseType } from "../../../lib/routes.js";
 import { sql } from "../../database.js";
 import { requestHandler } from "../../express.js";
-import { checkPassword } from "../../password.js";
 import type { OutgoingHttpHeaders } from "node:http";
 import nodeCrypto from "node:crypto";
 import { typedSql } from "../../describe.js";
 // @ts-expect-error wrong typings
 const { webcrypto: crypto }: { webcrypto: Crypto } = nodeCrypto;
 
-export const loginHandler = requestHandler(
+export const sudoHandler = requestHandler(
   "POST",
-  "/api/v1/login",
-  async function (body) {
+  "/api/v1/sudo",
+  async function (body, loggedInUser) {
+    if (!loggedInUser) {
+      const returnValue: [OutgoingHttpHeaders, ResponseType<"/api/v1/sudo">] = [
+        {
+          "content-type": "text/json; charset=utf-8",
+          ":status": 401,
+        },
+        {
+          success: false as const,
+          error: {
+            issues: [
+              {
+                code: ZodIssueCode.custom,
+                path: ["unauthorized"],
+                message: "Nicht angemeldet! Klicke rechts oben auf Anmelden.",
+              },
+            ],
+          },
+        },
+      ];
+      return returnValue;
+    }
+
+    if (!(loggedInUser?.type === "admin")) {
+      const returnValue: [OutgoingHttpHeaders, ResponseType<"/api/v1/sudo">] = [
+        {
+          "content-type": "text/json; charset=utf-8",
+          ":status": 403,
+        },
+        {
+          success: false as const,
+          error: {
+            issues: [
+              {
+                code: ZodIssueCode.custom,
+                path: ["forbidden"],
+                message: "Unzureichende Berechtigung!",
+              },
+            ],
+          },
+        },
+      ];
+      return returnValue;
+    }
+
     const r = await sql.begin(async (tsql) => {
       await tsql`SELECT set_config('projektwahl.type', 'root', true);`;
       return await typedSql(tsql, {
@@ -44,7 +87,7 @@ export const loginHandler = requestHandler(
           password_hash: 1043,
           type: null, // custom enum
         },
-      } as const)`SELECT id, username, password_hash, type FROM users WHERE username = ${body.username} LIMIT 1`;
+      } as const)`SELECT id, username, password_hash, type FROM users WHERE id = ${body.id} LIMIT 1`;
     });
 
     const dbUser = r[0];
@@ -71,67 +114,6 @@ export const loginHandler = requestHandler(
           },
         ];
       return returnValue;
-    }
-
-    if (dbUser.password_hash == null) {
-      const returnValue: [OutgoingHttpHeaders, ResponseType<"/api/v1/login">] =
-        [
-          {
-            "content-type": "text/json; charset=utf-8",
-            ":status": "200",
-          },
-          {
-            success: false as const,
-            error: {
-              issues: [
-                {
-                  code: ZodIssueCode.custom,
-                  path: ["password"],
-                  message: "Kein Password für Account gesetzt!",
-                },
-              ],
-            },
-          },
-        ];
-      return returnValue;
-    }
-
-    const [valid, needsRehash, newHash] = await checkPassword(
-      dbUser.password_hash,
-      body.password
-    );
-
-    if (!valid) {
-      const returnValue: [OutgoingHttpHeaders, ResponseType<"/api/v1/login">] =
-        [
-          {
-            "content-type": "text/json; charset=utf-8",
-            ":status": "200",
-          },
-          {
-            success: false as const,
-            error: {
-              issues: [
-                {
-                  code: ZodIssueCode.custom,
-                  path: ["password"],
-                  message: "Falsches Passwort!",
-                },
-              ],
-            },
-          },
-        ];
-      return returnValue;
-    }
-
-    if (needsRehash) {
-      await sql.begin("READ WRITE", async (tsql) => {
-        await tsql`SELECT set_config('projektwahl.type', ${dbUser.id}, true);`;
-
-        return await typedSql(tsql, {
-          columns: {},
-        } as const)`UPDATE users SET password_hash = ${newHash} WHERE id = ${dbUser.id}`;
-      });
     }
 
     const session_id_unhashed = Buffer.from(

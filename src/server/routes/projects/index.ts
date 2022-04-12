@@ -167,7 +167,8 @@ export const projectsHandler = requestHandler(
               ? "ASC"
               : "DESC"
           )}`,
-      }
+      },
+      "id"
     );
   }
 );

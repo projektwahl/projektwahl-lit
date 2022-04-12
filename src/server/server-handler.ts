@@ -43,6 +43,8 @@ import { choicesHandler } from "./routes/choices/index.js";
 import { updateChoiceHandler } from "./routes/choices/create-or-update.js";
 import { z, ZodIssueCode, ZodIssueOptionalMessage } from "zod";
 import { sleep } from "../client/utils.js";
+import { sessionsHandler } from "./routes/sessions/index.js";
+import { sudoHandler } from "./routes/login/sudo.js";
 
 // https://github.com/colinhacks/zod/blob/master/src/ZodError.ts
 type ErrorMapCtx = {
@@ -257,6 +259,12 @@ export async function serverHandler(
         break;
       case "/api/v1/choices/update":
         await updateChoiceHandler(url, request, response);
+        break;
+      case "/api/v1/sessions":
+        await sessionsHandler(url, request, response);
+        break;
+      case "/api/v1/sudo":
+        await sudoHandler(url, request, response);
         break;
       default:
         response.writeHead(404, {

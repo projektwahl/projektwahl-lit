@@ -76,6 +76,12 @@ type entitiesType15 = {
   >;
 };
 
+type entitiesType18 = {
+  [K in keyof typeof entityRoutes]: z.infer<
+    typeof entityRoutes[K]["request"]
+  >["sorting"][number][0];
+};
+
 type entitiesType6 = {
   [K in keyof typeof entityRoutes]: entitiesType4[K][0];
 };
@@ -99,12 +105,14 @@ export async function fetchData<R extends keyof typeof entityRoutes>(
   path: R,
   query: entitiesType0[R],
   sqlQuery: (query: entitiesType0[R]) => PendingQuery<Row[]>,
-  orderByQueries: entitiesType8[R]
+  orderByQueries: entitiesType8[R],
+  tiebreaker: entitiesType18[R]
 ): Promise<[OutgoingHttpHeaders, ResponseType<R>]> {
   const sorting: entitiesType15[R] = mappedIndexing(query, "sorting");
 
-  if (!sorting.find((e) => e[0] == "id")) {
-    sorting.push(["id", "ASC", null]);
+  if (!sorting.find((e) => e[0] == tiebreaker)) {
+    // @ts-expect-error probably mappedfunctioncall needed. or maybe we can store that tuple separately and type it.
+    sorting.push([tiebreaker, "ASC", null]);
   }
 
   const orderByQuery = mappedFunctionCall2(sorting, (v: entitiesType4[R]) => {
