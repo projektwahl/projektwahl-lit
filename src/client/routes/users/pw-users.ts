@@ -37,6 +37,9 @@ import { pwInputSelect } from "../../form/pw-input-select.js";
 import type { z } from "zod";
 import type { entityRoutes, routes } from "../../../lib/routes.js";
 import { pwInputCheckbox } from "../../form/pw-input-checkbox.js";
+import { myFetch } from "../../utils.js";
+import { HistoryController } from "../../history-controller.js";
+import { LoggedInUserController } from "../../user-controller.js";
 
 const defaultValue: z.infer<typeof entityRoutes["/api/v1/users"]["request"]> = {
   sorting: [],
@@ -81,12 +84,16 @@ export class PwUsers<X extends string> extends PwEntityList<
     };
   }
 
+  userController: LoggedInUserController;
+
   constructor() {
     super();
 
     this.url = "/api/v1/users";
 
     this.defaultValue = defaultValue;
+
+    this.userController = new LoggedInUserController(this);
   }
 
   override get title() {
@@ -342,6 +349,60 @@ export class PwUsers<X extends string> extends PwEntityList<
                         />
                       </svg>
                     </a>
+                    ${this.userController.type === "admin"
+                      ? html` <a
+                          class="btn btn-secondary"
+                          role="button"
+                          @click=${async () => {
+                            const result = await myFetch<"/api/v1/sudo">(
+                              "POST",
+                              "/api/v1/sudo",
+                              {
+                                id: value.id,
+                              },
+                              {}
+                            );
+
+                            if (result.success) {
+                              if ("BroadcastChannel" in window) {
+                                const bc = new BroadcastChannel(
+                                  "updateloginstate"
+                                );
+                                bc.postMessage("login");
+                                bc.close();
+                              }
+
+                              HistoryController.goto(
+                                new URL("/", window.location.href),
+                                {},
+                                true
+                              );
+                            } else {
+                              // TODO FIXME do this cleaner
+                              console.log(result.error);
+                              throw new Error(String(result.error));
+                            }
+                          }}
+                        >
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            width="16"
+                            height="16"
+                            fill="currentColor"
+                            class="bi bi-box-arrow-in-right"
+                            viewBox="0 0 16 16"
+                          >
+                            <path
+                              fill-rule="evenodd"
+                              d="M6 3.5a.5.5 0 0 1 .5-.5h8a.5.5 0 0 1 .5.5v9a.5.5 0 0 1-.5.5h-8a.5.5 0 0 1-.5-.5v-2a.5.5 0 0 0-1 0v2A1.5 1.5 0 0 0 6.5 14h8a1.5 1.5 0 0 0 1.5-1.5v-9A1.5 1.5 0 0 0 14.5 2h-8A1.5 1.5 0 0 0 5 3.5v2a.5.5 0 0 0 1 0v-2z"
+                            />
+                            <path
+                              fill-rule="evenodd"
+                              d="M11.854 8.354a.5.5 0 0 0 0-.708l-3-3a.5.5 0 1 0-.708.708L10.293 7.5H1.5a.5.5 0 0 0 0 1h8.793l-2.147 2.146a.5.5 0 0 0 .708.708l3-3z"
+                            />
+                          </svg>
+                        </a>`
+                      : undefined}
                   </td>
                 </tr>`
               )
