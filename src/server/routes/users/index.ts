@@ -159,7 +159,8 @@ export const usersHandler = requestHandler(
                 ? "ASC"
                 : "DESC"
             )}`,
-        }
+        },
+        "id"
       );
     return ret;
   }

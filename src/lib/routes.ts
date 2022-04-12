@@ -82,8 +82,8 @@ export const rawProjectSchema = z
 
 export const rawSessionType = z.object({
   session_id: z.string(),
-  created_at: z.date(),
-  updated_at: z.date(),
+  created_at: z.string(),
+  updated_at: z.string(),
   user_id: z.number(),
 });
 
@@ -451,12 +451,24 @@ export const routes = {
       .strict(),
     response: z.object({}).strict(),
   },
+  "/api/v1/sessions": baseQuery(
+    rawSessionType,
+    z.array(
+      z.tuple([
+        z.literal("session_id" as const),
+        z.enum(["ASC", "DESC"] as const),
+        z.null(),
+      ])
+    ),
+    z.object({})
+  ),
 } as const;
 
 export const entityRoutes = {
   "/api/v1/users": routes["/api/v1/users"],
   "/api/v1/projects": routes["/api/v1/projects"],
   "/api/v1/choices": routes["/api/v1/choices"],
+  "/api/v1/sessions": routes["/api/v1/sessions"],
 };
 
 export declare class MinimalZodError {

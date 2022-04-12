@@ -144,7 +144,8 @@ export const choicesHandler = requestHandler(
               ? "ASC"
               : "DESC"
           )}`,
-      }
+      },
+      "id"
     );
   }
 );
