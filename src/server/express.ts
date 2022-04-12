@@ -89,7 +89,7 @@ export function requestHandler<P extends keyof typeof routes>(
           // if the hashed session id gets leaked in the log files / database dump or so you still are not able to login with it.
           session_id = new Uint8Array(
             await crypto.subtle.digest(
-              "SHA-512",
+              "SHA-256",
               new TextEncoder().encode(session_id_unhashed)
             )
           );
