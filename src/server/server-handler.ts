@@ -261,6 +261,7 @@ export async function serverHandler(
         break;
       case "/api/v1/sessions":
         await sessionsHandler(url, request, response);
+        break;
       default:
         response.writeHead(404, {
           ...defaultHeaders,

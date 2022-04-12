@@ -139,7 +139,7 @@ export const loginHandler = requestHandler(
     ).toString("hex");
     const session_id = new Uint8Array(
       await crypto.subtle.digest(
-        "SHA-512",
+        "SHA-256",
         new TextEncoder().encode(session_id_unhashed)
       )
     );
