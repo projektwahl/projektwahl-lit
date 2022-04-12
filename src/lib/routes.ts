@@ -468,7 +468,9 @@ export const routes = {
         z.null(),
       ])
     ),
-    z.object({})
+    z.object({
+      user_id: z.number().nullable(),
+    })
   ),
 } as const;
 

@@ -25,16 +25,22 @@ import { html } from "lit";
 import { noChange } from "lit";
 import { aClick } from "../../pw-a.js";
 import { msg } from "@lit/localize";
-import { PwEntityList } from "../../entity-list/pw-entitylist.js";
+import {
+  parseRequestWithPrefix,
+  PwEntityList,
+} from "../../entity-list/pw-entitylist.js";
 import { taskFunction } from "../../entity-list/pw-entitylist.js";
 import type { z } from "zod";
 import type { entityRoutes } from "../../../lib/routes.js";
+import { pwInputNumber } from "../../form/pw-input-number.js";
 
 const defaultValue: z.infer<
   typeof entityRoutes["/api/v1/sessions"]["request"]
 > = {
   sorting: [],
-  filters: {},
+  filters: {
+    user_id: null,
+  },
   paginationDirection: "forwards",
   paginationLimit: 100,
 };
@@ -94,6 +100,15 @@ export class PwSessions<X extends string> extends PwEntityList<
 
   override get head() {
     try {
+      const data = parseRequestWithPrefix(
+        this.url,
+        this.prefix,
+        this.history.url,
+        defaultValue
+      );
+
+      const initial = data[this.prefix];
+
       return html`<tr>
           <th class="table-cell-hover" scope="col">session_id</th>
 
@@ -105,7 +120,21 @@ export class PwSessions<X extends string> extends PwEntityList<
         </tr>
 
         <tr>
-          <th scope="col"></th>
+          <th scope="col">
+            ${pwInputNumber<"/api/v1/sessions", number | null>({
+              enabled: true,
+              url: this.url,
+              label: null,
+              name: ["filters", "user_id"],
+              get: (o) => o.filters.user_id,
+              set: (o, v) => (o.filters.user_id = v),
+              task: this._task,
+              type: "number",
+              defaultValue: null,
+              initial,
+              resettable: false,
+            })}
+          </th>
 
           <th scope="col"></th>
 
