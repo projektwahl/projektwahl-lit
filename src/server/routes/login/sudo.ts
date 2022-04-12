@@ -24,7 +24,6 @@ import { ZodIssueCode } from "zod";
 import type { ResponseType } from "../../../lib/routes.js";
 import { sql } from "../../database.js";
 import { requestHandler } from "../../express.js";
-import { checkPassword } from "../../password.js";
 import type { OutgoingHttpHeaders } from "node:http";
 import nodeCrypto from "node:crypto";
 import { typedSql } from "../../describe.js";

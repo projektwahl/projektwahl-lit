@@ -29,14 +29,9 @@ import {
   parseRequestWithPrefix,
   PwEntityList,
 } from "../../entity-list/pw-entitylist.js";
-import { pwOrder } from "../../entity-list/pw-order.js";
 import { taskFunction } from "../../entity-list/pw-entitylist.js";
-import { pwInputNumber } from "../../form/pw-input-number.js";
-import { pwInputText } from "../../form/pw-input-text.js";
-import { pwInputSelect } from "../../form/pw-input-select.js";
 import type { z } from "zod";
-import type { entityRoutes, routes } from "../../../lib/routes.js";
-import { pwInputCheckbox } from "../../form/pw-input-checkbox.js";
+import type { entityRoutes } from "../../../lib/routes.js";
 
 const defaultValue: z.infer<
   typeof entityRoutes["/api/v1/sessions"]["request"]
@@ -102,15 +97,6 @@ export class PwSessions<X extends string> extends PwEntityList<
 
   override get head() {
     try {
-      const data = parseRequestWithPrefix(
-        this.url,
-        this.prefix,
-        this.history.url,
-        defaultValue
-      );
-
-      const initial = data[this.prefix];
-
       return html`<tr>
           <th class="table-cell-hover" scope="col">session_id</th>
 
