@@ -452,6 +452,10 @@ async function loginEmptyUsername(helper: Helper) {
 
 async function loginWrongPassword(helper: Helper) {
   await helper.driver.get(`${BASE_URL}/login`);
+
+  // login ratelimiting
+  await helper.driver.sleep(5000);
+
   const formTester = await helper.form("pw-login");
   await formTester.setField("username", "admin");
   await formTester.setField("password", "wrongpassword");
