@@ -33,7 +33,7 @@ jobs:
     strategy:
       matrix:
         node-version: [16.x] # 17.x
-        browser-engine: [firefox chrome]
+        browser-engine: [firefox, chrome]
 
     steps:
       - uses: actions/checkout@v2
