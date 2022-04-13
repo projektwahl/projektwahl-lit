@@ -452,6 +452,7 @@ async function loginEmptyUsername(helper: Helper) {
 
 async function loginWrongPassword(helper: Helper) {
   await helper.driver.get(`${BASE_URL}/login`);
+
   const formTester = await helper.form("pw-login");
   await formTester.setField("username", "admin");
   await formTester.setField("password", "wrongpassword");
@@ -1551,8 +1552,14 @@ await runTestAllBrowsers(async (helper) => {
   await loginEmptyUsername(helper);
   await helper.driver.manage().deleteAllCookies();
 
+  // login ratelimiting
+  await helper.driver.sleep(5000);
+
   await loginWrongPassword(helper);
   await helper.driver.manage().deleteAllCookies();
+
+  // login ratelimiting
+  await helper.driver.sleep(5000);
 
   await loginCorrect(helper);
   await helper.driver.manage().deleteAllCookies();
