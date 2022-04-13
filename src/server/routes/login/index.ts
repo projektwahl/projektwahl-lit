@@ -43,8 +43,9 @@ export const loginHandler = requestHandler(
           username: 1043,
           password_hash: 1043,
           type: null, // custom enum
+          last_failed_login_attempt: 16,
         },
-      } as const)`SELECT id, username, password_hash, type FROM users WHERE username = ${body.username} LIMIT 1`;
+      } as const)`SELECT id, username, password_hash, type, CURRENT_TIMESTAMP > last_failed_login_attempt + interval '5 seconds' as last_failed_login_attempt FROM users WHERE username = ${body.username} LIMIT 1`;
     });
 
     const dbUser = r[0];
@@ -96,12 +97,41 @@ export const loginHandler = requestHandler(
       return returnValue;
     }
 
+    if (!dbUser.last_failed_login_attempt) {
+      const returnValue: [OutgoingHttpHeaders, ResponseType<"/api/v1/login">] =
+        [
+          {
+            "content-type": "text/json; charset=utf-8",
+            ":status": "200",
+          },
+          {
+            success: false as const,
+            error: {
+              issues: [
+                {
+                  code: ZodIssueCode.custom,
+                  path: ["login"],
+                  message:
+                    "Zu viele Anmeldeversuche in zu kurzer Zeit. Warte einen Moment.",
+                },
+              ],
+            },
+          },
+        ];
+      return returnValue;
+    }
+
     const [valid, needsRehash, newHash] = await checkPassword(
       dbUser.password_hash,
       body.password
     );
 
     if (!valid) {
+      await sql.begin("READ WRITE", async (tsql) => {
+        await tsql`SELECT set_config('projektwahl.type', 'root', true);`;
+        await tsql`UPDATE users SET last_failed_login_attempt = CURRENT_TIMESTAMP WHERE id = ${dbUser.id}`;
+      });
+
       const returnValue: [OutgoingHttpHeaders, ResponseType<"/api/v1/login">] =
         [
           {
@@ -127,7 +157,6 @@ export const loginHandler = requestHandler(
     if (needsRehash) {
       await sql.begin("READ WRITE", async (tsql) => {
         await tsql`SELECT set_config('projektwahl.type', ${dbUser.id}, true);`;
-
         return await typedSql(tsql, {
           columns: {},
         } as const)`UPDATE users SET password_hash = ${newHash} WHERE id = ${dbUser.id}`;

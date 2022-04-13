@@ -113,7 +113,8 @@ CREATE TABLE IF NOT EXISTS users_with_deleted (
   force_in_project_id INTEGER,
   computed_in_project_id INTEGER,
   deleted BOOLEAN NOT NULL DEFAULT FALSE,
-  last_updated_by INTEGER
+  last_updated_by INTEGER,
+  last_failed_login_attempt TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
 CREATE TABLE IF NOT EXISTS users_history (
@@ -491,7 +492,7 @@ EXECUTE FUNCTION check_users_force_in_project();
 CREATE OR REPLACE FUNCTION check_users_project_leader_id2() RETURNS TRIGGER AS $body$
 BEGIN
   IF (SELECT COUNT(*) FROM users_with_deleted WHERE id = NEW.last_updated_by AND type = 'admin') != 1 THEN
-    RAISE EXCEPTION 'Lehrer dürfen nur Projektleiter oder Mitglieder ihrer eigenen Projekte ändern.';
+    RAISE EXCEPTION 'Lehrer dürfen nur Ihre eigenen Projekte ändern.';
   END IF;
   RETURN NEW;
 END;
@@ -537,4 +538,5 @@ ALTER TABLE users_with_deleted ENABLE ROW LEVEL SECURITY;
 
 DROP POLICY IF EXISTS users_voters_only_project_leaders ON users_with_deleted;
 
+-- TODO FIXMe switch to USING AND WITH so no entries are accidentially hidden but instead an error is thrown that rls is violated
 CREATE POLICY users_voters_only_project_leaders ON users_with_deleted FOR ALL TO PUBLIC USING (current_setting('projektwahl.type') IN ('root', 'admin', 'helper') OR project_leader_id IS NOT NULL);
