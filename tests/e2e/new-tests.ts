@@ -43,6 +43,7 @@ import firefox from "selenium-webdriver/firefox.js";
 import { installConsoleHandler } from "selenium-webdriver/lib/logging.js";
 import { sql } from "../../src/server/database.js";
 import { Chance } from "chance";
+import { argv } from "process";
 
 let chance: Chance.Chance;
 
@@ -253,16 +254,6 @@ class Helper {
 
     await this.click(navbarButton);
   }
-}
-
-async function runTestAllBrowsers(
-  testFunction: (helper: Helper) => Promise<void>
-) {
-  //await Promise.all([
-  // TODO FIXME running in parallel fails to load the modules in firefox. Don't know whats wrong
-  await runTest("chrome", testFunction);
-  await runTest("firefox", testFunction);
-  //]);
 }
 
 async function runTest(
@@ -1498,9 +1489,15 @@ async function testHelperCreatesProjectWithProjectLeadersAndMembers(
   assert.equal(alerts2.length, 1);
 }
 
-// TODO better would be some kind of queing system where a ready browser takes the next task
+if (argv.length !== 2) {
+  throw new Error("provide browser name as second argument");
+}
 
-await runTestAllBrowsers(async (helper) => {
+if (argv[1] !== "chrome" || argv[0] !== "firefox") {
+  throw new Error("possible browser names: chrome, firefox");
+}
+
+await runTest(argv[1], async (helper) => {
   await checkUserOrProjectNotFound(helper);
   await helper.driver.manage().deleteAllCookies();
 
