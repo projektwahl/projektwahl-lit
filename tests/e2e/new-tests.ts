@@ -1489,15 +1489,17 @@ async function testHelperCreatesProjectWithProjectLeadersAndMembers(
   assert.equal(alerts2.length, 1);
 }
 
-if (argv.length !== 2) {
+console.log(argv);
+
+if (argv.length !== 3) {
   throw new Error("provide browser name as second argument");
 }
 
-if (argv[1] !== "chrome" || argv[0] !== "firefox") {
+if (argv[2] !== "chrome" && argv[2] !== "firefox") {
   throw new Error("possible browser names: chrome, firefox");
 }
 
-await runTest(argv[1], async (helper) => {
+await runTest(argv[2], async (helper) => {
   await checkUserOrProjectNotFound(helper);
   await helper.driver.manage().deleteAllCookies();
 
