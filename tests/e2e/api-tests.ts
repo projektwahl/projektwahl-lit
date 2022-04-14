@@ -40,20 +40,27 @@ if (!process.env["BASE_URL"]) {
 }
 const BASE_URL = process.env.BASE_URL;
 
-function request(requestHeaders: OutgoingHttpHeaders, requestBody: string) {
+function request(
+  requestHeaders: OutgoingHttpHeaders,
+  requestBody: string | null
+): Promise<[string, IncomingHttpHeaders & IncomingHttpStatusHeader]> {
   return new Promise((resolve, reject) => {
     const client = connect(BASE_URL, {
       rejectUnauthorized: false,
     });
     client.on("error", (err) => reject(err));
 
-    const buffer = Buffer.from(requestBody);
+    const buffer = requestBody !== null ? Buffer.from(requestBody) : null;
 
     const req = client.request({
       [constants.HTTP2_HEADER_SCHEME]: "https",
-      "Content-Type": "application/json",
-      "Content-Length": buffer.length,
       ...requestHeaders,
+      ...(buffer !== null
+        ? {
+            "Content-Type": "application/json",
+            "Content-Length": buffer.length,
+          }
+        : {}),
     });
 
     let responseHeaders: IncomingHttpHeaders & IncomingHttpStatusHeader;
@@ -69,23 +76,48 @@ function request(requestHeaders: OutgoingHttpHeaders, requestBody: string) {
     req.on("end", () => {
       client.close();
 
-      resolve([responseHeaders, JSON.parse(data)]);
+      resolve([data, responseHeaders]);
     });
 
-    req.write(buffer);
+    if (buffer) {
+      req.write(buffer);
+    }
     req.end();
   });
 }
 
 async function testLogin() {
-  const r = await request(
+  let r, headers;
+
+  [r, headers] = await request(
+    {
+      [constants.HTTP2_HEADER_METHOD]: constants.HTTP2_METHOD_GET,
+      [constants.HTTP2_HEADER_PATH]: `/api/v1/login`,
+    },
+    null
+  );
+  assert.deepEqual(headers[constants.HTTP2_HEADER_STATUS], 400);
+  assert.deepEqual(r, "");
+
+  [r] = await request(
     {
       [constants.HTTP2_HEADER_METHOD]: constants.HTTP2_METHOD_POST,
       [constants.HTTP2_HEADER_PATH]: `/api/v1/login`,
     },
     "null"
   );
-  console.log(r);
+  assert.deepEqual(JSON.parse(r), {
+    success: false,
+    error: {
+      issues: [
+        {
+          code: "custom",
+          path: ["internal_error"],
+          message: "Error: No CSRF header!",
+        },
+      ],
+    },
+  });
 }
 
 chance.integer();
