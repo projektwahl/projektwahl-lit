@@ -1540,11 +1540,7 @@ async function checkSettingEmptyPasswordFails(helper: Helper) {
     await helper.driver.findElement(By.css(`a[href="/users"]`))
   );
   form = await helper.form("pw-users");
-  form.setField("filters,id", id);
-  await helper.waitUntilLoaded();
-  await helper.waitUntilLoaded();
-  await helper.waitUntilLoaded();
-  await helper.waitUntilLoaded();
+  await form.setField("filters,id", id);
   await helper.waitUntilLoaded();
 
   await helper.click(
