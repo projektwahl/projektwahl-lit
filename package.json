@@ -33,7 +33,7 @@
     "evaluate": "node --experimental-loader ./src/loader.js --enable-source-maps ./src/server/routes/evaluate/index.ts",
     "test-evaluate": "node --experimental-loader ./src/loader.js --enable-source-maps ./tests/e2e/test-calculate.ts",
     "setup": "node --experimental-loader ./src/loader.js --enable-source-maps ./src/server/setup.ts",
-    "server": "node  --conditions=development --experimental-loader ./src/loader.js --enable-source-maps --experimental-import-meta-resolve ./src/server/index.ts",
+    "server": "node --conditions=development --experimental-loader ./src/loader.js --enable-source-maps --experimental-import-meta-resolve ./src/server/index.ts",
     "localize-extract": "mkdir -p src/client/generated && docker build -t getting-started . && docker run --mount type=bind,source=\"$(pwd)\"/xliff,target=/opt/projektwahl-lit/xliff getting-started npm run localize-extract-internal",
     "localize-extract-internal": "lit-localize extract",
     "localize-build": "mkdir -p src/client/generated && docker build -t getting-started . && docker run --mount type=bind,source=\"$(pwd)\"/src/client/generated,target=/opt/projektwahl-lit/src/client/generated getting-started npm run localize-build-internal",
@@ -72,6 +72,7 @@
   "optionalDependencies": {
     "@lit/localize-tools": "^0.6.1",
     "@typescript-eslint/eslint-plugin": "^5.15.0",
+    "c8": "^7.11.0",
     "eslint": "^8.11.0",
     "eslint-config-prettier": "^8.5.0",
     "prettier": "^2.6.0",

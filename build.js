@@ -225,3 +225,17 @@ await writeFile("dist/index.html", index);
     plugins: [nativeNodeModulesPlugin],
   });
 }
+
+
+{
+  await build({
+    platform: "node",
+    format: "esm",
+    bundle: true,
+    entryPoints: ["tests/e2e/api-tests.ts"],
+    charset: "utf8",
+    sourcemap: true,
+    outfile: "dist/api-tests.js",
+    treeShaking: true,
+  });
+}

@@ -15,3 +15,4 @@ screenshot.png
 *.rtf
 openid_client_secret
 postgres
+coverage/
