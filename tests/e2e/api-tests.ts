@@ -30,9 +30,7 @@ import {
   OutgoingHttpHeaders,
 } from "node:http2";
 
-let chance: Chance.Chance;
-
-chance = new Chance(1234);
+const chance: Chance.Chance = new Chance(1234);
 
 if (!process.env["BASE_URL"]) {
   console.error("BASE_URL not set!");
@@ -99,7 +97,7 @@ async function testLogin() {
   assert.deepEqual(headers[constants.HTTP2_HEADER_STATUS], 400);
   assert.deepEqual(r, "");
 
-  [r] = await request(
+  [r, headers] = await request(
     {
       [constants.HTTP2_HEADER_METHOD]: constants.HTTP2_METHOD_POST,
       [constants.HTTP2_HEADER_PATH]: `/api/v1/login`,
