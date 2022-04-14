@@ -28,6 +28,7 @@ import net from "net";
 import cluster from "cluster";
 import { watch } from "node:fs/promises";
 import { setupClient } from "./routes/login/openid-client.js";
+import { exit } from "node:process";
 
 if (!process.env["BASE_URL"]) {
   console.error("BASE_URL not set!");
@@ -138,16 +139,17 @@ if (
         }
       });
     }
+
+    // https://github.com/nodejs/node/issues/35212
+    process.on("SIGINT", () => {
+      server.close();
+      process.exit();
+    });
+    process.on("SIGTERM", () => {
+      server.close();
+      process.exit();
+    });
   })();
 }
 
 //repl.start({})
-
-/*
-process.on("SIGINT", () => {
-  console.log("SIGINT signal received: closing HTTP server");
-  server.close(() => {
-    console.log("HTTP server closed");
-  });
-});
-*/

@@ -113,9 +113,13 @@ NODE_ENV=testing PORT=8443 BASE_URL=https://localhost:8443 CREDENTIALS_DIRECTORY
 ## Coverage
 
 ```
+
 rm -Rf dist coverage
-npm run build
-NODE_ENV=testing PORT=8443 BASE_URL=https://localhost:8443 CREDENTIALS_DIRECTORY=$PWD DATABASE_HOST=localhost DATABASE_URL=postgres://projektwahl_staging_admin:projektwahl@localhost/projektwahl_staging NODE_V8_COVERAGE=coverage node dist/api-tests.js
+
+npm run build && NODE_ENV=coverage PORT=8443 BASE_URL=https://localhost:8443 CREDENTIALS_DIRECTORY=$PWD DATABASE_HOST=localhost DATABASE_URL=postgres://projektwahl_staging:projektwahl@localhost/projektwahl_staging NODE_V8_COVERAGE=coverage node dist/server.js
+
+
+npm run build && NODE_ENV=coverage PORT=8443 BASE_URL=https://localhost:8443 CREDENTIALS_DIRECTORY=$PWD DATABASE_HOST=localhost DATABASE_URL=postgres://projektwahl_staging_admin:projektwahl@localhost/projektwahl_staging NODE_V8_COVERAGE=coverage node dist/api-tests.js
 npx c8 report --temp-directory=coverage
 npx c8 report --temp-directory=coverage --reporter=html && firefox coverage/index.html
 ```
