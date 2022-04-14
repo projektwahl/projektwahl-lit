@@ -87,7 +87,7 @@ ALTER VIEW users OWNER TO projektwahl_staging;
 ALTER VIEW present_voters OWNER TO projektwahl_staging;
 ALTER VIEW projects OWNER TO projektwahl_staging;
 
-sudo -u projektwahl_staging NODE_ENV=development DATABASE_HOST=/run/postgresql DATABASE_URL=postgres://projektwahl_staging@localhost/projektwahl_staging npm run setup
+NODE_ENV=development DATABASE_HOST=/run/postgresql DATABASE_URL=postgres://projektwahl_staging:projektwahl@localhost/projektwahl_staging npm run setup
 
 
 PORT=8443 BASE_URL=https://localhost:8443 DATABASE_URL=postgres://projektwahl@projektwahl/projektwahl CREDENTIALS_DIRECTORY=$PWD node  --enable-source-maps dist/server.js
@@ -99,15 +99,15 @@ PORT=8443 BASE_URL=https://localhost:8443 DATABASE_URL=postgres://projektwahl@pr
 ```bash
 ln -s $PWD/pre-commit .git/hooks/pre-commit
 
-sudo -u projektwahl_staging NODE_ENV=development PORT=8443 BASE_URL=https://localhost:8443 CREDENTIALS_DIRECTORY=$PWD DATABASE_HOST=/run/postgresql DATABASE_URL=postgres://projektwahl_staging@localhost/projektwahl_staging npm run server
+NODE_ENV=development PORT=8443 BASE_URL=https://localhost:8443 CREDENTIALS_DIRECTORY=$PWD DATABASE_HOST=localhost DATABASE_URL=postgres://projektwahl_staging:projektwahl@localhost/projektwahl_staging npm run server
 ```
 
 ## Testing
 
 ```
-sudo -u projektwahl_staging NODE_ENV=testing PORT=8443 BASE_URL=https://localhost:8443 CREDENTIALS_DIRECTORY=$PWD DATABASE_HOST=/run/postgresql DATABASE_URL=postgres://projektwahl_staging@localhost/projektwahl_staging npm run server
+NODE_ENV=testing PORT=8443 BASE_URL=https://localhost:8443 CREDENTIALS_DIRECTORY=$PWD DATABASE_HOST=localhost DATABASE_URL=postgres://projektwahl_staging:projektwahl@localhost/projektwahl_staging npm run server
 
-NODE_ENV=testing PORT=8443 BASE_URL=https://localhost:8443 CREDENTIALS_DIRECTORY=$PWD DATABASE_HOST=/run/postgresql DATABASE_URL=postgres://projektwahl_staging_admin:projektwahl@localhost/projektwahl_staging npm run test-internal
+NODE_ENV=testing PORT=8443 BASE_URL=https://localhost:8443 CREDENTIALS_DIRECTORY=$PWD DATABASE_HOST=localhost DATABASE_URL=postgres://projektwahl_staging_admin:projektwahl@localhost/projektwahl_staging npm run test-internal
 
 
 ```
