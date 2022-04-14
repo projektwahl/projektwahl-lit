@@ -30,7 +30,7 @@ jobs:
       - run: npm ci --ignore-scripts
       - run: npm run format:check-internal
       - run: ./node_modules/@dev.mohe/argon2/build.sh /opt/hostedtoolcache/node/$(node -v | cut -c2-)/x64/include/node
-      - run: npm run build
+      - run: LANGUAGE=de npm run build
       - run: npm run typecheck
       - run: npm run lint-internal
       - run: npm run localize-extract-internal

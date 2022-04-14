@@ -28,7 +28,6 @@ import net from "net";
 import cluster from "cluster";
 import { watch } from "node:fs/promises";
 import { setupClient } from "./routes/login/openid-client.js";
-import { exit } from "node:process";
 
 if (!process.env["BASE_URL"]) {
   console.error("BASE_URL not set!");
