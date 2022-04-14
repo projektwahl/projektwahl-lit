@@ -42,7 +42,6 @@ import type { MyRequest } from "./express.js";
 import { choicesHandler } from "./routes/choices/index.js";
 import { updateChoiceHandler } from "./routes/choices/create-or-update.js";
 import { z, ZodIssueCode, ZodIssueOptionalMessage } from "zod";
-import { sleep } from "../client/utils.js";
 import { sessionsHandler } from "./routes/sessions/index.js";
 import { sudoHandler } from "./routes/login/sudo.js";
 
