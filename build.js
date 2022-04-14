@@ -76,7 +76,9 @@ let version_short = (
 
 {
   let { stdout, stderr } = await exec(
-    `esbuild --format=esm --bundle ./src/client/pw-app.js --charset=utf8 --define:window.PRODUCTION=true --define:window.LANGUAGE=\\"de\\" --define:window.VERSION_FULL=\\"${version_full}\\" --define:window.VERSION_SHORT=\\"${version_short}\\" --entry-names=[dir]/[name] --sourcemap  --analyze --outdir=dist --tree-shaking=true`
+    `esbuild --format=esm --bundle ./src/client/pw-app.js --charset=utf8 --define:window.PRODUCTION=true --define:window.LANGUAGE=\\"${
+      process.env.LANGUAGE ?? "de"
+    }\\" --define:window.VERSION_FULL=\\"${version_full}\\" --define:window.VERSION_SHORT=\\"${version_short}\\" --entry-names=[dir]/[name] --sourcemap  --analyze --outdir=dist --tree-shaking=true`
   );
 
   console.log(stdout);
@@ -128,7 +130,9 @@ await rename(
 // rebuild with path to bootstrap.css
 {
   let { stdout, stderr } = await exec(
-    `esbuild --format=esm --bundle ./src/client/pw-app.js --charset=utf8 --define:window.PRODUCTION=true --define:window.LANGUAGE=\\"de\\" --define:window.VERSION_FULL=\\"${version_full}\\" --define:window.VERSION_SHORT=\\"${version_short}\\" --define:window.BOOTSTRAP_CSS=\\"/dist/bootstrap_${bootstrapHash}.min.css\\" --entry-names=[dir]/[name] --sourcemap --analyze --outdir=dist --tree-shaking=true`
+    `esbuild --format=esm --bundle ./src/client/pw-app.js --charset=utf8 --define:window.PRODUCTION=true --define:window.LANGUAGE=\\"${
+      process.env.LANGUAGE ?? "de"
+    }\\" --define:window.VERSION_FULL=\\"${version_full}\\" --define:window.VERSION_SHORT=\\"${version_short}\\" --define:window.BOOTSTRAP_CSS=\\"/dist/bootstrap_${bootstrapHash}.min.css\\" --entry-names=[dir]/[name] --sourcemap --analyze --outdir=dist --tree-shaking=true`
   );
 
   console.log(stdout);
@@ -223,5 +227,37 @@ await writeFile("dist/index.html", index);
     inject: ["./require-shim.js"],
     treeShaking: true,
     plugins: [nativeNodeModulesPlugin],
+  });
+}
+
+{
+  await build({
+    platform: "node",
+    format: "esm",
+    bundle: true,
+    entryPoints: ["src/server/index.ts"],
+    define: {
+      "process.env.NODE_ENV": '"testing"',
+    },
+    external: ["@dev.mohe/argon2"],
+    charset: "utf8",
+    sourcemap: true,
+    outfile: "dist/server-testing.js",
+    inject: ["./require-shim.js"],
+    treeShaking: true,
+    plugins: [nativeNodeModulesPlugin],
+  });
+}
+
+{
+  await build({
+    platform: "node",
+    format: "esm",
+    bundle: true,
+    entryPoints: ["tests/e2e/api-tests.ts"],
+    charset: "utf8",
+    sourcemap: true,
+    outfile: "dist/api-tests.js",
+    treeShaking: true,
   });
 }

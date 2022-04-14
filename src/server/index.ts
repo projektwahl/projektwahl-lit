@@ -138,16 +138,17 @@ if (
         }
       });
     }
+
+    // https://github.com/nodejs/node/issues/35212
+    process.on("SIGINT", () => {
+      server.close();
+      process.exit();
+    });
+    process.on("SIGTERM", () => {
+      server.close();
+      process.exit();
+    });
   })();
 }
 
 //repl.start({})
-
-/*
-process.on("SIGINT", () => {
-  console.log("SIGINT signal received: closing HTTP server");
-  server.close(() => {
-    console.log("HTTP server closed");
-  });
-});
-*/

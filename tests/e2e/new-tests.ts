@@ -614,7 +614,7 @@ async function createUserAllFields(helper: Helper) {
 
   form = await helper.form("pw-user-create");
 
-  await helper.driver.sleep(2000);
+  await helper.driver.sleep(1000);
 
   assert.equal(await form.getField("0,username"), username);
   assert.equal(await form.getField("0,openid_id"), "");
@@ -1209,7 +1209,7 @@ async function resettingUserWorks2(helper: Helper) {
       ).map((elem) => helper.click(elem))
     );
 
-    await helper.driver.sleep(2000);
+    await helper.driver.sleep(1000);
 
     // check what resetting worked
     form = await helper.form("pw-user-create");
@@ -1295,7 +1295,7 @@ async function resettingProjectWorks2(helper: Helper) {
       ).map((elem) => helper.click(elem))
     );
 
-    await helper.driver.sleep(2000);
+    await helper.driver.sleep(1000);
 
     // check what resetting worked
     form = await helper.form("pw-project-create");
@@ -1361,6 +1361,8 @@ async function testVotingWorks(helper: Helper) {
   );
 
   await helper.waitUntilLoaded();
+  await helper.waitUntilLoaded();
+  await helper.waitUntilLoaded();
 
   const alerts1 = await helper.driver.findElements(
     By.css('div[class="alert alert-danger"]')
@@ -1376,7 +1378,7 @@ async function testVotingWorks(helper: Helper) {
     )
   );
 
-  await helper.driver.sleep(2000);
+  await helper.driver.sleep(1000);
 
   await helper.waitUntilLoaded();
   await helper.waitUntilLoaded();
@@ -1478,7 +1480,7 @@ async function testHelperCreatesProjectWithProjectLeadersAndMembers(
     )
   );
 
-  await helper.driver.sleep(2000);
+  await helper.driver.sleep(1000);
 
   await helper.waitUntilLoaded();
 
