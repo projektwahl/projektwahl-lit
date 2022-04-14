@@ -22,6 +22,7 @@
     "format:check": "docker build -t getting-started . && docker run getting-started npm run format:check-internal",
     "format:check-internal": "prettier --ignore-path .prettierignore --check .",
     "test-internal:chrome": "node --experimental-loader ./src/loader.js --enable-source-maps tests/e2e/new-tests.ts chrome",
+    "test-api": "node --experimental-loader ./src/loader.js --enable-source-maps tests/e2e/api-tests.ts chrome",
     "test-internal:firefox": "node --experimental-loader ./src/loader.js --enable-source-maps tests/e2e/new-tests.ts firefox",
     "test:chrome": "docker build -t getting-started . && docker run --mount type=bind,source=\"$(pwd)\"/tests/e2e/new-tests.ts,target=/opt/projektwahl-lit/tests/e2e/new-tests.ts --net=host -e BASE_URL -e DATABASE_URL -e DATABASE_HOST -e CI=1 getting-started npm run test-internal:chrome",
     "test:firefox": "docker build -t getting-started . && docker run --mount type=bind,source=\"$(pwd)\"/tests/e2e/new-tests.ts,target=/opt/projektwahl-lit/tests/e2e/new-tests.ts --net=host -e BASE_URL -e DATABASE_URL -e DATABASE_HOST -e CI=1 getting-started npm run test-internal:firefox",
