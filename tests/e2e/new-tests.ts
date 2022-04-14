@@ -1489,6 +1489,91 @@ async function testHelperCreatesProjectWithProjectLeadersAndMembers(
   assert.equal(alerts2.length, 1);
 }
 
+async function checkSettingEmptyPasswordFails(helper: Helper) {
+  await loginCorrect(helper);
+
+  await helper.openNavbar();
+  await helper.click(
+    await helper.driver.findElement(By.css(`a[href="/users"]`))
+  );
+
+  await helper.form("pw-users");
+  await helper.click(
+    await helper.driver.findElement(By.css(`a[href="/users/create"]`))
+  );
+  let form = await helper.form("pw-user-create");
+  const username = `username${crypto.getRandomValues(new Uint32Array(1))[0]}`;
+
+  await (
+    await helper.driver.findElement(
+      By.css('select[name="0,type"] option[value="helper"]')
+    )
+  ).click();
+
+  await form.setField("0,username", username);
+  await form.submitSuccess();
+  await helper.driver.wait(until.urlContains("/users/edit/"), 2000);
+  const id = (await helper.driver.getCurrentUrl()).match(
+    /\/users\/edit\/(\d+)/
+  )?.[1];
+  if (!id) {
+    assert.fail("id not found in url");
+  }
+  await helper.waitUntilLoaded();
+
+  await helper.click(
+    await helper.driver.findElement(By.css(`a[href="/logout"]`))
+  );
+  await helper.form("pw-login");
+  form = await helper.form("pw-login");
+  await form.setField("username", username);
+  await form.setField("password", "");
+
+  assert.deepStrictEqual(
+    [["password", "Kein Password für Account gesetzt!"]],
+    await form.submitFailure()
+  );
+
+  await loginCorrect(helper);
+
+  await helper.click(
+    await helper.driver.findElement(By.css(`a[href="/users"]`))
+  );
+  form = await helper.form("pw-users");
+  form.setField("filters,id", id);
+  await helper.waitUntilLoaded();
+  await helper.waitUntilLoaded();
+  await helper.waitUntilLoaded();
+  await helper.waitUntilLoaded();
+  await helper.waitUntilLoaded();
+
+  await helper.click(
+    await helper.driver.findElement(By.css(`a[href="/users/edit/${id}"]`))
+  );
+  await helper.waitUntilLoaded();
+
+  form = await helper.form("pw-user-create");
+  await helper.waitUntilLoaded();
+  await form.resetField("0,password", "hopefullynotsaved");
+  await form.resetField("0,password", "");
+  await form.submitSuccess();
+
+  await helper.click(
+    await helper.driver.findElement(By.css(`a[href="/logout"]`))
+  );
+  await helper.form("pw-login");
+  form = await helper.form("pw-login");
+  await form.setField("username", username);
+  await form.setField("password", "");
+
+  assert.deepStrictEqual(
+    [["password", "Kein Password für Account gesetzt!"]],
+    await form.submitFailure()
+  );
+
+  await loginCorrect(helper);
+}
+
 console.log(argv);
 
 if (argv.length !== 3) {
@@ -1579,6 +1664,12 @@ await runTest(argv[2], async (helper) => {
   await helper.driver.manage().deleteAllCookies();
 
   await checkNotLoggedInProjects(helper);
+  await helper.driver.manage().deleteAllCookies();
+
+  // login ratelimiting
+  await helper.driver.sleep(5000);
+
+  await checkSettingEmptyPasswordFails(helper);
   await helper.driver.manage().deleteAllCookies();
 });
 
