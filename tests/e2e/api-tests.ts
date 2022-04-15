@@ -116,6 +116,124 @@ async function testLogin() {
       ],
     },
   });
+
+  [r, headers] = await request(
+    {
+      [constants.HTTP2_HEADER_METHOD]: constants.HTTP2_METHOD_POST,
+      [constants.HTTP2_HEADER_PATH]: `/api/v1/login`,
+      "x-csrf-protection": "wrong",
+    },
+    "null"
+  );
+  assert.deepEqual(JSON.parse(r), {
+    success: false,
+    error: {
+      issues: [
+        {
+          code: "custom",
+          path: ["internal_error"],
+          message: "Error: No CSRF header!",
+        },
+      ],
+    },
+  });
+
+  [r, headers] = await request(
+    {
+      [constants.HTTP2_HEADER_METHOD]: constants.HTTP2_METHOD_POST,
+      [constants.HTTP2_HEADER_PATH]: `/api/v1/login`,
+      "x-csrf-protection": "projektwahl",
+    },
+    "null"
+  );
+  assert.deepEqual(JSON.parse(r), {
+    success: false,
+    error: {
+      issues: [
+        {
+          code: "invalid_type",
+          expected: "object",
+          received: "null",
+          path: [],
+          message: "Erwarte object, aber null bekommen",
+        },
+      ],
+      name: "ZodError",
+    },
+  });
+
+  [r, headers] = await request(
+    {
+      [constants.HTTP2_HEADER_METHOD]: constants.HTTP2_METHOD_POST,
+      [constants.HTTP2_HEADER_PATH]: `/api/v1/login`,
+      "x-csrf-protection": "projektwahl",
+    },
+    "undefined"
+  );
+  assert.deepEqual(JSON.parse(r), {
+    success: false,
+    error: {
+      issues: [
+        {
+          code: "custom",
+          path: ["internal_error"],
+          message: "SyntaxError: Unexpected token u in JSON at position 0",
+        },
+      ],
+    },
+  });
+
+  [r, headers] = await request(
+    {
+      [constants.HTTP2_HEADER_METHOD]: constants.HTTP2_METHOD_POST,
+      [constants.HTTP2_HEADER_PATH]: `/api/v1/login`,
+      "x-csrf-protection": "projektwahl",
+    },
+    ""
+  );
+  assert.deepEqual(JSON.parse(r), {
+    success: false,
+    error: {
+      issues: [
+        {
+          code: "custom",
+          path: ["internal_error"],
+          message: "SyntaxError: Unexpected end of JSON input",
+        },
+      ],
+    },
+  });
+
+  [r, headers] = await request(
+    {
+      [constants.HTTP2_HEADER_METHOD]: constants.HTTP2_METHOD_POST,
+      [constants.HTTP2_HEADER_PATH]: `/api/v1/login`,
+      "x-csrf-protection": "projektwahl",
+    },
+    "{}"
+  );
+  assert.deepEqual(JSON.parse(r), {
+    success: false,
+    error: {
+      issues: [
+        {
+          code: "invalid_type",
+          expected: "string",
+          received: "undefined",
+          path: ["username"],
+          message: "Pflichtfeld",
+        },
+        {
+          code: "invalid_type",
+          expected: "string",
+          received: "undefined",
+          path: ["password"],
+          message: "Pflichtfeld",
+        },
+      ],
+      name: "ZodError",
+    },
+  });
 }
 
 chance.integer();
