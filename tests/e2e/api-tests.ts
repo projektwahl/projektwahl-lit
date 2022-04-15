@@ -380,6 +380,8 @@ async function testLogin() {
       ],
     },
   });
+
+  console.log(headers);
 }
 
 async function testLogout() {
@@ -432,7 +434,9 @@ async function testLogout() {
     })
   );
   assert.deepEqual(JSON.parse(r), { success: true, data: {} });
-  const session_id = headers["set-cookie"]![0].split(";")[0].split("=")[1];
+  const session_id = (headers["set-cookie"] || "")[0]
+    .split(";")[0]
+    .split("=")[1];
 
   [r, headers] = await request(
     {
@@ -450,7 +454,9 @@ async function testLogout() {
     },
     null
   );
-  assert.deepEqual(JSON.parse(r).success, true);
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+  const parsed: { success: unknown } = JSON.parse(r);
+  assert.equal(parsed.success, true);
 
   [r, headers] = await request(
     {
@@ -495,6 +501,6 @@ async function testLogout() {
 
 chance.integer();
 
-//await testLogin();
+await testLogin();
 
 await testLogout();
