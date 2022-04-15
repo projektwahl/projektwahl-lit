@@ -23,6 +23,7 @@ SPDX-FileCopyrightText: 2021 Moritz Hedtke <Moritz.Hedtke@t-online.de>
 import { msg } from "@lit/localize";
 import { html } from "lit";
 import { PwElement } from "../pw-element.js";
+import { LoggedInUserController } from "../user-controller.js";
 
 // workaround see https://github.com/runem/lit-analyzer/issues/149#issuecomment-1006162839
 export function pwWelcome(
@@ -35,16 +36,31 @@ export function pwWelcome(
 }
 
 export class PwWelcome extends PwElement {
+  userController: LoggedInUserController;
+
+  constructor() {
+    super();
+    this.userController = new LoggedInUserController(this);
+  }
+
   protected render() {
     return html`
       <div class="container">
-        <h1 class="text-center">${msg("Welcome")}</h1>
+        <h1 class="text-center">Projektwoche AES 3.0 18.-21. Juli 2022</h1>
 
+        <h2 class="text-center">Montag bis Mittwoch: Projekttage</h2>
+        <h2 class="text-center">Donnerstag: großes AES - Festival</h2>
         <p>
-          ${msg(
-            "This is some boilerplate welcome text that can be adapted by changing the translation."
-          )}
+          Voice-Aid Schulkonzert, Flashmop (Musik, Tanz, Kreativität,
+          Kleiderbasar, Vorbereitung Präsentationen), Sommerfest mit Eltern und
+          Ausstellung der Ergebnisse der Projekttage
         </p>
+
+        ${this.userController.type === "helper"
+          ? `Oben im Menü unter "Projekte" kannst du Projekte erstellen und bearbeiten.`
+          : this.userController.type === "voter"
+          ? `Oben im Menü unter "Wahl" kannst du deine Projektwünsche auswählen.`
+          : ``}
 
         <br />
         <h2 class="text-center">${msg("Credits")}</h2>

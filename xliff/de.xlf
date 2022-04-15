@@ -2,14 +2,6 @@
 <xliff version="1.2" xmlns="urn:oasis:names:tc:xliff:document:1.2">
 <file target-language="de" source-language="en" original="lit-localize-inputs" datatype="plaintext">
 <body>
-<trans-unit id="scdb1bac161852c73">
-  <source>Welcome</source>
-  <target>Willkommen</target>
-</trans-unit>
-<trans-unit id="se478d5906376d65e">
-  <source>This is some boilerplate welcome text that can be adapted by changing the translation.</source>
-  <target>Dieser Text kann angepasst werden.</target>
-</trans-unit>
 <trans-unit id="s7a391ae3182a86b5">
   <source>Credits</source>
   <target>Danksagung</target>
