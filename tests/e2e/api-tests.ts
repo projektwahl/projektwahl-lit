@@ -419,6 +419,78 @@ async function testLogout() {
     JSON.stringify({})
   );
   assert.deepEqual(JSON.parse(r), { success: true, data: {} });
+
+  [r, headers] = await request(
+    {
+      [constants.HTTP2_HEADER_METHOD]: constants.HTTP2_METHOD_POST,
+      [constants.HTTP2_HEADER_PATH]: `/api/v1/login`,
+      "x-csrf-protection": "projektwahl",
+    },
+    JSON.stringify({
+      username: "admin",
+      password: "changeme",
+    })
+  );
+  assert.deepEqual(JSON.parse(r), { success: true, data: {} });
+  const session_id = headers["set-cookie"]![0].split(";")[0].split("=")[1];
+
+  [r, headers] = await request(
+    {
+      [constants.HTTP2_HEADER_METHOD]: constants.HTTP2_METHOD_GET,
+      [constants.HTTP2_HEADER_PATH]: `/api/v1/sessions?${encodeURIComponent(
+        JSON.stringify({
+          filters: {
+            user_id: null,
+          },
+          sorting: [],
+        })
+      )}`,
+      [constants.HTTP2_HEADER_COOKIE]: `lax_id=${session_id}`,
+      "x-csrf-protection": "projektwahl",
+    },
+    null
+  );
+  assert.deepEqual(JSON.parse(r).success, true);
+
+  [r, headers] = await request(
+    {
+      [constants.HTTP2_HEADER_METHOD]: constants.HTTP2_METHOD_POST,
+      [constants.HTTP2_HEADER_PATH]: `/api/v1/logout`,
+      [constants.HTTP2_HEADER_COOKIE]: `strict_id=${session_id}`,
+      "x-csrf-protection": "projektwahl",
+    },
+    JSON.stringify({})
+  );
+  assert.deepEqual(JSON.parse(r), { success: true, data: {} });
+
+  [r, headers] = await request(
+    {
+      [constants.HTTP2_HEADER_METHOD]: constants.HTTP2_METHOD_GET,
+      [constants.HTTP2_HEADER_PATH]: `/api/v1/sessions?${encodeURIComponent(
+        JSON.stringify({
+          filters: {
+            user_id: null,
+          },
+          sorting: [],
+        })
+      )}`,
+      [constants.HTTP2_HEADER_COOKIE]: `lax_id=${session_id}`,
+      "x-csrf-protection": "projektwahl",
+    },
+    null
+  );
+  assert.deepEqual(JSON.parse(r), {
+    success: false,
+    error: {
+      issues: [
+        {
+          code: "custom",
+          path: ["unauthorized"],
+          message: "Nicht angemeldet! Klicke rechts oben auf Anmelden.",
+        },
+      ],
+    },
+  });
 }
 
 chance.integer();
