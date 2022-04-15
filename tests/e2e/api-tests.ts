@@ -29,6 +29,7 @@ import {
   IncomingHttpStatusHeader,
   OutgoingHttpHeaders,
 } from "node:http2";
+import { sleep } from "../../src/client/utils.js";
 
 const chance: Chance.Chance = new Chance(1234);
 
@@ -234,10 +235,153 @@ async function testLogin() {
       name: "ZodError",
     },
   });
+
+  [r, headers] = await request(
+    {
+      [constants.HTTP2_HEADER_METHOD]: constants.HTTP2_METHOD_POST,
+      [constants.HTTP2_HEADER_PATH]: `/api/v1/login`,
+      "x-csrf-protection": "projektwahl",
+    },
+    JSON.stringify({
+      usernamee: "hi",
+      password: "jo",
+    })
+  );
+  assert.deepEqual(JSON.parse(r), {
+    success: false,
+    error: {
+      issues: [
+        {
+          code: "invalid_type",
+          expected: "string",
+          received: "undefined",
+          path: ["username"],
+          message: "Pflichtfeld",
+        },
+        {
+          code: "unrecognized_keys",
+          keys: ["usernamee"],
+          path: [],
+          message: "Unbekannte Schlüssel: 'usernamee'",
+        },
+      ],
+      name: "ZodError",
+    },
+  });
+
+  [r, headers] = await request(
+    {
+      [constants.HTTP2_HEADER_METHOD]: constants.HTTP2_METHOD_POST,
+      [constants.HTTP2_HEADER_PATH]: `/api/v1/login`,
+      "x-csrf-protection": "projektwahl",
+    },
+    JSON.stringify({
+      username: "hi",
+      password: "jo",
+    })
+  );
+  assert.deepEqual(JSON.parse(r), {
+    success: false,
+    error: {
+      issues: [
+        {
+          code: "custom",
+          path: ["username"],
+          message: "Nutzer existiert nicht!",
+        },
+      ],
+    },
+  });
+
+  [r, headers] = await request(
+    {
+      [constants.HTTP2_HEADER_METHOD]: constants.HTTP2_METHOD_POST,
+      [constants.HTTP2_HEADER_PATH]: `/api/v1/login`,
+      "x-csrf-protection": "projektwahl",
+    },
+    JSON.stringify({
+      username: "admin",
+      password: "jo",
+    })
+  );
+  assert.deepEqual(JSON.parse(r), {
+    success: false,
+    error: {
+      issues: [
+        {
+          code: "custom",
+          path: ["password"],
+          message: "Falsches Passwort!",
+        },
+      ],
+    },
+  });
+
+  [r, headers] = await request(
+    {
+      [constants.HTTP2_HEADER_METHOD]: constants.HTTP2_METHOD_POST,
+      [constants.HTTP2_HEADER_PATH]: `/api/v1/login`,
+      "x-csrf-protection": "projektwahl",
+    },
+    JSON.stringify({
+      username: "admin",
+      password: "jo",
+    })
+  );
+  assert.deepEqual(JSON.parse(r), {
+    success: false,
+    error: {
+      issues: [
+        {
+          code: "custom",
+          path: ["login"],
+          message:
+            "Zu viele Anmeldeversuche in zu kurzer Zeit. Warte einen Moment.",
+        },
+      ],
+    },
+  });
+
+  await sleep(5000);
+
+  [r, headers] = await request(
+    {
+      [constants.HTTP2_HEADER_METHOD]: constants.HTTP2_METHOD_POST,
+      [constants.HTTP2_HEADER_PATH]: `/api/v1/login`,
+      "x-csrf-protection": "projektwahl",
+    },
+    JSON.stringify({
+      username: "admin",
+      password: "changeme",
+    })
+  );
+  assert.deepEqual(JSON.parse(r), { success: true, data: {} });
+
+  [r, headers] = await request(
+    {
+      [constants.HTTP2_HEADER_METHOD]: constants.HTTP2_METHOD_POST,
+      [constants.HTTP2_HEADER_PATH]: `/api/v1/login`,
+      "x-csrf-protection": "projektwahl",
+    },
+    JSON.stringify({
+      username: "admin",
+      password: "jo",
+    })
+  );
+  assert.deepEqual(JSON.parse(r), {
+    success: false,
+    error: {
+      issues: [
+        {
+          code: "custom",
+          path: ["password"],
+          message: "Falsches Passwort!",
+        },
+      ],
+    },
+  });
 }
 
 chance.integer();
-
-assert.ok(true);
 
 await testLogin();
