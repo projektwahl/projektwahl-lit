@@ -382,6 +382,47 @@ async function testLogin() {
   });
 }
 
+async function testLogout() {
+  let r, headers;
+
+  [r, headers] = await request(
+    {
+      [constants.HTTP2_HEADER_METHOD]: constants.HTTP2_METHOD_POST,
+      [constants.HTTP2_HEADER_PATH]: `/api/v1/logout`,
+      "x-csrf-protection": "projektwahl",
+    },
+    JSON.stringify({
+      anything: 1,
+    })
+  );
+  assert.deepEqual(JSON.parse(r), {
+    success: false,
+    error: {
+      issues: [
+        {
+          code: "unrecognized_keys",
+          keys: ["anything"],
+          path: [],
+          message: "Unbekannte Schlüssel: 'anything'",
+        },
+      ],
+      name: "ZodError",
+    },
+  });
+
+  [r, headers] = await request(
+    {
+      [constants.HTTP2_HEADER_METHOD]: constants.HTTP2_METHOD_POST,
+      [constants.HTTP2_HEADER_PATH]: `/api/v1/logout`,
+      "x-csrf-protection": "projektwahl",
+    },
+    JSON.stringify({})
+  );
+  assert.deepEqual(JSON.parse(r), { success: true, data: {} });
+}
+
 chance.integer();
 
-await testLogin();
+//await testLogin();
+
+await testLogout();
