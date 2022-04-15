@@ -465,7 +465,7 @@ async function welcomeWorks(helper: Helper) {
   await helper.driver.get(`${BASE_URL}/`);
   assert.match(
     await (await helper.waitElem("pw-welcome")).getText(),
-    /Welcome/
+    /Projektwoche/
   );
 }
 
