@@ -900,6 +900,100 @@ async function testCreateOrUpdateProjects() {
   const id = data.data.id;
   data.data.id = 1337;
   assert.deepEqual(data, { success: true, data: { id: 1337 } });
+
+  [r] = await request(
+    {
+      [constants.HTTP2_HEADER_METHOD]: constants.HTTP2_METHOD_GET,
+      [constants.HTTP2_HEADER_PATH]: `/api/v1/projects?${encodeURIComponent(
+        JSON.stringify({
+          filters: {
+            id,
+          },
+          sorting: [],
+        })
+      )}`,
+      [constants.HTTP2_HEADER_COOKIE]: `lax_id=${session_id}`,
+      "x-csrf-protection": "projektwahl",
+    },
+    null
+  );
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+  const value = JSON.parse(r);
+  assert.deepEqual(value, {
+    success: true,
+    data: {
+      entities: [
+        {
+          id,
+          title: "hi",
+          info: "",
+          place: "jo",
+          costs: 0,
+          min_age: 5,
+          max_age: 13,
+          min_participants: 5,
+          max_participants: 15,
+          random_assignments: false,
+          deleted: false,
+        },
+      ],
+      nextCursor: null,
+      previousCursor: null,
+    },
+  });
+
+  [r] = await request(
+    {
+      [constants.HTTP2_HEADER_METHOD]: constants.HTTP2_METHOD_POST,
+      [constants.HTTP2_HEADER_PATH]: `/api/v1/projects/update`,
+      [constants.HTTP2_HEADER_COOKIE]: `strict_id=${session_id}`,
+      "x-csrf-protection": "projektwahl",
+    },
+    JSON.stringify({
+      id,
+      title: "bruh",
+    })
+  );
+  assert.deepEqual(JSON.parse(r), { success: true, data: { id } });
+
+  [r] = await request(
+    {
+      [constants.HTTP2_HEADER_METHOD]: constants.HTTP2_METHOD_GET,
+      [constants.HTTP2_HEADER_PATH]: `/api/v1/projects?${encodeURIComponent(
+        JSON.stringify({
+          filters: {
+            id,
+          },
+          sorting: [],
+        })
+      )}`,
+      [constants.HTTP2_HEADER_COOKIE]: `lax_id=${session_id}`,
+      "x-csrf-protection": "projektwahl",
+    },
+    null
+  );
+  assert.deepEqual(JSON.parse(r), {
+    success: true,
+    data: {
+      entities: [
+        {
+          id,
+          title: "bruh",
+          info: "",
+          place: "jo",
+          costs: 0,
+          min_age: 5,
+          max_age: 13,
+          min_participants: 5,
+          max_participants: 15,
+          random_assignments: false,
+          deleted: false,
+        },
+      ],
+      nextCursor: null,
+      previousCursor: null,
+    },
+  });
 }
 
 await testCreateOrUpdateProjects();
