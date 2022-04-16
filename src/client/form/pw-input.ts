@@ -269,6 +269,7 @@ export abstract class PwInput<
             : literal`input`
         }
           ${ref(this.input)}
+          rows="6"
           type=${ifDefined(this.type !== "textarea" ? this.type : undefined)}
           name=${this.name}
           .value=${ifDefined(
