@@ -618,8 +618,8 @@ async function testCreateOrUpdateUsers() {
   );
   // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
   let value = JSON.parse(r);
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-  const id = value.data[0].id;
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access,@typescript-eslint/no-unsafe-assignment
+  const id: number = value.data[0].id;
   // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
   value.data[0].id = 1337;
   assert.deepEqual(value, {
@@ -677,6 +677,46 @@ async function testCreateOrUpdateUsers() {
   assert.deepEqual(value, {
     success: true,
     data: [{ id, project_leader_id: null, force_in_project_id: null }],
+  });
+
+  [r] = await request(
+    {
+      [constants.HTTP2_HEADER_METHOD]: constants.HTTP2_METHOD_GET,
+      [constants.HTTP2_HEADER_PATH]: `/api/v1/users?${encodeURIComponent(
+        JSON.stringify({
+          filters: {
+            id,
+          },
+          sorting: [],
+        })
+      )}`,
+      [constants.HTTP2_HEADER_COOKIE]: `lax_id=${session_id}`,
+      "x-csrf-protection": "projektwahl",
+    },
+    null
+  );
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+  value = JSON.parse(r);
+  assert.deepEqual(value, {
+    success: true,
+    data: {
+      entities: [
+        {
+          id,
+          type: "admin",
+          username: old_username,
+          openid_id: null,
+          group: null,
+          age: null,
+          away: false,
+          project_leader_id: null,
+          force_in_project_id: null,
+          deleted: false,
+        },
+      ],
+      nextCursor: null,
+      previousCursor: null,
+    },
   });
 
   const new_username = chance.name();
