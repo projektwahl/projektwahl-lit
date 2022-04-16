@@ -383,9 +383,7 @@ async function testLogin() {
 }
 
 async function getAdminSessionId() {
-  let r, headers;
-
-  [r, headers] = await request(
+  const [r, headers] = await request(
     {
       [constants.HTTP2_HEADER_METHOD]: constants.HTTP2_METHOD_POST,
       [constants.HTTP2_HEADER_PATH]: `/api/v1/login`,
@@ -404,9 +402,9 @@ async function getAdminSessionId() {
 }
 
 async function testLogout() {
-  let r, headers;
+  let r;
 
-  [r, headers] = await request(
+  [r] = await request(
     {
       [constants.HTTP2_HEADER_METHOD]: constants.HTTP2_METHOD_POST,
       [constants.HTTP2_HEADER_PATH]: `/api/v1/logout`,
@@ -431,7 +429,7 @@ async function testLogout() {
     },
   });
 
-  [r, headers] = await request(
+  [r] = await request(
     {
       [constants.HTTP2_HEADER_METHOD]: constants.HTTP2_METHOD_POST,
       [constants.HTTP2_HEADER_PATH]: `/api/v1/logout`,
@@ -443,7 +441,7 @@ async function testLogout() {
 
   const session_id = await getAdminSessionId();
 
-  [r, headers] = await request(
+  [r] = await request(
     {
       [constants.HTTP2_HEADER_METHOD]: constants.HTTP2_METHOD_GET,
       [constants.HTTP2_HEADER_PATH]: `/api/v1/sessions?${encodeURIComponent(
@@ -463,7 +461,7 @@ async function testLogout() {
   const parsed: { success: unknown } = JSON.parse(r);
   assert.equal(parsed.success, true);
 
-  [r, headers] = await request(
+  [r] = await request(
     {
       [constants.HTTP2_HEADER_METHOD]: constants.HTTP2_METHOD_POST,
       [constants.HTTP2_HEADER_PATH]: `/api/v1/logout`,
@@ -474,7 +472,7 @@ async function testLogout() {
   );
   assert.deepEqual(JSON.parse(r), { success: true, data: {} });
 
-  [r, headers] = await request(
+  [r] = await request(
     {
       [constants.HTTP2_HEADER_METHOD]: constants.HTTP2_METHOD_GET,
       [constants.HTTP2_HEADER_PATH]: `/api/v1/sessions?${encodeURIComponent(
@@ -505,9 +503,9 @@ async function testLogout() {
 }
 
 async function testCreateOrUpdateUsers() {
-  let r, headers;
+  let r;
 
-  [r, headers] = await request(
+  [r] = await request(
     {
       [constants.HTTP2_HEADER_METHOD]: constants.HTTP2_METHOD_POST,
       [constants.HTTP2_HEADER_PATH]: `/api/v1/users/create-or-update`,
@@ -530,7 +528,7 @@ async function testCreateOrUpdateUsers() {
 
   const session_id = await getAdminSessionId();
 
-  [r, headers] = await request(
+  [r] = await request(
     {
       [constants.HTTP2_HEADER_METHOD]: constants.HTTP2_METHOD_POST,
       [constants.HTTP2_HEADER_PATH]: `/api/v1/users/create-or-update`,
@@ -541,7 +539,7 @@ async function testCreateOrUpdateUsers() {
   );
   assert.deepEqual(JSON.parse(r), { success: true });
 
-  [r, headers] = await request(
+  [r] = await request(
     {
       [constants.HTTP2_HEADER_METHOD]: constants.HTTP2_METHOD_POST,
       [constants.HTTP2_HEADER_PATH]: `/api/v1/users/create-or-update`,
@@ -566,7 +564,7 @@ async function testCreateOrUpdateUsers() {
     },
   });
 
-  [r, headers] = await request(
+  [r] = await request(
     {
       [constants.HTTP2_HEADER_METHOD]: constants.HTTP2_METHOD_POST,
       [constants.HTTP2_HEADER_PATH]: `/api/v1/users/create-or-update`,
@@ -602,7 +600,7 @@ async function testCreateOrUpdateUsers() {
     },
   });
 
-  [r, headers] = await request(
+  [r] = await request(
     {
       [constants.HTTP2_HEADER_METHOD]: constants.HTTP2_METHOD_POST,
       [constants.HTTP2_HEADER_PATH]: `/api/v1/users/create-or-update`,
@@ -617,7 +615,9 @@ async function testCreateOrUpdateUsers() {
       },
     ])
   );
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
   const value = JSON.parse(r);
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
   value.data[0].id = 1337;
   assert.deepEqual(value, {
     success: true,
@@ -627,12 +627,8 @@ async function testCreateOrUpdateUsers() {
 
 await testCreateOrUpdateUsers();
 
-/*
-
 await testLogin();
 
 await sleep(5000);
 
 await testLogout();
-
-*/
