@@ -616,16 +616,94 @@ async function testCreateOrUpdateUsers() {
     ])
   );
   // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-  const value = JSON.parse(r);
+  let value = JSON.parse(r);
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+  const id = value.data[0].id;
   // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
   value.data[0].id = 1337;
   assert.deepEqual(value, {
     success: true,
     data: [{ id: 1337, project_leader_id: null, force_in_project_id: null }],
   });
+
+  [r] = await request(
+    {
+      [constants.HTTP2_HEADER_METHOD]: constants.HTTP2_METHOD_POST,
+      [constants.HTTP2_HEADER_PATH]: `/api/v1/users/create-or-update`,
+      [constants.HTTP2_HEADER_COOKIE]: `strict_id=${session_id}`,
+      "x-csrf-protection": "projektwahl",
+    },
+    JSON.stringify([
+      {
+        action: "update",
+      },
+    ])
+  );
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+  value = JSON.parse(r);
+  assert.deepEqual(value, {
+    success: false,
+    error: {
+      issues: [
+        {
+          code: "invalid_type",
+          expected: "number",
+          received: "undefined",
+          path: [0, "id"],
+          message: "Pflichtfeld",
+        },
+      ],
+      name: "ZodError",
+    },
+  });
+
+  [r] = await request(
+    {
+      [constants.HTTP2_HEADER_METHOD]: constants.HTTP2_METHOD_POST,
+      [constants.HTTP2_HEADER_PATH]: `/api/v1/users/create-or-update`,
+      [constants.HTTP2_HEADER_COOKIE]: `strict_id=${session_id}`,
+      "x-csrf-protection": "projektwahl",
+    },
+    JSON.stringify([
+      {
+        action: "update",
+        id,
+      },
+    ])
+  );
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+  value = JSON.parse(r);
+  assert.deepEqual(value, {
+    success: true,
+    data: [{ id, project_leader_id: null, force_in_project_id: null }],
+  });
+
+  [r] = await request(
+    {
+      [constants.HTTP2_HEADER_METHOD]: constants.HTTP2_METHOD_POST,
+      [constants.HTTP2_HEADER_PATH]: `/api/v1/users/create-or-update`,
+      [constants.HTTP2_HEADER_COOKIE]: `strict_id=${session_id}`,
+      "x-csrf-protection": "projektwahl",
+    },
+    JSON.stringify([
+      {
+        action: "update",
+        id,
+        username: "anothername",
+      },
+    ])
+  );
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+  value = JSON.parse(r);
+  assert.deepEqual(value, {
+    success: true,
+    data: [{ id, project_leader_id: null, force_in_project_id: null }],
+  });
 }
 
 await testCreateOrUpdateUsers();
+
+console.log("done");
 
 await testLogin();
 
