@@ -401,6 +401,25 @@ async function getAdminSessionId() {
   return session_id;
 }
 
+async function getVoterSessionId() {
+  const [r, headers] = await request(
+    {
+      [constants.HTTP2_HEADER_METHOD]: constants.HTTP2_METHOD_POST,
+      [constants.HTTP2_HEADER_PATH]: `/api/v1/login`,
+      "x-csrf-protection": "projektwahl",
+    },
+    JSON.stringify({
+      username: "Dr. Dustin Allison M.D.",
+      password: "changeme",
+    })
+  );
+  assert.deepEqual(JSON.parse(r), { success: true, data: {} });
+  const session_id = (headers["set-cookie"] || "")[0]
+    .split(";")[0]
+    .split("=")[1];
+  return session_id;
+}
+
 async function testLogout() {
   let r;
 
@@ -995,6 +1014,128 @@ async function testCreateOrUpdateProjects() {
     },
   });
 }
+
+async function testChoices() {
+  let r;
+
+  const session_id = await getVoterSessionId();
+
+  [r] = await request(
+    {
+      [constants.HTTP2_HEADER_METHOD]: constants.HTTP2_METHOD_POST,
+      [constants.HTTP2_HEADER_PATH]: `/api/v1/choices/update`,
+      [constants.HTTP2_HEADER_COOKIE]: `strict_id=${session_id}`,
+      "x-csrf-protection": "projektwahl",
+    },
+    JSON.stringify({})
+  );
+  assert.deepEqual(JSON.parse(r), {
+    success: false,
+    error: {
+      issues: [
+        {
+          code: "invalid_type",
+          expected: "number",
+          received: "undefined",
+          path: ["project_id"],
+          message: "Pflichtfeld",
+        },
+        {
+          code: "invalid_type",
+          expected: "number",
+          received: "undefined",
+          path: ["rank"],
+          message: "Pflichtfeld",
+        },
+      ],
+      name: "ZodError",
+    },
+  });
+
+  [r] = await request(
+    {
+      [constants.HTTP2_HEADER_METHOD]: constants.HTTP2_METHOD_POST,
+      [constants.HTTP2_HEADER_PATH]: `/api/v1/choices/update`,
+      [constants.HTTP2_HEADER_COOKIE]: `strict_id=${session_id}`,
+      "x-csrf-protection": "projektwahl",
+    },
+    JSON.stringify({
+      project_id: 42,
+      rank: 1,
+    })
+  );
+  assert.deepEqual(JSON.parse(r), {
+    success: false,
+    error: {
+      issues: [
+        {
+          code: "custom",
+          path: ["database"],
+          message:
+            "Der Nutzer passt nicht in die Altersbegrenzung des Projekts!",
+        },
+      ],
+    },
+  });
+
+  [r] = await request(
+    {
+      [constants.HTTP2_HEADER_METHOD]: constants.HTTP2_METHOD_POST,
+      [constants.HTTP2_HEADER_PATH]: `/api/v1/choices/update`,
+      [constants.HTTP2_HEADER_COOKIE]: `strict_id=${session_id}`,
+      "x-csrf-protection": "projektwahl",
+    },
+    JSON.stringify({
+      project_id: 1,
+      rank: 1,
+    })
+  );
+  assert.deepEqual(JSON.parse(r), { success: true, data: {} });
+
+  [r] = await request(
+    {
+      [constants.HTTP2_HEADER_METHOD]: constants.HTTP2_METHOD_GET,
+      [constants.HTTP2_HEADER_PATH]: `/api/v1/choices?${encodeURIComponent(
+        JSON.stringify({
+          filters: {
+            title: "Tu asojag aza",
+          },
+          sorting: [],
+        })
+      )}`,
+      [constants.HTTP2_HEADER_COOKIE]: `lax_id=${session_id}`,
+      "x-csrf-protection": "projektwahl",
+    },
+    null
+  );
+  assert.deepEqual(JSON.parse(r), {
+    success: true,
+    data: {
+      entities: [
+        {
+          id: 1,
+          title: "Tu asojag aza",
+          info: "Pikot ranab igwocuj mol atesi nutfinoj ot ibagob onumagmes dansab kul ujdowzo. Guab gudo won ga cu umbuhnup roffaw elonidsa obri jufgozu awfuwza haw kafnewipe paidowow. Seodke cibko epna zugedi mu sinve odaegu vejazat bujmil wuz muccip ikbik komeb lerotpom ekwiw. Konuj idi wid lodi obuiwmul wibnehku zu vipla madu saokule lifhok hozueja. Suib biza aceuc daz keunian vabcocapu hatejoval nozrimub fulwok mo gon dipa wutehfo izu. Inav duaz enro fe ufzo la rajom pujevi vesul awa lacem puda uk ipgul ziozpof megzo. Rulbanuk osnomej tuvaju hed paakne et salpufo gehucu izcuceb zueliize zo zag sa kuomwih.",
+          place: "335 Uwoege Turnpike",
+          costs: 10,
+          min_age: 9,
+          max_age: 12,
+          min_participants: 9,
+          max_participants: 12,
+          random_assignments: false,
+          deleted: false,
+          rank: 1,
+          project_id: 1,
+          user_id: 2,
+        },
+      ],
+      nextCursor: null,
+      previousCursor: null,
+    },
+  });
+}
+
+await testChoices();
 
 await testCreateOrUpdateProjects();
 
