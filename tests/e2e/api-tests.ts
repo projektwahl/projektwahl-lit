@@ -600,6 +600,7 @@ async function testCreateOrUpdateUsers() {
     },
   });
 
+  const old_username = chance.name();
   [r] = await request(
     {
       [constants.HTTP2_HEADER_METHOD]: constants.HTTP2_METHOD_POST,
@@ -611,7 +612,7 @@ async function testCreateOrUpdateUsers() {
       {
         action: "create",
         type: "admin",
-        username: `admin${chance.name()}`,
+        username: old_username,
       },
     ])
   );
@@ -678,6 +679,7 @@ async function testCreateOrUpdateUsers() {
     data: [{ id, project_leader_id: null, force_in_project_id: null }],
   });
 
+  const new_username = chance.name();
   [r] = await request(
     {
       [constants.HTTP2_HEADER_METHOD]: constants.HTTP2_METHOD_POST,
@@ -689,7 +691,7 @@ async function testCreateOrUpdateUsers() {
       {
         action: "update",
         id,
-        username: "anothername",
+        username: new_username,
       },
     ])
   );
@@ -698,6 +700,46 @@ async function testCreateOrUpdateUsers() {
   assert.deepEqual(value, {
     success: true,
     data: [{ id, project_leader_id: null, force_in_project_id: null }],
+  });
+
+  [r] = await request(
+    {
+      [constants.HTTP2_HEADER_METHOD]: constants.HTTP2_METHOD_GET,
+      [constants.HTTP2_HEADER_PATH]: `/api/v1/users?${encodeURIComponent(
+        JSON.stringify({
+          filters: {
+            id,
+          },
+          sorting: [],
+        })
+      )}`,
+      [constants.HTTP2_HEADER_COOKIE]: `lax_id=${session_id}`,
+      "x-csrf-protection": "projektwahl",
+    },
+    null
+  );
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+  value = JSON.parse(r);
+  assert.deepEqual(value, {
+    success: true,
+    data: {
+      entities: [
+        {
+          id,
+          type: "admin",
+          username: new_username,
+          openid_id: null,
+          group: null,
+          age: null,
+          away: false,
+          project_leader_id: null,
+          force_in_project_id: null,
+          deleted: false,
+        },
+      ],
+      nextCursor: null,
+      previousCursor: null,
+    },
   });
 }
 
