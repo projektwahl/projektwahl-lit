@@ -29,6 +29,6 @@ export class PwElement extends LitElement {
   }
 
   protected willUpdate(_changedProperties: Map<PropertyKey, unknown>): void {
-    console.log(this.tagName, _changedProperties);
+    console.debug(this.tagName, _changedProperties);
   }
 }
