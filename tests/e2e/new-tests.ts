@@ -1360,6 +1360,8 @@ async function testVotingWorks(helper: Helper) {
     )
   );
 
+  await helper.driver.sleep(1000);
+
   await helper.waitUntilLoaded();
   await helper.waitUntilLoaded();
   await helper.waitUntilLoaded();

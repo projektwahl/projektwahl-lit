@@ -80,12 +80,14 @@ export const rawProjectSchema = z
   })
   .strict();
 
-export const rawSessionType = z.object({
-  session_id: z.string(),
-  created_at: z.string(),
-  updated_at: z.string(),
-  user_id: z.number(),
-});
+export const rawSessionType = z
+  .object({
+    session_id: z.string(),
+    created_at: z.string(),
+    updated_at: z.string(),
+    user_id: z.number(),
+  })
+  .strict();
 
 export const userSchema = rawUserSchema
   .pick({
@@ -107,11 +109,13 @@ export const entities = <
   entity: ZodObject<T, UnknownKeys, Catchall>
 ) =>
   result(
-    z.object({
-      entities: z.array(entity),
-      previousCursor: entity.nullable(),
-      nextCursor: entity.nullable(),
-    })
+    z
+      .object({
+        entities: z.array(entity),
+        previousCursor: entity.nullable(),
+        nextCursor: entity.nullable(),
+      })
+      .strict()
   );
 
 const baseQuery = <
@@ -193,7 +197,7 @@ export const updateUserAction = rawUserSchema
 
 export const routes = {
   "/api/v1/logout": {
-    request: z.any(),
+    request: z.object({}).strict(),
     response: z.object({}).strict(),
   },
   "/api/v1/login": {
@@ -214,7 +218,7 @@ export const routes = {
     response: z.object({}).strict(),
   },
   "/api/v1/openid-login": {
-    request: z.any(),
+    request: z.object({}).strict(),
     response: z.object({}).strict(),
   },
   "/api/v1/redirect": {
@@ -227,16 +231,19 @@ export const routes = {
     response: z.object({}).strict(),
   },
   "/api/v1/sleep": {
-    request: z.undefined(),
+    request: z.object({}).strict(),
     response: z.object({}).strict(),
   },
   "/api/v1/update": {
-    request: z.undefined(),
+    request: z.object({}).strict(),
     response: z.object({}).strict(),
   },
   "/api/v1/users/create-or-update": {
     request: z.array(
-      z.discriminatedUnion("action", [createUserAction, updateUserAction])
+      z.discriminatedUnion("action", [
+        createUserAction.strict(),
+        updateUserAction.strict(),
+      ])
     ),
     response: z.array(
       rawUserSchema
@@ -303,7 +310,8 @@ export const routes = {
       .partial({
         openid_id: true,
         force_in_project_id: true,
-      }),
+      })
+      .strict(),
     z
       .array(
         z.union([
@@ -468,9 +476,11 @@ export const routes = {
         z.null(),
       ])
     ),
-    z.object({
-      user_id: z.number().nullable(),
-    })
+    z
+      .object({
+        user_id: z.number().nullable(),
+      })
+      .strict()
   ),
 } as const;
 
