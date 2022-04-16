@@ -1138,13 +1138,84 @@ async function testChoices() {
   });
 }
 
+async function testSudo() {
+  const session_id = await getAdminSessionId();
+
+  let headers;
+
+  let [r] = await request(
+    {
+      [constants.HTTP2_HEADER_METHOD]: constants.HTTP2_METHOD_POST,
+      [constants.HTTP2_HEADER_PATH]: `/api/v1/sudo`,
+      [constants.HTTP2_HEADER_COOKIE]: `strict_id=${session_id}`,
+      "x-csrf-protection": "projektwahl",
+    },
+    JSON.stringify({})
+  );
+  assert.deepEqual(JSON.parse(r), {
+    success: false,
+    error: {
+      issues: [
+        {
+          code: "invalid_type",
+          expected: "number",
+          received: "undefined",
+          path: ["id"],
+          message: "Pflichtfeld",
+        },
+      ],
+      name: "ZodError",
+    },
+  });
+
+  [r, headers] = await request(
+    {
+      [constants.HTTP2_HEADER_METHOD]: constants.HTTP2_METHOD_POST,
+      [constants.HTTP2_HEADER_PATH]: `/api/v1/sudo`,
+      [constants.HTTP2_HEADER_COOKIE]: `strict_id=${session_id}`,
+      "x-csrf-protection": "projektwahl",
+    },
+    JSON.stringify({
+      id: 2,
+    })
+  );
+  const sudo_session_id = (headers["set-cookie"] || "")[0]
+    .split(";")[0]
+    .split("=")[1];
+  assert.deepEqual(JSON.parse(r), { success: true, data: {} });
+
+  [r, headers] = await request(
+    {
+      [constants.HTTP2_HEADER_METHOD]: constants.HTTP2_METHOD_POST,
+      [constants.HTTP2_HEADER_PATH]: `/api/v1/sudo`,
+      [constants.HTTP2_HEADER_COOKIE]: `strict_id=${sudo_session_id}`,
+      "x-csrf-protection": "projektwahl",
+    },
+    JSON.stringify({
+      id: 2,
+    })
+  );
+  assert.deepEqual(JSON.parse(r), {
+    success: false,
+    error: {
+      issues: [
+        {
+          code: "custom",
+          path: ["forbidden"],
+          message: "Unzureichende Berechtigung!",
+        },
+      ],
+    },
+  });
+}
+
+await testSudo();
+
 await testChoices();
 
 await testCreateOrUpdateProjects();
 
 await testCreateOrUpdateUsers();
-
-console.log("done");
 
 await testLogin();
 
