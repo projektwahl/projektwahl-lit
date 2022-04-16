@@ -380,8 +380,6 @@ async function testLogin() {
       ],
     },
   });
-
-  console.log(headers);
 }
 
 async function testLogout() {
@@ -502,5 +500,7 @@ async function testLogout() {
 chance.integer();
 
 await testLogin();
+
+await sleep(5000);
 
 await testLogout();
