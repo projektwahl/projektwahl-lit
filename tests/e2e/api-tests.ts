@@ -382,6 +382,27 @@ async function testLogin() {
   });
 }
 
+async function getAdminSessionId() {
+  let r, headers;
+
+  [r, headers] = await request(
+    {
+      [constants.HTTP2_HEADER_METHOD]: constants.HTTP2_METHOD_POST,
+      [constants.HTTP2_HEADER_PATH]: `/api/v1/login`,
+      "x-csrf-protection": "projektwahl",
+    },
+    JSON.stringify({
+      username: "admin",
+      password: "changeme",
+    })
+  );
+  assert.deepEqual(JSON.parse(r), { success: true, data: {} });
+  const session_id = (headers["set-cookie"] || "")[0]
+    .split(";")[0]
+    .split("=")[1];
+  return session_id;
+}
+
 async function testLogout() {
   let r, headers;
 
@@ -420,21 +441,7 @@ async function testLogout() {
   );
   assert.deepEqual(JSON.parse(r), { success: true, data: {} });
 
-  [r, headers] = await request(
-    {
-      [constants.HTTP2_HEADER_METHOD]: constants.HTTP2_METHOD_POST,
-      [constants.HTTP2_HEADER_PATH]: `/api/v1/login`,
-      "x-csrf-protection": "projektwahl",
-    },
-    JSON.stringify({
-      username: "admin",
-      password: "changeme",
-    })
-  );
-  assert.deepEqual(JSON.parse(r), { success: true, data: {} });
-  const session_id = (headers["set-cookie"] || "")[0]
-    .split(";")[0]
-    .split("=")[1];
+  const session_id = await getAdminSessionId();
 
   [r, headers] = await request(
     {
@@ -497,10 +504,54 @@ async function testLogout() {
   });
 }
 
+async function testCreateOrUpdateUsers() {
+  let r, headers;
+
+  [r, headers] = await request(
+    {
+      [constants.HTTP2_HEADER_METHOD]: constants.HTTP2_METHOD_POST,
+      [constants.HTTP2_HEADER_PATH]: `/api/v1/users/create-or-update`,
+      "x-csrf-protection": "projektwahl",
+    },
+    JSON.stringify([])
+  );
+  assert.deepEqual(JSON.parse(r), {
+    success: false,
+    error: {
+      issues: [
+        {
+          code: "custom",
+          path: ["unauthorized"],
+          message: "Nicht angemeldet! Klicke rechts oben auf Anmelden.",
+        },
+      ],
+    },
+  });
+
+  const session_id = await getAdminSessionId();
+
+  [r, headers] = await request(
+    {
+      [constants.HTTP2_HEADER_METHOD]: constants.HTTP2_METHOD_POST,
+      [constants.HTTP2_HEADER_PATH]: `/api/v1/users/create-or-update`,
+      [constants.HTTP2_HEADER_COOKIE]: `strict_id=${session_id}`,
+      "x-csrf-protection": "projektwahl",
+    },
+    JSON.stringify([])
+  );
+  assert.deepEqual(JSON.parse(r), { success: true });
+}
+
 chance.integer();
+
+await testCreateOrUpdateUsers();
+
+/*
 
 await testLogin();
 
 await sleep(5000);
 
 await testLogout();
+
+*/
