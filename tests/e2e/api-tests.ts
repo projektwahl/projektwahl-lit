@@ -783,6 +783,127 @@ async function testCreateOrUpdateUsers() {
   });
 }
 
+async function testCreateOrUpdateProjects() {
+  let r;
+
+  const session_id = await getAdminSessionId();
+
+  [r] = await request(
+    {
+      [constants.HTTP2_HEADER_METHOD]: constants.HTTP2_METHOD_POST,
+      [constants.HTTP2_HEADER_PATH]: `/api/v1/projects/create`,
+      [constants.HTTP2_HEADER_COOKIE]: `strict_id=${session_id}`,
+      "x-csrf-protection": "projektwahl",
+    },
+    JSON.stringify({})
+  );
+  assert.deepEqual(JSON.parse(r), {
+    success: false,
+    error: {
+      issues: [
+        {
+          code: "invalid_type",
+          expected: "number",
+          received: "undefined",
+          path: ["costs"],
+          message: "Pflichtfeld",
+        },
+        {
+          code: "invalid_type",
+          expected: "boolean",
+          received: "undefined",
+          path: ["deleted"],
+          message: "Pflichtfeld",
+        },
+        {
+          code: "invalid_type",
+          expected: "string",
+          received: "undefined",
+          path: ["info"],
+          message: "Pflichtfeld",
+        },
+        {
+          code: "invalid_type",
+          expected: "number",
+          received: "undefined",
+          path: ["max_age"],
+          message: "Pflichtfeld",
+        },
+        {
+          code: "invalid_type",
+          expected: "number",
+          received: "undefined",
+          path: ["max_participants"],
+          message: "Pflichtfeld",
+        },
+        {
+          code: "invalid_type",
+          expected: "number",
+          received: "undefined",
+          path: ["min_age"],
+          message: "Pflichtfeld",
+        },
+        {
+          code: "invalid_type",
+          expected: "number",
+          received: "undefined",
+          path: ["min_participants"],
+          message: "Pflichtfeld",
+        },
+        {
+          code: "invalid_type",
+          expected: "string",
+          received: "undefined",
+          path: ["place"],
+          message: "Pflichtfeld",
+        },
+        {
+          code: "invalid_type",
+          expected: "boolean",
+          received: "undefined",
+          path: ["random_assignments"],
+          message: "Pflichtfeld",
+        },
+        {
+          code: "invalid_type",
+          expected: "string",
+          received: "undefined",
+          path: ["title"],
+          message: "Pflichtfeld",
+        },
+      ],
+      name: "ZodError",
+    },
+  });
+
+  [r] = await request(
+    {
+      [constants.HTTP2_HEADER_METHOD]: constants.HTTP2_METHOD_POST,
+      [constants.HTTP2_HEADER_PATH]: `/api/v1/projects/create`,
+      [constants.HTTP2_HEADER_COOKIE]: `strict_id=${session_id}`,
+      "x-csrf-protection": "projektwahl",
+    },
+    JSON.stringify({
+      title: "hi",
+      costs: 0,
+      deleted: false,
+      info: "",
+      min_age: 5,
+      max_age: 13,
+      min_participants: 5,
+      max_participants: 15,
+      place: "jo",
+      random_assignments: false,
+    })
+  );
+  const data = JSON.parse(r);
+  const id = data.data.id;
+  data.data.id = 1337;
+  assert.deepEqual(data, { success: true, data: { id: 1337 } });
+}
+
+await testCreateOrUpdateProjects();
+
 await testCreateOrUpdateUsers();
 
 console.log("done");
