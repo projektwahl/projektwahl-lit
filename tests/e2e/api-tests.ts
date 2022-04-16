@@ -31,7 +31,7 @@ import {
 } from "node:http2";
 import { sleep } from "../../src/client/utils.js";
 
-const chance: Chance.Chance = new Chance(1234);
+const chance: Chance.Chance = new Chance(/*1234*/);
 
 if (!process.env["BASE_URL"]) {
   console.error("BASE_URL not set!");
@@ -540,9 +540,90 @@ async function testCreateOrUpdateUsers() {
     JSON.stringify([])
   );
   assert.deepEqual(JSON.parse(r), { success: true });
-}
 
-chance.integer();
+  [r, headers] = await request(
+    {
+      [constants.HTTP2_HEADER_METHOD]: constants.HTTP2_METHOD_POST,
+      [constants.HTTP2_HEADER_PATH]: `/api/v1/users/create-or-update`,
+      [constants.HTTP2_HEADER_COOKIE]: `strict_id=${session_id}`,
+      "x-csrf-protection": "projektwahl",
+    },
+    JSON.stringify([{}])
+  );
+  assert.deepEqual(JSON.parse(r), {
+    success: false,
+    error: {
+      issues: [
+        {
+          code: "invalid_union_discriminator",
+          options: ["create", "update"],
+          path: [0, "action"],
+          message:
+            "Ungültiger Unterscheidungswert. Erwarte 'create' | 'update'",
+        },
+      ],
+      name: "ZodError",
+    },
+  });
+
+  [r, headers] = await request(
+    {
+      [constants.HTTP2_HEADER_METHOD]: constants.HTTP2_METHOD_POST,
+      [constants.HTTP2_HEADER_PATH]: `/api/v1/users/create-or-update`,
+      [constants.HTTP2_HEADER_COOKIE]: `strict_id=${session_id}`,
+      "x-csrf-protection": "projektwahl",
+    },
+    JSON.stringify([
+      {
+        action: "create",
+      },
+    ])
+  );
+  assert.deepEqual(JSON.parse(r), {
+    success: false,
+    error: {
+      issues: [
+        {
+          code: "invalid_enum_value",
+          options: ["voter", "helper", "admin"],
+          path: [0, "type"],
+          message:
+            "Ungültiger Auswahlwert. Erwarte 'voter' | 'helper' | 'admin'",
+        },
+        {
+          code: "invalid_type",
+          expected: "string",
+          received: "undefined",
+          path: [0, "username"],
+          message: "Pflichtfeld",
+        },
+      ],
+      name: "ZodError",
+    },
+  });
+
+  [r, headers] = await request(
+    {
+      [constants.HTTP2_HEADER_METHOD]: constants.HTTP2_METHOD_POST,
+      [constants.HTTP2_HEADER_PATH]: `/api/v1/users/create-or-update`,
+      [constants.HTTP2_HEADER_COOKIE]: `strict_id=${session_id}`,
+      "x-csrf-protection": "projektwahl",
+    },
+    JSON.stringify([
+      {
+        action: "create",
+        type: "admin",
+        username: `admin${chance.name()}`,
+      },
+    ])
+  );
+  const value = JSON.parse(r);
+  value.data[0].id = 1337;
+  assert.deepEqual(value, {
+    success: true,
+    data: [{ id: 1337, project_leader_id: null, force_in_project_id: null }],
+  });
+}
 
 await testCreateOrUpdateUsers();
 
