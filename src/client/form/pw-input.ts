@@ -207,7 +207,7 @@ export abstract class PwInput<
   }
 
   protected willUpdate(changedProperties: Map<PropertyKey, unknown>): void {
-    console.log("PW_INPUT", changedProperties);
+    super.willUpdate(changedProperties);
     if (this.resettable && changedProperties.has("initial")) {
       // this is a "hack" so that rerendering with new initial data resets the resettable fields.
 
@@ -269,6 +269,7 @@ export abstract class PwInput<
             : literal`input`
         }
           ${ref(this.input)}
+          rows="6"
           type=${ifDefined(this.type !== "textarea" ? this.type : undefined)}
           name=${this.name}
           .value=${ifDefined(

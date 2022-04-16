@@ -178,15 +178,25 @@ export class PwUserProjects<X extends string> extends PwProjects<X> {
               url: this.url,
               label: null,
               name: ["filters", "id"],
-              get: (o) => o.filters.id == this.user[this.name],
-              set: (o, v) =>
-                (o.filters.id = v
-                  ? this.user[this.name] ?? undefined
-                  : undefined),
+              get: (o) => {
+                console.log(o.filters);
+                console.log(this.user);
+                const val = this.user[this.name];
+                return o.filters.id === (val === null ? undefined : val);
+              },
+              set: (o, v) => {
+                const val = this.user[this.name];
+                return (o.filters.id = v
+                  ? val === null
+                    ? undefined
+                    : val
+                  : undefined);
+              },
               task: this._task,
               type: "checkbox",
+              // TODO FIXME can we remove these everywhere and do this in get and set?
               trueValue: true,
-              falseValue: undefined,
+              falseValue: false,
               defaultValue: undefined,
               initial: initial,
               resettable: false,

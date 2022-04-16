@@ -93,14 +93,18 @@ export const usersHandler = requestHandler(
             } OR id = ${id ?? null}) AND username LIKE ${
             "%" + (username ?? "") + "%"
           }
-          AND (${project_leader_id === undefined} OR project_leader_id = ${
+          AND (${
+            project_leader_id === undefined
+          } OR project_leader_id IS NOT DISTINCT FROM  ${
             project_leader_id ?? null
           })
           AND (${deleted === undefined} OR deleted = ${deleted ?? null})
           AND (${
             force_in_project_id === undefined ||
             !(loggedInUser.type === "admin" || loggedInUser.type === "helper")
-          } OR force_in_project_id = ${force_in_project_id ?? null})
+          } OR force_in_project_id IS NOT DISTINCT FROM ${
+            force_in_project_id ?? null
+          })
             AND (${type === undefined} OR type = ${type ?? null})`;
         },
         {
