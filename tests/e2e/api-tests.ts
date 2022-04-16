@@ -915,8 +915,11 @@ async function testCreateOrUpdateProjects() {
       random_assignments: false,
     })
   );
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
   const data = JSON.parse(r);
-  const id = data.data.id;
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment,@typescript-eslint/no-unsafe-member-access
+  const id: number = data.data.id;
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
   data.data.id = 1337;
   assert.deepEqual(data, { success: true, data: { id: 1337 } });
 
