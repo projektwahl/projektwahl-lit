@@ -207,7 +207,7 @@ export abstract class PwInput<
   }
 
   protected willUpdate(changedProperties: Map<PropertyKey, unknown>): void {
-    super.willUpdate(changedProperties)
+    super.willUpdate(changedProperties);
     if (this.resettable && changedProperties.has("initial")) {
       // this is a "hack" so that rerendering with new initial data resets the resettable fields.
 

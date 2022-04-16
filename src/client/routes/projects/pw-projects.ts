@@ -293,12 +293,10 @@ export class PwProjects<X extends string> extends PwEntityList<
                           >`}
                     </p>
                   </td>
-                  <td>
-                    <p>
-                      ${value.deleted
-                        ? html`<del>${value.info}</del>`
-                        : html`${value.info}`}
-                    </p>
+                  <td class="td-truncate w-50">
+                    ${value.deleted
+                      ? html`<del>${value.info}</del>`
+                      : html`${value.info}`}
                   </td>
                   <td>
                     <p>${value.deleted ? msg("deleted") : ""}</p>
