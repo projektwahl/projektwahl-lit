@@ -31,7 +31,7 @@ import {
 } from "node:http2";
 import { sleep } from "../../src/client/utils.js";
 
-const chance: Chance.Chance = new Chance(1234);
+const chance: Chance.Chance = new Chance(/*1234*/);
 
 if (!process.env["BASE_URL"]) {
   console.error("BASE_URL not set!");
@@ -382,10 +382,29 @@ async function testLogin() {
   });
 }
 
-async function testLogout() {
-  let r, headers;
+async function getAdminSessionId() {
+  const [r, headers] = await request(
+    {
+      [constants.HTTP2_HEADER_METHOD]: constants.HTTP2_METHOD_POST,
+      [constants.HTTP2_HEADER_PATH]: `/api/v1/login`,
+      "x-csrf-protection": "projektwahl",
+    },
+    JSON.stringify({
+      username: "admin",
+      password: "changeme",
+    })
+  );
+  assert.deepEqual(JSON.parse(r), { success: true, data: {} });
+  const session_id = (headers["set-cookie"] || "")[0]
+    .split(";")[0]
+    .split("=")[1];
+  return session_id;
+}
 
-  [r, headers] = await request(
+async function testLogout() {
+  let r;
+
+  [r] = await request(
     {
       [constants.HTTP2_HEADER_METHOD]: constants.HTTP2_METHOD_POST,
       [constants.HTTP2_HEADER_PATH]: `/api/v1/logout`,
@@ -410,7 +429,7 @@ async function testLogout() {
     },
   });
 
-  [r, headers] = await request(
+  [r] = await request(
     {
       [constants.HTTP2_HEADER_METHOD]: constants.HTTP2_METHOD_POST,
       [constants.HTTP2_HEADER_PATH]: `/api/v1/logout`,
@@ -420,23 +439,9 @@ async function testLogout() {
   );
   assert.deepEqual(JSON.parse(r), { success: true, data: {} });
 
-  [r, headers] = await request(
-    {
-      [constants.HTTP2_HEADER_METHOD]: constants.HTTP2_METHOD_POST,
-      [constants.HTTP2_HEADER_PATH]: `/api/v1/login`,
-      "x-csrf-protection": "projektwahl",
-    },
-    JSON.stringify({
-      username: "admin",
-      password: "changeme",
-    })
-  );
-  assert.deepEqual(JSON.parse(r), { success: true, data: {} });
-  const session_id = (headers["set-cookie"] || "")[0]
-    .split(";")[0]
-    .split("=")[1];
+  const session_id = await getAdminSessionId();
 
-  [r, headers] = await request(
+  [r] = await request(
     {
       [constants.HTTP2_HEADER_METHOD]: constants.HTTP2_METHOD_GET,
       [constants.HTTP2_HEADER_PATH]: `/api/v1/sessions?${encodeURIComponent(
@@ -456,7 +461,7 @@ async function testLogout() {
   const parsed: { success: unknown } = JSON.parse(r);
   assert.equal(parsed.success, true);
 
-  [r, headers] = await request(
+  [r] = await request(
     {
       [constants.HTTP2_HEADER_METHOD]: constants.HTTP2_METHOD_POST,
       [constants.HTTP2_HEADER_PATH]: `/api/v1/logout`,
@@ -467,7 +472,7 @@ async function testLogout() {
   );
   assert.deepEqual(JSON.parse(r), { success: true, data: {} });
 
-  [r, headers] = await request(
+  [r] = await request(
     {
       [constants.HTTP2_HEADER_METHOD]: constants.HTTP2_METHOD_GET,
       [constants.HTTP2_HEADER_PATH]: `/api/v1/sessions?${encodeURIComponent(
@@ -497,7 +502,290 @@ async function testLogout() {
   });
 }
 
-chance.integer();
+async function testCreateOrUpdateUsers() {
+  let r;
+
+  [r] = await request(
+    {
+      [constants.HTTP2_HEADER_METHOD]: constants.HTTP2_METHOD_POST,
+      [constants.HTTP2_HEADER_PATH]: `/api/v1/users/create-or-update`,
+      "x-csrf-protection": "projektwahl",
+    },
+    JSON.stringify([])
+  );
+  assert.deepEqual(JSON.parse(r), {
+    success: false,
+    error: {
+      issues: [
+        {
+          code: "custom",
+          path: ["unauthorized"],
+          message: "Nicht angemeldet! Klicke rechts oben auf Anmelden.",
+        },
+      ],
+    },
+  });
+
+  const session_id = await getAdminSessionId();
+
+  [r] = await request(
+    {
+      [constants.HTTP2_HEADER_METHOD]: constants.HTTP2_METHOD_POST,
+      [constants.HTTP2_HEADER_PATH]: `/api/v1/users/create-or-update`,
+      [constants.HTTP2_HEADER_COOKIE]: `strict_id=${session_id}`,
+      "x-csrf-protection": "projektwahl",
+    },
+    JSON.stringify([])
+  );
+  assert.deepEqual(JSON.parse(r), { success: true });
+
+  [r] = await request(
+    {
+      [constants.HTTP2_HEADER_METHOD]: constants.HTTP2_METHOD_POST,
+      [constants.HTTP2_HEADER_PATH]: `/api/v1/users/create-or-update`,
+      [constants.HTTP2_HEADER_COOKIE]: `strict_id=${session_id}`,
+      "x-csrf-protection": "projektwahl",
+    },
+    JSON.stringify([{}])
+  );
+  assert.deepEqual(JSON.parse(r), {
+    success: false,
+    error: {
+      issues: [
+        {
+          code: "invalid_union_discriminator",
+          options: ["create", "update"],
+          path: [0, "action"],
+          message:
+            "Ungültiger Unterscheidungswert. Erwarte 'create' | 'update'",
+        },
+      ],
+      name: "ZodError",
+    },
+  });
+
+  [r] = await request(
+    {
+      [constants.HTTP2_HEADER_METHOD]: constants.HTTP2_METHOD_POST,
+      [constants.HTTP2_HEADER_PATH]: `/api/v1/users/create-or-update`,
+      [constants.HTTP2_HEADER_COOKIE]: `strict_id=${session_id}`,
+      "x-csrf-protection": "projektwahl",
+    },
+    JSON.stringify([
+      {
+        action: "create",
+      },
+    ])
+  );
+  assert.deepEqual(JSON.parse(r), {
+    success: false,
+    error: {
+      issues: [
+        {
+          code: "invalid_enum_value",
+          options: ["voter", "helper", "admin"],
+          path: [0, "type"],
+          message:
+            "Ungültiger Auswahlwert. Erwarte 'voter' | 'helper' | 'admin'",
+        },
+        {
+          code: "invalid_type",
+          expected: "string",
+          received: "undefined",
+          path: [0, "username"],
+          message: "Pflichtfeld",
+        },
+      ],
+      name: "ZodError",
+    },
+  });
+
+  const old_username = chance.name();
+  [r] = await request(
+    {
+      [constants.HTTP2_HEADER_METHOD]: constants.HTTP2_METHOD_POST,
+      [constants.HTTP2_HEADER_PATH]: `/api/v1/users/create-or-update`,
+      [constants.HTTP2_HEADER_COOKIE]: `strict_id=${session_id}`,
+      "x-csrf-protection": "projektwahl",
+    },
+    JSON.stringify([
+      {
+        action: "create",
+        type: "admin",
+        username: old_username,
+      },
+    ])
+  );
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+  let value = JSON.parse(r);
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access,@typescript-eslint/no-unsafe-assignment
+  const id: number = value.data[0].id;
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+  value.data[0].id = 1337;
+  assert.deepEqual(value, {
+    success: true,
+    data: [{ id: 1337, project_leader_id: null, force_in_project_id: null }],
+  });
+
+  [r] = await request(
+    {
+      [constants.HTTP2_HEADER_METHOD]: constants.HTTP2_METHOD_POST,
+      [constants.HTTP2_HEADER_PATH]: `/api/v1/users/create-or-update`,
+      [constants.HTTP2_HEADER_COOKIE]: `strict_id=${session_id}`,
+      "x-csrf-protection": "projektwahl",
+    },
+    JSON.stringify([
+      {
+        action: "update",
+      },
+    ])
+  );
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+  value = JSON.parse(r);
+  assert.deepEqual(value, {
+    success: false,
+    error: {
+      issues: [
+        {
+          code: "invalid_type",
+          expected: "number",
+          received: "undefined",
+          path: [0, "id"],
+          message: "Pflichtfeld",
+        },
+      ],
+      name: "ZodError",
+    },
+  });
+
+  [r] = await request(
+    {
+      [constants.HTTP2_HEADER_METHOD]: constants.HTTP2_METHOD_POST,
+      [constants.HTTP2_HEADER_PATH]: `/api/v1/users/create-or-update`,
+      [constants.HTTP2_HEADER_COOKIE]: `strict_id=${session_id}`,
+      "x-csrf-protection": "projektwahl",
+    },
+    JSON.stringify([
+      {
+        action: "update",
+        id,
+      },
+    ])
+  );
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+  value = JSON.parse(r);
+  assert.deepEqual(value, {
+    success: true,
+    data: [{ id, project_leader_id: null, force_in_project_id: null }],
+  });
+
+  [r] = await request(
+    {
+      [constants.HTTP2_HEADER_METHOD]: constants.HTTP2_METHOD_GET,
+      [constants.HTTP2_HEADER_PATH]: `/api/v1/users?${encodeURIComponent(
+        JSON.stringify({
+          filters: {
+            id,
+          },
+          sorting: [],
+        })
+      )}`,
+      [constants.HTTP2_HEADER_COOKIE]: `lax_id=${session_id}`,
+      "x-csrf-protection": "projektwahl",
+    },
+    null
+  );
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+  value = JSON.parse(r);
+  assert.deepEqual(value, {
+    success: true,
+    data: {
+      entities: [
+        {
+          id,
+          type: "admin",
+          username: old_username,
+          openid_id: null,
+          group: null,
+          age: null,
+          away: false,
+          project_leader_id: null,
+          force_in_project_id: null,
+          deleted: false,
+        },
+      ],
+      nextCursor: null,
+      previousCursor: null,
+    },
+  });
+
+  const new_username = chance.name();
+  [r] = await request(
+    {
+      [constants.HTTP2_HEADER_METHOD]: constants.HTTP2_METHOD_POST,
+      [constants.HTTP2_HEADER_PATH]: `/api/v1/users/create-or-update`,
+      [constants.HTTP2_HEADER_COOKIE]: `strict_id=${session_id}`,
+      "x-csrf-protection": "projektwahl",
+    },
+    JSON.stringify([
+      {
+        action: "update",
+        id,
+        username: new_username,
+      },
+    ])
+  );
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+  value = JSON.parse(r);
+  assert.deepEqual(value, {
+    success: true,
+    data: [{ id, project_leader_id: null, force_in_project_id: null }],
+  });
+
+  [r] = await request(
+    {
+      [constants.HTTP2_HEADER_METHOD]: constants.HTTP2_METHOD_GET,
+      [constants.HTTP2_HEADER_PATH]: `/api/v1/users?${encodeURIComponent(
+        JSON.stringify({
+          filters: {
+            id,
+          },
+          sorting: [],
+        })
+      )}`,
+      [constants.HTTP2_HEADER_COOKIE]: `lax_id=${session_id}`,
+      "x-csrf-protection": "projektwahl",
+    },
+    null
+  );
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+  value = JSON.parse(r);
+  assert.deepEqual(value, {
+    success: true,
+    data: {
+      entities: [
+        {
+          id,
+          type: "admin",
+          username: new_username,
+          openid_id: null,
+          group: null,
+          age: null,
+          away: false,
+          project_leader_id: null,
+          force_in_project_id: null,
+          deleted: false,
+        },
+      ],
+      nextCursor: null,
+      previousCursor: null,
+    },
+  });
+}
+
+await testCreateOrUpdateUsers();
+
+console.log("done");
 
 await testLogin();
 
