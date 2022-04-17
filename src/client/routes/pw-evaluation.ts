@@ -57,7 +57,7 @@ export class PwEvaluation extends PwElement {
         <p>
           Fangen wir mit den Grundlagen an: Die Wahl einer Person ist gültig,
           wenn genau fünf Projekte gewählt wurden und dabei die
-          Altersbeschränkung eingehalten wurde (dies ist aktuell immer der
+          Altersbeschränkung eingehalten wurde (zweiteres ist aktuell immer der
           Fall). Personen, die nicht gültig gewählt haben, können allen
           Projekten zugewiesen werden, die von der Altersbeschränkung her passen
           (und solche zufälligen Zuweisungen erlauben). Man kann nicht ein
