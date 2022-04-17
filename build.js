@@ -85,10 +85,14 @@ let version_short = (
   console.log(stderr);
 }
 
+let mainCssContents = await readFile("src/client/main.css", "utf8");
+
+let mainCssHash = createHash("sha256").update(mainCssContents).digest("hex");
+
 {
   let { stdout, stderr } = await exec(
     //"purgecss --css node_modules/bootstrap/dist/css/bootstrap.css --content dist/*.js --output dist/bootstrap.min.css --font-face --keyframes --variables"
-    "cp src/client/main.css dist/"
+    `cp src/client/main.css dist/main_${mainCssHash}.css`
   );
 
   console.log(stdout);
@@ -165,7 +169,7 @@ const index = `<!DOCTYPE html>
 SPDX-License-Identifier: AGPL-3.0-or-later
 SPDX-FileCopyrightText: 2021 Moritz Hedtke <Moritz.Hedtke@t-online.de>
 -->
-    <link rel="stylesheet" href="/dist/main.css">
+    <link rel="stylesheet" href="/dist/main_${mainCssHash}.css">
     <link
       href="/dist/bootstrap_${bootstrapHash}.min.css"
       rel="stylesheet"
