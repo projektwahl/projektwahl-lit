@@ -71,7 +71,6 @@ export function pwOrder<P extends keyof typeof entityRoutes, X extends string>(
     | "get"
     | "set"
     | "initial"
-    | "defaultValue"
   >
 ) {
   const {
@@ -84,7 +83,6 @@ export function pwOrder<P extends keyof typeof entityRoutes, X extends string>(
     get,
     set,
     initial,
-    defaultValue,
     ...rest
   } = props;
   let _ = rest;
@@ -99,7 +97,6 @@ export function pwOrder<P extends keyof typeof entityRoutes, X extends string>(
     .value=${value}
     .orderBy=${orderBy}
     .initial=${initial}
-    .defaultValue=${defaultValue}
   ></pw-order>`;
 }
 
@@ -193,8 +190,7 @@ export class PwOrder<
       sorting.push(adding2);
     }
 
-    this.inputValue = sorting;
-    this.set(this.pwForm.formData, this.inputValue);
+    this.set(this.pwForm.formData, sorting);
 
     this.dispatchEvent(
       new CustomEvent("refreshentitylist", {
@@ -207,12 +203,8 @@ export class PwOrder<
   // TODO FIXME we're not able to reset this so move this somewhere else
   protected willUpdate(changedProperties: Map<PropertyKey, unknown>): void {
     if (changedProperties.has("initial")) {
-      // the input value contains the value that is shown to the user
-      this.inputValue =
-        this.initial !== undefined ? this.get(this.initial) : this.defaultValue;
-
       // in case this is an update set the value to undefined as it wasn't changed yet.
-      this.set(this.pwForm.formData, this.inputValue);
+      this.set(this.pwForm.formData, this.get(this.initial));
     }
   }
 

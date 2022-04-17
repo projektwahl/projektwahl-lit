@@ -41,7 +41,6 @@ export function pwInputCheckbox<P extends keyof typeof routes>(
     | "set"
     | "options"
     | "task"
-    | "defaultValue"
     | "resettable"
   >
 ) {
@@ -58,7 +57,6 @@ export function pwInputCheckbox<P extends keyof typeof routes>(
     task,
     type,
     autocomplete,
-    defaultValue,
     resettable,
     ...rest
   } = props;
@@ -77,7 +75,6 @@ export function pwInputCheckbox<P extends keyof typeof routes>(
     autocomplete=${ifDefined(autocomplete)}
     .task=${task}
     .initial=${initial}
-    .defaultValue=${defaultValue}
     .resettable=${resettable}
   ></pw-input-checkbox>`;
 }
@@ -98,8 +95,7 @@ export class PwInputCheckbox<P extends keyof typeof routes> extends PwInput<
       throw new Error();
     }
 
-    this.inputValue = this.input.value.checked;
-    this.set(this.pwForm.formData, this.inputValue);
+    this.set(this.pwForm.formData, this.input.value.checked);
 
     this.input.value?.dispatchEvent(
       new CustomEvent("refreshentitylist", {

@@ -320,7 +320,7 @@ class PwUserCreate extends PwForm<"/api/v1/users/create-or-update"> {
                         initial: value?.data,
                         resettable: value !== undefined,
                       })}
-                      ${this.typeRef.value?.inputValue === "voter"
+                      ${this.typeRef.value?.get(this.formData) === "voter"
                         ? html`${pwInputText<
                             "/api/v1/users/create-or-update",
                             string | null | undefined

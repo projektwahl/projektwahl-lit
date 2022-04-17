@@ -41,7 +41,6 @@ export function pwInputFile<P extends keyof typeof routes>(
     | "set"
     | "options"
     | "task"
-    | "defaultValue"
     | "resettable"
   >
 ) {
@@ -58,7 +57,6 @@ export function pwInputFile<P extends keyof typeof routes>(
     task,
     type,
     autocomplete,
-    defaultValue,
     resettable,
     ...rest
   } = props;
@@ -77,7 +75,6 @@ export function pwInputFile<P extends keyof typeof routes>(
     autocomplete=${ifDefined(autocomplete)}
     .task=${task}
     .initial=${initial}
-    .defaultValue=${defaultValue}
     .resettable=${resettable}
   ></pw-input-file>`;
 }

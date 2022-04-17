@@ -65,7 +65,6 @@ export abstract class PwInput<
       disabled: { type: Boolean },
       enabled: { type: Boolean },
       randomId: { state: true },
-      defaultValue: { attribute: false },
       url: { attribute: false },
       task: {
         attribute: false,
@@ -156,19 +155,9 @@ export abstract class PwInput<
   options?: { value: T; text: string }[];
 
   /**
-   * The default value. This values is used if e.g. a text/number field is empty.
-   */
-  defaultValue!: T;
-
-  /**
    * The parent form.
    */
   pwForm!: PwForm<P>;
-
-  /**
-   * The value that is currently shown to the user. This value may differ from the value in pwForm.formData e.g. in case you are updating values and have either not changed a field yet or reset the field. This is so the update on the server only updates the fields that you actually changed.
-   */
-  inputValue!: T;
 
   constructor() {
     super();
@@ -211,19 +200,13 @@ export abstract class PwInput<
     if (this.resettable && changedProperties.has("initial")) {
       // this is a "hack" so that rerendering with new initial data resets the resettable fields.
 
-      // the input value contains the value that is shown to the user
-      this.inputValue =
-        this.initial !== undefined ? this.get(this.initial) : this.defaultValue;
-
       // in case this is an update set the value to undefined as it wasn't changed yet.
       this.set(
         this.pwForm.formData,
         // @ts-expect-error tmp error
         this.resettable
-          ? this.initial !== undefined
-            ? undefined
-            : this.defaultValue
-          : this.inputValue
+          ? undefined
+          : this.get(this.pwForm.formData)
       );
     }
   }
@@ -235,18 +218,13 @@ export abstract class PwInput<
 
     if (!this.hasUpdated) {
       // TODO FIXME updated from above
-      this.inputValue =
-        this.initial !== undefined ? this.get(this.initial) : this.defaultValue;
 
       // in case this is an update set the value to undefined as it wasn't changed yet.
       this.set(
         this.pwForm.formData,
-        // @ts-expect-error tmp error
         this.resettable
-          ? this.initial !== undefined
-            ? undefined
-            : this.defaultValue
-          : this.inputValue
+          ? undefined
+          : this.get(this.initial)
       );
     }
 
@@ -274,11 +252,11 @@ export abstract class PwInput<
           name=${this.name}
           .value=${ifDefined(
             this.type !== "checkbox" && this.type !== "select"
-              ? live(this.inputValue ?? "")
+              ? live(this.get(this.pwForm.formData))
               : undefined
           )}
           .checked=${ifDefined(
-            this.type === "checkbox" ? live(this.inputValue) : undefined
+            this.type === "checkbox" ? live(this.get(this.pwForm.formData) ) : undefined
           )}
           class="${
             this.type === "checkbox" ? "form-check-input" : "form-control"
@@ -312,7 +290,7 @@ export abstract class PwInput<
                 (o) => o.value,
                 (o) =>
                   html`<option
-                    .selected=${live(this.inputValue === o.value)}
+                    .selected=${live(this.get(this.pwForm.formData)  === o.value)}
                     .value=${o.value}
                   >
                     ${o.text}
@@ -337,14 +315,9 @@ export abstract class PwInput<
       this.resettable && !this.disabled
         ? html`<button
             @click=${() => {
-              this.inputValue =
-                this.initial !== undefined
-                  ? this.get(this.initial)
-                  : this.defaultValue;
               this.set(
                 this.pwForm.formData,
-                // @ts-expect-error tmp error
-                this.initial !== undefined ? undefined : this.defaultValue
+                this.initial
               );
               this.requestUpdate();
             }}

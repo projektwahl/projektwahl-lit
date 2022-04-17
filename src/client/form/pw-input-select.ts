@@ -45,7 +45,6 @@ export function pwInputSelect<
     | "set"
     | "options"
     | "task"
-    | "defaultValue"
     | "resettable"
   > & { pwRef?: Ref<PwInputSelect<P, T>> }
 ) {
@@ -62,7 +61,6 @@ export function pwInputSelect<
     task,
     type,
     autocomplete,
-    defaultValue,
     resettable,
     pwRef,
     ...rest
@@ -84,7 +82,6 @@ export function pwInputSelect<
       autocomplete=${ifDefined(autocomplete)}
       .task=${task}
       .initial=${initial}
-      .defaultValue=${defaultValue}
       .resettable=${resettable}
     ></pw-input-select>`;
   } else {
@@ -101,7 +98,6 @@ export function pwInputSelect<
       autocomplete=${ifDefined(autocomplete)}
       .task=${task}
       .initial=${initial}
-      .defaultValue=${defaultValue}
       .resettable=${resettable}
     ></pw-input-select>`;
   }
@@ -117,13 +113,9 @@ export class PwInputSelect<
     }
     const input = this.input.value;
 
-    this.inputValue =
-      input.selectedIndex == -1
-        ? this.defaultValue
-        : this.options?.find((v) => v.value == input.value)?.value ??
-          this.defaultValue;
-
-    this.set(this.pwForm.formData, this.inputValue);
+    this.set(this.pwForm.formData, input.selectedIndex == -1
+      ? null
+      : this.options?.find((v) => v.value == input.value)?.value);
 
     this.input.value?.dispatchEvent(
       new CustomEvent("refreshentitylist", {
