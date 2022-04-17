@@ -61,9 +61,7 @@ export async function user(
   return (
     await typedSql(tsql, {
       columns: { id: 23 },
-    } as const)`INSERT INTO users (username, type, "group", age, project_leader_id, last_updated_by) VALUES (${
-      "user" + chance.integer() + chance.integer()
-    }, 'voter', '', ${age}, ${project_leader_id}, NULL) RETURNING users.id;`
+    } as const)`INSERT INTO users (username, type, "group", age, project_leader_id, last_updated_by) VALUES (${`user${chance.integer()}`}, 'voter', '', ${age}, ${project_leader_id}, NULL) RETURNING users.id;`
   )[0].id;
 }
 
@@ -73,14 +71,14 @@ export async function vote(
   user_id: number,
   rank: number
 ) {
-  await tsql`INSERT INTO choices (user_id, project_id, rank) VALUES (${user_id}, ${project_id}, ${rank});`;
+  await tsql`INSERT INTO choices (user_id, project_id, rank) VALUES (${user_id}, ${project_id}, ${rank}) ON CONFLICT DO NOTHING;`;
 }
 
 export async function test_only_one_user() {
   await reset();
   await sql.begin(async (tsql) => {
     const _u1 = await user(tsql, 5);
-    deepEqual(await evaluate(), {});
+    deepEqual(await evaluate(tsql), {});
   });
 }
 
@@ -91,7 +89,7 @@ export async function test_only_one_project() {
   await reset();
   await sql.begin(async (tsql) => {
     const _p1 = await project(tsql);
-    deepEqual(await evaluate(), {});
+    deepEqual(await evaluate(tsql), {});
   });
 }
 
@@ -103,7 +101,7 @@ export async function test_one_project_one_user_correct_age() {
   await sql.begin(async (tsql) => {
     const _p1 = await project(tsql);
     const _u1 = await user(tsql, 5);
-    deepEqual(await evaluate(), {
+    deepEqual(await evaluate(tsql), {
       overloaded: [],
       underloaded: [[1, 4]],
       notexists: [],
@@ -136,7 +134,7 @@ export async function test_five_projects_one_user() {
     const _p4 = await project(tsql);
     const _p5 = await project(tsql);
     const _u1 = await user(tsql, 5);
-    deepEqual(await evaluate(), {
+    deepEqual(await evaluate(tsql), {
       overloaded: [],
       underloaded: [[5, 4]],
       notexists: [1, 2, 3, 4],
@@ -153,7 +151,7 @@ export async function test_one_user_one_project_voted_incorrectly() {
     const p1 = await project(tsql);
     const u1 = await user(tsql, 5);
     await vote(tsql, p1, u1, 1);
-    deepEqual(await evaluate(), {
+    deepEqual(await evaluate(tsql), {
       overloaded: [],
       underloaded: [[1, 4]],
       notexists: [],
@@ -178,7 +176,7 @@ export async function test_five_projects_one_user_voted_correctly() {
     await vote(tsql, p3, u1, 3);
     await vote(tsql, p4, u1, 1);
     await vote(tsql, p5, u1, 2);
-    deepEqual(await evaluate(), {
+    deepEqual(await evaluate(tsql), {
       overloaded: [],
       underloaded: [[4, 4]],
       notexists: [1, 2, 3, 5],
@@ -210,7 +208,7 @@ export async function test_five_projects_conflicting_equal_votes() {
     await vote(tsql, p3, u2, 3);
     await vote(tsql, p4, u2, 1);
     await vote(tsql, p5, u2, 2);
-    deepEqual(await evaluate(), {
+    deepEqual(await evaluate(tsql), {
       overloaded: [],
       underloaded: [],
       notexists: [1, 2, 3],
@@ -247,7 +245,7 @@ export async function test_five_projects_different_conflicting_votes() {
     await vote(tsql, p3, u2, 3);
     await vote(tsql, p4, u2, 2); // different
     await vote(tsql, p5, u2, 1); // different
-    deepEqual(await evaluate(), {
+    deepEqual(await evaluate(tsql), {
       overloaded: [[4, 1]],
       underloaded: [],
       notexists: [],
@@ -282,7 +280,7 @@ export async function test_five_projects_different_votes() {
     await vote(tsql, p3, u2, 3);
     await vote(tsql, p4, u2, 2); // different
     await vote(tsql, p5, u2, 1); // different
-    deepEqual(await evaluate(), {
+    deepEqual(await evaluate(tsql), {
       overloaded: [],
       underloaded: [],
       notexists: [1, 2, 3],
@@ -301,7 +299,7 @@ export async function test_project_leader() {
   await sql.begin(async (tsql) => {
     const p1 = await project(tsql, 0, 0);
     const _u1 = await user(tsql, 5, p1);
-    deepEqual(await evaluate(), {
+    deepEqual(await evaluate(tsql), {
       overloaded: [],
       underloaded: [],
       notexists: [],
@@ -317,7 +315,7 @@ export async function test_not_project_leader() {
   await sql.begin(async (tsql) => {
     const p1 = await project(tsql, 1, 1);
     const _u1 = await user(tsql, 5, p1);
-    deepEqual(await evaluate(), {
+    deepEqual(await evaluate(tsql), {
       overloaded: [],
       underloaded: [],
       notexists: [1],
@@ -343,7 +341,7 @@ export async function test_not_project_leader_voted_correctly() {
     await vote(tsql, p4, u1, 3);
     await vote(tsql, p5, u1, 4);
     await vote(tsql, p6, u1, 5);
-    deepEqual(await evaluate(), {
+    deepEqual(await evaluate(tsql), {
       overloaded: [],
       underloaded: [[2, 4]],
       notexists: [1, 3, 4, 5, 6],
@@ -369,7 +367,7 @@ export async function test_not_project_leader_voted_correctly2() {
     await vote(tsql, p4, u1, 3);
     await vote(tsql, p5, u1, 4);
     await vote(tsql, p6, u1, 5);
-    deepEqual(await evaluate(), {
+    deepEqual(await evaluate(tsql), {
       overloaded: [],
       underloaded: [],
       notexists: [1, 3, 4, 5, 6],
@@ -382,30 +380,26 @@ await test_not_project_leader_voted_correctly2();
 
 export async function test_extreme() {
   await sql.begin(async (tsql) => {
-    const projects = [];
+    const projects: number[] = [];
     for (let i = 0; i < 1000; i++) {
       projects.push(await project(tsql));
     }
 
-    const users = [];
+    const users: number[] = [];
     for (let i = 0; i < 10000; i++) {
       const currentUser = await user(tsql, 5);
       users.push(currentUser);
       for (let j = 1; j <= 5; j++) {
-        try {
-          await vote(
-            tsql,
-            projects[chance.integer({ min: 0, max: projects.length })],
-            currentUser,
-            j
-          );
-        } catch (error) {
-          // do nothing
-        }
+        await vote(
+          tsql,
+          projects[chance.integer({ min: 0, max: projects.length - 1 })],
+          currentUser,
+          j
+        );
       }
     }
 
-    await evaluate();
+    await evaluate(tsql);
   });
 }
 

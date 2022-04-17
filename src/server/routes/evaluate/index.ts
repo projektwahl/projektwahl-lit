@@ -30,6 +30,7 @@ import { rawChoice } from "../../../lib/routes.js";
 import { z } from "zod";
 import { typedSql } from "../../describe.js";
 import type { Abortable } from "node:events";
+import type { TransactionSql } from "postgres";
 
 async function readFileWithBacktrace(
   path: PathLike | FileHandle,
@@ -242,28 +243,25 @@ export const rank2points = (rank: number) => {
   }
 };
 
-export async function evaluate() {
+export async function evaluate(tsql: TransactionSql<{}>) {
   const lp = new CPLEXLP();
   await lp.setup();
 
-  const [choices, projects, users] = await sql.begin(async (tsql) => {
-    await tsql`SELECT set_config('projektwahl.type', 'root', true);`;
+  await tsql`SELECT set_config('projektwahl.type', 'root', true);`;
 
-    const choices = z.array(rawChoice).parse(
-      await tsql.file("src/server/routes/evaluate/calculate.sql", [], {
-        cache: false,
-      })
-    );
+  const choices = z.array(rawChoice).parse(
+    await tsql.file("src/server/routes/evaluate/calculate.sql", [], {
+      cache: false,
+    })
+  );
 
-    const projects = await typedSql(tsql, {
-      columns: { id: 23, min_participants: 23, max_participants: 23 },
-    } as const)`SELECT id, min_participants, max_participants FROM projects;`;
+  const projects = await typedSql(tsql, {
+    columns: { id: 23, min_participants: 23, max_participants: 23 },
+  } as const)`SELECT id, min_participants, max_participants FROM projects;`;
 
-    const users = await typedSql(tsql, {
-      columns: { id: 23, project_leader_id: 23 },
-    } as const)`SELECT id, project_leader_id FROM present_voters ORDER BY id;`;
-    return [choices, projects, users];
-  });
+  const users = await typedSql(tsql, {
+    columns: { id: 23, project_leader_id: 23 },
+  } as const)`SELECT id, project_leader_id FROM present_voters ORDER BY id;`;
 
   console.log("choices: ", choices);
   console.log("projects: ", projects);
