@@ -93,12 +93,12 @@ export abstract class PwInput<
   /**
    * Extracts the value from the routes request data.
    */
-  get!: (o: z.infer<typeof routes[P]["request"]>) => T;
+  get!: (o: z.infer<typeof routes[P]["request"]>) => string;
 
   /**
    * Sets the value in the routes request data.
    */
-  set!: (o: z.infer<typeof routes[P]["request"]>, v: T) => void;
+  set!: (o: z.infer<typeof routes[P]["request"]>, v: string) => void;
 
   // TODO FIXME maybe merge these two?
   disabled?: boolean = false;

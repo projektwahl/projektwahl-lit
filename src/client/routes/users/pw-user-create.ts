@@ -315,7 +315,6 @@ class PwUserCreate extends PwForm<"/api/v1/users/create-or-update"> {
                           { value: "admin", text: "Admin" },
                         ],
                         task: this._task,
-                        defaultValue: "voter",
                         pwRef: this.typeRef,
                         initial: value?.data,
                         resettable: value !== undefined,
@@ -333,7 +332,6 @@ class PwUserCreate extends PwForm<"/api/v1/users/create-or-update"> {
                             get: (o) => o[0].group,
                             set: (o, v) => (o[0].group = v),
                             task: this._task,
-                            defaultValue: "",
                             initial: value?.data,
                             resettable: value !== undefined,
                           })}
@@ -346,10 +344,9 @@ class PwUserCreate extends PwForm<"/api/v1/users/create-or-update"> {
                             disabled: this.disabled,
                             label: msg("Age"),
                             name: [0, "age"],
-                            get: (o) => o[0].age,
-                            set: (o, v) => (o[0].age = v),
+                            get: (o) => String(o[0].age ?? ""),
+                            set: (o, v) => (o[0].age = v === "" ? null : Number(v)),
                             task: this._task,
-                            defaultValue: null,
                             initial: value?.data,
                             resettable: value !== undefined,
                           })}`
