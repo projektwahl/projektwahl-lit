@@ -102,16 +102,14 @@ export class CPLEXLP {
   constraint = async (
     name: string,
     min: number | null,
-    constraints: [number, string | null][],
+    constraints: [number, string][],
     max: number | null
   ) => {
     if (min !== null && min === max) {
       await this.fileHandle.write(`\neq_${name}: `);
       for (const constraint of constraints) {
         await this.fileHandle.write(
-          ` ${constraint[0] < 0 ? "" : "+"}${constraint[0]} ${
-            constraint[1] ?? ""
-          }`
+          ` ${constraint[0] < 0 ? "" : "+"}${constraint[0]} ${constraint[1]}`
         );
       }
       await this.fileHandle.write(` = ${min}`);
@@ -120,9 +118,7 @@ export class CPLEXLP {
         await this.fileHandle.write(`\nmin_${name}: `);
         for (const constraint of constraints) {
           await this.fileHandle.write(
-            ` ${constraint[0] < 0 ? "" : "+"}${constraint[0]} ${
-              constraint[1] ?? ""
-            }`
+            ` ${constraint[0] < 0 ? "" : "+"}${constraint[0]} ${constraint[1]}`
           );
         }
         await this.fileHandle.write(` >= ${min}`);
@@ -131,9 +127,7 @@ export class CPLEXLP {
         await this.fileHandle.write(`\nmax_${name}: `);
         for (const constraint of constraints) {
           await this.fileHandle.write(
-            ` ${constraint[0] < 0 ? "" : "+"}${constraint[0]} ${
-              constraint[1] ?? ""
-            }`
+            ` ${constraint[0] < 0 ? "" : "+"}${constraint[0]} ${constraint[1]}`
           );
         }
         await this.fileHandle.write(` <= ${max}`);
@@ -303,18 +297,16 @@ export async function evaluate() {
     ]);
     const user = users.find((u) => u.id == Number(groupedChoice[0]));
 
-    const b: [number, string | null][] = user?.project_leader_id
-      ? [
-          [-1, `project_not_exists_${user.project_leader_id}`],
-          [1, null],
-        ]
-      : [];
-    await lp.constraint(
-      `only_in_one_project_${groupedChoice[0]}`,
-      1,
-      [...a, ...b],
-      1
-    );
+    if (user?.project_leader_id) {
+      await lp.constraint(
+        `only_in_one_project_${groupedChoice[0]}`,
+        0,
+        [...a, [-1, `project_not_exists_${user.project_leader_id}`]],
+        0
+      );
+    } else {
+      await lp.constraint(`only_in_one_project_${groupedChoice[0]}`, 1, a, 1);
+    }
   }
 
   // only in project if it exists
