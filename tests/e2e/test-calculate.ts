@@ -192,8 +192,10 @@ export async function test_five_projects_conflicting_equal_votes() {
     underloaded: [],
     notexists: [1, 2, 3],
     choices: [
-      [1, 4, 1],
-      [2, 5, 2],
+      /*[1, 4, 1],
+      [2, 5, 2],*/
+      [1, 5, 2],
+      [2, 4, 1],
     ],
   });
 }
@@ -308,12 +310,11 @@ export async function test_not_project_leader_voted_correctly() {
   await vote(p4, u1, 3);
   await vote(p5, u1, 4);
   await vote(p6, u1, 5);
-  // TODO FIXME this doesnt seem to make sense
   deepEqual(await evaluate(), {
     overloaded: [],
-    underloaded: [[1, 1]],
-    notexists: [2, 3, 4, 5, 6],
-    choices: [],
+    underloaded: [[2, 4]],
+    notexists: [1, 3, 4, 5, 6],
+    choices: [[1, 2, 1]],
   });
 }
 

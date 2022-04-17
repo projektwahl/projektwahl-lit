@@ -355,7 +355,11 @@ export async function evaluate() {
 
   for (const project of projects) {
     await lp.bound(0, `project_overloaded_${project.id}`, null);
-    await lp.bound(0, `project_underloaded_${project.id}`, null);
+    await lp.bound(
+      0,
+      `project_underloaded_${project.id}`,
+      Math.max(project.min_participants - 1, 0)
+    ); // don't allow an empty project
   }
 
   await lp.startVariables();
