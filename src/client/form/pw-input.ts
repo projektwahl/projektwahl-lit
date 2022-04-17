@@ -36,6 +36,8 @@ import { live } from "lit/directives/live.js";
 export abstract class PwInput<
   P extends keyof typeof routes,
   T,
+  RESETTABLE extends boolean,
+  Q,
   I extends Element
 > extends PwElement {
   static override get properties() {
@@ -90,15 +92,17 @@ export abstract class PwInput<
    */
   name!: (string | number)[];
 
+  // TODO FIXME goddammit, the problem is probably differentiating an undefined start value and resetting to null/"". But maybe this works as we `set` the value to undefined at the start and all later `set` calls should use the default value instead
+
   /**
    * Extracts the value from the routes request data.
    */
-  get!: (o: z.infer<typeof routes[P]["request"]>) => string;
+  get!: (o: z.infer<typeof routes[P]["request"]>) => [RESETTABLE] extends [true] ? (Q | undefined) : Q;
 
   /**
    * Sets the value in the routes request data.
    */
-  set!: (o: z.infer<typeof routes[P]["request"]>, v: string) => void;
+  set!: (o: z.infer<typeof routes[P]["request"]>, v: [RESETTABLE] extends [true] ? (Q | undefined) : Q) => void;
 
   // TODO FIXME maybe merge these two?
   disabled?: boolean = false;
@@ -107,7 +111,7 @@ export abstract class PwInput<
   /**
    * Whether the input is resettable. Adds a reset button that resets the value to the initial value.
    */
-  resettable = false;
+  resettable!: RESETTABLE;
 
   /**
    * A random id to associate the label and input errors to the input.
@@ -220,12 +224,21 @@ export abstract class PwInput<
       // TODO FIXME updated from above
 
       // in case this is an update set the value to undefined as it wasn't changed yet.
-      this.set(
-        this.pwForm.formData,
-        this.resettable
-          ? undefined
-          : this.get(this.initial)
-      );
+      if (this.resettable) {
+        // @ts-expect-error bruh, known issue https://github.com/Microsoft/TypeScript/issues/24929
+        const theUndefined: [RESETTABLE] extends [true] ? undefined : never = undefined;
+
+        this.set(
+          this.pwForm.formData,
+          theUndefined
+        );
+      } else {
+        this.set(
+          this.pwForm.formData,
+          this.get(this.initial)
+        );
+      }
+      
     }
 
     return html`
@@ -290,7 +303,7 @@ export abstract class PwInput<
                 (o) => o.value,
                 (o) =>
                   html`<option
-                    .selected=${live(this.get(this.pwForm.formData)  === o.value)}
+                    .selected=${live(this.get(this.pwForm.formData) === o.value)}
                     .value=${o.value}
                   >
                     ${o.text}
