@@ -406,3 +406,24 @@ export async function test_extreme() {
 await test_extreme();
 
 await sql.end();
+
+/*
+32s
+time glpsol --lp /tmp/nix-shell.rMXcKH/projektwahl-1ftrhx/cplex.lp
+
+42s
+time glpsol --cgr --lp /tmp/nix-shell.rMXcKH/projektwahl-1ftrhx/cplex.lp
+
+39s
+time glpsol --cbg --lp /tmp/nix-shell.rMXcKH/projektwahl-1ftrhx/cplex.lp
+
+1m59s
+lp_solve -v5 -max -fmps /tmp/nix-shell.rMXcKH/projektwahl-fOnCpY/problem.freemps
+
+1m31s
+time lp_solve -piv3 -max -v5 -fmps /tmp/nix-shell.rMXcKH/projektwahl-fOnCpY/problem.freemps
+
+2s
+time cbc /tmp/nix-shell.rMXcKH/projektwahl-fOnCpY/problem.freemps -max -dualsimplex
+
+*/

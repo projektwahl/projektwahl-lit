@@ -73,6 +73,7 @@ export class CPLEXLP {
   fileHandle!: FileHandle;
   solutionPath!: string;
   problemPath!: string;
+  problemFreeMpsPath!: string;
 
   setup = async () => {
     this.dir = await mkdtemp(path.join(os.tmpdir(), "projektwahl-"));
@@ -173,6 +174,7 @@ export class CPLEXLP {
 
     this.solutionPath = path.join(this.dir, "solution.sol");
     this.problemPath = path.join(this.dir, "problem.glp");
+    this.problemFreeMpsPath = path.join(this.dir, "problem.freemps");
 
     const childProcess = execFile(
       "glpsol",
@@ -183,6 +185,8 @@ export class CPLEXLP {
         this.solutionPath,
         "--wglp",
         this.problemPath,
+        "--wfreemps",
+        this.problemFreeMpsPath,
       ],
       {}
     );
@@ -432,9 +436,11 @@ export async function evaluate(tsql: TransactionSql<{}>) {
     }
   }
 
-  const rank_distribution = [0,0,0,0,0,0]
+  const rank_distribution = [0, 0, 0, 0, 0, 0];
 
-  const keyed_choices = Object.fromEntries(choices.map(c => [`${c.user_id}_${c.project_id}` ,c]))
+  const keyed_choices = Object.fromEntries(
+    choices.map((c) => [`${c.user_id}_${c.project_id}`, c])
+  );
 
   for (const result of results
     .filter(([name]) => name.startsWith("choice_"))
@@ -460,7 +466,7 @@ export async function evaluate(tsql: TransactionSql<{}>) {
 
   console.log(finalOutput);
 
-  console.log(rank_distribution)
+  console.log(rank_distribution);
 
   return finalOutput;
 }
