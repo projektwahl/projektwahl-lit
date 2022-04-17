@@ -25,11 +25,11 @@ import path from "node:path";
 import os from "node:os";
 import { constants, OpenMode, PathLike } from "node:fs";
 import { execFile } from "node:child_process";
-import { sql } from "../../database.js";
 import { rawChoice } from "../../../lib/routes.js";
 import { z } from "zod";
 import { typedSql } from "../../describe.js";
 import type { Abortable } from "node:events";
+import type { TransactionSql } from "postgres";
 
 async function readFileWithBacktrace(
   path: PathLike | FileHandle,
@@ -72,6 +72,7 @@ export class CPLEXLP {
   fileHandle!: FileHandle;
   solutionPath!: string;
   problemPath!: string;
+  problemFreeMpsPath!: string;
 
   setup = async () => {
     this.dir = await mkdtemp(path.join(os.tmpdir(), "projektwahl-"));
@@ -172,6 +173,7 @@ export class CPLEXLP {
 
     this.solutionPath = path.join(this.dir, "solution.sol");
     this.problemPath = path.join(this.dir, "problem.glp");
+    this.problemFreeMpsPath = path.join(this.dir, "problem.freemps");
 
     const childProcess = execFile(
       "glpsol",
@@ -182,6 +184,8 @@ export class CPLEXLP {
         this.solutionPath,
         "--wglp",
         this.problemPath,
+        "--wfreemps",
+        this.problemFreeMpsPath,
       ],
       {}
     );
@@ -242,28 +246,25 @@ export const rank2points = (rank: number) => {
   }
 };
 
-export async function evaluate() {
+export async function evaluate(tsql: TransactionSql<Record<string, never>>) {
   const lp = new CPLEXLP();
   await lp.setup();
 
-  const [choices, projects, users] = await sql.begin(async (tsql) => {
-    await tsql`SELECT set_config('projektwahl.type', 'root', true);`;
+  await tsql`SELECT set_config('projektwahl.type', 'root', true);`;
 
-    const choices = z.array(rawChoice).parse(
-      await tsql.file("src/server/routes/evaluate/calculate.sql", [], {
-        cache: false,
-      })
-    );
+  const choices = z.array(rawChoice).parse(
+    await tsql.file("src/server/routes/evaluate/calculate.sql", [], {
+      cache: false,
+    })
+  );
 
-    const projects = await typedSql(tsql, {
-      columns: { id: 23, min_participants: 23, max_participants: 23 },
-    } as const)`SELECT id, min_participants, max_participants FROM projects;`;
+  const projects = await typedSql(tsql, {
+    columns: { id: 23, min_participants: 23, max_participants: 23 },
+  } as const)`SELECT id, min_participants, max_participants FROM projects;`;
 
-    const users = await typedSql(tsql, {
-      columns: { id: 23, project_leader_id: 23 },
-    } as const)`SELECT id, project_leader_id FROM present_voters ORDER BY id;`;
-    return [choices, projects, users];
-  });
+  const users = await typedSql(tsql, {
+    columns: { id: 23, project_leader_id: 23 },
+  } as const)`SELECT id, project_leader_id FROM present_voters ORDER BY id;`;
 
   console.log("choices: ", choices);
   console.log("projects: ", projects);
@@ -381,9 +382,9 @@ export async function evaluate() {
 
   const results = await lp.calculate();
 
-  for (const result of results) {
+  /*for (const result of results) {
     console.log(result);
-  }
+  }*/
 
   const finalOutput: {
     overloaded: [number, number][];
@@ -434,6 +435,12 @@ export async function evaluate() {
     }
   }
 
+  const rank_distribution = [0, 0, 0, 0, 0, 0];
+
+  const keyed_choices = Object.fromEntries(
+    choices.map((c) => [`${c.user_id}_${c.project_id}`, c])
+  );
+
   for (const result of results
     .filter(([name]) => name.startsWith("choice_"))
     .map<[number, number, number]>(([name, value]) => {
@@ -443,22 +450,22 @@ export async function evaluate() {
         value,
       ];
     })) {
-    // TODO FIXME optimize
-    const choice = choices.find(
-      (c) => c.user_id == result[0] && c.project_id == result[1]
-    );
+    const choice = keyed_choices[`${result[0]}_${result[1]}`];
     if (!choice) {
       throw new Error("something went wrong. couldn't find that choice");
     }
     if (result[2] != 0) {
       finalOutput.choices.push([result[0], result[1], choice.rank]);
-      console.log(
+      /*console.log(
         `user: ${choice.user_id}, project: ${choice.project_id}, rank: ${choice.rank}`
-      );
+      );*/
+      rank_distribution[choice.rank]++;
     }
   }
 
   console.log(finalOutput);
+
+  console.log(rank_distribution);
 
   return finalOutput;
 }
