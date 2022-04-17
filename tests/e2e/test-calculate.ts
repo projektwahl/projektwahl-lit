@@ -381,12 +381,12 @@ await test_not_project_leader_voted_correctly2();
 export async function test_extreme() {
   await sql.begin(async (tsql) => {
     const projects: number[] = [];
-    for (let i = 0; i < 1000; i++) {
+    for (let i = 0; i < 200; i++) {
       projects.push(await project(tsql));
     }
 
     const users: number[] = [];
-    for (let i = 0; i < 10000; i++) {
+    for (let i = 0; i < 3000; i++) {
       const currentUser = await user(tsql, 5);
       users.push(currentUser);
       for (let j = 1; j <= 5; j++) {

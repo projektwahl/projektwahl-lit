@@ -380,7 +380,7 @@ export async function evaluate(tsql: TransactionSql<{}>) {
   const results = await lp.calculate();
 
   for (const result of results) {
-    console.log(result);
+    //console.log(result);
   }
 
   const finalOutput: {
@@ -432,6 +432,10 @@ export async function evaluate(tsql: TransactionSql<{}>) {
     }
   }
 
+  const rank_distribution = [0,0,0,0,0,0]
+
+  const keyed_choices = Object.fromEntries(choices.map(c => [`${c.user_id}_${c.project_id}` ,c]))
+
   for (const result of results
     .filter(([name]) => name.startsWith("choice_"))
     .map<[number, number, number]>(([name, value]) => {
@@ -441,22 +445,22 @@ export async function evaluate(tsql: TransactionSql<{}>) {
         value,
       ];
     })) {
-    // TODO FIXME optimize
-    const choice = choices.find(
-      (c) => c.user_id == result[0] && c.project_id == result[1]
-    );
+    const choice = keyed_choices[`${result[0]}_${result[1]}`];
     if (!choice) {
       throw new Error("something went wrong. couldn't find that choice");
     }
     if (result[2] != 0) {
       finalOutput.choices.push([result[0], result[1], choice.rank]);
-      console.log(
+      /*console.log(
         `user: ${choice.user_id}, project: ${choice.project_id}, rank: ${choice.rank}`
-      );
+      );*/
+      rank_distribution[choice.rank]++;
     }
   }
 
   console.log(finalOutput);
+
+  console.log(rank_distribution)
 
   return finalOutput;
 }
