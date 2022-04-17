@@ -194,9 +194,6 @@ export class PwUserProjects<X extends string> extends PwProjects<X> {
               },
               task: this._task,
               type: "checkbox",
-              // TODO FIXME can we remove these everywhere and do this in get and set?
-              trueValue: true,
-              falseValue: false,
               defaultValue: undefined,
               initial: initial,
               resettable: false,

@@ -378,8 +378,6 @@ class PwUserCreate extends PwForm<"/api/v1/users/create-or-update"> {
                       ${pwInputCheckbox<"/api/v1/users/create-or-update">({
                         url: this.url,
                         type: "checkbox",
-                        trueValue: true,
-                        falseValue: false,
                         defaultValue: false,
                         disabled: this.disabled,
                         label: msg("Away"),
@@ -393,8 +391,6 @@ class PwUserCreate extends PwForm<"/api/v1/users/create-or-update"> {
                       ${pwInputCheckbox<"/api/v1/users/create-or-update">({
                         url: this.url,
                         type: "checkbox",
-                        trueValue: true,
-                        falseValue: false,
                         defaultValue: false,
                         disabled: this.disabled,
                         label: msg("Mark this user as deleted"),

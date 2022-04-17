@@ -42,8 +42,6 @@ export function pwInputCheckbox<P extends keyof typeof routes>(
     | "options"
     | "task"
     | "defaultValue"
-    | "trueValue"
-    | "falseValue"
     | "resettable"
   >
 ) {
@@ -60,9 +58,7 @@ export function pwInputCheckbox<P extends keyof typeof routes>(
     task,
     type,
     autocomplete,
-    trueValue,
     defaultValue,
-    falseValue,
     resettable,
     ...rest
   } = props;
@@ -82,8 +78,6 @@ export function pwInputCheckbox<P extends keyof typeof routes>(
     .task=${task}
     .initial=${initial}
     .defaultValue=${defaultValue}
-    .trueValue=${trueValue}
-    .falseValue=${falseValue}
     .resettable=${resettable}
   ></pw-input-checkbox>`;
 }
@@ -95,14 +89,9 @@ export class PwInputCheckbox<P extends keyof typeof routes> extends PwInput<
 > {
   static override get properties() {
     return {
-      trueValue: { attribute: false },
-      falseValue: { attribute: false },
       ...super.properties,
     };
   }
-
-  falseValue!: boolean | undefined;
-  trueValue!: boolean | undefined;
 
   mypwinputchangeDispatcher = () => {
     if (!this.input.value) {
@@ -110,10 +99,7 @@ export class PwInputCheckbox<P extends keyof typeof routes> extends PwInput<
     }
 
     this.inputValue = this.input.value.checked;
-    this.set(
-      this.pwForm.formData,
-      this.inputValue ? this.trueValue : this.falseValue
-    );
+    this.set(this.pwForm.formData, this.inputValue);
 
     this.input.value?.dispatchEvent(
       new CustomEvent("refreshentitylist", {

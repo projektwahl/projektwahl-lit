@@ -389,8 +389,6 @@ export class PwProjectCreate extends PwForm<
                       >({
                         url: this.url,
                         type: "checkbox",
-                        trueValue: true,
-                        falseValue: false,
                         defaultValue: true,
                         disabled: this.disabled,
                         label: msg("Allow random assignments"),
@@ -406,8 +404,6 @@ export class PwProjectCreate extends PwForm<
                       >({
                         url: this.url,
                         type: "checkbox",
-                        trueValue: true,
-                        falseValue: false,
                         defaultValue: false,
                         disabled: this.disabled,
                         label: msg("Mark this project as deleted"),

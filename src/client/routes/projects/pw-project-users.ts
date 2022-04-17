@@ -171,8 +171,6 @@ export class PwProjectUsers<X extends string> extends PwUsers<X> {
                 (o.filters[this.name] = v ? this.projectId : undefined),
               task: this._task,
               type: "checkbox",
-              trueValue: true,
-              falseValue: undefined,
               defaultValue: undefined,
               initial: initial,
               resettable: false,
