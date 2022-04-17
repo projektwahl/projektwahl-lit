@@ -40,8 +40,8 @@ export class PwEvaluation extends PwElement {
         <h1 class="text-center">Wie funktioniert die Auswertung?</h1>
 
         <p>
-          Zuerst einmal vorneweg: Wer sich von der Richtigkeit der Angaben hier
-          überzeugen möchte, kann im
+          Zuerst einmal vorneweg: Wer die Angaben hier überprüfen möchte, kann
+          im
           <a
             href="https://github.com/projektwahl/projektwahl-lit/blob/main/src/server/routes/evaluate/index.ts"
             target="_blank"
@@ -57,7 +57,7 @@ export class PwEvaluation extends PwElement {
         <p>
           Fangen wir mit den Grundlagen an: Die Wahl einer Person ist gültig,
           wenn genau fünf Projekte gewählt wurden und dabei die
-          Altersbeschränkung eingehalten wurde (dies ist aktuell immer der
+          Altersbeschränkung eingehalten wurde (zweiteres ist aktuell immer der
           Fall). Personen, die nicht gültig gewählt haben, können allen
           Projekten zugewiesen werden, die von der Altersbeschränkung her passen
           (und solche zufälligen Zuweisungen erlauben). Man kann nicht ein

@@ -131,7 +131,12 @@ class PwChoices<X extends string> extends PwEntityList<"/api/v1/choices", X> {
   }
 
   override get buttons() {
-    return html`${this.correctlyVotedTask.render({
+    return html` <p>
+        <a target="_blank" href="/evaluation"
+          >Wie funktioniert die Wahlauswertung?</a
+        >
+      </p>
+      ${this.correctlyVotedTask.render({
         complete: (value) => {
           if (value.success) {
             if (value.data.every((v) => v === 1)) {

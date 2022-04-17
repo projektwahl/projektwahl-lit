@@ -51,13 +51,16 @@ export async function project(
   )[0].id;
 }
 
-export async function user(age: number): Promise<number> {
+export async function user(
+  age: number,
+  project_leader_id: number | null = null
+): Promise<number> {
   return (
     await typedSql(sql, {
       columns: { id: 23 },
-    } as const)`INSERT INTO users (username, type, "group", age, last_updated_by) VALUES (${chance.name(
+    } as const)`INSERT INTO users (username, type, "group", age, project_leader_id, last_updated_by) VALUES (${chance.name(
       { prefix: true, suffix: true }
-    )}, 'voter', '', ${age}, NULL) RETURNING users.id;`
+    )}, 'voter', '', ${age}, ${project_leader_id}, NULL) RETURNING users.id;`
   )[0].id;
 }
 
@@ -163,5 +166,182 @@ export async function test_five_projects_one_user_voted_correctly() {
 }
 
 await test_five_projects_one_user_voted_correctly();
+
+export async function test_five_projects_conflicting_equal_votes() {
+  await reset();
+  const p1 = await project(1, 1);
+  const p2 = await project(1, 1);
+  const p3 = await project(1, 1);
+  const p4 = await project(1, 1);
+  const p5 = await project(1, 1);
+  const u1 = await user(5);
+  const u2 = await user(5);
+  await vote(p1, u1, 4);
+  await vote(p2, u1, 5);
+  await vote(p3, u1, 3);
+  await vote(p4, u1, 1);
+  await vote(p5, u1, 2);
+
+  await vote(p1, u2, 4);
+  await vote(p2, u2, 5);
+  await vote(p3, u2, 3);
+  await vote(p4, u2, 1);
+  await vote(p5, u2, 2);
+  deepEqual(await evaluate(), {
+    overloaded: [],
+    underloaded: [],
+    notexists: [1, 2, 3],
+    choices: [
+      /*[1, 4, 1],
+      [2, 5, 2],*/
+      [1, 5, 2],
+      [2, 4, 1],
+    ],
+  });
+}
+
+await test_five_projects_conflicting_equal_votes();
+
+export async function test_five_projects_different_conflicting_votes() {
+  await reset();
+  const p1 = await project(0, 0);
+  const p2 = await project(0, 0); // fake project
+  const p3 = await project(0, 0); // fake project
+  const p4 = await project(0, 0); // fake project
+  const p5 = await project(1, 1); // fake project
+  const u1 = await user(5);
+  const u2 = await user(5);
+  await vote(p1, u1, 4);
+  await vote(p2, u1, 5);
+  await vote(p3, u1, 3);
+  await vote(p4, u1, 1);
+  await vote(p5, u1, 2);
+
+  await vote(p1, u2, 4);
+  await vote(p2, u2, 5);
+  await vote(p3, u2, 3);
+  await vote(p4, u2, 2); // different
+  await vote(p5, u2, 1); // different
+  deepEqual(await evaluate(), {
+    overloaded: [[4, 1]],
+    underloaded: [],
+    notexists: [],
+    choices: [
+      [1, 4, 1],
+      [2, 5, 1],
+    ],
+  });
+}
+
+await test_five_projects_different_conflicting_votes();
+
+export async function test_five_projects_different_votes() {
+  await reset();
+  const p1 = await project(1, 1);
+  const p2 = await project(1, 1);
+  const p3 = await project(1, 1);
+  const p4 = await project(1, 1);
+  const p5 = await project(1, 1);
+  const u1 = await user(5);
+  const u2 = await user(5);
+  await vote(p1, u1, 4);
+  await vote(p2, u1, 5);
+  await vote(p3, u1, 3);
+  await vote(p4, u1, 1);
+  await vote(p5, u1, 2);
+
+  await vote(p1, u2, 4);
+  await vote(p2, u2, 5);
+  await vote(p3, u2, 3);
+  await vote(p4, u2, 2); // different
+  await vote(p5, u2, 1); // different
+  deepEqual(await evaluate(), {
+    overloaded: [],
+    underloaded: [],
+    notexists: [1, 2, 3],
+    choices: [
+      [1, 4, 1],
+      [2, 5, 1],
+    ],
+  });
+}
+
+await test_five_projects_different_votes();
+
+export async function test_project_leader() {
+  await reset();
+  const p1 = await project(0, 0);
+  const _u1 = await user(5, p1);
+  deepEqual(await evaluate(), {
+    overloaded: [],
+    underloaded: [],
+    notexists: [],
+    choices: [],
+  });
+}
+
+await test_project_leader();
+
+export async function test_not_project_leader() {
+  await reset();
+  const p1 = await project(1, 1);
+  const _u1 = await user(5, p1);
+  deepEqual(await evaluate(), {
+    overloaded: [],
+    underloaded: [],
+    notexists: [1],
+    choices: [],
+  });
+}
+
+await test_not_project_leader();
+
+export async function test_not_project_leader_voted_correctly() {
+  await reset();
+  const p1 = await project(1, 1);
+  const p2 = await project();
+  const p3 = await project();
+  const p4 = await project();
+  const p5 = await project();
+  const p6 = await project();
+  const u1 = await user(5, p1);
+  await vote(p2, u1, 1);
+  await vote(p3, u1, 2);
+  await vote(p4, u1, 3);
+  await vote(p5, u1, 4);
+  await vote(p6, u1, 5);
+  deepEqual(await evaluate(), {
+    overloaded: [],
+    underloaded: [[2, 4]],
+    notexists: [1, 3, 4, 5, 6],
+    choices: [[1, 2, 1]],
+  });
+}
+
+await test_not_project_leader_voted_correctly();
+
+export async function test_not_project_leader_voted_correctly2() {
+  await reset();
+  const p1 = await project(1, 1);
+  const p2 = await project(1, 1);
+  const p3 = await project(1, 1);
+  const p4 = await project(1, 1);
+  const p5 = await project(1, 1);
+  const p6 = await project(1, 1);
+  const u1 = await user(5, p1);
+  await vote(p2, u1, 1);
+  await vote(p3, u1, 2);
+  await vote(p4, u1, 3);
+  await vote(p5, u1, 4);
+  await vote(p6, u1, 5);
+  deepEqual(await evaluate(), {
+    overloaded: [],
+    underloaded: [],
+    notexists: [1, 3, 4, 5, 6],
+    choices: [[1, 2, 1]],
+  });
+}
+
+await test_not_project_leader_voted_correctly2();
 
 await sql.end();

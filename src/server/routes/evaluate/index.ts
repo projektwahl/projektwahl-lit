@@ -297,15 +297,16 @@ export async function evaluate() {
     ]);
     const user = users.find((u) => u.id == Number(groupedChoice[0]));
 
-    const b: [number, string][] = user?.project_leader_id
-      ? [[1, `project_leader_${user.project_leader_id}`]]
-      : [];
-    await lp.constraint(
-      `only_in_one_project_${groupedChoice[0]}`,
-      1,
-      [...a, ...b],
-      1
-    );
+    if (user?.project_leader_id) {
+      await lp.constraint(
+        `only_in_one_project_${groupedChoice[0]}`,
+        0,
+        [...a, [-1, `project_not_exists_${user.project_leader_id}`]],
+        0
+      );
+    } else {
+      await lp.constraint(`only_in_one_project_${groupedChoice[0]}`, 1, a, 1);
+    }
   }
 
   // only in project if it exists
@@ -321,23 +322,8 @@ export async function evaluate() {
     );
   }
 
-  // either project leader or project does not exist
-  for (const user of users) {
-    if (user.project_leader_id === null) continue;
-    await lp.constraint(
-      `either_project_leader_or_project_not_exists_${user.id}`,
-      0,
-      [
-        [1, `project_leader_${user.id}`],
-        [1, `project_not_exists_${user.project_leader_id}`],
-      ],
-      1
-    );
-  }
-
   // project size matches
   for (const project of projects) {
-    // TODO FIXME project not exists
     await lp.constraint(
       `project_min_size_${project.id}`,
       project.min_participants,
@@ -365,13 +351,15 @@ export async function evaluate() {
     );
   }
 
-  // TODO FIXME not underloaded/overloaded if project does not exist
-
   await lp.startBounds();
 
   for (const project of projects) {
     await lp.bound(0, `project_overloaded_${project.id}`, null);
-    await lp.bound(0, `project_underloaded_${project.id}`, null);
+    await lp.bound(
+      0,
+      `project_underloaded_${project.id}`,
+      Math.max(project.min_participants - 1, 0)
+    ); // don't allow an empty project
   }
 
   await lp.startVariables();
@@ -385,13 +373,6 @@ export async function evaluate() {
 
   for (const choice of choices) {
     await lp.binaryVariable(`choice_${choice.user_id}_${choice.project_id}`);
-  }
-
-  // TODO FIXME remove this completely as its implied by the project_not_exists
-  for (const user of users) {
-    if (user.project_leader_id) {
-      await lp.binaryVariable(`project_leader_${user.id}`);
-    }
   }
 
   for (const project of projects) {
