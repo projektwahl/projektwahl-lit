@@ -102,14 +102,16 @@ export class CPLEXLP {
   constraint = async (
     name: string,
     min: number | null,
-    constraints: [number, string][],
+    constraints: [number, string | null][],
     max: number | null
   ) => {
     if (min !== null && min === max) {
       await this.fileHandle.write(`\neq_${name}: `);
       for (const constraint of constraints) {
         await this.fileHandle.write(
-          ` ${constraint[0] < 0 ? "" : "+"}${constraint[0]} ${constraint[1]}`
+          ` ${constraint[0] < 0 ? "" : "+"}${constraint[0]} ${
+            constraint[1] ?? ""
+          }`
         );
       }
       await this.fileHandle.write(` = ${min}`);
@@ -118,7 +120,9 @@ export class CPLEXLP {
         await this.fileHandle.write(`\nmin_${name}: `);
         for (const constraint of constraints) {
           await this.fileHandle.write(
-            ` ${constraint[0] < 0 ? "" : "+"}${constraint[0]} ${constraint[1]}`
+            ` ${constraint[0] < 0 ? "" : "+"}${constraint[0]} ${
+              constraint[1] ?? ""
+            }`
           );
         }
         await this.fileHandle.write(` >= ${min}`);
@@ -127,7 +131,9 @@ export class CPLEXLP {
         await this.fileHandle.write(`\nmax_${name}: `);
         for (const constraint of constraints) {
           await this.fileHandle.write(
-            ` ${constraint[0] < 0 ? "" : "+"}${constraint[0]} ${constraint[1]}`
+            ` ${constraint[0] < 0 ? "" : "+"}${constraint[0]} ${
+              constraint[1] ?? ""
+            }`
           );
         }
         await this.fileHandle.write(` <= ${max}`);
@@ -297,8 +303,11 @@ export async function evaluate() {
     ]);
     const user = users.find((u) => u.id == Number(groupedChoice[0]));
 
-    const b: [number, string][] = user?.project_leader_id
-      ? [[1, `project_leader_${user.project_leader_id}`]]
+    const b: [number, string | null][] = user?.project_leader_id
+      ? [
+          [-1, `project_not_exists_${user.project_leader_id}`],
+          [1, null],
+        ]
       : [];
     await lp.constraint(
       `only_in_one_project_${groupedChoice[0]}`,
@@ -321,23 +330,8 @@ export async function evaluate() {
     );
   }
 
-  // either project leader or project does not exist
-  for (const user of users) {
-    if (user.project_leader_id === null) continue;
-    await lp.constraint(
-      `either_project_leader_or_project_not_exists_${user.id}`,
-      0,
-      [
-        [1, `project_leader_${user.id}`],
-        [1, `project_not_exists_${user.project_leader_id}`],
-      ],
-      1
-    );
-  }
-
   // project size matches
   for (const project of projects) {
-    // TODO FIXME project not exists
     await lp.constraint(
       `project_min_size_${project.id}`,
       project.min_participants,
@@ -365,8 +359,6 @@ export async function evaluate() {
     );
   }
 
-  // TODO FIXME not underloaded/overloaded if project does not exist
-
   await lp.startBounds();
 
   for (const project of projects) {
@@ -385,13 +377,6 @@ export async function evaluate() {
 
   for (const choice of choices) {
     await lp.binaryVariable(`choice_${choice.user_id}_${choice.project_id}`);
-  }
-
-  // TODO FIXME remove this completely as its implied by the project_not_exists
-  for (const user of users) {
-    if (user.project_leader_id) {
-      await lp.binaryVariable(`project_leader_${user.id}`);
-    }
   }
 
   for (const project of projects) {
