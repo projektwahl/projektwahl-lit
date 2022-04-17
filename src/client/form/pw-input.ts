@@ -303,7 +303,7 @@ export abstract class PwInput<
                 (o) => o.value,
                 (o) =>
                   html`<option
-                    .selected=${live(this.get(this.pwForm.formData) === o.value)}
+                    .selected=${/* maybe do this in the subclass and then maybe we can type it better */live(this.get(this.pwForm.formData) === o.value)}
                     .value=${o.value}
                   >
                     ${o.text}
