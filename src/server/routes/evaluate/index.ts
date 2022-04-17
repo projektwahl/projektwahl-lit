@@ -25,7 +25,6 @@ import path from "node:path";
 import os from "node:os";
 import { constants, OpenMode, PathLike } from "node:fs";
 import { execFile } from "node:child_process";
-import { sql } from "../../database.js";
 import { rawChoice } from "../../../lib/routes.js";
 import { z } from "zod";
 import { typedSql } from "../../describe.js";
@@ -247,7 +246,7 @@ export const rank2points = (rank: number) => {
   }
 };
 
-export async function evaluate(tsql: TransactionSql<{}>) {
+export async function evaluate(tsql: TransactionSql<Record<string, never>>) {
   const lp = new CPLEXLP();
   await lp.setup();
 
@@ -383,9 +382,9 @@ export async function evaluate(tsql: TransactionSql<{}>) {
 
   const results = await lp.calculate();
 
-  for (const result of results) {
-    //console.log(result);
-  }
+  /*for (const result of results) {
+    console.log(result);
+  }*/
 
   const finalOutput: {
     overloaded: [number, number][];

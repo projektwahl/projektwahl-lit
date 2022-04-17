@@ -29,8 +29,6 @@ import type { TransactionSql } from "postgres";
 
 const chance = new Chance();
 
-export {};
-
 export async function reset() {
   await sql`DROP TABLE IF EXISTS settings, sessions, choices_history, projects_history, users_history, choices, users_with_deleted, projects_with_deleted CASCADE;`;
   await sql.begin(async (tsql) => {
@@ -39,7 +37,7 @@ export async function reset() {
 }
 
 export async function project(
-  tsql: TransactionSql<{}>,
+  tsql: TransactionSql<Record<string, never>>,
   min_participants = 5,
   max_participants = 15,
   min_age = 5,
@@ -54,7 +52,7 @@ export async function project(
 }
 
 export async function user(
-  tsql: TransactionSql<{}>,
+  tsql: TransactionSql<Record<string, never>>,
   age: number,
   project_leader_id: number | null = null
 ): Promise<number> {
@@ -66,7 +64,7 @@ export async function user(
 }
 
 export async function vote(
-  tsql: TransactionSql<{}>,
+  tsql: TransactionSql<Record<string, never>>,
   project_id: number,
   user_id: number,
   rank: number
