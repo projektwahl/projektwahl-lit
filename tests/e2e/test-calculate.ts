@@ -269,7 +269,7 @@ await test_five_projects_different_votes();
 export async function test_project_leader() {
   await reset();
   const p1 = await project(0, 0);
-  const u1 = await user(5, p1);
+  const _u1 = await user(5, p1);
   deepEqual(await evaluate(), {
     overloaded: [],
     underloaded: [],
@@ -283,7 +283,7 @@ await test_project_leader();
 export async function test_not_project_leader() {
   await reset();
   const p1 = await project(1, 1);
-  const u1 = await user(5, p1);
+  const _u1 = await user(5, p1);
   deepEqual(await evaluate(), {
     overloaded: [],
     underloaded: [],
