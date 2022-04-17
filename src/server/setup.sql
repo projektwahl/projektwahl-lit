@@ -101,7 +101,7 @@ END $$;
 -- TODO ADd check that group and age is NULL if type is not voter
 CREATE TABLE IF NOT EXISTS users_with_deleted (
   id INT GENERATED ALWAYS AS IDENTITY PRIMARY KEY NOT NULL,
-  username VARCHAR(64) UNIQUE NOT NULL,
+  username VARCHAR(128) UNIQUE NOT NULL,
   openid_id VARCHAR(256) UNIQUE,
   password_hash VARCHAR(256),
   type user_type NOT NULL,
@@ -122,7 +122,7 @@ CREATE TABLE IF NOT EXISTS users_history (
   operation TEXT NOT NULL,
 
   id INTEGER NOT NULL,
-  username VARCHAR(64) NOT NULL,
+  username VARCHAR(128) NOT NULL,
   openid_id VARCHAR(256),
   type user_type NOT NULL,
   project_leader_id INTEGER, -- TODO FIXME maybe m:n as somebody could theoretically be leader in multiple projects?
