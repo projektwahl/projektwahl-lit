@@ -40,8 +40,8 @@ export class PwEvaluation extends PwElement {
         <h1 class="text-center">Wie funktioniert die Auswertung?</h1>
 
         <p>
-          Zuerst einmal vorneweg: Wer sich von der Richtigkeit der Angaben hier
-          überzeugen möchte, kann im
+          Zuerst einmal vorneweg: Wer die Angaben hier überprüfen möchte, kann
+          im
           <a
             href="https://github.com/projektwahl/projektwahl-lit/blob/main/src/server/routes/evaluate/index.ts"
             target="_blank"
