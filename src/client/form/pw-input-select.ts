@@ -25,9 +25,9 @@ import { ifDefined } from "lit/directives/if-defined.js";
 import type { routes } from "../../lib/routes.js";
 import { PwInput } from "./pw-input.js";
 import { Ref, ref } from "lit/directives/ref.js";
-import { literal } from "lit/static-html";
-import { live } from "lit/directives/live";
-import { repeat } from "lit/directives/repeat";
+import { literal } from "lit/static-html.js";
+import { live } from "lit/directives/live.js";
+import { repeat } from "lit/directives/repeat.js";
 
 // workaround see https://github.com/runem/lit-analyzer/issues/149#issuecomment-1006162839
 export function pwInputSelect<
@@ -164,9 +164,7 @@ export class PwInputSelect<
               initial: () => false,
             }))
         }
-      >${
-        this.type === "select" && this.options
-          ? repeat(
+      >${repeat(
               this.options,
               (o) => o.value,
               (o) =>
@@ -177,7 +175,6 @@ export class PwInputSelect<
                   ${o.text}
                 </option>`
             )
-          : undefined
       }</${
     this.type === "select"
       ? literal`select`

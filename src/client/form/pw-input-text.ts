@@ -22,10 +22,9 @@ SPDX-FileCopyrightText: 2021 Moritz Hedtke <Moritz.Hedtke@t-online.de>
 */
 import { html, noChange } from "lit";
 import { ifDefined } from "lit/directives/if-defined.js";
-import { live } from "lit/directives/live";
-import { ref } from "lit/directives/ref";
-import { repeat } from "lit/directives/repeat";
-import { literal } from "lit/static-html";
+import { live } from "lit/directives/live.js";
+import { ref } from "lit/directives/ref.js";
+import { literal } from "lit/static-html.js";
 import type { routes } from "../../lib/routes.js";
 import { PwInput } from "./pw-input.js";
 
@@ -144,21 +143,7 @@ export class PwInputText<
               initial: () => false,
             }))
         }
-      >${
-        this.type === "select" && this.options
-          ? repeat(
-              this.options,
-              (o) => o.value,
-              (o) =>
-                html`<option
-                  .selected=${/* maybe do this in the subclass and then maybe we can type it better */live(this.get(this.pwForm.formData) === o.value)}
-                  .value=${o.value}
-                >
-                  ${o.text}
-                </option>`
-            )
-          : undefined
-      }</${
+      ></${
     this.type === "select"
       ? literal`select`
       : this.type === "textarea"
