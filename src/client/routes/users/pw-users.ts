@@ -185,7 +185,7 @@ export class PwUsers<X extends string> extends PwEntityList<
 
         <tr>
           <th scope="col">
-            ${pwInputNumber<"/api/v1/users", number | undefined>({
+            ${pwInputNumber<"/api/v1/users", false, number | undefined>({
               enabled: true,
               url: this.url,
               label: null,
@@ -201,7 +201,7 @@ export class PwUsers<X extends string> extends PwEntityList<
           </th>
 
           <th scope="col">
-            ${pwInputText<"/api/v1/users", string | undefined>({
+            ${pwInputText<"/api/v1/users", false, string | undefined>({
               enabled: true,
               url: this.url,
               label: null,
@@ -219,6 +219,7 @@ export class PwUsers<X extends string> extends PwEntityList<
           <th scope="col">
             ${pwInputSelect<
               "/api/v1/users",
+              false,
               z.infer<
                 typeof routes["/api/v1/users"]["request"]
               >["filters"]["type"]
@@ -244,7 +245,7 @@ export class PwUsers<X extends string> extends PwEntityList<
             })}
           </th>
 
-          ${pwInputCheckbox<"/api/v1/users">({
+          ${pwInputCheckbox<"/api/v1/users", false>({
             url: this.url,
             label: null,
             name: ["filters", "deleted"],

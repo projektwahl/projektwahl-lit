@@ -253,6 +253,7 @@ export class PwProjectCreate extends PwForm<
                     >
                       ${pwInputText<
                         "/api/v1/projects/create" | "/api/v1/projects/update",
+                        boolean,
                         string | undefined
                       >({
                         url: this.url,
@@ -270,6 +271,7 @@ export class PwProjectCreate extends PwForm<
                       })}
                       ${pwInputText<
                         "/api/v1/projects/create" | "/api/v1/projects/update",
+                        boolean,
                         string | undefined
                       >({
                         url: this.url,
@@ -286,6 +288,7 @@ export class PwProjectCreate extends PwForm<
                       })}
                       ${pwInputText<
                         "/api/v1/projects/create" | "/api/v1/projects/update",
+                        boolean,
                         string | undefined
                       >({
                         url: this.url,
@@ -302,6 +305,7 @@ export class PwProjectCreate extends PwForm<
                       })}
                       ${pwInputNumber<
                         "/api/v1/projects/create" | "/api/v1/projects/update",
+                        boolean,
                         number | undefined
                       >({
                         url: this.url,
@@ -318,6 +322,7 @@ export class PwProjectCreate extends PwForm<
                       })}
                       ${pwInputNumber<
                         "/api/v1/projects/create" | "/api/v1/projects/update",
+                        boolean,
                         number | undefined
                       >({
                         url: this.url,
@@ -334,6 +339,7 @@ export class PwProjectCreate extends PwForm<
                       })}
                       ${pwInputNumber<
                         "/api/v1/projects/create" | "/api/v1/projects/update",
+                        boolean,
                         number | undefined
                       >({
                         url: this.url,
@@ -350,6 +356,7 @@ export class PwProjectCreate extends PwForm<
                       })}
                       ${pwInputNumber<
                         "/api/v1/projects/create" | "/api/v1/projects/update",
+                        boolean,
                         number | undefined
                       >({
                         url: this.url,
@@ -366,6 +373,7 @@ export class PwProjectCreate extends PwForm<
                       })}
                       ${pwInputNumber<
                         "/api/v1/projects/create" | "/api/v1/projects/update",
+                        boolean,
                         number | undefined
                       >({
                         url: this.url,
@@ -385,7 +393,8 @@ export class PwProjectCreate extends PwForm<
                         möglichen Teilnehmenden.
                       </div>
                       ${pwInputCheckbox<
-                        "/api/v1/projects/create" | "/api/v1/projects/update"
+                        "/api/v1/projects/create" | "/api/v1/projects/update",
+                        boolean
                       >({
                         url: this.url,
                         type: "checkbox",
@@ -400,7 +409,8 @@ export class PwProjectCreate extends PwForm<
                         resettable: value !== undefined,
                       })}
                       ${pwInputCheckbox<
-                        "/api/v1/projects/create" | "/api/v1/projects/update"
+                        "/api/v1/projects/create" | "/api/v1/projects/update",
+                        boolean
                       >({
                         url: this.url,
                         type: "checkbox",

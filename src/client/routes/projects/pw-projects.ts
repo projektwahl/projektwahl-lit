@@ -177,7 +177,7 @@ export class PwProjects<X extends string> extends PwEntityList<
 
         <tr>
           <th scope="col">
-            ${pwInputNumber<"/api/v1/projects", number | undefined>({
+            ${pwInputNumber<"/api/v1/projects", false, number | undefined>({
               enabled: true,
               url: this.url,
               label: null,
@@ -193,7 +193,7 @@ export class PwProjects<X extends string> extends PwEntityList<
           </th>
 
           <th scope="col">
-            ${pwInputText<"/api/v1/projects", string | undefined>({
+            ${pwInputText<"/api/v1/projects", false, string | undefined>({
               enabled: true,
               url: this.url,
               label: null,
@@ -209,7 +209,7 @@ export class PwProjects<X extends string> extends PwEntityList<
           </th>
 
           <th scope="col">
-            ${pwInputText<"/api/v1/projects", string | undefined>({
+            ${pwInputText<"/api/v1/projects", false, string | undefined>({
               enabled: true,
               url: this.url,
               label: null,
@@ -224,7 +224,7 @@ export class PwProjects<X extends string> extends PwEntityList<
             })}
           </th>
 
-          ${pwInputCheckbox<"/api/v1/projects">({
+          ${pwInputCheckbox<"/api/v1/projects", false>({
             url: this.url,
             label: null,
             name: ["filters", "deleted"],

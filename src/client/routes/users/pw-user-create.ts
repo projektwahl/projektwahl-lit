@@ -141,6 +141,7 @@ class PwUserCreate extends PwForm<"/api/v1/users/create-or-update"> {
   typeRef!: Ref<
     PwInputSelect<
       "/api/v1/users/create-or-update",
+      boolean,
       "voter" | "helper" | "admin" | undefined
     >
   >;
@@ -265,6 +266,7 @@ class PwUserCreate extends PwForm<"/api/v1/users/create-or-update"> {
                     >
                       ${pwInputText<
                         "/api/v1/users/create-or-update",
+                        boolean,
                         string | undefined
                       >({
                         url: this.url,
@@ -281,6 +283,7 @@ class PwUserCreate extends PwForm<"/api/v1/users/create-or-update"> {
                       })}
                       ${pwInputText<
                         "/api/v1/users/create-or-update",
+                        boolean,
                         string | null | undefined
                       >({
                         url: this.url,
@@ -297,6 +300,7 @@ class PwUserCreate extends PwForm<"/api/v1/users/create-or-update"> {
                       })}
                       ${pwInputSelect<
                         "/api/v1/users/create-or-update",
+                        boolean,
                         "voter" | "helper" | "admin" | undefined
                       >({
                         url: this.url,
@@ -322,6 +326,7 @@ class PwUserCreate extends PwForm<"/api/v1/users/create-or-update"> {
                       ${this.typeRef.value?.get(this.formData) === "voter"
                         ? html`${pwInputText<
                             "/api/v1/users/create-or-update",
+                            boolean,
                             string | null | undefined
                           >({
                             url: this.url,
@@ -337,6 +342,7 @@ class PwUserCreate extends PwForm<"/api/v1/users/create-or-update"> {
                           })}
                           ${pwInputNumber<
                             "/api/v1/users/create-or-update",
+                            boolean,
                             number | undefined | null
                           >({
                             url: this.url,
@@ -356,6 +362,7 @@ class PwUserCreate extends PwForm<"/api/v1/users/create-or-update"> {
                         ? html`
                             ${pwInputText<
                               "/api/v1/users/create-or-update",
+                              boolean,
                               string | undefined
                             >({
                               url: this.url,
@@ -372,7 +379,7 @@ class PwUserCreate extends PwForm<"/api/v1/users/create-or-update"> {
                             })}
                           `
                         : undefined}
-                      ${pwInputCheckbox<"/api/v1/users/create-or-update">({
+                      ${pwInputCheckbox<"/api/v1/users/create-or-update", boolean>({
                         url: this.url,
                         type: "checkbox",
                         disabled: this.disabled,
@@ -385,7 +392,7 @@ class PwUserCreate extends PwForm<"/api/v1/users/create-or-update"> {
                         initial: value?.data,
                         resettable: value !== undefined,
                       })}
-                      ${pwInputCheckbox<"/api/v1/users/create-or-update">({
+                      ${pwInputCheckbox<"/api/v1/users/create-or-update", boolean>({
                         url: this.url,
                         type: "checkbox",
                         defaultValue: false,

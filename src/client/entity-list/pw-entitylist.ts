@@ -249,7 +249,7 @@ export class PwEntityList<
 
           <div class="row justify-content-end">
             <div class="col-4">
-              ${pwInputSelect<P, number>({
+              ${pwInputSelect<P, false, number>({
                 url: this.url,
                 label: "Elemente pro Seite",
                 name: ["paginationLimit"],
