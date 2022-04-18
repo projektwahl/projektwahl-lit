@@ -125,7 +125,7 @@ class PwLogin extends PwForm<"/api/v1/login"> {
               >
               <h3 class="text-center">${msg("Login as guest")}</h3>
 
-              ${pwInputText<"/api/v1/login", string>({
+              ${pwInputText<"/api/v1/login", false, string>({
                 url: this.url,
                 type: "text",
                 autocomplete: "username",
@@ -137,7 +137,7 @@ class PwLogin extends PwForm<"/api/v1/login"> {
                 defaultValue: "",
                 resettable: false,
               })}
-              ${pwInputText<"/api/v1/login", string>({
+              ${pwInputText<"/api/v1/login", false, string>({
                 url: this.url,
                 type: "password",
                 label: msg("Password"),

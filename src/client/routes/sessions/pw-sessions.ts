@@ -121,7 +121,7 @@ export class PwSessions<X extends string> extends PwEntityList<
 
         <tr>
           <th scope="col">
-            ${pwInputNumber<"/api/v1/sessions", number | null>({
+            ${pwInputNumber<"/api/v1/sessions", false, number | null>({
               enabled: true,
               url: this.url,
               label: null,
