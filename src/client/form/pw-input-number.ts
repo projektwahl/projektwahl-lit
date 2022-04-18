@@ -84,8 +84,9 @@ export function pwInputNumber<
 
 export class PwInputNumber<
   P extends keyof typeof routes,
+  RESETTABLE extends boolean,
   T extends number | undefined | null
-> extends PwInput<P, T, HTMLInputElement> {
+> extends PwInput<P, T, RESETTABLE, number, HTMLInputElement> {
   get inner() {
     return html`${
       this.type !== "checkbox" && this.label !== null
@@ -170,7 +171,7 @@ export class PwInputNumber<
   }
 
 
-  
+
   mypwinputchangeDispatcher = () => {
     if (!this.input.value) {
       throw new Error();

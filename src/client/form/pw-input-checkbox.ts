@@ -79,9 +79,12 @@ export function pwInputCheckbox<P extends keyof typeof routes>(
   ></pw-input-checkbox>`;
 }
 
-export class PwInputCheckbox<P extends keyof typeof routes> extends PwInput<
+export class PwInputCheckbox<P extends keyof typeof routes, RESETTABLE extends boolean,
+> extends PwInput<
   P,
   boolean | undefined,
+  RESETTABLE,
+  boolean,
   HTMLInputElement
 > {
   static override get properties() {

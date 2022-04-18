@@ -82,6 +82,8 @@ export function pwInputFile<P extends keyof typeof routes>(
 export class PwInputFile<P extends keyof typeof routes> extends PwInput<
   P,
   Promise<string> | undefined,
+  false,
+  string,
   HTMLInputElement
 > {
 
@@ -168,7 +170,7 @@ export class PwInputFile<P extends keyof typeof routes> extends PwInput<
   }`
   }
 
-  
+
   mypwinputchangeDispatcher = () => {
     if (!this.input.value) {
       throw new Error();

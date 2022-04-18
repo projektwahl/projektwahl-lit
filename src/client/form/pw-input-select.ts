@@ -105,8 +105,9 @@ export function pwInputSelect<
 
 export class PwInputSelect<
   P extends keyof typeof routes,
+  RESETTABLE extends boolean,
   T extends string | number | undefined
-> extends PwInput<P, T, HTMLSelectElement> {
+> extends PwInput<P, T, RESETTABLE, string, HTMLSelectElement> {
   get inner() {
     return html`${
       this.type !== "checkbox" && this.label !== null
@@ -191,7 +192,7 @@ export class PwInputSelect<
   }
 
 
-  
+
   mypwinputchangeDispatcher = () => {
     if (!this.input.value) {
       throw new Error();
