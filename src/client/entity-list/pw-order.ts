@@ -106,6 +106,8 @@ export class PwOrder<
 > extends PwInput<
   P,
   Array<z.infer<typeof entityRoutes[P]["request"]>["sorting"][number]>,
+  false,
+  unknown,
   HTMLButtonElement
 > {
   static override get properties() {
@@ -206,6 +208,10 @@ export class PwOrder<
       // in case this is an update set the value to undefined as it wasn't changed yet.
       this.set(this.pwForm.formData, this.get(this.initial));
     }
+  }
+
+  get inner() {
+    throw new Error("not implemented")
   }
 
   override render() {

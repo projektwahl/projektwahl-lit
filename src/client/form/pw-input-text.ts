@@ -45,7 +45,6 @@ export function pwInputText<
     | "url"
     | "get"
     | "set"
-    | "options"
     | "task"
     | "resettable"
   >
@@ -55,7 +54,6 @@ export function pwInputText<
     enabled,
     initial,
     label,
-    options,
     name,
     get,
     set,
@@ -77,7 +75,6 @@ export function pwInputText<
     .set=${set}
     .url=${url}
     .name=${name}
-    .options=${options}
     autocomplete=${ifDefined(autocomplete)}
     .task=${task}
     .initial=${initial}

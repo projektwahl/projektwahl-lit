@@ -45,7 +45,6 @@ export function pwInputNumber<
     | "url"
     | "get"
     | "set"
-    | "options"
     | "task"
     | "resettable"
   >
@@ -55,7 +54,6 @@ export function pwInputNumber<
     enabled,
     initial,
     label,
-    options,
     name,
     get,
     set,
@@ -77,7 +75,6 @@ export function pwInputNumber<
     .set=${set}
     .url=${url}
     .name=${name}
-    .options=${options}
     autocomplete=${ifDefined(autocomplete)}
     .task=${task}
     .initial=${initial}
@@ -137,7 +134,7 @@ export class PwInputNumber<
       throw new Error();
     }
 
-    this.set(this.pwForm.formData, this.input.value.value);
+    this.set(this.pwForm.formData, this.input.value.valueAsNumber);
 
     this.input.value?.dispatchEvent(
       new CustomEvent("refreshentitylist", {

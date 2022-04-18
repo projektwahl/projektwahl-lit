@@ -44,7 +44,6 @@ export function pwInputCheckbox<
     | "url"
     | "get"
     | "set"
-    | "options"
     | "task"
     | "resettable"
   >
@@ -54,7 +53,6 @@ export function pwInputCheckbox<
     enabled,
     initial,
     label,
-    options,
     name,
     get,
     set,
@@ -76,7 +74,6 @@ export function pwInputCheckbox<
     .set=${set}
     .url=${url}
     .name=${name}
-    .options=${options}
     autocomplete=${ifDefined(autocomplete)}
     .task=${task}
     .initial=${initial}

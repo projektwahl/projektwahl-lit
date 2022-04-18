@@ -41,7 +41,6 @@ export function pwInputFile<P extends keyof typeof routes>(
     | "url"
     | "get"
     | "set"
-    | "options"
     | "task"
     | "resettable"
   >
@@ -51,7 +50,6 @@ export function pwInputFile<P extends keyof typeof routes>(
     enabled,
     initial,
     label,
-    options,
     name,
     get,
     set,
@@ -73,7 +71,6 @@ export function pwInputFile<P extends keyof typeof routes>(
     .set=${set}
     .url=${url}
     .name=${name}
-    .options=${options}
     autocomplete=${ifDefined(autocomplete)}
     .task=${task}
     .initial=${initial}
