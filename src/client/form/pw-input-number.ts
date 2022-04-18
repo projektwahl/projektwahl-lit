@@ -102,7 +102,6 @@ export class PwInputNumber<
     <div class="input-group">
       <input
         ${ref(this.input)}
-        rows="6"
         type=${ifDefined(this.type !== "textarea" ? this.type : undefined)}
         name=${this.name}
         .value=${ifDefined(
@@ -110,12 +109,7 @@ export class PwInputNumber<
             ? live(this.get(this.pwForm.formData))
             : undefined
         )}
-        .checked=${ifDefined(
-          this.type === "checkbox" ? live(this.get(this.pwForm.formData) ) : undefined
-        )}
-        class="${
-          this.type === "checkbox" ? "form-check-input" : "form-control"
-        } ${this.task.render({
+        class="form-control ${this.task.render({
     pending: () => noChange,
     complete: (v) =>
       !v.success &&
@@ -139,13 +133,7 @@ export class PwInputNumber<
             }))
         }
       ></input>
-  ${
-    this.type === "checkbox" && this.label !== null
-      ? html`<label for=${this.randomId} class="form-check-label"
-          >${this.label}</label
-        >`
-      : undefined
-  }   ${this.inner2}    </div>
+   ${this.inner2}    </div>
   `
   }
 

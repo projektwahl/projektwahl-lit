@@ -101,20 +101,10 @@ export class PwInputCheckbox<P extends keyof typeof routes, RESETTABLE extends b
     <div>
       <input
         ${ref(this.input)}
-        rows="6"
-        type=${ifDefined(this.type !== "textarea" ? this.type : undefined)}
+        type=${this.type}
         name=${this.name}
-        .value=${ifDefined(
-          this.type !== "checkbox" && this.type !== "select"
-            ? live(this.get(this.pwForm.formData))
-            : undefined
-        )}
-        .checked=${ifDefined(
-          this.type === "checkbox" ? live(this.get(this.pwForm.formData) ) : undefined
-        )}
-        class="${
-          this.type === "checkbox" ? "form-check-input" : "form-control"
-        } ${this.task.render({
+        .checked=${live(this.get(this.pwForm.formData) )}
+        class="form-check-input ${this.task.render({
     pending: () => noChange,
     complete: (v) =>
       !v.success &&
@@ -139,7 +129,7 @@ export class PwInputCheckbox<P extends keyof typeof routes, RESETTABLE extends b
         }
       ></input>
   ${
-    this.type === "checkbox" && this.label !== null
+    this.label !== null
       ? html`<label for=${this.randomId} class="form-check-label"
           >${this.label}</label
         >`
