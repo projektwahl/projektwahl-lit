@@ -105,16 +105,16 @@ export class PwInputText<
         name=${this.name}
         .value=${live(this.get(this.pwForm.formData))}
         class="form-control ${this.task.render({
-    pending: () => noChange,
-    complete: (v) =>
-      !v.success &&
-      v.error.issues.find(
-        (i) => JSON.stringify(i.path) == JSON.stringify(this.name)
-      ) !== undefined
-        ? "is-invalid"
-        : "is-valid",
-    initial: () => "",
-  })}"
+          pending: () => noChange,
+          complete: (v) =>
+            !v.success &&
+            v.error.issues.find(
+              (i) => JSON.stringify(i.path) == JSON.stringify(this.name)
+            ) !== undefined
+              ? "is-invalid"
+              : "is-valid",
+          initial: () => "",
+        })}"
         id=${this.randomId}
         aria-describedby="${this.randomId}-feedback"
         autocomplete=${ifDefined(this.autocomplete)}
@@ -129,10 +129,8 @@ export class PwInputText<
         }
       ></input>
     ${this.inner2}  </div>
-  `
+  `;
   }
-
-
 
   mypwinputchangeDispatcher = () => {
     if (!this.input.value) {

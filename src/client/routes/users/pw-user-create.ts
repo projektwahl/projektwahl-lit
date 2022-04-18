@@ -345,7 +345,8 @@ class PwUserCreate extends PwForm<"/api/v1/users/create-or-update"> {
                             label: msg("Age"),
                             name: [0, "age"],
                             get: (o) => String(o[0].age ?? ""),
-                            set: (o, v) => (o[0].age = v === "" ? null : Number(v)),
+                            set: (o, v) =>
+                              (o[0].age = v === "" ? null : Number(v)),
                             task: this._task,
                             initial: value?.data,
                             resettable: value !== undefined,
@@ -377,8 +378,9 @@ class PwUserCreate extends PwForm<"/api/v1/users/create-or-update"> {
                         disabled: this.disabled,
                         label: msg("Away"),
                         name: [0, "away"],
-                        get: (o) => String(o[0].away ?? value?.data[0].away ?? false),
-                        set: (o, v) => (o[0].away =  v),
+                        get: (o) =>
+                          String(o[0].away ?? value?.data[0].away ?? false),
+                        set: (o, v) => (o[0].away = v),
                         task: this._task,
                         initial: value?.data,
                         resettable: value !== undefined,

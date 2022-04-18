@@ -94,12 +94,17 @@ export abstract class PwInput<
   /**
    * Extracts the value from the routes request data.
    */
-  get!: (o: z.infer<typeof routes[P]["request"]>) => [RESETTABLE] extends [true] ? (Q | undefined) : Q;
+  get!: (
+    o: z.infer<typeof routes[P]["request"]>
+  ) => [RESETTABLE] extends [true] ? Q | undefined : Q;
 
   /**
    * Sets the value in the routes request data.
    */
-  set!: (o: z.infer<typeof routes[P]["request"]>, v: [RESETTABLE] extends [true] ? (Q | undefined) : Q) => void;
+  set!: (
+    o: z.infer<typeof routes[P]["request"]>,
+    v: [RESETTABLE] extends [true] ? Q | undefined : Q
+  ) => void;
 
   // TODO FIXME maybe merge these two?
   disabled?: boolean = false;
@@ -205,9 +210,7 @@ export abstract class PwInput<
       this.set(
         this.pwForm.formData,
         // @ts-expect-error tmp error
-        this.resettable
-          ? undefined
-          : this.get(this.pwForm.formData)
+        this.resettable ? undefined : this.get(this.pwForm.formData)
       );
     }
   }
@@ -215,61 +218,56 @@ export abstract class PwInput<
   abstract get inner(): TemplateResult;
 
   get inner2() {
-    return html`${
-      this.resettable && !this.disabled
-        ? html`<button
-            @click=${() => {
-              this.set(
-                this.pwForm.formData,
-                this.initial
-              );
-              this.requestUpdate();
-            }}
-            class="btn btn-outline-secondary"
-            type="button"
+    return html`${this.resettable && !this.disabled
+      ? html`<button
+          @click=${() => {
+            this.set(this.pwForm.formData, this.initial);
+            this.requestUpdate();
+          }}
+          class="btn btn-outline-secondary"
+          type="button"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="16"
+            height="16"
+            fill="currentColor"
+            class="bi bi-arrow-counterclockwise"
+            viewBox="0 0 16 16"
           >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              width="16"
-              height="16"
-              fill="currentColor"
-              class="bi bi-arrow-counterclockwise"
-              viewBox="0 0 16 16"
+            <path
+              fill-rule="evenodd"
+              d="M8 3a5 5 0 1 1-4.546 2.914.5.5 0 0 0-.908-.417A6 6 0 1 0 8 2v1z"
+            />
+            <path
+              d="M8 4.466V.534a.25.25 0 0 0-.41-.192L5.23 2.308a.25.25 0 0 0 0 .384l2.36 1.966A.25.25 0 0 0 8 4.466z"
+            />
+          </svg>
+        </button>`
+      : undefined}
+    ${this.task.render({
+      complete: (v) => {
+        if (!v.success) {
+          if (
+            v.error.issues.find(
+              (i) => JSON.stringify(i.path) == JSON.stringify(this.name)
+            ) !== undefined
+          ) {
+            return html` <div
+              id="${this.randomId}-feedback"
+              class="invalid-feedback"
             >
-              <path
-                fill-rule="evenodd"
-                d="M8 3a5 5 0 1 1-4.546 2.914.5.5 0 0 0-.908-.417A6 6 0 1 0 8 2v1z"
-              />
-              <path
-                d="M8 4.466V.534a.25.25 0 0 0-.41-.192L5.23 2.308a.25.25 0 0 0 0 .384l2.36 1.966A.25.25 0 0 0 8 4.466z"
-              />
-            </svg>
-          </button>`
-        : undefined
-    }
-        ${this.task.render({
-          complete: (v) => {
-            if (!v.success) {
-              if (
-                v.error.issues.find(
-                  (i) => JSON.stringify(i.path) == JSON.stringify(this.name)
-                ) !== undefined
-              ) {
-                return html` <div
-                  id="${this.randomId}-feedback"
-                  class="invalid-feedback"
-                >
-                  ${v.error.issues.find(
-                    (i) => JSON.stringify(i.path) == JSON.stringify(this.name)
-                  )?.message}
-                </div>`;
-              }
-              return undefined;
-            }
-          },
-          initial: () => undefined,
-          pending: () => noChange,
-        })}`
+              ${v.error.issues.find(
+                (i) => JSON.stringify(i.path) == JSON.stringify(this.name)
+              )?.message}
+            </div>`;
+          }
+          return undefined;
+        }
+      },
+      initial: () => undefined,
+      pending: () => noChange,
+    })}`;
   }
 
   override render() {
@@ -283,28 +281,19 @@ export abstract class PwInput<
       // in case this is an update set the value to undefined as it wasn't changed yet.
       if (this.resettable) {
         // @ts-expect-error bruh, known issue https://github.com/Microsoft/TypeScript/issues/24929
-        const theUndefined: [RESETTABLE] extends [true] ? undefined : never = undefined;
+        const theUndefined: [RESETTABLE] extends [true] ? undefined : never =
+          undefined;
 
-        this.set(
-          this.pwForm.formData,
-          theUndefined
-        );
+        this.set(this.pwForm.formData, theUndefined);
       } else {
-        this.set(
-          this.pwForm.formData,
-          this.get(this.initial)
-        );
+        this.set(this.pwForm.formData, this.get(this.initial));
       }
-      
     }
 
     return html`
-      
       <div class="col mb-3">
-      ${this.inner}
-    
-      ${
-        this.autocomplete === "new-password"
+        ${this.inner}
+        ${this.autocomplete === "new-password"
           ? html`<div id="passwordHelp" class="form-text">
               <a
                 target="_blank"
@@ -324,9 +313,7 @@ export abstract class PwInput<
                 >${msg("Bitwarden")}</a
               >
             </div>`
-          : undefined
-      }
-      
+          : undefined}
       </div>
     `;
   }

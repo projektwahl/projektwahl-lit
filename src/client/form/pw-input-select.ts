@@ -112,58 +112,57 @@ export class PwInputSelect<
   T extends string | number | undefined
 > extends PwInput<P, T, RESETTABLE, string, HTMLSelectElement> {
   get inner() {
-    return html`${
-       this.label !== null
+    return html`${this.label !== null
         ? html`<label for=${this.randomId} class="form-label"
             >${this.label}:</label
           >`
-        : undefined
-    }
-    <div class="input-group">
-      <select
-        ${ref(this.input)}
-        type=${this.type}
-        name=${this.name}
-        class="form-control ${this.task.render({
-    pending: () => noChange,
-    complete: (v) =>
-      !v.success &&
-      v.error.issues.find(
-        (i) => JSON.stringify(i.path) == JSON.stringify(this.name)
-      ) !== undefined
-        ? "is-invalid"
-        : "is-valid",
-    initial: () => "",
-  })}"
-        id=${this.randomId}
-        aria-describedby="${this.randomId}-feedback"
-        autocomplete=${ifDefined(this.autocomplete)}
-        ?disabled=${
-          !this.enabled &&
+        : undefined}
+      <div class="input-group">
+        <select
+          ${ref(this.input)}
+          type=${this.type}
+          name=${this.name}
+          class="form-control ${this.task.render({
+            pending: () => noChange,
+            complete: (v) =>
+              !v.success &&
+              v.error.issues.find(
+                (i) => JSON.stringify(i.path) == JSON.stringify(this.name)
+              ) !== undefined
+                ? "is-invalid"
+                : "is-valid",
+            initial: () => "",
+          })}"
+          id=${this.randomId}
+          aria-describedby="${this.randomId}-feedback"
+          autocomplete=${ifDefined(this.autocomplete)}
+          ?disabled=${!this.enabled &&
           (this.disabled ||
             this.task.render({
               complete: () => false,
               pending: () => true,
               initial: () => false,
-            }))
-        }
-      >${repeat(
-              this.options,
-              (o) => o.value,
-              (o) =>
-                html`<option
-                  .selected=${/* maybe do this in the subclass and then maybe we can type it better */live(this.get(this.pwForm.formData) === o.value)}
-                  .value=${o.value}
-                >
-                  ${o.text}
-                </option>`
-            )
-      }</select>
-   ${this.inner2}    </div>
-  `
+            }))}
+        >
+          ${repeat(
+            this.options,
+            (o) => o.value,
+            (o) =>
+              html`<option
+                .selected=${
+                  /* maybe do this in the subclass and then maybe we can type it better */ live(
+                    this.get(this.pwForm.formData) === o.value
+                  )
+                }
+                .value=${o.value}
+              >
+                ${o.text}
+              </option>`
+          )}
+        </select>
+        ${this.inner2}
+      </div> `;
   }
-
-
 
   mypwinputchangeDispatcher = () => {
     if (!this.input.value) {
@@ -171,9 +170,12 @@ export class PwInputSelect<
     }
     const input = this.input.value;
 
-    this.set(this.pwForm.formData, input.selectedIndex == -1
-      ? null
-      : this.options?.find((v) => v.value == input.value)?.value);
+    this.set(
+      this.pwForm.formData,
+      input.selectedIndex == -1
+        ? null
+        : this.options?.find((v) => v.value == input.value)?.value
+    );
 
     this.input.value?.dispatchEvent(
       new CustomEvent("refreshentitylist", {

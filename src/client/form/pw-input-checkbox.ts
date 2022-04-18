@@ -28,7 +28,10 @@ import type { routes } from "../../lib/routes.js";
 import { PwInput } from "./pw-input.js";
 
 // workaround see https://github.com/runem/lit-analyzer/issues/149#issuecomment-1006162839
-export function pwInputCheckbox<P extends keyof typeof routes, RESETTABLE extends boolean,>(
+export function pwInputCheckbox<
+  P extends keyof typeof routes,
+  RESETTABLE extends boolean
+>(
   props: Pick<
     PwInputCheckbox<P, RESETTABLE>,
     | "type"
@@ -81,7 +84,9 @@ export function pwInputCheckbox<P extends keyof typeof routes, RESETTABLE extend
   ></pw-input-checkbox>`;
 }
 
-export class PwInputCheckbox<P extends keyof typeof routes, RESETTABLE extends boolean,
+export class PwInputCheckbox<
+  P extends keyof typeof routes,
+  RESETTABLE extends boolean
 > extends PwInput<
   P,
   boolean | undefined,
@@ -102,18 +107,18 @@ export class PwInputCheckbox<P extends keyof typeof routes, RESETTABLE extends b
         ${ref(this.input)}
         type=${this.type}
         name=${this.name}
-        .checked=${live(this.get(this.pwForm.formData) )}
+        .checked=${live(this.get(this.pwForm.formData))}
         class="form-check-input ${this.task.render({
-    pending: () => noChange,
-    complete: (v) =>
-      !v.success &&
-      v.error.issues.find(
-        (i) => JSON.stringify(i.path) == JSON.stringify(this.name)
-      ) !== undefined
-        ? "is-invalid"
-        : "is-valid",
-    initial: () => "",
-  })}"
+          pending: () => noChange,
+          complete: (v) =>
+            !v.success &&
+            v.error.issues.find(
+              (i) => JSON.stringify(i.path) == JSON.stringify(this.name)
+            ) !== undefined
+              ? "is-invalid"
+              : "is-valid",
+          initial: () => "",
+        })}"
         id=${this.randomId}
         aria-describedby="${this.randomId}-feedback"
         autocomplete=${ifDefined(this.autocomplete)}
@@ -134,7 +139,7 @@ export class PwInputCheckbox<P extends keyof typeof routes, RESETTABLE extends b
         >`
       : undefined
   }  ${this.inner2}     </div>
-  `
+  `;
   }
 
   mypwinputchangeDispatcher = () => {
