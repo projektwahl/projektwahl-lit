@@ -24,7 +24,6 @@ import { html, noChange } from "lit";
 import { ifDefined } from "lit/directives/if-defined.js";
 import { live } from "lit/directives/live.js";
 import { ref } from "lit/directives/ref.js";
-import { literal } from "lit/static-html.js";
 import type { routes } from "../../lib/routes.js";
 import { PwInput } from "./pw-input.js";
 

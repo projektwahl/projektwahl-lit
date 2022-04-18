@@ -24,7 +24,6 @@ import { html, noChange } from "lit";
 import { ifDefined } from "lit/directives/if-defined.js";
 import { live } from "lit/directives/live.js";
 import { ref } from "lit/directives/ref.js";
-import { literal } from "lit/static-html.js";
 import type { routes } from "../../lib/routes.js";
 import { PwInput } from "./pw-input.js";
 
@@ -102,13 +101,9 @@ export class PwInputNumber<
     <div class="input-group">
       <input
         ${ref(this.input)}
-        type=${ifDefined(this.type !== "textarea" ? this.type : undefined)}
+        type=${this.type}
         name=${this.name}
-        .value=${ifDefined(
-          this.type !== "checkbox" && this.type !== "select"
-            ? live(this.get(this.pwForm.formData))
-            : undefined
-        )}
+        .value=${live(this.get(this.pwForm.formData))}
         class="form-control ${this.task.render({
     pending: () => noChange,
     complete: (v) =>

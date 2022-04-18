@@ -25,7 +25,6 @@ import { ifDefined } from "lit/directives/if-defined.js";
 import type { routes } from "../../lib/routes.js";
 import { PwInput } from "./pw-input.js";
 import { Ref, ref } from "lit/directives/ref.js";
-import { literal } from "lit/static-html.js";
 import { live } from "lit/directives/live.js";
 import { repeat } from "lit/directives/repeat.js";
 
@@ -123,13 +122,8 @@ export class PwInputSelect<
     <div class="input-group">
       <select
         ${ref(this.input)}
-        type=${ifDefined(this.type !== "textarea" ? this.type : undefined)}
+        type=${this.type}
         name=${this.name}
-        .value=${ifDefined(
-          this.type !== "checkbox" && this.type !== "select"
-            ? live(this.get(this.pwForm.formData))
-            : undefined
-        )}
         class="form-control ${this.task.render({
     pending: () => noChange,
     complete: (v) =>
