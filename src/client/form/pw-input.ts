@@ -86,7 +86,7 @@ export abstract class PwInput<
    * Extracts the value from the routes request data.
    */
   get!: (
-    o: z.infer<typeof routes[P]["request"]>
+    o: z.infer<typeof routes[P]["request"]> | undefined // maybe no initial value
   ) => [RESETTABLE] extends [true] ? Q | undefined : Q;
 
   /**
@@ -209,7 +209,7 @@ export abstract class PwInput<
     return html`${this.resettable && !this.disabled
       ? html`<button
           @click=${() => {
-            this.set(this.pwForm.formData, this.initial);
+            this.set(this.pwForm.formData, this.get(this.initial));
             this.requestUpdate();
           }}
           class="btn btn-outline-secondary"

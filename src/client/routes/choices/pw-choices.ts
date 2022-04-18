@@ -263,7 +263,6 @@ class PwChoices<X extends string> extends PwEntityList<"/api/v1/choices", X> {
               set: (o, v) => (o.filters.id = v),
               task: this._task,
               type: "number",
-              defaultValue: undefined,
               initial,
               resettable: false,
             })}

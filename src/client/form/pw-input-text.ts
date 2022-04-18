@@ -86,7 +86,7 @@ export class PwInputText<
   P extends keyof typeof routes,
   RESETTABLE extends boolean,
   T extends string | undefined | null
-> extends PwInput<P, T, RESETTABLE, string, HTMLInputElement> {
+> extends PwInput<P, T, RESETTABLE, string | undefined, HTMLInputElement> {
   get inner() {
     return html`${
       this.label !== null
