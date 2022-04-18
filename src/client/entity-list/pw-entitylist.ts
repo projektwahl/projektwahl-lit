@@ -253,7 +253,7 @@ export class PwEntityList<
                 url: this.url,
                 label: "Elemente pro Seite",
                 name: ["paginationLimit"],
-                get: (o) => String(o.paginationLimit),
+                get: (o) => String(o?.paginationLimit ?? 10),
                 set: (o, v) => {
                   o.paginationLimit = Number(v);
                 },

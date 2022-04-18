@@ -215,7 +215,7 @@ class PwChoices<X extends string> extends PwEntityList<"/api/v1/choices", X> {
               prefix: this.prefix,
               title: msg("ID"),
               value: null,
-              get: (o) => o.sorting,
+              get: (o) => o?.sorting ?? [],
               set: (o, v) => (o.sorting = v),
               initial,
             })}
@@ -229,7 +229,7 @@ class PwChoices<X extends string> extends PwEntityList<"/api/v1/choices", X> {
               prefix: this.prefix,
               title: msg("Title"),
               value: null,
-              get: (o) => o.sorting,
+              get: (o) => o?.sorting ?? [],
               set: (o, v) => (o.sorting = v),
               initial,
             })}
@@ -245,7 +245,7 @@ class PwChoices<X extends string> extends PwEntityList<"/api/v1/choices", X> {
               prefix: this.prefix,
               title: msg("Rank"),
               value: null,
-              get: (o) => o.sorting,
+              get: (o) => o?.sorting ?? [],
               set: (o, v) => (o.sorting = v),
               initial,
             })}
@@ -259,7 +259,7 @@ class PwChoices<X extends string> extends PwEntityList<"/api/v1/choices", X> {
               url: this.url,
               label: null,
               name: ["filters", "id"],
-              get: (o) => o.filters.id,
+              get: (o) => o?.filters.id,
               set: (o, v) => (o.filters.id = v),
               task: this._task,
               type: "number",
@@ -274,12 +274,11 @@ class PwChoices<X extends string> extends PwEntityList<"/api/v1/choices", X> {
               url: this.url,
               label: null,
               name: ["filters", "title"],
-              get: (o) => o.filters.title,
+              get: (o) => o?.filters.title,
               set: (o, v) => (o.filters.title = v),
               task: this._task,
               type: "text",
               initial,
-              defaultValue: "",
               resettable: false,
             })}
           </th>
@@ -292,7 +291,7 @@ class PwChoices<X extends string> extends PwEntityList<"/api/v1/choices", X> {
               url: this.url,
               label: null,
               name: ["filters", "rank"],
-              get: (o) => o.filters.rank,
+              get: (o) => o?.filters.rank,
               set: (o, v) => (o.filters.rank = v),
               task: this._task,
               type: "number",

@@ -131,7 +131,7 @@ class PwLogin extends PwForm<"/api/v1/login"> {
                 autocomplete: "username",
                 label: msg("Username"),
                 name: ["username"],
-                get: (o) => o.username,
+                get: (o) => o?.username,
                 set: (o, v) => (o.username = v),
                 task: this._task,
                 resettable: false,
