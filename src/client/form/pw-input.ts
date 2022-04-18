@@ -21,7 +21,7 @@ SPDX-License-Identifier: AGPL-3.0-or-later
 SPDX-FileCopyrightText: 2021 Moritz Hedtke <Moritz.Hedtke@t-online.de>
 */
 import { html, literal } from "lit/static-html.js";
-import { noChange } from "lit";
+import { noChange, TemplateResult } from "lit";
 import { ifDefined } from "lit/directives/if-defined.js";
 import { msg } from "@lit/localize";
 import { createRef, Ref, ref } from "lit/directives/ref.js";
@@ -215,6 +215,8 @@ export abstract class PwInput<
     }
   }
 
+  abstract get inner(): TemplateResult;
+
   override render() {
     if (this.label === undefined || this.task === undefined) {
       throw new Error(msg("component not fully initialized"));
@@ -244,86 +246,7 @@ export abstract class PwInput<
     return html`
       
       <div class="col mb-3">
-      ${
-        this.type !== "checkbox" && this.label !== null
-          ? html`<label for=${this.randomId} class="form-label"
-              >${this.label}:</label
-            >`
-          : undefined
-      }
-      <div class="${this.type !== "checkbox" ? "input-group" : ""}">
-        <${
-          this.type === "select"
-            ? literal`select`
-            : this.type === "textarea"
-            ? literal`textarea`
-            : literal`input`
-        }
-          ${ref(this.input)}
-          rows="6"
-          type=${ifDefined(this.type !== "textarea" ? this.type : undefined)}
-          name=${this.name}
-          .value=${ifDefined(
-            this.type !== "checkbox" && this.type !== "select"
-              ? live(this.get(this.pwForm.formData))
-              : undefined
-          )}
-          .checked=${ifDefined(
-            this.type === "checkbox" ? live(this.get(this.pwForm.formData) ) : undefined
-          )}
-          class="${
-            this.type === "checkbox" ? "form-check-input" : "form-control"
-          } ${this.task.render({
-      pending: () => noChange,
-      complete: (v) =>
-        !v.success &&
-        v.error.issues.find(
-          (i) => JSON.stringify(i.path) == JSON.stringify(this.name)
-        ) !== undefined
-          ? "is-invalid"
-          : "is-valid",
-      initial: () => "",
-    })}"
-          id=${this.randomId}
-          aria-describedby="${this.randomId}-feedback"
-          autocomplete=${ifDefined(this.autocomplete)}
-          ?disabled=${
-            !this.enabled &&
-            (this.disabled ||
-              this.task.render({
-                complete: () => false,
-                pending: () => true,
-                initial: () => false,
-              }))
-          }
-        >${
-          this.type === "select" && this.options
-            ? repeat(
-                this.options,
-                (o) => o.value,
-                (o) =>
-                  html`<option
-                    .selected=${/* maybe do this in the subclass and then maybe we can type it better */live(this.get(this.pwForm.formData) === o.value)}
-                    .value=${o.value}
-                  >
-                    ${o.text}
-                  </option>`
-              )
-            : undefined
-        }</${
-      this.type === "select"
-        ? literal`select`
-        : this.type === "textarea"
-        ? literal`textarea`
-        : literal`input`
-    }>
-    ${
-      this.type === "checkbox" && this.label !== null
-        ? html`<label for=${this.randomId} class="form-check-label"
-            >${this.label}</label
-          >`
-        : undefined
-    }
+      ${this.inner}
     ${
       this.resettable && !this.disabled
         ? html`<button
