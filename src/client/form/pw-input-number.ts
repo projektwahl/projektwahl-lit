@@ -31,10 +31,11 @@ import { PwInput } from "./pw-input.js";
 // workaround see https://github.com/runem/lit-analyzer/issues/149#issuecomment-1006162839
 export function pwInputNumber<
   P extends keyof typeof routes,
+  RESETTABLE extends boolean,
   T extends number | undefined | null
 >(
   props: Pick<
-    PwInputNumber<P, T>,
+    PwInputNumber<P, RESETTABLE, T>,
     | "type"
     | "autocomplete"
     | "disabled"

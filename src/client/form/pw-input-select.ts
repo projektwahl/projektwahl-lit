@@ -32,10 +32,11 @@ import { repeat } from "lit/directives/repeat.js";
 // workaround see https://github.com/runem/lit-analyzer/issues/149#issuecomment-1006162839
 export function pwInputSelect<
   P extends keyof typeof routes,
+  RESETTABLE extends boolean,
   T extends string | number | undefined
 >(
   props: Pick<
-    PwInputSelect<P, T>,
+    PwInputSelect<P, RESETTABLE, T>,
     | "type"
     | "autocomplete"
     | "disabled"
@@ -49,7 +50,7 @@ export function pwInputSelect<
     | "options"
     | "task"
     | "resettable"
-  > & { pwRef?: Ref<PwInputSelect<P, T>> }
+  > & { pwRef?: Ref<PwInputSelect<P, RESETTABLE, T>> }
 ) {
   const {
     disabled,

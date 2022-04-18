@@ -29,9 +29,9 @@ import type { routes } from "../../lib/routes.js";
 import { PwInput } from "./pw-input.js";
 
 // workaround see https://github.com/runem/lit-analyzer/issues/149#issuecomment-1006162839
-export function pwInputCheckbox<P extends keyof typeof routes>(
+export function pwInputCheckbox<P extends keyof typeof routes, RESETTABLE extends boolean,>(
   props: Pick<
-    PwInputCheckbox<P>,
+    PwInputCheckbox<P, RESETTABLE>,
     | "type"
     | "autocomplete"
     | "disabled"
