@@ -111,6 +111,24 @@ export class PwInputSelect<
   RESETTABLE extends boolean,
   T extends string | number | undefined
 > extends PwInput<P, T, RESETTABLE, string, HTMLSelectElement> {
+
+  static override get properties() {
+    return {
+      ...super.properties,
+      options: {
+        attribute: false,
+        hasChanged: (
+          newVal: (string | number)[],
+          oldVal: (string | number)[]
+        ) => {
+          return JSON.stringify(newVal) !== JSON.stringify(oldVal);
+        },
+      },
+    }
+  }
+
+  options!: { value: T; text: string }[];
+
   get inner() {
     return html`${this.label !== null
         ? html`<label for=${this.randomId} class="form-label"
@@ -168,13 +186,10 @@ export class PwInputSelect<
     if (!this.input.value) {
       throw new Error();
     }
-    const input = this.input.value;
 
     this.set(
       this.pwForm.formData,
-      input.selectedIndex == -1
-        ? null
-        : this.options?.find((v) => v.value == input.value)?.value
+      this.input.value.value
     );
 
     this.input.value?.dispatchEvent(

@@ -51,15 +51,6 @@ export abstract class PwInput<
         },
       },
       type: { type: String },
-      options: {
-        attribute: false,
-        hasChanged: (
-          newVal: (string | number)[],
-          oldVal: (string | number)[]
-        ) => {
-          return JSON.stringify(newVal) !== JSON.stringify(oldVal);
-        },
-      },
       autocomplete: { type: String },
       disabled: { type: Boolean },
       enabled: { type: Boolean },
@@ -156,9 +147,6 @@ export abstract class PwInput<
    * A reference to the input element.
    */
   input: Ref<I>;
-
-  // TODO FIXME
-  options?: { value: T; text: string }[];
 
   /**
    * The parent form.
