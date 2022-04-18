@@ -217,37 +217,8 @@ export abstract class PwInput<
 
   abstract get inner(): TemplateResult;
 
-  override render() {
-    if (this.label === undefined || this.task === undefined) {
-      throw new Error(msg("component not fully initialized"));
-    }
-
-    if (!this.hasUpdated) {
-      // TODO FIXME updated from above
-
-      // in case this is an update set the value to undefined as it wasn't changed yet.
-      if (this.resettable) {
-        // @ts-expect-error bruh, known issue https://github.com/Microsoft/TypeScript/issues/24929
-        const theUndefined: [RESETTABLE] extends [true] ? undefined : never = undefined;
-
-        this.set(
-          this.pwForm.formData,
-          theUndefined
-        );
-      } else {
-        this.set(
-          this.pwForm.formData,
-          this.get(this.initial)
-        );
-      }
-      
-    }
-
-    return html`
-      
-      <div class="col mb-3">
-      ${this.inner}
-    ${
+  get inner2() {
+    return html`${
       this.resettable && !this.disabled
         ? html`<button
             @click=${() => {
@@ -301,8 +272,40 @@ export abstract class PwInput<
           },
           initial: () => undefined,
           pending: () => noChange,
-        })}
-      </div>
+        })}`
+  }
+
+  override render() {
+    if (this.label === undefined || this.task === undefined) {
+      throw new Error(msg("component not fully initialized"));
+    }
+
+    if (!this.hasUpdated) {
+      // TODO FIXME updated from above
+
+      // in case this is an update set the value to undefined as it wasn't changed yet.
+      if (this.resettable) {
+        // @ts-expect-error bruh, known issue https://github.com/Microsoft/TypeScript/issues/24929
+        const theUndefined: [RESETTABLE] extends [true] ? undefined : never = undefined;
+
+        this.set(
+          this.pwForm.formData,
+          theUndefined
+        );
+      } else {
+        this.set(
+          this.pwForm.formData,
+          this.get(this.initial)
+        );
+      }
+      
+    }
+
+    return html`
+      
+      <div class="col mb-3">
+      ${this.inner}
+    
       ${
         this.autocomplete === "new-password"
           ? html`<div id="passwordHelp" class="form-text">

@@ -20,11 +20,14 @@ https://github.com/projektwahl/projektwahl-lit
 SPDX-License-Identifier: AGPL-3.0-or-later
 SPDX-FileCopyrightText: 2021 Moritz Hedtke <Moritz.Hedtke@t-online.de>
 */
-import { html } from "lit";
+import { html, noChange } from "lit";
 import { ifDefined } from "lit/directives/if-defined.js";
 import type { routes } from "../../lib/routes.js";
 import { PwInput } from "./pw-input.js";
 import { Ref, ref } from "lit/directives/ref.js";
+import { literal } from "lit/static-html";
+import { live } from "lit/directives/live";
+import { repeat } from "lit/directives/repeat";
 
 // workaround see https://github.com/runem/lit-analyzer/issues/149#issuecomment-1006162839
 export function pwInputSelect<
@@ -188,7 +191,8 @@ export class PwInputSelect<
           >${this.label}</label
         >`
       : undefined
-  }`
+  }   ${this.inner2}    </div>
+  `
   }
 
 
