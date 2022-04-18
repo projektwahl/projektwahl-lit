@@ -97,21 +97,9 @@ export class PwInputCheckbox<P extends keyof typeof routes, RESETTABLE extends b
   }
 
   get inner() {
-    return html`${
-      this.type !== "checkbox" && this.label !== null
-        ? html`<label for=${this.randomId} class="form-label"
-            >${this.label}:</label
-          >`
-        : undefined
-    }
-    <div class="${this.type !== "checkbox" ? "input-group" : ""}">
-      <${
-        this.type === "select"
-          ? literal`select`
-          : this.type === "textarea"
-          ? literal`textarea`
-          : literal`input`
-      }
+    return html`
+    <div>
+      <input
         ${ref(this.input)}
         rows="6"
         type=${ifDefined(this.type !== "textarea" ? this.type : undefined)}
@@ -149,13 +137,7 @@ export class PwInputCheckbox<P extends keyof typeof routes, RESETTABLE extends b
               initial: () => false,
             }))
         }
-      ></${
-    this.type === "select"
-      ? literal`select`
-      : this.type === "textarea"
-      ? literal`textarea`
-      : literal`input`
-  }>
+      ></input>
   ${
     this.type === "checkbox" && this.label !== null
       ? html`<label for=${this.randomId} class="form-check-label"
