@@ -253,9 +253,9 @@ export class PwEntityList<
                 url: this.url,
                 label: "Elemente pro Seite",
                 name: ["paginationLimit"],
-                get: (o) => o.paginationLimit,
+                get: (o) => String(o.paginationLimit),
                 set: (o, v) => {
-                  o.paginationLimit = v;
+                  o.paginationLimit = Number(v);
                 },
                 task: this._task,
                 type: "select",
@@ -278,7 +278,6 @@ export class PwEntityList<
                     value: 100,
                   },
                 ],
-                defaultValue: 10,
                 resettable: false,
               })}
             </div>

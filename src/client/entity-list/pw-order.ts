@@ -20,7 +20,7 @@ https://github.com/projektwahl/projektwahl-lit
 SPDX-License-Identifier: AGPL-3.0-or-later
 SPDX-FileCopyrightText: 2021 Moritz Hedtke <Moritz.Hedtke@t-online.de>
 */
-import { html } from "lit";
+import { html, TemplateResult } from "lit";
 import { HistoryController } from "../history-controller.js";
 import { msg, str } from "@lit/localize";
 import type { entityRoutes } from "../../lib/routes.js";
@@ -107,7 +107,7 @@ export class PwOrder<
   P,
   Array<z.infer<typeof entityRoutes[P]["request"]>["sorting"][number]>,
   false,
-  unknown,
+  entitiesType3[P],
   HTMLButtonElement
 > {
   static override get properties() {
@@ -210,8 +210,8 @@ export class PwOrder<
     }
   }
 
-  get inner() {
-    throw new Error("not implemented")
+  get inner(): TemplateResult {
+    throw new Error("not implemented");
   }
 
   override render() {

@@ -136,7 +136,6 @@ export class PwProjects<X extends string> extends PwEntityList<
               get: (o) => o.sorting,
               set: (o, v) => (o.sorting = v),
               initial,
-              defaultValue: [],
             })}
           </th>
 
@@ -151,7 +150,6 @@ export class PwProjects<X extends string> extends PwEntityList<
               get: (o) => o.sorting,
               set: (o, v) => (o.sorting = v),
               initial,
-              defaultValue: [],
             })}
           </th>
 
@@ -166,7 +164,6 @@ export class PwProjects<X extends string> extends PwEntityList<
               get: (o) => o.sorting,
               set: (o, v) => (o.sorting = v),
               initial,
-              defaultValue: [],
             })}
           </th>
 

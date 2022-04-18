@@ -218,7 +218,6 @@ class PwChoices<X extends string> extends PwEntityList<"/api/v1/choices", X> {
               get: (o) => o.sorting,
               set: (o, v) => (o.sorting = v),
               initial,
-              defaultValue: [],
             })}
           </th>
 
@@ -233,7 +232,6 @@ class PwChoices<X extends string> extends PwEntityList<"/api/v1/choices", X> {
               get: (o) => o.sorting,
               set: (o, v) => (o.sorting = v),
               initial,
-              defaultValue: [],
             })}
           </th>
 
@@ -250,14 +248,13 @@ class PwChoices<X extends string> extends PwEntityList<"/api/v1/choices", X> {
               get: (o) => o.sorting,
               set: (o, v) => (o.sorting = v),
               initial,
-              defaultValue: [],
             })}
           </th>
         </tr>
 
         <tr>
           <th scope="col">
-            ${pwInputNumber<"/api/v1/choices", number | undefined>({
+            ${pwInputNumber<"/api/v1/choices", false, number | undefined>({
               enabled: true,
               url: this.url,
               label: null,
@@ -273,7 +270,7 @@ class PwChoices<X extends string> extends PwEntityList<"/api/v1/choices", X> {
           </th>
 
           <th scope="col">
-            ${pwInputText<"/api/v1/choices", string | undefined>({
+            ${pwInputText<"/api/v1/choices", false, string | undefined>({
               enabled: true,
               url: this.url,
               label: null,
@@ -291,7 +288,7 @@ class PwChoices<X extends string> extends PwEntityList<"/api/v1/choices", X> {
           <th scope="col"></th>
 
           <th scope="col">
-            ${pwInputNumber<"/api/v1/choices", number | undefined | null>({
+            ${pwInputNumber<"/api/v1/choices", false, number | undefined | null>({
               enabled: true,
               url: this.url,
               label: null,

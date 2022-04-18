@@ -122,7 +122,6 @@ export class PwUserProjects<X extends string> extends PwProjects<X> {
               get: (o) => o.sorting,
               set: (o, v) => (o.sorting = v),
               initial,
-              defaultValue: [],
             })}
           </th>
 
@@ -137,7 +136,6 @@ export class PwUserProjects<X extends string> extends PwProjects<X> {
               get: (o) => o.sorting,
               set: (o, v) => (o.sorting = v),
               initial,
-              defaultValue: [],
             })}
           </th>
 
@@ -152,7 +150,6 @@ export class PwUserProjects<X extends string> extends PwProjects<X> {
               get: (o) => o.sorting,
               set: (o, v) => (o.sorting = v),
               initial,
-              defaultValue: [],
             })}
           </th>
 
@@ -167,7 +164,6 @@ export class PwUserProjects<X extends string> extends PwProjects<X> {
               get: (o) => o.sorting,
               set: (o, v) => (o.sorting = v),
               initial,
-              defaultValue: [],
             })}
           </th>
         </tr>
@@ -194,7 +190,6 @@ export class PwUserProjects<X extends string> extends PwProjects<X> {
               },
               task: this._task,
               type: "checkbox",
-              defaultValue: undefined,
               initial: initial,
               resettable: false,
             })}
@@ -210,7 +205,6 @@ export class PwUserProjects<X extends string> extends PwProjects<X> {
               set: (o, v) => (o.filters.id = v),
               task: this._task,
               type: "number",
-              defaultValue: undefined,
               initial,
               resettable: false,
             })}
