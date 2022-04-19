@@ -86,7 +86,7 @@ export abstract class PwInput<
    * Extracts the value from the routes request data.
    */
   get!: (
-    o: z.infer<typeof routes[P]["request"]> | undefined // maybe no initial value
+    o: z.infer<typeof routes[P]["request"]>
   ) => [RESETTABLE] extends [true] ? Q | undefined : Q;
 
   /**
@@ -139,9 +139,9 @@ export abstract class PwInput<
   task!: Task<[URLSearchParams], ResponseType<P>>;
 
   /**
-   * The initial data to show and reset to.
+   * The initial data to show and reset to. We need to store this to be able to know what to reset to. For creation this should be the default values. For updating this should be the old values.
    */
-  initial?: z.infer<typeof routes[P]["request"]>;
+  initial!: z.infer<typeof routes[P]["request"]>;
 
   /**
    * A reference to the input element.

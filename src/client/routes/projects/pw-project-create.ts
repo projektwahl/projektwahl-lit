@@ -226,6 +226,8 @@ export class PwProjectCreate extends PwForm<
           </main>`;
             }
 
+            const resettable = value !== undefined;
+
             return html`
               <main class="container">
                 <h1 class="text-center">${this.actionText}</h1>
@@ -261,13 +263,12 @@ export class PwProjectCreate extends PwForm<
                         disabled: this.disabled,
                         label: msg("Title"),
                         name: ["title"],
-                        get: (o) => o.title,
+                        get: (o) => value !== undefined ? o.title : "",
                         set: (o, v) => (o.title = v),
                         task: this._task,
                         // setting it like this is probably suboptimal as resettable is probably not working like that
                         initial: value?.data,
-                        defaultValue: "",
-                        resettable: value !== undefined,
+                        resettable,
                       })}
                       ${pwInputText<
                         "/api/v1/projects/create" | "/api/v1/projects/update",
@@ -279,12 +280,11 @@ export class PwProjectCreate extends PwForm<
                         disabled: this.disabled,
                         label: msg("Info"),
                         name: ["info"],
-                        get: (o) => o.info,
+                        get: (o) => o?.info,
                         set: (o, v) => (o.info = v),
                         task: this._task,
                         initial: value?.data,
-                        defaultValue: "",
-                        resettable: value !== undefined,
+                        resettable,
                       })}
                       ${pwInputText<
                         "/api/v1/projects/create" | "/api/v1/projects/update",
@@ -296,12 +296,11 @@ export class PwProjectCreate extends PwForm<
                         disabled: this.disabled,
                         label: msg("Place"),
                         name: ["place"],
-                        get: (o) => o.place,
+                        get: (o) => o?.place,
                         set: (o, v) => (o.place = v),
                         task: this._task,
                         initial: value?.data,
-                        defaultValue: "",
-                        resettable: value !== undefined,
+                        resettable,
                       })}
                       ${pwInputNumber<
                         "/api/v1/projects/create" | "/api/v1/projects/update",
@@ -313,12 +312,11 @@ export class PwProjectCreate extends PwForm<
                         disabled: this.disabled,
                         label: msg("Costs"),
                         name: ["costs"],
-                        get: (o) => o.costs,
+                        get: (o) => o === undefined ? 0 : o.costs,
                         set: (o, v) => (o.costs = v),
                         task: this._task,
                         initial: value?.data,
-                        defaultValue: 0,
-                        resettable: value !== undefined,
+                        resettable,
                       })}
                       ${pwInputNumber<
                         "/api/v1/projects/create" | "/api/v1/projects/update",
@@ -335,7 +333,7 @@ export class PwProjectCreate extends PwForm<
                         task: this._task,
                         initial: value?.data,
                         defaultValue: 5,
-                        resettable: value !== undefined,
+                        resettable,
                       })}
                       ${pwInputNumber<
                         "/api/v1/projects/create" | "/api/v1/projects/update",
@@ -352,7 +350,7 @@ export class PwProjectCreate extends PwForm<
                         task: this._task,
                         initial: value?.data,
                         defaultValue: 13,
-                        resettable: value !== undefined,
+                        resettable,
                       })}
                       ${pwInputNumber<
                         "/api/v1/projects/create" | "/api/v1/projects/update",
@@ -369,7 +367,7 @@ export class PwProjectCreate extends PwForm<
                         task: this._task,
                         initial: value?.data,
                         defaultValue: 5,
-                        resettable: value !== undefined,
+                        resettable,
                       })}
                       ${pwInputNumber<
                         "/api/v1/projects/create" | "/api/v1/projects/update",
@@ -386,7 +384,7 @@ export class PwProjectCreate extends PwForm<
                         task: this._task,
                         initial: value?.data,
                         defaultValue: 15,
-                        resettable: value !== undefined,
+                        resettable,
                       })}
                       <div class="form-text mb-3">
                         Bitte erstellen Sie keine Projekte mit mehr als 15
@@ -406,7 +404,7 @@ export class PwProjectCreate extends PwForm<
                         set: (o, v) => (o.random_assignments = v),
                         task: this._task,
                         initial: value?.data,
-                        resettable: value !== undefined,
+                        resettable,
                       })}
                       ${pwInputCheckbox<
                         "/api/v1/projects/create" | "/api/v1/projects/update",
@@ -422,7 +420,7 @@ export class PwProjectCreate extends PwForm<
                         set: (o, v) => (o.deleted = v),
                         task: this._task,
                         initial: value?.data,
-                        resettable: value !== undefined,
+                        resettable,
                       })}
                       ${!this.disabled
                         ? html`
