@@ -330,7 +330,7 @@ export class VPick<
 
   constructor(parentSchema: VObject<O>, keys: K[]) {
     super();
-    this.pickedSchema = new VObject(inclusivePick(parentSchema.schema, keys));
+    this.pickedSchema = new VObject(inclusivePick(parentSchema.objectSchema, keys));
   }
 
   validate(input: unknown): Result<Pick<SchemaObjectToSchema<O>, K>, any> {
@@ -409,5 +409,9 @@ console.log(
 
 const pickedSchema = new VPick(schema5, ["test"]);
 
-
 console.log(pickedSchema.validate({}));
+console.log(pickedSchema.validate({test: ""}));
+console.log(pickedSchema.validate({test: 1}));
+
+console.log(pickedSchema.validate({test: 1, hi: 2}));
+console.log(pickedSchema.validate({test: "jo", hi: 2}));
