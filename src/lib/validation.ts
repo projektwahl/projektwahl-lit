@@ -95,6 +95,31 @@ export const vintersection =
     };
   };
 
+function setDifference(
+  a: (string | number | symbol)[],
+  b: Set<string | number | symbol>
+) {
+  return new Set(Array.from(a).filter((item) => !b.has(item)));
+}
+
+export const vfilterKeys =
+  <K extends string | number | symbol, S>(
+    keys: Set<K>,
+    schema: (input: unknown) => Result<S, any>
+  ) =>
+  (input: unknown): Result<S, any> => {
+    const diff = setDifference(Object.keys(input), keys);
+    if (diff.size > 0) {
+      return {
+        success: false,
+        error: Object.fromEntries(
+          Array.from(diff).map((v) => [v, `${v} unbekannter Schlüssel`])
+        ),
+      };
+    }
+    return schema(input);
+  };
+
 const schema1 = vobject("helper" as const, vnumber);
 const schema2 = vobject("tester" as const, vnumber);
 
@@ -111,3 +136,10 @@ console.log(schema({ helper: 1, tester: 1 }));
 console.log(schema({ helper: 1, tejster: 1 }));
 console.log(schema({ hjelper: 1, tester: 1 }));
 console.log(schema({ helliper: 1, testekr: 1 }));
+
+const betterSchema = vfilterKeys(new Set(["helper", "tester"]), schema);
+
+console.log(betterSchema({ helper: 1, tester: 1 }));
+console.log(betterSchema({ helper: 1, tejster: 1 }));
+console.log(betterSchema({ hjelper: 1, tester: 1 }));
+console.log(betterSchema({ helliper: 1, testekr: 1 }));
