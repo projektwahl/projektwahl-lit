@@ -61,7 +61,8 @@ export class VObject<K extends string | number | symbol, V> extends VSchema<{
       };
     }
     // @ts-expect-error probably not typeable
-    const inner = value(input[key]);
+    const val = input[this.key];
+    const inner = this.value.validate(val);
     if (inner.success) {
       // @ts-expect-error probably not typeable
       const data: { [k in K]: V } = {
