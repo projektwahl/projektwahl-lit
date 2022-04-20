@@ -26,74 +26,71 @@ export class VNumber extends VSchema<number> {
 export class VObject<K extends string | number | symbol, V> extends VSchema<{
   [k in K]: V;
 }> {
-    private key: K;
+  private key: K;
 
-    private value: VSchema<V>
+  private value: VSchema<V>;
 
-    constructor( key: K, value: VSchema<V>) {
-        super();
-        this.key = key;
-        this.value = value;
-    }
+  constructor(key: K, value: VSchema<V>) {
+    super();
+    this.key = key;
+    this.value = value;
+  }
 
   validate(input: unknown): Result<{ [k in K]: V }, any> {
-      if (typeof input !== "object") {
-        return {
-          success: false,
-          error: {
-            // TODO don't stringify as this could explode the error message length
-            [this.key]: `${JSON.stringify(input)} ist kein Objekt!`,
-          },
-        };
-      }
-      if (input === null) {
-        return {
-          success: false,
-          error: { [this.key]: `${JSON.stringify(input)} ist null!` },
-        };
-      }
-      if (!(this.key in input)) {
-        return {
-          success: false,
-          error: {
-            [this.key]: `${JSON.stringify(input)} hat kein Attribut ${this.key}!`,
-          },
-        };
-      }
+    if (typeof input !== "object") {
+      return {
+        success: false,
+        error: {
+          // TODO don't stringify as this could explode the error message length
+          [this.key]: `${JSON.stringify(input)} ist kein Objekt!`,
+        },
+      };
+    }
+    if (input === null) {
+      return {
+        success: false,
+        error: { [this.key]: `${JSON.stringify(input)} ist null!` },
+      };
+    }
+    if (!(this.key in input)) {
+      return {
+        success: false,
+        error: {
+          [this.key]: `${JSON.stringify(input)} hat kein Attribut ${this.key}!`,
+        },
+      };
+    }
+    // @ts-expect-error probably not typeable
+    const inner = value(input[key]);
+    if (inner.success) {
       // @ts-expect-error probably not typeable
-      const inner = value(input[key]);
-      if (inner.success) {
-        // @ts-expect-error probably not typeable
-        const data: { [k in K]: V } = {
-          [this.key]: inner.data,
-        };
-        return {
-          success: true,
-          data,
-        };
-      } else {
-        return {
-          success: false,
-          error: {
-            key: `${inner.error}`,
-          },
-        };
-      }
-    };
+      const data: { [k in K]: V } = {
+        [this.key]: inner.data,
+      };
+      return {
+        success: true,
+        data,
+      };
+    } else {
+      return {
+        success: false,
+        error: {
+          key: `${inner.error}`,
+        },
+      };
+    }
   }
 }
 
 export class VIntersection<S1, S2> extends VSchema<S1 & S2> {
+  private schema1: VSchema<S1>;
+  private schema2: VSchema<S2>;
 
-    private schema1: VSchema<S1>
-    private schema2: VSchema<S2>
-
-    constructor(schema1: VSchema<S1>,
-        schema2: VSchema<S2>) {
-        super()
-        this.schema1 = schema1
-        this.schema2 = schema2
-    }
+  constructor(schema1: VSchema<S1>, schema2: VSchema<S2>) {
+    super();
+    this.schema1 = schema1;
+    this.schema2 = schema2;
+  }
 
   validate(input: unknown): Result<S1 & S2, any> {
     const output1 = this.schema1.validate(input);
@@ -132,18 +129,14 @@ function setDifference(
 
 // https://stackoverflow.com/questions/58779360/typescript-generic-being-incorrectly-inferred-as-unknown ?
 export class VFilterKeys<S, K extends keyof S> extends VSchema<Pick<S, K>> {
+  private keys: Set<K>;
+  private parentSchema: VSchema<S>;
 
-private keys: Set<K>;
-private parentSchema: VSchema<S>
-  
-    constructor(
-        keys: Set<K>,
-        parentSchema: VSchema<S>) {
-        super();
-            this.keys = keys;
-            this.parentSchema = parentSchema;
-    }
-
+  constructor(keys: Set<K>, parentSchema: VSchema<S>) {
+    super();
+    this.keys = keys;
+    this.parentSchema = parentSchema;
+  }
 
   validate(input: unknown): Result<Pick<S, K>, any> {
     const diff = setDifference(Object.keys(input), this.keys);
@@ -192,7 +185,10 @@ const testGenericSchema = <K extends string | number | symbol>(k: K) => {
 const testGenericSchema2 = <K extends string | number | symbol>(k: K) => {
   return new VFilterKeys(
     new Set(["helper"] as const),
-    new VIntersection(new VObject("helper" as const, new VNumber()), new VObject(k, new VNumber()))
+    new VIntersection(
+      new VObject("helper" as const, new VNumber()),
+      new VObject(k, new VNumber())
+    )
   );
 };
 
