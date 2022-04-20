@@ -295,7 +295,6 @@ function setDifference(
   return new Set(Array.from(a).filter((item) => !b.has(item)));
 }
 
-// https://stackoverflow.com/questions/58779360/typescript-generic-being-incorrectly-inferred-as-unknown ?
 export class VFilterKeys<S, K extends keyof S> extends VSchema<Pick<S, K>> {
   private keys: Set<K>;
   private parentSchema: VSchema<S>;
@@ -317,6 +316,25 @@ export class VFilterKeys<S, K extends keyof S> extends VSchema<Pick<S, K>> {
       };
     }
     return this.parentSchema.validate(input);
+  }
+}
+
+const inclusivePick = <O, K extends keyof O>(obj: O, keys: K[]): Pick<O, K> =>
+  Object.fromEntries(keys.map((key) => [key, obj[key]])) as any;
+
+export class VPick<
+  O extends { [key: string]: VSchema<any> },
+  K extends keyof O
+> extends VSchema<Pick<SchemaObjectToSchema<O>, K>> {
+  private pickedSchema: VObject<Pick<SchemaObjectToSchema<O>, K>>;
+
+  constructor(parentSchema: VObject<O>, keys: K[]) {
+    super();
+    this.pickedSchema = new VObject(inclusivePick(parentSchema.schema, keys));
+  }
+
+  validate(input: unknown): Result<Pick<SchemaObjectToSchema<O>, K>, any> {
+    return this.pickedSchema.validate(input);
   }
 }
 
@@ -388,3 +406,8 @@ console.log(
     bruh: "hi",
   })
 );
+
+const pickedSchema = new VPick(schema5, ["test"]);
+
+
+console.log(pickedSchema.validate({}));

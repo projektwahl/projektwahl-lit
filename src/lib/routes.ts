@@ -57,35 +57,39 @@ const rawUserCommon = {
 };
 
 export const rawUserSchema = new VObject({
-    type: z.enum(["voter", "helper", "admin"]),
-    // we can't use a discriminated union because it doesn't work with .pick()
-    group: new VNullable(new VString(0, 100)),
-    age: new VNullable(new VNumber(0, 200)),
-    ...rawUserCommon,
-  });
+  type: z.enum(["voter", "helper", "admin"]),
+  // we can't use a discriminated union because it doesn't work with .pick()
+  group: new VNullable(new VString(0, 100)),
+  age: new VNullable(new VNumber(0, 200)),
+  ...rawUserCommon,
+});
 
 export const rawProjectSchema = new VObject({
-    id: new VNumber(),
-    title: new VString(0, 1024),
-    info: new VString(0, 8192),
-    place: new VString(0, 1024),
-    costs: new VNumber(0, 100),
-    min_age: new VNumber(0, 200),
-    max_age: new VNumber(0, 200),
-    min_participants: new VNumber(1, 1000),
-    max_participants: new VNumber(1, 1000),
-    random_assignments: new VBoolean(),
-    deleted: new VBoolean(),
-    last_updated_by: new VNumber(),
-  });
+  id: new VNumber(),
+  title: new VString(0, 1024),
+  info: new VString(0, 8192),
+  place: new VString(0, 1024),
+  costs: new VNumber(0, 100),
+  min_age: new VNumber(0, 200),
+  max_age: new VNumber(0, 200),
+  min_participants: new VNumber(1, 1000),
+  max_participants: new VNumber(1, 1000),
+  random_assignments: new VBoolean(),
+  deleted: new VBoolean(),
+  last_updated_by: new VNumber(),
+});
 
 export const rawSessionType = new VObject({
-    session_id: new VString(),
-    created_at: new VString(),
-    updated_at: new VString(),
-    user_id: new VNumber(),
-  });
+  session_id: new VString(),
+  created_at: new VString(),
+  updated_at: new VString(),
+  user_id: new VNumber(),
+});
 
+// so now I either need pick or I need union
+
+// pick would work on all object schemas and should be quite simple (and also nice to use)
+// union would be not so nice to use but probably similar to implement.
 export const userSchema = rawUserSchema
   .pick({
     id: true,
@@ -107,10 +111,10 @@ export const entities = <
 ) =>
   result(
     new VObject({
-        entities: z.array(entity),
-        previousCursor: entity.nullable(),
-        nextCursor: entity.nullable(),
-      })
+      entities: z.array(entity),
+      previousCursor: entity.nullable(),
+      nextCursor: entity.nullable(),
+    })
   );
 
 const baseQuery = <
