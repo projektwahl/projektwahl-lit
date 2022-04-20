@@ -2,8 +2,14 @@ export type Result<R, E> =
   | { success: true; data: R }
   | { success: false; error: E };
 
-export const vnumber = {
-  validate: (input: unknown): Result<number, any> => {
+abstract class VSchema<T> {
+
+    schema!: T
+}
+
+export const vnumber = class VNumber extends VSchema<number> {
+
+  validate(input: unknown): Result<number, any> {
     if (typeof input !== "number") {
       return {
         success: false,
@@ -14,17 +20,16 @@ export const vnumber = {
       success: true,
       data: input,
     };
-  },
-
-  schema: 1
+  }
 };
 
-export const vobject =
-  <K extends string | number | symbol, V>(
+export const vobject = class VObject<K extends string | number | symbol, V> extends VSchema<{ [k in K]: V }> {
+  
+  validate(
     key: K,
     value: (input: unknown) => Result<V, any>
-  ) =>
-  (input: unknown): Result<{ [k in K]: V }, any> => {
+  ) {
+  return (input: unknown): Result<{ [k in K]: V }, any> => {
     if (typeof input !== "object") {
       return {
         success: false,
@@ -65,7 +70,8 @@ export const vobject =
         },
       };
     }
-  };
+}
+};
 
 export const vintersection =
   <S1, S2>(
