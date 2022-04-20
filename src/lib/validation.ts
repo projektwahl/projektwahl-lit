@@ -2,17 +2,21 @@ export type Result<R, E> =
   | { success: true; data: R }
   | { success: false; error: E };
 
-export const vnumber = (input: unknown): Result<number, any> => {
-  if (typeof input !== "number") {
+export const vnumber = {
+  validate: (input: unknown): Result<number, any> => {
+    if (typeof input !== "number") {
+      return {
+        success: false,
+        error: `${input} ist keine Zahl!`,
+      };
+    }
     return {
-      success: false,
-      error: `${input} ist keine Zahl!`,
+      success: true,
+      data: input,
     };
-  }
-  return {
-    success: true,
-    data: input,
-  };
+  },
+
+  schema: 1
 };
 
 export const vobject =
@@ -102,8 +106,9 @@ function setDifference(
   return new Set(Array.from(a).filter((item) => !b.has(item)));
 }
 
+// https://stackoverflow.com/questions/58779360/typescript-generic-being-incorrectly-inferred-as-unknown ?
 export const vfilterKeys =
-  <K extends keyof S, S>(
+  <S, K extends keyof S>(
     keys: Set<K>,
     schema: (input: unknown) => Result<S, any>
   ) =>
@@ -147,10 +152,7 @@ const testGenericSchema = <K extends string | number | symbol>(k: K) => {
     vobject("helper" as const, vnumber),
     vobject(k, vnumber)
   );
-  return vfilterKeys<"helper" | K, { helper: number } & { [k in K]: number }>(
-    new Set(["helper", k] as const),
-    a
-  );
+  return vfilterKeys(new Set(["helper", k] as const), a);
 };
 
 const testGenericSchema2 = <K extends string | number | symbol>(k: K) => {
