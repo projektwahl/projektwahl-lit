@@ -176,11 +176,13 @@ const betterSchema = new VFilterKeys(
 );
 
 const testGenericSchema = <K extends string | number | symbol>(k: K) => {
-  const a = new VIntersection(
-    new VObject("helper" as const, new VNumber()),
-    new VObject(k, new VNumber())
+  return new VFilterKeys(
+    new Set(["helper", k] as const),
+    new VIntersection(
+      new VObject("helper" as const, new VNumber()),
+      new VObject(k, new VNumber())
+    )
   );
-  return new VFilterKeys(new Set(["helper", k] as const), a);
 };
 
 const testGenericSchema2 = <K extends string | number | symbol>(k: K) => {
