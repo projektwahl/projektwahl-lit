@@ -103,17 +103,17 @@ function setDifference(
 }
 
 export const vfilterKeys =
-  <K extends string | number | symbol, S>(
+  <K extends keyof S, S>(
     keys: Set<K>,
     schema: (input: unknown) => Result<S, any>
   ) =>
-  (input: unknown): Result<S, any> => {
+  (input: unknown): Result<Pick<S, K>, any> => {
     const diff = setDifference(Object.keys(input), keys);
     if (diff.size > 0) {
       return {
         success: false,
         error: Object.fromEntries(
-          Array.from(diff).map((v) => [v, `${v} unbekannter Schlüssel`])
+          Array.from(diff).map((v) => [v, `${String(v)} unbekannter Schlüssel`])
         ),
       };
     }
@@ -137,7 +137,30 @@ console.log(schema({ helper: 1, tejster: 1 }));
 console.log(schema({ hjelper: 1, tester: 1 }));
 console.log(schema({ helliper: 1, testekr: 1 }));
 
-const betterSchema = vfilterKeys(new Set(["helper", "tester"]), schema);
+const betterSchema = vfilterKeys(new Set(["helper", "tester"] as const), schema);
+
+const testGenericSchema = <K extends string | number | symbol>(k: K) => {
+  return vfilterKeys(
+    new Set(["helper", k] as const),
+    vintersection(vobject("helper" as const, vnumber), vobject(k, vnumber))
+  );
+};
+
+const testGenericSchema2 = <K extends string | number | symbol>(k: K) => {
+    return vfilterKeys(
+      new Set(["helper"] as const),
+      vintersection(vobject("helper" as const, vnumber), vobject(k, vnumber))
+    );
+  };
+  
+
+const joGeneric = testGenericSchema("hi");
+
+const parsed = joGeneric("");
+
+if (parsed.success) {
+  parsed.data.hi;
+}
 
 console.log(betterSchema({ helper: 1, tester: 1 }));
 console.log(betterSchema({ helper: 1, tejster: 1 }));
