@@ -23,6 +23,25 @@ export class VNumber extends VSchema<number> {
   }
 }
 
+export class VNullable<T> extends VSchema<T | null> {
+  innerSchema: VSchema<T>;
+
+  constructor(innerSchema: VSchema<T>) {
+    super();
+    this.innerSchema = innerSchema;
+  }
+
+  validate(input: unknown): Result<T | null, any> {
+    if (input === null) {
+      return {
+        success: true,
+        data: null,
+      };
+    }
+    return this.innerSchema.validate(input);
+  }
+}
+
 type SchemaObjectToSchema<Type extends { [key: string]: VSchema<any> }> = {
   [Property in keyof Type]: Type[Property]["schema"];
 };

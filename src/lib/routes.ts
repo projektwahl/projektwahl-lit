@@ -22,34 +22,32 @@ SPDX-FileCopyrightText: 2021 Moritz Hedtke <Moritz.Hedtke@t-online.de>
 */
 import { z, ZodIssue, ZodObject, ZodTypeAny } from "zod";
 import { result } from "./result.js";
-import { VNumber, VObject } from "./validation.js";
+import { VNullable, VNumber, VObject } from "./validation.js";
 
 export const rawChoice = new VObject({
-    rank: new VNumber(),
-    project_id: new VNumber(),
-    user_id: new VNumber(),
-  });
+  rank: new VNumber(),
+  project_id: new VNumber(),
+  user_id: new VNumber(),
+});
 
-export const rawChoiceNullable = z
-  .object({
-    rank: z.number().nullable(),
-    project_id: z.number().nullable(),
-    user_id: z.number().nullable(),
-  })
-  .strict();
+export const rawChoiceNullable = new VObject({
+  rank: new VNullable(new VNumber()),
+  project_id: new VNullable(new VNumber()),
+  user_id: new VNullable(new VNumber()),
+});
 
 const rawUserCommon = {
-  id: z.number(),
+  id: new VNumber(),
   username: z.string().min(1).max(100),
   openid_id: z.string().nullish(),
   password_hash: z.string(),
   away: z.boolean(),
-  project_leader_id: z.number().nullable(),
+  project_leader_id: new VNumber().nullable(),
   password_changed: z.boolean(),
-  force_in_project_id: z.number().nullable(),
-  computed_in_project_id: z.number().nullable(),
+  force_in_project_id: new VNumber().nullable(),
+  computed_in_project_id: new VNumber().nullable(),
   deleted: z.boolean(),
-  last_updated_by: z.number(),
+  last_updated_by: new VNumber(),
 };
 
 export const rawUserSchema = z
