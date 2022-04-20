@@ -64,31 +64,27 @@ export const rawUserSchema = new VObject({
     ...rawUserCommon,
   });
 
-export const rawProjectSchema = z
-  .object({
-    id: z.number(),
-    title: z.string().max(1024),
-    info: z.string().max(8192),
-    place: z.string().max(1024),
-    costs: z.number().min(0).max(100),
-    min_age: z.number().min(0).max(200),
-    max_age: z.number().min(0).max(200),
-    min_participants: z.number().min(1).max(1000),
-    max_participants: z.number().min(1).max(1000),
-    random_assignments: z.boolean(),
-    deleted: z.boolean(),
-    last_updated_by: z.number(),
-  })
-  .strict();
+export const rawProjectSchema = new VObject({
+    id: new VNumber(),
+    title: new VString(0, 1024),
+    info: new VString(0, 8192),
+    place: new VString(0, 1024),
+    costs: new VNumber(0, 100),
+    min_age: new VNumber(0, 200),
+    max_age: new VNumber(0, 200),
+    min_participants: new VNumber(1, 1000),
+    max_participants: new VNumber(1, 1000),
+    random_assignments: new VBoolean(),
+    deleted: new VBoolean(),
+    last_updated_by: new VNumber(),
+  });
 
-export const rawSessionType = z
-  .object({
-    session_id: z.string(),
-    created_at: z.string(),
-    updated_at: z.string(),
-    user_id: z.number(),
-  })
-  .strict();
+export const rawSessionType = new VObject({
+    session_id: new VString(),
+    created_at: new VString(),
+    updated_at: new VString(),
+    user_id: new VNumber(),
+  });
 
 export const userSchema = rawUserSchema
   .pick({
@@ -110,13 +106,11 @@ export const entities = <
   entity: ZodObject<T, UnknownKeys, Catchall>
 ) =>
   result(
-    z
-      .object({
+    new VObject({
         entities: z.array(entity),
         previousCursor: entity.nullable(),
         nextCursor: entity.nullable(),
       })
-      .strict()
   );
 
 const baseQuery = <
