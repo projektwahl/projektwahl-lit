@@ -85,63 +85,31 @@ let version_short = (
   console.log(stderr);
 }
 
-let mainCssContents = await readFile("src/client/main.css", "utf8");
+{
+  let { stdout, stderr } = await exec(
+    "cat node_modules/bootstrap/dist/css/bootstrap.css src/client/main.css > dist/main.css"
+  );
+
+  console.log(stdout);
+  console.log(stderr);
+}
+
+{
+  let { stdout, stderr } = await exec(
+    "purgecss --css dist/main.css --content dist/pw-app.js --output dist/main.min.css --font-face --keyframes --variables"
+  );
+
+  console.log(stdout);
+  console.log(stderr);
+}
+
+let mainCssContents = await readFile("dist/main.min.css", "utf8");
 
 let mainCssHash = createHash("sha256").update(mainCssContents).digest("hex");
 
-{
-  let { stdout, stderr } = await exec(
-    //"purgecss --css node_modules/bootstrap/dist/css/bootstrap.css --content dist/*.js --output dist/bootstrap.min.css --font-face --keyframes --variables"
-    `cp src/client/main.css dist/main_${mainCssHash}.css`
-  );
+console.log(mainCssHash);
 
-  console.log(stdout);
-  console.log(stderr);
-}
-
-{
-  let { stdout, stderr } = await exec(
-    "cp node_modules/bootstrap/dist/css/bootstrap.min.css.map dist/"
-  );
-
-  console.log(stdout);
-  console.log(stderr);
-}
-
-{
-  let { stdout, stderr } = await exec(
-    //"purgecss --css node_modules/bootstrap/dist/css/bootstrap.css --content dist/*.js --output dist/bootstrap.min.css --font-face --keyframes --variables"
-    "cp node_modules/bootstrap/dist/css/bootstrap.min.css dist/"
-  );
-
-  console.log(stdout);
-  console.log(stderr);
-}
-
-let bootstrapContents = await readFile("dist/bootstrap.min.css", "utf8");
-
-let bootstrapHash = createHash("sha256")
-  .update(bootstrapContents)
-  .digest("hex");
-
-console.log(bootstrapHash);
-
-await rename(
-  "dist/bootstrap.min.css",
-  `dist/bootstrap_${bootstrapHash}.min.css`
-);
-
-// rebuild with path to bootstrap.css
-{
-  let { stdout, stderr } = await exec(
-    `esbuild --format=esm --bundle ./src/client/pw-app.js --charset=utf8 --define:window.PRODUCTION=true --define:window.LANGUAGE=\\"${
-      process.env.LANGUAGE ?? "de"
-    }\\" --define:window.VERSION_FULL=\\"${version_full}\\" --define:window.VERSION_SHORT=\\"${version_short}\\" --define:window.BOOTSTRAP_CSS=\\"/dist/bootstrap_${bootstrapHash}.min.css\\" --entry-names=[dir]/[name] --sourcemap --analyze --outdir=dist --tree-shaking=true`
-  );
-
-  console.log(stdout);
-  console.log(stderr);
-}
+await rename("dist/main.min.css", `dist/main_${mainCssHash}.min.css`);
 
 let pwAppContents = await readFile("dist/pw-app.js", "utf8");
 
@@ -169,11 +137,7 @@ const index = `<!DOCTYPE html>
 SPDX-License-Identifier: AGPL-3.0-or-later
 SPDX-FileCopyrightText: 2021 Moritz Hedtke <Moritz.Hedtke@t-online.de>
 -->
-    <link rel="stylesheet" href="/dist/main_${mainCssHash}.css">
-    <link
-      href="/dist/bootstrap_${bootstrapHash}.min.css"
-      rel="stylesheet"
-    />
+    <link rel="stylesheet" href="/dist/main_${mainCssHash}.min.css">
     
     <title>Projektwahl</title>
 

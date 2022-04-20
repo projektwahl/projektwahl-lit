@@ -31,7 +31,6 @@ declare global {
   }
 
   interface Window {
-    BOOTSTRAP_CSS: string | undefined;
     LANGUAGE: string | undefined;
     PRODUCTION: boolean | undefined;
     VERSION_FULL: string | undefined;
