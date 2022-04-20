@@ -22,12 +22,13 @@ SPDX-FileCopyrightText: 2021 Moritz Hedtke <Moritz.Hedtke@t-online.de>
 */
 import { z, ZodIssue, ZodObject, ZodTypeAny } from "zod";
 import { result } from "./result.js";
+import { VNumber } from "./validation.js";
 
 export const rawChoice = z
   .object({
-    rank: z.number(),
-    project_id: z.number(),
-    user_id: z.number(),
+    rank: new VNumber(),
+    project_id: new VNumber(),
+    user_id: new VNumber(),
   })
   .strict();
 

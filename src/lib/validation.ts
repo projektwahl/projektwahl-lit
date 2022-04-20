@@ -3,7 +3,7 @@ export type Result<R, E> =
   | { success: false; error: E };
 
 abstract class VSchema<T> {
-  private schema!: T;
+  schema!: T;
 
   abstract validate(input: unknown): Result<T, any>;
 }
@@ -23,7 +23,77 @@ export class VNumber extends VSchema<number> {
   }
 }
 
-export class VObject<K extends string | number | symbol, V> extends VSchema<{
+type SchemaObjectToSchema<Type extends { [key: string]: VSchema<any> }> = {
+  [Property in keyof Type]: Type[Property]["schema"];
+};
+
+export class VObject<O extends { [key: string]: VSchema<any> }> extends VSchema<
+  SchemaObjectToSchema<O>
+> {
+  objectSchema: O;
+
+  constructor(objectSchema: O) {
+    super();
+    this.objectSchema = objectSchema;
+  }
+
+  validate(input: unknown): Result<SchemaObjectToSchema<O>, any> {
+    if (typeof input !== "object") {
+      return {
+        success: false,
+        error: `${JSON.stringify(input)} ist kein Objekt!`,
+      };
+    }
+    if (input === null) {
+      return {
+        success: false,
+        error: `${JSON.stringify(input)} ist null!`,
+      };
+    }
+    const diff = setDifference(
+      Object.keys(input),
+      new Set(Object.keys(this.objectSchema))
+    );
+    if (diff.size > 0) {
+      return {
+        success: false,
+        error: Object.fromEntries(
+          Array.from(diff).map((v) => [v, `${String(v)} unbekannter Schlüssel`])
+        ),
+      };
+    }
+    /*for (const key in this.objectSchema) {
+        // @ts-expect-error probably not typeable
+        const val = input[key];
+        const result = this.objectSchema[key].validate(val)
+    }*/
+    // TODO FIXME mapped type would be needed
+    const validations = Object.keys(this.objectSchema).map((key) => {
+      // @ts-expect-error probably not typeable
+      const val = input[key];
+      const innerSchema: O[keyof O] = this.objectSchema[key];
+      return [key, innerSchema.validate(val)] as const;
+    });
+    // TODO FIXME use `is` type refinement for Result
+    const errors = validations.filter((v) => !v[1].success);
+    if (errors.length > 0) {
+      return {
+        success: false,
+        error: Object.fromEntries(errors),
+      };
+    }
+    const successes = validations.map((v) => [v[0], v[1].data] as const);
+    return {
+      success: true,
+      data: Object.fromEntries(successes),
+    };
+  }
+}
+
+export class VObjectEntry<
+  K extends string | number | symbol,
+  V
+> extends VSchema<{
   [k in K]: V;
 }> {
   private key: K;
@@ -153,8 +223,8 @@ export class VFilterKeys<S, K extends keyof S> extends VSchema<Pick<S, K>> {
   }
 }
 
-const schema1 = new VObject("helper" as const, new VNumber());
-const schema2 = new VObject("tester" as const, new VNumber());
+const schema1 = new VObjectEntry("helper" as const, new VNumber());
+const schema2 = new VObjectEntry("tester" as const, new VNumber());
 
 console.log(schema1.validate({ helper: 1 }));
 console.log(schema1.validate({ helper: null }));
@@ -179,8 +249,8 @@ const testGenericSchema = <K extends string | number | symbol>(k: K) => {
   return new VFilterKeys(
     new Set(["helper", k] as const),
     new VIntersection(
-      new VObject("helper" as const, new VNumber()),
-      new VObject(k, new VNumber())
+      new VObjectEntry("helper" as const, new VNumber()),
+      new VObjectEntry(k, new VNumber())
     )
   );
 };
@@ -189,8 +259,8 @@ const testGenericSchema2 = <K extends string | number | symbol>(k: K) => {
   return new VFilterKeys(
     new Set(["helper"] as const),
     new VIntersection(
-      new VObject("helper" as const, new VNumber()),
-      new VObject(k, new VNumber())
+      new VObjectEntry("helper" as const, new VNumber()),
+      new VObjectEntry(k, new VNumber())
     )
   );
 };
@@ -207,3 +277,17 @@ console.log(betterSchema.validate({ helper: 1, tester: 1 }));
 console.log(betterSchema.validate({ helper: 1, tejster: 1 }));
 console.log(betterSchema.validate({ hjelper: 1, tester: 1 }));
 console.log(betterSchema.validate({ helliper: 1, testekr: 1 }));
+
+const schema5 = new VObject({
+  test: new VNumber(),
+  jo: new VNumber(),
+});
+
+console.log(
+  schema5.validate({
+    test: 1,
+    jo: 1,
+    invalid: 1,
+    bruh: "hi",
+  })
+);
