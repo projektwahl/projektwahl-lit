@@ -22,7 +22,13 @@ SPDX-FileCopyrightText: 2021 Moritz Hedtke <Moritz.Hedtke@t-online.de>
 */
 import { z, ZodIssue, ZodObject, ZodTypeAny } from "zod";
 import { result } from "./result.js";
-import { VNullable, VNumber, VObject } from "./validation.js";
+import {
+  VBoolean,
+  VNullable,
+  VNumber,
+  VObject,
+  VString,
+} from "./validation.js";
 
 export const rawChoice = new VObject({
   rank: new VNumber(),
@@ -38,27 +44,25 @@ export const rawChoiceNullable = new VObject({
 
 const rawUserCommon = {
   id: new VNumber(),
-  username: z.string().min(1).max(100),
-  openid_id: z.string().nullish(),
-  password_hash: z.string(),
-  away: z.boolean(),
-  project_leader_id: new VNumber().nullable(),
-  password_changed: z.boolean(),
-  force_in_project_id: new VNumber().nullable(),
-  computed_in_project_id: new VNumber().nullable(),
-  deleted: z.boolean(),
+  username: new VString(1, 100),
+  openid_id: new VNullable(new VString()), // nullish(),
+  password_hash: new VString(),
+  away: new VBoolean(),
+  project_leader_id: new VNullable(new VNumber()),
+  password_changed: new VBoolean(),
+  force_in_project_id: new VNullable(new VNumber()),
+  computed_in_project_id: new VNullable(new VNumber()),
+  deleted: new VBoolean(),
   last_updated_by: new VNumber(),
 };
 
-export const rawUserSchema = z
-  .object({
+export const rawUserSchema = new VObject({
     type: z.enum(["voter", "helper", "admin"]),
     // we can't use a discriminated union because it doesn't work with .pick()
-    group: z.string().min(0).max(100).nullable(),
-    age: z.number().min(0).max(200).nullable(),
+    group: new VNullable(new VString(0, 100)),
+    age: new VNullable(new VNumber(0, 200)),
     ...rawUserCommon,
-  })
-  .strict();
+  });
 
 export const rawProjectSchema = z
   .object({

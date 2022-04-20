@@ -9,11 +9,89 @@ abstract class VSchema<T> {
 }
 
 export class VNumber extends VSchema<number> {
+  min: number;
+  max: number;
+
+  constructor(
+    min: number = Number.NEGATIVE_INFINITY,
+    max: number = Number.POSITIVE_INFINITY
+  ) {
+    super();
+    this.min = min;
+    this.max = max;
+  }
+
   validate(input: unknown): Result<number, any> {
     if (typeof input !== "number") {
       return {
         success: false,
         error: `${input} ist keine Zahl!`,
+      };
+    }
+    if (input < this.min) {
+      return {
+        success: false,
+        error: `${input} muss mindestens ${this.min} sein!`,
+      };
+    }
+    if (input > this.max) {
+      return {
+        success: false,
+        error: `${input} darf höchstens ${this.min} sein!`,
+      };
+    }
+    return {
+      success: true,
+      data: input,
+    };
+  }
+}
+
+export class VBoolean extends VSchema<boolean> {
+  validate(input: unknown): Result<boolean, any> {
+    if (typeof input !== "boolean") {
+      return {
+        success: false,
+        error: `${input} ist keine Zahl!`,
+      };
+    }
+    return {
+      success: true,
+      data: input,
+    };
+  }
+}
+
+export class VString extends VSchema<string> {
+  min: number;
+  max: number;
+
+  constructor(
+    min: number = Number.NEGATIVE_INFINITY,
+    max: number = Number.POSITIVE_INFINITY
+  ) {
+    super();
+    this.min = min;
+    this.max = max;
+  }
+
+  validate(input: unknown): Result<string, any> {
+    if (typeof input !== "string") {
+      return {
+        success: false,
+        error: `${input} ist kein String!`,
+      };
+    }
+    if (input.length < this.min) {
+      return {
+        success: false,
+        error: `${input} muss mindestens ${this.min} Zeichen lang sein!`,
+      };
+    }
+    if (input.length > this.max) {
+      return {
+        success: false,
+        error: `${input} darf höchstens ${this.min} Zeichen lang sein!`,
       };
     }
     return {
