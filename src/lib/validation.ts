@@ -137,22 +137,28 @@ console.log(schema({ helper: 1, tejster: 1 }));
 console.log(schema({ hjelper: 1, tester: 1 }));
 console.log(schema({ helliper: 1, testekr: 1 }));
 
-const betterSchema = vfilterKeys(new Set(["helper", "tester"] as const), schema);
+const betterSchema = vfilterKeys(
+  new Set(["helper", "tester"] as const),
+  schema
+);
 
 const testGenericSchema = <K extends string | number | symbol>(k: K) => {
-  return vfilterKeys(
+  const a = vintersection(
+    vobject("helper" as const, vnumber),
+    vobject(k, vnumber)
+  );
+  return vfilterKeys<"helper" | K, { helper: number } & { [k in K]: number }>(
     new Set(["helper", k] as const),
-    vintersection(vobject("helper" as const, vnumber), vobject(k, vnumber))
+    a
   );
 };
 
 const testGenericSchema2 = <K extends string | number | symbol>(k: K) => {
-    return vfilterKeys(
-      new Set(["helper"] as const),
-      vintersection(vobject("helper" as const, vnumber), vobject(k, vnumber))
-    );
-  };
-  
+  return vfilterKeys(
+    new Set(["helper"] as const),
+    vintersection(vobject("helper" as const, vnumber), vobject(k, vnumber))
+  );
+};
 
 const joGeneric = testGenericSchema("hi");
 
