@@ -24,19 +24,22 @@ export const vobject =
     if (typeof input !== "object") {
       return {
         success: false,
-        error: `${input} ist kein Objekt!`,
+        error: {
+          // TODO don't stringify as this could explode the error message length
+          [key]: `${JSON.stringify(input)} ist kein Objekt!`,
+        },
       };
     }
     if (input === null) {
       return {
         success: false,
-        error: `${input} ist null!`,
+        error: { [key]: `${JSON.stringify(input)} ist null!` },
       };
     }
     if (!(key in input)) {
       return {
         success: false,
-        error: `${input} hat kein Attribut ${key}!`,
+        error: { [key]: `${JSON.stringify(input)} hat kein Attribut ${key}!` },
       };
     }
     // @ts-expect-error probably not typeable
@@ -60,9 +63,51 @@ export const vobject =
     }
   };
 
-const schema = vobject("helper" as const, vnumber);
+export const vintersection =
+  <S1, S2>(
+    schema1: (input: unknown) => Result<S1, any>,
+    schema2: (input: unknown) => Result<S2, any>
+  ) =>
+  (input: unknown): Result<S1 & S2, any> => {
+    const output1 = schema1(input);
+    const output2 = schema2(input);
+    if (!output1.success && !output2.success) {
+      return {
+        success: false,
+        error: {
+          ...output1.error,
+          ...output2.error,
+        },
+      };
+    }
+    if (!output1.success) {
+      return output1;
+    }
+    if (!output2.success) {
+      return output2;
+    }
+    return {
+      success: true,
+      data: {
+        ...output1.data,
+        ...output2.data,
+      },
+    };
+  };
 
-console.log(schema({ helper: 1 }));
-console.log(schema({ helper: null }));
-console.log(schema({ he: 1 }));
-console.log(schema({ he: 1, helper: 1 }));
+const schema1 = vobject("helper" as const, vnumber);
+const schema2 = vobject("tester" as const, vnumber);
+
+console.log(schema1({ helper: 1 }));
+console.log(schema1({ helper: null }));
+console.log(schema1({ he: 1 }));
+console.log(schema1({ he: 1, helper: 1 }));
+
+console.log(schema2({ tester: 1 }));
+
+const schema = vintersection(schema1, schema2);
+
+console.log(schema({ helper: 1, tester: 1 }));
+console.log(schema({ helper: 1, tejster: 1 }));
+console.log(schema({ hjelper: 1, tester: 1 }));
+console.log(schema({ helliper: 1, testekr: 1 }));
