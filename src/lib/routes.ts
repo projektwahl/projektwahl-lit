@@ -160,70 +160,53 @@ export const createUserAction = new VPick(rawUserSchema,
     action: z.literal("create"),
   });
 
-export const updateUserAction = rawUserSchema
-  .pick({
-    openid_id: true,
-    age: true,
-    away: true,
-    group: true,
-    type: true,
-    username: true,
-    project_leader_id: true,
-    force_in_project_id: true,
-    deleted: true,
-  })
+export const updateUserAction = new VPick(rawUserSchema,
+  ["openid_id", "age", "away", "group", "type", "username", "project_leader_id", "force_in_project_id", "deleted"])
   .extend({
     password: z.optional(z.string().min(1)),
   })
   .partial()
   .extend({
-    id: z.number(),
-    action: z.literal("update"),
-  })
-  .strict();
+    id: new VNumber(),
+    action: new VConstant("update"),
+  });
 
 export const routes = {
   "/api/v1/logout": {
-    request: z.object({}).strict(),
-    response: z.object({}).strict(),
+    request: new VObject({}),
+    response: new VObject({}),
   },
   "/api/v1/login": {
-    request: z
-      .object({
-        username: z.string().min(1).max(100),
-        password: z.string(),
-      })
-      .strict(),
-    response: z.object({}).strict(),
+    request: new VObject({
+        username: new VString(1, 100),
+        password: new VString(),
+      }),
+    response: new VObject({}),
   },
   "/api/v1/sudo": {
-    request: z
-      .object({
-        id: z.number(),
-      })
-      .strict(),
-    response: z.object({}).strict(),
+    request: new VObject({
+        id: new VNumber(),
+      }),
+    response: new VObject({}),
   },
   "/api/v1/openid-login": {
-    request: z.object({}).strict(),
-    response: z.object({}).strict(),
+    request: new VObject({}),
+    response: new VObject({}),
   },
   "/api/v1/redirect": {
-    request: z
-      .object({
-        session_state: z.string(),
-        code: z.string(),
-      })
-      .strict(),
-    response: z.object({}).strict(),
+    request: new VObject({
+        session_state: new VString(),
+        code: new VString(),
+      }),
+    response: new VObject({}),
   },
   "/api/v1/sleep": {
-    request: z.object({}).strict(),
-    response: z.object({}).strict(),
+    request: new VObject({}),
+    response: new VObject({}),
   },
   "/api/v1/update": {
-    request: z.object({}).strict(),
-    response: z.object({}).strict(),
+    request: new VObject({}),
+    response: new VObject({}),
   },
   "/api/v1/users/create-or-update": {
     request: z.array(
