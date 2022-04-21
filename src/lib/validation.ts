@@ -8,6 +8,30 @@ export abstract class VSchema<T> {
   abstract validate(input: unknown): Result<T, any>;
 }
 
+export class VConstant<T> extends VSchema<T> {
+
+  value: T;
+
+  constructor(value: T) {
+    super();
+    this.value = value;
+  }
+
+  validate(input: unknown): Result<T, any> {
+      if (input === this.value) {
+        return {
+          success: true,
+          data: this.value,
+        }
+      } else {
+        return {
+          success: false,
+          error: `Erwartet: ${this.value}`
+        }
+      }
+  }
+}
+
 export class VNumber extends VSchema<number> {
   min: number;
   max: number;

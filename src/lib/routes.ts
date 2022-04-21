@@ -24,6 +24,7 @@ import { z, ZodIssue, ZodObject, ZodTypeAny } from "zod";
 import { result } from "./result.js";
 import {
   VBoolean,
+  VConstant,
   VDiscriminatedUnion,
   VNullable,
   VNumber,
@@ -61,18 +62,17 @@ const rawUserCommon = {
 
 export const rawUserSchema = new VDiscriminatedUnion("type", [
   new VObject({
-    type: z.enum(["voter"]),
-    // we can't use a discriminated union because it doesn't work with .pick()
+    type: new VConstant("voter"),
     group: new VNullable(new VString(0, 100)),
     age: new VNullable(new VNumber(0, 200)),
     ...rawUserCommon,
   }),
   new VObject({
-    type: z.enum(["admin"]),
+    type: new VConstant("admin"),
     ...rawUserCommon,
   }),
   new VObject({
-    type: z.enum(["helper"]),
+    type: new VConstant("helper"),
     ...rawUserCommon,
   })
 ])
@@ -93,7 +93,7 @@ export const rawProjectSchema = new VObject({
 });
 
 export const rawSessionType = new VObject({
-  session_id: new VString()
+  session_id: new VString(),
   created_at: new VString(),
   updated_at: new VString(),
   user_id: new VNumber(),
@@ -122,48 +122,33 @@ export const entities = <
   );
 
 const baseQuery = <
-  T1 extends { [k: string]: ZodTypeAny },
-  T2 extends ZodTypeAny,
-  T3 extends ZodTypeAny,
-  UnknownKeys extends UnknownKeysParam = "strip",
-  Catchall extends ZodTypeAny = ZodTypeAny
+  T1,
+  T2,
+  T3,
 >(
-  s: ZodObject<T1, UnknownKeys, Catchall>,
-  sorting: T2,
-  filters: T3
+  s: T1,
+  sorting: VSchema<T2>,
+  filters: VSchema<T3>
 ) => {
   return {
-    request: z
-      .object({
+    request: new VObject({
         paginationDirection: z
-          .enum(["forwards", "backwards"])
-          .default("forwards"),
-        paginationCursor: s.nullish(),
+          .enum(["forwards", "backwards"]),
+        paginationCursor: new VNullable(s),
         filters,
         sorting,
-        paginationLimit: z.number().default(10),
-      })
-      .strict(),
-    response: z
-      .object({
+        paginationLimit: new VNumber(),
+      }),
+    response: new VObject({
         entities: z.array(s),
-        previousCursor: s.nullable(),
-        nextCursor: s.nullable(),
-      })
-      .strict(),
+        previousCursor: new VNullable(s),
+        nextCursor: new VNullable(s),
+      }),
   };
 };
 
-export const createUserAction = rawUserSchema
-  .pick({
-    openid_id: true,
-    age: true,
-    away: true,
-    group: true,
-    type: true,
-    username: true,
-    deleted: true,
-  })
+export const createUserAction = new VPick(rawUserSchema,
+  ["openid_id", "age", "away", "group", "type", "username","deleted"])
   .partial({
     deleted: true,
     group: true,
@@ -173,8 +158,7 @@ export const createUserAction = rawUserSchema
   .extend({
     password: z.optional(z.string().min(1)),
     action: z.literal("create"),
-  })
-  .strict();
+  });
 
 export const updateUserAction = rawUserSchema
   .pick({
