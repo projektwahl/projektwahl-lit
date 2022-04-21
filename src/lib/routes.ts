@@ -210,9 +210,9 @@ export const routes = {
   },
   "/api/v1/users/create-or-update": {
     request: z.array(
-      z.discriminatedUnion("action", [
-        createUserAction.strict(),
-        updateUserAction.strict(),
+      new VDiscriminatedUnion("action", [
+        createUserAction,
+        updateUserAction,
       ])
     ),
     response: z.array(
@@ -222,66 +222,31 @@ export const routes = {
           project_leader_id: true,
           force_in_project_id: true,
         })
-        .strict()
+        
     ),
   },
   "/api/v1/projects/create": {
-    request: rawProjectSchema
-      .pick({
-        costs: true,
-        deleted: true,
-        info: true,
-        max_age: true,
-        max_participants: true,
-        min_age: true,
-        min_participants: true,
-        place: true,
-        random_assignments: true,
-        title: true,
-      })
-      .strict(),
-    response: z.object({}).extend({ id: z.number() }).strict(),
+    request: new VPick(rawProjectSchema,
+      [ "costs", "deleted", "info", "max_age", "max_participants", "min_age", "min_participants", "place", "random_assignments", "title"]),
+    response: new VObject({ id: new VNumber() }),
   },
   "/api/v1/projects/update": {
-    request: rawProjectSchema
-      .pick({
-        costs: true,
-        deleted: true,
-        info: true,
-        max_age: true,
-        max_participants: true,
-        min_age: true,
-        min_participants: true,
-        place: true,
-        random_assignments: true,
-        title: true,
-      })
+    request: new VPick(rawProjectSchema, ["costs", "deleted","info","max_age","max_participants", "min_age","min_participants","place","random_assignments","title"])
       .partial()
       .extend({
         id: z.number(),
       })
-      .strict(),
-    response: z.object({}).extend({ id: z.number() }).strict(),
+      ,
+    response: new VObject({ id: new VNumber() }),
   },
   "/api/v1/users": baseQuery(
-    rawUserSchema
-      .pick({
-        id: true,
-        type: true,
-        username: true,
-        openid_id: true,
-        group: true,
-        age: true,
-        away: true,
-        project_leader_id: true,
-        force_in_project_id: true,
-        deleted: true,
-      })
+    new VPick(rawUserSchema,
+     ["id","type","username","openid_id","group","age","away","project_leader_id","force_in_project_id","deleted",])
       .partial({
         openid_id: true,
         force_in_project_id: true,
       })
-      .strict(),
+      ,
     z
       .array(
         z.union([
@@ -322,7 +287,7 @@ export const routes = {
         force_in_project_id: true,
         deleted: true,
       })
-      .strict()
+      
       .partial()
   ),
   "/api/v1/projects": baseQuery(
@@ -377,7 +342,7 @@ export const routes = {
         info: true,
         deleted: true,
       })
-      .strict()
+      
       .partial()
   ),
   "/api/v1/choices": baseQuery(
@@ -425,7 +390,7 @@ export const routes = {
         info: true,
         rank: true,
       })
-      .strict()
+      
       .partial()
   ),
   "/api/v1/choices/update": {
@@ -434,8 +399,8 @@ export const routes = {
         project_id: true,
         rank: true,
       })
-      .strict(),
-    response: z.object({}).strict(),
+      ,
+    response: z.object({}),
   },
   "/api/v1/sessions": baseQuery(
     rawSessionType,
@@ -450,7 +415,7 @@ export const routes = {
       .object({
         user_id: z.number().nullable(),
       })
-      .strict()
+      
   ),
 } as const;
 
