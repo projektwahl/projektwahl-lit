@@ -23,42 +23,31 @@ SPDX-FileCopyrightText: 2021 Moritz Hedtke <Moritz.Hedtke@t-online.de>
 
 import { z, ZodObject, ZodType, ZodTypeAny, ZodTypeDef } from "zod";
 import type { entityRoutes, UnknownKeysParam } from "./routes.js";
+import { VObject, VSchema } from "./validation.js";
 
 export const successResult = <
-  T extends { [k: string]: ZodTypeAny },
-  UnknownKeys extends UnknownKeysParam = "strip",
-  Catchall extends ZodTypeAny = ZodTypeAny
+  T
 >(
-  s: ZodObject<T, UnknownKeys, Catchall>
+  s: VSchema<T>
 ) =>
-  z
-    .object({
+  new VObject({
       success: z.literal(true),
       data: s,
-    })
-    .strict();
+    });
 
 // TODO FIXME UPDATE TO zod error schema
-export const failureResult = <
-  Output,
-  Def extends ZodTypeDef = ZodTypeDef,
-  Input = Output
->(
-  s: ZodType<Output, Def, Input>
+export const failureResult = <T>(
+  s: VSchema<T>
 ) =>
-  z
-    .object({
+  new VObject({
       success: z.literal(false),
       error: s,
-    })
-    .strict();
+    });
 
 export const result = <
-  T extends { [k: string]: ZodTypeAny },
-  UnknownKeys extends UnknownKeysParam = "strip",
-  Catchall extends ZodTypeAny = ZodTypeAny
+  T
 >(
-  s: ZodObject<T, UnknownKeys, Catchall>
+  s: VSchema<T>
 ) => z.union([successResult(s), failureResult(z.record(z.string()))]);
 
 export type ToIndexed<

@@ -27,6 +27,8 @@ import {
   VNullable,
   VNumber,
   VObject,
+  VPick,
+  VSchema,
   VString,
 } from "./validation.js";
 
@@ -90,30 +92,21 @@ export const rawSessionType = new VObject({
 
 // pick would work on all object schemas and should be quite simple (and also nice to use)
 // union would be not so nice to use but probably similar to implement.
-export const userSchema = rawUserSchema
-  .pick({
-    id: true,
-    type: true,
-    username: true,
-    group: true,
-    age: true,
-  })
-  .optional();
+export const userSchema = new VPick(rawUserSchema,
+    ["id", "type", "username", "group","age"]) // .optional();
 
 export type UnknownKeysParam = "passthrough" | "strict" | "strip";
 
 export const entities = <
-  T extends { [k: string]: ZodTypeAny },
-  UnknownKeys extends UnknownKeysParam = "strip",
-  Catchall extends ZodTypeAny = ZodTypeAny
+  T
 >(
-  entity: ZodObject<T, UnknownKeys, Catchall>
+  entity: VSchema<T>
 ) =>
   result(
     new VObject({
       entities: z.array(entity),
-      previousCursor: entity.nullable(),
-      nextCursor: entity.nullable(),
+      previousCursor: new VNullable(entity),
+      nextCursor: new VNullable(entity),
     })
   );
 

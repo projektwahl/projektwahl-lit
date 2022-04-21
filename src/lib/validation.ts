@@ -2,7 +2,7 @@ export type Result<R, E> =
   | { success: true; data: R }
   | { success: false; error: E };
 
-abstract class VSchema<T> {
+export abstract class VSchema<T> {
   schema!: T;
 
   abstract validate(input: unknown): Result<T, any>;
@@ -152,6 +152,7 @@ export class VObject<O extends { [key: string]: VSchema<any> }> extends VSchema<
       new Set(Object.keys(this.objectSchema))
     );
     if (diff.size > 0) {
+        // TODO FIXME potentially still do the validation below of the entries
       return {
         success: false,
         error: Object.fromEntries(
