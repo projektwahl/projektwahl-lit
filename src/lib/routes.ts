@@ -278,32 +278,12 @@ export const routes = {
         ])
       )
       .default([]),
-    rawUserSchema
-      .pick({
-        id: true,
-        username: true,
-        type: true,
-        project_leader_id: true,
-        force_in_project_id: true,
-        deleted: true,
-      })
-      
+    new VPick(rawUserSchema,
+      ["id","username","type","project_leader_id","force_in_project_id","deleted"])
       .partial()
   ),
   "/api/v1/projects": baseQuery(
-    rawProjectSchema.pick({
-      id: true,
-      title: true,
-      info: true,
-      place: true,
-      costs: true,
-      min_age: true,
-      max_age: true,
-      min_participants: true,
-      max_participants: true,
-      random_assignments: true,
-      deleted: true,
-    }),
+    new VPick(rawProjectSchema, ["id","title","info","place","costs","min_age","max_age","min_participants","max_participants","random_assignments","deleted"]),
     z
       .array(
         z.union([
@@ -335,14 +315,7 @@ export const routes = {
         ])
       )
       .default([]),
-    rawProjectSchema
-      .pick({
-        id: true,
-        title: true,
-        info: true,
-        deleted: true,
-      })
-      
+    new VPick(rawProjectSchema,["id","title","info","deleted"])
       .partial()
   ),
   "/api/v1/choices": baseQuery(
@@ -394,12 +367,8 @@ export const routes = {
       .partial()
   ),
   "/api/v1/choices/update": {
-    request: rawChoiceNullable
-      .pick({
-        project_id: true,
-        rank: true,
-      })
-      ,
+    request: new VPick(rawChoiceNullable,
+     ["project_id","rank"]),
     response: z.object({}),
   },
   "/api/v1/sessions": baseQuery(
@@ -411,9 +380,8 @@ export const routes = {
         z.null(),
       ])
     ),
-    z
-      .object({
-        user_id: z.number().nullable(),
+    new VObject({
+        user_id: new VNullable(new VNumber()),
       })
       
   ),
