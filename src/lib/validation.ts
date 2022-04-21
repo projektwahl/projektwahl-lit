@@ -339,6 +339,33 @@ export class VPick<
   }
 }
 
+export class VDiscriminatedUnion<T extends VObject<any>, K extends keyof T["objectSchema"]> extends VSchema<T> {
+  key: K;
+  unions: T[];
+
+  constructor(key: K, unions: T[]) {
+    super();
+    this.key = key;
+    this.unions = unions
+  }
+
+  validate(input: unknown): Result<T, any> {
+    for (const union of this.unions) {
+      const test = union.objectSchema[this.key]
+      const result = test.validate(input[this.key])
+      if (result.success) {
+        return union.validate(input)
+      }
+    }
+    return {
+      success: false,
+      error: {
+        [this.key]: `Ungültiger Wert ${input[this.key]}`
+      }
+    }
+  }
+}
+
 const schema1 = new VObjectEntry("helper" as const, new VNumber());
 const schema2 = new VObjectEntry("tester" as const, new VNumber());
 

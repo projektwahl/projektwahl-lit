@@ -24,6 +24,7 @@ import { z, ZodIssue, ZodObject, ZodTypeAny } from "zod";
 import { result } from "./result.js";
 import {
   VBoolean,
+  VDiscriminatedUnion,
   VNullable,
   VNumber,
   VObject,
@@ -58,13 +59,23 @@ const rawUserCommon = {
   last_updated_by: new VNumber(),
 };
 
-export const rawUserSchema = new VObject({
-  type: z.enum(["voter", "helper", "admin"]),
-  // we can't use a discriminated union because it doesn't work with .pick()
-  group: new VNullable(new VString(0, 100)),
-  age: new VNullable(new VNumber(0, 200)),
-  ...rawUserCommon,
-});
+export const rawUserSchema = new VDiscriminatedUnion("type", [
+  new VObject({
+    type: z.enum(["voter"]),
+    // we can't use a discriminated union because it doesn't work with .pick()
+    group: new VNullable(new VString(0, 100)),
+    age: new VNullable(new VNumber(0, 200)),
+    ...rawUserCommon,
+  }),
+  new VObject({
+    type: z.enum(["admin"]),
+    ...rawUserCommon,
+  }),
+  new VObject({
+    type: z.enum(["helper"]),
+    ...rawUserCommon,
+  })
+])
 
 export const rawProjectSchema = new VObject({
   id: new VNumber(),
@@ -82,7 +93,7 @@ export const rawProjectSchema = new VObject({
 });
 
 export const rawSessionType = new VObject({
-  session_id: new VString(),
+  session_id: new VString()
   created_at: new VString(),
   updated_at: new VString(),
   user_id: new VNumber(),
