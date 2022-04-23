@@ -526,10 +526,10 @@ export class VMergeUnion<
 > extends VDiscriminatedUnion<(T[number]["objectSchema"] & O2["objectSchema"])[], K> {
 
   constructor(schema1: O1, schema2: O2) {
-    super(schema1.key, schema1.unions.map(v => { return {
+    super(schema1.key, schema1.unions.map(v => { return new VObject({
       ...v,
       ...schema2.objectSchema
-    }}));
+    })}));
   }
 }
 
