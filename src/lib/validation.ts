@@ -518,6 +518,21 @@ export class VMerge<
   }
 }
 
+export class VMergeUnion<
+  T extends VObject<any>[],
+  K extends keyof T[number]["objectSchema"],
+  O1 extends VDiscriminatedUnion<T, K>,
+  O2 extends VObject<{ [key: string]: VSchema<any> }>
+> extends VDiscriminatedUnion<(T[number]["objectSchema"] & O2["objectSchema"])[], K> {
+
+  constructor(schema1: O1, schema2: O2) {
+    super(schema1.key, schema1.unions.map(v => { return {
+      ...v,
+      ...schema2.objectSchema
+    }}));
+  }
+}
+
 const schema5 = new VObject({
   test: new VNumber(),
   jo: new VNumber(),
