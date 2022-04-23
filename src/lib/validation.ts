@@ -1,6 +1,17 @@
+export type ResultSuccess<R> = { success: true; data: R }
+export type ResultError<E> = { success: false; error: E }
+
 export type Result<R, E> =
-  | { success: true; data: R }
-  | { success: false; error: E };
+  | ResultSuccess<R>
+  | ResultError<E>;
+
+export function isOk<R, E>(result: Result<R, E>): result is ResultSuccess<R> {
+  return result.success;
+}
+
+export function isErr<R, E>(result: Result<R, E>): result is ResultError<R> {
+  return !result.success;
+}
 
 export abstract class VSchema<T> {
   schema!: T;
@@ -183,14 +194,14 @@ export class VArray<T> extends VSchema<T[]> {
       }
     }
     const validations = input.map((v, i) => [i, this.innerSchema.validate(v)] as const)
-    const errors = validations.filter((v) => !v[1].success);
+    const errors = validations.filter((v): v is [number, ResultError<any>] => isErr(v[1]));
     if (errors.length > 0) {
       return {
         success: false,
         error: Object.fromEntries(errors),
       };
     }
-    const successes = validations.map((v) => v[1].data);
+    const successes = validations.map(v => v[1]).filter(isOk).map((v) => v.data);
     return {
       success: true,
       data: successes,
@@ -280,14 +291,14 @@ export class VObject<O extends { [key: string]: VSchema<any> }> extends VSchema<
       return [key, innerSchema.validate(val)] as const;
     });
     // TODO FIXME use `is` type refinement for Result
-    const errors = validations.filter((v) => !v[1].success);
+    const errors = validations.filter((v): v is [number, ResultError<any>] => isErr(v[1]));
     if (errors.length > 0) {
       return {
         success: false,
         error: Object.fromEntries(errors),
       };
     }
-    const successes = validations.map((v) => [v[0], v[1].data] as const);
+    const successes = validations.filter((v): v is [number, ResultSuccess<O[keyof O]>] => isOk(v[1])).map((v) => [v[0], v[1].data] as const);
     return {
       success: true,
       data: Object.fromEntries(successes),
