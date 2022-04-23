@@ -10,9 +10,9 @@ export abstract class VSchema<T> {
 
 export class VEnum<T> extends VSchema<T> {
 
-  values: [T, ...T[]];
+  values: readonly [T, ...T[]];
 
-  constructor(values: [T, ...T[]]) {
+  constructor(values: readonly [T, ...T[]]) {
     super();
     this.values = values;
   }
@@ -199,9 +199,9 @@ export class VArray<T> extends VSchema<T[]> {
 }
 
 export class VNullable<T> extends VSchema<T | null> {
-  innerSchema: VSchema<T>;
+  innerSchema?: VSchema<T>;
 
-  constructor(innerSchema: VSchema<T>) {
+  constructor(innerSchema?: VSchema<T>) {
     super();
     this.innerSchema = innerSchema;
   }
@@ -211,6 +211,12 @@ export class VNullable<T> extends VSchema<T | null> {
       return {
         success: true,
         data: null,
+      };
+    }
+    if (this.innerSchema === undefined) {
+      return {
+        success: false,
+        error: "Null erwartet.",
       };
     }
     return this.innerSchema.validate(input);
