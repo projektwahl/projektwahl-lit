@@ -1,9 +1,7 @@
-export type ResultSuccess<R> = { success: true; data: R }
-export type ResultError<E> = { success: false; error: E }
+export type ResultSuccess<R> = { success: true; data: R };
+export type ResultError<E> = { success: false; error: E };
 
-export type Result<R, E> =
-  | ResultSuccess<R>
-  | ResultError<E>;
+export type Result<R, E> = ResultSuccess<R> | ResultError<E>;
 
 export function isOk<R, E>(result: Result<R, E>): result is ResultSuccess<R> {
   return result.success;
@@ -14,7 +12,7 @@ export function isErr<R, E>(result: Result<R, E>): result is ResultError<E> {
 }
 
 function hasProp<T extends object, K extends PropertyKey>(
-  obj: T, 
+  obj: T,
   key: K
 ): obj is T & Record<K, any> {
   return key in obj;
@@ -27,7 +25,6 @@ export abstract class VSchema<T> {
 }
 
 export class VEnum<T> extends VSchema<T> {
-
   values: readonly [T, ...T[]];
 
   constructor(values: readonly [T, ...T[]]) {
@@ -36,23 +33,24 @@ export class VEnum<T> extends VSchema<T> {
   }
 
   validate(input: unknown): Result<T, any> {
-    const found = this.values.find(v => v === input)
-      if (found !== undefined) {
-        return {
-          success: true,
-          data: found,
-        }
-      } else {
-        return {
-          success: false,
-          error: `Erwartet eines von: ${this.values}`
-        }
-      }
+    const found = this.values.find((v) => v === input);
+    if (found !== undefined) {
+      return {
+        success: true,
+        data: found,
+      };
+    } else {
+      return {
+        success: false,
+        error: `Erwartet eines von: ${this.values}`,
+      };
+    }
   }
 }
 
-export class VTuple<T extends VSchema<any>[]> extends VSchema<SchemaArrayToSchema<T>> {
-
+export class VTuple<T extends VSchema<any>[]> extends VSchema<
+  SchemaArrayToSchema<T>
+> {
   objectSchema: T;
 
   constructor(objectSchema: T) {
@@ -65,24 +63,31 @@ export class VTuple<T extends VSchema<any>[]> extends VSchema<SchemaArrayToSchem
     if (!Array.isArray(input)) {
       return {
         success: false,
-        error: `Keine Liste!`
-      }
+        error: `Keine Liste!`,
+      };
     }
     if (input.length !== this.objectSchema.length) {
       return {
         success: false,
-        error: `Liste nicht ${this.objectSchema.length} lang, sondern ${input.length}!`
-      }
+        error: `Liste nicht ${this.objectSchema.length} lang, sondern ${input.length}!`,
+      };
     }
-    const validations = input.map((v, i) => [i, this.objectSchema[i].validate(v)] as const)
-    const errors = validations.filter((v): v is [number, ResultError<any>] => isErr(v[1]));
+    const validations = input.map(
+      (v, i) => [i, this.objectSchema[i].validate(v)] as const
+    );
+    const errors = validations.filter((v): v is [number, ResultError<any>] =>
+      isErr(v[1])
+    );
     if (errors.length > 0) {
       return {
         success: false,
         error: Object.fromEntries(errors),
       };
     }
-    const successes = validations.map(v => v[1]).filter(isOk).map((v) => v.data);
+    const successes = validations
+      .map((v) => v[1])
+      .filter(isOk)
+      .map((v) => v.data);
     return {
       success: true,
       data: successes,
@@ -184,7 +189,6 @@ export class VString extends VSchema<string> {
 }
 
 export class VArray<T> extends VSchema<T[]> {
-
   innerSchema: VSchema<T>;
 
   constructor(innerSchema: VSchema<T>) {
@@ -197,18 +201,25 @@ export class VArray<T> extends VSchema<T[]> {
     if (!Array.isArray(input)) {
       return {
         success: false,
-        error: `Keine Liste!`
-      }
+        error: `Keine Liste!`,
+      };
     }
-    const validations = input.map((v, i) => [i, this.innerSchema.validate(v)] as const)
-    const errors = validations.filter((v): v is [number, ResultError<any>] => isErr(v[1]));
+    const validations = input.map(
+      (v, i) => [i, this.innerSchema.validate(v)] as const
+    );
+    const errors = validations.filter((v): v is [number, ResultError<any>] =>
+      isErr(v[1])
+    );
     if (errors.length > 0) {
       return {
         success: false,
         error: Object.fromEntries(errors),
       };
     }
-    const successes = validations.map(v => v[1]).filter(isOk).map((v) => v.data);
+    const successes = validations
+      .map((v) => v[1])
+      .filter(isOk)
+      .map((v) => v.data);
     return {
       success: true,
       data: successes,
@@ -302,7 +313,7 @@ export class VObject<O extends { [key: string]: VSchema<any> }> extends VSchema<
       new Set(Object.keys(this.objectSchema))
     );
     if (diff.size > 0) {
-        // TODO FIXME potentially still do the validation below of the entries
+      // TODO FIXME potentially still do the validation below of the entries
       return {
         success: false,
         error: Object.fromEntries(
@@ -317,14 +328,18 @@ export class VObject<O extends { [key: string]: VSchema<any> }> extends VSchema<
       return [key, innerSchema.validate(val)] as const;
     });
     // TODO FIXME use `is` type refinement for Result
-    const errors = validations.filter((v): v is [number, ResultError<any>] => isErr(v[1]));
+    const errors = validations.filter((v): v is [number, ResultError<any>] =>
+      isErr(v[1])
+    );
     if (errors.length > 0) {
       return {
         success: false,
         error: Object.fromEntries(errors),
       };
     }
-    const successes = validations.filter((v): v is [number, ResultSuccess<O[keyof O]>] => isOk(v[1])).map((v) => [v[0], v[1].data] as const);
+    const successes = validations
+      .filter((v): v is [number, ResultSuccess<O[keyof O]>] => isOk(v[1]))
+      .map((v) => [v[0], v[1].data] as const);
     return {
       success: true,
       data: Object.fromEntries(successes),
@@ -346,57 +361,103 @@ export class VPick<
   O extends VObject<{ [key: string]: VSchema<any> }>,
   K extends string | number
 > extends VSchema<Pick<SchemaObjectToSchema<O["objectSchema"]>, K>> {
-  private pickedSchema: VSchema<Pick<SchemaObjectToSchema<O["objectSchema"]>, K>>;
+  private pickedSchema: VSchema<
+    Pick<SchemaObjectToSchema<O["objectSchema"]>, K>
+  >;
 
   constructor(parentSchema: O | VDiscriminatedUnion<O[], any>, keys: K[]) {
     super();
     if ("unions" in parentSchema) {
-      this.pickedSchema = new VDiscriminatedUnion(parentSchema.key, parentSchema.unions.map(s => new VObject(inclusivePick<O["objectSchema"], K>(s.objectSchema, keys))))
+      this.pickedSchema = new VDiscriminatedUnion(
+        parentSchema.key,
+        parentSchema.unions.map(
+          (s) =>
+            new VObject(
+              inclusivePick<O["objectSchema"], K>(s.objectSchema, keys)
+            )
+        )
+      );
     } else {
-      this.pickedSchema = new VObject(inclusivePick<O["objectSchema"], K>(parentSchema["objectSchema"], keys));
+      this.pickedSchema = new VObject(
+        inclusivePick<O["objectSchema"], K>(parentSchema["objectSchema"], keys)
+      );
     }
   }
 
-  validate(input: unknown): Result<Pick<SchemaObjectToSchema<O["objectSchema"]>, K>, any> {
+  validate(
+    input: unknown
+  ): Result<Pick<SchemaObjectToSchema<O["objectSchema"]>, K>, any> {
     return this.pickedSchema.validate(input);
   }
 }
 
 // fix this with schema types
-const makePartial = <O, K extends keyof O>(obj: O, keys: K[]): Partial<Pick<O, K>> & Exclude<O, K> =>
-  Object.fromEntries(Object.entries(obj).map(([key, value]) => keys.includes(key as K) ? new VUndefined(value) : value)) as any;
+const makePartial = <O, K extends keyof O>(
+  obj: O,
+  keys: K[]
+): Partial<Pick<O, K>> & Exclude<O, K> =>
+  Object.fromEntries(
+    Object.entries(obj).map(([key, value]) =>
+      keys.includes(key as K) ? new VUndefined(value) : value
+    )
+  ) as any;
 
 export class VPartial<
   O extends VObject<{ [key: string]: VSchema<any> }>,
   K extends string | number
-> extends VSchema<Partial<Pick<SchemaObjectToSchema<O["objectSchema"]>, K>> & Exclude<SchemaObjectToSchema<O["objectSchema"]>, K>> {
-  private pickedSchema: VSchema<Partial<Pick<SchemaObjectToSchema<O["objectSchema"]>, K>> & Exclude<SchemaObjectToSchema<O["objectSchema"]>, K>>;
+> extends VSchema<
+  Partial<Pick<SchemaObjectToSchema<O["objectSchema"]>, K>> &
+    Exclude<SchemaObjectToSchema<O["objectSchema"]>, K>
+> {
+  private pickedSchema: VSchema<
+    Partial<Pick<SchemaObjectToSchema<O["objectSchema"]>, K>> &
+      Exclude<SchemaObjectToSchema<O["objectSchema"]>, K>
+  >;
 
   constructor(parentSchema: O | VDiscriminatedUnion<O[], any>, keys: K[]) {
     super();
     if ("unions" in parentSchema) {
-      this.pickedSchema = new VDiscriminatedUnion(parentSchema.key, parentSchema.unions.map(s => new VObject(makePartial<O["objectSchema"], K>(s.objectSchema, keys))))
+      this.pickedSchema = new VDiscriminatedUnion(
+        parentSchema.key,
+        parentSchema.unions.map(
+          (s) =>
+            new VObject(makePartial<O["objectSchema"], K>(s.objectSchema, keys))
+        )
+      );
     } else {
-      this.pickedSchema = new VObject(makePartial<O["objectSchema"], K>(parentSchema["objectSchema"], keys));
+      this.pickedSchema = new VObject(
+        makePartial<O["objectSchema"], K>(parentSchema["objectSchema"], keys)
+      );
     }
   }
 
-  validate(input: unknown): Result<Partial<Pick<SchemaObjectToSchema<O["objectSchema"]>, K>> & Exclude<SchemaObjectToSchema<O["objectSchema"]>, K>, any> {
+  validate(
+    input: unknown
+  ): Result<
+    Partial<Pick<SchemaObjectToSchema<O["objectSchema"]>, K>> &
+      Exclude<SchemaObjectToSchema<O["objectSchema"]>, K>,
+    any
+  > {
     return this.pickedSchema.validate(input);
   }
 }
 
-export class VDiscriminatedUnion<T extends VObject<any>[], K extends keyof T[number]["objectSchema"]> extends VSchema<T[number]["objectSchema"]> {
+export class VDiscriminatedUnion<
+  T extends VObject<any>[],
+  K extends keyof T[number]["objectSchema"]
+> extends VSchema<T[number]["objectSchema"]> {
   key: K;
   unions: T;
 
   constructor(key: K, unions: T) {
     super();
     this.key = key;
-    this.unions = unions
+    this.unions = unions;
   }
 
-  validate(input: unknown): Result<SchemaObjectToSchema<T[number]["objectSchema"]>, any> {
+  validate(
+    input: unknown
+  ): Result<SchemaObjectToSchema<T[number]["objectSchema"]>, any> {
     if (typeof input !== "object") {
       return {
         success: false,
@@ -419,35 +480,37 @@ export class VDiscriminatedUnion<T extends VObject<any>[], K extends keyof T[num
       };
     }
     for (const union of this.unions) {
-      const test = union.objectSchema[this.key]
-      const result = test.validate(input[this.key])
+      const test = union.objectSchema[this.key];
+      const result = test.validate(input[this.key]);
       if (result.success) {
-        return union.validate(input)
+        return union.validate(input);
       }
     }
     return {
       success: false,
       error: {
-        [this.key]: `Ungültiger Wert ${input[this.key]}`
-      }
-    }
+        [this.key]: `Ungültiger Wert ${input[this.key]}`,
+      },
+    };
   }
 }
 
-export class VMerge<O1 extends { [key: string]: VSchema<any>; }, O2 extends { [key: string]: VSchema<any>; }> extends VSchema<SchemaObjectToSchema<O1> & SchemaObjectToSchema<O2>> {
-
+export class VMerge<
+  O1 extends { [key: string]: VSchema<any> },
+  O2 extends { [key: string]: VSchema<any> }
+> extends VSchema<SchemaObjectToSchema<O1> & SchemaObjectToSchema<O2>> {
   objectSchema: VObject<O1 & O2>;
 
   constructor(schema1: VObject<O1>, schema2: VObject<O2>) {
     super();
     this.objectSchema = new VObject({
       ...schema1.objectSchema,
-      ...schema2.objectSchema
-    })
+      ...schema2.objectSchema,
+    });
   }
 
   validate(input: unknown) {
-    return this.objectSchema.validate(input)
+    return this.objectSchema.validate(input);
   }
 }
 
@@ -474,38 +537,38 @@ const res2 = schema5.validate({
   jo: 1,
   invalid: 1,
   bruh: "hi",
-})
+});
 
 if (res2.success) {
-  res2.data.jo
+  res2.data.jo;
 }
 
 const pickedSchema = new VPick(schema5, ["test"]);
 
 console.log(pickedSchema.validate({}));
-console.log(pickedSchema.validate({test: ""}));
-console.log(pickedSchema.validate({test: 1}));
+console.log(pickedSchema.validate({ test: "" }));
+console.log(pickedSchema.validate({ test: 1 }));
 
-console.log(pickedSchema.validate({test: 1, hi: 2}));
-console.log(pickedSchema.validate({test: "jo", hi: 2}));
+console.log(pickedSchema.validate({ test: 1, hi: 2 }));
+console.log(pickedSchema.validate({ test: "jo", hi: 2 }));
 
 const discriminated = new VDiscriminatedUnion("test", [
   new VObject({
-    test: new VEnum([1])
+    test: new VEnum([1]),
   }),
   new VObject({
-    test: new VEnum([2])
+    test: new VEnum([2]),
   }),
-])
+]);
 
-console.log(discriminated.validate({ test: 1 }))
-console.log(discriminated.validate({ test: 2 }))
-console.log(discriminated.validate({ test: 3 }))
-console.log(discriminated.validate({ }))
+console.log(discriminated.validate({ test: 1 }));
+console.log(discriminated.validate({ test: 2 }));
+console.log(discriminated.validate({ test: 3 }));
+console.log(discriminated.validate({}));
 
-const res = discriminated.validate({ test: 3 })
+const res = discriminated.validate({ test: 3 });
 
 if (res.success) {
   // broken
-  res.data.test
+  res.data.test;
 }

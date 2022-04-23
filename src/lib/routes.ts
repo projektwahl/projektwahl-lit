@@ -79,8 +79,8 @@ export const rawUserSchema = new VDiscriminatedUnion("type", [
   new VObject({
     type: new VEnum(["helper"]),
     ...rawUserCommon,
-  })
-])
+  }),
+]);
 
 export const rawProjectSchema = new VObject({
   id: new VNumber(),
@@ -108,16 +108,17 @@ export const rawSessionType = new VObject({
 
 // pick would work on all object schemas and should be quite simple (and also nice to use)
 // union would be not so nice to use but probably similar to implement.
-export const userSchema = new VPick(rawUserSchema,
-    ["id", "type", "username", "group","age"]) // .optional();
+export const userSchema = new VPick(rawUserSchema, [
+  "id",
+  "type",
+  "username",
+  "group",
+  "age",
+]); // .optional();
 
 export type UnknownKeysParam = "passthrough" | "strict" | "strip";
 
-export const entities = <
-  T
->(
-  entity: VSchema<T>
-) =>
+export const entities = <T>(entity: VSchema<T>) =>
   result(
     new VObject({
       entities: new VArray(entity),
@@ -126,49 +127,82 @@ export const entities = <
     })
   );
 
-const baseQuery = <
-  T1,
-  T2,
-  T3,
->(
+const baseQuery = <T1, T2, T3>(
   s: VSchema<T1>,
   sorting: VSchema<T2>,
   filters: VSchema<T3>
 ) => {
   return {
     request: new VObject({
-        paginationDirection: new VEnum(["forwards", "backwards"]),
-        paginationCursor: new VNullable(s),
-        filters,
-        sorting,
-        paginationLimit: new VNumber(),
-      }),
+      paginationDirection: new VEnum(["forwards", "backwards"]),
+      paginationCursor: new VNullable(s),
+      filters,
+      sorting,
+      paginationLimit: new VNumber(),
+    }),
     response: new VObject({
-        entities: new VArray(s),
-        previousCursor: new VNullable(s),
-        nextCursor: new VNullable(s),
-      }),
+      entities: new VArray(s),
+      previousCursor: new VNullable(s),
+      nextCursor: new VNullable(s),
+    }),
   };
 };
 
-export const createUserAction = new VMerge(new VPartial(new VPick(rawUserSchema,
-  ["openid_id", "age", "away", "group", "type", "username","deleted"]),
-  ["deleted", "group", "age", "away"]),
+export const createUserAction = new VMerge(
+  new VPartial(
+    new VPick(rawUserSchema, [
+      "openid_id",
+      "age",
+      "away",
+      "group",
+      "type",
+      "username",
+      "deleted",
+    ]),
+    ["deleted", "group", "age", "away"]
+  ),
   new VObject({
     password: new VUndefined(new VString(1)),
     action: new VEnum(["create"]),
-  }));
+  })
+);
 
-export const updateUserAction = new VMerge(new VPartial(new VMerge(new VPick(rawUserSchema,
-  ["openid_id", "age", "away", "group", "type", "username", "project_leader_id", "force_in_project_id", "deleted"]),
+export const updateUserAction = new VMerge(
+  new VPartial(
+    new VMerge(
+      new VPick(rawUserSchema, [
+        "openid_id",
+        "age",
+        "away",
+        "group",
+        "type",
+        "username",
+        "project_leader_id",
+        "force_in_project_id",
+        "deleted",
+      ]),
+      new VObject({
+        password: new VUndefined(new VString(1)),
+      })
+    ),
+    [
+      "openid_id",
+      "age",
+      "away",
+      "group",
+      "type",
+      "username",
+      "project_leader_id",
+      "force_in_project_id",
+      "deleted",
+      "password",
+    ]
+  ),
   new VObject({
-    password: new VUndefined(new VString(1)),
-  }))
-  , ["openid_id", "age", "away", "group", "type", "username", "project_leader_id", "force_in_project_id", "deleted", "password"]
-  ),new VObject({
     id: new VNumber(),
     action: new VEnum(["update"]),
-  }));
+  })
+);
 
 export const routes = {
   "/api/v1/logout": {
@@ -177,15 +211,15 @@ export const routes = {
   },
   "/api/v1/login": {
     request: new VObject({
-        username: new VString(1, 100),
-        password: new VString(),
-      }),
+      username: new VString(1, 100),
+      password: new VString(),
+    }),
     response: new VObject({}),
   },
   "/api/v1/sudo": {
     request: new VObject({
-        id: new VNumber(),
-      }),
+      id: new VNumber(),
+    }),
     response: new VObject({}),
   },
   "/api/v1/openid-login": {
@@ -194,9 +228,9 @@ export const routes = {
   },
   "/api/v1/redirect": {
     request: new VObject({
-        session_state: new VString(),
-        code: new VString(),
-      }),
+      session_state: new VString(),
+      code: new VString(),
+    }),
     response: new VObject({}),
   },
   "/api/v1/sleep": {
@@ -209,131 +243,225 @@ export const routes = {
   },
   "/api/v1/users/create-or-update": {
     request: new VArray(
-      new VDiscriminatedUnion("action", [
-        createUserAction,
-        updateUserAction,
-      ])
+      new VDiscriminatedUnion("action", [createUserAction, updateUserAction])
     ),
     response: new VArray(
-      new VPick(rawUserSchema, ["id", "project_leader_id", "force_in_project_id",])
+      new VPick(rawUserSchema, [
+        "id",
+        "project_leader_id",
+        "force_in_project_id",
+      ])
     ),
   },
   "/api/v1/projects/create": {
-    request: new VPick(rawProjectSchema,
-      [ "costs", "deleted", "info", "max_age", "max_participants", "min_age", "min_participants", "place", "random_assignments", "title"]),
+    request: new VPick(rawProjectSchema, [
+      "costs",
+      "deleted",
+      "info",
+      "max_age",
+      "max_participants",
+      "min_age",
+      "min_participants",
+      "place",
+      "random_assignments",
+      "title",
+    ]),
     response: new VObject({ id: new VNumber() }),
   },
   "/api/v1/projects/update": {
-    request: new VMerge(new VPartial(new VPick(rawProjectSchema, ["costs", "deleted","info","max_age","max_participants", "min_age","min_participants","place","random_assignments","title"]),
-    ["costs", "deleted","info","max_age","max_participants", "min_age","min_participants","place","random_assignments","title"]),
+    request: new VMerge(
+      new VPartial(
+        new VPick(rawProjectSchema, [
+          "costs",
+          "deleted",
+          "info",
+          "max_age",
+          "max_participants",
+          "min_age",
+          "min_participants",
+          "place",
+          "random_assignments",
+          "title",
+        ]),
+        [
+          "costs",
+          "deleted",
+          "info",
+          "max_age",
+          "max_participants",
+          "min_age",
+          "min_participants",
+          "place",
+          "random_assignments",
+          "title",
+        ]
+      ),
       new VObject({
         id: new VNumber(),
-      }))
-      ,
+      })
+    ),
     response: new VObject({ id: new VNumber() }),
   },
   "/api/v1/users": baseQuery(
-    new VPartial(new VPick(rawUserSchema,
-     ["id","type","username","openid_id","group","age","away","project_leader_id","force_in_project_id","deleted",]),
-      ["openid_id", "force_in_project_id"])
-      ,
-    new VArray(
-      new VDiscriminatedUnion(0, [
-          new VTuple([
-            new VEnum(["id"] as const),
-            new VEnum(["ASC", "DESC"] as const),
-            new VNullable(),
-          ]),
-          new VTuple([
-            new VEnum(["username"] as const),
-            new VEnum(["ASC", "DESC"] as const),
-            new VNullable(),
-          ]),
-          new VTuple([
-            new VEnum(["type"] as const),
-            new VEnum(["ASC", "DESC"] as const),
-            new VNullable(),
-          ]),
-          new VTuple([
-            new VEnum(["project_leader_id_eq"] as const),
-            new VEnum(["ASC", "DESC"] as const),
-            new VNumber(),
-          ]),
-          new VTuple([
-            new VEnum(["force_in_project_id_eq"] as const),
-            new VEnum(["ASC", "DESC"] as const),
-            new VNumber(),
-          ]),
-        ])
-      ),
-     new VPartial(new VPick(rawUserSchema,
-      ["id","username","type","project_leader_id","force_in_project_id","deleted"]),
-      ["id","username","type","project_leader_id","force_in_project_id","deleted"])
-  ),
-  "/api/v1/projects": baseQuery(
-    new VPick(rawProjectSchema, ["id","title","info","place","costs","min_age","max_age","min_participants","max_participants","random_assignments","deleted"]),
-    new VArray(
-        new VDiscriminatedUnion(0, [
-          new VTuple([
-            new VEnum(["id"] as const),
-            new VEnum(["ASC", "DESC"] as const),
-            new VNullable(),
-          ]),
-          new VTuple([
-            new VEnum(["title"] as const),
-            new VEnum(["ASC", "DESC"] as const),
-            new VNullable(),
-          ]),
-          new VTuple([
-            new VEnum(["info"] as const),
-            new VEnum(["ASC", "DESC"] as const),
-            new VNullable(),
-          ]),
-          new VTuple([
-            new VEnum(["project_leader_id_eq"] as const),
-            new VEnum(["ASC", "DESC"] as const),
-            new VNumber(),
-          ]),
-          new VTuple([
-            new VEnum(["force_in_project_id_eq"] as const),
-            new VEnum(["ASC", "DESC"] as const),
-            new VNumber(),
-          ]),
-        ])
-      ),
-    new VPartial(new VPick(rawProjectSchema,["id","title","info","deleted"]),
-    ["id","title","info","deleted"])
-  ),
-  "/api/v1/choices": baseQuery(
-    new VMerge(rawChoiceNullable,
-      new VPick(rawProjectSchema, ["id", "title", "info","place", "costs", "min_age","max_age","min_participants", "max_participants", "random_assignments", "deleted"])
+    new VPartial(
+      new VPick(rawUserSchema, [
+        "id",
+        "type",
+        "username",
+        "openid_id",
+        "group",
+        "age",
+        "away",
+        "project_leader_id",
+        "force_in_project_id",
+        "deleted",
+      ]),
+      ["openid_id", "force_in_project_id"]
     ),
     new VArray(
       new VDiscriminatedUnion(0, [
-          new VTuple([
-            new VEnum(["id"] as const),
-            new VEnum(["ASC", "DESC"] as const),
-            new VNullable(),
-          ]),
-          new VTuple([
-            new VEnum(["title"] as const),
-            new VEnum(["ASC", "DESC"] as const),
-            new VNullable(),
-          ]),
-          new VTuple([
-            new VEnum(["rank"] as const),
-            new VEnum(["ASC", "DESC"] as const),
-            new VNullable(),
-          ]),
-        ])
-      ),
-    new VPartial(new VPick(new VMerge(rawChoiceNullable, rawProjectSchema),
-      ["id", "title", "info", "rank"]),
-      ["id", "title", "info", "rank"])
+        new VTuple([
+          new VEnum(["id"] as const),
+          new VEnum(["ASC", "DESC"] as const),
+          new VNullable(),
+        ]),
+        new VTuple([
+          new VEnum(["username"] as const),
+          new VEnum(["ASC", "DESC"] as const),
+          new VNullable(),
+        ]),
+        new VTuple([
+          new VEnum(["type"] as const),
+          new VEnum(["ASC", "DESC"] as const),
+          new VNullable(),
+        ]),
+        new VTuple([
+          new VEnum(["project_leader_id_eq"] as const),
+          new VEnum(["ASC", "DESC"] as const),
+          new VNumber(),
+        ]),
+        new VTuple([
+          new VEnum(["force_in_project_id_eq"] as const),
+          new VEnum(["ASC", "DESC"] as const),
+          new VNumber(),
+        ]),
+      ])
+    ),
+    new VPartial(
+      new VPick(rawUserSchema, [
+        "id",
+        "username",
+        "type",
+        "project_leader_id",
+        "force_in_project_id",
+        "deleted",
+      ]),
+      [
+        "id",
+        "username",
+        "type",
+        "project_leader_id",
+        "force_in_project_id",
+        "deleted",
+      ]
+    )
+  ),
+  "/api/v1/projects": baseQuery(
+    new VPick(rawProjectSchema, [
+      "id",
+      "title",
+      "info",
+      "place",
+      "costs",
+      "min_age",
+      "max_age",
+      "min_participants",
+      "max_participants",
+      "random_assignments",
+      "deleted",
+    ]),
+    new VArray(
+      new VDiscriminatedUnion(0, [
+        new VTuple([
+          new VEnum(["id"] as const),
+          new VEnum(["ASC", "DESC"] as const),
+          new VNullable(),
+        ]),
+        new VTuple([
+          new VEnum(["title"] as const),
+          new VEnum(["ASC", "DESC"] as const),
+          new VNullable(),
+        ]),
+        new VTuple([
+          new VEnum(["info"] as const),
+          new VEnum(["ASC", "DESC"] as const),
+          new VNullable(),
+        ]),
+        new VTuple([
+          new VEnum(["project_leader_id_eq"] as const),
+          new VEnum(["ASC", "DESC"] as const),
+          new VNumber(),
+        ]),
+        new VTuple([
+          new VEnum(["force_in_project_id_eq"] as const),
+          new VEnum(["ASC", "DESC"] as const),
+          new VNumber(),
+        ]),
+      ])
+    ),
+    new VPartial(
+      new VPick(rawProjectSchema, ["id", "title", "info", "deleted"]),
+      ["id", "title", "info", "deleted"]
+    )
+  ),
+  "/api/v1/choices": baseQuery(
+    new VMerge(
+      rawChoiceNullable,
+      new VPick(rawProjectSchema, [
+        "id",
+        "title",
+        "info",
+        "place",
+        "costs",
+        "min_age",
+        "max_age",
+        "min_participants",
+        "max_participants",
+        "random_assignments",
+        "deleted",
+      ])
+    ),
+    new VArray(
+      new VDiscriminatedUnion(0, [
+        new VTuple([
+          new VEnum(["id"] as const),
+          new VEnum(["ASC", "DESC"] as const),
+          new VNullable(),
+        ]),
+        new VTuple([
+          new VEnum(["title"] as const),
+          new VEnum(["ASC", "DESC"] as const),
+          new VNullable(),
+        ]),
+        new VTuple([
+          new VEnum(["rank"] as const),
+          new VEnum(["ASC", "DESC"] as const),
+          new VNullable(),
+        ]),
+      ])
+    ),
+    new VPartial(
+      new VPick(new VMerge(rawChoiceNullable, rawProjectSchema), [
+        "id",
+        "title",
+        "info",
+        "rank",
+      ]),
+      ["id", "title", "info", "rank"]
+    )
   ),
   "/api/v1/choices/update": {
-    request: new VPick(rawChoiceNullable,
-     ["project_id","rank"]),
+    request: new VPick(rawChoiceNullable, ["project_id", "rank"]),
     response: z.object({}),
   },
   "/api/v1/sessions": baseQuery(
@@ -346,9 +474,8 @@ export const routes = {
       ])
     ),
     new VObject({
-        user_id: new VNullable(new VNumber()),
-      })
-      
+      user_id: new VNullable(new VNumber()),
+    })
   ),
 } as const;
 

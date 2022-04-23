@@ -25,30 +25,21 @@ import { z, ZodObject, ZodType, ZodTypeAny, ZodTypeDef } from "zod";
 import type { entityRoutes, UnknownKeysParam } from "./routes.js";
 import { VObject, VSchema } from "./validation.js";
 
-export const successResult = <
-  T
->(
-  s: VSchema<T>
-) =>
+export const successResult = <T>(s: VSchema<T>) =>
   new VObject({
-      success: z.literal(true),
-      data: s,
-    });
+    success: z.literal(true),
+    data: s,
+  });
 
 // TODO FIXME UPDATE TO zod error schema
-export const failureResult = <T>(
-  s: VSchema<T>
-) =>
+export const failureResult = <T>(s: VSchema<T>) =>
   new VObject({
-      success: z.literal(false),
-      error: s,
-    });
+    success: z.literal(false),
+    error: s,
+  });
 
-export const result = <
-  T
->(
-  s: VSchema<T>
-) => z.union([successResult(s), failureResult(z.record(z.string()))]);
+export const result = <T>(s: VSchema<T>) =>
+  z.union([successResult(s), failureResult(z.record(z.string()))]);
 
 export type ToIndexed<
   T extends { [K: string]: { [inner in I]: unknown } },
