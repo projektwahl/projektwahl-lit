@@ -243,7 +243,7 @@ export const routes = {
       })
       ,
     new VArray(
-        z.union([
+      new VDiscriminatedUnion(0, [
           new VTuple([
             new VEnum(["id"] as const),
             new VEnum(["ASC", "DESC"] as const),
@@ -270,7 +270,7 @@ export const routes = {
             new VNumber(),
           ]),
         ])
-      )
+      ),
     new VPick(rawUserSchema,
       ["id","username","type","project_leader_id","force_in_project_id","deleted"])
       .partial()
@@ -278,7 +278,7 @@ export const routes = {
   "/api/v1/projects": baseQuery(
     new VPick(rawProjectSchema, ["id","title","info","place","costs","min_age","max_age","min_participants","max_participants","random_assignments","deleted"]),
     new VArray(
-        z.union([
+        new VDiscriminatedUnion(0, [
           new VTuple([
             new VEnum(["id"] as const),
             new VEnum(["ASC", "DESC"] as const),
@@ -305,7 +305,7 @@ export const routes = {
             new VNumber(),
           ]),
         ])
-      )
+      ),
     new VPick(rawProjectSchema,["id","title","info","deleted"])
       .partial()
   ),
@@ -326,7 +326,7 @@ export const routes = {
       })
     ),
     new VArray(
-        z.union([
+      new VDiscriminatedUnion(0, [
           new VTuple([
             new VEnum(["id"] as const),
             new VEnum(["ASC", "DESC"] as const),
@@ -343,8 +343,7 @@ export const routes = {
             new VNullable(),
           ]),
         ])
-      )
-      .default([]),
+      ),
     rawChoiceNullable
       .merge(rawProjectSchema)
       .pick({
@@ -353,7 +352,6 @@ export const routes = {
         info: true,
         rank: true,
       })
-      
       .partial()
   ),
   "/api/v1/choices/update": {
