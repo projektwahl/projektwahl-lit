@@ -434,6 +434,23 @@ export class VDiscriminatedUnion<T extends VObject<any>[], K extends keyof T[num
   }
 }
 
+export class VMerge<O1 extends { [key: string]: VSchema<any>; }, O2 extends { [key: string]: VSchema<any>; }> extends VSchema<SchemaObjectToSchema<O1> & SchemaObjectToSchema<O2>> {
+
+  objectSchema: VObject<O1 & O2>;
+
+  constructor(schema1: VObject<O1>, schema2: VObject<O2>) {
+    super();
+    this.objectSchema = new VObject({
+      ...schema1.objectSchema,
+      ...schema2.objectSchema
+    })
+  }
+
+  validate(input: unknown) {
+    return this.objectSchema.validate(input)
+  }
+}
+
 // partial and merge need to be implemented
 
 // how to implement partial? maybe like pick?
