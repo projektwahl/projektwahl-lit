@@ -23,6 +23,7 @@ SPDX-FileCopyrightText: 2021 Moritz Hedtke <Moritz.Hedtke@t-online.de>
 import { z, ZodIssue, ZodObject, ZodTypeAny } from "zod";
 import { result } from "./result.js";
 import {
+  VArray,
   VBoolean,
   VConstant,
   VDiscriminatedUnion,
@@ -115,7 +116,7 @@ export const entities = <
 ) =>
   result(
     new VObject({
-      entities: z.array(entity),
+      entities: new VArray(entity),
       previousCursor: new VNullable(entity),
       nextCursor: new VNullable(entity),
     })
@@ -126,7 +127,7 @@ const baseQuery = <
   T2,
   T3,
 >(
-  s: T1,
+  s: VSchema<T1>,
   sorting: VSchema<T2>,
   filters: VSchema<T3>
 ) => {
@@ -140,7 +141,7 @@ const baseQuery = <
         paginationLimit: new VNumber(),
       }),
     response: new VObject({
-        entities: z.array(s),
+        entities: new VArray(s),
         previousCursor: new VNullable(s),
         nextCursor: new VNullable(s),
       }),
@@ -209,20 +210,14 @@ export const routes = {
     response: new VObject({}),
   },
   "/api/v1/users/create-or-update": {
-    request: z.array(
+    request: new VArray(
       new VDiscriminatedUnion("action", [
         createUserAction,
         updateUserAction,
       ])
     ),
-    response: z.array(
-      rawUserSchema
-        .pick({
-          id: true,
-          project_leader_id: true,
-          force_in_project_id: true,
-        })
-        
+    response: new VArray(
+      new VPick(rawUserSchema, ["id", "project_leader_id", "force_in_project_id",])
     ),
   },
   "/api/v1/projects/create": {
@@ -247,33 +242,32 @@ export const routes = {
         force_in_project_id: true,
       })
       ,
-    z
-      .array(
+    new VArray(
         z.union([
           z.tuple([
-            z.literal("id" as const),
+            new VConstant("id" as const),
             z.enum(["ASC", "DESC"] as const),
-            z.null(),
+            new VNullable(),
           ]),
           z.tuple([
-            z.literal("username" as const),
+            new VConstant("username" as const),
             z.enum(["ASC", "DESC"] as const),
-            z.null(),
+            new VNullable(),
           ]),
           z.tuple([
-            z.literal("type" as const),
+            new VConstant("type" as const),
             z.enum(["ASC", "DESC"] as const),
-            z.null(),
+            new VNullable(),
           ]),
           z.tuple([
-            z.literal("project_leader_id_eq" as const),
+            new VConstant("project_leader_id_eq" as const),
             z.enum(["ASC", "DESC"] as const),
-            z.number(),
+            new VNumber(),
           ]),
           z.tuple([
-            z.literal("force_in_project_id_eq" as const),
+            new VConstant("force_in_project_id_eq" as const),
             z.enum(["ASC", "DESC"] as const),
-            z.number(),
+            new VNumber(),
           ]),
         ])
       )
@@ -373,7 +367,7 @@ export const routes = {
   },
   "/api/v1/sessions": baseQuery(
     rawSessionType,
-    z.array(
+    new VArray(
       z.tuple([
         z.literal("session_id" as const),
         z.enum(["ASC", "DESC"] as const),

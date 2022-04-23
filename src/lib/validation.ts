@@ -125,6 +125,39 @@ export class VString extends VSchema<string> {
   }
 }
 
+export class VArray<T> extends VSchema<T[]> {
+
+  innerSchema: VSchema<T>;
+
+  constructor(innerSchema: VSchema<T>) {
+    super();
+    this.innerSchema = innerSchema;
+  }
+
+  validate(input: unknown): Result<T[], any> {
+    // similar to VObject impl
+    if (!Array.isArray(input)) {
+      return {
+        success: false,
+        error: `Keine Liste!`
+      }
+    }
+    const validations = input.map((v, i) => [i, this.innerSchema.validate(v)] as const)
+    const errors = validations.filter((v) => !v[1].success);
+    if (errors.length > 0) {
+      return {
+        success: false,
+        error: Object.fromEntries(errors),
+      };
+    }
+    const successes = validations.map((v) => v[1].data);
+    return {
+      success: true,
+      data: successes,
+    };
+  }
+}
+
 export class VNullable<T> extends VSchema<T | null> {
   innerSchema: VSchema<T>;
 
