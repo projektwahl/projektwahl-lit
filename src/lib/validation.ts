@@ -8,25 +8,26 @@ export abstract class VSchema<T> {
   abstract validate(input: unknown): Result<T, any>;
 }
 
-export class VConstant<T> extends VSchema<T> {
+export class VEnum<T> extends VSchema<T> {
 
-  value: T;
+  values: [T, ...T[]];
 
-  constructor(value: T) {
+  constructor(values: [T, ...T[]]) {
     super();
-    this.value = value;
+    this.values = values;
   }
 
   validate(input: unknown): Result<T, any> {
-      if (input === this.value) {
+    const found = this.values.find(v => v === input)
+      if (found !== undefined) {
         return {
           success: true,
-          data: this.value,
+          data: found,
         }
       } else {
         return {
           success: false,
-          error: `Erwartet: ${this.value}`
+          error: `Erwartet eines von: ${this.values}`
         }
       }
   }

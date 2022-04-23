@@ -25,8 +25,8 @@ import { result } from "./result.js";
 import {
   VArray,
   VBoolean,
-  VConstant,
   VDiscriminatedUnion,
+  VEnum,
   VNullable,
   VNumber,
   VObject,
@@ -63,17 +63,17 @@ const rawUserCommon = {
 
 export const rawUserSchema = new VDiscriminatedUnion("type", [
   new VObject({
-    type: new VConstant("voter"),
+    type: new VEnum(["voter"]),
     group: new VNullable(new VString(0, 100)),
     age: new VNullable(new VNumber(0, 200)),
     ...rawUserCommon,
   }),
   new VObject({
-    type: new VConstant("admin"),
+    type: new VEnum(["admin"]),
     ...rawUserCommon,
   }),
   new VObject({
-    type: new VConstant("helper"),
+    type: new VEnum(["helper"]),
     ...rawUserCommon,
   })
 ])
@@ -133,8 +133,7 @@ const baseQuery = <
 ) => {
   return {
     request: new VObject({
-        paginationDirection: z
-          .enum(["forwards", "backwards"]),
+        paginationDirection: new VEnum(["forwards", "backwards"]),
         paginationCursor: new VNullable(s),
         filters,
         sorting,
@@ -169,7 +168,7 @@ export const updateUserAction = new VPick(rawUserSchema,
   .partial()
   .extend({
     id: new VNumber(),
-    action: new VConstant("update"),
+    action: new VEnum(["update"]),
   });
 
 export const routes = {
@@ -245,33 +244,32 @@ export const routes = {
     new VArray(
         z.union([
           z.tuple([
-            new VConstant("id" as const),
-            z.enum(["ASC", "DESC"] as const),
+            new VEnum(["id"] as const),
+            new VEnum(["ASC", "DESC"] as const),
             new VNullable(),
           ]),
           z.tuple([
-            new VConstant("username" as const),
-            z.enum(["ASC", "DESC"] as const),
+            new VEnum(["username"] as const),
+            new VEnum(["ASC", "DESC"] as const),
             new VNullable(),
           ]),
           z.tuple([
-            new VConstant("type" as const),
-            z.enum(["ASC", "DESC"] as const),
+            new VEnum(["type"] as const),
+            new VEnum(["ASC", "DESC"] as const),
             new VNullable(),
           ]),
           z.tuple([
-            new VConstant("project_leader_id_eq" as const),
-            z.enum(["ASC", "DESC"] as const),
+            new VEnum(["project_leader_id_eq"] as const),
+            new VEnum(["ASC", "DESC"] as const),
             new VNumber(),
           ]),
           z.tuple([
-            new VConstant("force_in_project_id_eq" as const),
-            z.enum(["ASC", "DESC"] as const),
+            new VEnum(["force_in_project_id_eq"] as const),
+            new VEnum(["ASC", "DESC"] as const),
             new VNumber(),
           ]),
         ])
       )
-      .default([]),
     new VPick(rawUserSchema,
       ["id","username","type","project_leader_id","force_in_project_id","deleted"])
       .partial()
@@ -282,33 +280,32 @@ export const routes = {
       .array(
         z.union([
           z.tuple([
-            z.literal("id" as const),
-            z.enum(["ASC", "DESC"] as const),
-            z.null(),
+            new VEnuml(["id"] as const),
+            new VEnum(["ASC", "DESC"] as const),
+            new VNullable(),
           ]),
           z.tuple([
-            z.literal("title" as const),
-            z.enum(["ASC", "DESC"] as const),
-            z.null(),
+            new VEnum(["title"] as const),
+            new VEnum(["ASC", "DESC"] as const),
+            new VNullable(),
           ]),
           z.tuple([
-            z.literal("info" as const),
-            z.enum(["ASC", "DESC"] as const),
-            z.null(),
+            new VEnum(["info"] as const),
+            new VEnum(["ASC", "DESC"] as const),
+            new VNullable(),
           ]),
           z.tuple([
-            z.literal("project_leader_id_eq" as const),
-            z.enum(["ASC", "DESC"] as const),
-            z.number(),
+            new VEnum(["project_leader_id_eq"] as const),
+            new VEnum(["ASC", "DESC"] as const),
+            new VNumber(),
           ]),
           z.tuple([
-            z.literal("force_in_project_id_eq" as const),
-            z.enum(["ASC", "DESC"] as const),
-            z.number(),
+            new VEnum(["force_in_project_id_eq"] as const),
+            new VEnum(["ASC", "DESC"] as const),
+            new VNumber(),
           ]),
         ])
       )
-      .default([]),
     new VPick(rawProjectSchema,["id","title","info","deleted"])
       .partial()
   ),
@@ -332,19 +329,19 @@ export const routes = {
       .array(
         z.union([
           z.tuple([
-            z.literal("id" as const),
-            z.enum(["ASC", "DESC"] as const),
-            z.null(),
+            new VEnum(["id"] as const),
+            new VEnum(["ASC", "DESC"] as const),
+            new VNullable(),
           ]),
           z.tuple([
-            z.literal("title" as const),
-            z.enum(["ASC", "DESC"] as const),
-            z.null(),
+            new VEnum(["title"] as const),
+            new VEnum(["ASC", "DESC"] as const),
+            new VNullable(),
           ]),
           z.tuple([
-            z.literal("rank" as const),
-            z.enum(["ASC", "DESC"] as const),
-            z.null(),
+            new VEnum(["rank"] as const),
+            new VEnum(["ASC", "DESC"] as const),
+            new VNullable(),
           ]),
         ])
       )
@@ -369,9 +366,9 @@ export const routes = {
     rawSessionType,
     new VArray(
       z.tuple([
-        z.literal("session_id" as const),
-        z.enum(["ASC", "DESC"] as const),
-        z.null(),
+        new VEnum(["session_id"] as const),
+        new VEnum(["ASC", "DESC"] as const),
+        new VNullable(),
       ])
     ),
     new VObject({
