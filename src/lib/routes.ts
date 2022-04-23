@@ -33,6 +33,7 @@ import {
   VPick,
   VSchema,
   VString,
+  VTuple,
 } from "./validation.js";
 
 export const rawChoice = new VObject({
@@ -243,27 +244,27 @@ export const routes = {
       ,
     new VArray(
         z.union([
-          z.tuple([
+          new VTuple([
             new VEnum(["id"] as const),
             new VEnum(["ASC", "DESC"] as const),
             new VNullable(),
           ]),
-          z.tuple([
+          new VTuple([
             new VEnum(["username"] as const),
             new VEnum(["ASC", "DESC"] as const),
             new VNullable(),
           ]),
-          z.tuple([
+          new VTuple([
             new VEnum(["type"] as const),
             new VEnum(["ASC", "DESC"] as const),
             new VNullable(),
           ]),
-          z.tuple([
+          new VTuple([
             new VEnum(["project_leader_id_eq"] as const),
             new VEnum(["ASC", "DESC"] as const),
             new VNumber(),
           ]),
-          z.tuple([
+          new VTuple([
             new VEnum(["force_in_project_id_eq"] as const),
             new VEnum(["ASC", "DESC"] as const),
             new VNumber(),
@@ -278,27 +279,27 @@ export const routes = {
     new VPick(rawProjectSchema, ["id","title","info","place","costs","min_age","max_age","min_participants","max_participants","random_assignments","deleted"]),
     new VArray(
         z.union([
-          z.tuple([
-            new VEnuml(["id"] as const),
+          new VTuple([
+            new VEnum(["id"] as const),
             new VEnum(["ASC", "DESC"] as const),
             new VNullable(),
           ]),
-          z.tuple([
+          new VTuple([
             new VEnum(["title"] as const),
             new VEnum(["ASC", "DESC"] as const),
             new VNullable(),
           ]),
-          z.tuple([
+          new VTuple([
             new VEnum(["info"] as const),
             new VEnum(["ASC", "DESC"] as const),
             new VNullable(),
           ]),
-          z.tuple([
+          new VTuple([
             new VEnum(["project_leader_id_eq"] as const),
             new VEnum(["ASC", "DESC"] as const),
             new VNumber(),
           ]),
-          z.tuple([
+          new VTuple([
             new VEnum(["force_in_project_id_eq"] as const),
             new VEnum(["ASC", "DESC"] as const),
             new VNumber(),
@@ -326,17 +327,17 @@ export const routes = {
     ),
     new VArray(
         z.union([
-          z.tuple([
+          new VTuple([
             new VEnum(["id"] as const),
             new VEnum(["ASC", "DESC"] as const),
             new VNullable(),
           ]),
-          z.tuple([
+          new VTuple([
             new VEnum(["title"] as const),
             new VEnum(["ASC", "DESC"] as const),
             new VNullable(),
           ]),
-          z.tuple([
+          new VTuple([
             new VEnum(["rank"] as const),
             new VEnum(["ASC", "DESC"] as const),
             new VNullable(),
@@ -363,7 +364,7 @@ export const routes = {
   "/api/v1/sessions": baseQuery(
     rawSessionType,
     new VArray(
-      z.tuple([
+      new VTuple([
         new VEnum(["session_id"] as const),
         new VEnum(["ASC", "DESC"] as const),
         new VNullable(),
