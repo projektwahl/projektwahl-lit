@@ -327,7 +327,6 @@ export class VObject<O extends { [key: string]: VSchema<any> }> extends VSchema<
       const innerSchema: O[keyof O] = this.objectSchema[key];
       return [key, innerSchema.validate(val)] as const;
     });
-    // TODO FIXME use `is` type refinement for Result
     const errors = validations.filter((v): v is [number, ResultError<any>] =>
       isErr(v[1])
     );
@@ -358,6 +357,8 @@ const inclusivePick = <O, K extends keyof O>(obj: O, keys: K[]): Pick<O, K> =>
   Object.fromEntries(keys.map((key) => [key, obj[key]])) as any;
 
 // type-wise could be represented as VObject
+// this needs to work with both
+
 export class VPick<
   O extends VObject<{ [key: string]: VSchema<any> }>,
   K extends string | number
@@ -404,6 +405,7 @@ const makePartial = <O, K extends keyof O>(
   ) as any;
 
 // type-wise could be represented as VObject
+// this needs to work with both
 export class VPartial<
   O extends VObject<{ [key: string]: VSchema<any> }>,
   K extends string | number
@@ -444,6 +446,7 @@ export class VPartial<
   }
 }
 
+// this only needs vobject like objects
 export class VDiscriminatedUnion<
   T extends VObject<any>[],
   K extends keyof T[number]["objectSchema"]
@@ -497,6 +500,11 @@ export class VDiscriminatedUnion<
   }
 }
 
+// maybe for everything create two classes.
+// I think we need to do that otherwise we don't know whether something can actually be used. (e.g whether a a picked union can be used as the second argument to vmerge)
+
+// this needs actual vobject objects (e.g. not unions)
+// actually it needs to work with both (at least first one discriminated union and second one anything)
 export class VMerge<
   O1 extends { [key: string]: VSchema<any> },
   O2 extends { [key: string]: VSchema<any> }

@@ -169,22 +169,22 @@ export const createUserAction = new VMerge(
 
 export const updateUserAction = new VMerge(
   new VPartial(
-    new VMerge(
-      new VPick(rawUserSchema, [
-        "openid_id",
-        "age",
-        "away",
-        "group",
-        "type",
-        "username",
-        "project_leader_id",
-        "force_in_project_id",
-        "deleted",
-      ]),
+    new VPick(new VMerge(
+     rawUserSchema,
       new VObject({
         password: new VUndefined(new VString(1)),
       })
-    ),
+    ), [
+      "openid_id",
+      "age",
+      "away",
+      "group",
+      "type",
+      "username",
+      "project_leader_id",
+      "force_in_project_id",
+      "deleted",
+    ]),
     [
       "openid_id",
       "age",
