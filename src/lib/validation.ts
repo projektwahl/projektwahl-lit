@@ -357,6 +357,7 @@ function setDifference(
 const inclusivePick = <O, K extends keyof O>(obj: O, keys: K[]): Pick<O, K> =>
   Object.fromEntries(keys.map((key) => [key, obj[key]])) as any;
 
+// type-wise could be represented as VObject
 export class VPick<
   O extends VObject<{ [key: string]: VSchema<any> }>,
   K extends string | number
@@ -402,6 +403,7 @@ const makePartial = <O, K extends keyof O>(
     )
   ) as any;
 
+// type-wise could be represented as VObject
 export class VPartial<
   O extends VObject<{ [key: string]: VSchema<any> }>,
   K extends string | number
@@ -495,6 +497,7 @@ export class VDiscriminatedUnion<
   }
 }
 
+// type-wise could be represented as VObject
 export class VMerge<
   O1 extends { [key: string]: VSchema<any> },
   O2 extends { [key: string]: VSchema<any> }

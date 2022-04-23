@@ -496,5 +496,5 @@ export declare type MinimalSafeParseError = {
 };
 
 export type ResponseType<P extends keyof typeof routes> =
-  | z.SafeParseSuccess<z.infer<typeof routes[P]["response"]>>
+  | z.SafeParseSuccess<typeof routes[P]["response"]["schema"]>
   | MinimalSafeParseError;
