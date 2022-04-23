@@ -518,6 +518,28 @@ export class VMerge<
   }
 }
 
+const testb = <Q extends { [key: string]: VSchema<any> }>(schema: VObject<Q>) => <T extends { [key: string]: VSchema<any> }>(v: VObject<T>) => {
+  return new VObject({
+    ...v.objectSchema,
+    ...schema.objectSchema
+  })
+}
+
+export type MappedFunctionCallType<
+  Q extends { [key: string]: VSchema<any> },
+  T extends { [K: string]: VObject<any> }
+> = {
+  [K in keyof T]: VObject<T[K]["objectSchema"] & Q>;
+};
+
+export const mappedFunctionCall = <
+  Q extends { [key: string]: VSchema<any> },
+  
+>(schema: VObject<Q>) => <T extends { [K: string]: VObject<any> },
+K extends string>(value: T[K]): MappedFunctionCallType<Q, T>[K] {
+  return testb(schema)(value);
+}
+
 export class VMergeUnion<
   T extends VObject<any>[],
   K extends keyof T[number]["objectSchema"],
@@ -526,10 +548,7 @@ export class VMergeUnion<
 > extends VDiscriminatedUnion<(T[number]["objectSchema"] & O2["objectSchema"])[], K> {
 
   constructor(schema1: O1, schema2: O2) {
-    super(schema1.key, schema1.unions.map(v => { return new VObject({
-      ...v,
-      ...schema2.objectSchema
-    })}));
+    super(schema1.key, schema1.unions.map(mappedFunctionCall(schema2)));
   }
 }
 
