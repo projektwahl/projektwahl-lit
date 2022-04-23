@@ -356,12 +356,12 @@ const inclusivePick = <O, K extends keyof O>(obj: O, keys: K[]): Pick<O, K> =>
   Object.fromEntries(keys.map((key) => [key, obj[key]])) as any;
 
 export class VPick<
-  O extends { [key: string]: VSchema<any> },
-  K extends keyof O
-> extends VSchema<Pick<SchemaObjectToSchema<O>, K>> {
-  private pickedSchema: VSchema<Pick<SchemaObjectToSchema<O>, K>>;
+  O extends VObject<{ [key: string]: VSchema<any> }>,
+  K extends keyof O["objectSchema"]
+> extends VSchema<Pick<SchemaObjectToSchema<O["objectSchema"]>, K>> {
+  private pickedSchema: VSchema<Pick<SchemaObjectToSchema<O["objectSchema"]>, K>>;
 
-  constructor(parentSchema: VObject<O> | VDiscriminatedUnion<VObject<O>, any>, keys: K[]) {
+  constructor(parentSchema: O | VDiscriminatedUnion<O[], any>, keys: K[]) {
     super();
     if ("unions" in parentSchema) {
       this.pickedSchema = new VDiscriminatedUnion(parentSchema.key, parentSchema.unions.map(s => new VObject(inclusivePick(s.objectSchema, keys))))
@@ -370,22 +370,22 @@ export class VPick<
     }
   }
 
-  validate(input: unknown): Result<Pick<SchemaObjectToSchema<O>, K>, any> {
+  validate(input: unknown): Result<Pick<SchemaObjectToSchema<O["objectSchema"]>, K>, any> {
     return this.pickedSchema.validate(input);
   }
 }
 
-export class VDiscriminatedUnion<T extends VObject<any>, K extends keyof T["objectSchema"]> extends VSchema<T["objectSchema"]> {
+export class VDiscriminatedUnion<T extends VObject<any>[], K extends keyof T[number]["objectSchema"]> extends VSchema<T[number]["objectSchema"]> {
   key: K;
-  unions: T[];
+  unions: T;
 
-  constructor(key: K, unions: T[]) {
+  constructor(key: K, unions: T) {
     super();
     this.key = key;
     this.unions = unions
   }
 
-  validate(input: unknown): Result<SchemaObjectToSchema<T["objectSchema"]>, any> {
+  validate(input: unknown): Result<SchemaObjectToSchema<T[number]["objectSchema"]>, any> {
     if (typeof input !== "object") {
       return {
         success: false,
