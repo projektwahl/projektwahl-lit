@@ -337,6 +337,26 @@ export class VPick<
   }
 }
 
+export class VPartial<
+  O extends VObject<{ [key: string]: VSchema<any> }>,
+  K extends string | number
+> extends VSchema<Partial<Pick<SchemaObjectToSchema<O["objectSchema"]>, K>> & Exclude<SchemaObjectToSchema<O["objectSchema"]>, K>> {
+  private pickedSchema: VSchema<Partial<Pick<SchemaObjectToSchema<O["objectSchema"]>, K>> & Exclude<SchemaObjectToSchema<O["objectSchema"]>, K>>;
+
+  constructor(parentSchema: O | VDiscriminatedUnion<O[], any>, keys: K[]) {
+    super();
+    if ("unions" in parentSchema) {
+      this.pickedSchema = new VDiscriminatedUnion(parentSchema.key, parentSchema.unions.map(s => new VObject(makePartial<O["objectSchema"], K>(s.objectSchema, keys))))
+    } else {
+      this.pickedSchema = new VObject(makePartial<O["objectSchema"], K>(parentSchema["objectSchema"], keys));
+    }
+  }
+
+  validate(input: unknown): Result<Partial<Pick<SchemaObjectToSchema<O["objectSchema"]>, K>> & Exclude<SchemaObjectToSchema<O["objectSchema"]>, K>, any> {
+    return this.pickedSchema.validate(input);
+  }
+}
+
 export class VDiscriminatedUnion<T extends VObject<any>[], K extends keyof T[number]["objectSchema"]> extends VSchema<T[number]["objectSchema"]> {
   key: K;
   unions: T;
@@ -384,6 +404,10 @@ export class VDiscriminatedUnion<T extends VObject<any>[], K extends keyof T[num
     }
   }
 }
+
+// partial and merge need to be implemented
+
+// how to implement partial? maybe like pick?
 
 const schema5 = new VObject({
   test: new VNumber(),

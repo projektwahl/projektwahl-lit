@@ -311,19 +311,7 @@ export const routes = {
   ),
   "/api/v1/choices": baseQuery(
     rawChoiceNullable.merge(
-      rawProjectSchema.pick({
-        id: true,
-        title: true,
-        info: true,
-        place: true,
-        costs: true,
-        min_age: true,
-        max_age: true,
-        min_participants: true,
-        max_participants: true,
-        random_assignments: true,
-        deleted: true,
-      })
+      new VPick(rawProjectSchema, ["id", "title", "info","place", "costs", "min_age","max_age","min_participants", "max_participants", "random_assignments", "deleted"])
     ),
     new VArray(
       new VDiscriminatedUnion(0, [
