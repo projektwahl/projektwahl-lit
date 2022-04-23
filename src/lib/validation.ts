@@ -285,15 +285,9 @@ export class VObject<O extends { [key: string]: VSchema<any> }> extends VSchema<
         ),
       };
     }
-    /*for (const key in this.objectSchema) {
-        // @ts-expect-error probably not typeable
-        const val = input[key];
-        const result = this.objectSchema[key].validate(val)
-    }*/
     // TODO FIXME mapped type would be needed
     const validations = Object.keys(this.objectSchema).map((key) => {
-      // @ts-expect-error probably not typeable
-      const val = input[key];
+      const val = hasProp(input, key) ? input[key] : undefined;
       const innerSchema: O[keyof O] = this.objectSchema[key];
       return [key, innerSchema.validate(val)] as const;
     });
@@ -310,69 +304,6 @@ export class VObject<O extends { [key: string]: VSchema<any> }> extends VSchema<
       success: true,
       data: Object.fromEntries(successes),
     };
-  }
-}
-
-export class VObjectEntry<
-  K extends string | number | symbol,
-  V
-> extends VSchema<{
-  [k in K]: V;
-}> {
-  private key: K;
-
-  private value: VSchema<V>;
-
-  constructor(key: K, value: VSchema<V>) {
-    super();
-    this.key = key;
-    this.value = value;
-  }
-
-  validate(input: unknown): Result<{ [k in K]: V }, any> {
-    if (typeof input !== "object") {
-      return {
-        success: false,
-        error: {
-          // TODO don't stringify as this could explode the error message length
-          [this.key]: `${JSON.stringify(input)} ist kein Objekt!`,
-        },
-      };
-    }
-    if (input === null) {
-      return {
-        success: false,
-        error: { [this.key]: `${JSON.stringify(input)} ist null!` },
-      };
-    }
-    if (!(this.key in input)) {
-      return {
-        success: false,
-        error: {
-          [this.key]: `${JSON.stringify(input)} hat kein Attribut ${this.key}!`,
-        },
-      };
-    }
-    // @ts-expect-error probably not typeable
-    const val = input[this.key];
-    const inner = this.value.validate(val);
-    if (inner.success) {
-      // @ts-expect-error probably not typeable
-      const data: { [k in K]: V } = {
-        [this.key]: inner.data,
-      };
-      return {
-        success: true,
-        data,
-      };
-    } else {
-      return {
-        success: false,
-        error: {
-          key: `${inner.error}`,
-        },
-      };
-    }
   }
 }
 
@@ -419,30 +350,6 @@ function setDifference(
   b: Set<string | number | symbol>
 ) {
   return new Set(Array.from(a).filter((item) => !b.has(item)));
-}
-
-export class VFilterKeys<S, K extends keyof S> extends VSchema<Pick<S, K>> {
-  private keys: Set<K>;
-  private parentSchema: VSchema<S>;
-
-  constructor(keys: Set<K>, parentSchema: VSchema<S>) {
-    super();
-    this.keys = keys;
-    this.parentSchema = parentSchema;
-  }
-
-  validate(input: unknown): Result<Pick<S, K>, any> {
-    const diff = setDifference(Object.keys(input), this.keys);
-    if (diff.size > 0) {
-      return {
-        success: false,
-        error: Object.fromEntries(
-          Array.from(diff).map((v) => [v, `${String(v)} unbekannter Schlüssel`])
-        ),
-      };
-    }
-    return this.parentSchema.validate(input);
-  }
 }
 
 const inclusivePick = <O, K extends keyof O>(obj: O, keys: K[]): Pick<O, K> =>
@@ -515,61 +422,6 @@ export class VDiscriminatedUnion<T extends VObject<any>, K extends keyof T["obje
     }
   }
 }
-
-const schema1 = new VObjectEntry("helper" as const, new VNumber());
-const schema2 = new VObjectEntry("tester" as const, new VNumber());
-
-console.log(schema1.validate({ helper: 1 }));
-console.log(schema1.validate({ helper: null }));
-console.log(schema1.validate({ he: 1 }));
-console.log(schema1.validate({ he: 1, helper: 1 }));
-
-console.log(schema2.validate({ tester: 1 }));
-
-const schema = new VIntersection(schema1, schema2);
-
-console.log(schema.validate({ helper: 1, tester: 1 }));
-console.log(schema.validate({ helper: 1, tejster: 1 }));
-console.log(schema.validate({ hjelper: 1, tester: 1 }));
-console.log(schema.validate({ helliper: 1, testekr: 1 }));
-
-const betterSchema = new VFilterKeys(
-  new Set(["helper", "tester"] as const),
-  schema
-);
-
-const testGenericSchema = <K extends string | number | symbol>(k: K) => {
-  return new VFilterKeys(
-    new Set(["helper", k] as const),
-    new VIntersection(
-      new VObjectEntry("helper" as const, new VNumber()),
-      new VObjectEntry(k, new VNumber())
-    )
-  );
-};
-
-const testGenericSchema2 = <K extends string | number | symbol>(k: K) => {
-  return new VFilterKeys(
-    new Set(["helper"] as const),
-    new VIntersection(
-      new VObjectEntry("helper" as const, new VNumber()),
-      new VObjectEntry(k, new VNumber())
-    )
-  );
-};
-
-const joGeneric = testGenericSchema("hi");
-
-const parsed = joGeneric.validate("");
-
-if (parsed.success) {
-  parsed.data.hi;
-}
-
-console.log(betterSchema.validate({ helper: 1, tester: 1 }));
-console.log(betterSchema.validate({ helper: 1, tejster: 1 }));
-console.log(betterSchema.validate({ hjelper: 1, tester: 1 }));
-console.log(betterSchema.validate({ helliper: 1, testekr: 1 }));
 
 const schema5 = new VObject({
   test: new VNumber(),
