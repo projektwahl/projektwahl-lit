@@ -53,11 +53,11 @@ export class VEnum<T> extends VSchema<T> {
 
 export class VTuple<T extends VSchema<any>[]> extends VSchema<SchemaArrayToSchema<T>> {
 
-  entries: T;
+  objectSchema: T;
 
-  constructor(entries: T) {
+  constructor(objectSchema: T) {
     super();
-    this.entries = entries;
+    this.objectSchema = objectSchema;
   }
 
   validate(input: unknown): Result<T, any> {
@@ -68,13 +68,13 @@ export class VTuple<T extends VSchema<any>[]> extends VSchema<SchemaArrayToSchem
         error: `Keine Liste!`
       }
     }
-    if (input.length !== this.entries.length) {
+    if (input.length !== this.objectSchema.length) {
       return {
         success: false,
-        error: `Liste nicht ${this.entries.length} lang, sondern ${input.length}!`
+        error: `Liste nicht ${this.objectSchema.length} lang, sondern ${input.length}!`
       }
     }
-    const validations = input.map((v, i) => [i, this.entries[i].validate(v)] as const)
+    const validations = input.map((v, i) => [i, this.objectSchema[i].validate(v)] as const)
     const errors = validations.filter((v): v is [number, ResultError<any>] => isErr(v[1]));
     if (errors.length > 0) {
       return {
@@ -319,7 +319,7 @@ const inclusivePick = <O, K extends keyof O>(obj: O, keys: K[]): Pick<O, K> =>
 
 export class VPick<
   O extends VObject<{ [key: string]: VSchema<any> }>,
-  K extends keyof O["objectSchema"]
+  K extends string | number
 > extends VSchema<Pick<SchemaObjectToSchema<O["objectSchema"]>, K>> {
   private pickedSchema: VSchema<Pick<SchemaObjectToSchema<O["objectSchema"]>, K>>;
 
