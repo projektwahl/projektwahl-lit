@@ -9,8 +9,15 @@ export function isOk<R, E>(result: Result<R, E>): result is ResultSuccess<R> {
   return result.success;
 }
 
-export function isErr<R, E>(result: Result<R, E>): result is ResultError<R> {
+export function isErr<R, E>(result: Result<R, E>): result is ResultError<E> {
   return !result.success;
+}
+
+function hasProp<T extends object, K extends PropertyKey>(
+  obj: T, 
+  key: K
+): obj is T & Record<K, any> {
+  return key in obj;
 }
 
 export abstract class VSchema<T> {
@@ -68,14 +75,14 @@ export class VTuple<T extends VSchema<any>[]> extends VSchema<SchemaArrayToSchem
       }
     }
     const validations = input.map((v, i) => [i, this.entries[i].validate(v)] as const)
-    const errors = validations.filter((v) => !v[1].success);
+    const errors = validations.filter((v): v is [number, ResultError<any>] => isErr(v[1]));
     if (errors.length > 0) {
       return {
         success: false,
         error: Object.fromEntries(errors),
       };
     }
-    const successes = validations.map((v) => v[1].data);
+    const successes = validations.map(v => v[1]).filter(isOk).map((v) => v.data);
     return {
       success: true,
       data: successes,
@@ -472,6 +479,27 @@ export class VDiscriminatedUnion<T extends VObject<any>, K extends keyof T["obje
   }
 
   validate(input: unknown): Result<SchemaObjectToSchema<T["objectSchema"]>, any> {
+    if (typeof input !== "object") {
+      return {
+        success: false,
+        error: {
+          // TODO don't stringify as this could explode the error message length
+          [this.key]: `${JSON.stringify(input)} ist kein Objekt!`,
+        },
+      };
+    }
+    if (input === null) {
+      return {
+        success: false,
+        error: { [this.key]: `${JSON.stringify(input)} ist null!` },
+      };
+    }
+    if (!hasProp(input, this.key)) {
+      return {
+        success: false,
+        error: { [this.key]: `${this.key} fehlt!` },
+      };
+    }
     for (const union of this.unions) {
       const test = union.objectSchema[this.key]
       const result = test.validate(input[this.key])
