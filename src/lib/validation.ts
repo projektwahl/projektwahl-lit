@@ -307,44 +307,6 @@ export class VObject<O extends { [key: string]: VSchema<any> }> extends VSchema<
   }
 }
 
-export class VIntersection<S1, S2> extends VSchema<S1 & S2> {
-  private schema1: VSchema<S1>;
-  private schema2: VSchema<S2>;
-
-  constructor(schema1: VSchema<S1>, schema2: VSchema<S2>) {
-    super();
-    this.schema1 = schema1;
-    this.schema2 = schema2;
-  }
-
-  validate(input: unknown): Result<S1 & S2, any> {
-    const output1 = this.schema1.validate(input);
-    const output2 = this.schema2.validate(input);
-    if (!output1.success && !output2.success) {
-      return {
-        success: false,
-        error: {
-          ...output1.error,
-          ...output2.error,
-        },
-      };
-    }
-    if (!output1.success) {
-      return output1;
-    }
-    if (!output2.success) {
-      return output2;
-    }
-    return {
-      success: true,
-      data: {
-        ...output1.data,
-        ...output2.data,
-      },
-    };
-  }
-}
-
 function setDifference(
   a: (string | number | symbol)[],
   b: Set<string | number | symbol>
@@ -364,9 +326,9 @@ export class VPick<
   constructor(parentSchema: O | VDiscriminatedUnion<O[], any>, keys: K[]) {
     super();
     if ("unions" in parentSchema) {
-      this.pickedSchema = new VDiscriminatedUnion(parentSchema.key, parentSchema.unions.map(s => new VObject(inclusivePick(s.objectSchema, keys))))
+      this.pickedSchema = new VDiscriminatedUnion(parentSchema.key, parentSchema.unions.map(s => new VObject(inclusivePick<O["objectSchema"], K>(s.objectSchema, keys))))
     } else {
-      this.pickedSchema = new VObject(inclusivePick(parentSchema.objectSchema, keys));
+      this.pickedSchema = new VObject(inclusivePick<O["objectSchema"], K>(parentSchema["objectSchema"], keys));
     }
   }
 
