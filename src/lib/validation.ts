@@ -450,7 +450,7 @@ export class VPick<
   }
 }
 
-export class VDiscriminatedUnion<T extends VObject<any>, K extends keyof T["objectSchema"]> extends VSchema<T> {
+export class VDiscriminatedUnion<T extends VObject<any>, K extends keyof T["objectSchema"]> extends VSchema<T["objectSchema"]> {
   key: K;
   unions: T[];
 
@@ -460,7 +460,7 @@ export class VDiscriminatedUnion<T extends VObject<any>, K extends keyof T["obje
     this.unions = unions
   }
 
-  validate(input: unknown): Result<T, any> {
+  validate(input: unknown): Result<SchemaObjectToSchema<T["objectSchema"]>, any> {
     for (const union of this.unions) {
       const test = union.objectSchema[this.key]
       const result = test.validate(input[this.key])
@@ -546,6 +546,17 @@ console.log(
   })
 );
 
+const res2 = schema5.validate({
+  test: 1,
+  jo: 1,
+  invalid: 1,
+  bruh: "hi",
+})
+
+if (res2.success) {
+  res2.data.jo
+}
+
 const pickedSchema = new VPick(schema5, ["test"]);
 
 console.log(pickedSchema.validate({}));
@@ -554,3 +565,24 @@ console.log(pickedSchema.validate({test: 1}));
 
 console.log(pickedSchema.validate({test: 1, hi: 2}));
 console.log(pickedSchema.validate({test: "jo", hi: 2}));
+
+const discriminated = new VDiscriminatedUnion("test", [
+  new VObject({
+    test: new VEnum([1])
+  }),
+  new VObject({
+    test: new VEnum([2])
+  }),
+])
+
+console.log(discriminated.validate({ test: 1 }))
+console.log(discriminated.validate({ test: 2 }))
+console.log(discriminated.validate({ test: 3 }))
+console.log(discriminated.validate({ }))
+
+const res = discriminated.validate({ test: 3 })
+
+if (res.success) {
+  // broken
+  res.data.test
+}
