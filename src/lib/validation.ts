@@ -434,11 +434,15 @@ export class VPick<
   O extends { [key: string]: VSchema<any> },
   K extends keyof O
 > extends VSchema<Pick<SchemaObjectToSchema<O>, K>> {
-  private pickedSchema: VObject<Pick<SchemaObjectToSchema<O>, K>>;
+  private pickedSchema: VSchema<Pick<SchemaObjectToSchema<O>, K>>;
 
-  constructor(parentSchema: VObject<O>, keys: K[]) {
+  constructor(parentSchema: VObject<O> | VDiscriminatedUnion<VObject<O>, any>, keys: K[]) {
     super();
-    this.pickedSchema = new VObject(inclusivePick(parentSchema.objectSchema, keys));
+    if ("unions" in parentSchema) {
+      this.pickedSchema = new VDiscriminatedUnion(parentSchema.key, parentSchema.unions.map(s => new VObject(inclusivePick(s.objectSchema, keys))))
+    } else {
+      this.pickedSchema = new VObject(inclusivePick(parentSchema.objectSchema, keys));
+    }
   }
 
   validate(input: unknown): Result<Pick<SchemaObjectToSchema<O>, K>, any> {
