@@ -241,6 +241,31 @@ export class VNullable<T> extends VSchema<T | null> {
   }
 }
 
+export class VUndefined<T> extends VSchema<T | undefined> {
+  innerSchema?: VSchema<T>;
+
+  constructor(innerSchema?: VSchema<T>) {
+    super();
+    this.innerSchema = innerSchema;
+  }
+
+  validate(input: unknown): Result<T | undefined, any> {
+    if (input === undefined) {
+      return {
+        success: true,
+        data: undefined,
+      };
+    }
+    if (this.innerSchema === undefined) {
+      return {
+        success: false,
+        error: "Undefined erwartet.",
+      };
+    }
+    return this.innerSchema.validate(input);
+  }
+}
+
 type SchemaObjectToSchema<Type extends { [key: string]: VSchema<any> }> = {
   [Property in keyof Type]: Type[Property]["schema"];
 };
@@ -336,6 +361,10 @@ export class VPick<
     return this.pickedSchema.validate(input);
   }
 }
+
+// fix this with schema types
+const makePartial = <O, K extends keyof O>(obj: O, keys: K[]): Partial<Pick<O, K>> & Exclude<O, K> =>
+  Object.fromEntries(Object.entries(obj).map(([key, value]) => keys.includes(key as K) ? new VUndefined(value) : value)) as any;
 
 export class VPartial<
   O extends VObject<{ [key: string]: VSchema<any> }>,

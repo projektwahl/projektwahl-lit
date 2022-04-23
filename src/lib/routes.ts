@@ -30,10 +30,12 @@ import {
   VNullable,
   VNumber,
   VObject,
+  VPartial,
   VPick,
   VSchema,
   VString,
   VTuple,
+  VUndefined,
 } from "./validation.js";
 
 export const rawChoice = new VObject({
@@ -148,14 +150,9 @@ const baseQuery = <
   };
 };
 
-export const createUserAction = new VPick(rawUserSchema,
-  ["openid_id", "age", "away", "group", "type", "username","deleted"])
-  .partial({
-    deleted: true,
-    group: true,
-    age: true,
-    away: true,
-  })
+export const createUserAction = new VPartial(new VPick(rawUserSchema,
+  ["openid_id", "age", "away", "group", "type", "username","deleted"]),
+  ["deleted", "group", "age", "away"])
   .extend({
     password: z.optional(z.string().min(1)),
     action: z.literal("create"),
@@ -163,14 +160,14 @@ export const createUserAction = new VPick(rawUserSchema,
 
 export const updateUserAction = new VPick(rawUserSchema,
   ["openid_id", "age", "away", "group", "type", "username", "project_leader_id", "force_in_project_id", "deleted"])
-  .extend({
-    password: z.optional(z.string().min(1)),
-  })
+  .extend(new VObject({
+    password: new VUndefined(new VString(1)),
+  }))
   .partial()
-  .extend({
+  .extend(new VObject({
     id: new VNumber(),
     action: new VEnum(["update"]),
-  });
+  }));
 
 export const routes = {
   "/api/v1/logout": {
@@ -226,21 +223,18 @@ export const routes = {
     response: new VObject({ id: new VNumber() }),
   },
   "/api/v1/projects/update": {
-    request: new VPick(rawProjectSchema, ["costs", "deleted","info","max_age","max_participants", "min_age","min_participants","place","random_assignments","title"])
-      .partial()
-      .extend({
-        id: z.number(),
-      })
+    request: new VPartial(new VPick(rawProjectSchema, ["costs", "deleted","info","max_age","max_participants", "min_age","min_participants","place","random_assignments","title"]),
+    ["costs", "deleted","info","max_age","max_participants", "min_age","min_participants","place","random_assignments","title"])
+      .extend(new VObject({
+        id: new VNumber(),
+      }))
       ,
     response: new VObject({ id: new VNumber() }),
   },
   "/api/v1/users": baseQuery(
-    new VPick(rawUserSchema,
-     ["id","type","username","openid_id","group","age","away","project_leader_id","force_in_project_id","deleted",])
-      .partial({
-        openid_id: true,
-        force_in_project_id: true,
-      })
+    new VPartial(new VPick(rawUserSchema,
+     ["id","type","username","openid_id","group","age","away","project_leader_id","force_in_project_id","deleted",]),
+      ["openid_id", "force_in_project_id"])
       ,
     new VArray(
       new VDiscriminatedUnion(0, [
@@ -271,9 +265,9 @@ export const routes = {
           ]),
         ])
       ),
-    new VPick(rawUserSchema,
+     new VPartial(new VPick(rawUserSchema,
+      ["id","username","type","project_leader_id","force_in_project_id","deleted"]),
       ["id","username","type","project_leader_id","force_in_project_id","deleted"])
-      .partial()
   ),
   "/api/v1/projects": baseQuery(
     new VPick(rawProjectSchema, ["id","title","info","place","costs","min_age","max_age","min_participants","max_participants","random_assignments","deleted"]),
@@ -306,8 +300,8 @@ export const routes = {
           ]),
         ])
       ),
-    new VPick(rawProjectSchema,["id","title","info","deleted"])
-      .partial()
+    new VPartial(new VPick(rawProjectSchema,["id","title","info","deleted"]),
+    ["id","title","info","deleted"])
   ),
   "/api/v1/choices": baseQuery(
     rawChoiceNullable.merge(
