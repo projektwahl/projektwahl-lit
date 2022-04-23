@@ -33,6 +33,45 @@ export class VEnum<T> extends VSchema<T> {
   }
 }
 
+export class VTuple<T extends VSchema<any>[]> extends VSchema<SchemaArrayToSchema<T>> {
+
+  entries: T;
+
+  constructor(entries: T) {
+    super();
+    this.entries = entries;
+  }
+
+  validate(input: unknown): Result<T, any> {
+    // similar to VObject
+    if (!Array.isArray(input)) {
+      return {
+        success: false,
+        error: `Keine Liste!`
+      }
+    }
+    if (input.length !== this.entries.length) {
+      return {
+        success: false,
+        error: `Liste nicht ${this.entries.length} lang, sondern ${input.length}!`
+      }
+    }
+    const validations = input.map((v, i) => [i, this.entries[i].validate(v)] as const)
+    const errors = validations.filter((v) => !v[1].success);
+    if (errors.length > 0) {
+      return {
+        success: false,
+        error: Object.fromEntries(errors),
+      };
+    }
+    const successes = validations.map((v) => v[1].data);
+    return {
+      success: true,
+      data: successes,
+    };
+  }
+}
+
 export class VNumber extends VSchema<number> {
   min: number;
   max: number;
@@ -180,6 +219,10 @@ export class VNullable<T> extends VSchema<T | null> {
 
 type SchemaObjectToSchema<Type extends { [key: string]: VSchema<any> }> = {
   [Property in keyof Type]: Type[Property]["schema"];
+};
+
+type SchemaArrayToSchema<Type extends VSchema<any>[]> = {
+  [Property in number]: Type[Property]["schema"];
 };
 
 export class VObject<O extends { [key: string]: VSchema<any> }> extends VSchema<

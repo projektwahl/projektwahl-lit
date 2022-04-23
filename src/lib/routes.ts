@@ -20,7 +20,7 @@ https://github.com/projektwahl/projektwahl-lit
 SPDX-License-Identifier: AGPL-3.0-or-later
 SPDX-FileCopyrightText: 2021 Moritz Hedtke <Moritz.Hedtke@t-online.de>
 */
-import { z, ZodIssue, ZodObject, ZodTypeAny } from "zod";
+import { z, ZodIssue } from "zod";
 import { result } from "./result.js";
 import {
   VArray,
@@ -276,8 +276,7 @@ export const routes = {
   ),
   "/api/v1/projects": baseQuery(
     new VPick(rawProjectSchema, ["id","title","info","place","costs","min_age","max_age","min_participants","max_participants","random_assignments","deleted"]),
-    z
-      .array(
+    new VArray(
         z.union([
           z.tuple([
             new VEnuml(["id"] as const),
@@ -325,8 +324,7 @@ export const routes = {
         deleted: true,
       })
     ),
-    z
-      .array(
+    new VArray(
         z.union([
           z.tuple([
             new VEnum(["id"] as const),
