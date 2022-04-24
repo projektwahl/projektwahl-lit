@@ -28,11 +28,14 @@ import {
   VDiscriminatedUnion,
   VEnum,
   VMerge,
+  VMergeUnion,
   VNullable,
   VNumber,
   VObject,
   VPartial,
+  VPartialUnion,
   VPick,
+  VPickUnion,
   VSchema,
   VString,
   VTuple,
@@ -148,9 +151,9 @@ const baseQuery = <T1, T2, T3>(
   };
 };
 
-export const createUserAction = new VMerge(
-  new VPartial(
-    new VPick(rawUserSchema, [
+export const createUserAction = new VMergeUnion(
+  new VPartialUnion(
+    new VPickUnion(rawUserSchema, [
       "openid_id",
       "age",
       "away",
