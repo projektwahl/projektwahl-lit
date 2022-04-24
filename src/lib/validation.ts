@@ -415,7 +415,7 @@ const inclusivePick = <O, K extends keyof O>(obj: O, keys: K[]): Pick<O, K> =>
 export class VPick<
   O extends VObject<{ [key: string]: VSchema<any> }>,
   K extends string | number
-> extends VObject<Pick<SchemaObjectToSchema<O["objectSchema"]>, K>> {
+> extends VObject<Pick<O["objectSchema"], K>> {
 
   constructor(parentSchema: O, keys: K[]) {
     super(inclusivePick<O["objectSchema"], K>(parentSchema["objectSchema"], keys))
@@ -457,66 +457,34 @@ const makePartial = <O, K extends keyof O>(
 export class VPartial<
   O extends VObject<{ [key: string]: VSchema<any> }>,
   K extends string | number
-> extends VSchema<
-  Partial<Pick<SchemaObjectToSchema<O["objectSchema"]>, K>> &
-    Exclude<SchemaObjectToSchema<O["objectSchema"]>, K>
+> extends VObject<
+  Partial<Pick<O["objectSchema"], K>> &
+    Exclude<O["objectSchema"], K>
 > {
-  private pickedSchema: VSchema<
-    Partial<Pick<SchemaObjectToSchema<O["objectSchema"]>, K>> &
-      Exclude<SchemaObjectToSchema<O["objectSchema"]>, K>
-  >;
-
   constructor(parentSchema: O, keys: K[]) {
-    super();
-    
-      this.pickedSchema = new VObject(
+    super(
         makePartial<O["objectSchema"], K>(parentSchema["objectSchema"], keys)
       );
-    
-  }
-
-  validate(
-    input: unknown
-  ): Result<
-    Partial<Pick<SchemaObjectToSchema<O["objectSchema"]>, K>> &
-      Exclude<SchemaObjectToSchema<O["objectSchema"]>, K>,
-    any
-  > {
-    return this.pickedSchema.validate(input);
   }
 }
 
-export class VPartialUnion<
-  O extends VObject<{ [key: string]: VSchema<any> }>,
-  K extends string | number
-> extends VDiscriminatedUnion<
-  Partial<Pick<SchemaObjectToSchema<O["objectSchema"]>, K>> &
-    Exclude<SchemaObjectToSchema<O["objectSchema"]>, K>
-> {
-  private pickedSchema: VSchema<
-    Partial<Pick<SchemaObjectToSchema<O["objectSchema"]>, K>> &
-      Exclude<SchemaObjectToSchema<O["objectSchema"]>, K>
-  >;
 
-  constructor(parentSchema: VDiscriminatedUnion<O[], any>, keys: K[]) {
-    super();
-      this.pickedSchema = new VDiscriminatedUnion(
+export class VPartialUnion<
+  T extends VObject<any>[],
+  K extends KEYS,
+  KEYS extends string|number
+> extends VDiscriminatedUnion<
+VObject<(Partial<Pick<T[number]["objectSchema"], KEYS>> &
+Exclude<T[number]["objectSchema"], KEYS>)>[], K  
+> {
+  constructor(parentSchema: VDiscriminatedUnion<T, K>, keys: K[]) {
+    super(
         parentSchema.key,
         parentSchema.unions.map(
           (s) =>
             new VObject(makePartial<O["objectSchema"], K>(s.objectSchema, keys))
         )
       );
-  }
-
-  validate(
-    input: unknown
-  ): Result<
-    Partial<Pick<SchemaObjectToSchema<O["objectSchema"]>, K>> &
-      Exclude<SchemaObjectToSchema<O["objectSchema"]>, K>,
-    any
-  > {
-    return this.pickedSchema.validate(input);
   }
 }
 
