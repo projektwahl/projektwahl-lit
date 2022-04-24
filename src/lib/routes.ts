@@ -201,7 +201,7 @@ export const updateUserAction = VMergeUnion(
   ),
   new VObject({
     id: new VNumber(),
-    action: new VEnum(["update"]),
+    action: new VEnum(["update"] as const),
   })
 );
 
@@ -244,6 +244,7 @@ export const routes = {
   },
   "/api/v1/users/create-or-update": {
     request: new VArray(
+      // this is our first nested discriminated union...
       new VDiscriminatedUnion("action", [createUserAction, updateUserAction])
     ),
     response: new VArray(
@@ -251,7 +252,7 @@ export const routes = {
         "id",
         "project_leader_id",
         "force_in_project_id",
-      ])
+      ] as const)
     ),
   },
   "/api/v1/projects/create": {
@@ -266,7 +267,7 @@ export const routes = {
       "place",
       "random_assignments",
       "title",
-    ]),
+    ] as const),
     response: new VObject({ id: new VNumber() }),
   },
   "/api/v1/projects/update": {
@@ -283,7 +284,7 @@ export const routes = {
           "place",
           "random_assignments",
           "title",
-        ]),
+        ] as const),
         [
           "costs",
           "deleted",
@@ -295,7 +296,7 @@ export const routes = {
           "place",
           "random_assignments",
           "title",
-        ]
+        ] as const
       ),
       new VObject({
         id: new VNumber(),
@@ -316,8 +317,8 @@ export const routes = {
         "project_leader_id",
         "force_in_project_id",
         "deleted",
-      ]),
-      ["openid_id", "force_in_project_id"]
+      ] as const),
+      ["openid_id", "force_in_project_id"] as const
     ),
     new VArray(
       new VDiscriminatedUnion(0, [
@@ -356,7 +357,7 @@ export const routes = {
         "project_leader_id",
         "force_in_project_id",
         "deleted",
-      ]),
+      ] as const),
       [
         "id",
         "username",
@@ -364,7 +365,7 @@ export const routes = {
         "project_leader_id",
         "force_in_project_id",
         "deleted",
-      ]
+      ] as const
     )
   ),
   "/api/v1/projects": baseQuery(
@@ -380,7 +381,7 @@ export const routes = {
       "max_participants",
       "random_assignments",
       "deleted",
-    ]),
+    ] as const),
     new VArray(
       new VDiscriminatedUnion(0, [
         new VTuple([
@@ -411,8 +412,8 @@ export const routes = {
       ])
     ),
     new VPartial(
-      new VPick(rawProjectSchema, ["id", "title", "info", "deleted"]),
-      ["id", "title", "info", "deleted"]
+      new VPick(rawProjectSchema, ["id", "title", "info", "deleted"] as const),
+      ["id", "title", "info", "deleted"] as const
     )
   ),
   "/api/v1/choices": baseQuery(
@@ -430,7 +431,7 @@ export const routes = {
         "max_participants",
         "random_assignments",
         "deleted",
-      ])
+      ] as const)
     ),
     new VArray(
       new VDiscriminatedUnion(0, [
@@ -457,12 +458,12 @@ export const routes = {
         "title",
         "info",
         "rank",
-      ]),
-      ["id", "title", "info", "rank"]
+      ] as const),
+      ["id", "title", "info", "rank"] as const
     )
   ),
   "/api/v1/choices/update": {
-    request: new VPick(rawChoiceNullable, ["project_id", "rank"]),
+    request: new VPick(rawChoiceNullable, ["project_id", "rank"] as const),
     response: z.object({}),
   },
   "/api/v1/sessions": baseQuery(
