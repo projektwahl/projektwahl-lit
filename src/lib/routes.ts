@@ -168,14 +168,15 @@ export const createUserAction = new VMergeUnion(
   })
 );
 
+
 export const updateUserAction = new VMergeUnion(
   new VPartialUnion(
     new VPickUnion(new VMergeUnion(
-     rawUserSchema,
-      new VObject({
-        password: new VUndefined(new VString(1)),
-      })
-    ), [
+      rawUserSchema,
+       new VObject({
+         password: new VUndefined(new VString(1)),
+       })
+     ), [
       "openid_id",
       "age",
       "away",
