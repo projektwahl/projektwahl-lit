@@ -168,6 +168,14 @@ export const createUserAction = new VMergeUnion(
   })
 );
 
+
+const afds = new VMergeUnion(
+  rawUserSchema,
+   new VObject({
+     password: new VUndefined(new VString(1)),
+   })
+ )
+
 export const updateUserAction = new VMergeUnion(
   new VPartialUnion(
     new VPickUnion(new VMergeUnion(
