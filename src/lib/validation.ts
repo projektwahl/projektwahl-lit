@@ -409,7 +409,7 @@ function setDifference(
   return new Set(Array.from(a).filter((item) => !b.has(item)));
 }
 
-const inclusivePick = <O, K extends keyof O>(obj: O, keys: K[]): Pick<O, K> =>
+const inclusivePick = <O, K extends keyof O>(obj: O, keys: readonly K[]): Pick<O, K> =>
   Object.fromEntries(keys.map((key) => [key, obj[key]])) as any;
 
 export class VPick<
@@ -417,7 +417,7 @@ export class VPick<
   K extends string | number
 > extends VObject<Pick<O["objectSchema"], K>> {
 
-  constructor(parentSchema: O, keys: K[]) {
+  constructor(parentSchema: O, keys: readonly K[]) {
     super(inclusivePick<O["objectSchema"], K>(parentSchema["objectSchema"], keys))
   }
 }
@@ -428,7 +428,7 @@ export class VPickUnion<
   KEYS extends string|number
 > extends VDiscriminatedUnion<VObject<Pick<T[number]["objectSchema"], KEYS>>[], K> {
  
-  constructor(parentSchema: VDiscriminatedUnion<T, K>, keys: KEYS[]) {
+  constructor(parentSchema: VDiscriminatedUnion<T, K>, keys: readonly KEYS[]) {
     super(
         parentSchema.key,
         parentSchema.unions.map(
@@ -461,7 +461,7 @@ export class VPartial<
   Partial<Pick<O["objectSchema"], K>> &
     Exclude<O["objectSchema"], K>
 > {
-  constructor(parentSchema: O, keys: K[]) {
+  constructor(parentSchema: O, keys: readonly K[]) {
     super(
         makePartial<O["objectSchema"], K>(parentSchema["objectSchema"], keys)
       );
@@ -477,7 +477,7 @@ export class VPartialUnion<
 VObject<(Partial<Pick<T[number]["objectSchema"], KEYS>> &
 Exclude<T[number]["objectSchema"], KEYS>)>[], K  
 > {
-  constructor(parentSchema: VDiscriminatedUnion<T, K>, keys: K[]) {
+  constructor(parentSchema: VDiscriminatedUnion<T, K>, keys: readonly K[]) {
     super(
         parentSchema.key,
         parentSchema.unions.map(
