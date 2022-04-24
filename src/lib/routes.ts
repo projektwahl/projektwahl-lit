@@ -70,17 +70,17 @@ const rawUserCommon = {
 
 export const rawUserSchema = new VDiscriminatedUnion("type", [
   new VObject({
-    type: new VEnum(["voter"]),
+    type: new VEnum(["voter"] as const),
     group: new VNullable(new VString(0, 100)),
     age: new VNullable(new VNumber(0, 200)),
     ...rawUserCommon,
   }),
   new VObject({
-    type: new VEnum(["admin"]),
+    type: new VEnum(["admin"] as const),
     ...rawUserCommon,
   }),
   new VObject({
-    type: new VEnum(["helper"]),
+    type: new VEnum(["helper"] as const),
     ...rawUserCommon,
   }),
 ]);
@@ -117,9 +117,7 @@ export const userSchema = new VPickUnion(rawUserSchema, [
   "username",
   "group",
   "age",
-]); // .optional();
-
-export type UnknownKeysParam = "passthrough" | "strict" | "strip";
+] as const); // .optional();
 
 export const entities = <T>(entity: VSchema<T>) =>
   result(
@@ -137,7 +135,7 @@ const baseQuery = <T1, T2, T3>(
 ) => {
   return {
     request: new VObject({
-      paginationDirection: new VEnum(["forwards", "backwards"]),
+      paginationDirection: new VEnum(["forwards", "backwards"] as const),
       paginationCursor: new VNullable(s),
       filters,
       sorting,
@@ -161,12 +159,12 @@ export const createUserAction = new VMergeUnion(
       "type",
       "username",
       "deleted",
-    ]),
-    ["deleted", "group", "age", "away"]
+    ] as const),
+    ["deleted", "group", "age", "away"] as const
   ),
   new VObject({
     password: new VUndefined(new VString(1)),
-    action: new VEnum(["create"]),
+    action: new VEnum(["create"] as const),
   })
 );
 
@@ -187,7 +185,7 @@ export const updateUserAction = new VMergeUnion(
       "project_leader_id",
       "force_in_project_id",
       "deleted",
-    ]),
+    ] as const),
     [
       "openid_id",
       "age",
@@ -199,7 +197,7 @@ export const updateUserAction = new VMergeUnion(
       "force_in_project_id",
       "deleted",
       "password",
-    ]
+    ] as const
   ),
   new VObject({
     id: new VNumber(),
