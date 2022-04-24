@@ -434,7 +434,7 @@ export class VPickUnion<
         parentSchema.unions.map(
           (s) =>
             new VObject(
-              inclusivePick<O["objectSchema"], K>(s.objectSchema, keys)
+              inclusivePick(s.objectSchema, keys)
             )
         )
       );
@@ -482,7 +482,7 @@ Exclude<T[number]["objectSchema"], KEYS>)>[], K
         parentSchema.key,
         parentSchema.unions.map(
           (s) =>
-            new VObject(makePartial<O["objectSchema"], K>(s.objectSchema, keys))
+            new VObject(makePartial(s.objectSchema, keys))
         )
       );
   }
