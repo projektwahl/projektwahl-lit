@@ -90,6 +90,7 @@ export class VTuple<T extends VSchema<any>[]> extends VSchema<
       .map((v) => v.data);
     return {
       success: true,
+      // @ts-expect-error map function not typeable
       data: successes,
     };
   }
@@ -341,7 +342,62 @@ export class VObject<O extends { [key: string]: VSchema<any> }> extends VSchema<
       .map((v) => [v[0], v[1].data] as const);
     return {
       success: true,
+      // @ts-expect-error bruh
       data: Object.fromEntries(successes),
+    };
+  }
+}
+
+// this only needs vobject like objects
+export class VDiscriminatedUnion<
+  T extends VObject<any>[],
+  K extends keyof T[number]["objectSchema"]
+> extends VSchema<T[number]["objectSchema"]> {
+  key: K;
+  unions: T;
+
+  constructor(key: K, unions: T) {
+    super();
+    this.key = key;
+    this.unions = unions;
+  }
+
+  validate(
+    input: unknown
+  ): Result<SchemaObjectToSchema<T[number]["objectSchema"]>, any> {
+    if (typeof input !== "object") {
+      return {
+        success: false,
+        error: {
+          // TODO don't stringify as this could explode the error message length
+          [this.key]: `${JSON.stringify(input)} ist kein Objekt!`,
+        },
+      };
+    }
+    if (input === null) {
+      return {
+        success: false,
+        error: { [this.key]: `${JSON.stringify(input)} ist null!` },
+      };
+    }
+    if (!hasProp(input, this.key)) {
+      return {
+        success: false,
+        error: { [this.key]: `${this.key} fehlt!` },
+      };
+    }
+    for (const union of this.unions) {
+      const test = union.objectSchema[this.key];
+      const result = test.validate(input[this.key]);
+      if (result.success) {
+        return union.validate(input);
+      }
+    }
+    return {
+      success: false,
+      error: {
+        [this.key]: `Ungültiger Wert ${input[this.key]}`,
+      },
     };
   }
 }
@@ -356,44 +412,24 @@ function setDifference(
 const inclusivePick = <O, K extends keyof O>(obj: O, keys: K[]): Pick<O, K> =>
   Object.fromEntries(keys.map((key) => [key, obj[key]])) as any;
 
-// type-wise could be represented as VObject
-// this needs to work with both
-
 export class VPick<
   O extends VObject<{ [key: string]: VSchema<any> }>,
   K extends string | number
-> extends VSchema<Pick<SchemaObjectToSchema<O["objectSchema"]>, K>> {
-  private pickedSchema: VSchema<
-    Pick<SchemaObjectToSchema<O["objectSchema"]>, K>
-  >;
+> extends VObject<Pick<SchemaObjectToSchema<O["objectSchema"]>, K>> {
 
   constructor(parentSchema: O, keys: K[]) {
-    super();
-  
-      this.pickedSchema = new VObject(
-        inclusivePick<O["objectSchema"], K>(parentSchema["objectSchema"], keys)
-      );
-  }
-
-  validate(
-    input: unknown
-  ): Result<Pick<SchemaObjectToSchema<O["objectSchema"]>, K>, any> {
-    return this.pickedSchema.validate(input);
+    super(inclusivePick<O["objectSchema"], K>(parentSchema["objectSchema"], keys))
   }
 }
 
-
 export class VPickUnion<
-  O extends VObject<{ [key: string]: VSchema<any> }>,
-  K extends string | number
-> extends VSchema<Pick<SchemaObjectToSchema<O["objectSchema"]>, K>> {
-  private pickedSchema: VSchema<
-    Pick<SchemaObjectToSchema<O["objectSchema"]>, K>
-  >;
-
-  constructor(parentSchema: VDiscriminatedUnion<O[], any>, keys: K[]) {
-    super();
-      this.pickedSchema = new VDiscriminatedUnion(
+  T extends VObject<any>[],
+  K extends KEYS,
+  KEYS extends string|number
+> extends VDiscriminatedUnion<VObject<Pick<T[number]["objectSchema"], KEYS>>[], K> {
+ 
+  constructor(parentSchema: VDiscriminatedUnion<T, K>, keys: KEYS[]) {
+    super(
         parentSchema.key,
         parentSchema.unions.map(
           (s) =>
@@ -402,13 +438,6 @@ export class VPickUnion<
             )
         )
       );
-   
-  }
-
-  validate(
-    input: unknown
-  ): Result<Pick<SchemaObjectToSchema<O["objectSchema"]>, K>, any> {
-    return this.pickedSchema.validate(input);
   }
 }
 
@@ -491,59 +520,6 @@ export class VPartialUnion<
   }
 }
 
-// this only needs vobject like objects
-export class VDiscriminatedUnion<
-  T extends VObject<any>[],
-  K extends keyof T[number]["objectSchema"]
-> extends VSchema<T[number]["objectSchema"]> {
-  key: K;
-  unions: T;
-
-  constructor(key: K, unions: T) {
-    super();
-    this.key = key;
-    this.unions = unions;
-  }
-
-  validate(
-    input: unknown
-  ): Result<SchemaObjectToSchema<T[number]["objectSchema"]>, any> {
-    if (typeof input !== "object") {
-      return {
-        success: false,
-        error: {
-          // TODO don't stringify as this could explode the error message length
-          [this.key]: `${JSON.stringify(input)} ist kein Objekt!`,
-        },
-      };
-    }
-    if (input === null) {
-      return {
-        success: false,
-        error: { [this.key]: `${JSON.stringify(input)} ist null!` },
-      };
-    }
-    if (!hasProp(input, this.key)) {
-      return {
-        success: false,
-        error: { [this.key]: `${this.key} fehlt!` },
-      };
-    }
-    for (const union of this.unions) {
-      const test = union.objectSchema[this.key];
-      const result = test.validate(input[this.key]);
-      if (result.success) {
-        return union.validate(input);
-      }
-    }
-    return {
-      success: false,
-      error: {
-        [this.key]: `Ungültiger Wert ${input[this.key]}`,
-      },
-    };
-  }
-}
 
 // maybe for everything create two classes.
 // I think we need to do that otherwise we don't know whether something can actually be used. (e.g whether a a picked union can be used as the second argument to vmerge)
