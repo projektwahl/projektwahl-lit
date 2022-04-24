@@ -305,8 +305,8 @@ export const routes = {
     response: new VObject({ id: new VNumber() }),
   },
   "/api/v1/users": baseQuery(
-    new VPartial(
-      new VPick(rawUserSchema, [
+    new VPartialUnion(
+      new VPickUnion(rawUserSchema, [
         "id",
         "type",
         "username",
@@ -349,8 +349,8 @@ export const routes = {
         ]),
       ])
     ),
-    new VPartial(
-      new VPick(rawUserSchema, [
+    new VPartialUnion(
+      new VPickUnion(rawUserSchema, [
         "id",
         "username",
         "type",
