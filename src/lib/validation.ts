@@ -418,9 +418,40 @@ export class VPartial<
       Exclude<SchemaObjectToSchema<O["objectSchema"]>, K>
   >;
 
-  constructor(parentSchema: O | VDiscriminatedUnion<O[], any>, keys: K[]) {
+  constructor(parentSchema: O, keys: K[]) {
     super();
-    if ("unions" in parentSchema) {
+    
+      this.pickedSchema = new VObject(
+        makePartial<O["objectSchema"], K>(parentSchema["objectSchema"], keys)
+      );
+    
+  }
+
+  validate(
+    input: unknown
+  ): Result<
+    Partial<Pick<SchemaObjectToSchema<O["objectSchema"]>, K>> &
+      Exclude<SchemaObjectToSchema<O["objectSchema"]>, K>,
+    any
+  > {
+    return this.pickedSchema.validate(input);
+  }
+}
+
+export class VPartialUnion<
+  O extends VObject<{ [key: string]: VSchema<any> }>,
+  K extends string | number
+> extends VDiscriminatedUnion<
+  Partial<Pick<SchemaObjectToSchema<O["objectSchema"]>, K>> &
+    Exclude<SchemaObjectToSchema<O["objectSchema"]>, K>
+> {
+  private pickedSchema: VSchema<
+    Partial<Pick<SchemaObjectToSchema<O["objectSchema"]>, K>> &
+      Exclude<SchemaObjectToSchema<O["objectSchema"]>, K>
+  >;
+
+  constructor(parentSchema: VDiscriminatedUnion<O[], any>, keys: K[]) {
+    super();
       this.pickedSchema = new VDiscriminatedUnion(
         parentSchema.key,
         parentSchema.unions.map(
@@ -428,11 +459,6 @@ export class VPartial<
             new VObject(makePartial<O["objectSchema"], K>(s.objectSchema, keys))
         )
       );
-    } else {
-      this.pickedSchema = new VObject(
-        makePartial<O["objectSchema"], K>(parentSchema["objectSchema"], keys)
-      );
-    }
   }
 
   validate(
