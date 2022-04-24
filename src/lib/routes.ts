@@ -111,7 +111,7 @@ export const rawSessionType = new VObject({
 
 // pick would work on all object schemas and should be quite simple (and also nice to use)
 // union would be not so nice to use but probably similar to implement.
-export const userSchema = new VPick(rawUserSchema, [
+export const userSchema = new VPickUnion(rawUserSchema, [
   "id",
   "type",
   "username",
@@ -170,9 +170,9 @@ export const createUserAction = new VMergeUnion(
   })
 );
 
-export const updateUserAction = new VMerge(
-  new VPartial(
-    new VPick(new VMerge(
+export const updateUserAction = new VMergeUnion(
+  new VPartialUnion(
+    new VPickUnion(new VMergeUnion(
      rawUserSchema,
       new VObject({
         password: new VUndefined(new VString(1)),
@@ -249,7 +249,7 @@ export const routes = {
       new VDiscriminatedUnion("action", [createUserAction, updateUserAction])
     ),
     response: new VArray(
-      new VPick(rawUserSchema, [
+      new VPickUnion(rawUserSchema, [
         "id",
         "project_leader_id",
         "force_in_project_id",
