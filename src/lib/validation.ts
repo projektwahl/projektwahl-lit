@@ -24,7 +24,7 @@ export abstract class VSchema<T> {
   abstract validate(input: unknown): Result<T, any>;
 }
 
-export class VEnum<T extends readonly string[]> extends VSchema<T[number]> {
+export class VEnum<T extends readonly (string | number)[]> extends VSchema<T[number]> {
   values: T;
 
   constructor(values: T) {
@@ -350,13 +350,13 @@ export class VObject<O extends { [key: string]: VSchema<any> }> extends VSchema<
 
 // this only needs vobject like objects
 export class VDiscriminatedUnion<
-  T extends VObject<any>[],
-  K extends keyof T[number]["objectSchema"]
-> extends VSchema<T[number]["objectSchema"]> {
+  T extends VObject<any>,
+  K extends keyof T["objectSchema"]
+> extends VSchema<T["objectSchema"]> {
   key: K;
-  unions: T;
+  unions: T[];
 
-  constructor(key: K, unions: T) {
+  constructor(key: K, unions: T[]) {
     super();
     this.key = key;
     this.unions = unions;
@@ -364,10 +364,10 @@ export class VDiscriminatedUnion<
 
   validate(
     input: unknown
-  ): Result<SchemaObjectToSchema<T[number]["objectSchema"]>, any> {
+  ) {
     if (typeof input !== "object") {
       return {
-        success: false,
+        success: false as const,
         error: {
           // TODO don't stringify as this could explode the error message length
           [this.key]: `${JSON.stringify(input)} ist kein Objekt!`,
@@ -376,13 +376,13 @@ export class VDiscriminatedUnion<
     }
     if (input === null) {
       return {
-        success: false,
+        success: false as const,
         error: { [this.key]: `${JSON.stringify(input)} ist null!` },
       };
     }
     if (!hasProp(input, this.key)) {
       return {
-        success: false,
+        success: false as const,
         error: { [this.key]: `${this.key} fehlt!` },
       };
     }
@@ -394,7 +394,7 @@ export class VDiscriminatedUnion<
       }
     }
     return {
-      success: false,
+      success: false as const,
       error: {
         [this.key]: `Ungültiger Wert ${input[this.key]}`,
       },
@@ -423,10 +423,10 @@ export class VPick<
 }
 
 export class VPickUnion<
-  T extends VObject<any>[],
+  T extends VObject<any>,
   K extends KEYS,
   KEYS extends string|number
-> extends VDiscriminatedUnion<VObject<Pick<T[number]["objectSchema"], KEYS>>[], K> {
+> extends VDiscriminatedUnion<VObject<Pick<T["objectSchema"], KEYS>>, K> {
  
   constructor(parentSchema: VDiscriminatedUnion<T, K>, keys: readonly KEYS[]) {
     super(
@@ -470,12 +470,12 @@ export class VPartial<
 
 
 export class VPartialUnion<
-  T extends VObject<any>[],
+  T extends VObject<any>,
   K extends KEYS,
   KEYS extends string|number
 > extends VDiscriminatedUnion<
-VObject<(Partial<Pick<T[number]["objectSchema"], KEYS>> &
-Exclude<T[number]["objectSchema"], KEYS>)>[], K  
+VObject<(Partial<Pick<T["objectSchema"], KEYS>> &
+Exclude<T["objectSchema"], KEYS>)>, K  
 > {
   constructor(parentSchema: VDiscriminatedUnion<T, K>, keys: readonly K[]) {
     super(
@@ -515,11 +515,11 @@ export type MappedFunctionCallType<
 };
 
 export class VMergeUnion<
-  T extends VObject<any>[],
-  K extends keyof T[number]["objectSchema"],
+  T extends VObject<any>,
+  K extends keyof T["objectSchema"],
   O1 extends VDiscriminatedUnion<T, K>,
   O2 extends VObject<{ [key: string]: VSchema<any> }>
-> extends VDiscriminatedUnion<(T[number]["objectSchema"] & O2["objectSchema"])[], K> {
+> extends VDiscriminatedUnion<(T["objectSchema"] & O2["objectSchema"]), K> {
 
   constructor(schema1: O1, schema2: O2) {
     // @ts-expect-error - mapped tuple types, yeah
