@@ -514,20 +514,16 @@ export type MappedFunctionCallType<
   [K in keyof T]: VObject<T[K]["objectSchema"] & Q>;
 };
 
-export class VMergeUnion<
+export function VMergeUnion<
   T extends VObject<any>,
   K extends keyof T["objectSchema"],
   O2 extends VObject<{ [key: string]: VSchema<any> }>
-> extends VDiscriminatedUnion<(T["objectSchema"] & O2["objectSchema"]), K> {
-
-  constructor(schema1: VDiscriminatedUnion<T, K>, schema2: O2) {
-    // @ts-expect-error - mapped tuple types, yeah
-    super(schema1.key, schema1.unions.map(v => new VObject({
+>(schema1: VDiscriminatedUnion<T, K>, schema2: O2): VDiscriminatedUnion<VObject<(T["objectSchema"] & O2["objectSchema"])>, K> {
+    return new VDiscriminatedUnion(schema1.key, schema1.unions.map(v => new VObject({
       ...v.objectSchema,
       ...schema2.objectSchema
     })));
   }
-}
 
 const schema5 = new VObject({
   test: new VNumber(),

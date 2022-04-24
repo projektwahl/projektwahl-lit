@@ -149,7 +149,7 @@ const baseQuery = <T1, T2, T3>(
   };
 };
 
-export const createUserAction = new VMergeUnion(
+export const createUserAction = VMergeUnion(
   new VPartialUnion(
     new VPickUnion(rawUserSchema, [
       "openid_id",
@@ -168,10 +168,9 @@ export const createUserAction = new VMergeUnion(
   })
 );
 
-
-export const updateUserAction = new VMergeUnion(
+export const updateUserAction = VMergeUnion(
   new VPartialUnion(
-    new VPickUnion(new VMergeUnion(
+    new VPickUnion(VMergeUnion(
       rawUserSchema,
        new VObject({
          password: new VUndefined(new VString(1)),
