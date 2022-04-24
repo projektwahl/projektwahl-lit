@@ -24,15 +24,15 @@ export abstract class VSchema<T> {
   abstract validate(input: unknown): Result<T, any>;
 }
 
-export class VEnum<T> extends VSchema<T> {
-  values: readonly [T, ...T[]];
+export class VEnum<T extends readonly string[]> extends VSchema<T[number]> {
+  values: T;
 
-  constructor(values: readonly [T, ...T[]]) {
+  constructor(values: T) {
     super();
     this.values = values;
   }
 
-  validate(input: unknown): Result<T, any> {
+  validate(input: unknown): Result<T[number], any> {
     const found = this.values.find((v) => v === input);
     if (found !== undefined) {
       return {
