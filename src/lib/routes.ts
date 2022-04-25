@@ -245,6 +245,7 @@ export const routes = {
   "/api/v1/users/create-or-update": {
     request: new VArray(
       // this is our first nested discriminated union...
+      // but we probably need to implmenet it
       new VDiscriminatedUnion("action", [createUserAction, updateUserAction])
     ),
     response: new VArray(

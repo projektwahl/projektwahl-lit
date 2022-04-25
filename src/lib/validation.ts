@@ -424,7 +424,7 @@ export class VPick<
 
 export class VPickUnion<
   T extends VObject<any>,
-  K extends KEYS,
+  K extends keyof T["objectSchema"],
   KEYS extends string|number
 > extends VDiscriminatedUnion<VObject<Pick<T["objectSchema"], KEYS>>, K> {
  
