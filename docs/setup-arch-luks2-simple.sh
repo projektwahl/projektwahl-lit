@@ -801,3 +801,28 @@ ssh -L 9221:localhost:9229 moritz@aes.selfmade4u.de -p 2121
 
 sudo systemd-creds encrypt --with-key=host - openid_client_secret
 
+
+
+# POSTGRESQL major update
+
+# MAKE A BACKUP BEFORE
+
+sudo -u postgres pg_dumpall > /tmp/outputfile
+
+# https://www.postgresql.org/docs/current/upgrading.html
+# https://wiki.archlinux.org/title/PostgreSQL#Upgrading_PostgreSQL
+
+sudo systemctl stop projektwahl@production.socket
+sudo systemctl stop postgresql
+# TODO FIXME disable dynamicuser
+
+TODO FIXME remove all default_read_only as they break the backup
+
+sudo mv /var/lib/postgres/data /var/lib/postgres/olddata
+sudo mkdir /var/lib/postgres/data
+sudo chown postgres:postgres /var/lib/postgres/data
+sudo -u postgres initdb -D /var/lib/postgres/data
+
+sudo systemctl start postgresql
+
+ sudo -u postgres psql -d postgres -f /tmp/outputfile
