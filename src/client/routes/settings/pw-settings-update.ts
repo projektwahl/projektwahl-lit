@@ -192,6 +192,7 @@ class PwSettingsUpdate extends PwForm<"/api/v1/settings/update"> {
                         set: (o, v) => (o.open_date = v),
                         task: this._task,
                         defaultValue: "",
+                        // TODO FIXME loading the initial data doesn't work because the format of the open_date is wrong. we probably need to convert it to the local timezone (maybe already on the server side) and truncate the + at the start etc.
                         initial: value?.data,
                         resettable: value !== undefined,
                       })}
