@@ -31,3 +31,14 @@ pw-app {
   width: 100%;
   max-width: 0;
 }
+
+.test-parent {
+  display: inline-grid;
+  grid-template-columns: 1fr;
+  grid-template-rows: 1fr;
+}
+
+.test {
+  grid-column: 1;
+  grid-row: 1;
+}

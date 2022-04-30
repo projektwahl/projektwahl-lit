@@ -25,10 +25,11 @@ import { html } from "lit";
 import { PwElement } from "../pw-element.js";
 import { LoggedInUserController } from "../user-controller.js";
 import { myFetch } from "../utils.js";
-import { until } from "lit/directives/until.js";
 import { ClockController } from "../clock-controller.js";
 import { Task } from "@lit-labs/task";
-import { ResponseType } from "../../lib/routes.js";
+import type { ResponseType } from "../../lib/routes.js";
+import { animate, flyBelow, flyAbove } from "@lit-labs/motion";
+import {choose} from 'lit/directives/choose.js';
 
 // workaround see https://github.com/runem/lit-analyzer/issues/149#issuecomment-1006162839
 export function pwWelcome(
@@ -38,6 +39,61 @@ export function pwWelcome(
   const _: Record<string, never> = rest;
   //_ = 1; // ensure no property is missed - Don't use `{}` as a type. `{}` actually means "any non-nullish value".
   return html`<pw-welcome></pw-welcome>`;
+}
+
+function renderDigit(digit: number) {
+  return html`<span class="test-parent">${choose(digit, [
+    [0, () => html`<span class="test" ${animate({
+      in: flyAbove,
+      out: flyBelow,
+      stabilizeOut: true
+    })}>0</span>`],
+    [1, () =>  html`<span class="test" ${animate({
+      in: flyAbove,
+      out: flyBelow,
+      stabilizeOut: true
+    })}>1</span>`],
+    [2, () =>  html`<span class="test" ${animate({
+      in: flyAbove,
+      out: flyBelow,
+      stabilizeOut: true
+    })}>2</span>`],
+    [3, () =>  html`<span class="test" ${animate({
+      in: flyAbove,
+      out: flyBelow,
+      stabilizeOut: true
+    })}>3</span>`],
+    [4, () =>  html`<span class="test" ${animate({
+      in: flyAbove,
+      out: flyBelow,
+      stabilizeOut: true
+    })}>4</span>`],
+    [5, () =>  html`<span class="test" ${animate({
+      in: flyAbove,
+      out: flyBelow,
+      stabilizeOut: true
+    })}>5</span>`],
+    [6, () =>  html`<span class="test" ${animate({
+      in: flyAbove,
+      out: flyBelow,
+      stabilizeOut: true
+    })}>6</span>`],
+    [7, () =>  html`<span class="test" ${animate({
+      in: flyAbove,
+      out: flyBelow,
+      stabilizeOut: true
+    })}>7</span>`],
+    [8, () =>  html`<span class="test" ${animate({
+      in: flyAbove,
+      out: flyBelow,
+      stabilizeOut: true
+    })}>8</span>`],
+    [9, () =>  html`<span class="test" ${animate({
+      in: flyAbove,
+      out: flyBelow,
+      stabilizeOut: true
+    })}>9</span>`],
+  ])}</span>`
 }
 
 export class PwWelcome extends PwElement {
@@ -101,8 +157,8 @@ export class PwWelcome extends PwElement {
 
               const days = Math.floor(diff / (1000 * 60 * 60 * 24));
 
-              return html`${days} days, ${hours} hours, ${minutes} minutes,
-              ${seconds} seconds`;
+              return html`<span class="font-monospace">${renderDigit(days / 10)}${renderDigit(days % 10)} days, ${hours} hours, ${minutes} minutes,
+              ${renderDigit(Math.floor(seconds / 10))}${renderDigit(seconds % 10)} seconds</span>`;
             }
           },
         })}
