@@ -57,6 +57,8 @@ export async function retryableBegin<T>(
 
 export let settings = (await sql`SELECT * FROM settings`)[0];
 
-export const updateCachedSettings = async (tsql: postgres.TransactionSql<Record<string, never>>) => {
+export const updateCachedSettings = async (
+  tsql: postgres.TransactionSql<Record<string, never>>
+) => {
   settings = (await tsql`SELECT * FROM settings`)[0];
 };
