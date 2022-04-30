@@ -25,38 +25,33 @@ import "../../form/pw-form.js";
 import { Task } from "@lit-labs/task";
 import { myFetch } from "../../utils.js";
 import { PwForm } from "../../form/pw-form.js";
-import { HistoryController } from "../../history-controller.js";
 import { msg } from "@lit/localize";
 import "../../form/pw-input.js";
 import type { MinimalSafeParseError, routes } from "../../../lib/routes.js";
 import type { z } from "zod";
-import { createRef, Ref, ref } from "lit/directives/ref.js";
+import { ref } from "lit/directives/ref.js";
 import { pwInputText } from "../../form/pw-input-text.js";
-import { PwInputSelect, pwInputSelect } from "../../form/pw-input-select.js";
-import { pwInputNumber } from "../../form/pw-input-number.js";
-import { pwInputCheckbox } from "../../form/pw-input-checkbox.js";
-import { aClick } from "../../pw-a.js";
 import "./pw-user-projects.js";
 
 // workaround see https://github.com/runem/lit-analyzer/issues/149#issuecomment-1006162839
 export function pwSettingsUpdate(
   props: Pick<PwSettingsUpdate, "disabled" | "url">
 ) {
-  const { disabled, userId, url, ...rest } = props;
+  const { disabled, url, ...rest } = props;
   let _ = rest;
   _ = 1; // ensure no property is missed - Don't use `{}` as a type. `{}` actually means "any non-nullish value".
-  return html`<pw-user-create
+  return html`<pw-settings-update
     ?disabled=${disabled}
     .url=${url}
-  ></pw-user-create>`;
+  ></pw-settings-update>`;
 }
 
-const taskFunction = async ([id]: [number]): Promise<
+const taskFunction = async (): Promise<
   | MinimalSafeParseError
   | z.SafeParseSuccess<
       (z.infer<
         typeof routes["/api/v1/settings"]["response"]
-      >["entities"][number])[]
+      >["entities"][number])
     >
 > => {
   const response = await myFetch<"/api/v1/settings">(
@@ -75,10 +70,7 @@ const taskFunction = async ([id]: [number]): Promise<
   if (response.success) {
     return {
       success: true as const,
-      data:
-        response.data.entities.length == 1
-          ? response.data.entities
-          : [],
+      data: response.data.entities[0],
     };
   }
   return response;
@@ -109,14 +101,12 @@ class PwSettingsUpdate extends PwForm<"/api/v1/settings/update"> {
       : msg("Update settings");
   }
 
-  userId!: number | null;
-
   initialTask: Task<
-    [number | null],
+    [],
     | z.SafeParseSuccess<
         (z.infer<
           typeof routes["/api/v1/settings"]["response"]
-        >["entities"][number])[]
+        >["entities"][number])
       >
     | MinimalSafeParseError
     | undefined
@@ -141,32 +131,10 @@ class PwSettingsUpdate extends PwForm<"/api/v1/settings/update"> {
     this.initialTask = new Task(
       this,
       async () => {
-        if (this.userId !== null) {
-          return await taskFunction([this.userId]);
-        } else {
-          return undefined;
-        }
+        return await taskFunction();
       },
-      () => [this.userId]
+      () => []
     );
-  }
-
-  protected willUpdate(changedProperties: Map<PropertyKey, unknown>): void {
-    super.willUpdate(changedProperties);
-    if (changedProperties.has("userId")) {
-      // because fields are resettable we need to set this to undefined
-
-      if (this.userId !== null) {
-        this.formData = [
-          {
-            id: this.userId,
-          },
-        ];
-      } else {
-        // @ts-expect-error bruh
-        this.formData = [];
-      }
-    }
   }
 
   override render() {
@@ -190,19 +158,6 @@ class PwSettingsUpdate extends PwForm<"/api/v1/settings/update"> {
           if (value === undefined || value?.success) {
             if (this.actionText === undefined) {
               throw new Error(msg("component not fully initialized"));
-            }
-
-            if (value?.data.length === 0) {
-              return html`<main class="container">
-              <h1 class="text-center">${this.actionText}</h1>
-              
-              <div class="alert alert-danger" role="alert">
-              ${msg("Account nicht gefunden!")}<br />
-            
-            </div>
-            
-            </div>
-          </main>`;
             }
 
             return html`
@@ -231,168 +186,33 @@ class PwSettingsUpdate extends PwForm<"/api/v1/settings/update"> {
                       }}
                     >
                       ${pwInputText<
-                        "/api/v1/users/create-or-update",
-                        string | undefined
+                        "/api/v1/settings/update",
+                        string
                       >({
                         url: this.url,
                         type: "text",
                         disabled: this.disabled,
-                        label: msg("Username"),
-                        name: [0, "username"],
-                        get: (o) => o[0].username,
-                        set: (o, v) => (o[0].username = v),
+                        label: msg("Open date"),
+                        name: ["open_date"],
+                        get: (o) => o.open_date,
+                        set: (o, v) => (o.open_date = v),
                         task: this._task,
                         defaultValue: "",
                         initial: value?.data,
                         resettable: value !== undefined,
                       })}
-                      ${pwInputText<
-                        "/api/v1/users/create-or-update",
-                        string | null | undefined
-                      >({
-                        url: this.url,
-                        type: "text",
-                        disabled: this.disabled,
-                        label: msg("Third-party email address"),
-                        name: [0, "openid_id"],
-                        get: (o) => o[0].openid_id,
-                        set: (o, v) => (o[0].openid_id = v),
-                        task: this._task,
-                        defaultValue: null,
-                        initial: value?.data,
-                        resettable: value !== undefined,
-                      })}
-                      ${pwInputSelect<
-                        "/api/v1/users/create-or-update",
-                        "voter" | "helper" | "admin" | undefined
-                      >({
-                        url: this.url,
-                        type: "select",
-                        disabled: this.disabled,
-                        label: msg("User type"),
-                        name: [0, "type"],
-                        get: (o) => o[0].type,
-                        set: (o, v) => {
-                          o[0].type = v;
-                          this.requestUpdate(); // hack to update on this
-                        },
-                        options: [
-                          { value: "voter", text: "Schüler" },
-                          { value: "helper", text: "Helfer" },
-                          { value: "admin", text: "Admin" },
-                        ],
-                        task: this._task,
-                        defaultValue: "voter",
-                        pwRef: this.typeRef,
-                        initial: value?.data,
-                        resettable: value !== undefined,
-                      })}
-                      ${this.typeRef.value?.inputValue === "voter"
-                        ? html`${pwInputText<
-                            "/api/v1/users/create-or-update",
-                            string | null | undefined
-                          >({
-                            url: this.url,
-                            type: "text",
-                            disabled: this.disabled,
-                            label: msg("Group"),
-                            name: [0, "group"],
-                            get: (o) => o[0].group,
-                            set: (o, v) => (o[0].group = v),
-                            task: this._task,
-                            defaultValue: "",
-                            initial: value?.data,
-                            resettable: value !== undefined,
-                          })}
-                          ${pwInputNumber<
-                            "/api/v1/users/create-or-update",
-                            number | undefined | null
-                          >({
-                            url: this.url,
-                            type: "number",
-                            disabled: this.disabled,
-                            label: msg("Age"),
-                            name: [0, "age"],
-                            get: (o) => o[0].age,
-                            set: (o, v) => (o[0].age = v),
-                            task: this._task,
-                            defaultValue: null,
-                            initial: value?.data,
-                            resettable: value !== undefined,
-                          })}`
-                        : undefined}
-                      ${!this.disabled
-                        ? html`
-                            ${pwInputText<
-                              "/api/v1/users/create-or-update",
-                              string | undefined
-                            >({
-                              url: this.url,
-                              type: "password",
-                              disabled: this.disabled,
-                              label: msg("Password"),
-                              name: [0, "password"],
-                              get: (o) => o[0].password,
-                              set: (o, v) => (o[0].password = v),
-                              task: this._task,
-                              autocomplete: "new-password",
-                              defaultValue: undefined,
-                              initial: value?.data,
-                              resettable: value !== undefined,
-                            })}
-                          `
-                        : undefined}
-                      ${pwInputCheckbox<"/api/v1/users/create-or-update">({
-                        url: this.url,
-                        type: "checkbox",
-                        trueValue: true,
-                        falseValue: false,
-                        defaultValue: false,
-                        disabled: this.disabled,
-                        label: msg("Away"),
-                        name: [0, "away"],
-                        get: (o) => o[0].away,
-                        set: (o, v) => (o[0].away = v),
-                        task: this._task,
-                        initial: value?.data,
-                        resettable: value !== undefined,
-                      })}
-                      ${pwInputCheckbox<"/api/v1/users/create-or-update">({
-                        url: this.url,
-                        type: "checkbox",
-                        trueValue: true,
-                        falseValue: false,
-                        defaultValue: false,
-                        disabled: this.disabled,
-                        label: msg("Mark this user as deleted"),
-                        name: [0, "deleted"],
-                        get: (o) => o[0].deleted,
-                        set: (o, v) => (o[0].deleted = v),
-                        task: this._task,
-                        initial: value?.data,
-                        resettable: value !== undefined,
-                      })}
-                      ${!this.disabled
-                        ? html`
-                            <button
-                              type="submit"
-                              ?disabled=${this._task.render({
-                                pending: () => true,
-                                complete: () => false,
-                                initial: () => false,
-                              })}
-                              class="btn btn-primary"
-                            >
-                              ${this.actionText}
-                            </button>
-                          `
-                        : html`<a
-                            class="btn btn-secondary"
-                            href="/users/edit/${value?.data[0].id}"
-                            @click=${aClick}
-                            role="button"
-                            >Edit user</a
-                          >`}
+                      
+                      <button
+                        type="submit"
+                        ?disabled=${this._task.render({
+                          pending: () => true,
+                          complete: () => false,
+                          initial: () => false,
+                        })}
+                        class="btn btn-primary"
+                      >
+                        ${this.actionText}
+                      </button>
                       <button
                         type="button"
                         class="btn btn-secondary"
@@ -440,4 +260,4 @@ class PwSettingsUpdate extends PwForm<"/api/v1/settings/update"> {
   }
 }
 
-customElements.define("pw-user-create", PwUserCreate);
+customElements.define("pw-settings-update", PwSettingsUpdate);
