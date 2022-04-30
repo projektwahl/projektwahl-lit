@@ -73,20 +73,6 @@ REVOKE CREATE ON SCHEMA public FROM PUBLIC;
 
 sudo -u projektwahl_staging_admin psql --single-transaction --db projektwahl_staging < src/server/setup.sql
 
-
-sudo -u projektwahl_staging_admin psql --db projektwahl_staging
-ALTER DATABASE projektwahl_staging SET default_transaction_isolation = 'serializable';
-GRANT SELECT,INSERT,UPDATE ON users_with_deleted TO projektwahl_staging;
-GRANT SELECT,INSERT,UPDATE ON users TO projektwahl_staging;
-GRANT SELECT,INSERT,UPDATE ON projects_with_deleted TO projektwahl_staging;
-GRANT SELECT,INSERT,UPDATE ON projects TO projektwahl_staging;
-GRANT SELECT,INSERT,UPDATE,DELETE ON choices TO projektwahl_staging;
-GRANT INSERT ON settings TO projektwahl_staging;
-GRANT SELECT,INSERT,UPDATE,DELETE ON sessions TO projektwahl_staging;
-ALTER VIEW users OWNER TO projektwahl_staging;
-ALTER VIEW present_voters OWNER TO projektwahl_staging;
-ALTER VIEW projects OWNER TO projektwahl_staging;
-
 NODE_ENV=development DATABASE_HOST=/run/postgresql DATABASE_URL=postgres://projektwahl_staging:projektwahl@localhost/projektwahl_staging npm run setup
 
 
