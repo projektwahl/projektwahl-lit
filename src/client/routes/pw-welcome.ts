@@ -44,54 +44,54 @@ export function pwWelcome(
 function renderDigit(digit: number) {
   return html`<span class="test-parent">${choose(digit, [
     [0, () => html`<span class="test" ${animate({
+      skipInitial: true,
       in: flyAbove,
       out: flyBelow,
-      stabilizeOut: true
     })}>0</span>`],
     [1, () =>  html`<span class="test" ${animate({
+      skipInitial: true,
       in: flyAbove,
       out: flyBelow,
-      stabilizeOut: true
     })}>1</span>`],
     [2, () =>  html`<span class="test" ${animate({
+      skipInitial: true,
       in: flyAbove,
       out: flyBelow,
-      stabilizeOut: true
     })}>2</span>`],
     [3, () =>  html`<span class="test" ${animate({
+      skipInitial: true,
       in: flyAbove,
       out: flyBelow,
-      stabilizeOut: true
     })}>3</span>`],
     [4, () =>  html`<span class="test" ${animate({
+      skipInitial: true,
       in: flyAbove,
       out: flyBelow,
-      stabilizeOut: true
     })}>4</span>`],
     [5, () =>  html`<span class="test" ${animate({
+      skipInitial: true,
       in: flyAbove,
       out: flyBelow,
-      stabilizeOut: true
     })}>5</span>`],
     [6, () =>  html`<span class="test" ${animate({
+      skipInitial: true,
       in: flyAbove,
       out: flyBelow,
-      stabilizeOut: true
     })}>6</span>`],
     [7, () =>  html`<span class="test" ${animate({
+      skipInitial: true,
       in: flyAbove,
       out: flyBelow,
-      stabilizeOut: true
     })}>7</span>`],
     [8, () =>  html`<span class="test" ${animate({
+      skipInitial: true,
       in: flyAbove,
       out: flyBelow,
-      stabilizeOut: true
     })}>8</span>`],
     [9, () =>  html`<span class="test" ${animate({
+      skipInitial: true,
       in: flyAbove,
       out: flyBelow,
-      stabilizeOut: true
     })}>9</span>`],
   ])}</span>`
 }
