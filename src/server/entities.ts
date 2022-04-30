@@ -106,7 +106,7 @@ export async function fetchData<R extends keyof typeof entityRoutes>(
   query: entitiesType0[R],
   sqlQuery: (query: entitiesType0[R]) => PendingQuery<Row[]>,
   orderByQueries: entitiesType8[R],
-  tiebreaker: entitiesType18[R]
+  tiebreaker: entitiesType18[R] | undefined
 ): Promise<[OutgoingHttpHeaders, ResponseType<R>]> {
   const sorting: entitiesType15[R] = mappedIndexing(query, "sorting");
 
