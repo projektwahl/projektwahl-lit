@@ -29,7 +29,7 @@ import { ClockController } from "../clock-controller.js";
 import { Task } from "@lit-labs/task";
 import type { ResponseType } from "../../lib/routes.js";
 import { animate, flyBelow, flyAbove } from "@lit-labs/motion";
-import {choose} from 'lit/directives/choose.js';
+import { choose } from "lit/directives/choose.js";
 
 // workaround see https://github.com/runem/lit-analyzer/issues/149#issuecomment-1006162839
 export function pwWelcome(
@@ -42,58 +42,140 @@ export function pwWelcome(
 }
 
 function renderDigit(digit: number) {
-  return html`<span class="test-parent">${choose(digit, [
-    [0, () => html`<span class="test" ${animate({
-      skipInitial: true,
-      in: flyAbove,
-      out: flyBelow,
-    })}>0</span>`],
-    [1, () =>  html`<span class="test" ${animate({
-      skipInitial: true,
-      in: flyAbove,
-      out: flyBelow,
-    })}>1</span>`],
-    [2, () =>  html`<span class="test" ${animate({
-      skipInitial: true,
-      in: flyAbove,
-      out: flyBelow,
-    })}>2</span>`],
-    [3, () =>  html`<span class="test" ${animate({
-      skipInitial: true,
-      in: flyAbove,
-      out: flyBelow,
-    })}>3</span>`],
-    [4, () =>  html`<span class="test" ${animate({
-      skipInitial: true,
-      in: flyAbove,
-      out: flyBelow,
-    })}>4</span>`],
-    [5, () =>  html`<span class="test" ${animate({
-      skipInitial: true,
-      in: flyAbove,
-      out: flyBelow,
-    })}>5</span>`],
-    [6, () =>  html`<span class="test" ${animate({
-      skipInitial: true,
-      in: flyAbove,
-      out: flyBelow,
-    })}>6</span>`],
-    [7, () =>  html`<span class="test" ${animate({
-      skipInitial: true,
-      in: flyAbove,
-      out: flyBelow,
-    })}>7</span>`],
-    [8, () =>  html`<span class="test" ${animate({
-      skipInitial: true,
-      in: flyAbove,
-      out: flyBelow,
-    })}>8</span>`],
-    [9, () =>  html`<span class="test" ${animate({
-      skipInitial: true,
-      in: flyAbove,
-      out: flyBelow,
-    })}>9</span>`],
-  ])}</span>`
+  return html`<span class="test-parent"
+    >${choose(digit, [
+      [
+        0,
+        () =>
+          html`<span
+            class="test"
+            ${animate({
+              skipInitial: true,
+              in: flyAbove,
+              out: flyBelow,
+            })}
+            >0</span
+          >`,
+      ],
+      [
+        1,
+        () =>
+          html`<span
+            class="test"
+            ${animate({
+              skipInitial: true,
+              in: flyAbove,
+              out: flyBelow,
+            })}
+            >1</span
+          >`,
+      ],
+      [
+        2,
+        () =>
+          html`<span
+            class="test"
+            ${animate({
+              skipInitial: true,
+              in: flyAbove,
+              out: flyBelow,
+            })}
+            >2</span
+          >`,
+      ],
+      [
+        3,
+        () =>
+          html`<span
+            class="test"
+            ${animate({
+              skipInitial: true,
+              in: flyAbove,
+              out: flyBelow,
+            })}
+            >3</span
+          >`,
+      ],
+      [
+        4,
+        () =>
+          html`<span
+            class="test"
+            ${animate({
+              skipInitial: true,
+              in: flyAbove,
+              out: flyBelow,
+            })}
+            >4</span
+          >`,
+      ],
+      [
+        5,
+        () =>
+          html`<span
+            class="test"
+            ${animate({
+              skipInitial: true,
+              in: flyAbove,
+              out: flyBelow,
+            })}
+            >5</span
+          >`,
+      ],
+      [
+        6,
+        () =>
+          html`<span
+            class="test"
+            ${animate({
+              skipInitial: true,
+              in: flyAbove,
+              out: flyBelow,
+            })}
+            >6</span
+          >`,
+      ],
+      [
+        7,
+        () =>
+          html`<span
+            class="test"
+            ${animate({
+              skipInitial: true,
+              in: flyAbove,
+              out: flyBelow,
+            })}
+            >7</span
+          >`,
+      ],
+      [
+        8,
+        () =>
+          html`<span
+            class="test"
+            ${animate({
+              skipInitial: true,
+              in: flyAbove,
+              out: flyBelow,
+            })}
+            >8</span
+          >`,
+      ],
+      [
+        9,
+        () =>
+          html`<span
+            class="test"
+            ${animate({
+              skipInitial: true,
+              in: flyAbove,
+              out: flyBelow,
+            })}
+            >9</span
+          >`,
+      ],
+    ])}</span
+  >`;
 }
 
 export class PwWelcome extends PwElement {
@@ -145,20 +227,66 @@ export class PwWelcome extends PwElement {
         ${this.task.render({
           complete: (value) => {
             if (value.success) {
-              const diff =
-                new Date(value.data.entities[0].open_date).getTime() -
-                this.clockController.value.getTime();
+              const val = value.data.entities[0];
+              const curr = new Date();
 
-              const seconds = Math.floor(diff / 1000) % 60;
+              const state =
+                curr > new Date(val.results_date)
+                  ? "results"
+                  : curr > new Date(val.voting_end_date)
+                  ? "voting end"
+                  : curr > new Date(val.voting_start_date)
+                  ? "voting start"
+                  : curr > new Date(val.open_date)
+                  ? "preparation"
+                  : "not started yet";
 
-              const minutes = Math.floor(diff / (1000 * 60)) % 60;
+              const next_date_and_state =
+                curr > new Date(val.results_date)
+                  ? null
+                  : curr > new Date(val.voting_end_date)
+                  ? ["results", val.results_date]
+                  : curr > new Date(val.voting_start_date)
+                  ? ["voting end", val.voting_end_date]
+                  : curr > new Date(val.open_date)
+                  ? ["voting start", val.voting_start_date]
+                  : ["preparation", val.open_date];
 
-              const hours = Math.floor(diff / (1000 * 60 * 60)) % 24;
+              if (next_date_and_state) {
+                const diff =
+                  new Date(next_date_and_state[1]).getTime() -
+                  this.clockController.value.getTime();
 
-              const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+                const seconds = Math.floor(diff / 1000) % 60;
 
-              return html`<span class="font-monospace">${renderDigit(days / 10)}${renderDigit(days % 10)} days, ${hours} hours, ${minutes} minutes,
-              ${renderDigit(Math.floor(seconds / 10))}${renderDigit(seconds % 10)} seconds</span>`;
+                const minutes = Math.floor(diff / (1000 * 60)) % 60;
+
+                const hours = Math.floor(diff / (1000 * 60 * 60)) % 24;
+
+                const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+
+                return html`<span
+                  >currently ${state},
+                  ${renderDigit(Math.floor(days / 100) % 10)}${renderDigit(
+                    Math.floor(days / 10) % 10
+                  )}${renderDigit(days % 10)}
+                  days,
+                  ${renderDigit(Math.floor(hours / 10))}${renderDigit(
+                    hours % 10
+                  )}
+                  hours,
+                  ${renderDigit(Math.floor(minutes / 10))}${renderDigit(
+                    minutes % 10
+                  )}
+                  minutes,
+                  ${renderDigit(Math.floor(seconds / 10))}${renderDigit(
+                    seconds % 10
+                  )}
+                  seconds until ${next_date_and_state[0]}</span
+                >`;
+              } else {
+                return html`<span>done</span>`;
+              }
             }
           },
         })}
