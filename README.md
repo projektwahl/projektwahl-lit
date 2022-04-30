@@ -64,7 +64,7 @@ sudo -u postgres psql
 CREATE ROLE projektwahl SUPERUSER LOGIN PASSWORD 'projektwahl'; -- CHANGE/REMOVE THIS PASSWORD
 
 CREATE ROLE projektwahl_staging LOGIN PASSWORD 'projektwahl'; -- CHANGE/REMOVE THIS PASSWORD
-CREATE ROLE projektwahl_staging_admin LOGIN PASSWORD 'projektwahl'; -- CHANGE/REMOVE THIS PASSWORD
+CREATE ROLE projektwahl_staging_admin IN ROLE projektwahl_staging LOGIN PASSWORD 'projektwahl'; -- CHANGE/REMOVE THIS PASSWORD
 CREATE DATABASE projektwahl_staging OWNER projektwahl_staging_admin;
 
 sudo -u postgres psql --db projektwahl_staging

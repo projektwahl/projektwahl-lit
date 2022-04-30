@@ -265,9 +265,9 @@ sudo certbot --nginx -d aes.selfmade4u.de -d staging-aes.selfmade4u.de -m Moritz
 
 sudo -u postgres psql
 CREATE ROLE projektwahl_staging LOGIN;
-CREATE ROLE projektwahl_staging_admin LOGIN;
+CREATE ROLE projektwahl_staging_admin IN ROLE projektwahl_staging LOGIN;
 CREATE ROLE projektwahl_production LOGIN;
-CREATE ROLE projektwahl_production_admin LOGIN;
+CREATE ROLE projektwahl_production_admin IN ROLE projektwahl_production LOGIN;
 CREATE DATABASE projektwahl_staging OWNER projektwahl_staging_admin;
 CREATE DATABASE projektwahl_production OWNER projektwahl_production_admin;
 
