@@ -49,7 +49,7 @@ jobs:
           CREATE ROLE projektwahl_staging_admin IN ROLE projektwahl_staging LOGIN PASSWORD 'projektwahl';"
       - run: |
           psql postgres://projektwahl:projektwahl@localhost/projektwahl --command="CREATE DATABASE projektwahl_staging OWNER projektwahl_staging_admin"
-      - run: psql --single-transaction postgres://projektwahl_staging_admin:projektwahl@localhost/projektwahl_staging < src/server/setup.sql          
+      - run: psql --single-transaction postgres://projektwahl_staging_admin:projektwahl@localhost/projektwahl_staging < src/server/setup.sql
       - run: NODE_ENV=development DATABASE_URL=postgres://projektwahl_staging:projektwahl@localhost/projektwahl_staging npm run setup
       - run: |
           NODE_ENV=development PORT=8443 BASE_URL=https://localhost:8443 DATABASE_URL=postgres://projektwahl_staging:projektwahl@localhost/projektwahl_staging CREDENTIALS_DIRECTORY=$PWD npm run server &
