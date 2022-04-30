@@ -91,45 +91,11 @@ systemctl enable sshd
 pacman -S arch-audit
 arch-audit
 
-glibc is affected by multiple issues. (CVE-2021-43396, CVE-2021-3999, CVE-2021-3998, CVE-2021-35942, CVE-2021-33574, CVE-2021-27645). High risk!
-Up to date, unknown if vulnerable.
-
-postgresql is affected by man-in-the-middle. (CVE-2021-23214). High risk!
-Already fixed in 13.5 https://www.postgresql.org/support/security/CVE-2021-23214/
-
-apr is affected by information disclosure. (CVE-2021-35940). Medium risk!
-Shouldn't be used.
-
-binutils is affected by multiple issues, arbitrary code execution. (CVE-2021-3648, CVE-2021-3530, CVE-2021-20197, CVE-2021-3549). Medium risk!
-Should be fixed.
-
-krb5 is affected by denial of service. (CVE-2021-37750). Medium risk!
-Shouldn't be used.
-
-libarchive is affected by arbitrary code execution. (CVE-2021-36976). Medium risk!
-Already fixed in 3.6.0 https://nvd.nist.gov/vuln/detail/CVE-2021-36976
-
-linux is affected by multiple issues, insufficient validation. (CVE-2021-43976, CVE-2021-4095, CVE-2021-4028, CVE-2021-3847, CVE-2021-3752, CVE-2021-3669, CVE-2021-31615, CVE-2020-26560, CVE-2020-26559, CVE-2020-26557, CVE-2020-26556, CVE-2020-26555, CVE-2020-35501). Medium risk!
-Needs update to 5.16.10 (released yesterday)
-
-ncurses is affected by arbitrary code execution. (CVE-2021-39537). Medium risk!
-Don't care. sudo pacman -R perl
-
-npm is affected by insufficient validation. (CVE-2021-43616). Medium risk!
-Already fixed in 8.5.0 https://nvd.nist.gov/vuln/detail/CVE-2021-43616
-
-perl is affected by signature forgery, directory traversal. (CVE-2020-16156, CVE-2021-36770). Medium risk!
-Shouldn't be used.
-
-rsync is affected by arbitrary command execution. (CVE-2021-3755). Medium risk!
-Shouldn't be used.
-
-openssh is affected by information disclosure. (CVE-2016-20012). Low risk!
-Already fixed in 8.8p1 https://nvd.nist.gov/vuln/detail/CVE-2016-20012
-
-postgresql-libs is affected by man-in-the-middle. (CVE-2021-23222). Low risk!
-Already fixed in 13.5 https://www.postgresql.org/support/security/CVE-2021-23222/
-
+apr is affected by information disclosure. Medium risk!
+curl is affected by multiple issues. Medium risk!
+linux is affected by multiple issues, insufficient validation. Medium risk!
+perl is affected by signature forgery, directory traversal. Medium risk!
+rsync is affected by arbitrary command execution. Medium risk!
 
 
 
