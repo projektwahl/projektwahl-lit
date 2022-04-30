@@ -1461,6 +1461,7 @@ async function testHelperCreatesProjectWithProjectLeadersAndMembers(
   );
 
   await helper.waitUntilLoaded();
+  await helper.waitUntilLoaded();
 
   const alerts1 = await helper.driver.findElements(
     By.css('div[class="alert alert-danger"]')
