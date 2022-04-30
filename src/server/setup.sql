@@ -21,13 +21,6 @@ SPDX-License-Identifier: AGPL-3.0-or-later
 SPDX-FileCopyrightText: 2021 Moritz Hedtke <Moritz.Hedtke@t-online.de>
 */
 
--- if you remove this you get a CVE for free - so don't. (because the triggers can have race conditions then)
--- https://www.postgresql.org/docs/current/transaction-iso.html
--- currently done in the setup instructions and not automatically here
--- ALTER DATABASE projektwahl SET default_transaction_isolation = 'serializable';
--- ALTER DATABASE projektwahl SET default_transaction_read_only = true;
-
--- TODO FIXME at some point create the tables based on the zod definitions? so min/max etc. are checked correctly?
 CREATE TABLE IF NOT EXISTS projects_with_deleted (
   id INT GENERATED ALWAYS AS IDENTITY PRIMARY KEY NOT NULL,
   title VARCHAR(255) NOT NULL,
@@ -65,11 +58,7 @@ CREATE OR REPLACE FUNCTION log_history_projects() RETURNS TRIGGER AS $body$
 DECLARE
   d RECORD;
 BEGIN
-  --if (TG_OP = 'DELETE') then
-  --  d := OLD;
-  --else
-    d := NEW;
-  --end if;
+  d := NEW;
   INSERT INTO projects_history (operation, id, title, info, place, costs, min_age, max_age, min_participants, max_participants, random_assignments, deleted, last_updated_by) VALUES (TG_OP, d.id, d.title, d.info, d.place, d.costs, d.min_age, d.max_age, d.min_participants, d.max_participants, d.random_assignments, d.deleted, d.last_updated_by);
   RETURN NULL;
 END;
@@ -79,16 +68,12 @@ SET search_path = public;
 
 REVOKE ALL ON FUNCTION log_history_projects() FROM PUBLIC;
 
-DROP TRIGGER IF EXISTS projects_audit_insert_delete ON projects_with_deleted;
-
-CREATE TRIGGER projects_audit_insert_delete
+CREATE OR REPLACE TRIGGER projects_audit_insert_delete
 AFTER INSERT OR DELETE ON projects_with_deleted FOR EACH ROW
 EXECUTE PROCEDURE log_history_projects();
 
 
-DROP TRIGGER IF EXISTS projects_audit_update_selective ON projects_with_deleted;
-
-CREATE TRIGGER projects_audit_update_selective
+CREATE OR REPLACE TRIGGER projects_audit_update_selective
 AFTER UPDATE ON projects_with_deleted FOR EACH ROW
 EXECUTE PROCEDURE log_history_projects();
 
@@ -98,7 +83,6 @@ EXCEPTION
     WHEN duplicate_object THEN null;
 END $$;
 
--- TODO ADd check that group and age is NULL if type is not voter
 CREATE TABLE IF NOT EXISTS users_with_deleted (
   id INT GENERATED ALWAYS AS IDENTITY PRIMARY KEY NOT NULL,
   username VARCHAR(128) UNIQUE NOT NULL,
@@ -202,11 +186,7 @@ CREATE OR REPLACE FUNCTION log_history_users() RETURNS TRIGGER AS $body$
 DECLARE
   d RECORD;
 BEGIN
-  --if (TG_OP = 'DELETE') then
-  --  d := OLD;
-  --else
-    d := NEW;
-  --end if;
+  d := NEW;
   INSERT INTO users_history (operation, id, username, openid_id, type, project_leader_id, "group", age, away, password_changed, force_in_project_id, computed_in_project_id, deleted, last_updated_by) VALUES (TG_OP, d.id, d.username, d.openid_id, d.type, d.project_leader_id, d."group", d.age, d.away, d.password_changed, d.force_in_project_id, d.computed_in_project_id, d.deleted, d.last_updated_by);
   RETURN NULL;
 END;
@@ -216,16 +196,12 @@ SET search_path = public;
 
 REVOKE ALL ON FUNCTION log_history_users() FROM PUBLIC;
 
-DROP TRIGGER IF EXISTS users_audit_insert_delete ON users_with_deleted;
-
-CREATE TRIGGER users_audit_insert_delete
+CREATE OR REPLACE TRIGGER users_audit_insert_delete
 AFTER INSERT OR DELETE ON users_with_deleted FOR EACH ROW
 EXECUTE PROCEDURE log_history_users();
 
 
-DROP TRIGGER IF EXISTS users_audit_update_selective ON users_with_deleted;
-
-CREATE TRIGGER users_audit_update_selective
+CREATE OR REPLACE TRIGGER users_audit_update_selective
 AFTER UPDATE ON users_with_deleted FOR EACH ROW
 EXECUTE PROCEDURE log_history_users();
 
@@ -279,16 +255,12 @@ SET search_path = public;
 
 REVOKE ALL ON FUNCTION log_history_choices() FROM PUBLIC;
 
-DROP TRIGGER IF EXISTS choices_audit_insert_delete ON choices;
-
-CREATE TRIGGER choices_audit_insert_delete
+CREATE OR REPLACE TRIGGER choices_audit_insert_delete
 AFTER INSERT OR DELETE ON choices FOR EACH ROW
 EXECUTE PROCEDURE log_history_choices();
 
 
-DROP TRIGGER IF EXISTS choices_audit_update_selective ON choices;
-
-CREATE TRIGGER choices_audit_update_selective
+CREATE OR REPLACE TRIGGER choices_audit_update_selective
 AFTER UPDATE ON choices FOR EACH ROW
 EXECUTE PROCEDURE log_history_choices();
 
@@ -308,21 +280,12 @@ CREATE TABLE IF NOT EXISTS settings (
   election_running BOOLEAN NOT NULL
 );
 
--- warning: if we replace our row level security by users this will break. view are always executed as their owner. I think postgresql 14 fixes that.
-CREATE OR REPLACE VIEW users AS SELECT * FROM users_with_deleted WHERE NOT deleted;
+-- warning: if we replace our row level security by users this will break. view are always executed as their owner. https://www.depesz.com/2022/03/22/waiting-for-postgresql-15-add-support-for-security-invoker-views/. Postgresql 15 will add the security_invoker option
+CREATE OR REPLACE VIEW users WITH (security_barrier) AS SELECT * FROM users_with_deleted WHERE NOT deleted;
 
-CREATE OR REPLACE VIEW projects AS SELECT * FROM projects_with_deleted WHERE NOT deleted;
+CREATE OR REPLACE VIEW projects WITH (security_barrier) AS SELECT * FROM projects_with_deleted WHERE NOT deleted;
 
-CREATE OR REPLACE VIEW present_voters AS SELECT * FROM users WHERE type = 'voter' AND NOT away;
-
--- https://www.cybertec-postgresql.com/en/triggers-to-enforce-constraints/
--- https://www.bizety.com/2018/09/24/acidrain-concurrency-attacks-on-database-backed-applications/
--- https://dl.acm.org/doi/10.1145/3035918.3064037
-
--- START TRANSACTION ISOLATION LEVEL SERIALIZABLE;
--- alternatively: pessimistic locking: FOR KEY SHARE OF on_duty
-
--- TODO LOOK AT https://www.postgresql.org/docs/current/plpgsql-trigger.html
+CREATE OR REPLACE VIEW present_voters WITH (security_barrier) AS SELECT * FROM users WHERE type = 'voter' AND NOT away;
 
 CREATE OR REPLACE FUNCTION check_choices_age() RETURNS TRIGGER AS $body$
 BEGIN
@@ -338,9 +301,8 @@ SET search_path = public;
 
 REVOKE ALL ON FUNCTION check_choices_age() FROM PUBLIC;
 
-DROP TRIGGER IF EXISTS trigger_check_choices_age ON choices;
 
-CREATE TRIGGER trigger_check_choices_age
+CREATE OR REPLACE TRIGGER trigger_check_choices_age
 BEFORE INSERT OR UPDATE ON choices
 FOR EACH ROW
 EXECUTE FUNCTION check_choices_age();
@@ -361,9 +323,8 @@ SET search_path = public;
 
 REVOKE ALL ON FUNCTION update_project_check_choices_age() FROM PUBLIC;
 
-DROP TRIGGER IF EXISTS trigger_update_project_check_choices_age ON projects_with_deleted;
 
-CREATE TRIGGER trigger_update_project_check_choices_age
+CREATE OR REPLACE TRIGGER trigger_update_project_check_choices_age
 BEFORE UPDATE ON projects_with_deleted
 FOR EACH ROW
 EXECUTE FUNCTION update_project_check_choices_age();
@@ -382,9 +343,8 @@ SET search_path = public;
 
 REVOKE ALL ON FUNCTION check_project_leader_voted_own_project() FROM PUBLIC;
 
-DROP TRIGGER IF EXISTS trigger_check_project_leader_voted_own_project ON users_with_deleted;
 
-CREATE TRIGGER trigger_check_project_leader_voted_own_project BEFORE UPDATE ON users_with_deleted
+CREATE OR REPLACE TRIGGER trigger_check_project_leader_voted_own_project BEFORE UPDATE ON users_with_deleted
 FOR EACH ROW
 EXECUTE FUNCTION check_project_leader_voted_own_project();
 
@@ -403,19 +363,11 @@ SET search_path = public;
 
 REVOKE ALL ON FUNCTION check_project_leader_choices() FROM PUBLIC;
 
-DROP TRIGGER IF EXISTS trigger_check_project_leader_choices ON choices;
 
-CREATE TRIGGER trigger_check_project_leader_choices BEFORE INSERT ON choices
+CREATE OR REPLACE TRIGGER trigger_check_project_leader_choices BEFORE INSERT ON choices
 FOR EACH ROW
 EXECUTE FUNCTION check_project_leader_choices();
 
-
-
--- https://www.postgresql.org/docs/current/plpgsql.html
-
-
--- https://www.postgresql.org/docs/14/plpgsql-trigger.html
--- https://www.postgresql.org/docs/current/sql-createtrigger.html
 
 CREATE OR REPLACE FUNCTION check_users_project_leader_id1() RETURNS TRIGGER AS $body$
 BEGIN
@@ -442,7 +394,6 @@ SET search_path = public;
 
 REVOKE ALL ON FUNCTION check_users_project_leader_id1() FROM PUBLIC;
 
--- warning: Copy pasta from above
 CREATE OR REPLACE FUNCTION check_users_force_in_project() RETURNS TRIGGER AS $body$
 BEGIN
   IF (SELECT COUNT(*) FROM users_with_deleted WHERE id = NEW.last_updated_by AND type = 'admin') = 1 THEN
@@ -468,9 +419,8 @@ SET search_path = public;
 
 REVOKE ALL ON FUNCTION check_users_force_in_project() FROM PUBLIC;
 
-DROP TRIGGER IF EXISTS trigger_check_users_project_leader_id1 ON users_with_deleted;
 
-CREATE TRIGGER trigger_check_users_project_leader_id1
+CREATE OR REPLACE TRIGGER trigger_check_users_project_leader_id1
 BEFORE UPDATE OF project_leader_id ON users_with_deleted
 FOR EACH ROW
 EXECUTE FUNCTION check_users_project_leader_id1();
@@ -478,9 +428,8 @@ EXECUTE FUNCTION check_users_project_leader_id1();
 
 
 
-DROP TRIGGER IF EXISTS trigger_check_users_force_in_project ON users_with_deleted;
 
-CREATE TRIGGER trigger_check_users_force_in_project
+CREATE OR REPLACE TRIGGER trigger_check_users_force_in_project
 BEFORE UPDATE OF force_in_project_id ON users_with_deleted
 FOR EACH ROW
 EXECUTE FUNCTION check_users_force_in_project();
@@ -502,10 +451,9 @@ SET search_path = public;
 
 REVOKE ALL ON FUNCTION check_users_project_leader_id2() FROM PUBLIC;
 
-DROP TRIGGER IF EXISTS trigger_check_users_project_leader_id2 ON users_with_deleted;
 
 -- SECURITY: Update columns if you add/change some
-CREATE TRIGGER trigger_check_users_project_leader_id2
+CREATE OR REPLACE TRIGGER trigger_check_users_project_leader_id2
 BEFORE UPDATE OF id, username, openid_id, password_hash, type, "group", age, away, password_changed, computed_in_project_id, deleted ON users_with_deleted
 FOR EACH ROW
 EXECUTE FUNCTION check_users_project_leader_id2();
@@ -527,9 +475,8 @@ SET search_path = public;
 
 REVOKE ALL ON FUNCTION check_users_project_leader_id3() FROM PUBLIC;
 
-DROP TRIGGER IF EXISTS trigger_check_users_project_leader_id3 ON users_with_deleted;
 
-CREATE TRIGGER trigger_check_users_project_leader_id3
+CREATE OR REPLACE TRIGGER trigger_check_users_project_leader_id3
 BEFORE INSERT ON users_with_deleted
 FOR EACH ROW
 EXECUTE FUNCTION check_users_project_leader_id3();
@@ -538,5 +485,27 @@ ALTER TABLE users_with_deleted ENABLE ROW LEVEL SECURITY;
 
 DROP POLICY IF EXISTS users_voters_only_project_leaders ON users_with_deleted;
 
--- TODO FIXMe switch to USING AND WITH so no entries are accidentially hidden but instead an error is thrown that rls is violated
+-- TODO FIXME switch to USING AND WITH so no entries are accidentially hidden but instead an error is thrown that rls is violated
 CREATE POLICY users_voters_only_project_leaders ON users_with_deleted FOR ALL TO PUBLIC USING (current_setting('projektwahl.type') IN ('root', 'admin', 'helper') OR project_leader_id IS NOT NULL);
+
+DO $_$
+    DECLARE
+        the_database TEXT := CURRENT_DATABASE();
+    BEGIN
+        -- if you remove this you get a CVE for free - so don't. (because the triggers can have race conditions then)
+        -- https://www.cybertec-postgresql.com/en/triggers-to-enforce-constraints/
+        -- https://www.bizety.com/2018/09/24/acidrain-concurrency-attacks-on-database-backed-applications/
+        -- https://dl.acm.org/doi/10.1145/3035918.3064037
+        EXECUTE FORMAT('ALTER DATABASE %I SET default_transaction_isolation = ''serializable'';', the_database);
+        EXECUTE FORMAT('GRANT SELECT,INSERT,UPDATE ON users_with_deleted TO %I;', the_database);
+        EXECUTE FORMAT('GRANT SELECT,INSERT,UPDATE ON users TO %I;', the_database);
+        EXECUTE FORMAT('GRANT SELECT,INSERT,UPDATE ON projects_with_deleted TO %I;', the_database);
+        EXECUTE FORMAT('GRANT SELECT,INSERT,UPDATE ON projects TO %I;', the_database);
+        EXECUTE FORMAT('GRANT SELECT,INSERT,UPDATE,DELETE ON choices TO %I;', the_database);
+        EXECUTE FORMAT('GRANT INSERT ON settings TO %I;', the_database);
+        EXECUTE FORMAT('GRANT SELECT,INSERT,UPDATE,DELETE ON sessions TO %I;', the_database);
+        EXECUTE FORMAT('ALTER VIEW users OWNER TO %I;', the_database);
+        EXECUTE FORMAT('ALTER VIEW present_voters OWNER TO %I;', the_database);
+        EXECUTE FORMAT('ALTER VIEW projects OWNER TO %I;', the_database);
+    END
+$_$;

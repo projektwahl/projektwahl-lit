@@ -34,7 +34,7 @@ This software is licensed under the GNU Affero General Public License v3.0 or an
 - **Remove/Adapt https://github.com/projektwahl/projektwahl-lit/blob/main/src/client/routes/pw-privacy.ts and https://github.com/projektwahl/projektwahl-lit/blob/main/src/client/routes/pw-imprint.ts**
 - Node 16+
 - npm
-- Postgresql database 13+
+- Postgresql database **14+**
 - OpenID credentials (optional)
 
 ## Important notes
@@ -64,7 +64,7 @@ sudo -u postgres psql
 CREATE ROLE projektwahl SUPERUSER LOGIN PASSWORD 'projektwahl'; -- CHANGE/REMOVE THIS PASSWORD
 
 CREATE ROLE projektwahl_staging LOGIN PASSWORD 'projektwahl'; -- CHANGE/REMOVE THIS PASSWORD
-CREATE ROLE projektwahl_staging_admin LOGIN PASSWORD 'projektwahl'; -- CHANGE/REMOVE THIS PASSWORD
+CREATE ROLE projektwahl_staging_admin IN ROLE projektwahl_staging LOGIN PASSWORD 'projektwahl'; -- CHANGE/REMOVE THIS PASSWORD
 CREATE DATABASE projektwahl_staging OWNER projektwahl_staging_admin;
 
 sudo -u postgres psql --db projektwahl_staging
@@ -72,20 +72,6 @@ REVOKE CREATE ON SCHEMA public FROM PUBLIC;
 
 
 sudo -u projektwahl_staging_admin psql --single-transaction --db projektwahl_staging < src/server/setup.sql
-
-
-sudo -u projektwahl_staging_admin psql --db projektwahl_staging
-ALTER DATABASE projektwahl_staging SET default_transaction_isolation = 'serializable';
-GRANT SELECT,INSERT,UPDATE ON users_with_deleted TO projektwahl_staging;
-GRANT SELECT,INSERT,UPDATE ON users TO projektwahl_staging;
-GRANT SELECT,INSERT,UPDATE ON projects_with_deleted TO projektwahl_staging;
-GRANT SELECT,INSERT,UPDATE ON projects TO projektwahl_staging;
-GRANT SELECT,INSERT,UPDATE,DELETE ON choices TO projektwahl_staging;
-GRANT INSERT ON settings TO projektwahl_staging;
-GRANT SELECT,INSERT,UPDATE,DELETE ON sessions TO projektwahl_staging;
-ALTER VIEW users OWNER TO projektwahl_staging;
-ALTER VIEW present_voters OWNER TO projektwahl_staging;
-ALTER VIEW projects OWNER TO projektwahl_staging;
 
 NODE_ENV=development DATABASE_HOST=/run/postgresql DATABASE_URL=postgres://projektwahl_staging:projektwahl@localhost/projektwahl_staging npm run setup
 
