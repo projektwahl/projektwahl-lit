@@ -540,3 +540,21 @@ DROP POLICY IF EXISTS users_voters_only_project_leaders ON users_with_deleted;
 
 -- TODO FIXMe switch to USING AND WITH so no entries are accidentially hidden but instead an error is thrown that rls is violated
 CREATE POLICY users_voters_only_project_leaders ON users_with_deleted FOR ALL TO PUBLIC USING (current_setting('projektwahl.type') IN ('root', 'admin', 'helper') OR project_leader_id IS NOT NULL);
+
+DO $_$
+    DECLARE
+        the_database TEXT := CURRENT_DATABASE();
+    BEGIN
+        EXECUTE FORMAT('ALTER DATABASE %I SET default_transaction_isolation = ''serializable'';', the_database);
+        EXECUTE FORMAT('GRANT SELECT,INSERT,UPDATE ON users_with_deleted TO %I;', the_database);
+        EXECUTE FORMAT('GRANT SELECT,INSERT,UPDATE ON users TO %I;', the_database);
+        EXECUTE FORMAT('GRANT SELECT,INSERT,UPDATE ON projects_with_deleted TO %I;', the_database);
+        EXECUTE FORMAT('GRANT SELECT,INSERT,UPDATE ON projects TO %I;', the_database);
+        EXECUTE FORMAT('GRANT SELECT,INSERT,UPDATE,DELETE ON choices TO %I;', the_database);
+        EXECUTE FORMAT('GRANT INSERT ON settings TO %I;', the_database);
+        EXECUTE FORMAT('GRANT SELECT,INSERT,UPDATE,DELETE ON sessions TO %I;', the_database);
+        EXECUTE FORMAT('ALTER VIEW users OWNER TO %I;', the_database);
+        EXECUTE FORMAT('ALTER VIEW present_voters OWNER TO %I;', the_database);
+        EXECUTE FORMAT('ALTER VIEW projects OWNER TO %I;', the_database);
+    END
+$_$;
