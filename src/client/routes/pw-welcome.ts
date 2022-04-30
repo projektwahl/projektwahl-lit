@@ -25,7 +25,10 @@ import { html } from "lit";
 import { PwElement } from "../pw-element.js";
 import { LoggedInUserController } from "../user-controller.js";
 import { myFetch } from "../utils.js";
-import {until} from 'lit/directives/until.js';
+import { until } from "lit/directives/until.js";
+import { ClockController } from "../clock-controller.js";
+import { Task } from "@lit-labs/task";
+import { ResponseType } from "../../lib/routes.js";
 
 // workaround see https://github.com/runem/lit-analyzer/issues/149#issuecomment-1006162839
 export function pwWelcome(
@@ -39,10 +42,30 @@ export function pwWelcome(
 
 export class PwWelcome extends PwElement {
   userController: LoggedInUserController;
+  clockController: ClockController;
+  task: Task<[], ResponseType<"/api/v1/settings">>;
 
   constructor() {
     super();
     this.userController = new LoggedInUserController(this);
+    this.clockController = new ClockController(this);
+
+    this.task = new Task(
+      this,
+      async () =>
+        await myFetch(
+          "GET",
+          "/api/v1/settings",
+          {
+            filters: {},
+            sorting: [],
+            paginationDirection: "forwards",
+            paginationLimit: 100,
+          },
+          {}
+        ),
+      () => []
+    );
   }
 
   protected render() {
@@ -63,14 +86,26 @@ export class PwWelcome extends PwElement {
           : this.userController.type === "voter"
           ? `Oben im Menü unter "Wahl" kannst du deine Projektwünsche auswählen.`
           : ``}
+        ${this.task.render({
+          complete: (value) => {
+            if (value.success) {
+              const diff =
+                new Date(value.data.entities[0].open_date).getTime() -
+                this.clockController.value.getTime();
 
-        ${until(myFetch("GET", "/api/v1/settings", {filters:{},sorting:[], paginationDirection: "forwards", paginationLimit: 100}, {}).then(v => {
-          if (v.success) {
-            return v.data.entities[0].open_date
-          } else {
-            return "error"
-          }
-        }), html``)}
+              const seconds = Math.floor(diff / 1000) % 60;
+
+              const minutes = Math.floor(diff / (1000 * 60)) % 60;
+
+              const hours = Math.floor(diff / (1000 * 60 * 60)) % 24;
+
+              const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+
+              return html`${days} days, ${hours} hours, ${minutes} minutes,
+              ${seconds} seconds`;
+            }
+          },
+        })}
 
         <br />
         <h2 class="text-center">${msg("Credits")}</h2>
