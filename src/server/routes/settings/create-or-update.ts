@@ -87,7 +87,7 @@ export const updateSettingsHandler = requestHandler(
     }
 
     try {
-      const row: { id: number } = (
+      const row: {} = (
         await sql.begin("READ WRITE", async (tsql) => {
           await tsql`SELECT set_config('projektwahl.type', ${
             loggedInUser?.type ?? null
@@ -102,39 +102,14 @@ export const updateSettingsHandler = requestHandler(
           let _ = rest;
           _ = 1; // ensure no property is missed - Don't use `{}` as a type. `{}` actually means "any non-nullish value".
           const finalQuery = typedSql(tsql, {
-            columns: { id: 23 },
-          } as const)`UPDATE settings SET open_date = ${open_date}, voting_start_date = ${voting_start_date}, voting_end_date = ${voting_end_date}, results_date = ${results_date};`;
+            columns: {},
+          } as const)`UPDATE settings SET open_date = ${open_date}::TEXT::TIMESTAMP WITHOUT TIME ZONE AT TIME ZONE 'Europe/Berlin', voting_start_date = ${voting_start_date}::TEXT::TIMESTAMP WITHOUT TIME ZONE AT TIME ZONE 'Europe/Berlin', voting_end_date = ${voting_end_date}::TEXT::TIMESTAMP WITHOUT TIME ZONE AT TIME ZONE 'Europe/Berlin', results_date = ${results_date}::TEXT::TIMESTAMP WITHOUT TIME ZONE AT TIME ZONE 'Europe/Berlin';`;
           // warning: this will not work if we will ever use multiple workers in production
           await updateCachedSettings(tsql);
           return await finalQuery;
         })
       )[0];
 
-      if (!row) {
-        // insufficient permissions
-        const returnValue: [
-          OutgoingHttpHeaders,
-          ResponseType<"/api/v1/settings/update">
-        ] = [
-          {
-            "content-type": "text/json; charset=utf-8",
-            ":status": 403,
-          },
-          {
-            success: false as const,
-            error: {
-              issues: [
-                {
-                  code: ZodIssueCode.custom,
-                  path: ["forbidden"],
-                  message: "Unzureichende Berechtigung!",
-                },
-              ],
-            },
-          },
-        ];
-        return returnValue;
-      }
       return [
         {
           "content-type": "text/json; charset=utf-8",

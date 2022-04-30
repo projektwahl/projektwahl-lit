@@ -31,7 +31,6 @@ import type { MinimalSafeParseError, routes } from "../../../lib/routes.js";
 import type { z } from "zod";
 import { ref } from "lit/directives/ref.js";
 import { pwInputText } from "../../form/pw-input-text.js";
-import "./pw-user-projects.js";
 
 // workaround see https://github.com/runem/lit-analyzer/issues/149#issuecomment-1006162839
 export function pwSettingsUpdate(
@@ -49,17 +48,14 @@ export function pwSettingsUpdate(
 const taskFunction = async (): Promise<
   | MinimalSafeParseError
   | z.SafeParseSuccess<
-      (z.infer<
-        typeof routes["/api/v1/settings"]["response"]
-      >["entities"][number])
+      z.infer<typeof routes["/api/v1/settings"]["response"]>["entities"][number]
     >
 > => {
   const response = await myFetch<"/api/v1/settings">(
     "GET",
     `/api/v1/settings`,
     {
-      filters: {
-      },
+      filters: {},
       paginationCursor: null,
       paginationDirection: "forwards",
       paginationLimit: 100,
@@ -96,17 +92,15 @@ class PwSettingsUpdate extends PwForm<"/api/v1/settings/update"> {
   }
 
   override get actionText() {
-    return this.disabled
-      ? msg("View settings")
-      : msg("Update settings");
+    return this.disabled ? msg("View settings") : msg("Update settings");
   }
 
   initialTask: Task<
     [],
     | z.SafeParseSuccess<
-        (z.infer<
+        z.infer<
           typeof routes["/api/v1/settings"]["response"]
-        >["entities"][number])
+        >["entities"][number]
       >
     | MinimalSafeParseError
     | undefined
@@ -135,6 +129,8 @@ class PwSettingsUpdate extends PwForm<"/api/v1/settings/update"> {
       },
       () => []
     );
+
+    this.formData = {};
   }
 
   override render() {
@@ -185,12 +181,10 @@ class PwSettingsUpdate extends PwForm<"/api/v1/settings/update"> {
                         }
                       }}
                     >
-                      ${pwInputText<
-                        "/api/v1/settings/update",
-                        string
-                      >({
+                      ${pwInputText<"/api/v1/settings/update", string>({
+                        // 1010-10-10T22:10
                         url: this.url,
-                        type: "text",
+                        type: "datetime-local",
                         disabled: this.disabled,
                         label: msg("Open date"),
                         name: ["open_date"],
@@ -201,7 +195,46 @@ class PwSettingsUpdate extends PwForm<"/api/v1/settings/update"> {
                         initial: value?.data,
                         resettable: value !== undefined,
                       })}
-                      
+                      ${pwInputText<"/api/v1/settings/update", string>({
+                        url: this.url,
+                        type: "datetime-local",
+                        disabled: this.disabled,
+                        label: msg("Voting start date"),
+                        name: ["voting_start_date"],
+                        get: (o) => o.voting_start_date,
+                        set: (o, v) => (o.voting_start_date = v),
+                        task: this._task,
+                        defaultValue: "",
+                        initial: value?.data,
+                        resettable: value !== undefined,
+                      })}
+                      ${pwInputText<"/api/v1/settings/update", string>({
+                        url: this.url,
+                        type: "datetime-local",
+                        disabled: this.disabled,
+                        label: msg("Voting end date"),
+                        name: ["voting_end_date"],
+                        get: (o) => o.voting_end_date,
+                        set: (o, v) => (o.voting_end_date = v),
+                        task: this._task,
+                        defaultValue: "",
+                        initial: value?.data,
+                        resettable: value !== undefined,
+                      })}
+                      ${pwInputText<"/api/v1/settings/update", string>({
+                        url: this.url,
+                        type: "datetime-local",
+                        disabled: this.disabled,
+                        label: msg("Results date"),
+                        name: ["results_date"],
+                        get: (o) => o.results_date,
+                        set: (o, v) => (o.results_date = v),
+                        task: this._task,
+                        defaultValue: "",
+                        initial: value?.data,
+                        resettable: value !== undefined,
+                      })}
+
                       <button
                         type="submit"
                         ?disabled=${this._task.render({
