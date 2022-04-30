@@ -24,6 +24,8 @@ import { msg } from "@lit/localize";
 import { html } from "lit";
 import { PwElement } from "../pw-element.js";
 import { LoggedInUserController } from "../user-controller.js";
+import { myFetch } from "../utils.js";
+import {until} from 'lit/directives/until.js';
 
 // workaround see https://github.com/runem/lit-analyzer/issues/149#issuecomment-1006162839
 export function pwWelcome(
@@ -61,6 +63,14 @@ export class PwWelcome extends PwElement {
           : this.userController.type === "voter"
           ? `Oben im Menü unter "Wahl" kannst du deine Projektwünsche auswählen.`
           : ``}
+
+        ${until(myFetch("GET", "/api/v1/settings", {filters:{},sorting:[], paginationDirection: "forwards", paginationLimit: 100}, {}).then(v => {
+          if (v.success) {
+            return v.data.entities[0].open_date
+          } else {
+            return "error"
+          }
+        }), html``)}
 
         <br />
         <h2 class="text-center">${msg("Credits")}</h2>

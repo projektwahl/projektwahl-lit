@@ -494,7 +494,14 @@ export const routes = {
       .strict()
   ),
   "/api/v1/settings": baseQuery(
-    rawSessionType,
+    z
+      .object({
+        open_date: z.string(),
+        voting_start_date: z.string(),
+        voting_end_date: z.string(),
+        results_date: z.string(),
+      })
+      .strict(),
     z.array(z.never()),
     z.object({}).strict()
   ),
