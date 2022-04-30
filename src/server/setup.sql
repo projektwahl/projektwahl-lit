@@ -276,9 +276,13 @@ CREATE TABLE IF NOT EXISTS sessions (
 );
 
 CREATE TABLE IF NOT EXISTS settings (
-  id INTEGER PRIMARY KEY NOT NULL,
-  election_running BOOLEAN NOT NULL
+  open_date TIMESTAMP WITH TIME ZONE,
+  voting_start_date TIMESTAMP WITH TIME ZONE,
+  voting_end_date TIMESTAMP WITH TIME ZONE,
+  results_date TIMESTAMP WITH TIME ZONE
 );
+
+INSERT INTO settings (open_date, voting_start_date, voting_end_date, results_date) SELECT NULL, NULL, NULL, NULL WHERE NOT EXISTS (SELECT * FROM settings);
 
 -- warning: if we replace our row level security by users this will break. view are always executed as their owner. https://www.depesz.com/2022/03/22/waiting-for-postgresql-15-add-support-for-security-invoker-views/. Postgresql 15 will add the security_invoker option
 CREATE OR REPLACE VIEW users WITH (security_barrier) AS SELECT * FROM users_with_deleted WHERE NOT deleted;
@@ -502,7 +506,7 @@ DO $_$
         EXECUTE FORMAT('GRANT SELECT,INSERT,UPDATE ON projects_with_deleted TO %I;', the_database);
         EXECUTE FORMAT('GRANT SELECT,INSERT,UPDATE ON projects TO %I;', the_database);
         EXECUTE FORMAT('GRANT SELECT,INSERT,UPDATE,DELETE ON choices TO %I;', the_database);
-        EXECUTE FORMAT('GRANT INSERT ON settings TO %I;', the_database);
+        EXECUTE FORMAT('GRANT SELECT,UPDATE ON settings TO %I;', the_database);
         EXECUTE FORMAT('GRANT SELECT,INSERT,UPDATE,DELETE ON sessions TO %I;', the_database);
         EXECUTE FORMAT('ALTER VIEW users OWNER TO %I;', the_database);
         EXECUTE FORMAT('ALTER VIEW present_voters OWNER TO %I;', the_database);

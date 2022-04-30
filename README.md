@@ -114,7 +114,7 @@ npx c8 report --exclude-after-remap --temp-directory=coverage --reporter=html &&
 ## Database access
 
 ```
-psql --username=projektwahl --host=projektwahl
+psql postgres://projektwahl_staging_admin:projektwahl@localhost/projektwahl_staging
 
 # sudo tail -f /var/lib/postgresql/14/log/postgresql-2022-03-31_201007.log
 ```
