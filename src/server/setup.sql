@@ -79,16 +79,12 @@ SET search_path = public;
 
 REVOKE ALL ON FUNCTION log_history_projects() FROM PUBLIC;
 
-DROP TRIGGER IF EXISTS projects_audit_insert_delete ON projects_with_deleted;
-
-CREATE TRIGGER projects_audit_insert_delete
+CREATE OR REPLACE TRIGGER projects_audit_insert_delete
 AFTER INSERT OR DELETE ON projects_with_deleted FOR EACH ROW
 EXECUTE PROCEDURE log_history_projects();
 
 
-DROP TRIGGER IF EXISTS projects_audit_update_selective ON projects_with_deleted;
-
-CREATE TRIGGER projects_audit_update_selective
+CREATE OR REPLACE TRIGGER projects_audit_update_selective
 AFTER UPDATE ON projects_with_deleted FOR EACH ROW
 EXECUTE PROCEDURE log_history_projects();
 
@@ -216,16 +212,12 @@ SET search_path = public;
 
 REVOKE ALL ON FUNCTION log_history_users() FROM PUBLIC;
 
-DROP TRIGGER IF EXISTS users_audit_insert_delete ON users_with_deleted;
-
-CREATE TRIGGER users_audit_insert_delete
+CREATE OR REPLACE TRIGGER users_audit_insert_delete
 AFTER INSERT OR DELETE ON users_with_deleted FOR EACH ROW
 EXECUTE PROCEDURE log_history_users();
 
 
-DROP TRIGGER IF EXISTS users_audit_update_selective ON users_with_deleted;
-
-CREATE TRIGGER users_audit_update_selective
+CREATE OR REPLACE TRIGGER users_audit_update_selective
 AFTER UPDATE ON users_with_deleted FOR EACH ROW
 EXECUTE PROCEDURE log_history_users();
 
@@ -279,16 +271,12 @@ SET search_path = public;
 
 REVOKE ALL ON FUNCTION log_history_choices() FROM PUBLIC;
 
-DROP TRIGGER IF EXISTS choices_audit_insert_delete ON choices;
-
-CREATE TRIGGER choices_audit_insert_delete
+CREATE OR REPLACE TRIGGER choices_audit_insert_delete
 AFTER INSERT OR DELETE ON choices FOR EACH ROW
 EXECUTE PROCEDURE log_history_choices();
 
 
-DROP TRIGGER IF EXISTS choices_audit_update_selective ON choices;
-
-CREATE TRIGGER choices_audit_update_selective
+CREATE OR REPLACE TRIGGER choices_audit_update_selective
 AFTER UPDATE ON choices FOR EACH ROW
 EXECUTE PROCEDURE log_history_choices();
 
@@ -338,9 +326,8 @@ SET search_path = public;
 
 REVOKE ALL ON FUNCTION check_choices_age() FROM PUBLIC;
 
-DROP TRIGGER IF EXISTS trigger_check_choices_age ON choices;
 
-CREATE TRIGGER trigger_check_choices_age
+CREATE OR REPLACE TRIGGER trigger_check_choices_age
 BEFORE INSERT OR UPDATE ON choices
 FOR EACH ROW
 EXECUTE FUNCTION check_choices_age();
@@ -361,9 +348,8 @@ SET search_path = public;
 
 REVOKE ALL ON FUNCTION update_project_check_choices_age() FROM PUBLIC;
 
-DROP TRIGGER IF EXISTS trigger_update_project_check_choices_age ON projects_with_deleted;
 
-CREATE TRIGGER trigger_update_project_check_choices_age
+CREATE OR REPLACE TRIGGER trigger_update_project_check_choices_age
 BEFORE UPDATE ON projects_with_deleted
 FOR EACH ROW
 EXECUTE FUNCTION update_project_check_choices_age();
@@ -382,9 +368,8 @@ SET search_path = public;
 
 REVOKE ALL ON FUNCTION check_project_leader_voted_own_project() FROM PUBLIC;
 
-DROP TRIGGER IF EXISTS trigger_check_project_leader_voted_own_project ON users_with_deleted;
 
-CREATE TRIGGER trigger_check_project_leader_voted_own_project BEFORE UPDATE ON users_with_deleted
+CREATE OR REPLACE TRIGGER trigger_check_project_leader_voted_own_project BEFORE UPDATE ON users_with_deleted
 FOR EACH ROW
 EXECUTE FUNCTION check_project_leader_voted_own_project();
 
@@ -403,9 +388,8 @@ SET search_path = public;
 
 REVOKE ALL ON FUNCTION check_project_leader_choices() FROM PUBLIC;
 
-DROP TRIGGER IF EXISTS trigger_check_project_leader_choices ON choices;
 
-CREATE TRIGGER trigger_check_project_leader_choices BEFORE INSERT ON choices
+CREATE OR REPLACE TRIGGER trigger_check_project_leader_choices BEFORE INSERT ON choices
 FOR EACH ROW
 EXECUTE FUNCTION check_project_leader_choices();
 
@@ -468,9 +452,8 @@ SET search_path = public;
 
 REVOKE ALL ON FUNCTION check_users_force_in_project() FROM PUBLIC;
 
-DROP TRIGGER IF EXISTS trigger_check_users_project_leader_id1 ON users_with_deleted;
 
-CREATE TRIGGER trigger_check_users_project_leader_id1
+CREATE OR REPLACE TRIGGER trigger_check_users_project_leader_id1
 BEFORE UPDATE OF project_leader_id ON users_with_deleted
 FOR EACH ROW
 EXECUTE FUNCTION check_users_project_leader_id1();
@@ -478,9 +461,8 @@ EXECUTE FUNCTION check_users_project_leader_id1();
 
 
 
-DROP TRIGGER IF EXISTS trigger_check_users_force_in_project ON users_with_deleted;
 
-CREATE TRIGGER trigger_check_users_force_in_project
+CREATE OR REPLACE TRIGGER trigger_check_users_force_in_project
 BEFORE UPDATE OF force_in_project_id ON users_with_deleted
 FOR EACH ROW
 EXECUTE FUNCTION check_users_force_in_project();
@@ -502,10 +484,9 @@ SET search_path = public;
 
 REVOKE ALL ON FUNCTION check_users_project_leader_id2() FROM PUBLIC;
 
-DROP TRIGGER IF EXISTS trigger_check_users_project_leader_id2 ON users_with_deleted;
 
 -- SECURITY: Update columns if you add/change some
-CREATE TRIGGER trigger_check_users_project_leader_id2
+CREATE OR REPLACE TRIGGER trigger_check_users_project_leader_id2
 BEFORE UPDATE OF id, username, openid_id, password_hash, type, "group", age, away, password_changed, computed_in_project_id, deleted ON users_with_deleted
 FOR EACH ROW
 EXECUTE FUNCTION check_users_project_leader_id2();
@@ -527,9 +508,8 @@ SET search_path = public;
 
 REVOKE ALL ON FUNCTION check_users_project_leader_id3() FROM PUBLIC;
 
-DROP TRIGGER IF EXISTS trigger_check_users_project_leader_id3 ON users_with_deleted;
 
-CREATE TRIGGER trigger_check_users_project_leader_id3
+CREATE OR REPLACE TRIGGER trigger_check_users_project_leader_id3
 BEFORE INSERT ON users_with_deleted
 FOR EACH ROW
 EXECUTE FUNCTION check_users_project_leader_id3();
