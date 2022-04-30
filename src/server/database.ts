@@ -54,3 +54,9 @@ export async function retryableBegin<T>(
     }
   }
 }
+
+export let settings = (await sql`SELECT * FROM settings`)[0];
+
+export const updateSettings = async () => {
+  settings = (await sql`SELECT * FROM settings`)[0];
+}
