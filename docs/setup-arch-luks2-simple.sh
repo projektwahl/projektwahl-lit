@@ -751,3 +751,14 @@ sudo -u postgres initdb -D /var/lib/postgres/data
 sudo systemctl start postgresql
 
 sudo -u postgres psql -d postgres -f /tmp/outputfile
+
+
+
+## DEBUGGING systemd sandboxing
+sudo systemctl log-level debug
+
+# SIGSYS means SystemCallFilter is at fault
+# https://www.freedesktop.org/software/systemd/man/systemd.exec.html#SystemCallFilter=
+
+systemd-analyze syscall-filter
+
