@@ -73,7 +73,10 @@ const taskFunction = async (): Promise<
 };
 
 function database2datetimelocal(unix_time: number) {
-  // 2022-05-04T20:58:46
+  if (typeof unix_time !== "number") {
+    throw new Error("not a number")
+  }
+  // 2022-05-04T20:58
   const d = new Date(unix_time);
   return `${d.getFullYear()}-${d.getMonth()}-${d.getDay()}T${d.getHours()}:${d.getMinutes()}`
 }
@@ -82,7 +85,6 @@ function database2datetimelocal(unix_time: number) {
 // what the hell
 function datetimelocal2database(input: string) {
   // 2022-05-03T15:43
-  // TODO FIXME month index by 0?
   return new Date(Number(input.slice(0, 4)), Number(input.slice(5, 7))-1, Number(input.slice(8, 10)),
   Number(input.slice(11, 13)), Number(input.slice(14, 16))).getTime();
 }
@@ -196,15 +198,15 @@ class PwSettingsUpdate extends PwForm<"/api/v1/settings/update"> {
                         }
                       }}
                     >
-                      ${pwInputText<"/api/v1/settings/update", string>({
+                      ${pwInputText<"/api/v1/settings/update", string|undefined>({
                         // 1010-10-10T22:10
                         url: this.url,
                         type: "datetime-local",
                         disabled: this.disabled,
                         label: msg("Open date"),
                         name: ["open_date"],
-                        get: (o) => o.open_date, // gets initial data
-                        set: (o, v) => (o.open_date = v), // gets default or inputvalue
+                        get: (o) => o.open_date !== undefined ? value?.data.open_date : database2datetimelocal(o.open_date), // gets initial data
+                        set: (o, v) => (o.open_date = v === undefined ? o.open_date : datetimelocal2database(v)), // gets default or inputvalue
                         task: this._task,
                         defaultValue: "",
                         // TODO FIXME loading the initial data doesn't work because the format of the open_date is wrong. we probably need to convert it to the local timezone (maybe already on the server side) and truncate the + at the start etc.
