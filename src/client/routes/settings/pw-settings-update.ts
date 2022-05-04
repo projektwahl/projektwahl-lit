@@ -72,6 +72,21 @@ const taskFunction = async (): Promise<
   return response;
 };
 
+function database2datetimelocal(unix_time: number) {
+  // 2022-05-04T20:58:46
+  const d = new Date(unix_time);
+  return `${d.getFullYear()}-${d.getMonth()}-${d.getDay()}T${d.getHours()}:${d.getMinutes()}`
+}
+
+// https://stackoverflow.com/questions/64440010/trying-to-set-datetime-local-using-javascript
+// what the hell
+function datetimelocal2database(input: string) {
+  // 2022-05-03T15:43
+  // TODO FIXME month index by 0?
+  return new Date(Number(input.slice(0, 4)), Number(input.slice(5, 7))-1, Number(input.slice(8, 10)),
+  Number(input.slice(11, 13)), Number(input.slice(14, 16))).getTime();
+}
+
 class PwSettingsUpdate extends PwForm<"/api/v1/settings/update"> {
   static get properties() {
     return {
@@ -188,8 +203,8 @@ class PwSettingsUpdate extends PwForm<"/api/v1/settings/update"> {
                         disabled: this.disabled,
                         label: msg("Open date"),
                         name: ["open_date"],
-                        get: (o) => o.open_date,
-                        set: (o, v) => (o.open_date = v),
+                        get: (o) => o.open_date, // gets initial data
+                        set: (o, v) => (o.open_date = v), // gets default or inputvalue
                         task: this._task,
                         defaultValue: "",
                         // TODO FIXME loading the initial data doesn't work because the format of the open_date is wrong. we probably need to convert it to the local timezone (maybe already on the server side) and truncate the + at the start etc.

@@ -69,7 +69,7 @@ export const settingsHandler = requestHandler(
           const { ...rest } = query.filters;
           let _ = rest;
           _ = 1; // ensure no property is missed - Don't use `{}` as a type. `{}` actually means "any non-nullish value".
-          return sql`SELECT * FROM settings`;
+          return sql`SELECT extract(epoch from open_date) * 1000 AS open_date, extract(epoch from voting_start_date) * 1000 AS voting_start_date, extract(epoch from voting_end_date) * 1000 AS voting_end_date, extract(epoch from results_date) * 1000 AS results_date FROM settings;`;
         },
         {},
         undefined
