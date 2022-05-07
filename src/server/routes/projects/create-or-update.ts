@@ -31,7 +31,7 @@ import { typedSql } from "../../describe.js";
 export const createProjectsHandler = createOrUpdateProjectsHandler(
   "/api/v1/projects/create",
   async (
-    sql,
+    tsql,
     project,
     loggedInUser: Exclude<z.infer<typeof userSchema>, undefined>
   ) => {
@@ -50,7 +50,7 @@ export const createProjectsHandler = createOrUpdateProjectsHandler(
     } = project;
     let _ = rest;
     _ = 1; // ensure no property is missed - Don't use `{}` as a type. `{}` actually means "any non-nullish value".
-    const res = await typedSql(sql, {
+    const res = await typedSql(tsql, {
       columns: { id: 23 },
     } as const)`INSERT INTO projects_with_deleted (title, info, place, costs, min_age, max_age, min_participants, max_participants, random_assignments, deleted, last_updated_by)
             (SELECT 
@@ -71,7 +71,7 @@ export const createProjectsHandler = createOrUpdateProjectsHandler(
 
     // TODO FIXME make this in sql directly
     if (loggedInUser.type === "helper") {
-      await typedSql(sql, {
+      await typedSql(tsql, {
         columns: {},
       } as const)`UPDATE users_with_deleted SET project_leader_id = ${res[0].id} WHERE project_leader_id IS NULL AND id = ${loggedInUser.id}`;
     }
@@ -83,7 +83,7 @@ export const createProjectsHandler = createOrUpdateProjectsHandler(
 export const updateProjectsHandler = createOrUpdateProjectsHandler(
   "/api/v1/projects/update",
   async (
-    sql,
+    tsql,
     project,
     loggedInUser: Exclude<z.infer<typeof userSchema>, undefined>
   ) => {
@@ -103,7 +103,7 @@ export const updateProjectsHandler = createOrUpdateProjectsHandler(
     } = project;
     let _ = rest;
     _ = 1; // ensure no property is missed - Don't use `{}` as a type. `{}` actually means "any non-nullish value".
-    const finalQuery = typedSql(sql, {
+    const finalQuery = typedSql(tsql, {
       columns: { id: 23 },
     } as const)`UPDATE projects_with_deleted SET
     "title" = CASE WHEN ${title !== undefined} THEN ${

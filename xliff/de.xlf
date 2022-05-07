@@ -253,6 +253,24 @@
 <trans-unit id="s5c18cae48b93138c">
   <source>Sessions</source>
 </trans-unit>
+<trans-unit id="s3d259b88e98f1095">
+  <source>View settings</source>
+</trans-unit>
+<trans-unit id="s7886195e5cfb6d41">
+  <source>Update settings</source>
+</trans-unit>
+<trans-unit id="sa605b453d445583f">
+  <source>Open date</source>
+</trans-unit>
+<trans-unit id="s13cb62951c0f5d42">
+  <source>Voting start date</source>
+</trans-unit>
+<trans-unit id="scb925f8c363a4029">
+  <source>Voting end date</source>
+</trans-unit>
+<trans-unit id="s180898dc64da0e8b">
+  <source>Results date</source>
+</trans-unit>
 <trans-unit id="hc66aaa662761137a">
   <source>Not Found</source>
   <target>Nicht gefunden</target>

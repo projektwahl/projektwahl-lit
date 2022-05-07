@@ -70,8 +70,7 @@ CREATE DATABASE projektwahl_staging OWNER projektwahl_staging_admin;
 sudo -u postgres psql --db projektwahl_staging
 REVOKE CREATE ON SCHEMA public FROM PUBLIC;
 
-
-sudo -u projektwahl_staging_admin psql --single-transaction --db projektwahl_staging < src/server/setup.sql
+psql postgres://projektwahl_staging_admin:projektwahl@localhost/projektwahl_staging --single-transaction < src/server/setup.sql
 
 NODE_ENV=development DATABASE_HOST=/run/postgresql DATABASE_URL=postgres://projektwahl_staging:projektwahl@localhost/projektwahl_staging npm run setup
 
@@ -114,7 +113,7 @@ npx c8 report --exclude-after-remap --temp-directory=coverage --reporter=html &&
 ## Database access
 
 ```
-psql --username=projektwahl --host=projektwahl
+psql postgres://projektwahl_staging_admin:projektwahl@localhost/projektwahl_staging
 
 # sudo tail -f /var/lib/postgresql/14/log/postgresql-2022-03-31_201007.log
 ```

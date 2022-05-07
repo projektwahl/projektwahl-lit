@@ -31,8 +31,6 @@ export async function setup() {
   await sql.begin("READ WRITE", async (tsql) => {
     await tsql`SELECT set_config('projektwahl.type', 'root', true);`;
 
-    await tsql`INSERT INTO settings (id, election_running) VALUES (1, false) ON CONFLICT DO NOTHING;`;
-
     const hash = await hashPassword("changeme");
 
     const admin = (

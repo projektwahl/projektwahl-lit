@@ -106,28 +106,37 @@ export async function fetchData<R extends keyof typeof entityRoutes>(
   query: entitiesType0[R],
   sqlQuery: (query: entitiesType0[R]) => PendingQuery<Row[]>,
   orderByQueries: entitiesType8[R],
-  tiebreaker: entitiesType18[R]
+  tiebreaker: entitiesType18[R] | undefined
 ): Promise<[OutgoingHttpHeaders, ResponseType<R>]> {
   const sorting: entitiesType15[R] = mappedIndexing(query, "sorting");
 
-  if (!sorting.find((e) => e[0] == tiebreaker)) {
+  if (tiebreaker !== undefined && !sorting.find((e) => e[0] == tiebreaker)) {
     // @ts-expect-error probably mappedfunctioncall needed. or maybe we can store that tuple separately and type it.
     sorting.push([tiebreaker, "ASC", null]);
   }
 
-  const orderByQuery = mappedFunctionCall2(sorting, (v: entitiesType4[R]) => {
-    const v0: entitiesType6[R] = mappedIndexing<entitiesType4, R, 0>(v, 0);
-    // @ts-expect-error bruh
-    const v1: entitiesType2[R][typeof v0] = mappedIndexing(v, 1);
-    const v2: entitiesType10[R] = mappedIndexing(v, 2);
-    return [
-      sql`,`,
+  const orderByQueryParts = mappedFunctionCall2(
+    sorting,
+    (v: entitiesType4[R]) => {
+      const v0: entitiesType6[R] = mappedIndexing<entitiesType4, R, 0>(v, 0);
       // @ts-expect-error bruh
-      sql`${orderByQueries[v0](v1, query.paginationDirection, v2)}`,
-    ];
-  })
-    .slice(1)
-    .reduce<PendingQuery<Row[]>>((prev, curr) => sql`${prev}${curr}`, sql``);
+      const v1: entitiesType2[R][typeof v0] = mappedIndexing(v, 1);
+      const v2: entitiesType10[R] = mappedIndexing(v, 2);
+      return [
+        sql`,`,
+        // @ts-expect-error bruh
+        sql`${orderByQueries[v0](v1, query.paginationDirection, v2)}`,
+      ];
+    }
+  ).slice(1);
+
+  const orderByQuery =
+    orderByQueryParts.length == 0
+      ? sql``
+      : orderByQueryParts.reduce<PendingQuery<Row[]>>(
+          (prev, curr) => sql`${prev}${curr}`,
+          sql` ORDER BY `
+        );
 
   const paginationCursor: entitiesType0[R]["paginationCursor"] =
     query.paginationCursor;
@@ -136,9 +145,9 @@ export async function fetchData<R extends keyof typeof entityRoutes>(
   if (!paginationCursor) {
     sqlResult = await sql.begin(async (tsql) => {
       await tsql`SELECT set_config('projektwahl.type', ${loggedInUser.type}, true);`;
-      return await tsql`${sql`(${sqlQuery(
-        query
-      )} ORDER BY ${orderByQuery} LIMIT ${query.paginationLimit + 1})`}`;
+      return await tsql`${sql`(${sqlQuery(query)} ${orderByQuery} LIMIT ${
+        query.paginationLimit + 1
+      })`}`;
     });
   } else {
     const queries = sorting.map((value, index) => {
@@ -162,9 +171,7 @@ export async function fetchData<R extends keyof typeof entityRoutes>(
         .slice(1)
         .reduce((prev, curr) => sql`${prev}${curr}`);
 
-      return sql`(${sqlQuery(
-        query
-      )} AND (${parts}) ORDER BY ${orderByQuery} LIMIT ${
+      return sql`(${sqlQuery(query)} AND (${parts}) ${orderByQuery} LIMIT ${
         query.paginationLimit + 1
       })`;
     });
