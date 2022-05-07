@@ -281,6 +281,13 @@ async function runTest(
   console.log(
     (
       await exec(
+        "psql postgres://projektwahl_staging_admin:projektwahl@localhost/projektwahl_staging --command=\"UPDATE settings SET open_date = CURRENT_TIMESTAMP + (- '1 minute'::interval), voting_start_date = CURRENT_TIMESTAMP, voting_end_date = CURRENT_TIMESTAMP + '1 hour', results_date = CURRENT_TIMESTAMP + '2 hours';\""
+      )
+    ).stderr
+  );
+  console.log(
+    (
+      await exec(
         "NODE_ENV=development DATABASE_HOST=localhost DATABASE_URL=postgres://projektwahl_staging:projektwahl@localhost/projektwahl_staging npm run setup",
         {
           maxBuffer: 1000 * 1000 * 1000,

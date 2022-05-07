@@ -69,6 +69,7 @@ CREATE DATABASE projektwahl_staging OWNER projektwahl_staging_admin;
 
 sudo -u postgres psql --db projektwahl_staging
 REVOKE CREATE ON SCHEMA public FROM PUBLIC;
+#GRANT CREATE ON SCHEMA public To projektwahl_staging_admin;
 
 psql postgres://projektwahl_staging_admin:projektwahl@localhost/projektwahl_staging --single-transaction < src/server/setup.sql
 

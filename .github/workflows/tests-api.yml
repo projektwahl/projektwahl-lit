@@ -50,6 +50,7 @@ jobs:
       - run: |
           psql postgres://projektwahl:projektwahl@localhost/projektwahl --command="CREATE DATABASE projektwahl_staging OWNER projektwahl_staging_admin"
       - run: psql --single-transaction postgres://projektwahl_staging_admin:projektwahl@localhost/projektwahl_staging < src/server/setup.sql
+      - run: psql postgres://projektwahl_staging_admin:projektwahl@localhost/projektwahl_staging --command="UPDATE settings SET open_date = CURRENT_TIMESTAMP + (- '1 minute'::interval), voting_start_date = CURRENT_TIMESTAMP, voting_end_date = CURRENT_TIMESTAMP + '1 hour', results_date = CURRENT_TIMESTAMP + '2 hours';"
       - run: NODE_ENV=development DATABASE_URL=postgres://projektwahl_staging:projektwahl@localhost/projektwahl_staging npm run setup
       - run: |
           NODE_ENV=development PORT=8443 BASE_URL=https://localhost:8443 DATABASE_URL=postgres://projektwahl_staging:projektwahl@localhost/projektwahl_staging CREDENTIALS_DIRECTORY=$PWD npm run server &

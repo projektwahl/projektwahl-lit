@@ -220,9 +220,15 @@ export class PwWelcome extends PwElement {
         </p>
 
         ${this.userController.type === "helper"
-          ? `Oben im Menü unter "Projekte" kannst du Projekte erstellen und bearbeiten.`
+          ? html`<p>
+              Oben im Menü unter "Projekte" kannst du Projekte erstellen und
+              bearbeiten.
+            </p>`
           : this.userController.type === "voter"
-          ? `Oben im Menü unter "Wahl" kannst du deine Projektwünsche auswählen.`
+          ? html`<p>
+              Oben im Menü unter "Wahl" kannst du deine Projektwünsche
+              auswählen.
+            </p>`
           : ``}
         ${this.task.render({
           complete: (value) => {
@@ -233,30 +239,30 @@ export class PwWelcome extends PwElement {
               // UPDATE settings SET open_date = CURRENT_TIMESTAMP + '1 minute', voting_start_date = CURRENT_TIMESTAMP + '2 minutes', voting_end_date = CURRENT_TIMESTAMP + '3 minutes', results_date = CURRENT_TIMESTAMP + '4 minutes';
 
               const state =
-                curr > new Date(val.results_date)
+                curr > new Date(Number(val.results_date))
                   ? "results"
-                  : curr > new Date(val.voting_end_date)
+                  : curr > new Date(Number(val.voting_end_date))
                   ? "voting end"
-                  : curr > new Date(val.voting_start_date)
+                  : curr > new Date(Number(val.voting_start_date))
                   ? "voting start"
-                  : curr > new Date(val.open_date)
+                  : curr > new Date(Number(val.open_date))
                   ? "preparation"
                   : "not started yet";
 
               const next_date_and_state =
-                curr > new Date(val.results_date)
+                curr > new Date(Number(val.results_date))
                   ? null
-                  : curr > new Date(val.voting_end_date)
+                  : curr > new Date(Number(val.voting_end_date))
                   ? ["results", val.results_date]
-                  : curr > new Date(val.voting_start_date)
+                  : curr > new Date(Number(val.voting_start_date))
                   ? ["voting end", val.voting_end_date]
-                  : curr > new Date(val.open_date)
+                  : curr > new Date(Number(val.open_date))
                   ? ["voting start", val.voting_start_date]
                   : ["preparation", val.open_date];
 
               if (next_date_and_state) {
                 const diff =
-                  new Date(next_date_and_state[1]).getTime() -
+                  new Date(Number(next_date_and_state[1])).getTime() -
                   this.clockController.value.getTime();
 
                 const seconds = Math.floor(diff / 1000) % 60;
@@ -267,7 +273,7 @@ export class PwWelcome extends PwElement {
 
                 const days = Math.floor(diff / (1000 * 60 * 60 * 24));
 
-                return html`<span
+                return html`<span class="font-monospace"
                   >currently ${state},
                   ${renderDigit(Math.floor(days / 100) % 10)}${renderDigit(
                     Math.floor(days / 10) % 10
