@@ -103,7 +103,7 @@ export const updateSettingsHandler = requestHandler(
           _ = 1; // ensure no property is missed - Don't use `{}` as a type. `{}` actually means "any non-nullish value".
           const finalQuery = typedSql(tsql, {
             columns: {},
-          } as const)`UPDATE settings SET open_date = ${open_date}::TEXT::TIMESTAMP WITHOUT TIME ZONE AT TIME ZONE 'Europe/Berlin', voting_start_date = ${voting_start_date}::TEXT::TIMESTAMP WITHOUT TIME ZONE AT TIME ZONE 'Europe/Berlin', voting_end_date = ${voting_end_date}::TEXT::TIMESTAMP WITHOUT TIME ZONE AT TIME ZONE 'Europe/Berlin', results_date = ${results_date}::TEXT::TIMESTAMP WITHOUT TIME ZONE AT TIME ZONE 'Europe/Berlin';`;
+          } as const)`UPDATE settings SET open_date = to_timestamp(${open_date}::BIGINT/1000)::TIMESTAMP WITH TIME ZONE, voting_start_date = to_timestamp(${voting_start_date}::BIGINT/1000)::TIMESTAMP WITH TIME ZONE, voting_end_date = to_timestamp(${voting_end_date}::BIGINT/1000)::TIMESTAMP WITH TIME ZONE, results_date = to_timestamp(${results_date}::BIGINT/1000)::TIMESTAMP WITH TIME ZONE;`;
           // warning: this will not work if we will ever use multiple workers in production
           await updateCachedSettings(tsql);
           return await finalQuery;

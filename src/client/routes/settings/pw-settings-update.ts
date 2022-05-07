@@ -198,7 +198,7 @@ class PwSettingsUpdate extends PwForm<"/api/v1/settings/update"> {
                         }
                       }}
                     >
-                      ${pwInputText<"/api/v1/settings/update", string|undefined>({
+                      ${pwInputText<"/api/v1/settings/update", string>({
                         // 1010-10-10T22:10
                         url: this.url,
                         type: "datetime-local",
@@ -206,12 +206,12 @@ class PwSettingsUpdate extends PwForm<"/api/v1/settings/update"> {
                         label: msg("Open date"),
                         name: ["open_date"],
                         get: (o) => database2datetimelocal(Number(o.open_date)), // gets initial data
-                        set: (o, v) => (o.open_date = v === undefined ? o.open_date : datetimelocal2database(v)), // gets default or inputvalue
+                        set: (o, v) => (o.open_date = String(datetimelocal2database(v))), // gets default or inputvalue
                         task: this._task,
                         defaultValue: "",
                         // TODO FIXME loading the initial data doesn't work because the format of the open_date is wrong. we probably need to convert it to the local timezone (maybe already on the server side) and truncate the + at the start etc.
                         initial: value?.data,
-                        resettable: value !== undefined,
+                        resettable: false,
                       })}
                       ${pwInputText<"/api/v1/settings/update", string>({
                         url: this.url,
@@ -220,11 +220,11 @@ class PwSettingsUpdate extends PwForm<"/api/v1/settings/update"> {
                         label: msg("Voting start date"),
                         name: ["voting_start_date"],
                         get: (o) => database2datetimelocal(Number(o.voting_start_date)), // gets initial data
-                        set: (o, v) => (o.voting_start_date = v),
+                        set: (o, v) => (o.voting_start_date = String(datetimelocal2database(v))),
                         task: this._task,
                         defaultValue: "",
                         initial: value?.data,
-                        resettable: value !== undefined,
+                        resettable: false,
                       })}
                       ${pwInputText<"/api/v1/settings/update", string>({
                         url: this.url,
@@ -233,11 +233,11 @@ class PwSettingsUpdate extends PwForm<"/api/v1/settings/update"> {
                         label: msg("Voting end date"),
                         name: ["voting_end_date"],
                         get: (o) => database2datetimelocal(Number(o.voting_end_date)), // gets initial data
-                        set: (o, v) => (o.voting_end_date = v),
+                        set: (o, v) => (o.voting_end_date = String(datetimelocal2database(v))),
                         task: this._task,
                         defaultValue: "",
                         initial: value?.data,
-                        resettable: value !== undefined,
+                        resettable: false,
                       })}
                       ${pwInputText<"/api/v1/settings/update", string>({
                         url: this.url,
@@ -246,11 +246,11 @@ class PwSettingsUpdate extends PwForm<"/api/v1/settings/update"> {
                         label: msg("Results date"),
                         name: ["results_date"],
                         get: (o) => database2datetimelocal(Number(o.results_date)), // gets initial data
-                        set: (o, v) => (o.results_date = v),
+                        set: (o, v) => (o.results_date = String(datetimelocal2database(v))),
                         task: this._task,
                         defaultValue: "",
                         initial: value?.data,
-                        resettable: value !== undefined,
+                        resettable: false,
                       })}
 
                       <button
