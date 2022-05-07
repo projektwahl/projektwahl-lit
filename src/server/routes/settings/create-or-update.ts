@@ -21,7 +21,7 @@ SPDX-License-Identifier: AGPL-3.0-or-later
 SPDX-FileCopyrightText: 2021 Moritz Hedtke <Moritz.Hedtke@t-online.de>
 */
 import postgres from "postgres";
-import { sql, updateCachedSettings } from "../../database.js";
+import { sql } from "../../database.js";
 import { requestHandler } from "../../express.js";
 import type { OutgoingHttpHeaders } from "node:http";
 import type { ResponseType } from "../../../lib/routes.js";
@@ -104,7 +104,7 @@ export const updateSettingsHandler = requestHandler(
           columns: {},
         } as const)`UPDATE settings SET open_date = to_timestamp(${open_date}::BIGINT/1000)::TIMESTAMP WITH TIME ZONE, voting_start_date = to_timestamp(${voting_start_date}::BIGINT/1000)::TIMESTAMP WITH TIME ZONE, voting_end_date = to_timestamp(${voting_end_date}::BIGINT/1000)::TIMESTAMP WITH TIME ZONE, results_date = to_timestamp(${results_date}::BIGINT/1000)::TIMESTAMP WITH TIME ZONE;`;
         // warning: this will not work if we will ever use multiple workers in production
-        await updateCachedSettings(tsql);
+        //await updateCachedSettings(tsql);
         return await finalQuery;
       });
 
