@@ -109,21 +109,47 @@ export function createOrUpdateChoiceHandler<P extends "/api/v1/choices/update">(
     }
 
     try {
-      await sql.begin("READ WRITE", async (tsql) => {
+      return await sql.begin("READ WRITE", async (tsql) => {
+        // only allowed if the state is voting
+        const voting_allowed =
+          1 ===
+          (
+            await tsql`SELECT COUNT(*) AS count FROM settings WHERE voting_start_date < CURRENT_TIMESTAMP AND CURRENT_TIMESTAMP < voting_end_date;`
+          )[0].count;
+        if (!voting_allowed) {
+          const returnValue: [OutgoingHttpHeaders, ResponseType<P>] = [
+            {
+              "content-type": "text/json; charset=utf-8",
+              ":status": 200,
+            },
+            {
+              success: false as const,
+              error: {
+                issues: [
+                  {
+                    code: ZodIssueCode.custom,
+                    path: ["no_voting_phase"],
+                    message: "Aktuell ist nicht Wahlphase!",
+                  },
+                ],
+              },
+            },
+          ];
+          return returnValue;
+        }
         await tsql`SELECT set_config('projektwahl.type', ${loggedInUser.type}, true);`;
-        return await dbquery(tsql, choice, loggedInUser);
+        await dbquery(tsql, choice, loggedInUser);
+        return [
+          {
+            "content-type": "text/json; charset=utf-8",
+            ":status": 200,
+          },
+          {
+            success: true as const,
+            data: {},
+          },
+        ];
       });
-
-      return [
-        {
-          "content-type": "text/json; charset=utf-8",
-          ":status": 200,
-        },
-        {
-          success: true as const,
-          data: {},
-        },
-      ];
     } catch (error: unknown) {
       console.error(error);
       if (error instanceof postgres.PostgresError) {
