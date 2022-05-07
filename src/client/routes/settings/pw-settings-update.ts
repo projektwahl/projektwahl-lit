@@ -156,6 +156,7 @@ class PwSettingsUpdate extends PwForm<"/api/v1/settings/update"> {
       () => []
     );
 
+    // @ts-expect-error not typeable
     this.formData = {};
   }
 

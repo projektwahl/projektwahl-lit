@@ -130,7 +130,8 @@ export abstract class PwInput<
     | "number"
     | "checkbox"
     | "select"
-    | "file";
+    | "file"
+    | "datetime-local";
 
   /**
    * Autocompletion settings.

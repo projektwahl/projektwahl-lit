@@ -38,7 +38,7 @@ export const settingsHandler = requestHandler(
     if (!loggedInUser) {
       const returnValue: [
         OutgoingHttpHeaders,
-        ResponseType<"/api/v1/sessions">
+        ResponseType<"/api/v1/settings">
       ] = [
         {
           "content-type": "text/json; charset=utf-8",
@@ -71,7 +71,9 @@ export const settingsHandler = requestHandler(
           _ = 1; // ensure no property is missed - Don't use `{}` as a type. `{}` actually means "any non-nullish value".
           return sql`SELECT (extract(epoch from open_date) * 1000)::BIGINT AS open_date, (extract(epoch from voting_start_date) * 1000)::BIGINT AS voting_start_date, (extract(epoch from voting_end_date) * 1000)::BIGINT AS voting_end_date, (extract(epoch from results_date) * 1000)::BIGINT AS results_date FROM settings`;
         },
-        {},
+        {
+          fake_sort: () => sql``,
+        },
         undefined
       );
     return ret;

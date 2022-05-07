@@ -1,4 +1,4 @@
-import { ReactiveController, ReactiveControllerHost } from "lit";
+import type { ReactiveController, ReactiveControllerHost } from "lit";
 
 export class ClockController implements ReactiveController {
   host: ReactiveControllerHost;
@@ -13,7 +13,7 @@ export class ClockController implements ReactiveController {
   }
   hostConnected() {
     // Start a timer when the host is connected
-    this._timerID = setInterval(() => {
+    this._timerID = window.setInterval(() => {
       this.value = new Date();
       // Update the host with new value
       this.host.requestUpdate();

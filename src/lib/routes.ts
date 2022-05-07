@@ -502,7 +502,13 @@ export const routes = {
         results_date: z.string(),
       })
       .strict(),
-    z.array(z.never()),
+    z.array(
+      z.tuple([
+        z.literal("fake_sort" as const),
+        z.enum(["ASC", "DESC"] as const),
+        z.null(),
+      ])
+    ),
     z.object({}).strict()
   ),
 } as const;
