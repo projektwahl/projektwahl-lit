@@ -91,45 +91,11 @@ systemctl enable sshd
 pacman -S arch-audit
 arch-audit
 
-glibc is affected by multiple issues. (CVE-2021-43396, CVE-2021-3999, CVE-2021-3998, CVE-2021-35942, CVE-2021-33574, CVE-2021-27645). High risk!
-Up to date, unknown if vulnerable.
-
-postgresql is affected by man-in-the-middle. (CVE-2021-23214). High risk!
-Already fixed in 13.5 https://www.postgresql.org/support/security/CVE-2021-23214/
-
-apr is affected by information disclosure. (CVE-2021-35940). Medium risk!
-Shouldn't be used.
-
-binutils is affected by multiple issues, arbitrary code execution. (CVE-2021-3648, CVE-2021-3530, CVE-2021-20197, CVE-2021-3549). Medium risk!
-Should be fixed.
-
-krb5 is affected by denial of service. (CVE-2021-37750). Medium risk!
-Shouldn't be used.
-
-libarchive is affected by arbitrary code execution. (CVE-2021-36976). Medium risk!
-Already fixed in 3.6.0 https://nvd.nist.gov/vuln/detail/CVE-2021-36976
-
-linux is affected by multiple issues, insufficient validation. (CVE-2021-43976, CVE-2021-4095, CVE-2021-4028, CVE-2021-3847, CVE-2021-3752, CVE-2021-3669, CVE-2021-31615, CVE-2020-26560, CVE-2020-26559, CVE-2020-26557, CVE-2020-26556, CVE-2020-26555, CVE-2020-35501). Medium risk!
-Needs update to 5.16.10 (released yesterday)
-
-ncurses is affected by arbitrary code execution. (CVE-2021-39537). Medium risk!
-Don't care. sudo pacman -R perl
-
-npm is affected by insufficient validation. (CVE-2021-43616). Medium risk!
-Already fixed in 8.5.0 https://nvd.nist.gov/vuln/detail/CVE-2021-43616
-
-perl is affected by signature forgery, directory traversal. (CVE-2020-16156, CVE-2021-36770). Medium risk!
-Shouldn't be used.
-
-rsync is affected by arbitrary command execution. (CVE-2021-3755). Medium risk!
-Shouldn't be used.
-
-openssh is affected by information disclosure. (CVE-2016-20012). Low risk!
-Already fixed in 8.8p1 https://nvd.nist.gov/vuln/detail/CVE-2016-20012
-
-postgresql-libs is affected by man-in-the-middle. (CVE-2021-23222). Low risk!
-Already fixed in 13.5 https://www.postgresql.org/support/security/CVE-2021-23222/
-
+apr is affected by information disclosure. Medium risk!
+curl is affected by multiple issues. Medium risk!
+linux is affected by multiple issues, insufficient validation. Medium risk!
+perl is affected by signature forgery, directory traversal. Medium risk!
+rsync is affected by arbitrary command execution. Medium risk!
 
 
 
@@ -299,9 +265,9 @@ sudo certbot --nginx -d aes.selfmade4u.de -d staging-aes.selfmade4u.de -m Moritz
 
 sudo -u postgres psql
 CREATE ROLE projektwahl_staging LOGIN;
-CREATE ROLE projektwahl_staging_admin LOGIN;
+CREATE ROLE projektwahl_staging_admin IN ROLE projektwahl_staging LOGIN;
 CREATE ROLE projektwahl_production LOGIN;
-CREATE ROLE projektwahl_production_admin LOGIN;
+CREATE ROLE projektwahl_production_admin IN ROLE projektwahl_production LOGIN;
 CREATE DATABASE projektwahl_staging OWNER projektwahl_staging_admin;
 CREATE DATABASE projektwahl_production OWNER projektwahl_production_admin;
 
@@ -342,48 +308,8 @@ LANGUAGE=de npm run build
 
 
 
-
-
-
-
-
-
-
-
 sudo -u projektwahl_staging_admin psql --single-transaction --db projektwahl_staging < src/server/setup.sql
 sudo -u projektwahl_production_admin psql --single-transaction --db projektwahl_production < src/server/setup.sql
-
-
-
-# maintenance:
-sudo -u projektwahl_staging_admin psql --db projektwahl_staging
-ALTER DATABASE projektwahl_staging SET default_transaction_isolation = 'serializable';
-GRANT SELECT,INSERT,UPDATE ON users_with_deleted TO projektwahl_staging;
-GRANT SELECT,INSERT,UPDATE ON users TO projektwahl_staging;
-GRANT SELECT,INSERT,UPDATE ON projects_with_deleted TO projektwahl_staging;
-GRANT SELECT,INSERT,UPDATE ON projects TO projektwahl_staging;
-GRANT SELECT,INSERT,UPDATE,DELETE ON choices TO projektwahl_staging;
-GRANT INSERT ON settings TO projektwahl_staging;
-GRANT SELECT,INSERT,UPDATE,DELETE ON sessions TO projektwahl_staging;
-ALTER VIEW users OWNER TO projektwahl_staging;
-ALTER VIEW present_voters OWNER TO projektwahl_staging;
-ALTER VIEW projects OWNER TO projektwahl_staging;
-
-
-
-sudo -u projektwahl_production_admin psql --db projektwahl_production
-ALTER DATABASE projektwahl_production SET default_transaction_isolation = 'serializable';
-GRANT SELECT,INSERT,UPDATE ON users_with_deleted TO projektwahl_production;
-GRANT SELECT,INSERT,UPDATE ON users TO projektwahl_production;
-GRANT SELECT,INSERT,UPDATE ON projects_with_deleted TO projektwahl_production;
-GRANT SELECT,INSERT,UPDATE ON projects TO projektwahl_production;
-GRANT SELECT,INSERT,UPDATE,DELETE ON choices TO projektwahl_production;
-GRANT INSERT ON settings TO projektwahl_production;
-GRANT SELECT,INSERT,UPDATE,DELETE ON sessions TO projektwahl_production;
-ALTER VIEW users OWNER TO projektwahl_production;
-ALTER VIEW present_voters OWNER TO projektwahl_production;
-ALTER VIEW projects OWNER TO projektwahl_production;
-
 
 
 # Backup
@@ -800,4 +726,39 @@ ssh -L 9221:localhost:9229 moritz@aes.selfmade4u.de -p 2121
 
 
 sudo systemd-creds encrypt --with-key=host - openid_client_secret
+
+
+
+# POSTGRESQL major update
+
+# MAKE A BACKUP BEFORE
+
+
+
+sudo -u postgres pg_dumpall > /tmp/outputfile
+
+# https://www.postgresql.org/docs/current/upgrading.html
+# https://wiki.archlinux.org/title/PostgreSQL#Upgrading_PostgreSQL
+
+sudo systemctl stop projektwahl@production.socket
+sudo systemctl stop postgresql
+
+sudo mv /var/lib/postgres/data /var/lib/postgres/olddata
+sudo mkdir /var/lib/postgres/data
+sudo chown postgres:postgres /var/lib/postgres/data
+sudo -u postgres initdb -D /var/lib/postgres/data
+
+sudo systemctl start postgresql
+
+sudo -u postgres psql -d postgres -f /tmp/outputfile
+
+
+
+## DEBUGGING systemd sandboxing
+sudo systemctl log-level debug
+
+# SIGSYS means SystemCallFilter is at fault
+# https://www.freedesktop.org/software/systemd/man/systemd.exec.html#SystemCallFilter=
+
+systemd-analyze syscall-filter
 

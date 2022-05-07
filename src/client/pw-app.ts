@@ -72,6 +72,7 @@ import {
 import { pwChoicesPreloaded } from "./routes/choices/pw-choices.js";
 import { pwLogin } from "./routes/login/pw-login.js";
 import { pwSessionsPreloaded } from "./routes/sessions/pw-sessions.js";
+import { pwSettingsUpdate } from "./routes/settings/pw-settings-update.js";
 
 export const { getLocale, setLocale } = configureLocalization({
   sourceLocale,
@@ -152,6 +153,12 @@ const pages = {
   },
   "^/sessions$": async (url: URL) => {
     return await pwSessionsPreloaded(url);
+  },
+  "^/settings$": () => {
+    return pwSettingsUpdate({
+      url: "/api/v1/settings/update",
+      disabled: false,
+    });
   },
 };
 

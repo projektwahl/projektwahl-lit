@@ -26,7 +26,7 @@ import jscookie from "js-cookie";
 export class LoggedInUserController implements ReactiveController {
   host: ReactiveControllerHost;
 
-  bc!: BroadcastChannel;
+  bc?: BroadcastChannel;
 
   username: string | undefined;
 
@@ -53,7 +53,9 @@ export class LoggedInUserController implements ReactiveController {
   }
 
   hostDisconnected() {
-    this.bc.removeEventListener("message", this.updateloginstate);
-    this.bc.close();
+    if (this.bc) {
+      this.bc.removeEventListener("message", this.updateloginstate);
+      this.bc.close();
+    }
   }
 }

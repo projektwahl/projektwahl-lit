@@ -467,6 +467,17 @@ export const routes = {
     request: new VPick(rawChoiceNullable, ["project_id", "rank"] as const),
     response: z.object({}),
   },
+  "/api/v1/settings/update": {
+    request: z
+      .object({
+        open_date: z.string(),
+        voting_start_date: z.string(),
+        voting_end_date: z.string(),
+        results_date: z.string(),
+      })
+      .strict(),
+    response: z.object({}).strict(),
+  },
   "/api/v1/sessions": baseQuery(
     rawSessionType,
     new VArray(
@@ -480,6 +491,24 @@ export const routes = {
       user_id: new VNullable(new VNumber()),
     })
   ),
+  "/api/v1/settings": baseQuery(
+    z
+      .object({
+        open_date: z.string(),
+        voting_start_date: z.string(),
+        voting_end_date: z.string(),
+        results_date: z.string(),
+      })
+      .strict(),
+    z.array(
+      z.tuple([
+        z.literal("fake_sort" as const),
+        z.enum(["ASC", "DESC"] as const),
+        z.null(),
+      ])
+    ),
+    z.object({}).strict()
+  ),
 } as const;
 
 export const entityRoutes = {
@@ -487,6 +516,7 @@ export const entityRoutes = {
   "/api/v1/projects": routes["/api/v1/projects"],
   "/api/v1/choices": routes["/api/v1/choices"],
   "/api/v1/sessions": routes["/api/v1/sessions"],
+  "/api/v1/settings": routes["/api/v1/settings"],
 };
 
 export declare class MinimalZodError {

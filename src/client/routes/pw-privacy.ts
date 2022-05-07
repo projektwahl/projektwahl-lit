@@ -174,26 +174,6 @@ export class PwPrivacy extends PwElement {
         >
         bis zum Ende der Projektwoche gespeichert.
 
-        <h2 class="text-center">Automatische Entscheidungsfindung</h2>
-
-        Die Zuweisung in Projekte ist nach
-        <a
-          href="https://eur-lex.europa.eu/legal-content/DE/TXT/HTML/?uri=CELEX:32016R0679&from=DE#d1e2853-1-1"
-          >Artikel 22 DSGVO</a
-        >
-        eine automatisierte Entscheidung, für die eine ausdrückliche
-        Einwilligung nach
-        <a
-          href="https://eur-lex.europa.eu/legal-content/DE/TXT/HTML/?uri=CELEX:32016R0679&from=DE#d1e2853-1-1"
-          >Artikel 22 Absatz 2c DSGVO</a
-        >
-        erfolgt ist. Gemäß
-        <a
-          href="https://eur-lex.europa.eu/legal-content/DE/TXT/HTML/?uri=CELEX:32016R0679&from=DE#d1e2853-1-1"
-          >Artikel 22 Absatz 3 DSGVO</a
-        >
-        können Sie die Entscheidung anfechten.
-
         <h2 class="text-center">Anmeldung mit Microsoft-Schulaccount</h2>
 
         Bei der Anmeldung mit einem Microsoft-Schulaccount übermitteln Sie den
