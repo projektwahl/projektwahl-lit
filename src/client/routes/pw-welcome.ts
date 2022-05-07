@@ -230,7 +230,7 @@ export class PwWelcome extends PwElement {
               const val = value.data.entities[0];
               const curr = new Date();
 
-              // UPDATE settings SET open_date = CURRENT_TIMESTAMP + '10 seconds', voting_start_date = CURRENT_TIMESTAMP + '20 seconds', voting_end_date = CURRENT_TIMESTAMP + '30 seconds', results_date = CURRENT_TIMESTAMP + '40 seconds';
+              // UPDATE settings SET open_date = CURRENT_TIMESTAMP + '1 minute', voting_start_date = CURRENT_TIMESTAMP + '2 minutes', voting_end_date = CURRENT_TIMESTAMP + '3 minutes', results_date = CURRENT_TIMESTAMP + '4 minutes';
 
               const state =
                 curr > new Date(val.results_date)
