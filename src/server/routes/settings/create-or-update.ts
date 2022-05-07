@@ -117,7 +117,7 @@ export const updateSettingsHandler = requestHandler(
         },
         {
           success: true as const,
-          data: row,
+          data: {},
         },
       ];
     } catch (error: unknown) {
