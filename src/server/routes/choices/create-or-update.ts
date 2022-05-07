@@ -110,9 +110,9 @@ export function createOrUpdateChoiceHandler<P extends "/api/v1/choices/update">(
 
     try {
       return await sql.begin("READ WRITE", async (tsql) => {
-        // only allowed if the state is voting
+        // only allowed if the state is voting+
         const voting_allowed =
-          1 ===
+          "1" ===
           (
             await tsql`SELECT COUNT(*) AS count FROM settings WHERE voting_start_date < CURRENT_TIMESTAMP AND CURRENT_TIMESTAMP < voting_end_date;`
           )[0].count;
