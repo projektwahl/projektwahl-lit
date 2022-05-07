@@ -154,7 +154,7 @@ const pages = {
   "^/sessions$": async (url: URL) => {
     return await pwSessionsPreloaded(url);
   },
-  "^/settings$": (url: URL) => {
+  "^/settings$": () => {
     return pwSettingsUpdate({
       url: "/api/v1/settings/update",
       disabled: false,

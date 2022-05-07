@@ -24,8 +24,8 @@ import postgres from "postgres";
 import { sql, updateCachedSettings } from "../../database.js";
 import { requestHandler } from "../../express.js";
 import type { OutgoingHttpHeaders } from "node:http";
-import type { ResponseType, routes, userSchema } from "../../../lib/routes.js";
-import { z, ZodIssueCode } from "zod";
+import type { ResponseType } from "../../../lib/routes.js";
+import { ZodIssueCode } from "zod";
 import { typedSql } from "../../describe.js";
 
 export const updateSettingsHandler = requestHandler(
@@ -87,28 +87,26 @@ export const updateSettingsHandler = requestHandler(
     }
 
     try {
-      const row: {} = (
-        await sql.begin("READ WRITE", async (tsql) => {
-          await tsql`SELECT set_config('projektwahl.type', ${
-            loggedInUser?.type ?? null
-          }, true);`;
-          const {
-            open_date,
-            voting_start_date,
-            voting_end_date,
-            results_date,
-            ...rest
-          } = new_settings;
-          let _ = rest;
-          _ = 1; // ensure no property is missed - Don't use `{}` as a type. `{}` actually means "any non-nullish value".
-          const finalQuery = typedSql(tsql, {
-            columns: {},
-          } as const)`UPDATE settings SET open_date = to_timestamp(${open_date}::BIGINT/1000)::TIMESTAMP WITH TIME ZONE, voting_start_date = to_timestamp(${voting_start_date}::BIGINT/1000)::TIMESTAMP WITH TIME ZONE, voting_end_date = to_timestamp(${voting_end_date}::BIGINT/1000)::TIMESTAMP WITH TIME ZONE, results_date = to_timestamp(${results_date}::BIGINT/1000)::TIMESTAMP WITH TIME ZONE;`;
-          // warning: this will not work if we will ever use multiple workers in production
-          await updateCachedSettings(tsql);
-          return await finalQuery;
-        })
-      )[0];
+      await sql.begin("READ WRITE", async (tsql) => {
+        await tsql`SELECT set_config('projektwahl.type', ${
+          loggedInUser?.type ?? null
+        }, true);`;
+        const {
+          open_date,
+          voting_start_date,
+          voting_end_date,
+          results_date,
+          ...rest
+        } = new_settings;
+        let _ = rest;
+        _ = 1; // ensure no property is missed - Don't use `{}` as a type. `{}` actually means "any non-nullish value".
+        const finalQuery = typedSql(tsql, {
+          columns: {},
+        } as const)`UPDATE settings SET open_date = to_timestamp(${open_date}::BIGINT/1000)::TIMESTAMP WITH TIME ZONE, voting_start_date = to_timestamp(${voting_start_date}::BIGINT/1000)::TIMESTAMP WITH TIME ZONE, voting_end_date = to_timestamp(${voting_end_date}::BIGINT/1000)::TIMESTAMP WITH TIME ZONE, results_date = to_timestamp(${results_date}::BIGINT/1000)::TIMESTAMP WITH TIME ZONE;`;
+        // warning: this will not work if we will ever use multiple workers in production
+        await updateCachedSettings(tsql);
+        return await finalQuery;
+      });
 
       return [
         {
