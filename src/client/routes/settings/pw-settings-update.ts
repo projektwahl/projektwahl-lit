@@ -74,19 +74,28 @@ const taskFunction = async (): Promise<
 
 function database2datetimelocal(unix_time: number) {
   if (typeof unix_time !== "number") {
-    throw new Error("not a number")
+    throw new Error("not a number");
   }
   // 2022-05-04T20:58
   const d = new Date(unix_time);
-  return `${String(d.getFullYear()).padStart(4, '0')}-${String(d.getMonth()+1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}T${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`
+  return `${String(d.getFullYear()).padStart(4, "0")}-${String(
+    d.getMonth() + 1
+  ).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}T${String(
+    d.getHours()
+  ).padStart(2, "0")}:${String(d.getMinutes()).padStart(2, "0")}`;
 }
 
 // https://stackoverflow.com/questions/64440010/trying-to-set-datetime-local-using-javascript
 // what the hell
 function datetimelocal2database(input: string) {
   // 2022-05-03T15:43
-  return new Date(Number(input.slice(0, 4)), Number(input.slice(5, 7))-1, Number(input.slice(8, 10)),
-  Number(input.slice(11, 13)), Number(input.slice(14, 16))).getTime();
+  return new Date(
+    Number(input.slice(0, 4)),
+    Number(input.slice(5, 7)) - 1,
+    Number(input.slice(8, 10)),
+    Number(input.slice(11, 13)),
+    Number(input.slice(14, 16))
+  ).getTime();
 }
 
 class PwSettingsUpdate extends PwForm<"/api/v1/settings/update"> {
@@ -206,7 +215,8 @@ class PwSettingsUpdate extends PwForm<"/api/v1/settings/update"> {
                         label: msg("Open date"),
                         name: ["open_date"],
                         get: (o) => database2datetimelocal(Number(o.open_date)), // gets initial data
-                        set: (o, v) => (o.open_date = String(datetimelocal2database(v))), // gets default or inputvalue
+                        set: (o, v) =>
+                          (o.open_date = String(datetimelocal2database(v))), // gets default or inputvalue
                         task: this._task,
                         defaultValue: "",
                         // TODO FIXME loading the initial data doesn't work because the format of the open_date is wrong. we probably need to convert it to the local timezone (maybe already on the server side) and truncate the + at the start etc.
@@ -219,8 +229,12 @@ class PwSettingsUpdate extends PwForm<"/api/v1/settings/update"> {
                         disabled: this.disabled,
                         label: msg("Voting start date"),
                         name: ["voting_start_date"],
-                        get: (o) => database2datetimelocal(Number(o.voting_start_date)), // gets initial data
-                        set: (o, v) => (o.voting_start_date = String(datetimelocal2database(v))),
+                        get: (o) =>
+                          database2datetimelocal(Number(o.voting_start_date)), // gets initial data
+                        set: (o, v) =>
+                          (o.voting_start_date = String(
+                            datetimelocal2database(v)
+                          )),
                         task: this._task,
                         defaultValue: "",
                         initial: value?.data,
@@ -232,8 +246,12 @@ class PwSettingsUpdate extends PwForm<"/api/v1/settings/update"> {
                         disabled: this.disabled,
                         label: msg("Voting end date"),
                         name: ["voting_end_date"],
-                        get: (o) => database2datetimelocal(Number(o.voting_end_date)), // gets initial data
-                        set: (o, v) => (o.voting_end_date = String(datetimelocal2database(v))),
+                        get: (o) =>
+                          database2datetimelocal(Number(o.voting_end_date)), // gets initial data
+                        set: (o, v) =>
+                          (o.voting_end_date = String(
+                            datetimelocal2database(v)
+                          )),
                         task: this._task,
                         defaultValue: "",
                         initial: value?.data,
@@ -245,8 +263,10 @@ class PwSettingsUpdate extends PwForm<"/api/v1/settings/update"> {
                         disabled: this.disabled,
                         label: msg("Results date"),
                         name: ["results_date"],
-                        get: (o) => database2datetimelocal(Number(o.results_date)), // gets initial data
-                        set: (o, v) => (o.results_date = String(datetimelocal2database(v))),
+                        get: (o) =>
+                          database2datetimelocal(Number(o.results_date)), // gets initial data
+                        set: (o, v) =>
+                          (o.results_date = String(datetimelocal2database(v))),
                         task: this._task,
                         defaultValue: "",
                         initial: value?.data,
