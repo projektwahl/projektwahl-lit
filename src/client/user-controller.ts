@@ -46,6 +46,8 @@ export class LoggedInUserController implements ReactiveController {
   };
 
   hostConnected() {
+    // maybe use https://developer.mozilla.org/en-US/docs/Web/API/Window/storage_event because safari is trash
+    // also fallback in a way that this at least always works for the page itself
     if ("BroadcastChannel" in window) {
       this.bc = new BroadcastChannel("updateloginstate");
       this.bc.addEventListener("message", this.updateloginstate);
