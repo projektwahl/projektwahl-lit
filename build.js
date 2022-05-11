@@ -76,7 +76,7 @@ let version_short = (
 
 {
   let { stdout, stderr } = await exec(
-    `esbuild --target=es2020,chrome58,firefox57,safari11 --format=esm --bundle ./src/client/pw-app.js --charset=utf8 --define:window.PRODUCTION=true --define:window.LANGUAGE=\\"${
+    `esbuild --target=es2019 --format=esm --bundle ./src/client/pw-app.js --charset=utf8 --define:window.PRODUCTION=true --define:window.LANGUAGE=\\"${
       process.env.LANGUAGE ?? "de"
     }\\" --define:window.VERSION_FULL=\\"${version_full}\\" --define:window.VERSION_SHORT=\\"${version_short}\\" --entry-names=[dir]/[name] --sourcemap  --analyze --outdir=dist --tree-shaking=true`
   );

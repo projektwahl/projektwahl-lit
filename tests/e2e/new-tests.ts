@@ -75,7 +75,7 @@ class FormTester {
       By.css(`input[name="${name}"]`)
     );
     // really? https://github.com/w3c/webdriver/issues/1630
-    //await element.sendKeys(Key.chord(Key.CONTROL, "a"), Key.BACK_SPACE);
+    await element.sendKeys(Key.chord(Key.CONTROL, "a"), Key.BACK_SPACE);
     await element.sendKeys(value);
   }
 
@@ -330,12 +330,12 @@ async function runTest(
 
   if (browser === "browserstack-ipad") {
     const capabilities = {
-      'device': 'iPad 9th',
-      'os_version': '15',
-      'browserName': 'ios',
-      'realMobile': 'true',
+      'browser': 'safari',
+      'browser_version': '13.1',
+      'os': 'OS X',
+      'os_version': 'Catalina',
       'build': 'browserstack-build-1',
-      'name': 'Parallel test 1',
+      'name': 'Parallel test 3',
       'browserstack.local': 'true',
       'acceptSslCerts': 'true',
       //'browserstack.networkLogs': 'true',
@@ -345,7 +345,7 @@ async function runTest(
     .usingServer(process.env.BROWSERSTACK_URL ?? "")
     .withCapabilities({
       ...capabilities,
-      ...capabilities['browserName'] && { browserName: capabilities['browserName']}  // Because NodeJS language binding requires browserName to be defined
+      ...capabilities['browser'] && { browserName: capabilities['browser']}  // Because NodeJS language binding requires browserName to be defined
     })
   }
 
