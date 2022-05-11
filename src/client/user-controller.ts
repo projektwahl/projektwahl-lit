@@ -26,8 +26,6 @@ import jscookie from "js-cookie";
 export class LoggedInUserController implements ReactiveController {
   host: ReactiveControllerHost;
 
-  bc?: BroadcastChannel;
-
   username: string | undefined;
 
   type: string | undefined;
@@ -46,18 +44,11 @@ export class LoggedInUserController implements ReactiveController {
   };
 
   hostConnected() {
-    // maybe use https://developer.mozilla.org/en-US/docs/Web/API/Window/storage_event because safari is trash
     // also fallback in a way that this at least always works for the page itself
-    if ("BroadcastChannel" in window) {
-      this.bc = new BroadcastChannel("updateloginstate");
-      this.bc.addEventListener("message", this.updateloginstate);
-    }
+    window.addEventListener("storage", this.updateloginstate);
   }
 
   hostDisconnected() {
-    if (this.bc) {
-      this.bc.removeEventListener("message", this.updateloginstate);
-      this.bc.close();
-    }
+    window.removeEventListener("storage", this.updateloginstate);
   }
 }
