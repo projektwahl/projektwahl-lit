@@ -75,7 +75,7 @@ class FormTester {
       By.css(`input[name="${name}"]`)
     );
     // really? https://github.com/w3c/webdriver/issues/1630
-    await element.sendKeys(Key.chord(Key.CONTROL, "a"), Key.BACK_SPACE);
+    //await element.sendKeys(Key.chord(Key.CONTROL, "a"), Key.BACK_SPACE);
     await element.sendKeys(value);
   }
 
@@ -338,6 +338,8 @@ async function runTest(
       'name': 'Parallel test 1',
       'browserstack.local': 'true',
       'acceptSslCerts': 'true',
+      //'browserstack.networkLogs': 'true',
+      //'browserstack.console': "verbose",
     } as const
     builder
     .usingServer(process.env.BROWSERSTACK_URL ?? "")
@@ -1451,8 +1453,9 @@ async function testHelperCreatesProjectWithProjectLeadersAndMembers(
   const max_participants = chance.integer({ min: 1, max: 10 });
   const random_assignments = chance.bool();
   const deleted = chance.bool();
+  await helper.driver.sleep(10000)
   await form.setField("title", title);
-  await form.setTextareaField("info", info); // Element is no longer attached to the DOM
+  await form.setTextareaField("info", info);
   await form.setField("place", place);
   await form.resetField("costs", `${costs}`);
   await form.resetField("min_age", `${min_age}`);
