@@ -331,9 +331,9 @@ async function runTest(
   if (browser === "browserstack-ipad") {
     const capabilities = {
       'browser': 'safari',
-      'browser_version': '13.1',
+      'browser_version': '15.3',
       'os': 'OS X',
-      'os_version': 'Catalina',
+      'os_version': 'Monterey',
       'build': 'browserstack-build-1',
       'name': 'Parallel test 3',
       'browserstack.local': 'true',
@@ -1417,8 +1417,9 @@ async function testVotingWorks(helper: Helper) {
 
   assert.equal(alerts2.length, 1);
 
+  // https://stackoverflow.com/questions/47101858/python-selenium-safari-returns-different-text-for-span-than-chrome-and-firefox
   assert.equal(
-    await alerts2[0].getText(),
+    (await alerts2[0].getAttribute("innerText")).trim(),
     "Some errors occurred!\n" +
       "database: Der Nutzer passt nicht in die Altersbegrenzung des Projekts!"
   );
