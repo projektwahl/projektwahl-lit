@@ -366,8 +366,12 @@ export class PwApp extends PwElement {
                               {}
                             );
 
-                            const bc = new BroadcastChannel("updateloginstate");
-                            bc.postMessage("logout");
+                            localStorage.setItem("stateupdate", "logout");
+                            window.dispatchEvent(
+                              new StorageEvent("storage", {
+                                newValue: "logout",
+                              })
+                            );
 
                             HistoryController.goto(
                               new URL("/login", window.location.href),
