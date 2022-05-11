@@ -339,7 +339,7 @@ async function runTest(
       'browserstack.local': 'true',
       'acceptSslCerts': 'true',
       //'browserstack.networkLogs': 'true',
-      //'browserstack.console': "verbose",
+      'browserstack.console': "verbose",
     } as const
     builder
     .usingServer(process.env.BROWSERSTACK_URL ?? "")
