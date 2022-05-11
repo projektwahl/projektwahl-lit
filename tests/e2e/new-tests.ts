@@ -27,6 +27,7 @@ import nodeCrypto from "node:crypto";
 import { promisify } from "node:util";
 // @ts-expect-error wrong typings
 const { webcrypto: crypto }: { webcrypto: Crypto } = nodeCrypto;
+import './fast-selenium.js'
 
 import {
   Builder,
@@ -235,7 +236,7 @@ class Helper {
   async waitElem(name: string) {
     return await this.driver.wait(
       until.elementLocated(By.css(name)),
-      2000,
+      10000,
       `Element ${name} not found`
     );
   }
@@ -257,7 +258,7 @@ class Helper {
 }
 
 async function runTest(
-  browser: "firefox" | "chrome",
+  browser: "firefox" | "chrome" | "browserstack-ipad",
   testFunction: (helper: Helper) => Promise<void>
 ) {
   chance = new Chance(1234);
@@ -327,6 +328,25 @@ async function runTest(
     //.usingServer("http://localhost:9515");
   }
 
+  if (browser === "browserstack-ipad") {
+    const capabilities = {
+      'device': 'iPad 9th',
+      'os_version': '15',
+      'browserName': 'ios',
+      'realMobile': 'true',
+      'build': 'browserstack-build-1',
+      'name': 'Parallel test 1',
+      'browserstack.local': 'true',
+      'acceptSslCerts': 'true',
+    } as const
+    builder
+    .usingServer(process.env.BROWSERSTACK_URL ?? "")
+    .withCapabilities({
+      ...capabilities,
+      ...capabilities['browserName'] && { browserName: capabilities['browserName']}  // Because NodeJS language binding requires browserName to be defined
+    })
+  }
+
   if (process.env.CI) {
     builder.setChromeOptions(
       new chrome.Options().addArguments(
@@ -340,10 +360,12 @@ async function runTest(
 
   const driver = builder.build();
 
+  if (browser !== "browserstack-ipad") {
   await driver.manage().window().setRect({
     width: 1000,
     height: 1000,
   });
+}
 
   try {
     await testFunction(new Helper(driver));
@@ -384,6 +406,21 @@ async function runTest(
     console.error(error);
     const screenshot = await driver.takeScreenshot();
     await writeFile("screenshot.png", screenshot, "base64");
+
+    if (browser === "browserstack-ipad") {
+      try {
+        await driver.executeScript(
+          `browserstack_executor: ${JSON.stringify({
+            action: "setSessionStatus",
+            arguments: {
+              status: "failed",
+              reason: `${error}`
+            }
+          })}`
+        );
+      await driver.quit()
+      } catch (error) {}
+    }
 
     throw error;
   }
@@ -1415,7 +1452,7 @@ async function testHelperCreatesProjectWithProjectLeadersAndMembers(
   const random_assignments = chance.bool();
   const deleted = chance.bool();
   await form.setField("title", title);
-  await form.setTextareaField("info", info);
+  await form.setTextareaField("info", info); // Element is no longer attached to the DOM
   await form.setField("place", place);
   await form.resetField("costs", `${costs}`);
   await form.resetField("min_age", `${min_age}`);
@@ -1568,11 +1605,12 @@ if (argv.length !== 3) {
   throw new Error("provide browser name as second argument");
 }
 
-if (argv[2] !== "chrome" && argv[2] !== "firefox") {
-  throw new Error("possible browser names: chrome, firefox");
+if (argv[2] !== "chrome" && argv[2] !== "firefox" && argv[2] !== "browserstack-ipad") {
+  throw new Error("possible browser names: chrome, firefox, browserstack-ipad");
 }
 
 await runTest(argv[2], async (helper) => {
+  /*
   await checkUserOrProjectNotFound(helper);
   await helper.driver.manage().deleteAllCookies();
 
@@ -1590,7 +1628,7 @@ await runTest(argv[2], async (helper) => {
 
   await checkProjectSortingWorks(helper);
   await helper.driver.manage().deleteAllCookies();
-
+*/
   await testHelperCreatesProjectWithProjectLeadersAndMembers(helper);
   await helper.driver.manage().deleteAllCookies();
 
