@@ -1453,7 +1453,6 @@ async function testHelperCreatesProjectWithProjectLeadersAndMembers(
   const max_participants = chance.integer({ min: 1, max: 10 });
   const random_assignments = chance.bool();
   const deleted = chance.bool();
-  await helper.driver.sleep(10000)
   await form.setField("title", title);
   await form.setTextareaField("info", info);
   await form.setField("place", place);
@@ -1613,7 +1612,6 @@ if (argv[2] !== "chrome" && argv[2] !== "firefox" && argv[2] !== "browserstack-i
 }
 
 await runTest(argv[2], async (helper) => {
-  /*
   await checkUserOrProjectNotFound(helper);
   await helper.driver.manage().deleteAllCookies();
 
@@ -1631,7 +1629,7 @@ await runTest(argv[2], async (helper) => {
 
   await checkProjectSortingWorks(helper);
   await helper.driver.manage().deleteAllCookies();
-*/
+
   await testHelperCreatesProjectWithProjectLeadersAndMembers(helper);
   await helper.driver.manage().deleteAllCookies();
 
