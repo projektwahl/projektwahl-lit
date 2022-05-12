@@ -412,7 +412,9 @@ async function runTest(
           })}`
         );
         await driver.quit();
-      } catch (error) {}
+      } catch (error) {
+        console.error(error);
+      }
     }
   } catch (error) {
     /*try {
@@ -438,12 +440,14 @@ async function runTest(
             action: "setSessionStatus",
             arguments: {
               status: "failed",
-              reason: `${error}`,
+              reason: String(error),
             },
           })}`
         );
         await driver.quit();
-      } catch (error) {}
+      } catch (error) {
+        console.error(error);
+      }
     }
 
     throw error;
