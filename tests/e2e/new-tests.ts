@@ -75,7 +75,11 @@ class FormTester {
       By.css(`input[name="${name}"]`)
     );
     // really? https://github.com/w3c/webdriver/issues/1630
-    await element.sendKeys(Key.chord(Key.CONTROL, "a"), Key.BACK_SPACE);
+    // https://github.com/w3c/webdriver/issues/445
+    // potentially on Mac you need to press Command+A?
+    while (await element.getAttribute("value") !== "") {
+      await element.sendKeys(Key.BACK_SPACE);
+    }
     await element.sendKeys(value);
   }
 
@@ -93,7 +97,10 @@ class FormTester {
       By.css(`textarea[name="${name}"]`)
     );
     await element.click();
-    await element.sendKeys(Key.chord(Key.CONTROL, "a"), Key.BACK_SPACE);
+    // copy pasta from above
+    while (await element.getAttribute("value") !== "") {
+      await element.sendKeys(Key.BACK_SPACE);
+    }
     await element.sendKeys(value);
   }
 
@@ -162,7 +169,7 @@ class FormTester {
       By.css('div[class="alert alert-danger"]')
     );
 
-    assert.match(await alert.getText(), /Some errors occurred./);
+    assert.match(await alert.getAttribute("innerText"), /Some errors occurred./);
     await this.helper.waitUntilLoaded();
     return this.getErrors();
   }
@@ -174,7 +181,7 @@ class FormTester {
           await e
             .findElement(By.xpath("preceding-sibling::input"))
             .getAttribute("name"),
-          await e.getText(),
+          await e.getAttribute("innerText"),
         ]
       )
     );
@@ -218,7 +225,7 @@ class Helper {
   }
 
   async waitUntilLoaded() {
-    try {
+    //try {
       const loadingIndicators = await this.driver.findElements(
         By.css(".spinner-grow")
       );
@@ -228,9 +235,9 @@ class Helper {
           this.driver.wait(until.stalenessOf(e), 10000, "waitUntilLoaded")
         )
       );
-    } catch (error) {
+    /*} catch (error) {
       throw new Error("spinner-grow failed");
-    }
+    }*/
   }
 
   async waitElem(name: string) {
@@ -490,7 +497,7 @@ async function loginCorrect(helper: Helper) {
 async function welcomeWorks(helper: Helper) {
   await helper.driver.get(`${BASE_URL}/`);
   assert.match(
-    await (await helper.waitElem("pw-welcome")).getText(),
+    await (await helper.waitElem("pw-welcome")).getAttribute("innerText"),
     /Projektwoche/
   );
 }
@@ -504,7 +511,7 @@ async function imprintWorks(helper: Helper) {
     .switchTo()
     .window((await helper.driver.getAllWindowHandles())[1]);
   assert.match(
-    await (await helper.waitElem("pw-imprint")).getText(),
+    await (await helper.waitElem("pw-imprint")).getAttribute("innerText"),
     /Angaben gemäß § 5 TMG/
   );
   await helper.driver.close();
@@ -522,7 +529,7 @@ async function privacyWorks(helper: Helper) {
     .switchTo()
     .window((await helper.driver.getAllWindowHandles())[1]);
   assert.match(
-    await (await helper.waitElem("pw-privacy")).getText(),
+    await (await helper.waitElem("pw-privacy")).getAttribute("innerText"),
     /Verantwortlicher/
   );
   await helper.driver.close();
@@ -790,7 +797,7 @@ async function checkNotLoggedInUsers(helper: Helper) {
     "Expected submit failure 2"
   );
 
-  assert.match(await alert.getText(), /Nicht angemeldet!/);
+  assert.match(await alert.getAttribute("innerText"), /Nicht angemeldet!/);
 }
 
 async function checkNotLoggedInProjects(helper: Helper) {
@@ -802,7 +809,7 @@ async function checkNotLoggedInProjects(helper: Helper) {
     "Expected submit failure 3"
   );
 
-  assert.match(await alert.getText(), /Nicht angemeldet!/);
+  assert.match(await alert.getAttribute("innerText"), /Nicht angemeldet!/);
 }
 
 const randomFromArray = function <T>(array: T[]): T {
@@ -835,7 +842,7 @@ async function checkProjectSortingWorks(helper: Helper) {
         By.css('tbody tr th[scope="row"]')
       );
       const thisRowsText = await Promise.all(
-        thisRows.map((r) => r.getText().then((v) => Number(v)))
+        thisRows.map((r) => r.getAttribute("innerText").then((v) => Number(v)))
       );
 
       console.log(thisRowsText);
@@ -892,7 +899,7 @@ async function checkUsersSortingWorks(helper: Helper) {
       By.css('tbody tr th[scope="row"]')
     );
     const thisRowsText = await Promise.all(
-      thisRows.map((r) => r.getText().then((v) => Number(v)))
+      thisRows.map((r) => r.getAttribute("innerText").then((v) => Number(v)))
     );
 
     console.log(thisRowsText);
@@ -948,7 +955,7 @@ async function checkUsersPaginationLimitWorks(helper: Helper) {
           By.css('tbody tr th[scope="row"]')
         );
         const thisRowsText = await Promise.all(
-          thisRows.map((r) => r.getText().then((v) => Number(v)))
+          thisRows.map((r) => r.getAttribute("innerText").then((v) => Number(v)))
         );
 
         assert.ok(thisRowsText.length <= 50);
@@ -1007,7 +1014,7 @@ async function checkUsersFilteringWorks(helper: Helper) {
     By.css('tbody tr th[scope="row"]')
   );
   const thisRowsText = await Promise.all(
-    thisRows.map((r) => r.getText().then((v) => Number(v)))
+    thisRows.map((r) => r.getAttribute("innerText").then((v) => Number(v)))
   );
 
   console.log(thisRowsText);
@@ -1350,7 +1357,7 @@ async function checkUserOrProjectNotFound(helper: Helper) {
     By.css('div[class="alert alert-danger"]')
   );
 
-  assert.match(await alert1.getText(), /Projekt nicht gefunden!/);
+  assert.match(await alert1.getAttribute("innerText"), /Projekt nicht gefunden!/);
 
   await helper.driver.get(`${BASE_URL}/users/edit/34234`);
 
@@ -1360,7 +1367,7 @@ async function checkUserOrProjectNotFound(helper: Helper) {
     By.css('div[class="alert alert-danger"]')
   );
 
-  assert.match(await alert2.getText(), /Account nicht gefunden!/);
+  assert.match(await alert2.getAttribute("innerText"), /Account nicht gefunden!/);
 }
 
 async function testVotingWorks(helper: Helper) {
@@ -1613,6 +1620,7 @@ if (argv[2] !== "chrome" && argv[2] !== "firefox" && argv[2] !== "browserstack-i
 }
 
 await runTest(argv[2], async (helper) => {
+/*
   await checkUserOrProjectNotFound(helper);
   await helper.driver.manage().deleteAllCookies();
 
@@ -1681,7 +1689,7 @@ await runTest(argv[2], async (helper) => {
 
   await imprintWorks(helper);
   await helper.driver.manage().deleteAllCookies();
-
+*/
   await privacyWorks(helper);
   await helper.driver.manage().deleteAllCookies();
 
