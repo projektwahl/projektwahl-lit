@@ -121,7 +121,7 @@ export const updateProjectsHandler = createOrUpdateProjectsHandler(
     "age_range" = '[CASE WHEN ${min_age !== undefined} THEN ${
       min_age ?? null
     } ELSE lower("projects_with_deleted"."age_range") END,
-    "max_age" = CASE WHEN ${max_age !== undefined} THEN ${
+    CASE WHEN ${max_age !== undefined} THEN ${
       max_age ?? null
     } ELSE upper("projects_with_deleted"."age_range") END]',
     "min_participants" = CASE WHEN ${min_participants !== undefined} THEN ${

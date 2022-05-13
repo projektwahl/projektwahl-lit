@@ -47,7 +47,7 @@ export async function project(
   return (
     await typedSql(tsql, {
       columns: { id: 23 },
-    } as const)`INSERT INTO projects (title, info, place, costs, min_age, max_age, min_participants, max_participants, random_assignments, last_updated_by) VALUES (${chance.sentence()}, '', '', 0, ${min_age}, ${max_age}, ${min_participants}, ${max_participants}, ${random_assignments}, NULL) RETURNING projects.id;`
+    } as const)`INSERT INTO projects (title, info, place, costs, age_range, min_participants, max_participants, random_assignments, last_updated_by) VALUES (${chance.sentence()}, '', '', 0, '[${min_age}, ${max_age}]', ${min_participants}, ${max_participants}, ${random_assignments}, NULL) RETURNING projects.id;`
   )[0].id;
 }
 
