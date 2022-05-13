@@ -228,19 +228,27 @@ class Helper {
   }
 
   async waitUntilLoaded() {
-    //try {
-    const loadingIndicators = await this.driver.findElements(
-      By.css(".spinner-grow")
-    );
+    for (;;) {
+      try {
+        const loadingIndicators = await this.driver.findElements(
+          By.css(".spinner-grow")
+        );
 
-    await Promise.all(
-      loadingIndicators.map((e) =>
-        this.driver.wait(until.stalenessOf(e), 10000, "waitUntilLoaded")
-      )
-    );
-    /*} catch (error) {
-      throw new Error("spinner-grow failed");
-    }*/
+        await Promise.all(
+          loadingIndicators.map((e) =>
+            this.driver.wait(until.stalenessOf(e), 10000, "waitUntilLoaded")
+          )
+        );
+        break;
+      } catch (error) {
+        if (
+          error instanceof Error &&
+          error.name !== "StaleElementReferenceError"
+        ) {
+          throw error;
+        }
+      }
+    }
   }
 
   async waitElem(name: string) {
@@ -344,14 +352,20 @@ async function runTest(
       browser_version: "15.3",
       os: "OS X",
       os_version: "Monterey",
-      build: "browserstack-build-1",
-      name: "Parallel test 3",
       "browserstack.local": "true",
       acceptSslCerts: "true",
       //'browserstack.networkLogs': 'true',
       "browserstack.console": "verbose",
+      tunnelIdentifier: process.env.SAUCELABS_TUNNEL_IDENTIFIER,
+      browserName: "Safari",
+      version: "15.0",
+      platform: "MacOS Monterey",
+      resolution: "1024x768",
+      tunnel: true,
+      build: "Lambdatest-Javascript-Sample-Build",
+      name: "Javascript-Sample-Test",
     } as const;
-    builder.usingServer(process.env.BROWSERSTACK_URL ?? "").withCapabilities({
+    builder.usingServer(process.env.SELENIUM_URL ?? "").withCapabilities({
       ...capabilities,
       ...(capabilities["browser"] && { browserName: capabilities["browser"] }), // Because NodeJS language binding requires browserName to be defined
     });
