@@ -79,13 +79,13 @@ export async function setup() {
           )}, ${chance.paragraph()}, ${chance.address()}, ${chance.integer({
             min: 0,
             max: 10,
-          })}, '[${chance.integer({ min: 5, max: 9 })}, ${chance.integer({
+          })}, int4range(${chance.integer({ min: 5, max: 9 })}, ${chance.integer({
             min: 9,
             max: 13,
-          })}]', ${chance.integer({ min: 5, max: 10 })}, ${chance.integer({
+          })}, '[]'), ${chance.integer({ min: 5, max: 10 })}, ${chance.integer({
             min: 10,
             max: 15,
-          })}, ${chance.bool({ likelihood: 90 })}, ${admin.id}) RETURNING *;`
+          })}, ${chance.bool({ likelihood: 90 })}, ${admin.id}) RETURNING id, title, info, place, costs, lower(age_range) AS min_age, upper(age_range) AS max_age, min_participants, max_participants, random_assignments, deleted, last_updated_by;`
         )[0];
 
         projects.push(project);
