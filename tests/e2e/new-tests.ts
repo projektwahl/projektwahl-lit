@@ -347,6 +347,52 @@ async function runTest(
   }
 
   if (browser === "browserstack-ipad") {
+/*
+const capabilities1 = {
+  'device': 'iPad 8th',
+  'os_version': '14',
+  'browserName': 'ios',
+  'realMobile': 'true',
+  'build': 'browserstack-build-1',
+  'name': 'Parallel test 1'
+}
+const capabilities2 = {
+	'device': 'iPhone 7',
+  'os_version': '10',
+  'browserName': 'ios',
+  'realMobile': 'true',
+  'build': 'browserstack-build-1',
+  'name': 'Parallel test 2'
+}
+const capabilities2 = {
+	'device': 'iPhone XS',
+  'os_version': '15',
+  'browserName': 'ios',
+  'realMobile': 'true',
+  'build': 'browserstack-build-1',
+  'name': 'Parallel test 2'
+}
+const capabilities3 = {
+	'browser': 'safari',
+  'browser_version': '13.1',
+  'os': 'OS X',
+  'os_version': 'Catalina',
+  'build': 'browserstack-build-1',
+  'name': 'Parallel test 3'
+}
+const capabilities2 = {
+	'device': 'iPhone XS',
+  'os_version': '15',
+  'browserName': 'ios',
+  'realMobile': 'true',
+  'build': 'browserstack-build-1',
+  'name': 'Parallel test 2'
+}
+runTestWithCaps(capabilities1);
+runTestWithCaps(capabilities2);
+runTestWithCaps(capabilities3);
+*/
+
     const capabilities = {
       browser: "safari",
       browser_version: "15.3",
