@@ -344,14 +344,20 @@ async function runTest(
       browser_version: "15.3",
       os: "OS X",
       os_version: "Monterey",
-      build: "browserstack-build-1",
-      name: "Parallel test 3",
       "browserstack.local": "true",
       acceptSslCerts: "true",
       //'browserstack.networkLogs': 'true',
       "browserstack.console": "verbose",
+      "tunnelIdentifier": process.env.SAUCELABS_TUNNEL_IDENTIFIER,
+      'browserName': 'Safari',
+      'version': '15.0',
+      'platform': 'MacOS Monterey',
+      'resolution': '1024x768',
+      'tunnel': true,
+      'build': 'Lambdatest-Javascript-Sample-Build',
+      'name': 'Javascript-Sample-Test'
     } as const;
-    builder.usingServer(process.env.BROWSERSTACK_URL ?? "").withCapabilities({
+    builder.usingServer(process.env.SELENIUM_URL ?? "").withCapabilities({
       ...capabilities,
       ...(capabilities["browser"] && { browserName: capabilities["browser"] }), // Because NodeJS language binding requires browserName to be defined
     });
@@ -1661,6 +1667,7 @@ if (
 }
 
 await runTest(argv[2], async (helper) => {
+/*
   await checkUserOrProjectNotFound(helper);
   await helper.driver.manage().deleteAllCookies();
 
@@ -1729,7 +1736,7 @@ await runTest(argv[2], async (helper) => {
 
   await imprintWorks(helper);
   await helper.driver.manage().deleteAllCookies();
-
+*/
   await privacyWorks(helper);
   await helper.driver.manage().deleteAllCookies();
 
