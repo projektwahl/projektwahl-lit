@@ -228,19 +228,23 @@ class Helper {
   }
 
   async waitUntilLoaded() {
-    //try {
-    const loadingIndicators = await this.driver.findElements(
-      By.css(".spinner-grow")
-    );
+    while (true) {
+      try {
+        const loadingIndicators = await this.driver.findElements(
+          By.css(".spinner-grow")
+        );
 
-    await Promise.all(
-      loadingIndicators.map((e) =>
-        this.driver.wait(until.stalenessOf(e), 10000, "waitUntilLoaded")
-      )
-    );
-    /*} catch (error) {
-      throw new Error("spinner-grow failed");
-    }*/
+        await Promise.all(
+          loadingIndicators.map((e) =>
+            this.driver.wait(until.stalenessOf(e), 10000, "waitUntilLoaded")
+          )
+        );
+      } catch (error) {
+        if (error.name !== "StaleElementReferenceError") {
+          throw error;
+        }
+      }
+    }
   }
 
   async waitElem(name: string) {
@@ -348,14 +352,14 @@ async function runTest(
       acceptSslCerts: "true",
       //'browserstack.networkLogs': 'true',
       "browserstack.console": "verbose",
-      "tunnelIdentifier": process.env.SAUCELABS_TUNNEL_IDENTIFIER,
-      'browserName': 'Safari',
-      'version': '15.0',
-      'platform': 'MacOS Monterey',
-      'resolution': '1024x768',
-      'tunnel': true,
-      'build': 'Lambdatest-Javascript-Sample-Build',
-      'name': 'Javascript-Sample-Test'
+      tunnelIdentifier: process.env.SAUCELABS_TUNNEL_IDENTIFIER,
+      browserName: "Safari",
+      version: "15.0",
+      platform: "MacOS Monterey",
+      resolution: "1024x768",
+      tunnel: true,
+      build: "Lambdatest-Javascript-Sample-Build",
+      name: "Javascript-Sample-Test",
     } as const;
     builder.usingServer(process.env.SELENIUM_URL ?? "").withCapabilities({
       ...capabilities,
