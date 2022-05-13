@@ -27,8 +27,7 @@ CREATE TABLE IF NOT EXISTS projects_with_deleted (
   info VARCHAR(4096) NOT NULL,
   place VARCHAR(256) NOT NULL,
   costs FLOAT NOT NULL,
-  min_age INTEGER NOT NULL,
-  max_age INTEGER NOT NULL,
+  age_range INT4RANGE NOT NULL,
   min_participants INTEGER NOT NULL,
   max_participants INTEGER NOT NULL,
   random_assignments BOOLEAN NOT NULL DEFAULT FALSE,
@@ -45,8 +44,7 @@ CREATE TABLE IF NOT EXISTS projects_history (
   info VARCHAR(4096) NOT NULL,
   place VARCHAR(256) NOT NULL,
   costs FLOAT NOT NULL,
-  min_age INTEGER NOT NULL,
-  max_age INTEGER NOT NULL,
+  age_range INT4RANGE NOT NULL,
   min_participants INTEGER NOT NULL,
   max_participants INTEGER NOT NULL,
   random_assignments BOOLEAN NOT NULL DEFAULT FALSE,
@@ -59,7 +57,7 @@ DECLARE
   d RECORD;
 BEGIN
   d := NEW;
-  INSERT INTO projects_history (operation, id, title, info, place, costs, min_age, max_age, min_participants, max_participants, random_assignments, deleted, last_updated_by) VALUES (TG_OP, d.id, d.title, d.info, d.place, d.costs, d.min_age, d.max_age, d.min_participants, d.max_participants, d.random_assignments, d.deleted, d.last_updated_by);
+  INSERT INTO projects_history (operation, id, title, info, place, costs, age_range, min_participants, max_participants, random_assignments, deleted, last_updated_by) VALUES (TG_OP, d.id, d.title, d.info, d.place, d.costs, d.age_range, d.min_participants, d.max_participants, d.random_assignments, d.deleted, d.last_updated_by);
   RETURN NULL;
 END;
 $body$ LANGUAGE plpgsql
@@ -293,8 +291,8 @@ CREATE OR REPLACE VIEW present_voters WITH (security_barrier) AS SELECT * FROM u
 
 CREATE OR REPLACE FUNCTION check_choices_age() RETURNS TRIGGER AS $body$
 BEGIN
-  IF (SELECT min_age FROM projects_with_deleted WHERE id = NEW.project_id) > (SELECT age FROM users_with_deleted WHERE id = NEW.user_id) OR
-     (SELECT max_age FROM projects_with_deleted WHERE id = NEW.project_id) < (SELECT age FROM users_with_deleted WHERE id = NEW.user_id) THEN
+  IF (SELECT lower(age_range) FROM projects_with_deleted WHERE id = NEW.project_id) > (SELECT age FROM users_with_deleted WHERE id = NEW.user_id) OR
+     (SELECT upper(age_range) FROM projects_with_deleted WHERE id = NEW.project_id) < (SELECT age FROM users_with_deleted WHERE id = NEW.user_id) THEN
       RAISE EXCEPTION 'Der Nutzer passt nicht in die Altersbegrenzung des Projekts!';
   END IF;
   RETURN NEW;
@@ -316,7 +314,7 @@ EXECUTE FUNCTION check_choices_age();
 
 CREATE OR REPLACE FUNCTION update_project_check_choices_age() RETURNS TRIGGER AS $test2$
 BEGIN
-  IF (SELECT COUNT(*) FROM choices, users_with_deleted WHERE choices.project_id = NEW.id AND users_with_deleted.id = choices.user_id AND (users_with_deleted.age < NEW.min_age OR users_with_deleted.age > NEW.max_age)) > 0 THEN
+  IF (SELECT COUNT(*) FROM choices, users_with_deleted WHERE choices.project_id = NEW.id AND users_with_deleted.id = choices.user_id AND (users_with_deleted.age < lower(NEW.age_range) OR users_with_deleted.age > upper(NEW.age_range))) > 0 THEN
       RAISE EXCEPTION 'Geänderte Altersbegrenzung wuerde Wahlen ungültig machen!';
   END IF;
   RETURN NEW;

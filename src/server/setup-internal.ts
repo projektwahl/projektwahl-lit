@@ -74,15 +74,15 @@ export async function setup() {
               deleted: 16,
               last_updated_by: 23,
             },
-          } as const)`INSERT INTO projects (title, info, place, costs, min_age, max_age, min_participants, max_participants, random_assignments, last_updated_by) (SELECT ${chance.sentence(
+          } as const)`INSERT INTO projects (title, info, place, costs, age_range, min_participants, max_participants, random_assignments, last_updated_by) (SELECT ${chance.sentence(
             { punctuation: false, words: 3 }
           )}, ${chance.paragraph()}, ${chance.address()}, ${chance.integer({
             min: 0,
             max: 10,
-          })}, ${chance.integer({ min: 5, max: 9 })}, ${chance.integer({
+          })}, '[${chance.integer({ min: 5, max: 9 })}, ${chance.integer({
             min: 9,
             max: 13,
-          })}, ${chance.integer({ min: 5, max: 10 })}, ${chance.integer({
+          })}]', ${chance.integer({ min: 5, max: 10 })}, ${chance.integer({
             min: 10,
             max: 15,
           })}, ${chance.bool({ likelihood: 90 })}, ${admin.id}) RETURNING *;`

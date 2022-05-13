@@ -52,14 +52,14 @@ export const createProjectsHandler = createOrUpdateProjectsHandler(
     _ = 1; // ensure no property is missed - Don't use `{}` as a type. `{}` actually means "any non-nullish value".
     const res = await typedSql(tsql, {
       columns: { id: 23 },
-    } as const)`INSERT INTO projects_with_deleted (title, info, place, costs, min_age, max_age, min_participants, max_participants, random_assignments, deleted, last_updated_by)
+    } as const)`INSERT INTO projects_with_deleted (title, info, place, costs, age_range, min_participants, max_participants, random_assignments, deleted, last_updated_by)
             (SELECT 
     ${title ?? null},
     ${info ?? null},
     ${place ?? null},
     ${costs ?? 0},
-    ${min_age ?? null},
-    ${max_age ?? null},
+    '[${min_age ?? null},
+    ${max_age ?? null}]',
     ${min_participants ?? null},
     ${max_participants ?? null},
     ${random_assignments ?? false}, ${deleted ?? false}, ${
@@ -118,12 +118,12 @@ export const updateProjectsHandler = createOrUpdateProjectsHandler(
     "costs" = CASE WHEN ${costs !== undefined} THEN ${
       costs ?? null
     } ELSE "projects_with_deleted"."costs" END,
-    "min_age" = CASE WHEN ${min_age !== undefined} THEN ${
+    "age_range" = '[CASE WHEN ${min_age !== undefined} THEN ${
       min_age ?? null
-    } ELSE "projects_with_deleted"."min_age" END,
+    } ELSE lower("projects_with_deleted"."age_range") END,
     "max_age" = CASE WHEN ${max_age !== undefined} THEN ${
       max_age ?? null
-    } ELSE "projects_with_deleted"."max_age" END,
+    } ELSE upper("projects_with_deleted"."age_range") END]',
     "min_participants" = CASE WHEN ${min_participants !== undefined} THEN ${
       min_participants ?? null
     } ELSE "projects_with_deleted"."min_participants" END,
