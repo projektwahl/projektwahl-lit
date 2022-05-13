@@ -362,8 +362,8 @@ async function runTest(
       platform: "MacOS Monterey",
       resolution: "1024x768",
       tunnel: true,
-      build: "Lambdatest-Javascript-Sample-Build",
-      name: "Javascript-Sample-Test",
+      build: "Browserstack Projektwahl",
+      name: "Projektwahl",
     } as const;
     builder.usingServer(process.env.SELENIUM_URL ?? "").withCapabilities({
       ...capabilities,
@@ -401,8 +401,6 @@ async function runTest(
 
     // TODO test openid
 
-    await driver.quit();
-
     /*
         const theRepl = repl.start();
         theRepl.context.driver = driver;
@@ -415,21 +413,18 @@ async function runTest(
         });
   */
     if (browser === "browserstack-ipad") {
-      try {
-        await driver.executeScript(
-          `browserstack_executor: ${JSON.stringify({
-            action: "setSessionStatus",
-            arguments: {
-              status: "passed",
-              reason: `Successfully ran all tests`,
-            },
-          })}`
-        );
-        await driver.quit();
-      } catch (error) {
-        console.error(error);
-      }
+      await driver.executeScript(
+        `browserstack_executor: ${JSON.stringify({
+          action: "setSessionStatus",
+          arguments: {
+            status: "passed",
+            reason: `Successfully ran all tests`,
+          },
+        })}`
+      );
     }
+
+    await driver.quit();
   } catch (error) {
     /*try {
       // Needed for Chrome. Firefox throws here, will not implement.
@@ -544,9 +539,14 @@ async function imprintWorks(helper: Helper) {
     async () => (await helper.driver.getAllWindowHandles()).length === 2,
     10000
   );
+  const windowHandle = await helper.driver.getWindowHandle();
   await helper.driver
     .switchTo()
-    .window((await helper.driver.getAllWindowHandles())[1]);
+    .window(
+      (
+        await helper.driver.getAllWindowHandles()
+      ).find((h) => h !== windowHandle) ?? ""
+    );
   assert.match(
     await (await helper.waitElem("pw-imprint")).getAttribute("innerText"),
     /Angaben gemäß § 5 TMG/
@@ -567,9 +567,14 @@ async function privacyWorks(helper: Helper) {
     async () => (await helper.driver.getAllWindowHandles()).length === 2,
     10000
   );
+  const windowHandle = await helper.driver.getWindowHandle();
   await helper.driver
     .switchTo()
-    .window((await helper.driver.getAllWindowHandles())[1]);
+    .window(
+      (
+        await helper.driver.getAllWindowHandles()
+      ).find((h) => h !== windowHandle) ?? ""
+    );
   assert.match(
     await (await helper.waitElem("pw-privacy")).getAttribute("innerText"),
     /Verantwortlicher/
