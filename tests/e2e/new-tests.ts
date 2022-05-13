@@ -401,8 +401,6 @@ async function runTest(
 
     // TODO test openid
 
-    await driver.quit();
-
     /*
         const theRepl = repl.start();
         theRepl.context.driver = driver;
@@ -415,21 +413,18 @@ async function runTest(
         });
   */
     if (browser === "browserstack-ipad") {
-      try {
-        await driver.executeScript(
-          `browserstack_executor: ${JSON.stringify({
-            action: "setSessionStatus",
-            arguments: {
-              status: "passed",
-              reason: `Successfully ran all tests`,
-            },
-          })}`
-        );
-        await driver.quit();
-      } catch (error) {
-        console.error(error);
-      }
+      await driver.executeScript(
+        `browserstack_executor: ${JSON.stringify({
+          action: "setSessionStatus",
+          arguments: {
+            status: "passed",
+            reason: `Successfully ran all tests`,
+          },
+        })}`
+      );
     }
+
+    await driver.quit();
   } catch (error) {
     /*try {
       // Needed for Chrome. Firefox throws here, will not implement.
