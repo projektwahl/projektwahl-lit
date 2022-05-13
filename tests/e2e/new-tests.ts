@@ -1667,7 +1667,6 @@ if (
 }
 
 await runTest(argv[2], async (helper) => {
-/*
   await checkUserOrProjectNotFound(helper);
   await helper.driver.manage().deleteAllCookies();
 
@@ -1736,7 +1735,7 @@ await runTest(argv[2], async (helper) => {
 
   await imprintWorks(helper);
   await helper.driver.manage().deleteAllCookies();
-*/
+
   await privacyWorks(helper);
   await helper.driver.manage().deleteAllCookies();
 
