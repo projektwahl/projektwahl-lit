@@ -228,7 +228,7 @@ class Helper {
   }
 
   async waitUntilLoaded() {
-    while (true) {
+    for (;;) {
       try {
         const loadingIndicators = await this.driver.findElements(
           By.css(".spinner-grow")
@@ -239,8 +239,12 @@ class Helper {
             this.driver.wait(until.stalenessOf(e), 10000, "waitUntilLoaded")
           )
         );
+        break;
       } catch (error) {
-        if (error.name !== "StaleElementReferenceError") {
+        if (
+          error instanceof Error &&
+          error.name !== "StaleElementReferenceError"
+        ) {
           throw error;
         }
       }
