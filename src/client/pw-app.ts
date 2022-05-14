@@ -20,6 +20,9 @@ https://github.com/projektwahl/projektwahl-lit
 SPDX-License-Identifier: AGPL-3.0-or-later
 SPDX-FileCopyrightText: 2021 Moritz Hedtke <Moritz.Hedtke@t-online.de>
 */
+// @ts-expect-error jo
+globalThis = window;
+
 import { html, noChange, ReactiveElement, TemplateResult } from "lit";
 import { HistoryController, HistoryState } from "./history-controller.js";
 import { aClick } from "./pw-a.js";
