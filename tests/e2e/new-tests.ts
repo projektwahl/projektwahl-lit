@@ -277,7 +277,7 @@ class Helper {
 
 async function runTest(
   browser: "firefox" | "chrome" | "browserstack-ipad",
-  capabilities: any,
+  capabilities: Capabilities,
   testFunction: (helper: Helper) => Promise<void>
 ) {
   chance = new Chance(1234);
@@ -357,12 +357,9 @@ async function runTest(
       build: "Browserstack Projektwahl",
       name: "Projektwahl",
     } as const;
-    builder.usingServer(process.env.SELENIUM_URL ?? "").withCapabilities({
-      ...combinedCapabilities,
-      ...(combinedCapabilities["browser"] && {
-        browserName: combinedCapabilities["browser"],
-      }), // Because NodeJS language binding requires browserName to be defined
-    });
+    builder
+      .usingServer(process.env.SELENIUM_URL ?? "")
+      .withCapabilities(combinedCapabilities);
   }
 
   if (process.env.CI) {
@@ -1674,62 +1671,66 @@ if (
 }
 
 const capabilitiesArray = [
-  {
+  new Capabilities({
     browser: "chrome",
+    browserName: "chrome",
     browser_version: "101.0",
     os: "Windows",
     os_version: "11",
     build: "browserstack-build-1",
     name: "Parallel test 1",
-  },
-  {
+  }),
+  new Capabilities({
     browser: "firefox",
+    browserName: "firefox",
     browser_version: "100.0",
     os: "Windows",
     os_version: "11",
     build: "browserstack-build-1",
     name: "Parallel test 2",
-  },
-  {
+  }),
+  new Capabilities({
     device: "iPad 8th",
     os_version: "14",
     browserName: "ios",
     realMobile: "true",
     build: "browserstack-build-1",
     name: "Parallel test 1",
-  },
-  {
+  }),
+  new Capabilities({
     device: "iPhone 7",
     os_version: "10",
     browserName: "ios",
     realMobile: "true",
     build: "browserstack-build-1",
     name: "Parallel test 2",
-  },
-  {
+  }),
+  new Capabilities({
     device: "iPhone XS",
     os_version: "15",
     browserName: "ios",
     realMobile: "true",
     build: "browserstack-build-1",
     name: "Parallel test 2",
-  },
-  {
+  }),
+  new Capabilities({
     browser: "safari",
+    browserName: "safari",
     browser_version: "13.1",
     os: "OS X",
     os_version: "Catalina",
     build: "browserstack-build-1",
     name: "Parallel test 3",
-  },
-  {
+  }),
+  new Capabilities({
     browser: "safari",
+    browserName: "safari",
     browser_version: "15.3",
     os: "OS X",
     os_version: "Monterey",
     build: "browserstack-build-1",
     name: "Parallel test 3",
-  },
+  }),
 ];
 
 await runTest(argv[2], capabilitiesArray[Number(argv[3])], async (helper) => {
