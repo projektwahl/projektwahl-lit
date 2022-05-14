@@ -1661,7 +1661,7 @@ async function checkSettingEmptyPasswordFails(helper: Helper) {
 
 console.log(argv);
 
-if (argv.length !== 3) {
+if (argv.length !== 4) {
   throw new Error("provide browser name as second argument");
 }
 
@@ -1732,95 +1732,93 @@ const capabilitiesArray = [
   },
 ];
 
-for (const capabilities of capabilitiesArray) {
-  await runTest(argv[2], capabilities, async (helper) => {
-    await checkUserOrProjectNotFound(helper);
-    await helper.driver.manage().deleteAllCookies();
+await runTest(argv[2], capabilitiesArray[Number(argv[3])], async (helper) => {
+  await checkUserOrProjectNotFound(helper);
+  await helper.driver.manage().deleteAllCookies();
 
-    await checkUsersSortingWorks(helper);
-    await helper.driver.manage().deleteAllCookies();
+  await checkUsersSortingWorks(helper);
+  await helper.driver.manage().deleteAllCookies();
 
-    await testVotingWorks(helper);
-    await helper.driver.manage().deleteAllCookies();
+  await testVotingWorks(helper);
+  await helper.driver.manage().deleteAllCookies();
 
-    await checkUsersFilteringWorks(helper);
-    await helper.driver.manage().deleteAllCookies();
+  await checkUsersFilteringWorks(helper);
+  await helper.driver.manage().deleteAllCookies();
 
-    await checkUsersPaginationLimitWorks(helper);
-    await helper.driver.manage().deleteAllCookies();
+  await checkUsersPaginationLimitWorks(helper);
+  await helper.driver.manage().deleteAllCookies();
 
-    await checkProjectSortingWorks(helper);
-    await helper.driver.manage().deleteAllCookies();
+  await checkProjectSortingWorks(helper);
+  await helper.driver.manage().deleteAllCookies();
 
-    await testHelperCreatesProjectWithProjectLeadersAndMembers(helper);
-    await helper.driver.manage().deleteAllCookies();
+  await testHelperCreatesProjectWithProjectLeadersAndMembers(helper);
+  await helper.driver.manage().deleteAllCookies();
 
-    await resettingUserWorks2(helper);
-    await helper.driver.manage().deleteAllCookies();
+  await resettingUserWorks2(helper);
+  await helper.driver.manage().deleteAllCookies();
 
-    await resettingUserWorks(helper);
-    await helper.driver.manage().deleteAllCookies();
+  await resettingUserWorks(helper);
+  await helper.driver.manage().deleteAllCookies();
 
-    await resettingProjectWorks2(helper);
-    await helper.driver.manage().deleteAllCookies();
+  await resettingProjectWorks2(helper);
+  await helper.driver.manage().deleteAllCookies();
 
-    await resettingProjectWorks(helper);
-    await helper.driver.manage().deleteAllCookies();
+  await resettingProjectWorks(helper);
+  await helper.driver.manage().deleteAllCookies();
 
-    await createProjectAllFields(helper);
-    await helper.driver.manage().deleteAllCookies();
+  await createProjectAllFields(helper);
+  await helper.driver.manage().deleteAllCookies();
 
-    await createUserAllFields(helper);
-    await helper.driver.manage().deleteAllCookies();
+  await createUserAllFields(helper);
+  await helper.driver.manage().deleteAllCookies();
 
-    await loginEmptyUsernameAndPassword(helper);
-    await helper.driver.manage().deleteAllCookies();
+  await loginEmptyUsernameAndPassword(helper);
+  await helper.driver.manage().deleteAllCookies();
 
-    await loginWrongUsername(helper);
-    await helper.driver.manage().deleteAllCookies();
+  await loginWrongUsername(helper);
+  await helper.driver.manage().deleteAllCookies();
 
-    await loginEmptyPassword(helper);
-    await helper.driver.manage().deleteAllCookies();
+  await loginEmptyPassword(helper);
+  await helper.driver.manage().deleteAllCookies();
 
-    await loginEmptyUsername(helper);
-    await helper.driver.manage().deleteAllCookies();
+  await loginEmptyUsername(helper);
+  await helper.driver.manage().deleteAllCookies();
 
-    // login ratelimiting
-    await helper.driver.sleep(5000);
+  // login ratelimiting
+  await helper.driver.sleep(5000);
 
-    await loginWrongPassword(helper);
-    await helper.driver.manage().deleteAllCookies();
+  await loginWrongPassword(helper);
+  await helper.driver.manage().deleteAllCookies();
 
-    // login ratelimiting
-    await helper.driver.sleep(5000);
+  // login ratelimiting
+  await helper.driver.sleep(5000);
 
-    await loginCorrect(helper);
-    await helper.driver.manage().deleteAllCookies();
+  await loginCorrect(helper);
+  await helper.driver.manage().deleteAllCookies();
 
-    await welcomeWorks(helper);
-    await helper.driver.manage().deleteAllCookies();
+  await welcomeWorks(helper);
+  await helper.driver.manage().deleteAllCookies();
 
-    await imprintWorks(helper);
-    await helper.driver.manage().deleteAllCookies();
+  await imprintWorks(helper);
+  await helper.driver.manage().deleteAllCookies();
 
-    await privacyWorks(helper);
-    await helper.driver.manage().deleteAllCookies();
+  await privacyWorks(helper);
+  await helper.driver.manage().deleteAllCookies();
 
-    await logoutWorks(helper);
-    await helper.driver.manage().deleteAllCookies();
+  await logoutWorks(helper);
+  await helper.driver.manage().deleteAllCookies();
 
-    await checkNotLoggedInUsers(helper);
-    await helper.driver.manage().deleteAllCookies();
+  await checkNotLoggedInUsers(helper);
+  await helper.driver.manage().deleteAllCookies();
 
-    await checkNotLoggedInProjects(helper);
-    await helper.driver.manage().deleteAllCookies();
+  await checkNotLoggedInProjects(helper);
+  await helper.driver.manage().deleteAllCookies();
 
-    // login ratelimiting
-    await helper.driver.sleep(5000);
+  // login ratelimiting
+  await helper.driver.sleep(5000);
 
-    await checkSettingEmptyPasswordFails(helper);
-    await helper.driver.manage().deleteAllCookies();
-  });
-}
+  await checkSettingEmptyPasswordFails(helper);
+  await helper.driver.manage().deleteAllCookies();
+});
 
 await sql.end();
