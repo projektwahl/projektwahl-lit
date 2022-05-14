@@ -277,6 +277,7 @@ class Helper {
 
 async function runTest(
   browser: "firefox" | "chrome" | "browserstack-ipad",
+  capabilities: any,
   testFunction: (helper: Helper) => Promise<void>
 ) {
   chance = new Chance(1234);
@@ -347,73 +348,18 @@ async function runTest(
   }
 
   if (browser === "browserstack-ipad") {
-/*
-const capabilities1 = {
-  'device': 'iPad 8th',
-  'os_version': '14',
-  'browserName': 'ios',
-  'realMobile': 'true',
-  'build': 'browserstack-build-1',
-  'name': 'Parallel test 1'
-}
-const capabilities2 = {
-	'device': 'iPhone 7',
-  'os_version': '10',
-  'browserName': 'ios',
-  'realMobile': 'true',
-  'build': 'browserstack-build-1',
-  'name': 'Parallel test 2'
-}
-const capabilities2 = {
-	'device': 'iPhone XS',
-  'os_version': '15',
-  'browserName': 'ios',
-  'realMobile': 'true',
-  'build': 'browserstack-build-1',
-  'name': 'Parallel test 2'
-}
-const capabilities3 = {
-	'browser': 'safari',
-  'browser_version': '13.1',
-  'os': 'OS X',
-  'os_version': 'Catalina',
-  'build': 'browserstack-build-1',
-  'name': 'Parallel test 3'
-}
-const capabilities2 = {
-	'device': 'iPhone XS',
-  'os_version': '15',
-  'browserName': 'ios',
-  'realMobile': 'true',
-  'build': 'browserstack-build-1',
-  'name': 'Parallel test 2'
-}
-runTestWithCaps(capabilities1);
-runTestWithCaps(capabilities2);
-runTestWithCaps(capabilities3);
-*/
-
-    const capabilities = {
-      browser: "safari",
-      browser_version: "15.3",
-      os: "OS X",
-      os_version: "Monterey",
+    const combinedCapabilities = {
+      ...capabilities,
       "browserstack.local": "true",
       acceptSslCerts: "true",
-      //'browserstack.networkLogs': 'true',
+      'browserstack.networkLogs': 'true',
       "browserstack.console": "verbose",
-      tunnelIdentifier: process.env.SAUCELABS_TUNNEL_IDENTIFIER,
-      browserName: "Safari",
-      version: "15.0",
-      platform: "MacOS Monterey",
-      resolution: "1024x768",
-      tunnel: true,
       build: "Browserstack Projektwahl",
       name: "Projektwahl",
     } as const;
     builder.usingServer(process.env.SELENIUM_URL ?? "").withCapabilities({
-      ...capabilities,
-      ...(capabilities["browser"] && { browserName: capabilities["browser"] }), // Because NodeJS language binding requires browserName to be defined
+      ...combinedCapabilities,
+      ...(combinedCapabilities["browser"] && { browserName: combinedCapabilities["browser"] }), // Because NodeJS language binding requires browserName to be defined
     });
   }
 
@@ -1725,93 +1671,138 @@ if (
   throw new Error("possible browser names: chrome, firefox, browserstack-ipad");
 }
 
-await runTest(argv[2], async (helper) => {
-  await checkUserOrProjectNotFound(helper);
-  await helper.driver.manage().deleteAllCookies();
+const capabilitiesArray = [
+  {
+    device: "iPad 8th",
+    os_version: "14",
+    browserName: "ios",
+    realMobile: "true",
+    build: "browserstack-build-1",
+    name: "Parallel test 1",
+  },
+  {
+    device: "iPhone 7",
+    os_version: "10",
+    browserName: "ios",
+    realMobile: "true",
+    build: "browserstack-build-1",
+    name: "Parallel test 2",
+  },
+  {
+    device: "iPhone XS",
+    os_version: "15",
+    browserName: "ios",
+    realMobile: "true",
+    build: "browserstack-build-1",
+    name: "Parallel test 2",
+  },
+  {
+    browser: "safari",
+    browser_version: "13.1",
+    os: "OS X",
+    os_version: "Catalina",
+    build: "browserstack-build-1",
+    name: "Parallel test 3",
+  },
+  {
+    browser: "safari",
+    browser_version: "15.3",
+    os: "OS X",
+    os_version: "Monterey",
+    build: "browserstack-build-1",
+    name: "Parallel test 3",
+  },
+];
 
-  await checkUsersSortingWorks(helper);
-  await helper.driver.manage().deleteAllCookies();
+for (const capabilities of capabilitiesArray) {
+  await runTest(argv[2], capabilities, async (helper) => {
+    await checkUserOrProjectNotFound(helper);
+    await helper.driver.manage().deleteAllCookies();
 
-  await testVotingWorks(helper);
-  await helper.driver.manage().deleteAllCookies();
+    await checkUsersSortingWorks(helper);
+    await helper.driver.manage().deleteAllCookies();
 
-  await checkUsersFilteringWorks(helper);
-  await helper.driver.manage().deleteAllCookies();
+    await testVotingWorks(helper);
+    await helper.driver.manage().deleteAllCookies();
 
-  await checkUsersPaginationLimitWorks(helper);
-  await helper.driver.manage().deleteAllCookies();
+    await checkUsersFilteringWorks(helper);
+    await helper.driver.manage().deleteAllCookies();
 
-  await checkProjectSortingWorks(helper);
-  await helper.driver.manage().deleteAllCookies();
+    await checkUsersPaginationLimitWorks(helper);
+    await helper.driver.manage().deleteAllCookies();
 
-  await testHelperCreatesProjectWithProjectLeadersAndMembers(helper);
-  await helper.driver.manage().deleteAllCookies();
+    await checkProjectSortingWorks(helper);
+    await helper.driver.manage().deleteAllCookies();
 
-  await resettingUserWorks2(helper);
-  await helper.driver.manage().deleteAllCookies();
+    await testHelperCreatesProjectWithProjectLeadersAndMembers(helper);
+    await helper.driver.manage().deleteAllCookies();
 
-  await resettingUserWorks(helper);
-  await helper.driver.manage().deleteAllCookies();
+    await resettingUserWorks2(helper);
+    await helper.driver.manage().deleteAllCookies();
 
-  await resettingProjectWorks2(helper);
-  await helper.driver.manage().deleteAllCookies();
+    await resettingUserWorks(helper);
+    await helper.driver.manage().deleteAllCookies();
 
-  await resettingProjectWorks(helper);
-  await helper.driver.manage().deleteAllCookies();
+    await resettingProjectWorks2(helper);
+    await helper.driver.manage().deleteAllCookies();
 
-  await createProjectAllFields(helper);
-  await helper.driver.manage().deleteAllCookies();
+    await resettingProjectWorks(helper);
+    await helper.driver.manage().deleteAllCookies();
 
-  await createUserAllFields(helper);
-  await helper.driver.manage().deleteAllCookies();
+    await createProjectAllFields(helper);
+    await helper.driver.manage().deleteAllCookies();
 
-  await loginEmptyUsernameAndPassword(helper);
-  await helper.driver.manage().deleteAllCookies();
+    await createUserAllFields(helper);
+    await helper.driver.manage().deleteAllCookies();
 
-  await loginWrongUsername(helper);
-  await helper.driver.manage().deleteAllCookies();
+    await loginEmptyUsernameAndPassword(helper);
+    await helper.driver.manage().deleteAllCookies();
 
-  await loginEmptyPassword(helper);
-  await helper.driver.manage().deleteAllCookies();
+    await loginWrongUsername(helper);
+    await helper.driver.manage().deleteAllCookies();
 
-  await loginEmptyUsername(helper);
-  await helper.driver.manage().deleteAllCookies();
+    await loginEmptyPassword(helper);
+    await helper.driver.manage().deleteAllCookies();
 
-  // login ratelimiting
-  await helper.driver.sleep(5000);
+    await loginEmptyUsername(helper);
+    await helper.driver.manage().deleteAllCookies();
 
-  await loginWrongPassword(helper);
-  await helper.driver.manage().deleteAllCookies();
+    // login ratelimiting
+    await helper.driver.sleep(5000);
 
-  // login ratelimiting
-  await helper.driver.sleep(5000);
+    await loginWrongPassword(helper);
+    await helper.driver.manage().deleteAllCookies();
 
-  await loginCorrect(helper);
-  await helper.driver.manage().deleteAllCookies();
+    // login ratelimiting
+    await helper.driver.sleep(5000);
 
-  await welcomeWorks(helper);
-  await helper.driver.manage().deleteAllCookies();
+    await loginCorrect(helper);
+    await helper.driver.manage().deleteAllCookies();
 
-  await imprintWorks(helper);
-  await helper.driver.manage().deleteAllCookies();
+    await welcomeWorks(helper);
+    await helper.driver.manage().deleteAllCookies();
 
-  await privacyWorks(helper);
-  await helper.driver.manage().deleteAllCookies();
+    await imprintWorks(helper);
+    await helper.driver.manage().deleteAllCookies();
 
-  await logoutWorks(helper);
-  await helper.driver.manage().deleteAllCookies();
+    await privacyWorks(helper);
+    await helper.driver.manage().deleteAllCookies();
 
-  await checkNotLoggedInUsers(helper);
-  await helper.driver.manage().deleteAllCookies();
+    await logoutWorks(helper);
+    await helper.driver.manage().deleteAllCookies();
 
-  await checkNotLoggedInProjects(helper);
-  await helper.driver.manage().deleteAllCookies();
+    await checkNotLoggedInUsers(helper);
+    await helper.driver.manage().deleteAllCookies();
 
-  // login ratelimiting
-  await helper.driver.sleep(5000);
+    await checkNotLoggedInProjects(helper);
+    await helper.driver.manage().deleteAllCookies();
 
-  await checkSettingEmptyPasswordFails(helper);
-  await helper.driver.manage().deleteAllCookies();
-});
+    // login ratelimiting
+    await helper.driver.sleep(5000);
+
+    await checkSettingEmptyPasswordFails(helper);
+    await helper.driver.manage().deleteAllCookies();
+  });
+}
 
 await sql.end();
