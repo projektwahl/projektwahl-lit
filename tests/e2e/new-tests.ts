@@ -254,7 +254,7 @@ class Helper {
   async waitElem(name: string) {
     return await this.driver.wait(
       until.elementLocated(By.css(name)),
-      10000,
+      20000,
       `Element ${name} not found`
     );
   }
@@ -352,14 +352,16 @@ async function runTest(
       ...capabilities,
       "browserstack.local": "true",
       acceptSslCerts: "true",
-      'browserstack.networkLogs': 'true',
+      "browserstack.networkLogs": "true",
       "browserstack.console": "verbose",
       build: "Browserstack Projektwahl",
       name: "Projektwahl",
     } as const;
     builder.usingServer(process.env.SELENIUM_URL ?? "").withCapabilities({
       ...combinedCapabilities,
-      ...(combinedCapabilities["browser"] && { browserName: combinedCapabilities["browser"] }), // Because NodeJS language binding requires browserName to be defined
+      ...(combinedCapabilities["browser"] && {
+        browserName: combinedCapabilities["browser"],
+      }), // Because NodeJS language binding requires browserName to be defined
     });
   }
 
@@ -1538,7 +1540,7 @@ async function testHelperCreatesProjectWithProjectLeadersAndMembers(
           `//th/p/a[@href="/users/view/${2}"]/../../../td/pw-project-user-checkbox/form/input`
         )
       ),
-      1000
+      10000
     )
   );
 
@@ -1561,7 +1563,7 @@ async function testHelperCreatesProjectWithProjectLeadersAndMembers(
           `//th/p/a[@href="/users/view/${4}"]/../../../td/pw-project-user-checkbox/form/input`
         )
       ),
-      1000
+      10000
     )
   );
 
@@ -1672,6 +1674,22 @@ if (
 }
 
 const capabilitiesArray = [
+  {
+    browser: "chrome",
+    browser_version: "101.0",
+    os: "Windows",
+    os_version: "11",
+    build: "browserstack-build-1",
+    name: "Parallel test 1",
+  },
+  {
+    browser: "firefox",
+    browser_version: "100.0",
+    os: "Windows",
+    os_version: "11",
+    build: "browserstack-build-1",
+    name: "Parallel test 2",
+  },
   {
     device: "iPad 8th",
     os_version: "14",
