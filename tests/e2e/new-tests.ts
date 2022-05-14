@@ -277,7 +277,7 @@ class Helper {
 
 async function runTest(
   browser: "firefox" | "chrome" | "browserstack-ipad",
-  capabilities: Capabilities,
+  capabilities: Record<string | symbol, unknown>,
   testFunction: (helper: Helper) => Promise<void>
 ) {
   chance = new Chance(1234);
@@ -1671,7 +1671,7 @@ if (
 }
 
 const capabilitiesArray = [
-  new Capabilities({
+  {
     browser: "chrome",
     browserName: "chrome",
     browser_version: "101.0",
@@ -1679,8 +1679,8 @@ const capabilitiesArray = [
     os_version: "11",
     build: "browserstack-build-1",
     name: "Parallel test 1",
-  }),
-  new Capabilities({
+  },
+  {
     browser: "firefox",
     browserName: "firefox",
     browser_version: "100.0",
@@ -1688,32 +1688,32 @@ const capabilitiesArray = [
     os_version: "11",
     build: "browserstack-build-1",
     name: "Parallel test 2",
-  }),
-  new Capabilities({
+  },
+  {
     device: "iPad 8th",
     os_version: "14",
     browserName: "ios",
     realMobile: "true",
     build: "browserstack-build-1",
     name: "Parallel test 1",
-  }),
-  new Capabilities({
+  },
+  {
     device: "iPhone 7",
     os_version: "10",
     browserName: "ios",
     realMobile: "true",
     build: "browserstack-build-1",
     name: "Parallel test 2",
-  }),
-  new Capabilities({
+  },
+  {
     device: "iPhone XS",
     os_version: "15",
     browserName: "ios",
     realMobile: "true",
     build: "browserstack-build-1",
     name: "Parallel test 2",
-  }),
-  new Capabilities({
+  },
+  {
     browser: "safari",
     browserName: "safari",
     browser_version: "13.1",
@@ -1721,8 +1721,8 @@ const capabilitiesArray = [
     os_version: "Catalina",
     build: "browserstack-build-1",
     name: "Parallel test 3",
-  }),
-  new Capabilities({
+  },
+  {
     browser: "safari",
     browserName: "safari",
     browser_version: "15.3",
@@ -1730,7 +1730,7 @@ const capabilitiesArray = [
     os_version: "Monterey",
     build: "browserstack-build-1",
     name: "Parallel test 3",
-  }),
+  },
 ];
 
 await runTest(argv[2], capabilitiesArray[Number(argv[3])], async (helper) => {
