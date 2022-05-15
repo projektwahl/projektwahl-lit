@@ -1686,7 +1686,7 @@ const capabilitiesArray = [
     os: "Windows",
     os_version: "11",
     build: "browserstack-build-1",
-    name: "Parallel test 1",
+    name: "Windows 11 Chrome",
   },
   {
     browser: "firefox",
@@ -1695,7 +1695,7 @@ const capabilitiesArray = [
     os: "Windows",
     os_version: "11",
     build: "browserstack-build-1",
-    name: "Parallel test 2",
+    name: "Windows 11 Firefox",
   },
   {
     device: "iPad 8th",
@@ -1703,7 +1703,7 @@ const capabilitiesArray = [
     browserName: "ios",
     realMobile: "true",
     build: "browserstack-build-1",
-    name: "Parallel test 1",
+    name: "iPad iOS 14",
   },
   {
     device: "iPhone 7",
@@ -1711,7 +1711,7 @@ const capabilitiesArray = [
     browserName: "ios",
     realMobile: "true",
     build: "browserstack-build-1",
-    name: "Parallel test 2",
+    name: "iPhone iOS 10",
   },
   {
     device: "iPhone XS",
@@ -1719,7 +1719,7 @@ const capabilitiesArray = [
     browserName: "ios",
     realMobile: "true",
     build: "browserstack-build-1",
-    name: "Parallel test 2",
+    name: "iPhone iOS 15",
   },
   {
     browser: "safari",
@@ -1728,7 +1728,7 @@ const capabilitiesArray = [
     os: "OS X",
     os_version: "Catalina",
     build: "browserstack-build-1",
-    name: "Parallel test 3",
+    name: "Safari 13.1",
   },
   {
     browser: "safari",
@@ -1737,7 +1737,7 @@ const capabilitiesArray = [
     os: "OS X",
     os_version: "Monterey",
     build: "browserstack-build-1",
-    name: "Parallel test 3",
+    name: "Safari 15.3",
   },
 ];
 
