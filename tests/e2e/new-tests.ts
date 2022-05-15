@@ -1504,7 +1504,7 @@ async function testHelperCreatesProjectWithProjectLeadersAndMembers(
     await helper.driver.findElement(By.css(`a[href="/projects/create"]`))
   );
   let form = await helper.form("pw-project-create");
-  await helper.waitUntilLoaded()
+  await helper.waitUntilLoaded();
   const title = `title${chance.integer()}`;
   const info = `info${chance.integer()}`;
   const place = `place${chance.integer()}`;
@@ -1683,19 +1683,19 @@ const capabilitiesArray = [
     browser: "chrome",
     browserName: "chrome",
     browser_version: "101.0",
-    os: "Windows",
-    os_version: "11",
+    os: "OS X",
+    os_version: "Monterey",
     build: "browserstack-build-1",
-    name: "Windows 11 Chrome",
+    name: "OS X Chrome 101",
   },
   {
     browser: "firefox",
     browserName: "firefox",
     browser_version: "100.0",
-    os: "Windows",
-    os_version: "11",
+    os: "OS X",
+    os_version: "Monterey",
     build: "browserstack-build-1",
-    name: "Windows 11 Firefox",
+    name: "OS X Firefox 100",
   },
   {
     device: "iPad 8th",
