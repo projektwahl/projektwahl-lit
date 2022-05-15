@@ -147,6 +147,8 @@ SPDX-FileCopyrightText: 2021 Moritz Hedtke <Moritz.Hedtke@t-online.de>
     <link rel="manifest" href="/dist/site.webmanifest">
   </head>
   <body class="height-100">
+    <script src="/src/client/polyfill.js">
+    </script>
     <script
       type="module"
       src="/dist/pw-app_${pwAppHash}.js"

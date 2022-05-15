@@ -423,6 +423,8 @@ export async function serverHandler(
       <title>Projektwahl</title>
     </head>
     <body class="height-100">
+      <script src="/src/client/polyfill.js">
+      </script>
       <script
         type="module"
         src="/src/client/pw-app.js"

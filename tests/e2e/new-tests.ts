@@ -1398,6 +1398,7 @@ async function checkUserOrProjectNotFound(helper: Helper) {
   await helper.driver.get(`${BASE_URL}/projects/edit/34234`);
 
   await helper.waitUntilLoaded();
+  await helper.waitUntilLoaded();
 
   const alert1 = await helper.driver.findElement(
     By.css('div[class="alert alert-danger"]')
