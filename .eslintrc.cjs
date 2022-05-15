@@ -59,5 +59,6 @@ module.exports = {
     "lit/",
     "coverage/",
     "tests/e2e/fast-selenium.js",
+    "src/client/polyfill.js",
   ],
 };
