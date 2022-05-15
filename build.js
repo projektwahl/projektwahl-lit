@@ -187,32 +187,10 @@ await writeFile("dist/index.html", index);
     format: "esm",
     bundle: true,
     entryPoints: ["src/server/index.ts"],
-    define: {
-      "process.env.NODE_ENV": '"production"',
-    },
     external: ["@dev.mohe/argon2"],
     charset: "utf8",
     sourcemap: true,
     outfile: "dist/server.js",
-    inject: ["./require-shim.js"],
-    treeShaking: true,
-    plugins: [nativeNodeModulesPlugin],
-  });
-}
-
-{
-  await build({
-    platform: "node",
-    format: "esm",
-    bundle: true,
-    entryPoints: ["src/server/index.ts"],
-    define: {
-      "process.env.NODE_ENV": '"testing"',
-    },
-    external: ["@dev.mohe/argon2"],
-    charset: "utf8",
-    sourcemap: true,
-    outfile: "dist/server-testing.js",
     inject: ["./require-shim.js"],
     treeShaking: true,
     plugins: [nativeNodeModulesPlugin],
