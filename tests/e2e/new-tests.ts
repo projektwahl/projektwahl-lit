@@ -1399,6 +1399,7 @@ async function checkUserOrProjectNotFound(helper: Helper) {
 
   await helper.waitUntilLoaded();
   await helper.waitUntilLoaded();
+  await helper.waitUntilLoaded();
 
   const alert1 = await helper.driver.findElement(
     By.css('div[class="alert alert-danger"]')
@@ -1560,17 +1561,19 @@ async function testHelperCreatesProjectWithProjectLeadersAndMembers(
 
   // this is a new project so nobody has voted it yet so obviously there can't be any collisions
 
-  // but we can try to add another teacher
-  await helper.click(
-    await helper.driver.wait(
-      until.elementLocated(
-        By.xpath(
-          `//th/p/a[@href="/users/view/${4}"]/../../../td/pw-project-user-checkbox/form/input`
-        )
-      ),
-      10000
-    )
+  const checkbox = await helper.driver.wait(
+    until.elementLocated(
+      By.xpath(
+        `//th/p/a[@href="/users/view/${4}"]/../../../td/pw-project-user-checkbox/form/input`
+      )
+    ),
+    10000
   );
+  await helper.waitUntilLoaded();
+  await helper.waitUntilLoaded();
+
+  // but we can try to add another teacher
+  await helper.click(checkbox);
 
   await helper.driver.sleep(1000);
 
