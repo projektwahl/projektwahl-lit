@@ -1504,6 +1504,7 @@ async function testHelperCreatesProjectWithProjectLeadersAndMembers(
     await helper.driver.findElement(By.css(`a[href="/projects/create"]`))
   );
   let form = await helper.form("pw-project-create");
+  await helper.waitUntilLoaded()
   const title = `title${chance.integer()}`;
   const info = `info${chance.integer()}`;
   const place = `place${chance.integer()}`;
