@@ -236,7 +236,7 @@ class Helper {
 
         await Promise.all(
           loadingIndicators.map((e) =>
-            this.driver.wait(until.stalenessOf(e), 10000, "waitUntilLoaded")
+            this.driver.wait(until.stalenessOf(e), 20000, "waitUntilLoaded spinners didn't go stale")
           )
         );
         break;
@@ -1542,6 +1542,7 @@ async function testHelperCreatesProjectWithProjectLeadersAndMembers(
     )
   );
 
+  await helper.waitUntilLoaded();
   await helper.waitUntilLoaded();
   await helper.waitUntilLoaded();
 
