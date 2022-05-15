@@ -236,7 +236,11 @@ class Helper {
 
         await Promise.all(
           loadingIndicators.map((e) =>
-            this.driver.wait(until.stalenessOf(e), 20000, "waitUntilLoaded spinners didn't go stale")
+            this.driver.wait(
+              until.stalenessOf(e),
+              20000,
+              "waitUntilLoaded spinners didn't go stale"
+            )
           )
         );
         break;
