@@ -27,8 +27,12 @@ services:
 #    secrets:
 #      - server-certificate
 #      - server-key
-    depends_on:
-      - frontend
+    healthcheck:
+      test: ["CMD", "curl", "-f", "--insecure", "https://localhost:443"]
+      interval: 10s
+      timeout: 10s
+      retries: 3
+      start_period: 0s
 
   postgres:
     image: postgres
