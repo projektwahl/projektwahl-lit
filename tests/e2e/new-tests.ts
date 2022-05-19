@@ -178,16 +178,16 @@ class FormTester {
   }
 
   private async getErrors() {
-    return Promise.all(
-      (await this.form.findElements(By.css(`.invalid-feedback`))).map(
-        async (e) => [
-          await e
-            .findElement(By.xpath("preceding-sibling::input"))
-            .getAttribute("name"),
-          await e.getAttribute("innerText"),
-        ]
-      )
-    );
+    const result = [];
+    for (const e of await this.form.findElements(By.css(`.invalid-feedback`))) {
+      result.push([
+        await e
+          .findElement(By.xpath("preceding-sibling::input"))
+          .getAttribute("name"),
+        await e.getAttribute("innerText"),
+      ]);
+    }
+    return result;
   }
 }
 
@@ -234,11 +234,13 @@ class Helper {
           By.css(".spinner-grow")
         );
 
-        await Promise.all(
-          loadingIndicators.map((e) =>
-            this.driver.wait(until.stalenessOf(e), 10000, "waitUntilLoaded")
-          )
-        );
+        for (const e of loadingIndicators) {
+          await this.driver.wait(
+            until.stalenessOf(e),
+            20000,
+            "waitUntilLoaded spinners didn't go stale"
+          );
+        }
         break;
       } catch (error) {
         if (
@@ -254,7 +256,7 @@ class Helper {
   async waitElem(name: string) {
     return await this.driver.wait(
       until.elementLocated(By.css(name)),
-      10000,
+      20000,
       `Element ${name} not found`
     );
   }
@@ -277,9 +279,11 @@ class Helper {
 
 async function runTest(
   browser: "firefox" | "chrome" | "browserstack-ipad",
+  capabilities: Record<string | symbol, unknown>,
   testFunction: (helper: Helper) => Promise<void>
 ) {
   chance = new Chance(1234);
+  /*
   console.log(
     (
       await exec(
@@ -313,7 +317,7 @@ async function runTest(
         }
       )
     ).stderr
-  );
+  );*/
 
   // https://github.com/mozilla/geckodriver/issues/882
   const builder = new Builder().disableEnvironmentOverrides();
@@ -347,28 +351,19 @@ async function runTest(
   }
 
   if (browser === "browserstack-ipad") {
-    const capabilities = {
-      browser: "safari",
-      browser_version: "15.3",
-      os: "OS X",
-      os_version: "Monterey",
+    const combinedCapabilities = {
+      ...capabilities,
       "browserstack.local": "true",
+      "browserstack.localIdentifier": process.env.BROWSERSTACK_LOCAL_IDENTIFIER,
       acceptSslCerts: "true",
-      //'browserstack.networkLogs': 'true',
+      "browserstack.networkLogs": "true",
       "browserstack.console": "verbose",
-      tunnelIdentifier: process.env.SAUCELABS_TUNNEL_IDENTIFIER,
-      browserName: "Safari",
-      version: "15.0",
-      platform: "MacOS Monterey",
-      resolution: "1024x768",
-      tunnel: true,
       build: "Browserstack Projektwahl",
       name: "Projektwahl",
     } as const;
-    builder.usingServer(process.env.SELENIUM_URL ?? "").withCapabilities({
-      ...capabilities,
-      ...(capabilities["browser"] && { browserName: capabilities["browser"] }), // Because NodeJS language binding requires browserName to be defined
-    });
+    builder
+      .usingServer(process.env.SELENIUM_URL ?? "")
+      .withCapabilities(combinedCapabilities);
   }
 
   if (process.env.CI) {
@@ -889,9 +884,10 @@ async function checkProjectSortingWorks(helper: Helper) {
       const thisRows = await helper.driver.findElements(
         By.css('tbody tr th[scope="row"]')
       );
-      const thisRowsText = await Promise.all(
-        thisRows.map((r) => r.getAttribute("innerText").then((v) => Number(v)))
-      );
+      const thisRowsText = [];
+      for (const r of thisRows) {
+        thisRowsText.push(Number(await r.getAttribute("innerText")));
+      }
 
       console.log(thisRowsText);
 
@@ -946,9 +942,11 @@ async function checkUsersSortingWorks(helper: Helper) {
     const thisRows = await helper.driver.findElements(
       By.css('tbody tr th[scope="row"]')
     );
-    const thisRowsText = await Promise.all(
-      thisRows.map((r) => r.getAttribute("innerText").then((v) => Number(v)))
-    );
+
+    const thisRowsText = [];
+    for (const r of thisRows) {
+      thisRowsText.push(Number(await r.getAttribute("innerText")));
+    }
 
     console.log(thisRowsText);
 
@@ -1002,11 +1000,10 @@ async function checkUsersPaginationLimitWorks(helper: Helper) {
         const thisRows = await helper.driver.findElements(
           By.css('tbody tr th[scope="row"]')
         );
-        const thisRowsText = await Promise.all(
-          thisRows.map((r) =>
-            r.getAttribute("innerText").then((v) => Number(v))
-          )
-        );
+        const thisRowsText = [];
+        for (const r of thisRows) {
+          thisRowsText.push(Number(await r.getAttribute("innerText")));
+        }
 
         assert.ok(thisRowsText.length <= 50);
 
@@ -1063,9 +1060,10 @@ async function checkUsersFilteringWorks(helper: Helper) {
   const thisRows = await helper.driver.findElements(
     By.css('tbody tr th[scope="row"]')
   );
-  const thisRowsText = await Promise.all(
-    thisRows.map((r) => r.getAttribute("innerText").then((v) => Number(v)))
-  );
+  const thisRowsText = [];
+  for (const r of thisRows) {
+    thisRowsText.push(Number(await r.getAttribute("innerText")));
+  }
 
   console.log(thisRowsText);
 
@@ -1131,13 +1129,11 @@ async function resettingUserWorks(helper: Helper) {
   await form.checkField("0,deleted", false);
 
   // TODO click all reset buttons
-  await Promise.all(
-    (
-      await helper.driver.findElements(
-        By.css('div button[class="btn btn-outline-secondary"]')
-      )
-    ).map((elem) => helper.click(elem))
-  );
+  for (const elem of await helper.driver.findElements(
+    By.css('div button[class="btn btn-outline-secondary"]')
+  )) {
+    await helper.click(elem);
+  }
 
   // check what resetting worked
   form = await helper.form("pw-user-create");
@@ -1203,13 +1199,11 @@ async function resettingProjectWorks(helper: Helper) {
   await form.checkField("deleted", false);
 
   // TODO click all reset buttons
-  await Promise.all(
-    (
-      await helper.driver.findElements(
-        By.css('button[class="btn btn-outline-secondary"]')
-      )
-    ).map((elem) => helper.click(elem))
-  );
+  for (const elem of await helper.driver.findElements(
+    By.css('div button[class="btn btn-outline-secondary"]')
+  )) {
+    await helper.click(elem);
+  }
 
   // check what resetting worked
   form = await helper.form("pw-project-create");
@@ -1284,13 +1278,11 @@ async function resettingUserWorks2(helper: Helper) {
     await helper.waitUntilLoaded();
 
     // TODO click all reset buttons
-    await Promise.all(
-      (
-        await helper.driver.findElements(
-          By.css('div button[class="btn btn-outline-secondary"]')
-        )
-      ).map((elem) => helper.click(elem))
-    );
+    for (const elem of await helper.driver.findElements(
+      By.css('div button[class="btn btn-outline-secondary"]')
+    )) {
+      await helper.click(elem);
+    }
 
     await helper.driver.sleep(1000);
 
@@ -1370,13 +1362,11 @@ async function resettingProjectWorks2(helper: Helper) {
     await helper.waitUntilLoaded();
 
     // TODO click all reset buttons
-    await Promise.all(
-      (
-        await helper.driver.findElements(
-          By.css('div button[class="btn btn-outline-secondary"]')
-        )
-      ).map((elem) => helper.click(elem))
-    );
+    for (const elem of await helper.driver.findElements(
+      By.css('div button[class="btn btn-outline-secondary"]')
+    )) {
+      await helper.click(elem);
+    }
 
     await helper.driver.sleep(1000);
 
@@ -1401,6 +1391,8 @@ async function checkUserOrProjectNotFound(helper: Helper) {
 
   await helper.driver.get(`${BASE_URL}/projects/edit/34234`);
 
+  await helper.waitUntilLoaded();
+  await helper.waitUntilLoaded();
   await helper.waitUntilLoaded();
 
   const alert1 = await helper.driver.findElement(
@@ -1507,6 +1499,7 @@ async function testHelperCreatesProjectWithProjectLeadersAndMembers(
     await helper.driver.findElement(By.css(`a[href="/projects/create"]`))
   );
   let form = await helper.form("pw-project-create");
+  await helper.waitUntilLoaded();
   const title = `title${chance.integer()}`;
   const info = `info${chance.integer()}`;
   const place = `place${chance.integer()}`;
@@ -1546,10 +1539,11 @@ async function testHelperCreatesProjectWithProjectLeadersAndMembers(
           `//th/p/a[@href="/users/view/${2}"]/../../../td/pw-project-user-checkbox/form/input`
         )
       ),
-      1000
+      10000
     )
   );
 
+  await helper.waitUntilLoaded();
   await helper.waitUntilLoaded();
   await helper.waitUntilLoaded();
 
@@ -1561,17 +1555,19 @@ async function testHelperCreatesProjectWithProjectLeadersAndMembers(
 
   // this is a new project so nobody has voted it yet so obviously there can't be any collisions
 
-  // but we can try to add another teacher
-  await helper.click(
-    await helper.driver.wait(
-      until.elementLocated(
-        By.xpath(
-          `//th/p/a[@href="/users/view/${4}"]/../../../td/pw-project-user-checkbox/form/input`
-        )
-      ),
-      1000
-    )
+  const checkbox = await helper.driver.wait(
+    until.elementLocated(
+      By.xpath(
+        `//th/p/a[@href="/users/view/${4}"]/../../../td/pw-project-user-checkbox/form/input`
+      )
+    ),
+    10000
   );
+  await helper.waitUntilLoaded();
+  await helper.waitUntilLoaded();
+
+  // but we can try to add another teacher
+  await helper.click(checkbox);
 
   await helper.driver.sleep(1000);
 
@@ -1667,7 +1663,7 @@ async function checkSettingEmptyPasswordFails(helper: Helper) {
 
 console.log(argv);
 
-if (argv.length !== 3) {
+if (argv.length !== 4) {
   throw new Error("provide browser name as second argument");
 }
 
@@ -1679,7 +1675,70 @@ if (
   throw new Error("possible browser names: chrome, firefox, browserstack-ipad");
 }
 
-await runTest(argv[2], async (helper) => {
+const capabilitiesArray = [
+  {
+    browser: "chrome",
+    browserName: "chrome",
+    browser_version: "101.0",
+    os: "OS X",
+    os_version: "Monterey",
+    build: "browserstack-build-1",
+    name: "OS X Chrome 101",
+  },
+  {
+    browser: "firefox",
+    browserName: "firefox",
+    browser_version: "100.0",
+    os: "OS X",
+    os_version: "Monterey",
+    build: "browserstack-build-1",
+    name: "OS X Firefox 100",
+  },
+  {
+    device: "iPad 8th",
+    os_version: "14",
+    browserName: "ios",
+    realMobile: "true",
+    build: "browserstack-build-1",
+    name: "iPad iOS 14",
+  },
+  {
+    device: "iPhone 7",
+    os_version: "10",
+    browserName: "ios",
+    realMobile: "true",
+    build: "browserstack-build-1",
+    name: "iPhone iOS 10",
+  },
+  {
+    device: "iPhone XS",
+    os_version: "15",
+    browserName: "ios",
+    realMobile: "true",
+    build: "browserstack-build-1",
+    name: "iPhone iOS 15",
+  },
+  {
+    browser: "safari",
+    browserName: "safari",
+    browser_version: "13.1",
+    os: "OS X",
+    os_version: "Catalina",
+    build: "browserstack-build-1",
+    name: "Safari 13.1",
+  },
+  {
+    browser: "safari",
+    browserName: "safari",
+    browser_version: "15.3",
+    os: "OS X",
+    os_version: "Monterey",
+    build: "browserstack-build-1",
+    name: "Safari 15.3",
+  },
+];
+
+await runTest(argv[2], capabilitiesArray[Number(argv[3])], async (helper) => {
   await checkUserOrProjectNotFound(helper);
   await helper.driver.manage().deleteAllCookies();
 

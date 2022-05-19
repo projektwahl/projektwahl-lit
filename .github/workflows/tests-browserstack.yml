@@ -1,0 +1,52 @@
+# SPDX-License-Identifier: AGPL-3.0-or-later
+# SPDX-FileCopyrightText: 2021 Moritz Hedtke <Moritz.Hedtke@t-online.de>
+# This workflow will do a clean install of node dependencies, cache/restore them, build the source code and run tests across different versions of node
+# For more information see: https://help.github.com/actions/language-and-framework-guides/using-nodejs-with-github-actions
+
+name: Browserstack Test
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  ubuntu-job:
+    runs-on: ubuntu-latest
+    name: "BrowserStack Test on Ubuntu"
+
+    strategy:
+      fail-fast: false
+      matrix:
+        node-version: [16.x] # 17.x
+        browser-engine: [0, 1, 2, 3, 4, 5, 6]
+
+    steps:
+      - name: "BrowserStack Env Setup" # Invokes the setup-env action
+        uses: browserstack/github-actions/setup-env@master
+        with:
+          username: ${{ secrets.BROWSERSTACK_USERNAME }}
+          access-key: ${{ secrets.BROWSERSTACK_ACCESS_KEY }}
+
+      - name: "BrowserStack Local Tunnel Setup" # Invokes the setup-local action
+        uses: browserstack/github-actions/setup-local@master
+        with:
+          local-testing: start
+          local-identifier: random
+      # The next 3 steps are for building the web application to be tested and starting the web server on the runner environment
+      - uses: actions/checkout@v2
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v2
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: "npm"
+      - run: npm ci --ignore-scripts --omit=optional
+      - run: sudo docker build -f Dockerfile -t projektwahl .
+      - run: sudo docker compose up --build --detach --wait
+      - name: "Running test on BrowserStack" # Invokes the actual test script that would run on BrowserStack browsers
+        run: SELENIUM_URL=http://${{ secrets.BROWSERSTACK_USERNAME }}:${{ secrets.BROWSERSTACK_ACCESS_KEY }}@hub-cloud.browserstack.com/wd/hub NODE_ENV=testing DATABASE_URL=postgres://projektwahl_staging:projektwahl@localhost/projektwahl_staging BASE_URL=https://localhost:8443 npm run test-internal:browserstack-ipad ${{ matrix.browser-engine }} # See sample test script above
+      - name: "BrowserStackLocal Stop" # Terminating the BrowserStackLocal tunnel connection
+        uses: browserstack/github-actions/setup-local@master
+        with:
+          local-testing: stop
