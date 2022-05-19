@@ -10,8 +10,8 @@ services:
       - front-tier
       - back-tier
     # https://docs.docker.com/compose/startup-order/
-#    configs:
-#      - httpd-config
+  #    configs:
+  #      - httpd-config
 
   reverse-proxy:
     image: projektwahl-reverse-proxy
@@ -19,14 +19,14 @@ services:
       context: .
       dockerfile: Dockerfile-reverse-proxy
     ports:
-    - "8443:443"
+      - "8443:443"
     networks:
       - front-tier
     volumes:
       - ./docs/sites-enabled-projektwahl.conf:/etc/nginx/conf.d/default.conf
-#    secrets:
-#      - server-certificate
-#      - server-key
+    #    secrets:
+    #      - server-certificate
+    #      - server-key
     healthcheck:
       # TODO FIXME test an API endpoint so that this is tested fully
       test: ["CMD", "curl", "-f", "--insecure", "https://localhost:443"]
