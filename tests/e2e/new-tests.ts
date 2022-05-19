@@ -77,7 +77,13 @@ class FormTester {
     // really? https://github.com/w3c/webdriver/issues/1630
     // https://github.com/w3c/webdriver/issues/445
     // potentially on Mac you need to press Command+A?
-    await element.sendKeys(Key.chord(Key.CONTROL, "a"), value);
+    await element.sendKeys(
+      Key.chord(
+        argv[2] === "browserstack-ipad" ? Key.COMMAND : Key.CONTROL,
+        "a"
+      ),
+      value
+    );
   }
 
   async setField(name: string, value: string) {
@@ -95,7 +101,13 @@ class FormTester {
     );
     await element.click();
     // copy pasta from above
-    await element.sendKeys(Key.chord(Key.CONTROL, "a"), value);
+    await element.sendKeys(
+      Key.chord(
+        argv[2] === "browserstack-ipad" ? Key.COMMAND : Key.CONTROL,
+        "a"
+      ),
+      value
+    );
   }
 
   async setTextareaField(name: string, value: string) {
