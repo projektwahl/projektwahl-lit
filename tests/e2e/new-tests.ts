@@ -283,6 +283,7 @@ async function runTest(
   testFunction: (helper: Helper) => Promise<void>
 ) {
   chance = new Chance(1234);
+  /*
   console.log(
     (
       await exec(
@@ -316,7 +317,7 @@ async function runTest(
         }
       )
     ).stderr
-  );
+  );*/
 
   // https://github.com/mozilla/geckodriver/issues/882
   const builder = new Builder().disableEnvironmentOverrides();
