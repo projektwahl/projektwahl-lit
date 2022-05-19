@@ -77,10 +77,7 @@ class FormTester {
     // really? https://github.com/w3c/webdriver/issues/1630
     // https://github.com/w3c/webdriver/issues/445
     // potentially on Mac you need to press Command+A?
-    while ((await element.getAttribute("value")) !== "") {
-      await element.sendKeys(Key.BACK_SPACE);
-    }
-    await element.sendKeys(value);
+    await element.sendKeys(Key.chord(Key.CONTROL, "a"), value);
   }
 
   async setField(name: string, value: string) {
@@ -98,10 +95,7 @@ class FormTester {
     );
     await element.click();
     // copy pasta from above
-    while ((await element.getAttribute("value")) !== "") {
-      await element.sendKeys(Key.BACK_SPACE);
-    }
-    await element.sendKeys(value);
+    await element.sendKeys(Key.chord(Key.CONTROL, "a"), value);
   }
 
   async setTextareaField(name: string, value: string) {
@@ -214,12 +208,14 @@ class Helper {
   }
 
   async ensureNothingLoading() {
+    /*
     try {
       await this.driver.findElement(By.css(".spinner-grow"));
     } catch (error) {
       return;
     }
     throw new Error("something is still loading. This may be a bug");
+    */
   }
 
   async click(element: WebElement) {
