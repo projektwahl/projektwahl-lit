@@ -15,5 +15,5 @@ RUN openssl req -x509 -newkey rsa:2048 -nodes -sha256 -subj '/CN=localhost' -key
 RUN npm ci --ignore-scripts
 RUN ./node_modules/@dev.mohe/argon2/build.sh /usr/local/include/node/
 COPY . .
-RUN npm run build
+RUN LANGUAGE=en npm run build
 CMD ./start.sh
