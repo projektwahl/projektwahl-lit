@@ -19,5 +19,4 @@ ENV PORT=8443
 ENV BASE_URL=https://localhost:8443
 ENV DATABASE_URL=postgres://projektwahl@projektwahl/projektwahl
 ENV CREDENTIALS_DIRECTORY=.
-CMD ["/bin/bash"]
-#CMD ["--enable-source-maps", "dist/server.js"]
+CMD ["--enable-source-maps", "dist/server.js"]

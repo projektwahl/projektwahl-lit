@@ -1,16 +1,20 @@
 # https://docs.docker.com/compose/compose-file/
+# sudo docker compose up
 services:
   frontend:
-    image: awesome/webapp
+    image: projektwahl
+    build:
+      context: .
+      dockerfile: Dockerfile
     ports:
-      - "443:8043"
+      - "8443:8443"
     networks:
       - front-tier
       - back-tier
-    configs:
-      - httpd-config
-    secrets:
-      - server-certificate
+#    configs:
+#      - httpd-config
+#    secrets:
+#      - server-certificate
 
   backend:
     image: postgres
@@ -26,17 +30,14 @@ services:
 
 volumes:
   db-data:
-    driver: flocker
-    driver_opts:
-      size: "10GiB"
 
-configs:
-  httpd-config:
-    external: true
+#configs:
+#  httpd-config:
+#    external: true
 
-secrets:
-  server-certificate:
-    external: true
+#secrets:
+#  server-certificate:
+#    external: true
 
 networks:
   # The presence of these objects is sufficient to define them
