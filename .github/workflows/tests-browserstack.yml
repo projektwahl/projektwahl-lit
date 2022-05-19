@@ -36,6 +36,7 @@ jobs:
           local-identifier: random
       # The next 3 steps are for building the web application to be tested and starting the web server on the runner environment
       - uses: actions/checkout@v2
+      - run: sudo docker build -f Dockerfile -t projektwahl .
       - run: sudo docker compose up --build --detach
       - name: "Running test on BrowserStack" # Invokes the actual test script that would run on BrowserStack browsers
         run: SELENIUM_URL=http://${{ secrets.BROWSERSTACK_USERNAME }}:${{ secrets.BROWSERSTACK_ACCESS_KEY }}@hub-cloud.browserstack.com/wd/hub NODE_ENV=testing DATABASE_URL=postgres://projektwahl_staging:projektwahl@localhost/projektwahl_staging BASE_URL=https://localhost:8443 npm run test-internal:browserstack-ipad ${{ matrix.browser-engine }} # See sample test script above
