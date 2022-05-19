@@ -150,7 +150,7 @@ export function createOrUpdateProjectsHandler<
 >(
   path: P,
   dbquery: (
-    sql: postgres.TransactionSql<Record<string, never>>,
+    sql: postgres.TransactionSql<Record<string, unknown>>,
     project: z.infer<typeof routes[P]["request"]>,
     loggedInUser: Exclude<z.infer<typeof userSchema>, undefined>
   ) => Promise<z.infer<typeof routes[P]["response"]>[]>

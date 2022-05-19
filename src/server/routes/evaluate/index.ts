@@ -246,7 +246,7 @@ export const rank2points = (rank: number) => {
   }
 };
 
-export async function evaluate(tsql: TransactionSql<Record<string, never>>) {
+export async function evaluate(tsql: TransactionSql<Record<string, unknown>>) {
   const lp = new CPLEXLP();
   await lp.setup();
 

@@ -21,10 +21,10 @@ SPDX-License-Identifier: AGPL-3.0-or-later
 SPDX-FileCopyrightText: 2021 Moritz Hedtke <Moritz.Hedtke@t-online.de>
 */
 import assert from "assert/strict";
-import { exec as unpromisifiedExec } from "child_process";
+// import { exec as unpromisifiedExec } from "child_process";
 import { writeFile } from "fs/promises";
 import nodeCrypto from "node:crypto";
-import { promisify } from "node:util";
+// import { promisify } from "node:util";
 // @ts-expect-error wrong typings
 const { webcrypto: crypto }: { webcrypto: Crypto } = nodeCrypto;
 import "./fast-selenium.js";
@@ -48,7 +48,7 @@ import { argv } from "process";
 
 let chance: Chance.Chance;
 
-const exec = promisify(unpromisifiedExec);
+// const exec = promisify(unpromisifiedExec);
 
 if (!process.env["BASE_URL"]) {
   console.error("BASE_URL not set!");
