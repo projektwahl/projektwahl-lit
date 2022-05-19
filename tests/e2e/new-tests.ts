@@ -178,16 +178,16 @@ class FormTester {
   }
 
   private async getErrors() {
-    return Promise.all(
-      (await this.form.findElements(By.css(`.invalid-feedback`))).map(
-        async (e) => [
-          await e
-            .findElement(By.xpath("preceding-sibling::input"))
-            .getAttribute("name"),
-          await e.getAttribute("innerText"),
-        ]
-      )
-    );
+    const result = [];
+    for (const e of await this.form.findElements(By.css(`.invalid-feedback`))) {
+      result.push([
+        await e
+          .findElement(By.xpath("preceding-sibling::input"))
+          .getAttribute("name"),
+        await e.getAttribute("innerText"),
+      ]);
+    }
+    return result;
   }
 }
 
@@ -234,15 +234,13 @@ class Helper {
           By.css(".spinner-grow")
         );
 
-        await Promise.all(
-          loadingIndicators.map((e) =>
-            this.driver.wait(
-              until.stalenessOf(e),
-              20000,
-              "waitUntilLoaded spinners didn't go stale"
-            )
-          )
-        );
+        for (const e of loadingIndicators) {
+          await this.driver.wait(
+            until.stalenessOf(e),
+            20000,
+            "waitUntilLoaded spinners didn't go stale"
+          );
+        }
         break;
       } catch (error) {
         if (
@@ -885,9 +883,10 @@ async function checkProjectSortingWorks(helper: Helper) {
       const thisRows = await helper.driver.findElements(
         By.css('tbody tr th[scope="row"]')
       );
-      const thisRowsText = await Promise.all(
-        thisRows.map((r) => r.getAttribute("innerText").then((v) => Number(v)))
-      );
+      const thisRowsText = [];
+      for (const r of thisRows) {
+        thisRowsText.push(Number(await r.getAttribute("innerText")));
+      }
 
       console.log(thisRowsText);
 
@@ -945,7 +944,7 @@ async function checkUsersSortingWorks(helper: Helper) {
 
     const thisRowsText = [];
     for (const r of thisRows) {
-      thisRowsText.push(Number(await r.getAttribute("innerText")))
+      thisRowsText.push(Number(await r.getAttribute("innerText")));
     }
 
     console.log(thisRowsText);
@@ -1000,11 +999,10 @@ async function checkUsersPaginationLimitWorks(helper: Helper) {
         const thisRows = await helper.driver.findElements(
           By.css('tbody tr th[scope="row"]')
         );
-        const thisRowsText = await Promise.all(
-          thisRows.map((r) =>
-            r.getAttribute("innerText").then((v) => Number(v))
-          )
-        );
+        const thisRowsText = [];
+        for (const r of thisRows) {
+          thisRowsText.push(Number(await r.getAttribute("innerText")));
+        }
 
         assert.ok(thisRowsText.length <= 50);
 
@@ -1061,9 +1059,10 @@ async function checkUsersFilteringWorks(helper: Helper) {
   const thisRows = await helper.driver.findElements(
     By.css('tbody tr th[scope="row"]')
   );
-  const thisRowsText = await Promise.all(
-    thisRows.map((r) => r.getAttribute("innerText").then((v) => Number(v)))
-  );
+  const thisRowsText = [];
+  for (const r of thisRows) {
+    thisRowsText.push(Number(await r.getAttribute("innerText")));
+  }
 
   console.log(thisRowsText);
 
@@ -1129,13 +1128,11 @@ async function resettingUserWorks(helper: Helper) {
   await form.checkField("0,deleted", false);
 
   // TODO click all reset buttons
-  await Promise.all(
-    (
-      await helper.driver.findElements(
-        By.css('div button[class="btn btn-outline-secondary"]')
-      )
-    ).map((elem) => helper.click(elem))
-  );
+  for (const elem of await helper.driver.findElements(
+    By.css('div button[class="btn btn-outline-secondary"]')
+  )) {
+    await helper.click(elem);
+  }
 
   // check what resetting worked
   form = await helper.form("pw-user-create");
@@ -1201,13 +1198,11 @@ async function resettingProjectWorks(helper: Helper) {
   await form.checkField("deleted", false);
 
   // TODO click all reset buttons
-  await Promise.all(
-    (
-      await helper.driver.findElements(
-        By.css('button[class="btn btn-outline-secondary"]')
-      )
-    ).map((elem) => helper.click(elem))
-  );
+  for (const elem of await helper.driver.findElements(
+    By.css('div button[class="btn btn-outline-secondary"]')
+  )) {
+    await helper.click(elem);
+  }
 
   // check what resetting worked
   form = await helper.form("pw-project-create");
@@ -1282,13 +1277,11 @@ async function resettingUserWorks2(helper: Helper) {
     await helper.waitUntilLoaded();
 
     // TODO click all reset buttons
-    await Promise.all(
-      (
-        await helper.driver.findElements(
-          By.css('div button[class="btn btn-outline-secondary"]')
-        )
-      ).map((elem) => helper.click(elem))
-    );
+    for (const elem of await helper.driver.findElements(
+      By.css('div button[class="btn btn-outline-secondary"]')
+    )) {
+      await helper.click(elem);
+    }
 
     await helper.driver.sleep(1000);
 
@@ -1368,13 +1361,11 @@ async function resettingProjectWorks2(helper: Helper) {
     await helper.waitUntilLoaded();
 
     // TODO click all reset buttons
-    await Promise.all(
-      (
-        await helper.driver.findElements(
-          By.css('div button[class="btn btn-outline-secondary"]')
-        )
-      ).map((elem) => helper.click(elem))
-    );
+    for (const elem of await helper.driver.findElements(
+      By.css('div button[class="btn btn-outline-secondary"]')
+    )) {
+      await helper.click(elem);
+    }
 
     await helper.driver.sleep(1000);
 
