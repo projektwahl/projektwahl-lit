@@ -942,9 +942,11 @@ async function checkUsersSortingWorks(helper: Helper) {
     const thisRows = await helper.driver.findElements(
       By.css('tbody tr th[scope="row"]')
     );
-    const thisRowsText = await Promise.all(
-      thisRows.map((r) => r.getAttribute("innerText").then((v) => Number(v)))
-    );
+
+    const thisRowsText = [];
+    for (const r of thisRows) {
+      thisRowsText.push(Number(await r.getAttribute("innerText")))
+    }
 
     console.log(thisRowsText);
 
