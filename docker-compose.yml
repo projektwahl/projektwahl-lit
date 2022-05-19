@@ -24,9 +24,9 @@ services:
       - front-tier
     volumes:
       - ./docs/sites-enabled-projektwahl.conf:/etc/nginx/conf.d/default.conf
-    secrets:
-      - server-certificate
-      - server-key
+#    secrets:
+#      - server-certificate
+#      - server-key
     depends_on:
       - frontend
 
@@ -49,11 +49,11 @@ volumes:
 #  httpd-config:
 #    external: true
 
-secrets:
-  server-certificate:
-    file: /opt/projektwahl-lit/cert.pem
-  server-key:
-    file: /opt/projektwahl-lit/key.pem
+#secrets:
+#  server-certificate:
+#    file: /opt/projektwahl-lit/cert.pem
+#  server-key:
+#    file: /opt/projektwahl-lit/key.pem
 
 networks:
   # The presence of these objects is sufficient to define them
