@@ -15,8 +15,4 @@ RUN npm ci --ignore-scripts
 RUN ./node_modules/@dev.mohe/argon2/build.sh /usr/local/include/node/
 COPY . .
 RUN npm run build
-ENV PORT=8443
-ENV BASE_URL=https://localhost:8443
-ENV DATABASE_URL=postgres://projektwahl:projektwahl@backend/projektwahl
-ENV CREDENTIALS_DIRECTORY=.
-CMD ["--enable-source-maps", "dist/server.js"]
+CMD ./start.sh
