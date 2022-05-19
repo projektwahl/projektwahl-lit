@@ -64,6 +64,7 @@ jobs:
           CREATE ROLE projektwahl_staging_admin IN ROLE projektwahl_staging LOGIN PASSWORD 'projektwahl';"
       - run: |
           psql postgres://projektwahl:projektwahl@localhost/projektwahl --command="CREATE DATABASE projektwahl_staging OWNER projektwahl_staging_admin"
+      - run: npm run build
       - run: NODE_ENV=testing PORT=8443 BASE_URL=https://localhost:8443 DATABASE_URL=postgres://projektwahl_staging:projektwahl@localhost/projektwahl_staging CREDENTIALS_DIRECTORY=$PWD npm run server &
       - name: "Running test on BrowserStack" # Invokes the actual test script that would run on BrowserStack browsers
         run: SELENIUM_URL=http://${{ secrets.BROWSERSTACK_USERNAME }}:${{ secrets.BROWSERSTACK_ACCESS_KEY }}@hub-cloud.browserstack.com/wd/hub NODE_ENV=testing DATABASE_URL=postgres://projektwahl_staging:projektwahl@localhost/projektwahl_staging BASE_URL=https://localhost:8443 npm run test-internal:browserstack-ipad ${{ matrix.browser-engine }} # See sample test script above
