@@ -8,6 +8,7 @@
 FROM node
 WORKDIR /opt/projektwahl-lit
 RUN chown node:node /opt/projektwahl-lit
+RUN apt update && apt install -y postgresql-client
 USER node:node
 COPY package.json package-lock.json /opt/projektwahl-lit/
 RUN openssl req -x509 -newkey rsa:2048 -nodes -sha256 -subj '/CN=localhost' -keyout key.pem -out cert.pem

@@ -9,6 +9,7 @@ services:
     networks:
       - front-tier
       - back-tier
+    # https://docs.docker.com/compose/startup-order/
 #    configs:
 #      - httpd-config
 
@@ -26,6 +27,8 @@ services:
     secrets:
       - server-certificate
       - server-key
+    depends_on:
+      - frontend
 
   postgres:
     image: postgres
