@@ -36,6 +36,12 @@ jobs:
           local-identifier: random
       # The next 3 steps are for building the web application to be tested and starting the web server on the runner environment
       - uses: actions/checkout@v2
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v2
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: "npm"
+      - run: npm ci --ignore-scripts --omit=optional
       - run: sudo docker build -f Dockerfile -t projektwahl .
       - run: sudo docker compose up --build --detach
       - name: "Running test on BrowserStack" # Invokes the actual test script that would run on BrowserStack browsers
