@@ -43,7 +43,7 @@ jobs:
           cache: "npm"
       - run: npm ci --ignore-scripts --omit=optional
       - run: sudo docker build -f Dockerfile -t projektwahl .
-      - run: sudo docker compose up --build --detach
+      - run: sudo docker compose up --build --detach --wait
       - name: "Running test on BrowserStack" # Invokes the actual test script that would run on BrowserStack browsers
         run: SELENIUM_URL=http://${{ secrets.BROWSERSTACK_USERNAME }}:${{ secrets.BROWSERSTACK_ACCESS_KEY }}@hub-cloud.browserstack.com/wd/hub NODE_ENV=testing DATABASE_URL=postgres://projektwahl_staging:projektwahl@localhost/projektwahl_staging BASE_URL=https://localhost:8443 npm run test-internal:browserstack-ipad ${{ matrix.browser-engine }} # See sample test script above
       - name: "BrowserStackLocal Stop" # Terminating the BrowserStackLocal tunnel connection
