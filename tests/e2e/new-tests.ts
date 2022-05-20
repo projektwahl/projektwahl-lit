@@ -1701,22 +1701,6 @@ const capabilitiesArray = [
     name: "OS X Firefox 100",
   },
   {
-    device: "iPad 8th",
-    os_version: "14",
-    browserName: "ios",
-    realMobile: "true",
-    build: "browserstack-build-1",
-    name: "iPad iOS 14",
-  },
-  {
-    device: "iPhone XS",
-    os_version: "15",
-    browserName: "ios",
-    realMobile: "true",
-    build: "browserstack-build-1",
-    name: "iPhone iOS 15",
-  },
-  {
     browser: "safari",
     browserName: "safari",
     browser_version: "13.1",
