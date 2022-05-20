@@ -98,7 +98,7 @@ class FormTester {
     const element = await this.form.findElement(
       By.css(`textarea[name="${name}"]`)
     );
-    //await element.click();
+    await element.click();
     // copy pasta from above
     await element.sendKeys(
       "a",
