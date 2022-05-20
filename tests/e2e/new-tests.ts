@@ -1705,14 +1705,6 @@ const capabilitiesArray = [
     name: "iPad iOS 14",
   },
   {
-    device: "iPhone 7",
-    os_version: "10",
-    browserName: "ios",
-    realMobile: "true",
-    build: "browserstack-build-1",
-    name: "iPhone iOS 10",
-  },
-  {
     device: "iPhone XS",
     os_version: "15",
     browserName: "ios",
