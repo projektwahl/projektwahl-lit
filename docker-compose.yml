@@ -41,7 +41,7 @@ services:
     environment:
       POSTGRES_PASSWORD: projektwahl
     volumes:
-      - db-data:/var/lib/postgresql
+      #      - db-data:/var/lib/postgresql
       - ./src/server/setup.sql:/opt/projektwahl-lit/src/server/setup.sql
       - ./setup-postgresql.sh:/docker-entrypoint-initdb.d/setup-postgresql.sh
     networks:
