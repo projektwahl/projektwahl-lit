@@ -78,7 +78,7 @@ class FormTester {
     // https://github.com/w3c/webdriver/issues/445
     // potentially on Mac you need to press Command+A?
     await element.sendKeys(
-      ...[...(await element.getAttribute("value"))].map((v) => Key.BACK_SPACE),
+      ...[...(await element.getAttribute("value"))].map(() => Key.BACK_SPACE),
       value
     );
   }
@@ -99,7 +99,7 @@ class FormTester {
     await element.click();
     // copy pasta from above
     await element.sendKeys(
-      ...[...(await element.getAttribute("value"))].map((v) => Key.BACK_SPACE),
+      ...[...(await element.getAttribute("value"))].map(() => Key.BACK_SPACE),
       value
     );
   }
