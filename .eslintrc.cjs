@@ -58,5 +58,7 @@ module.exports = {
     "rollup.config.js",
     "lit/",
     "coverage/",
+    "tests/e2e/fast-selenium.js",
+    "src/client/polyfill.js",
   ],
 };

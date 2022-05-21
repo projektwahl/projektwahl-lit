@@ -21,12 +21,13 @@ SPDX-License-Identifier: AGPL-3.0-or-later
 SPDX-FileCopyrightText: 2021 Moritz Hedtke <Moritz.Hedtke@t-online.de>
 */
 import assert from "assert/strict";
-import { exec as unpromisifiedExec } from "child_process";
+// import { exec as unpromisifiedExec } from "child_process";
 import { writeFile } from "fs/promises";
 import nodeCrypto from "node:crypto";
-import { promisify } from "node:util";
+// import { promisify } from "node:util";
 // @ts-expect-error wrong typings
 const { webcrypto: crypto }: { webcrypto: Crypto } = nodeCrypto;
+import "./fast-selenium.js";
 
 import {
   Builder,
@@ -47,7 +48,7 @@ import { argv } from "process";
 
 let chance: Chance.Chance;
 
-const exec = promisify(unpromisifiedExec);
+// const exec = promisify(unpromisifiedExec);
 
 if (!process.env["BASE_URL"]) {
   console.error("BASE_URL not set!");
@@ -74,8 +75,14 @@ class FormTester {
       By.css(`input[name="${name}"]`)
     );
     // really? https://github.com/w3c/webdriver/issues/1630
-    await element.sendKeys(Key.chord(Key.CONTROL, "a"), Key.BACK_SPACE);
-    await element.sendKeys(value);
+    // https://github.com/w3c/webdriver/issues/445
+    // potentially on Mac you need to press Command+A?
+    await element.sendKeys(
+      "a",
+      Key.BACK_SPACE,
+      ...[...(await element.getAttribute("value"))].map(() => Key.BACK_SPACE),
+      value
+    );
   }
 
   async setField(name: string, value: string) {
@@ -92,8 +99,13 @@ class FormTester {
       By.css(`textarea[name="${name}"]`)
     );
     await element.click();
-    await element.sendKeys(Key.chord(Key.CONTROL, "a"), Key.BACK_SPACE);
-    await element.sendKeys(value);
+    // copy pasta from above
+    await element.sendKeys(
+      "a",
+      Key.BACK_SPACE,
+      ...[...(await element.getAttribute("value"))].map(() => Key.BACK_SPACE),
+      value
+    );
   }
 
   async setTextareaField(name: string, value: string) {
@@ -161,22 +173,25 @@ class FormTester {
       By.css('div[class="alert alert-danger"]')
     );
 
-    assert.match(await alert.getText(), /Some errors occurred./);
+    assert.match(
+      await alert.getAttribute("innerText"),
+      /Some errors occurred./
+    );
     await this.helper.waitUntilLoaded();
     return this.getErrors();
   }
 
   private async getErrors() {
-    return Promise.all(
-      (await this.form.findElements(By.css(`.invalid-feedback`))).map(
-        async (e) => [
-          await e
-            .findElement(By.xpath("preceding-sibling::input"))
-            .getAttribute("name"),
-          await e.getText(),
-        ]
-      )
-    );
+    const result = [];
+    for (const e of await this.form.findElements(By.css(`.invalid-feedback`))) {
+      result.push([
+        await e
+          .findElement(By.xpath("preceding-sibling::input"))
+          .getAttribute("name"),
+        await e.getAttribute("innerText"),
+      ]);
+    }
+    return result;
   }
 }
 
@@ -203,12 +218,14 @@ class Helper {
   }
 
   async ensureNothingLoading() {
+    /*
     try {
       await this.driver.findElement(By.css(".spinner-grow"));
     } catch (error) {
       return;
     }
     throw new Error("something is still loading. This may be a bug");
+    */
   }
 
   async click(element: WebElement) {
@@ -217,25 +234,35 @@ class Helper {
   }
 
   async waitUntilLoaded() {
-    try {
-      const loadingIndicators = await this.driver.findElements(
-        By.css(".spinner-grow")
-      );
+    for (;;) {
+      try {
+        const loadingIndicators = await this.driver.findElements(
+          By.css(".spinner-grow")
+        );
 
-      await Promise.all(
-        loadingIndicators.map((e) =>
-          this.driver.wait(until.stalenessOf(e), 10000, "waitUntilLoaded")
-        )
-      );
-    } catch (error) {
-      throw new Error("spinner-grow failed");
+        for (const e of loadingIndicators) {
+          await this.driver.wait(
+            until.stalenessOf(e),
+            20000,
+            "waitUntilLoaded spinners didn't go stale"
+          );
+        }
+        break;
+      } catch (error) {
+        if (
+          error instanceof Error &&
+          error.name !== "StaleElementReferenceError"
+        ) {
+          throw error;
+        }
+      }
     }
   }
 
   async waitElem(name: string) {
     return await this.driver.wait(
       until.elementLocated(By.css(name)),
-      2000,
+      20000,
       `Element ${name} not found`
     );
   }
@@ -257,10 +284,12 @@ class Helper {
 }
 
 async function runTest(
-  browser: "firefox" | "chrome",
+  browser: "firefox" | "chrome" | "browserstack-ipad",
+  capabilities: Record<string | symbol, unknown>,
   testFunction: (helper: Helper) => Promise<void>
 ) {
   chance = new Chance(1234);
+  /*
   console.log(
     (
       await exec(
@@ -294,7 +323,7 @@ async function runTest(
         }
       )
     ).stderr
-  );
+  );*/
 
   // https://github.com/mozilla/geckodriver/issues/882
   const builder = new Builder().disableEnvironmentOverrides();
@@ -327,6 +356,22 @@ async function runTest(
     //.usingServer("http://localhost:9515");
   }
 
+  if (browser === "browserstack-ipad") {
+    const combinedCapabilities = {
+      ...capabilities,
+      "browserstack.local": "true",
+      "browserstack.localIdentifier": process.env.BROWSERSTACK_LOCAL_IDENTIFIER,
+      acceptSslCerts: "true",
+      "browserstack.networkLogs": "true",
+      "browserstack.console": "verbose",
+      build: "Browserstack Projektwahl",
+      name: "Projektwahl",
+    } as const;
+    builder
+      .usingServer(process.env.SELENIUM_URL ?? "")
+      .withCapabilities(combinedCapabilities);
+  }
+
   if (process.env.CI) {
     builder.setChromeOptions(
       new chrome.Options().addArguments(
@@ -340,10 +385,12 @@ async function runTest(
 
   const driver = builder.build();
 
-  await driver.manage().window().setRect({
-    width: 1000,
-    height: 1000,
-  });
+  if (browser !== "browserstack-ipad") {
+    await driver.manage().window().setRect({
+      width: 1000,
+      height: 1000,
+    });
+  }
 
   try {
     await testFunction(new Helper(driver));
@@ -355,8 +402,6 @@ async function runTest(
 
     // TODO test openid
 
-    await driver.quit();
-
     /*
         const theRepl = repl.start();
         theRepl.context.driver = driver;
@@ -367,7 +412,20 @@ async function runTest(
         theRepl.on("exit", () => {
         void driver.quit();
         });
-    */
+  */
+    if (browser === "browserstack-ipad") {
+      await driver.executeScript(
+        `browserstack_executor: ${JSON.stringify({
+          action: "setSessionStatus",
+          arguments: {
+            status: "passed",
+            reason: `Successfully ran all tests`,
+          },
+        })}`
+      );
+    }
+
+    await driver.quit();
   } catch (error) {
     /*try {
       // Needed for Chrome. Firefox throws here, will not implement.
@@ -384,6 +442,23 @@ async function runTest(
     console.error(error);
     const screenshot = await driver.takeScreenshot();
     await writeFile("screenshot.png", screenshot, "base64");
+
+    if (browser === "browserstack-ipad") {
+      try {
+        await driver.executeScript(
+          `browserstack_executor: ${JSON.stringify({
+            action: "setSessionStatus",
+            arguments: {
+              status: "failed",
+              reason: String(error),
+            },
+          })}`
+        );
+        await driver.quit();
+      } catch (error) {
+        console.error(error);
+      }
+    }
 
     throw error;
   }
@@ -451,7 +526,7 @@ async function loginCorrect(helper: Helper) {
 async function welcomeWorks(helper: Helper) {
   await helper.driver.get(`${BASE_URL}/`);
   assert.match(
-    await (await helper.waitElem("pw-welcome")).getText(),
+    await (await helper.waitElem("pw-welcome")).getAttribute("innerText"),
     /Projektwoche/
   );
 }
@@ -461,17 +536,27 @@ async function imprintWorks(helper: Helper) {
   await helper.click(
     await helper.driver.findElement(By.css(`a[href="/imprint"]`))
   );
+  await helper.driver.wait(
+    async () => (await helper.driver.getAllWindowHandles()).length === 2,
+    10000
+  );
+  const windowHandle = await helper.driver.getWindowHandle();
   await helper.driver
     .switchTo()
-    .window((await helper.driver.getAllWindowHandles())[1]);
+    .window(
+      (
+        await helper.driver.getAllWindowHandles()
+      ).find((h) => h !== windowHandle) ?? ""
+    );
   assert.match(
-    await (await helper.waitElem("pw-imprint")).getText(),
+    await (await helper.waitElem("pw-imprint")).getAttribute("innerText"),
     /Angaben gemäß § 5 TMG/
   );
   await helper.driver.close();
   await helper.driver
     .switchTo()
     .window((await helper.driver.getAllWindowHandles())[0]);
+  assert.equal((await helper.driver.getAllWindowHandles()).length, 1);
 }
 
 async function privacyWorks(helper: Helper) {
@@ -479,17 +564,27 @@ async function privacyWorks(helper: Helper) {
   await helper.click(
     await helper.driver.findElement(By.css(`a[href="/privacy"]`))
   );
+  await helper.driver.wait(
+    async () => (await helper.driver.getAllWindowHandles()).length === 2,
+    10000
+  );
+  const windowHandle = await helper.driver.getWindowHandle();
   await helper.driver
     .switchTo()
-    .window((await helper.driver.getAllWindowHandles())[1]);
+    .window(
+      (
+        await helper.driver.getAllWindowHandles()
+      ).find((h) => h !== windowHandle) ?? ""
+    );
   assert.match(
-    await (await helper.waitElem("pw-privacy")).getText(),
+    await (await helper.waitElem("pw-privacy")).getAttribute("innerText"),
     /Verantwortlicher/
   );
   await helper.driver.close();
   await helper.driver
     .switchTo()
     .window((await helper.driver.getAllWindowHandles())[0]);
+  assert.equal((await helper.driver.getAllWindowHandles()).length, 1);
 }
 
 async function logoutWorks(helper: Helper) {
@@ -751,7 +846,7 @@ async function checkNotLoggedInUsers(helper: Helper) {
     "Expected submit failure 2"
   );
 
-  assert.match(await alert.getText(), /Nicht angemeldet!/);
+  assert.match(await alert.getAttribute("innerText"), /Nicht angemeldet!/);
 }
 
 async function checkNotLoggedInProjects(helper: Helper) {
@@ -763,7 +858,7 @@ async function checkNotLoggedInProjects(helper: Helper) {
     "Expected submit failure 3"
   );
 
-  assert.match(await alert.getText(), /Nicht angemeldet!/);
+  assert.match(await alert.getAttribute("innerText"), /Nicht angemeldet!/);
 }
 
 const randomFromArray = function <T>(array: T[]): T {
@@ -795,9 +890,10 @@ async function checkProjectSortingWorks(helper: Helper) {
       const thisRows = await helper.driver.findElements(
         By.css('tbody tr th[scope="row"]')
       );
-      const thisRowsText = await Promise.all(
-        thisRows.map((r) => r.getText().then((v) => Number(v)))
-      );
+      const thisRowsText = [];
+      for (const r of thisRows) {
+        thisRowsText.push(Number(await r.getAttribute("innerText")));
+      }
 
       console.log(thisRowsText);
 
@@ -852,9 +948,11 @@ async function checkUsersSortingWorks(helper: Helper) {
     const thisRows = await helper.driver.findElements(
       By.css('tbody tr th[scope="row"]')
     );
-    const thisRowsText = await Promise.all(
-      thisRows.map((r) => r.getText().then((v) => Number(v)))
-    );
+
+    const thisRowsText = [];
+    for (const r of thisRows) {
+      thisRowsText.push(Number(await r.getAttribute("innerText")));
+    }
 
     console.log(thisRowsText);
 
@@ -908,9 +1006,10 @@ async function checkUsersPaginationLimitWorks(helper: Helper) {
         const thisRows = await helper.driver.findElements(
           By.css('tbody tr th[scope="row"]')
         );
-        const thisRowsText = await Promise.all(
-          thisRows.map((r) => r.getText().then((v) => Number(v)))
-        );
+        const thisRowsText = [];
+        for (const r of thisRows) {
+          thisRowsText.push(Number(await r.getAttribute("innerText")));
+        }
 
         assert.ok(thisRowsText.length <= 50);
 
@@ -967,9 +1066,10 @@ async function checkUsersFilteringWorks(helper: Helper) {
   const thisRows = await helper.driver.findElements(
     By.css('tbody tr th[scope="row"]')
   );
-  const thisRowsText = await Promise.all(
-    thisRows.map((r) => r.getText().then((v) => Number(v)))
-  );
+  const thisRowsText = [];
+  for (const r of thisRows) {
+    thisRowsText.push(Number(await r.getAttribute("innerText")));
+  }
 
   console.log(thisRowsText);
 
@@ -1035,13 +1135,11 @@ async function resettingUserWorks(helper: Helper) {
   await form.checkField("0,deleted", false);
 
   // TODO click all reset buttons
-  await Promise.all(
-    (
-      await helper.driver.findElements(
-        By.css('div button[class="btn btn-outline-secondary"]')
-      )
-    ).map((elem) => helper.click(elem))
-  );
+  for (const elem of await helper.driver.findElements(
+    By.css('div button[class="btn btn-outline-secondary"]')
+  )) {
+    await helper.click(elem);
+  }
 
   // check what resetting worked
   form = await helper.form("pw-user-create");
@@ -1107,13 +1205,11 @@ async function resettingProjectWorks(helper: Helper) {
   await form.checkField("deleted", false);
 
   // TODO click all reset buttons
-  await Promise.all(
-    (
-      await helper.driver.findElements(
-        By.css('button[class="btn btn-outline-secondary"]')
-      )
-    ).map((elem) => helper.click(elem))
-  );
+  for (const elem of await helper.driver.findElements(
+    By.css('div button[class="btn btn-outline-secondary"]')
+  )) {
+    await helper.click(elem);
+  }
 
   // check what resetting worked
   form = await helper.form("pw-project-create");
@@ -1188,13 +1284,11 @@ async function resettingUserWorks2(helper: Helper) {
     await helper.waitUntilLoaded();
 
     // TODO click all reset buttons
-    await Promise.all(
-      (
-        await helper.driver.findElements(
-          By.css('div button[class="btn btn-outline-secondary"]')
-        )
-      ).map((elem) => helper.click(elem))
-    );
+    for (const elem of await helper.driver.findElements(
+      By.css('div button[class="btn btn-outline-secondary"]')
+    )) {
+      await helper.click(elem);
+    }
 
     await helper.driver.sleep(1000);
 
@@ -1274,13 +1368,11 @@ async function resettingProjectWorks2(helper: Helper) {
     await helper.waitUntilLoaded();
 
     // TODO click all reset buttons
-    await Promise.all(
-      (
-        await helper.driver.findElements(
-          By.css('div button[class="btn btn-outline-secondary"]')
-        )
-      ).map((elem) => helper.click(elem))
-    );
+    for (const elem of await helper.driver.findElements(
+      By.css('div button[class="btn btn-outline-secondary"]')
+    )) {
+      await helper.click(elem);
+    }
 
     await helper.driver.sleep(1000);
 
@@ -1306,12 +1398,17 @@ async function checkUserOrProjectNotFound(helper: Helper) {
   await helper.driver.get(`${BASE_URL}/projects/edit/34234`);
 
   await helper.waitUntilLoaded();
+  await helper.waitUntilLoaded();
+  await helper.waitUntilLoaded();
 
   const alert1 = await helper.driver.findElement(
     By.css('div[class="alert alert-danger"]')
   );
 
-  assert.match(await alert1.getText(), /Projekt nicht gefunden!/);
+  assert.match(
+    await alert1.getAttribute("innerText"),
+    /Projekt nicht gefunden!/
+  );
 
   await helper.driver.get(`${BASE_URL}/users/edit/34234`);
 
@@ -1321,7 +1418,10 @@ async function checkUserOrProjectNotFound(helper: Helper) {
     By.css('div[class="alert alert-danger"]')
   );
 
-  assert.match(await alert2.getText(), /Account nicht gefunden!/);
+  assert.match(
+    await alert2.getAttribute("innerText"),
+    /Account nicht gefunden!/
+  );
 }
 
 async function testVotingWorks(helper: Helper) {
@@ -1378,8 +1478,9 @@ async function testVotingWorks(helper: Helper) {
 
   assert.equal(alerts2.length, 1);
 
+  // https://stackoverflow.com/questions/47101858/python-selenium-safari-returns-different-text-for-span-than-chrome-and-firefox
   assert.equal(
-    await alerts2[0].getText(),
+    (await alerts2[0].getAttribute("innerText")).trim(),
     "Some errors occurred!\n" +
       "database: Der Nutzer passt nicht in die Altersbegrenzung des Projekts!"
   );
@@ -1404,6 +1505,7 @@ async function testHelperCreatesProjectWithProjectLeadersAndMembers(
     await helper.driver.findElement(By.css(`a[href="/projects/create"]`))
   );
   let form = await helper.form("pw-project-create");
+  await helper.waitUntilLoaded();
   const title = `title${chance.integer()}`;
   const info = `info${chance.integer()}`;
   const place = `place${chance.integer()}`;
@@ -1443,10 +1545,11 @@ async function testHelperCreatesProjectWithProjectLeadersAndMembers(
           `//th/p/a[@href="/users/view/${2}"]/../../../td/pw-project-user-checkbox/form/input`
         )
       ),
-      1000
+      10000
     )
   );
 
+  await helper.waitUntilLoaded();
   await helper.waitUntilLoaded();
   await helper.waitUntilLoaded();
 
@@ -1458,17 +1561,19 @@ async function testHelperCreatesProjectWithProjectLeadersAndMembers(
 
   // this is a new project so nobody has voted it yet so obviously there can't be any collisions
 
-  // but we can try to add another teacher
-  await helper.click(
-    await helper.driver.wait(
-      until.elementLocated(
-        By.xpath(
-          `//th/p/a[@href="/users/view/${4}"]/../../../td/pw-project-user-checkbox/form/input`
-        )
-      ),
-      1000
-    )
+  const checkbox = await helper.driver.wait(
+    until.elementLocated(
+      By.xpath(
+        `//th/p/a[@href="/users/view/${4}"]/../../../td/pw-project-user-checkbox/form/input`
+      )
+    ),
+    10000
   );
+  await helper.waitUntilLoaded();
+  await helper.waitUntilLoaded();
+
+  // but we can try to add another teacher
+  await helper.click(checkbox);
 
   await helper.driver.sleep(1000);
 
@@ -1564,15 +1669,58 @@ async function checkSettingEmptyPasswordFails(helper: Helper) {
 
 console.log(argv);
 
-if (argv.length !== 3) {
+if (argv.length !== 4) {
   throw new Error("provide browser name as second argument");
 }
 
-if (argv[2] !== "chrome" && argv[2] !== "firefox") {
-  throw new Error("possible browser names: chrome, firefox");
+if (
+  argv[2] !== "chrome" &&
+  argv[2] !== "firefox" &&
+  argv[2] !== "browserstack-ipad"
+) {
+  throw new Error("possible browser names: chrome, firefox, browserstack-ipad");
 }
 
-await runTest(argv[2], async (helper) => {
+const capabilitiesArray = [
+  {
+    browser: "chrome",
+    browserName: "chrome",
+    browser_version: "101.0",
+    os: "OS X",
+    os_version: "Monterey",
+    build: "browserstack-build-1",
+    name: "OS X Chrome 101",
+  },
+  {
+    browser: "firefox",
+    browserName: "firefox",
+    browser_version: "100.0",
+    os: "OS X",
+    os_version: "Monterey",
+    build: "browserstack-build-1",
+    name: "OS X Firefox 100",
+  },
+  {
+    browser: "safari",
+    browserName: "safari",
+    browser_version: "13.1",
+    os: "OS X",
+    os_version: "Catalina",
+    build: "browserstack-build-1",
+    name: "Safari 13.1",
+  },
+  {
+    browser: "safari",
+    browserName: "safari",
+    browser_version: "15.3",
+    os: "OS X",
+    os_version: "Monterey",
+    build: "browserstack-build-1",
+    name: "Safari 15.3",
+  },
+];
+
+await runTest(argv[2], capabilitiesArray[Number(argv[3])], async (helper) => {
   await checkUserOrProjectNotFound(helper);
   await helper.driver.manage().deleteAllCookies();
 

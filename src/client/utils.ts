@@ -60,10 +60,12 @@ export const myFetch = async <P extends keyof typeof routes>(
         jscookie.remove("username");
         jscookie.remove("type");
 
-        if ("BroadcastChannel" in window) {
-          const bc = new BroadcastChannel("updateloginstate");
-          bc.postMessage("logout");
-        }
+        localStorage.setItem("stateupdate", "logout");
+        window.dispatchEvent(
+          new StorageEvent("storage", {
+            newValue: "logout",
+          })
+        );
       }
       try {
         // eslint-disable-next-line @typescript-eslint/no-unsafe-return

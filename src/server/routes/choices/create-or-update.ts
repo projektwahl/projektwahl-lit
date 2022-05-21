@@ -52,7 +52,7 @@ export const updateChoiceHandler = createOrUpdateChoiceHandler(
 export function createOrUpdateChoiceHandler<P extends "/api/v1/choices/update">(
   path: P,
   dbquery: (
-    sql: postgres.TransactionSql<Record<string, never>>,
+    sql: postgres.TransactionSql<Record<string, unknown>>,
     choice: z.infer<typeof routes[P]["request"]>,
     loggedInUser: Exclude<z.infer<typeof userSchema>, undefined>
   ) => Promise<z.infer<typeof routes[P]["response"]>[]>

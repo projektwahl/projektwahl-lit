@@ -1,0 +1,66 @@
+# https://docs.docker.com/compose/compose-file/
+# sudo docker compose up --build
+services:
+  frontend:
+    image: projektwahl
+    build:
+      context: .
+      dockerfile: Dockerfile
+    networks:
+      - front-tier
+      - back-tier
+    # https://docs.docker.com/compose/startup-order/
+  #    configs:
+  #      - httpd-config
+
+  reverse-proxy:
+    image: projektwahl-reverse-proxy
+    build:
+      context: .
+      dockerfile: Dockerfile-reverse-proxy
+    ports:
+      - "8443:443"
+    networks:
+      - front-tier
+    volumes:
+      - ./docs/sites-enabled-projektwahl.conf:/etc/nginx/conf.d/default.conf
+    #    secrets:
+    #      - server-certificate
+    #      - server-key
+    healthcheck:
+      # TODO FIXME test an API endpoint so that this is tested fully
+      test: ["CMD", "curl", "-f", "--insecure", "https://localhost:443"]
+      interval: 10s
+      timeout: 10s
+      retries: 3
+      start_period: 0s
+
+  postgres:
+    image: postgres
+    restart: always
+    environment:
+      POSTGRES_PASSWORD: projektwahl
+    volumes:
+      #      - db-data:/var/lib/postgresql
+      - ./src/server/setup.sql:/opt/projektwahl-lit/src/server/setup.sql
+      - ./setup-postgresql.sh:/docker-entrypoint-initdb.d/setup-postgresql.sh
+    networks:
+      - back-tier
+
+volumes:
+  db-data:
+
+#configs:
+#  httpd-config:
+#    external: true
+
+#secrets:
+#  server-certificate:
+#    file: /opt/projektwahl-lit/cert.pem
+#  server-key:
+#    file: /opt/projektwahl-lit/key.pem
+
+networks:
+  # The presence of these objects is sufficient to define them
+  front-tier: {}
+  back-tier: {}

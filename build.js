@@ -76,7 +76,7 @@ let version_short = (
 
 {
   let { stdout, stderr } = await exec(
-    `esbuild --format=esm --bundle ./src/client/pw-app.js --charset=utf8 --define:window.PRODUCTION=true --define:window.LANGUAGE=\\"${
+    `esbuild --target=es2020,chrome58,firefox57,safari11 --format=esm --bundle ./src/client/pw-app.js --charset=utf8 --define:window.PRODUCTION=true --define:window.LANGUAGE=\\"${
       process.env.LANGUAGE ?? "de"
     }\\" --define:window.VERSION_FULL=\\"${version_full}\\" --define:window.VERSION_SHORT=\\"${version_short}\\" --entry-names=[dir]/[name] --sourcemap  --analyze --outdir=dist --tree-shaking=true`
   );
@@ -147,6 +147,8 @@ SPDX-FileCopyrightText: 2021 Moritz Hedtke <Moritz.Hedtke@t-online.de>
     <link rel="manifest" href="/dist/site.webmanifest">
   </head>
   <body class="height-100">
+    <script src="/src/client/polyfill.js">
+    </script>
     <script
       type="module"
       src="/dist/pw-app_${pwAppHash}.js"
@@ -185,32 +187,10 @@ await writeFile("dist/index.html", index);
     format: "esm",
     bundle: true,
     entryPoints: ["src/server/index.ts"],
-    define: {
-      "process.env.NODE_ENV": '"production"',
-    },
     external: ["@dev.mohe/argon2"],
     charset: "utf8",
     sourcemap: true,
     outfile: "dist/server.js",
-    inject: ["./require-shim.js"],
-    treeShaking: true,
-    plugins: [nativeNodeModulesPlugin],
-  });
-}
-
-{
-  await build({
-    platform: "node",
-    format: "esm",
-    bundle: true,
-    entryPoints: ["src/server/index.ts"],
-    define: {
-      "process.env.NODE_ENV": '"testing"',
-    },
-    external: ["@dev.mohe/argon2"],
-    charset: "utf8",
-    sourcemap: true,
-    outfile: "dist/server-testing.js",
     inject: ["./require-shim.js"],
     treeShaking: true,
     plugins: [nativeNodeModulesPlugin],
