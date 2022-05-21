@@ -601,11 +601,11 @@ async function testCreateOrUpdateUsers() {
     error: {
       issues: [
         {
-          code: "invalid_enum_value",
-          options: ["voter", "helper", "admin"],
+          expected: "'voter' | 'helper' | 'admin'",
+          received: "undefined",
+          code: "invalid_type",
           path: [0, "type"],
-          message:
-            "Ungültiger Auswahlwert. Erwarte 'voter' | 'helper' | 'admin'",
+          message: "Pflichtfeld",
         },
         {
           code: "invalid_type",

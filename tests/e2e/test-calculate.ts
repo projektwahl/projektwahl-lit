@@ -37,7 +37,7 @@ export async function reset() {
 }
 
 export async function project(
-  tsql: TransactionSql<Record<string, never>>,
+  tsql: TransactionSql<Record<string, unknown>>,
   min_participants = 5,
   max_participants = 15,
   min_age = 5,
@@ -52,7 +52,7 @@ export async function project(
 }
 
 export async function user(
-  tsql: TransactionSql<Record<string, never>>,
+  tsql: TransactionSql<Record<string, unknown>>,
   age: number,
   project_leader_id: number | null = null
 ): Promise<number> {
@@ -64,7 +64,7 @@ export async function user(
 }
 
 export async function vote(
-  tsql: TransactionSql<Record<string, never>>,
+  tsql: TransactionSql<Record<string, unknown>>,
   project_id: number,
   user_id: number,
   rank: number

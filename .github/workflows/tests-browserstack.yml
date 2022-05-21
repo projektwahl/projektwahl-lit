@@ -6,8 +6,6 @@
 name: Browserstack Test
 
 on:
-  push:
-    branches: [main]
   pull_request:
     branches: [main]
 
@@ -20,7 +18,7 @@ jobs:
       fail-fast: false
       matrix:
         node-version: [16.x] # 17.x
-        browser-engine: [0, 1, 2, 3, 4, 5, 6]
+        browser-engine: [0, 1, 2, 3]
 
     steps:
       - name: "BrowserStack Env Setup" # Invokes the setup-env action

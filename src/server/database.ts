@@ -39,7 +39,7 @@ export const sql = postgres(process.env["DATABASE_URL"], {
 
 export async function retryableBegin<T>(
   options: string,
-  cb: (tsql: TransactionSql<Record<string, never>>) => Promise<T>
+  cb: (tsql: TransactionSql<Record<string, unknown>>) => Promise<T>
 ): Promise<T> {
   for (;;) {
     try {

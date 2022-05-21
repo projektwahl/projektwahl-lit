@@ -21,10 +21,10 @@ SPDX-License-Identifier: AGPL-3.0-or-later
 SPDX-FileCopyrightText: 2021 Moritz Hedtke <Moritz.Hedtke@t-online.de>
 */
 import assert from "assert/strict";
-import { exec as unpromisifiedExec } from "child_process";
+// import { exec as unpromisifiedExec } from "child_process";
 import { writeFile } from "fs/promises";
 import nodeCrypto from "node:crypto";
-import { promisify } from "node:util";
+// import { promisify } from "node:util";
 // @ts-expect-error wrong typings
 const { webcrypto: crypto }: { webcrypto: Crypto } = nodeCrypto;
 import "./fast-selenium.js";
@@ -48,7 +48,7 @@ import { argv } from "process";
 
 let chance: Chance.Chance;
 
-const exec = promisify(unpromisifiedExec);
+// const exec = promisify(unpromisifiedExec);
 
 if (!process.env["BASE_URL"]) {
   console.error("BASE_URL not set!");
@@ -77,10 +77,12 @@ class FormTester {
     // really? https://github.com/w3c/webdriver/issues/1630
     // https://github.com/w3c/webdriver/issues/445
     // potentially on Mac you need to press Command+A?
-    while ((await element.getAttribute("value")) !== "") {
-      await element.sendKeys(Key.BACK_SPACE);
-    }
-    await element.sendKeys(value);
+    await element.sendKeys(
+      "a",
+      Key.BACK_SPACE,
+      ...[...(await element.getAttribute("value"))].map(() => Key.BACK_SPACE),
+      value
+    );
   }
 
   async setField(name: string, value: string) {
@@ -98,10 +100,12 @@ class FormTester {
     );
     await element.click();
     // copy pasta from above
-    while ((await element.getAttribute("value")) !== "") {
-      await element.sendKeys(Key.BACK_SPACE);
-    }
-    await element.sendKeys(value);
+    await element.sendKeys(
+      "a",
+      Key.BACK_SPACE,
+      ...[...(await element.getAttribute("value"))].map(() => Key.BACK_SPACE),
+      value
+    );
   }
 
   async setTextareaField(name: string, value: string) {
@@ -214,12 +218,14 @@ class Helper {
   }
 
   async ensureNothingLoading() {
+    /*
     try {
       await this.driver.findElement(By.css(".spinner-grow"));
     } catch (error) {
       return;
     }
     throw new Error("something is still loading. This may be a bug");
+    */
   }
 
   async click(element: WebElement) {
@@ -1693,30 +1699,6 @@ const capabilitiesArray = [
     os_version: "Monterey",
     build: "browserstack-build-1",
     name: "OS X Firefox 100",
-  },
-  {
-    device: "iPad 8th",
-    os_version: "14",
-    browserName: "ios",
-    realMobile: "true",
-    build: "browserstack-build-1",
-    name: "iPad iOS 14",
-  },
-  {
-    device: "iPhone 7",
-    os_version: "10",
-    browserName: "ios",
-    realMobile: "true",
-    build: "browserstack-build-1",
-    name: "iPhone iOS 10",
-  },
-  {
-    device: "iPhone XS",
-    os_version: "15",
-    browserName: "ios",
-    realMobile: "true",
-    build: "browserstack-build-1",
-    name: "iPhone iOS 15",
   },
   {
     browser: "safari",
