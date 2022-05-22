@@ -31,7 +31,7 @@
     "lint-internal": "eslint .",
     "lint:fix": "docker build -t getting-started . && docker run --mount type=bind,source=\"$(pwd)\"/tests,target=/opt/projektwahl-lit/tests --mount type=bind,source=\"$(pwd)\"/src,target=/opt/projektwahl-lit/src getting-started npm run lint:fix-internal",
     "lint:fix-internal": "eslint --fix .",
-    "evaluate": "node --experimental-loader ./src/loader.js --enable-source-maps ./src/server/routes/evaluate/index.ts",
+    "evaluate": "node --experimental-loader ./src/loader.js --enable-source-maps ./src/server/routes/evaluate/evaluate.ts",
     "test-evaluate": "node --experimental-loader ./src/loader.js --enable-source-maps ./tests/e2e/test-calculate.ts",
     "setup": "node --experimental-loader ./src/loader.js --enable-source-maps ./src/server/setup.ts",
     "server": "node --conditions=development --experimental-loader ./src/loader.js --enable-source-maps --experimental-import-meta-resolve ./src/server/index.ts",
