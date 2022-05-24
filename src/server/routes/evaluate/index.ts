@@ -30,6 +30,7 @@ import { z } from "zod";
 import { typedSql } from "../../describe.js";
 import type { Abortable } from "node:events";
 import type { TransactionSql } from "postgres";
+import { sql } from "../../database.js";
 
 async function readFileWithBacktrace(
   path: PathLike | FileHandle,
@@ -464,6 +465,15 @@ export async function evaluate(tsql: TransactionSql<Record<string, unknown>>) {
   }
 
   console.log(finalOutput);
+
+  console.log(finalOutput.choices);
+  await sql.begin(async (tsql) => {
+    await tsql`SELECT set_config('projektwahl.type', 'admin', true);`;
+    await tsql`UPDATE users SET computed_in_project_id = NULL, last_updated_by = (SELECT id FROM users_with_deleted WHERE type = 'admin') WHERE computed_in_project_id IS NOT NULL;`; // reset previous computed
+    for (const choice of finalOutput.choices) {
+      await tsql`UPDATE users SET computed_in_project_id = ${choice[1]}, last_updated_by = (SELECT id FROM users_with_deleted WHERE type = 'admin') WHERE id = ${choice[0]}`;
+    }
+  });
 
   console.log(rank_distribution);
 
