@@ -265,7 +265,7 @@ export async function evaluate(tsql: TransactionSql<Record<string, unknown>>, up
 
   const users = await typedSql(tsql, {
     columns: { id: 23, project_leader_id: 23 },
-  } as const)`SELECT id, project_leader_id FROM present_voters ORDER BY id;`;
+  } as const)`SELECT id, project_leader_id FROM present_voters WHERE force_in_project_id IS NULL ORDER BY id;`;
 
   console.log("choices: ", choices);
   console.log("projects: ", projects);
