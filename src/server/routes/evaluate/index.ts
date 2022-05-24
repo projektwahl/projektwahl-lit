@@ -30,6 +30,7 @@ import { z } from "zod";
 import { typedSql } from "../../describe.js";
 import type { Abortable } from "node:events";
 import type { TransactionSql } from "postgres";
+import { sql } from "../../database.js";
 
 async function readFileWithBacktrace(
   path: PathLike | FileHandle,
@@ -246,7 +247,10 @@ export const rank2points = (rank: number) => {
   }
 };
 
-export async function evaluate(tsql: TransactionSql<Record<string, unknown>>) {
+export async function evaluate(
+  tsql: TransactionSql<Record<string, unknown>>,
+  update: boolean
+) {
   const lp = new CPLEXLP();
   await lp.setup();
 
@@ -264,7 +268,7 @@ export async function evaluate(tsql: TransactionSql<Record<string, unknown>>) {
 
   const users = await typedSql(tsql, {
     columns: { id: 23, project_leader_id: 23 },
-  } as const)`SELECT id, project_leader_id FROM present_voters ORDER BY id;`;
+  } as const)`SELECT id, project_leader_id FROM present_voters WHERE force_in_project_id IS NULL ORDER BY id;`;
 
   console.log("choices: ", choices);
   console.log("projects: ", projects);
@@ -464,6 +468,17 @@ export async function evaluate(tsql: TransactionSql<Record<string, unknown>>) {
   }
 
   console.log(finalOutput);
+
+  console.log(finalOutput.choices);
+  if (update) {
+    await sql.begin(async (tsql) => {
+      await tsql`SELECT set_config('projektwahl.type', 'admin', true);`;
+      await tsql`UPDATE users SET computed_in_project_id = NULL, last_updated_by = (SELECT id FROM users_with_deleted WHERE type = 'admin') WHERE computed_in_project_id IS NOT NULL;`; // reset previous computed
+      for (const choice of finalOutput.choices) {
+        await tsql`UPDATE users SET computed_in_project_id = ${choice[1]}, last_updated_by = (SELECT id FROM users_with_deleted WHERE type = 'admin') WHERE id = ${choice[0]}`;
+      }
+    });
+  }
 
   console.log(rank_distribution);
 
