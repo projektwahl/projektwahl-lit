@@ -23,43 +23,23 @@ SPDX-FileCopyrightText: 2021 Moritz Hedtke <Moritz.Hedtke@t-online.de>
 
 import { z, ZodObject, ZodType, ZodTypeAny, ZodTypeDef } from "zod";
 import type { entityRoutes, UnknownKeysParam } from "./routes.js";
+import { VObject, VSchema } from "./validation.js";
 
-export const successResult = <
-  T extends { [k: string]: ZodTypeAny },
-  UnknownKeys extends UnknownKeysParam = "strip",
-  Catchall extends ZodTypeAny = ZodTypeAny
->(
-  s: ZodObject<T, UnknownKeys, Catchall>
-) =>
-  z
-    .object({
-      success: z.literal(true),
-      data: s,
-    })
-    .strict();
+export const successResult = <T>(s: VSchema<T>) =>
+  new VObject({
+    success: z.literal(true),
+    data: s,
+  });
 
 // TODO FIXME UPDATE TO zod error schema
-export const failureResult = <
-  Output,
-  Def extends ZodTypeDef = ZodTypeDef,
-  Input = Output
->(
-  s: ZodType<Output, Def, Input>
-) =>
-  z
-    .object({
-      success: z.literal(false),
-      error: s,
-    })
-    .strict();
+export const failureResult = <T>(s: VSchema<T>) =>
+  new VObject({
+    success: z.literal(false),
+    error: s,
+  });
 
-export const result = <
-  T extends { [k: string]: ZodTypeAny },
-  UnknownKeys extends UnknownKeysParam = "strip",
-  Catchall extends ZodTypeAny = ZodTypeAny
->(
-  s: ZodObject<T, UnknownKeys, Catchall>
-) => z.union([successResult(s), failureResult(z.record(z.string()))]);
+export const result = <T>(s: VSchema<T>) =>
+  z.union([successResult(s), failureResult(z.record(z.string()))]);
 
 export type ToIndexed<
   T extends { [K: string]: { [inner in I]: unknown } },
