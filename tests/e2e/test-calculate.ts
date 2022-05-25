@@ -76,7 +76,7 @@ export async function test_only_one_user() {
   await reset();
   await sql.begin(async (tsql) => {
     const _u1 = await user(tsql, 5);
-    deepEqual(await evaluate(tsql), {});
+    deepEqual(await evaluate(tsql, false), {});
   });
 }
 
@@ -87,7 +87,7 @@ export async function test_only_one_project() {
   await reset();
   await sql.begin(async (tsql) => {
     const _p1 = await project(tsql);
-    deepEqual(await evaluate(tsql), {});
+    deepEqual(await evaluate(tsql, false), {});
   });
 }
 
@@ -99,7 +99,7 @@ export async function test_one_project_one_user_correct_age() {
   await sql.begin(async (tsql) => {
     const _p1 = await project(tsql);
     const _u1 = await user(tsql, 5);
-    deepEqual(await evaluate(tsql), {
+    deepEqual(await evaluate(tsql, false), {
       overloaded: [],
       underloaded: [[1, 4]],
       notexists: [],
@@ -117,7 +117,7 @@ export async function test_one_project_one_user_wrong_age() {
     const _u1 = await user(tsql, 4);
     // TODO FIXME HERE IS A BUG: IF NO PROJECTS ARE FOUND FOR A USER WITH THEIR AGE
     // we need to show an error
-    //deepEqual(await evaluate(), { });
+    //deepEqual(await evaluate(tsql, false), { });
   });
 }
 
@@ -132,7 +132,7 @@ export async function test_five_projects_one_user() {
     const _p4 = await project(tsql);
     const _p5 = await project(tsql);
     const _u1 = await user(tsql, 5);
-    deepEqual(await evaluate(tsql), {
+    deepEqual(await evaluate(tsql, false), {
       overloaded: [],
       underloaded: [[5, 4]],
       notexists: [1, 2, 3, 4],
@@ -149,7 +149,7 @@ export async function test_one_user_one_project_voted_incorrectly() {
     const p1 = await project(tsql);
     const u1 = await user(tsql, 5);
     await vote(tsql, p1, u1, 1);
-    deepEqual(await evaluate(tsql), {
+    deepEqual(await evaluate(tsql, false), {
       overloaded: [],
       underloaded: [[1, 4]],
       notexists: [],
@@ -174,7 +174,7 @@ export async function test_five_projects_one_user_voted_correctly() {
     await vote(tsql, p3, u1, 3);
     await vote(tsql, p4, u1, 1);
     await vote(tsql, p5, u1, 2);
-    deepEqual(await evaluate(tsql), {
+    deepEqual(await evaluate(tsql, false), {
       overloaded: [],
       underloaded: [[4, 4]],
       notexists: [1, 2, 3, 5],
@@ -206,7 +206,7 @@ export async function test_five_projects_conflicting_equal_votes() {
     await vote(tsql, p3, u2, 3);
     await vote(tsql, p4, u2, 1);
     await vote(tsql, p5, u2, 2);
-    deepEqual(await evaluate(tsql), {
+    deepEqual(await evaluate(tsql, false), {
       overloaded: [],
       underloaded: [],
       notexists: [1, 2, 3],
@@ -243,7 +243,7 @@ export async function test_five_projects_different_conflicting_votes() {
     await vote(tsql, p3, u2, 3);
     await vote(tsql, p4, u2, 2); // different
     await vote(tsql, p5, u2, 1); // different
-    deepEqual(await evaluate(tsql), {
+    deepEqual(await evaluate(tsql, false), {
       overloaded: [[4, 1]],
       underloaded: [],
       notexists: [],
@@ -278,7 +278,7 @@ export async function test_five_projects_different_votes() {
     await vote(tsql, p3, u2, 3);
     await vote(tsql, p4, u2, 2); // different
     await vote(tsql, p5, u2, 1); // different
-    deepEqual(await evaluate(tsql), {
+    deepEqual(await evaluate(tsql, false), {
       overloaded: [],
       underloaded: [],
       notexists: [1, 2, 3],
@@ -297,7 +297,7 @@ export async function test_project_leader() {
   await sql.begin(async (tsql) => {
     const p1 = await project(tsql, 0, 0);
     const _u1 = await user(tsql, 5, p1);
-    deepEqual(await evaluate(tsql), {
+    deepEqual(await evaluate(tsql, false), {
       overloaded: [],
       underloaded: [],
       notexists: [],
@@ -313,7 +313,7 @@ export async function test_not_project_leader() {
   await sql.begin(async (tsql) => {
     const p1 = await project(tsql, 1, 1);
     const _u1 = await user(tsql, 5, p1);
-    deepEqual(await evaluate(tsql), {
+    deepEqual(await evaluate(tsql, false), {
       overloaded: [],
       underloaded: [],
       notexists: [1],
@@ -339,7 +339,7 @@ export async function test_not_project_leader_voted_correctly() {
     await vote(tsql, p4, u1, 3);
     await vote(tsql, p5, u1, 4);
     await vote(tsql, p6, u1, 5);
-    deepEqual(await evaluate(tsql), {
+    deepEqual(await evaluate(tsql, false), {
       overloaded: [],
       underloaded: [[2, 4]],
       notexists: [1, 3, 4, 5, 6],
@@ -365,7 +365,7 @@ export async function test_not_project_leader_voted_correctly2() {
     await vote(tsql, p4, u1, 3);
     await vote(tsql, p5, u1, 4);
     await vote(tsql, p6, u1, 5);
-    deepEqual(await evaluate(tsql), {
+    deepEqual(await evaluate(tsql, false), {
       overloaded: [],
       underloaded: [],
       notexists: [1, 3, 4, 5, 6],
@@ -397,7 +397,7 @@ export async function test_extreme() {
       }
     }
 
-    await evaluate(tsql);
+    await evaluate(tsql, false);
   });
 }
 
