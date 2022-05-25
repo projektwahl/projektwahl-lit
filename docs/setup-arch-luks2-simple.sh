@@ -568,9 +568,8 @@ sudo ln -s /etc/nginx/sites-available/nginx-monitoring.conf /etc/nginx/sites-ena
 
 # https://github.com/prometheus/blackbox_exporter
 sudo pacman -S prometheus-blackbox-exporter
-sudo nano /etc/prometheus/blackbox.yml
-modules:
-
+curl -o blackbox.yml https://raw.githubusercontent.com/prometheus/blackbox_exporter/master/blackbox.yml
+sudo mv blackbox.yml /etc/prometheus/
 sudo systemctl enable --now prometheus-blackbox-exporter
 
 sudo nano /etc/prometheus/prometheus.yml
@@ -580,9 +579,8 @@ sudo nano /etc/prometheus/prometheus.yml
       module: [http_2xx]  # Look for a HTTP 200 response.
     static_configs:
       - targets:
-        - http://prometheus.io    # Target to probe with http.
-        - https://prometheus.io   # Target to probe with https.
-        - http://example.com:8080 # Target to probe with http on port 8080.
+        - https://aes.selfmade4u.de
+        - https://staging-aes.selfmade4u.de
     relabel_configs:
       - source_labels: [__address__]
         target_label: __param_target
