@@ -288,7 +288,7 @@ async function runTest(
   capabilities: Record<string | symbol, unknown>,
   testFunction: (helper: Helper) => Promise<void>
 ) {
-  chance = new Chance(1234);
+  chance = new Chance(12345);
   /*
   console.log(
     (
