@@ -139,7 +139,7 @@ export const usersHandler = requestHandler(
                 ? "ASC"
                 : "DESC"
             )}`,
-          force_in_project_id_eq: (q, o, v) =>
+          force_in_project_id: (q, o, v) =>
             sql`(users_with_deleted.force_in_project_id IS NOT DISTINCT FROM ${
               v ?? null
             }) ${sql.unsafe(
@@ -151,7 +151,7 @@ export const usersHandler = requestHandler(
                 ? "ASC"
                 : "DESC"
             )}`,
-          project_leader_id_eq: (q, o, v) =>
+          project_leader_id: (q, o, v) =>
             sql`(users_with_deleted.project_leader_id IS NOT DISTINCT FROM ${
               v ?? null
             }) ${sql.unsafe(
