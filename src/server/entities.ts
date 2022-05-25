@@ -182,6 +182,7 @@ export async function fetchData<R extends keyof typeof entityRoutes>(
         sqlResult = await tsql`${queries[0]}`;
       } else {
         sqlResult = await tsql`${queries
+          .reverse()
           .flatMap((v) => [sql`\nUNION ALL\n`, v])
           .slice(1)
           .reduce((prev, curr) => sql`${prev}${curr}`)} LIMIT ${
