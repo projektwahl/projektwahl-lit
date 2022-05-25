@@ -114,8 +114,8 @@ export class PwUserProjects<X extends string> extends PwProjects<X> {
           <th class="table-cell-hover p-0" scope="col">
             ${pwOrder({
               url: "/api/v1/projects",
-              name: ["sorting", `${this.name}_eq`],
-              orderBy: `${this.name}_eq`,
+              name: ["sorting", this.name],
+              orderBy: this.name,
               prefix: this.prefix,
               title: "",
               value: this.user[this.name] ?? null,

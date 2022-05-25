@@ -147,7 +147,7 @@ export const projectsHandler = requestHandler(
               ? "ASC"
               : "DESC"
           )}`,
-        force_in_project_id_eq: (q, o, v) =>
+        force_in_project_id: (q, o, v) =>
           sql`(id IS NOT DISTINCT FROM ${v ?? null}) ${sql.unsafe(
             o === "backwards"
               ? q === "ASC"
@@ -157,7 +157,7 @@ export const projectsHandler = requestHandler(
               ? "ASC"
               : "DESC"
           )}`,
-        project_leader_id_eq: (q, o, v) =>
+        project_leader_id: (q, o, v) =>
           sql`(id IS NOT DISTINCT FROM ${v ?? null}) ${sql.unsafe(
             o === "backwards"
               ? q === "ASC"
