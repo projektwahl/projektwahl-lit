@@ -579,8 +579,8 @@ sudo nano /etc/prometheus/prometheus.yml
       module: [http_2xx]  # Look for a HTTP 200 response.
     static_configs:
       - targets:
-        - https://aes.selfmade4u.de
-        - https://staging-aes.selfmade4u.de
+        - https://aes.selfmade4u.de/api/v1/login
+        - https://staging-aes.selfmade4u.de/api/v1/login
     relabel_configs:
       - source_labels: [__address__]
         target_label: __param_target
