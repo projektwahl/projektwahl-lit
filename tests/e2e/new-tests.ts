@@ -1721,10 +1721,10 @@ const capabilitiesArray = [
 ];
 
 await runTest(argv[2], capabilitiesArray[Number(argv[3])], async (helper) => {
-  await checkUserOrProjectNotFound(helper);
+  await checkUsersSortingWorks(helper);
   await helper.driver.manage().deleteAllCookies();
 
-  await checkUsersSortingWorks(helper);
+  await checkUserOrProjectNotFound(helper);
   await helper.driver.manage().deleteAllCookies();
 
   await testVotingWorks(helper);
