@@ -194,7 +194,8 @@ export async function serverHandler(
 
   if (
     (process.env.NODE_ENV === "development" ||
-      process.env.NODE_ENV === "testing") &&
+      process.env.NODE_ENV === "testing" ||
+      process.env.NODE_ENV === "debugging") &&
     (url.pathname === "/favicon.ico" || url.pathname === "/robots.txt")
   ) {
     response.writeHead(404, {
@@ -203,7 +204,8 @@ export async function serverHandler(
     response.end();
   } else if (
     (process.env.NODE_ENV === "development" ||
-      process.env.NODE_ENV === "testing") &&
+      process.env.NODE_ENV === "testing" ||
+      process.env.NODE_ENV === "debugging") &&
     url.pathname === "/api/v1/hmr"
   ) {
     response.writeHead(200, {
@@ -277,7 +279,8 @@ export async function serverHandler(
     }
   } else if (
     process.env.NODE_ENV === "development" ||
-    process.env.NODE_ENV === "testing"
+    process.env.NODE_ENV === "testing" ||
+    process.env.NODE_ENV === "debugging"
   ) {
     const { resolve: loaderResolve, load: loaderLoad } = await import(
       "../loader.js"
