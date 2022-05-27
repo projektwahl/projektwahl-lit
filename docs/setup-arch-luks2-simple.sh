@@ -576,7 +576,7 @@ sudo nano /etc/prometheus/prometheus.yml
   - job_name: 'blackbox'
     metrics_path: /probe
     params:
-      module: [http_2xx]  # Look for a HTTP 200 response.
+      module: [http_post_2xx]  # Look for a HTTP 200 response.
     static_configs:
       - targets:
         - https://aes.selfmade4u.de/api/v1/login
