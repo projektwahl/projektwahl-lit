@@ -3,33 +3,22 @@
 # This workflow will do a clean install of node dependencies, cache/restore them, build the source code and run tests across different versions of node
 # For more information see: https://help.github.com/actions/language-and-framework-guides/using-nodejs-with-github-actions
 
-name: Tests
+name: Test
 
-on: workflow_dispatch
+on:
+  pull_request:
+    branches: [main]
 
 jobs:
-  test:
+  ubuntu-job:
     runs-on: ubuntu-latest
-
-    services:
-      projektwahl:
-        image: postgres
-        ports:
-          - 5432:5432
-        env:
-          POSTGRES_USER: projektwahl
-          POSTGRES_DB: projektwahl
-          POSTGRES_PASSWORD: projektwahl
-        #options: >-
-        #  --health-cmd pg_isready
-        #  --health-interval 10s
-        #  --health-timeout 5s
-        #  --health-retries 5
+    name: "Test on Ubuntu"
 
     strategy:
+      fail-fast: false
       matrix:
-        node-version: [16.x] # 17.x
-        browser-engine: [firefox, chrome]
+        node-version: [18.x]
+        browser-engine: ["firefox", "chrome"]
 
     steps:
       - uses: actions/checkout@v2
@@ -39,20 +28,7 @@ jobs:
           node-version: ${{ matrix.node-version }}
           cache: "npm"
       - run: npm ci --ignore-scripts --omit=optional
-      - run: ./node_modules/@dev.mohe/argon2/build.sh /opt/hostedtoolcache/node/$(node -v | cut -c2-)/x64/include/node
-      - run: openssl req -x509 -newkey rsa:2048 -nodes -sha256 -subj '/CN=localhost' -keyout key.pem -out cert.pem
-      - run: |
-          psql postgres://projektwahl:projektwahl@localhost/projektwahl --command="CREATE ROLE projektwahl_staging LOGIN PASSWORD 'projektwahl';
-          CREATE ROLE projektwahl_staging_admin IN ROLE projektwahl_staging LOGIN PASSWORD 'projektwahl';"
-      - run: |
-          psql postgres://projektwahl:projektwahl@localhost/projektwahl --command="CREATE DATABASE projektwahl_staging OWNER projektwahl_staging_admin"
-      - run: |
-          NODE_ENV=testing PORT=8443 BASE_URL=https://localhost:8443 DATABASE_URL=postgres://projektwahl_staging:projektwahl@localhost/projektwahl_staging CREDENTIALS_DIRECTORY=$PWD npm run server &
-          NODE_ENV=testing DATABASE_URL=postgres://projektwahl_staging:projektwahl@localhost/projektwahl_staging BASE_URL=https://localhost:8443 npm run test-internal:${{ matrix.browser-engine }}
-      - name: Archive test screenshots
-        if: always()
-        uses: actions/upload-artifact@v3
-        with:
-          name: test-screenshots
-          path: screenshot.png
-          retention-days: 1
+      - run: sudo docker build -f Dockerfile -t projektwahl .
+      - run: sudo docker compose up --build --detach --wait
+      - name: "Running test"
+        run: NODE_ENV=testing DATABASE_URL=postgres://projektwahl_staging:projektwahl@localhost/projektwahl_staging BASE_URL=https://localhost:8443 npm run test-internal:${{ matrix.browser-engine }} 1

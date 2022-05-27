@@ -32,7 +32,7 @@ jobs:
 
     strategy:
       matrix:
-        node-version: [16.x] # 17.x
+        node-version: [18.x]
 
     steps:
       - run: sudo apt-get update && sudo apt-get install -y glpk-utils

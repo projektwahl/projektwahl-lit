@@ -5,9 +5,7 @@
 
 name: Browserstack Test
 
-on:
-  pull_request:
-    branches: [main]
+on: workflow_dispatch
 
 jobs:
   ubuntu-job:
@@ -17,8 +15,8 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        node-version: [16.x] # 17.x
-        browser-engine: [0, 1, 2, 3]
+        node-version: [18.x]
+        browser-engine: [2, 3]
 
     steps:
       - name: "BrowserStack Env Setup" # Invokes the setup-env action
