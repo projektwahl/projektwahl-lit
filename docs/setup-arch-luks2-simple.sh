@@ -593,6 +593,8 @@ sudo nano /etc/prometheus/prometheus.yml
 sudo systemctl reload prometheus
 
 
+https://grafana.com/grafana/dashboards/7587
+
 
 
 # TODO package with arch / search in aur
