@@ -5,9 +5,7 @@
 
 name: Browserstack Test
 
-on:
-  pull_request:
-    branches: [main]
+on: workflow_dispatch
 
 jobs:
   ubuntu-job:
