@@ -565,6 +565,38 @@ server {
 sudo ln -s /etc/nginx/sites-available/nginx-monitoring.conf /etc/nginx/sites-enabled/
 
 
+
+# https://github.com/prometheus/blackbox_exporter
+sudo pacman -S prometheus-blackbox-exporter
+curl -o blackbox.yml https://raw.githubusercontent.com/prometheus/blackbox_exporter/master/blackbox.yml
+sudo mv blackbox.yml /etc/prometheus/
+sudo systemctl enable --now prometheus-blackbox-exporter
+
+sudo nano /etc/prometheus/prometheus.yml
+  - job_name: 'blackbox'
+    metrics_path: /probe
+    params:
+      module: [http_post_2xx]  # Look for a HTTP 200 response.
+    static_configs:
+      - targets:
+        - https://aes.selfmade4u.de/api/v1/login
+        - https://staging-aes.selfmade4u.de/api/v1/login
+    relabel_configs:
+      - source_labels: [__address__]
+        target_label: __param_target
+      - source_labels: [__param_target]
+        target_label: instance
+      - target_label: __address__
+        replacement: 127.0.0.1:9115  # The blackbox exporter's real hostname:port.
+
+
+sudo systemctl reload prometheus
+
+
+https://grafana.com/grafana/dashboards/7587
+
+
+
 # TODO package with arch / search in aur
 cd /opt
 sudo mkdir nginx-prometheus-exporter
