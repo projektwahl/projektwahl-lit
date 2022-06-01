@@ -60,5 +60,6 @@ module.exports = {
     "coverage/",
     "tests/e2e/fast-selenium.js",
     "src/client/polyfill.js",
+    "jsonaddage.js",
   ],
 };

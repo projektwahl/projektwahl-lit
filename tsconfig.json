@@ -26,6 +26,7 @@
     "build.js",
     "require-shim.js",
     "src/loader.js",
-    "csv2json.js"
+    "csv2json.js",
+    "jsonaddage.js"
   ]
 }

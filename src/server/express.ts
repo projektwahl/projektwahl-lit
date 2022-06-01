@@ -75,7 +75,11 @@ export function requestHandler<P extends keyof typeof routes>(
         request.method === "POST" &&
         request.headers["x-csrf-protection"] !== "projektwahl"
       ) {
-        throw new Error("No CSRF header!");
+        response.writeHead(403, {
+          ...defaultHeaders,
+        });
+        response.end("No CSRF header!");
+        return;
       }
 
       let user: z.infer<typeof userSchema> | undefined = undefined;
@@ -99,19 +103,22 @@ export function requestHandler<P extends keyof typeof routes>(
         const session_id_ = session_id;
         // @ts-expect-error todo fixme
         user = (
-          await retryableBegin("READ WRITE", async (tsql) => {
-            await tsql`SELECT set_config('projektwahl.type', 'root', true);`;
-            //await typedSql(sql, {})`DELETE FROM sessions WHERE CURRENT_TIMESTAMP >= updated_at + interval '24 hours' AND session_id != ${session_id} `
-            return await typedSql(tsql, {
-              columns: {
-                id: 23,
-                type: null, // custom enum
-                username: 1043,
-                group: 1043,
-                age: 23,
-              },
-            } as const)`UPDATE sessions SET updated_at = CURRENT_TIMESTAMP FROM users WHERE users.id = sessions.user_id AND session_id = ${session_id_} AND CURRENT_TIMESTAMP < updated_at + interval '24 hours' RETURNING users.id, users.type, users.username, users.group, users.age`;
-          })
+          await retryableBegin(
+            "ISOLATION LEVEL READ COMMITTED READ WRITE",
+            async (tsql) => {
+              await tsql`SELECT set_config('projektwahl.type', 'root', true);`;
+              //await typedSql(sql, {})`DELETE FROM sessions WHERE CURRENT_TIMESTAMP >= updated_at + interval '24 hours' AND session_id != ${session_id} `
+              return await typedSql(tsql, {
+                columns: {
+                  id: 23,
+                  type: null, // custom enum
+                  username: 1043,
+                  group: 1043,
+                  age: 23,
+                },
+              } as const)`UPDATE sessions SET updated_at = CURRENT_TIMESTAMP FROM users WHERE users.id = sessions.user_id AND session_id = ${session_id_} AND CURRENT_TIMESTAMP < updated_at + interval '24 hours' RETURNING users.id, users.type, users.username, users.group, users.age`;
+            }
+          )
         )[0];
       }
 

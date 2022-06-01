@@ -105,18 +105,7 @@ async function testLogin() {
     },
     "null"
   );
-  assert.deepEqual(JSON.parse(r), {
-    success: false,
-    error: {
-      issues: [
-        {
-          code: "custom",
-          path: ["internal_error"],
-          message: "Error: No CSRF header!",
-        },
-      ],
-    },
-  });
+  assert.deepEqual(r, "No CSRF header!");
 
   [r, headers] = await request(
     {
@@ -126,18 +115,7 @@ async function testLogin() {
     },
     "null"
   );
-  assert.deepEqual(JSON.parse(r), {
-    success: false,
-    error: {
-      issues: [
-        {
-          code: "custom",
-          path: ["internal_error"],
-          message: "Error: No CSRF header!",
-        },
-      ],
-    },
-  });
+  assert.deepEqual(r, "No CSRF header!");
 
   [r, headers] = await request(
     {
