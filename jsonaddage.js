@@ -30,20 +30,26 @@ if (process.argv.length !== 3) {
 
 const contents = JSON.parse(await readFile(process.argv[2]));
 
-console.log(JSON.stringify(contents.map(e => {
-    let age;
-    let result = [...e.group.matchAll(/^\d+/g)]
-    if (result.length == 1) {
+console.log(
+  JSON.stringify(
+    contents.map((e) => {
+      let age;
+      let result = [...e.group.matchAll(/^\d+/g)];
+      if (result.length == 1) {
         age = Number(result[0]);
-    } else if (e.group.startsWith("E0")) {
+      } else if (e.group.startsWith("E0")) {
         age = 11;
-    } else if (e.group.startsWith("Q1")) {
+      } else if (e.group.startsWith("Q1")) {
         age = 12;
-    } else {
+      } else {
         throw new Error(`unknown group ${JSON.stringify(e)}`);
-    }
-    return {
+      }
+      return {
         age,
-        ...e
-    }
-}), null, 2))
+        ...e,
+      };
+    }),
+    null,
+    2
+  )
+);

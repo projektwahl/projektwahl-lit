@@ -67,13 +67,15 @@ CREATE ROLE projektwahl_staging LOGIN PASSWORD 'projektwahl'; -- CHANGE/REMOVE T
 CREATE ROLE projektwahl_staging_admin IN ROLE projektwahl_staging LOGIN PASSWORD 'projektwahl'; -- CHANGE/REMOVE THIS PASSWORD
 CREATE DATABASE projektwahl_staging OWNER projektwahl_staging_admin;
 
-sudo -u postgres psql --db projektwahl_staging
-REVOKE CREATE ON SCHEMA public FROM PUBLIC;
-#GRANT CREATE ON SCHEMA public To projektwahl_staging_admin;
-
 psql postgres://projektwahl_staging_admin:projektwahl@localhost/projektwahl_staging --single-transaction < src/server/setup.sql
 
+sudo -u postgres psql --db projektwahl_staging
+REVOKE CREATE ON SCHEMA public FROM PUBLIC;
+GRANT CREATE ON SCHEMA public To projektwahl_staging_admin;
+
+
 NODE_ENV=development DATABASE_HOST=/run/postgresql DATABASE_URL=postgres://projektwahl_staging:projektwahl@localhost/projektwahl_staging npm run setup
+
 
 
 PORT=8443 BASE_URL=https://localhost:8443 DATABASE_URL=postgres://projektwahl@projektwahl/projektwahl CREDENTIALS_DIRECTORY=$PWD node  --enable-source-maps dist/server.js
