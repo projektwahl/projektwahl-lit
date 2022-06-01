@@ -75,7 +75,11 @@ export function requestHandler<P extends keyof typeof routes>(
         request.method === "POST" &&
         request.headers["x-csrf-protection"] !== "projektwahl"
       ) {
-        throw new Error("No CSRF header!");
+        response.writeHead(403, {
+          ...defaultHeaders,
+        });
+        response.end("No CSRF header!");
+        return;
       }
 
       let user: z.infer<typeof userSchema> | undefined = undefined;
