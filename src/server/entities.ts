@@ -165,7 +165,7 @@ export async function fetchData<R extends keyof typeof entityRoutes>(
                   ? sql`<`
                   : sql`>`
                 : sql`IS NOT DISTINCT FROM`
-            } ${sql.unsafe(value[0] ?? null)}`,
+            } ${sql.unsafe(`"${value[0]}"`)}`,
           ];
         })
         .slice(1)
