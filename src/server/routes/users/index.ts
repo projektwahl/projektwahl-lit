@@ -106,7 +106,11 @@ export const usersHandler = requestHandler(
           } OR force_in_project_id IS NOT DISTINCT FROM ${
             force_in_project_id ?? null
           })
-          ${group === undefined ? sql`` : sql` AND "group" LIKE ${`${group}%`}`}
+          ${
+            group === undefined
+              ? sql``
+              : sql` AND "group" LIKE ${`${group ?? ""}%`}`
+          }
             AND (${type === undefined} OR type = ${type ?? null})`;
         },
         {
