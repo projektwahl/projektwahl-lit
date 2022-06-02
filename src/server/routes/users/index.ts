@@ -89,29 +89,25 @@ export const usersHandler = requestHandler(
                 ? sql`"force_in_project_id",`
                 : sql``
             }
-            "deleted" FROM users_with_deleted WHERE (${
-              id === undefined
-            } OR id = ${id ?? null}) AND username LIKE ${
-            "%" + (username ?? "") + "%"
-          }
-          AND (${
-            project_leader_id === undefined
-          } OR project_leader_id IS NOT DISTINCT FROM  ${
+            "deleted" FROM users_with_deleted WHERE 1 ${
+              id === undefined ? sql`` : sql`AND id = ${id ?? null}`} ${username === undefined ? sql`` : sql`AND username LIKE ${
+            "%" + username + "%"}`}
+          ${
+            project_leader_id === undefined ? sql`` : sql`
+          AND project_leader_id IS NOT DISTINCT FROM ${
             project_leader_id ?? null
-          })
-          AND (${deleted === undefined} OR deleted = ${deleted ?? null})
-          AND (${
-            force_in_project_id === undefined ||
-            !(loggedInUser.type === "admin" || loggedInUser.type === "helper")
-          } OR force_in_project_id IS NOT DISTINCT FROM ${
+          }`}
+          ${deleted === undefined ? sql`` : sql`AND deleted = ${deleted ?? null}`}
+          ${force_in_project_id === undefined ||
+            !(loggedInUser.type === "admin" || loggedInUser.type === "helper") ? sql`` : sql`AND force_in_project_id IS NOT DISTINCT FROM ${
             force_in_project_id ?? null
-          })
+          }`}
           ${
             group === undefined
               ? sql``
               : sql` AND "group" LIKE ${`${group ?? ""}%`}`
           }
-            AND (${type === undefined} OR type = ${type ?? null})`;
+          ${type === undefined ? sql`` : sql`AND type = ${type ?? null}`}`
         },
         {
           id: (q, o) => {
