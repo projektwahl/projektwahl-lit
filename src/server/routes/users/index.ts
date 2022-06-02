@@ -152,8 +152,8 @@ export const usersHandler = requestHandler(
                   ? "DESC"
                   : "ASC"
                 : q === "ASC"
-                ? "ASC"
-                : "DESC"
+                ? "ASC NULLS FIRST"
+                : "DESC NULLS LAST"
             )}`,
           force_in_project_id: (q, o, v) =>
             sql`(users_with_deleted.force_in_project_id IS NOT DISTINCT FROM ${

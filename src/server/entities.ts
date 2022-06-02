@@ -161,33 +161,45 @@ export async function fetchData<R extends keyof typeof entityRoutes>(
               case "ASC":
                 switch (query.paginationDirection) {
                   case "forwards":
-                    order = sql`<`;
+                    order = sql`NOT (${
+                      // @ts-expect-error this seems impossible to type - we probably need to unify this to the indexed type before
+                      paginationCursor ? paginationCursor[value[0]] : null
+                    } >= ${sql.unsafe(`"${value[0]}"`)})`
                     break;
                   case "backwards":
-                    order = sql`>`;
+                    order = sql`NOT (${
+                      // @ts-expect-error this seems impossible to type - we probably need to unify this to the indexed type before
+                      paginationCursor ? paginationCursor[value[0]] : null
+                    } <= ${sql.unsafe(`"${value[0]}"`)})`
                     break;
                 }
                 break;
               case "DESC":
                 switch (query.paginationDirection) {
                   case "forwards":
-                    order = sql`>`;
+                    order = sql`NOT (${
+                      // @ts-expect-error this seems impossible to type - we probably need to unify this to the indexed type before
+                      paginationCursor ? paginationCursor[value[0]] : null
+                    } <= ${sql.unsafe(`"${value[0]}"`)})`
                     break;
                   case "backwards":
-                    order = sql`<`;
+                    order = sql`NOT (${
+                      // @ts-expect-error this seems impossible to type - we probably need to unify this to the indexed type before
+                      paginationCursor ? paginationCursor[value[0]] : null
+                    } >= ${sql.unsafe(`"${value[0]}"`)})`
                     break;
                 }
                 break;
             }
           } else {
-            order = sql`IS NOT DISTINCT FROM`;
+            order = sql`${
+              // @ts-expect-error this seems impossible to type - we probably need to unify this to the indexed type before
+              paginationCursor ? paginationCursor[value[0]] : null
+            } IS NOT DISTINCT FROM ${sql.unsafe(`"${value[0]}"`)}`
           }
           return [
             sql` AND `,
-            sql`${
-              // @ts-expect-error this seems impossible to type - we probably need to unify this to the indexed type before
-              paginationCursor ? paginationCursor[value[0]] : null
-            } ${order} ${sql.unsafe(`"${value[0]}"`)}`,
+            order
           ];
         })
         .slice(1)
