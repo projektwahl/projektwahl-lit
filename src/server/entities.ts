@@ -155,17 +155,39 @@ export async function fetchData<R extends keyof typeof entityRoutes>(
 
       const parts = part
         .flatMap((value, index) => {
+          let order;
+          if (index === part.length - 1) {
+            switch (value[1]) {
+              case "ASC":
+                switch (query.paginationDirection) {
+                  case "forwards":
+                    order = sql`<`;
+                    break;
+                  case "backwards":
+                    order = sql`>`;
+                    break;
+                }
+                break;
+              case "DESC":
+                switch (query.paginationDirection) {
+                  case "forwards":
+                    order = sql`>`;
+                    break;
+                  case "backwards":
+                    order = sql`<`;
+                    break;
+                }
+                break;
+            }
+          } else {
+            order = sql`IS NOT DISTINCT FROM`;
+          }
           return [
             sql` AND `,
-            // @ts-expect-error this seems impossible to type - we probably need to unify this to the indexed type before
-            sql`${paginationCursor ? paginationCursor[value[0]] : null} ${
-              index === part.length - 1
-                ? (value[1] === "ASC") !==
-                  (query.paginationDirection === "backwards")
-                  ? sql`<`
-                  : sql`>`
-                : sql`IS NOT DISTINCT FROM`
-            } ${sql.unsafe(`"${value[0]}"`)}`,
+            sql`${
+              // @ts-expect-error this seems impossible to type - we probably need to unify this to the indexed type before
+              paginationCursor ? paginationCursor[value[0]] : null
+            } ${order} ${sql.unsafe(`"${value[0]}"`)}`,
           ];
         })
         .slice(1)
