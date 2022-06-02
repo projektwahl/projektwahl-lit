@@ -331,6 +331,11 @@ export const routes = {
             z.null(),
           ]),
           z.tuple([
+            z.literal("group" as const),
+            z.enum(["ASC", "DESC"] as const),
+            z.null(),
+          ]),
+          z.tuple([
             z.literal("project_leader_id" as const),
             z.enum(["ASC", "DESC"] as const),
             z.number(),
@@ -351,6 +356,7 @@ export const routes = {
         project_leader_id: true,
         force_in_project_id: true,
         deleted: true,
+        group: true,
       })
       .strict()
       .partial()

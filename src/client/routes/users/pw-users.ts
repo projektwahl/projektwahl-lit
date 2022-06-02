@@ -178,6 +178,21 @@ export class PwUsers<X extends string> extends PwEntityList<
             })}
           </th>
 
+          <th class="table-cell-hover p-0" scope="col">
+            ${pwOrder({
+              url: "/api/v1/users",
+              name: ["sorting", "group"],
+              orderBy: "group",
+              prefix: this.prefix,
+              title: msg("Group"),
+              value: null,
+              get: (o) => o.sorting,
+              set: (o, v) => (o.sorting = v),
+              initial,
+              defaultValue: [],
+            })}
+          </th>
+
           <th class="table-cell-hover">${msg("Show deleted")}</th>
 
           <th class="table-cell-hover">${msg("Actions")}</th>
@@ -238,6 +253,22 @@ export class PwUsers<X extends string> extends PwEntityList<
                 { value: "admin", text: "Admin" },
               ],
               task: this._task,
+              initial,
+              defaultValue: undefined,
+              resettable: false,
+            })}
+          </th>
+
+          <th scope="col">
+            ${pwInputText<"/api/v1/users", string | null | undefined>({
+              enabled: true,
+              url: this.url,
+              label: null,
+              name: ["filters", "group"],
+              get: (o) => o.filters.group,
+              set: (o, v) => (o.filters.group = v),
+              task: this._task,
+              type: "text",
               initial,
               defaultValue: undefined,
               resettable: false,
@@ -324,6 +355,13 @@ export class PwUsers<X extends string> extends PwEntityList<
                             : value.type === "helper"
                             ? msg("Lehrer")
                             : msg("Schüler")}`}
+                    </p>
+                  </td>
+                  <td>
+                    <p>
+                      ${value.deleted
+                        ? html`<del>${value.group} </del>`
+                        : html`${value.group} `}
                     </p>
                   </td>
                   <td>

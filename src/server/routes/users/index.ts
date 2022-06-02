@@ -71,6 +71,7 @@ export const usersHandler = requestHandler(
             project_leader_id,
             force_in_project_id,
             deleted,
+            group,
             ...rest
           } = query.filters;
           let _ = rest;
@@ -105,6 +106,7 @@ export const usersHandler = requestHandler(
           } OR force_in_project_id IS NOT DISTINCT FROM ${
             force_in_project_id ?? null
           })
+          ${group === undefined ? sql`` : sql` AND "group" LIKE ${group + "%"}`}
             AND (${type === undefined} OR type = ${type ?? null})`;
         },
         {
@@ -131,6 +133,16 @@ export const usersHandler = requestHandler(
             )}`,
           username: (q, o) =>
             sql`username ${sql.unsafe(
+              o === "backwards"
+                ? q === "ASC"
+                  ? "DESC"
+                  : "ASC"
+                : q === "ASC"
+                ? "ASC"
+                : "DESC"
+            )}`,
+          group: (q, o) =>
+            sql`"group" ${sql.unsafe(
               o === "backwards"
                 ? q === "ASC"
                   ? "DESC"
