@@ -89,7 +89,7 @@ export const usersHandler = requestHandler(
                 ? sql`"force_in_project_id",`
                 : sql``
             }
-            "deleted" FROM users_with_deleted WHERE 1 ${
+            "deleted" FROM users_with_deleted WHERE TRUE ${
               id === undefined ? sql`` : sql`AND id = ${id ?? null}`} ${username === undefined ? sql`` : sql`AND username LIKE ${
             "%" + username + "%"}`}
           ${
