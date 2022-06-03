@@ -156,51 +156,40 @@ export async function fetchData<R extends keyof typeof entityRoutes>(
       const parts = part
         .flatMap((value, index) => {
           let order;
+          // @ts-expect-error this seems impossible to type - we probably need to unify this to the indexed type before
+          const cursorValue = paginationCursor
+            ? paginationCursor[value[0]]
+            : null;
+          const column = sql.unsafe(`"${value[0]}"`);
           if (index === part.length - 1) {
             switch (value[1]) {
               case "ASC":
+                // ASC is NULLS LAST by default
                 switch (query.paginationDirection) {
                   case "forwards":
-                    order = sql`NOT (${
-                      // @ts-expect-error this seems impossible to type - we probably need to unify this to the indexed type before
-                      paginationCursor ? paginationCursor[value[0]] : null
-                    } >= ${sql.unsafe(`"${value[0]}"`)})`
+                    order = sql`(${cursorValue} < ${column} OR )`;
                     break;
                   case "backwards":
-                    order = sql`NOT (${
-                      // @ts-expect-error this seems impossible to type - we probably need to unify this to the indexed type before
-                      paginationCursor ? paginationCursor[value[0]] : null
-                    } <= ${sql.unsafe(`"${value[0]}"`)})`
+                    order = sql`(${cursorValue} > ${column})`;
                     break;
                 }
                 break;
               case "DESC":
+                // DESC is NULLS FIRST by default
                 switch (query.paginationDirection) {
                   case "forwards":
-                    order = sql`NOT (${
-                      // @ts-expect-error this seems impossible to type - we probably need to unify this to the indexed type before
-                      paginationCursor ? paginationCursor[value[0]] : null
-                    } <= ${sql.unsafe(`"${value[0]}"`)})`
+                    order = sql`(${cursorValue} > ${column})`;
                     break;
                   case "backwards":
-                    order = sql`NOT (${
-                      // @ts-expect-error this seems impossible to type - we probably need to unify this to the indexed type before
-                      paginationCursor ? paginationCursor[value[0]] : null
-                    } >= ${sql.unsafe(`"${value[0]}"`)})`
+                    order = sql` (${cursorValue} < ${column})`;
                     break;
                 }
                 break;
             }
           } else {
-            order = sql`${
-              // @ts-expect-error this seems impossible to type - we probably need to unify this to the indexed type before
-              paginationCursor ? paginationCursor[value[0]] : null
-            } IS NOT DISTINCT FROM ${sql.unsafe(`"${value[0]}"`)}`
+            order = sql`${cursorValue} IS NOT DISTINCT FROM ${column}`;
           }
-          return [
-            sql` AND `,
-            order
-          ];
+          return [sql` AND `, order];
         })
         .slice(1)
         .reduce((prev, curr) => sql`${prev}${curr}`);

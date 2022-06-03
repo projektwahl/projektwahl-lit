@@ -90,24 +90,39 @@ export const usersHandler = requestHandler(
                 : sql``
             }
             "deleted" FROM users_with_deleted WHERE TRUE ${
-              id === undefined ? sql`` : sql`AND id = ${id ?? null}`} ${username === undefined ? sql`` : sql`AND username LIKE ${
-            "%" + username + "%"}`}
+              id === undefined ? sql`` : sql`AND id = ${id ?? null}`
+            } ${
+            username === undefined
+              ? sql``
+              : sql`AND username LIKE ${"%" + username + "%"}`
+          }
           ${
-            project_leader_id === undefined ? sql`` : sql`
+            project_leader_id === undefined
+              ? sql``
+              : sql`
           AND project_leader_id IS NOT DISTINCT FROM ${
             project_leader_id ?? null
-          }`}
-          ${deleted === undefined ? sql`` : sql`AND deleted = ${deleted ?? null}`}
-          ${force_in_project_id === undefined ||
-            !(loggedInUser.type === "admin" || loggedInUser.type === "helper") ? sql`` : sql`AND force_in_project_id IS NOT DISTINCT FROM ${
-            force_in_project_id ?? null
-          }`}
+          }`
+          }
+          ${
+            deleted === undefined
+              ? sql``
+              : sql`AND deleted = ${deleted ?? null}`
+          }
+          ${
+            force_in_project_id === undefined ||
+            !(loggedInUser.type === "admin" || loggedInUser.type === "helper")
+              ? sql``
+              : sql`AND force_in_project_id IS NOT DISTINCT FROM ${
+                  force_in_project_id ?? null
+                }`
+          }
           ${
             group === undefined
               ? sql``
               : sql` AND "group" LIKE ${`${group ?? ""}%`}`
           }
-          ${type === undefined ? sql`` : sql`AND type = ${type ?? null}`}`
+          ${type === undefined ? sql`` : sql`AND type = ${type ?? null}`}`;
         },
         {
           id: (q, o) => {
@@ -148,8 +163,8 @@ export const usersHandler = requestHandler(
                   ? "DESC"
                   : "ASC"
                 : q === "ASC"
-                ? "ASC NULLS FIRST"
-                : "DESC NULLS LAST"
+                ? "ASC"
+                : "DESC"
             )}`,
           force_in_project_id: (q, o, v) =>
             sql`(users_with_deleted.force_in_project_id IS NOT DISTINCT FROM ${
