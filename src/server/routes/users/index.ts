@@ -71,6 +71,7 @@ export const usersHandler = requestHandler(
             project_leader_id,
             force_in_project_id,
             deleted,
+            group,
             ...rest
           } = query.filters;
           let _ = rest;
@@ -88,24 +89,40 @@ export const usersHandler = requestHandler(
                 ? sql`"force_in_project_id",`
                 : sql``
             }
-            "deleted" FROM users_with_deleted WHERE (${
-              id === undefined
-            } OR id = ${id ?? null}) AND username LIKE ${
-            "%" + (username ?? "") + "%"
+            "deleted" FROM users_with_deleted WHERE TRUE ${
+              id === undefined ? sql`` : sql`AND id = ${id ?? null}`
+            } ${
+            username === undefined
+              ? sql``
+              : sql`AND username LIKE ${"%" + username + "%"}`
           }
-          AND (${
+          ${
             project_leader_id === undefined
-          } OR project_leader_id IS NOT DISTINCT FROM  ${
+              ? sql``
+              : sql`
+          AND project_leader_id IS NOT DISTINCT FROM ${
             project_leader_id ?? null
-          })
-          AND (${deleted === undefined} OR deleted = ${deleted ?? null})
-          AND (${
+          }`
+          }
+          ${
+            deleted === undefined
+              ? sql``
+              : sql`AND deleted = ${deleted ?? null}`
+          }
+          ${
             force_in_project_id === undefined ||
             !(loggedInUser.type === "admin" || loggedInUser.type === "helper")
-          } OR force_in_project_id IS NOT DISTINCT FROM ${
-            force_in_project_id ?? null
-          })
-            AND (${type === undefined} OR type = ${type ?? null})`;
+              ? sql``
+              : sql`AND force_in_project_id IS NOT DISTINCT FROM ${
+                  force_in_project_id ?? null
+                }`
+          }
+          ${
+            group === undefined
+              ? sql``
+              : sql` AND "group" LIKE ${`${group ?? ""}%`}`
+          }
+          ${type === undefined ? sql`` : sql`AND type = ${type ?? null}`}`;
         },
         {
           id: (q, o) => {
@@ -131,6 +148,16 @@ export const usersHandler = requestHandler(
             )}`,
           username: (q, o) =>
             sql`username ${sql.unsafe(
+              o === "backwards"
+                ? q === "ASC"
+                  ? "DESC"
+                  : "ASC"
+                : q === "ASC"
+                ? "ASC"
+                : "DESC"
+            )}`,
+          group: (q, o) =>
+            sql`"group" ${sql.unsafe(
               o === "backwards"
                 ? q === "ASC"
                   ? "DESC"
