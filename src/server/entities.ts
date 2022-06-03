@@ -153,6 +153,12 @@ export async function fetchData<R extends keyof typeof entityRoutes>(
       })`}`;
     });
   } else {
+    // TODO test with pagination step 10 and 11 null values
+    // test group,type
+    // test type,group
+    // test group,id
+    // test id,group
+
     const queries = sorting.map((value, index) => {
       const part = sorting.slice(0, index + 1);
 
@@ -170,10 +176,10 @@ export async function fetchData<R extends keyof typeof entityRoutes>(
                 // ASC is NULLS LAST by default
                 switch (query.paginationDirection) {
                   case "forwards":
-                    order = sql`(${cursorValue} < ${column} OR ${column} IS NULL)`;
+                    order = sql`(${cursorValue} < ${column} ${paginationCursor == null || cursorValue !== null ? sql`OR ${column} IS NULL` : sql``})`;
                     break;
                   case "backwards":
-                    order = sql`(${cursorValue} > ${column} OR ${column} IS NULL)`;
+                    order = sql`(${cursorValue} > ${column} ${paginationCursor == null || cursorValue === null ? sql`OR ${column} IS NULL` : sql``})`;
                     break;
                 }
                 break;
@@ -181,10 +187,10 @@ export async function fetchData<R extends keyof typeof entityRoutes>(
                 // DESC is NULLS FIRST by default
                 switch (query.paginationDirection) {
                   case "forwards":
-                    order = sql`(${cursorValue} > ${column} OR ${column} IS NULL)`;
+                    order = sql`(${cursorValue} > ${column} ${paginationCursor == null || cursorValue === null ? sql`OR ${column} IS NULL` : sql``})`;
                     break;
                   case "backwards":
-                    order = sql` (${cursorValue} < ${column} OR ${column} IS NULL)`;
+                    order = sql` (${cursorValue} < ${column} ${paginationCursor == null || cursorValue !== null ? sql`OR ${column} IS NULL` : sql``})`;
                     break;
                 }
                 break;
