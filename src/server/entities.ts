@@ -116,7 +116,7 @@ export async function fetchData<R extends keyof typeof entityRoutes>(
   }
 
   // TODO FIXME id tiebreaker lost
-  console.log(sorting)
+  console.log(sorting);
 
   const orderByQueryParts = mappedFunctionCall2(
     sorting,
@@ -162,47 +162,63 @@ export async function fetchData<R extends keyof typeof entityRoutes>(
     const queries = sorting.map((value, index) => {
       const part = sorting.slice(0, index + 1);
 
-      const partsTmp = part
-        .flatMap((value, index) => {
-          let order;
-          const cursorValue = paginationCursor
-            // @ts-expect-error this seems impossible to type - we probably need to unify this to the indexed type before
-            ? paginationCursor[value[0]]
-            : null;
-          const column = sql.unsafe(`"${value[0]}"`);
-          if (index === part.length - 1) {
-            switch (value[1]) {
-              case "ASC":
-                // ASC is NULLS LAST by default
-                switch (query.paginationDirection) {
-                  case "forwards":
-                    order = sql`(${cursorValue} < ${column} ${paginationCursor == null || cursorValue !== null ? sql`OR ${column} IS NULL` : sql``})`;
-                    break;
-                  case "backwards":
-                    order = sql`(${cursorValue} > ${column} ${paginationCursor == null || cursorValue === null ? sql`OR ${column} IS NULL` : sql``})`;
-                    break;
-                }
-                break;
-              case "DESC":
-                // DESC is NULLS FIRST by default
-                switch (query.paginationDirection) {
-                  case "forwards":
-                    order = sql`(${cursorValue} > ${column} ${paginationCursor == null || cursorValue === null ? sql`OR ${column} IS NULL` : sql``})`;
-                    break;
-                  case "backwards":
-                    order = sql` (${cursorValue} < ${column} ${paginationCursor == null || cursorValue !== null ? sql`OR ${column} IS NULL` : sql``})`;
-                    break;
-                }
-                break;
-            }
-          } else {
-            // this is probably not compatible with the checks above
-            order = sql`${cursorValue} IS NOT DISTINCT FROM ${column}`;
+      const partsTmp = part.flatMap((value, index) => {
+        let order;
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+        const cursorValue = paginationCursor
+          ? // @ts-expect-error this seems impossible to type - we probably need to unify this to the indexed type before
+            paginationCursor[value[0]]
+          : null;
+        const column = sql.unsafe(`"${value[0]}"`);
+        if (index === part.length - 1) {
+          switch (value[1]) {
+            case "ASC":
+              // ASC is NULLS LAST by default
+              switch (query.paginationDirection) {
+                case "forwards":
+                  order = sql`(${cursorValue} < ${column} ${
+                    paginationCursor == null || cursorValue !== null
+                      ? sql`OR ${column} IS NULL`
+                      : sql``
+                  })`;
+                  break;
+                case "backwards":
+                  order = sql`(${cursorValue} > ${column} ${
+                    paginationCursor == null || cursorValue === null
+                      ? sql`OR ${column} IS NULL`
+                      : sql``
+                  })`;
+                  break;
+              }
+              break;
+            case "DESC":
+              // DESC is NULLS FIRST by default
+              switch (query.paginationDirection) {
+                case "forwards":
+                  order = sql`(${cursorValue} > ${column} ${
+                    paginationCursor == null || cursorValue === null
+                      ? sql`OR ${column} IS NULL`
+                      : sql``
+                  })`;
+                  break;
+                case "backwards":
+                  order = sql` (${cursorValue} < ${column} ${
+                    paginationCursor == null || cursorValue !== null
+                      ? sql`OR ${column} IS NULL`
+                      : sql``
+                  })`;
+                  break;
+              }
+              break;
           }
-          return [sql` AND `, order];
-        });
+        } else {
+          // this is probably not compatible with the checks above
+          order = sql`${cursorValue} IS NOT DISTINCT FROM ${column}`;
+        }
+        return [sql` AND `, order];
+      });
 
-        const parts = partsTmp
+      const parts = partsTmp
         .slice(1)
         .reduce((prev, curr) => sql`${prev}${curr}`);
 
