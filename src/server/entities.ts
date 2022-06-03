@@ -115,6 +115,9 @@ export async function fetchData<R extends keyof typeof entityRoutes>(
     sorting.push([tiebreaker, "ASC", null]);
   }
 
+  // TODO FIXME id tiebreaker lost
+  console.log(sorting)
+
   const orderByQueryParts = mappedFunctionCall2(
     sorting,
     (v: entitiesType4[R]) => {
@@ -153,11 +156,11 @@ export async function fetchData<R extends keyof typeof entityRoutes>(
     const queries = sorting.map((value, index) => {
       const part = sorting.slice(0, index + 1);
 
-      const parts = part
+      const partsTmp = part
         .flatMap((value, index) => {
           let order;
-          // @ts-expect-error this seems impossible to type - we probably need to unify this to the indexed type before
           const cursorValue = paginationCursor
+            // @ts-expect-error this seems impossible to type - we probably need to unify this to the indexed type before
             ? paginationCursor[value[0]]
             : null;
           const column = sql.unsafe(`"${value[0]}"`);
@@ -167,10 +170,10 @@ export async function fetchData<R extends keyof typeof entityRoutes>(
                 // ASC is NULLS LAST by default
                 switch (query.paginationDirection) {
                   case "forwards":
-                    order = sql`(${cursorValue} < ${column} OR )`;
+                    order = sql`(${cursorValue} < ${column} OR ${column} IS NULL)`;
                     break;
                   case "backwards":
-                    order = sql`(${cursorValue} > ${column})`;
+                    order = sql`(${cursorValue} > ${column} OR ${column} IS NULL)`;
                     break;
                 }
                 break;
@@ -178,19 +181,22 @@ export async function fetchData<R extends keyof typeof entityRoutes>(
                 // DESC is NULLS FIRST by default
                 switch (query.paginationDirection) {
                   case "forwards":
-                    order = sql`(${cursorValue} > ${column})`;
+                    order = sql`(${cursorValue} > ${column} OR ${column} IS NULL)`;
                     break;
                   case "backwards":
-                    order = sql` (${cursorValue} < ${column})`;
+                    order = sql` (${cursorValue} < ${column} OR ${column} IS NULL)`;
                     break;
                 }
                 break;
             }
           } else {
+            // this is probably not compatible with the checks above
             order = sql`${cursorValue} IS NOT DISTINCT FROM ${column}`;
           }
           return [sql` AND `, order];
-        })
+        });
+
+        const parts = partsTmp
         .slice(1)
         .reduce((prev, curr) => sql`${prev}${curr}`);
 
