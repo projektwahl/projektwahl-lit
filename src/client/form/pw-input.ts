@@ -406,7 +406,11 @@ export abstract class PwInput<
                   "Denk dran: Lange Passwörter sind viel sicherer als welche mit vielen Sonderzeichen."
                 )}</a
               ><br />
-              ${msg(html`Also lieber "Ich mag fliegende Autos." anstatt "Moritz1234!".<br />Du kannst auch einen Passwort-Manager verwenden, z.B.`)}
+              ${msg(
+                html`Also lieber "Ich mag fliegende Autos." anstatt
+                  "Moritz1234!".<br />Du kannst auch einen Passwort-Manager
+                  verwenden, z.B.`
+              )}
               <a
                 target="_blank"
                 rel="noopener noreferrer"

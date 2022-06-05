@@ -229,6 +229,8 @@ export class PwWelcome extends PwElement {
               Oben im Menü unter "Wahl" kannst du deine Projektwünsche
               auswählen.
             </p>`
+          : this.userController.type === undefined
+          ? html`<p>Oben rechts im Menü kann man sich anmelden.</p>`
           : ``}
         ${this.task.render({
           complete: (value) => {
