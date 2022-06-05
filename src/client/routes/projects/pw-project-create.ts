@@ -428,13 +428,15 @@ export class PwProjectCreate extends PwForm<
                               ${this.actionText}
                             </button>
                           `
-                        : html`<a
+                        : this.userController.type !== "voter"
+                        ? html`<a
                             class="btn btn-secondary"
                             @click=${aClick}
                             href="/projects/edit/${value?.data.id}"
                             role="button"
                             >Edit project</a
-                          >`}
+                          >`
+                        : ``}
                       <button
                         type="button"
                         class="btn btn-secondary"
