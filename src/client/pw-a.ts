@@ -25,13 +25,19 @@ import { HistoryController } from "./history-controller.js";
 // TODO FIXME https://lit.dev/docs/components/events/#shadowdom-retargeting just use the approach shown there
 
 export const aClick = (event: MouseEvent) => {
-  event.preventDefault();
-  if (!(event.target instanceof Element)) {
-    throw new Error("link not found");
+  if (!event.altKey && !event.ctrlKey && !event.metaKey && !event.shiftKey) {
+    event.preventDefault();
+    if (!(event.target instanceof Element)) {
+      throw new Error("link not found");
+    }
+    const target = event.target.closest("a");
+    if (!target) {
+      throw new Error("link not found");
+    }
+    HistoryController.goto(
+      new URL(target.href, window.location.href),
+      {},
+      false
+    );
   }
-  const target = event.target.closest("a");
-  if (!target) {
-    throw new Error("link not found");
-  }
-  HistoryController.goto(new URL(target.href, window.location.href), {}, false);
 };
