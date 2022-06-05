@@ -380,10 +380,6 @@ export class PwProjectCreate extends PwForm<
                         defaultValue: 15,
                         resettable: value !== undefined,
                       })}
-                      <div class="form-text mb-3">
-                        Bitte erstellen Sie keine Projekte mit mehr als 15
-                        möglichen Teilnehmenden.
-                      </div>
                       ${pwInputCheckbox<
                         "/api/v1/projects/create" | "/api/v1/projects/update"
                       >({
