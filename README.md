@@ -101,8 +101,8 @@ NODE_ENV=debugging PORT=8443 BASE_URL=https://localhost:8443 CREDENTIALS_DIRECTO
 ```
 NODE_ENV=testing PORT=8443 BASE_URL=https://localhost:8443 CREDENTIALS_DIRECTORY=$PWD DATABASE_HOST=localhost DATABASE_URL=postgres://projektwahl_staging:projektwahl@localhost/projektwahl_staging npm run server
 
-
-psql postgres://projektwahl_staging_admin:projektwahl@localhost/projektwahl_staging --command="DROP TABLE IF EXISTS settings, sessions, choices_history, projects_history, users_history, choices, users_with_deleted, projects_with_deleted CASCADE;"
+psql --u postgres --command="DROP DATABASE projektwahl_staging;"
+psql --u postgres --command="CREATE DATABASE projektwahl_staging OWNER projektwahl_staging_admin;"
 psql postgres://projektwahl_staging_admin:projektwahl@localhost/projektwahl_staging --single-transaction < src/server/setup.sql
 psql postgres://projektwahl_staging_admin:projektwahl@localhost/projektwahl_staging --command="UPDATE settings SET open_date = CURRENT_TIMESTAMP + (- '1 minute'::interval), voting_start_date = CURRENT_TIMESTAMP, voting_end_date = CURRENT_TIMESTAMP + '1 hour', results_date = CURRENT_TIMESTAMP + '2 hours';"
 NODE_ENV=development DATABASE_HOST=localhost DATABASE_URL=postgres://projektwahl_staging:projektwahl@localhost/projektwahl_staging npm run setup
