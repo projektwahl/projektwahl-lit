@@ -20,7 +20,7 @@ https://github.com/projektwahl/projektwahl-lit
 SPDX-License-Identifier: AGPL-3.0-or-later
 SPDX-FileCopyrightText: 2021 Moritz Hedtke <Moritz.Hedtke@t-online.de>
 */
-import { msg } from "@lit/localize";
+import { msg, str } from "@lit/localize";
 import { html } from "lit";
 import { PwElement } from "../pw-element.js";
 import { LoggedInUserController } from "../user-controller.js";
@@ -240,25 +240,25 @@ export class PwWelcome extends PwElement {
 
               const state =
                 curr > new Date(Number(val.results_date))
-                  ? "results"
+                  ? msg("results")
                   : curr > new Date(Number(val.voting_end_date))
-                  ? "voting end"
+                  ? msg("voting end")
                   : curr > new Date(Number(val.voting_start_date))
-                  ? "voting start"
+                  ? msg("voting start")
                   : curr > new Date(Number(val.open_date))
-                  ? "preparation"
-                  : "not started yet";
+                  ? msg("preparation")
+                  : msg("not started yet");
 
               const next_date_and_state =
                 curr > new Date(Number(val.results_date))
                   ? null
                   : curr > new Date(Number(val.voting_end_date))
-                  ? ["results", val.results_date]
+                  ? [msg("results"), val.results_date]
                   : curr > new Date(Number(val.voting_start_date))
-                  ? ["voting end", val.voting_end_date]
+                  ? [msg("voting end"), val.voting_end_date]
                   : curr > new Date(Number(val.open_date))
-                  ? ["voting start", val.voting_start_date]
-                  : ["preparation", val.open_date];
+                  ? [msg("voting start"), val.voting_start_date]
+                  : [msg("preparation"), val.open_date];
 
               if (next_date_and_state) {
                 const diff =
@@ -274,7 +274,7 @@ export class PwWelcome extends PwElement {
                 const days = Math.floor(diff / (1000 * 60 * 60 * 24));
 
                 return html`<span class="font-monospace"
-                  >currently ${state},
+                  >${msg(str`currently ${state},
                   ${renderDigit(Math.floor(days / 100) % 10)}${renderDigit(
                     Math.floor(days / 10) % 10
                   )}${renderDigit(days % 10)}
@@ -290,10 +290,10 @@ export class PwWelcome extends PwElement {
                   ${renderDigit(Math.floor(seconds / 10))}${renderDigit(
                     seconds % 10
                   )}
-                  seconds until ${next_date_and_state[0]}</span
+                  seconds until ${next_date_and_state[0]}`)}</span
                 >`;
               } else {
-                return html`<span>results available</span>`;
+                return html`<span>${msg("results available")}</span>`;
               }
             }
           },
