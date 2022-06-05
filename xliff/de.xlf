@@ -2,6 +2,50 @@
 <xliff version="1.2" xmlns="urn:oasis:names:tc:xliff:document:1.2">
 <file target-language="de" source-language="en" original="lit-localize-inputs" datatype="plaintext">
 <body>
+<trans-unit id="s5378e22204d21ef5">
+  <source>results</source>
+  <target>Ergebnisse</target>
+</trans-unit>
+<trans-unit id="s4eb073f52f33daf7">
+  <source>voting end</source>
+  <target>Ende der Wahl</target>
+</trans-unit>
+<trans-unit id="s1d6aa41e27789992">
+  <source>voting start</source>
+  <target>Anfang der Wahl</target>
+</trans-unit>
+<trans-unit id="sd3b8b328ea0a1a9a">
+  <source>preparation</source>
+  <target>Vorbereitung</target>
+</trans-unit>
+<trans-unit id="s81f9362a0dea88ed">
+  <source>not started yet</source>
+  <target>hat noch nicht angefangen</target>
+</trans-unit>
+<trans-unit id="s254dbd1c5813b447">
+  <source>currently <x id="0" equiv-text="${state}"/>,
+                  <x id="1" equiv-text="${renderDigit(Math.floor(days / 100) % 10)}${renderDigit(Math.floor(days / 10) % 10)}${renderDigit(days % 10)}"/>
+                  days,
+                  <x id="2" equiv-text="${renderDigit(Math.floor(hours / 10))}${renderDigit(hours % 10)}"/>
+                  hours,
+                  <x id="3" equiv-text="${renderDigit(Math.floor(minutes / 10))}${renderDigit(minutes % 10)}"/>
+                  minutes,
+                  <x id="4" equiv-text="${renderDigit(Math.floor(seconds / 10))}${renderDigit(seconds % 10)}"/>
+                  seconds until <x id="5" equiv-text="${next_date_and_state[0]}"/></source>
+  <target>aktuell <x id="0" equiv-text="${state}"/>,
+                  <x id="1" equiv-text="${renderDigit(Math.floor(days / 100) % 10)}${renderDigit(Math.floor(days / 10) % 10)}${renderDigit(days % 10)}"/>
+                  Tage,
+                  <x id="2" equiv-text="${renderDigit(Math.floor(hours / 10))}${renderDigit(hours % 10)}"/>
+                  Stunden,
+                  <x id="3" equiv-text="${renderDigit(Math.floor(minutes / 10))}${renderDigit(minutes % 10)}"/>
+                  Minuten,
+                  <x id="4" equiv-text="${renderDigit(Math.floor(seconds / 10))}${renderDigit(seconds % 10)}"/>
+                  Sekunden bis <x id="5" equiv-text="${next_date_and_state[0]}"/></target>
+</trans-unit>
+<trans-unit id="s40cdbe871cbd585e">
+  <source>results available</source>
+  <target>Ergebnisse verfügbar</target>
+</trans-unit>
 <trans-unit id="s7a391ae3182a86b5">
   <source>Credits</source>
   <target>Danksagung</target>
@@ -22,11 +66,10 @@
   <source>Denk dran: Lange Passwörter sind viel sicherer als welche mit vielen Sonderzeichen.</source>
   <target>Denk dran: Lange Passwörter sind viel sicherer als welche mit vielen Sonderzeichen.</target>
 </trans-unit>
-<trans-unit id="h080d38748cee9c72">
-  <source> Also lieber "Ich mag fliegende Autos." anstatt
-                "Moritz1234!".<x id="0" equiv-text="&lt;br>"/>Du kannst auch einen Passwort-Manager
-                verwenden, z.B.</source>
-  <target>Also lieber "Ich mag fliegende Autos." anstatt "Moritz1234!".<x id="0" equiv-text="&lt;br>"/>Du kannst auch einen Passwort-Manager verwenden, z.B.</target>
+<trans-unit id="head5dc831bccada8">
+  <source>Also lieber "Ich mag fliegende Autos." anstatt
+                  "Moritz1234!".<x id="0" equiv-text="&lt;br>"/>Du kannst auch einen Passwort-Manager
+                  verwenden, z.B.</source>
 </trans-unit>
 <trans-unit id="s1dc79c57a4bab199">
   <source>Bitwarden</source>
@@ -98,6 +141,7 @@
 </trans-unit>
 <trans-unit id="sd77ecad6065c6311">
   <source>Account nicht gefunden!</source>
+  <target>Account nicht gefunden!</target>
 </trans-unit>
 <trans-unit id="s03f42eea72154959">
   <source>Username</source>
@@ -185,6 +229,7 @@
 </trans-unit>
 <trans-unit id="s9b28032b240c4cfb">
   <source>Projekt nicht gefunden!</source>
+  <target>Projekt nicht gefunden!</target>
 </trans-unit>
 <trans-unit id="s13b3f5afa0862d1c">
   <source>Place</source>
@@ -232,7 +277,7 @@
 </trans-unit>
 <trans-unit id="s879f3dab73cde287">
   <source>Error: <x id="0" equiv-text="${value.error}"/></source>
-  <target>Fehler: <x id="0" equiv-text="${error}"/></target>
+  <target>Fehler: <x id="0" equiv-text="${value.error}"/></target>
 </trans-unit>
 <trans-unit id="s9841212bd35bac27">
   <source>Rank</source>
@@ -252,24 +297,31 @@
 </trans-unit>
 <trans-unit id="s5c18cae48b93138c">
   <source>Sessions</source>
+  <target>Sitzungen</target>
 </trans-unit>
 <trans-unit id="s3d259b88e98f1095">
   <source>View settings</source>
+  <target>Einstellungen anzeigen</target>
 </trans-unit>
 <trans-unit id="s7886195e5cfb6d41">
   <source>Update settings</source>
+  <target>Einstellungen aktualisieren</target>
 </trans-unit>
 <trans-unit id="sa605b453d445583f">
   <source>Open date</source>
+  <target>Startdatum</target>
 </trans-unit>
 <trans-unit id="s13cb62951c0f5d42">
   <source>Voting start date</source>
+  <target>Wahlstartdatum</target>
 </trans-unit>
 <trans-unit id="scb925f8c363a4029">
   <source>Voting end date</source>
+  <target>Wahlenddatum</target>
 </trans-unit>
 <trans-unit id="s180898dc64da0e8b">
   <source>Results date</source>
+  <target>Ergebnisdatum</target>
 </trans-unit>
 <trans-unit id="hc66aaa662761137a">
   <source>Not Found</source>

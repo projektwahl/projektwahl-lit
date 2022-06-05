@@ -131,7 +131,7 @@ class PwRankSelect extends PwElement {
               ? "btn-primary"
               : "btn-outline-primary"}"
           >
-            ${v === 0 ? "X" : v}
+            ${v === 0 ? "X" : `${v}.`}
           </button>`
         )}
       </div>

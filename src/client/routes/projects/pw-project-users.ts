@@ -34,16 +34,9 @@ import { parseRequestWithPrefix } from "../../entity-list/pw-entitylist.js";
 import { pwInputCheckbox } from "../../form/pw-input-checkbox.js";
 import { pwInputNumber } from "../../form/pw-input-number.js";
 import { pwInputText } from "../../form/pw-input-text.js";
-import type { entityRoutes, routes } from "../../../lib/routes.js";
+import type { routes } from "../../../lib/routes.js";
 import type { z } from "zod";
 import { pwInputSelect } from "../../form/pw-input-select.js";
-
-const defaultValue: z.infer<typeof entityRoutes["/api/v1/users"]["request"]> = {
-  sorting: [],
-  filters: {},
-  paginationDirection: "forwards",
-  paginationLimit: 100,
-};
 
 // workaround see https://github.com/runem/lit-analyzer/issues/149#issuecomment-1006162839
 export function pwProjectUsers<X extends string>(
@@ -75,8 +68,6 @@ export class PwProjectUsers<X extends string> extends PwUsers<X> {
 
   constructor() {
     super();
-
-    this.defaultValue = defaultValue;
   }
 
   name!: "project_leader_id" | "force_in_project_id";
@@ -87,13 +78,26 @@ export class PwProjectUsers<X extends string> extends PwUsers<X> {
     return html``;
   }
 
+  override render() {
+    if (!this.hasUpdated) {
+      console.log("DEFAULT VALUWE");
+      this.defaultValue = {
+        sorting: [[this.name, "DESC", this.projectId]],
+        filters: {},
+        paginationDirection: "forwards",
+        paginationLimit: 20,
+      };
+    }
+    return super.render();
+  }
+
   override get head() {
     try {
       const data = parseRequestWithPrefix(
         this.url,
         this.prefix,
         this.history.url,
-        defaultValue
+        this.defaultValue
       );
 
       const initial = data[this.prefix];
@@ -110,7 +114,7 @@ export class PwProjectUsers<X extends string> extends PwUsers<X> {
               get: (o) => o.sorting,
               set: (o, v) => (o.sorting = v),
               initial,
-              defaultValue: [],
+              defaultValue: this.defaultValue.sorting,
             })}
           </th>
 
@@ -125,7 +129,7 @@ export class PwProjectUsers<X extends string> extends PwUsers<X> {
               get: (o) => o.sorting,
               set: (o, v) => (o.sorting = v),
               initial,
-              defaultValue: [],
+              defaultValue: this.defaultValue.sorting,
             })}
           </th>
 
@@ -140,7 +144,7 @@ export class PwProjectUsers<X extends string> extends PwUsers<X> {
               get: (o) => o.sorting,
               set: (o, v) => (o.sorting = v),
               initial,
-              defaultValue: [],
+              defaultValue: this.defaultValue.sorting,
             })}
           </th>
 
@@ -155,7 +159,7 @@ export class PwProjectUsers<X extends string> extends PwUsers<X> {
               get: (o) => o.sorting,
               set: (o, v) => (o.sorting = v),
               initial,
-              defaultValue: [],
+              defaultValue: this.defaultValue.sorting,
             })}
           </th>
         </tr>
