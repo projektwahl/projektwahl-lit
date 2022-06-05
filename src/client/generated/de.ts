@@ -9,8 +9,7 @@
     /* eslint-disable @typescript-eslint/no-explicit-any */
 
     export const templates = {
-      'h0c534c69b0ebb45c': html`Also lieber "Ich mag fliegende Autos." anstatt "Moritz1234!".<br>Du kannst auch einen Passwort-Manager verwenden, z.B.`,
-'hc66aaa662761137a': html`Nicht gefunden`,
+      'hc66aaa662761137a': html`Nicht gefunden`,
 's01a8d45397ec133b': `Sicherheit`,
 's01dc5a60edf9e053': `Komponente nicht vollständig initialisiert`,
 's03f42eea72154959': `Accountname`,
@@ -105,5 +104,8 @@
 'sf9b8d419a00f04bc': `Jahrgang`,
 'sfb43be2359ccab14': `Projekt erstellen`,
 'sfebb69bee8b5102d': `Quellcode`,
+'head5dc831bccada8': html`Also lieber "Ich mag fliegende Autos." anstatt
+                  "Moritz1234!".<br>Du kannst auch einen Passwort-Manager
+                  verwenden, z.B.`,
     };
   
