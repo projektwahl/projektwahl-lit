@@ -181,7 +181,7 @@ function renderDigit(digit: number) {
 export class PwWelcome extends PwElement {
   userController: LoggedInUserController;
   clockController: ClockController;
-  task: Task<[], ResponseType<"/api/v1/settings">>;
+  task: Task<[string | undefined], ResponseType<"/api/v1/settings">>;
 
   constructor() {
     super();
