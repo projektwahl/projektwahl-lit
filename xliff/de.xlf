@@ -276,7 +276,7 @@
 </trans-unit>
 <trans-unit id="s879f3dab73cde287">
   <source>Error: <x id="0" equiv-text="${value.error}"/></source>
-  <target>Fehler: <x id="0" equiv-text="${error}"/></target>
+  <target state="translated">Fehler: <x id="0" equiv-text="${value.error}"/></target>
 </trans-unit>
 <trans-unit id="s9841212bd35bac27">
   <source>Rank</source>
