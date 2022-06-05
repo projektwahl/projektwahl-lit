@@ -570,6 +570,13 @@ sudo ln -s /etc/nginx/sites-available/nginx-monitoring.conf /etc/nginx/sites-ena
 sudo pacman -S prometheus-blackbox-exporter
 curl -o blackbox.yml https://raw.githubusercontent.com/prometheus/blackbox_exporter/master/blackbox.yml
 sudo mv blackbox.yml /etc/prometheus/
+sudo nano /etc/prometheus/blackbox.yml
+modules:
+  http_post_2xx:
+    http:
+      headers:
+        x-csrf-protection: projektwahl
+
 sudo systemctl enable --now prometheus-blackbox-exporter
 
 sudo nano /etc/prometheus/prometheus.yml
