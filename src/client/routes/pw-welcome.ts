@@ -202,7 +202,7 @@ export class PwWelcome extends PwElement {
           },
           {}
         ),
-      () => []
+      () => [this.userController.username]
     );
   }
 
