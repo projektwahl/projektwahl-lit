@@ -225,8 +225,9 @@ export class PwWelcome extends PwElement {
           );
         } else {
           return {
-            success: false
-          }
+            success: false,
+            error: "not a voter",
+          };
         }
       },
       () => [this.userController.username]
