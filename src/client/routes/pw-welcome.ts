@@ -226,7 +226,9 @@ export class PwWelcome extends PwElement {
         } else {
           return {
             success: false,
-            error: "not a voter",
+            error: {
+              issues: [],
+            },
           };
         }
       },
