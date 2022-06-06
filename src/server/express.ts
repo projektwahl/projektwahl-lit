@@ -106,7 +106,7 @@ export function requestHandler<P extends keyof typeof routes>(
           await retryableBegin(
             "ISOLATION LEVEL READ COMMITTED READ WRITE",
             async (tsql) => {
-              await tsql`SELECT set_config('projektwahl.id', 0, true);`;
+              await tsql`SELECT set_config('projektwahl.id', 0::text, true);`;
               //await typedSql(sql, {})`DELETE FROM sessions WHERE CURRENT_TIMESTAMP >= updated_at + interval '24 hours' AND session_id != ${session_id} `
               return await typedSql(tsql, {
                 columns: {

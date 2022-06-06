@@ -33,7 +33,7 @@ export const logoutHandler = requestHandler(
       await sql.begin("READ WRITE", async (tsql) => {
         await tsql`SELECT set_config('projektwahl.id', ${
           user?.id ?? null
-        }, true);`;
+        }::text, true);`;
         return await typedSql(tsql, {
           columns: {},
         } as const)`DELETE FROM sessions WHERE session_id = ${session_id}`;
