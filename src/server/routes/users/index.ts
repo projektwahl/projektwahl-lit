@@ -89,6 +89,7 @@ export const usersHandler = requestHandler(
                 ? sql`"force_in_project_id",`
                 : sql``
             }
+            ${id === loggedInUser.id ? sql`computed_in_project_id,` : sql``}
             "deleted" FROM users_with_deleted WHERE TRUE ${
               id === undefined ? sql`` : sql`AND id = ${id ?? null}`
             } ${

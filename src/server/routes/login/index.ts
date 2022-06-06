@@ -28,6 +28,7 @@ import { checkPassword } from "../../password.js";
 import type { OutgoingHttpHeaders } from "node:http";
 import nodeCrypto from "node:crypto";
 import { typedSql } from "../../describe.js";
+import { sensitiveHeaders } from "node:http2";
 // @ts-expect-error wrong typings
 const { webcrypto: crypto }: { webcrypto: Crypto } = nodeCrypto;
 
@@ -196,7 +197,11 @@ export const loginHandler = requestHandler(
         `type=${dbUser.type}; Secure; Path=/; SameSite=Lax; Max-Age=${
           48 * 60 * 60
         };`,
+        `id=${encodeURIComponent(
+          dbUser.id
+        )}; Secure; Path=/; SameSite=Lax; Max-Age=${48 * 60 * 60};`,
       ],
+      [sensitiveHeaders]: ["set-cookie"],
     };
     return [
       headers,

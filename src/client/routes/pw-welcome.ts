@@ -182,6 +182,7 @@ export class PwWelcome extends PwElement {
   userController: LoggedInUserController;
   clockController: ClockController;
   task: Task<[string | undefined], ResponseType<"/api/v1/settings">>;
+  userTask: Task<[string | undefined], ResponseType<"/api/v1/users">>;
 
   constructor() {
     super();
@@ -202,6 +203,32 @@ export class PwWelcome extends PwElement {
           },
           {}
         ),
+      () => [this.userController.username]
+    );
+
+    this.userTask = new Task(
+      this,
+      async () => {
+        if (this.userController.type === "voter") {
+          return await myFetch(
+            "GET",
+            "/api/v1/users",
+            {
+              filters: {
+                id: this.userController.id,
+              },
+              sorting: [],
+              paginationDirection: "forwards",
+              paginationLimit: 100,
+            },
+            {}
+          );
+        } else {
+          return {
+            success: false
+          }
+        }
+      },
       () => [this.userController.username]
     );
   }
@@ -231,6 +258,22 @@ export class PwWelcome extends PwElement {
             </p>`
           : this.userController.type === undefined
           ? html`<p>Oben rechts im Menü kann man sich anmelden.</p>`
+          : ``}
+        ${this.userController.type === "voter"
+          ? this.userTask.render({
+              complete: (value) => {
+                if (value.success) {
+                  return html`<p>
+                    Du bist im Projekt
+                    ${value.data.entities[0].computed_in_project_id}
+                  </p>`;
+                } else {
+                  return html`<p>
+                    Fehler beim Laden des Wahlergebnisses. Lade die Seite neu!
+                  </p>`;
+                }
+              },
+            })
           : ``}
         ${this.task.render({
           complete: (value) => {

@@ -30,16 +30,20 @@ export class LoggedInUserController implements ReactiveController {
 
   type: string | undefined;
 
+  id: number | undefined;
+
   constructor(host: ReactiveControllerHost) {
     (this.host = host).addController(this);
 
     this.username = jscookie.get("username");
     this.type = jscookie.get("type");
+    this.id = Number(jscookie.get("id"));
   }
 
   updateloginstate = () => {
     this.username = jscookie.get("username");
     this.type = jscookie.get("type");
+    this.id = Number(jscookie.get("id"));
     this.host.requestUpdate();
   };
 

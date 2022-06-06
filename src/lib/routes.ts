@@ -305,11 +305,13 @@ export const routes = {
         away: true,
         project_leader_id: true,
         force_in_project_id: true,
+        computed_in_project_id: true,
         deleted: true,
       })
       .partial({
         openid_id: true,
         force_in_project_id: true,
+        computed_in_project_id: true,
       })
       .strict(),
     z
