@@ -491,12 +491,7 @@ DROP POLICY IF EXISTS users_voters_only_project_leaders ON users_with_deleted;
 
 -- TODO FIXME switch to USING AND WITH so no entries are accidentially hidden but instead an error is thrown that rls is violated
 CREATE POLICY users_voters_only_project_leaders ON users_with_deleted FOR ALL TO PUBLIC USING (FALSE);
-
--- THIs is getting ridicolous - just also keep the setting projektwahl.type to prevent the recursion error
-ALTER POLICY users_voters_only_project_leaders ON users_with_deleted TO PUBLIC USING (CASE WHEN current_setting('projektwahl.id')::INT = 0 OR current_setting('projektwahl.id')::INT = id OR project_leader_id IS NOT NULL
-  THEN TRUE
-  ELSE (SELECT COUNT(*) FROM users_with_deleted WHERE NOT deleted AND id = current_setting('projektwahl.id')::INT AND type IN ('admin', 'helper')) > 0
-END);
+ALTER POLICY users_voters_only_project_leaders ON users_with_deleted TO PUBLIC USING (current_setting('projektwahl.type') IN ('root', 'admin', 'helper') OR current_setting('projektwahl.id')::INT = id OR project_leader_id IS NOT NULL);
 
 
 DO $_$

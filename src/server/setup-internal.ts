@@ -30,6 +30,7 @@ export async function setup() {
 
   await sql.begin("READ WRITE", async (tsql) => {
     await tsql`SELECT set_config('projektwahl.id', 0::text, true);`;
+    await tsql`SELECT set_config('projektwahl.type', 'root', true);`;
 
     const hash = await hashPassword("changeme");
 

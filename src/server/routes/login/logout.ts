@@ -34,6 +34,9 @@ export const logoutHandler = requestHandler(
         await tsql`SELECT set_config('projektwahl.id', ${
           user?.id ?? null
         }::text, true);`;
+        await tsql`SELECT set_config('projektwahl.type', ${
+          user?.type ?? null
+        }::text, true);`;
         return await typedSql(tsql, {
           columns: {},
         } as const)`DELETE FROM sessions WHERE session_id = ${session_id}`;
