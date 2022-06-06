@@ -56,7 +56,7 @@ export const openidRedirectHandler = requestHandler(
       );
 
       const dbUser = await sql.begin(async (tsql) => {
-        await tsql`SELECT set_config('projektwahl.type', 'root', true);`;
+        await tsql`SELECT set_config('projektwahl.id', 0, true);`;
         return (
           await typedSql(tsql, {
             columns: {
@@ -106,8 +106,8 @@ export const openidRedirectHandler = requestHandler(
       );
 
       await sql.begin("READ WRITE", async (tsql) => {
-        await tsql`SELECT set_config('projektwahl.type', ${
-          dbUser?.type ?? null
+        await tsql`SELECT set_config('projektwahl.id', ${
+          dbUser?.id ?? null
         }, true);`;
         return await typedSql(tsql, {
           columns: {},

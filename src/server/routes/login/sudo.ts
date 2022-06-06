@@ -80,7 +80,7 @@ export const sudoHandler = requestHandler(
     }
 
     const r = await sql.begin(async (tsql) => {
-      await tsql`SELECT set_config('projektwahl.type', 'root', true);`;
+      await tsql`SELECT set_config('projektwahl.id', 0, true);`;
       return await typedSql(tsql, {
         columns: {
           id: 23,
@@ -128,7 +128,7 @@ export const sudoHandler = requestHandler(
     );
 
     await sql.begin("READ WRITE", async (tsql) => {
-      await tsql`SELECT set_config('projektwahl.type', ${dbUser.id}, true);`;
+      await tsql`SELECT set_config('projektwahl.id', ${dbUser.id}, true);`;
       return await typedSql(tsql, {
         columns: {},
       } as const)`INSERT INTO sessions (user_id, session_id) VALUES (${dbUser.id}, ${session_id})`;

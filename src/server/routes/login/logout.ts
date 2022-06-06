@@ -31,8 +31,8 @@ export const logoutHandler = requestHandler(
   async function (body, user, session_id) {
     if (session_id) {
       await sql.begin("READ WRITE", async (tsql) => {
-        await tsql`SELECT set_config('projektwahl.type', ${
-          user?.type ?? null
+        await tsql`SELECT set_config('projektwahl.id', ${
+          user?.id ?? null
         }, true);`;
         return await typedSql(tsql, {
           columns: {},

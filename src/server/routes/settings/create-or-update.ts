@@ -88,8 +88,8 @@ export const updateSettingsHandler = requestHandler(
 
     try {
       await sql.begin("READ WRITE", async (tsql) => {
-        await tsql`SELECT set_config('projektwahl.type', ${
-          loggedInUser?.type ?? null
+        await tsql`SELECT set_config('projektwahl.id', ${
+          loggedInUser?.id ?? null
         }, true);`;
         const {
           open_date,

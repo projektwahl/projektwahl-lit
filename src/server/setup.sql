@@ -490,7 +490,9 @@ ALTER TABLE users_with_deleted ENABLE ROW LEVEL SECURITY;
 DROP POLICY IF EXISTS users_voters_only_project_leaders ON users_with_deleted;
 
 -- TODO FIXME switch to USING AND WITH so no entries are accidentially hidden but instead an error is thrown that rls is violated
-CREATE POLICY users_voters_only_project_leaders ON users_with_deleted FOR ALL TO PUBLIC USING (current_setting('projektwahl.type') IN ('root', 'admin', 'helper') OR project_leader_id IS NOT NULL);
+CREATE POLICY users_voters_only_project_leaders ON users_with_deleted FOR ALL TO PUBLIC USING (FALSE);
+ALTER POLICY users_voters_only_project_leaders ON users_with_deleted TO PUBLIC USING (current_setting('projektwahl.id')::INT = 0 OR (SELECT COUNT(*) FROM users_with_deleted WHERE NOT deleted AND id = current_setting('projektwahl.id')::INT AND type IN ('admin', 'helper')) > 0 OR project_leader_id IS NOT NULL);
+
 
 DO $_$
     DECLARE
