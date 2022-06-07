@@ -112,16 +112,131 @@ export class PwEvaluation extends PwElement {
 
         <p>
           Beispiel 1 (<a
-            href="https://github.com/projektwahl/projektwahl-lit/blob/c2e3f2a93ba3c12a27c8aeaae13e57dc2932d54a/tests/e2e/test-calculate.ts#L96"
+            href="https://github.com/projektwahl/projektwahl-lit/blob/36e3439bf9d0af11eefd6a08e7c6cd467df32593/tests/e2e/test-calculate.ts#L97"
             target="_blank"
             rel="noopener"
-            >test3</a
+            >test_one_project_one_user_correct_age</a
+          >
+          im Code): Es gibt ein Projekt mit Mindestteilnehmerzahl fünf und einen
+          Nutzer (der vom Alter in das Projekt passt, dieses aber nicht gewählt
+          hat). Der Nutzer wird dem Projekt zugeordnert und ein Hinweis, dass
+          das Projekt unterbesetzt ist, wird angezeigt.
+        </p>
+
+        <p>
+          Beispiel 2 (<a
+            href="https://github.com/projektwahl/projektwahl-lit/blob/36e3439bf9d0af11eefd6a08e7c6cd467df32593/tests/e2e/test-calculate.ts#L126"
+            target="_blank"
+            rel="noopener"
+            >test_five_projects_one_user</a
           >
           im Code): Es gibt fünf Projekte mit Mindestteilnehmeranzahl fünf und
           eine Person, die nicht gewählt hat. Der Algorithmus wählt dann ein
           zufälliges Projekt und weist die Person diesem zu (da
           Altersbeschränkung etc. eingehalten ist). Dieses hat dann 4 Personen
           zu wenig, sodass dies als Hinweis angezeigt wird.
+        </p>
+
+        <p>
+          Beispiel 3 (<a
+            href="https://github.com/projektwahl/projektwahl-lit/blob/36e3439bf9d0af11eefd6a08e7c6cd467df32593/tests/e2e/test-calculate.ts#L146"
+            target="_blank"
+            rel="noopener"
+            >test_one_user_one_project_voted_incorrectly</a
+          >
+          im Code): Es gibt ein Projekt und einen Nutzer, der dieses gewählt
+          hat, aber nicht insgesamt 5 Projekte und somit ungültig gewählt hat.
+          Der Nutzer wird dem Projekt dennoch zugewiesen, aber keine Punkte
+          berechnet.
+        </p>
+
+        <p>
+          Beispiel 4 (<a
+            href="https://github.com/projektwahl/projektwahl-lit/blob/36e3439bf9d0af11eefd6a08e7c6cd467df32593/tests/e2e/test-calculate.ts#L163"
+            target="_blank"
+            rel="noopener"
+            >test_five_projects_one_user_voted_correctly</a
+          >
+          im Code): Es gibt fünf Projekte und einen Nutzer, der diese korrekt
+          gewählt hat. Der Nutzer kommt somit in seine Erstwahl und die anderen
+          Projekte existieren nicht.
+        </p>
+
+        <p>
+          Beispiel 5 (<a
+            href="https://github.com/projektwahl/projektwahl-lit/blob/36e3439bf9d0af11eefd6a08e7c6cd467df32593/tests/e2e/test-calculate.ts#L188"
+            target="_blank"
+            rel="noopener"
+            >test_five_projects_conflicting_equal_votes</a
+          >
+          im Code): Es gibt fünf Projekte und zwei Nutzer, die identisch gewählt
+          haben. Es wird zufällig ein Nutzer gewählt, der in die Erstwahl kommt
+          und der andere kommt dann in die Zweitwahl. Es wird explizit kein
+          Wahlzeitpunkt berücksichtigt.
+        </p>
+
+        <p>
+          Beispiel 6 (<a
+            href="https://github.com/projektwahl/projektwahl-lit/blob/36e3439bf9d0af11eefd6a08e7c6cd467df32593/tests/e2e/test-calculate.ts#L225"
+            target="_blank"
+            rel="noopener"
+            >test_five_projects_different_conflicting_votes</a
+          >
+          im Code): Es gibt fünf Projekte und zwei Nutzer, wobei insgesamt nur 1
+          Platz in allen Projekten existiert. Der eine Nutzer kommt in seine
+          Erstwahl mit dem freien Platz und der zweite Nutzer kommt in seine
+          Erstwahl, was jedoch ein überfülltes Projekt erzeugt.
+        </p>
+
+        <!-- TODO test_five_projects_different_votes -->
+
+        <p>
+          Beispiel 7 (<a
+            href="https://github.com/projektwahl/projektwahl-lit/blob/36e3439bf9d0af11eefd6a08e7c6cd467df32593/tests/e2e/test-calculate.ts#L295"
+            target="_blank"
+            rel="noopener"
+            >test_project_leader</a
+          >
+          im Code): Es gibt ein zustandekommendes Projekt, in dem ein Nutzer
+          Projektleiter ist. Somit wird dieser dort tatsächlich Projektleiter
+          und bekommt auch keine andere Projektzuweisung.
+        </p>
+
+        <p>
+          Beispiel 8 (<a
+            href="https://github.com/projektwahl/projektwahl-lit/blob/36e3439bf9d0af11eefd6a08e7c6cd467df32593/tests/e2e/test-calculate.ts#L311"
+            target="_blank"
+            rel="noopener"
+            >test_not_project_leader</a
+          >
+          im Code): Falls das Projekt des Projektleiters nicht zustandekommt,
+          wird dieser auch kein Projektleiter.
+          <!-- TODO FIXME I think there is a bug? Where does the u1 go to? (Well technically this is an edge case because there it's not possible but whatever) -->
+        </p>
+
+        <!-- TODO test_not_project_leader_voted_correctly -->
+
+        <p>
+          Beispiel 9 (<a
+            href="https://github.com/projektwahl/projektwahl-lit/blob/36e3439bf9d0af11eefd6a08e7c6cd467df32593/tests/e2e/test-calculate.ts#L353"
+            target="_blank"
+            rel="noopener"
+            >test_not_project_leader_voted_correctly2</a
+          >
+          im Code): Falls das Projekt des Projektleiters nicht zustandekommt,
+          wird dieser kein Projektleiter, sondern kommt in ein Projekt, das er
+          gewählt hat.
+        </p>
+
+        <p>
+          Beispiel 10 (<a
+            href="https://github.com/projektwahl/projektwahl-lit/blob/36e3439bf9d0af11eefd6a08e7c6cd467df32593/tests/e2e/test-calculate.ts#L379"
+            target="_blank"
+            rel="noopener"
+            >test_extreme</a
+          >
+          im Code): Ein Testfall mit 200 Projekten und 3000 Schülern, um zu
+          überprüfen, ob der Algorithmus skalierbar ist.
         </p>
       </div>
     `;
