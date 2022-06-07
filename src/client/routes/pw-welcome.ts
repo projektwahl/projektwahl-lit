@@ -266,10 +266,14 @@ export class PwWelcome extends PwElement {
           ? this.userTask.render({
               complete: (value) => {
                 if (value.success) {
-                  return html`<p>
-                    Du bist im Projekt
-                    ${value.data.entities[0].computed_in_project_id}
-                  </p>`;
+                  if (value.data.entities[0].computed_in_project_id) {
+                    return html`<p>
+                      Du bist im Projekt
+                      ${value.data.entities[0].computed_in_project_id}
+                    </p>`;
+                  } else {
+                    return html``;
+                  }
                 } else {
                   return html`<p>
                     Fehler beim Laden des Wahlergebnisses. Lade die Seite neu!
