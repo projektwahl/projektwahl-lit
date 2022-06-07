@@ -56,6 +56,8 @@ export async function user(
   age: number,
   project_leader_id: number | null = null
 ): Promise<number> {
+  await tsql`SELECT set_config('projektwahl.id', 0::text, true);`;
+  await tsql`SELECT set_config('projektwahl.type', 'root', true);`;
   return (
     await typedSql(tsql, {
       columns: { id: 23 },
@@ -377,6 +379,7 @@ export async function test_not_project_leader_voted_correctly2() {
 await test_not_project_leader_voted_correctly2();
 
 export async function test_extreme() {
+  // TODO FIXME shouldn't this already overload?
   await sql.begin(async (tsql) => {
     const projects: number[] = [];
     for (let i = 0; i < 200; i++) {
