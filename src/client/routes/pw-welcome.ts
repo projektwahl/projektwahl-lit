@@ -20,7 +20,7 @@ https://github.com/projektwahl/projektwahl-lit
 SPDX-License-Identifier: AGPL-3.0-or-later
 SPDX-FileCopyrightText: 2021 Moritz Hedtke <Moritz.Hedtke@t-online.de>
 */
-import { msg, str } from "@lit/localize";
+import { msg } from "@lit/localize";
 import { html } from "lit";
 import { PwElement } from "../pw-element.js";
 import { LoggedInUserController } from "../user-controller.js";
@@ -322,7 +322,7 @@ export class PwWelcome extends PwElement {
                 const days = Math.floor(diff / (1000 * 60 * 60 * 24));
 
                 return html`<span class="font-monospace"
-                  >${msg(str`currently ${state},
+                  >${msg(html`currently ${state},
                   ${renderDigit(Math.floor(days / 100) % 10)}${renderDigit(
                     Math.floor(days / 10) % 10
                   )}${renderDigit(days % 10)}
