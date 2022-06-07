@@ -20,7 +20,7 @@ https://github.com/projektwahl/projektwahl-lit
 SPDX-License-Identifier: AGPL-3.0-or-later
 SPDX-FileCopyrightText: 2021 Moritz Hedtke <Moritz.Hedtke@t-online.de>
 */
-import { msg, str } from "@lit/localize";
+import { msg } from "@lit/localize";
 import { html } from "lit";
 import { PwElement } from "../pw-element.js";
 import { LoggedInUserController } from "../user-controller.js";
