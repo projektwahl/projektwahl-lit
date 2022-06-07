@@ -322,7 +322,7 @@ export class PwWelcome extends PwElement {
                 const days = Math.floor(diff / (1000 * 60 * 60 * 24));
 
                 return html`<span class="font-monospace"
-                  >${msg(str`currently ${state},
+                  >${msg(html`currently ${state},
                   ${renderDigit(Math.floor(days / 100) % 10)}${renderDigit(
                     Math.floor(days / 10) % 10
                   )}${renderDigit(days % 10)}

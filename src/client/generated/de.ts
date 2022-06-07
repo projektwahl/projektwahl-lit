@@ -29,15 +29,6 @@
 's1f25e1e20469a9ea': `gelöscht`,
 's1f7e12b71164c5da': `Impressum`,
 's2063a9d17c280fe5': `Info`,
-'s254dbd1c5813b447': str`aktuell ${0},
-                  ${1}${2}${3}
-                  Tage,
-                  ${4}${5}
-                  Stunden,
-                  ${6}${7}
-                  Minuten,
-                  ${8}${9}
-                  Sekunden bis ${10}`,
 's2667d13ee670a19d': str`${0} abmelden`,
 's38c268c406e1b02b': `Lehrer`,
 's3d259b88e98f1095': `Einstellungen anzeigen`,
@@ -104,6 +95,15 @@
 'sf9b8d419a00f04bc': `Jahrgang`,
 'sfb43be2359ccab14': `Projekt erstellen`,
 'sfebb69bee8b5102d': `Quellcode`,
+'h254dbd1c5813b447': html`currently ${0},
+                  ${1}${2}${3}
+                  days,
+                  ${4}${5}
+                  hours,
+                  ${6}${7}
+                  minutes,
+                  ${8}${9}
+                  seconds until ${10}`,
 'head5dc831bccada8': html`Also lieber "Ich mag fliegende Autos." anstatt
                   "Moritz1234!".<br>Du kannst auch einen Passwort-Manager
                   verwenden, z.B.`,
