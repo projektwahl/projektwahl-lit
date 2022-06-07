@@ -29,6 +29,13 @@ import type { TransactionSql } from "postgres";
 
 const chance = new Chance();
 
+export async function reset() {
+  await sql`DROP TABLE IF EXISTS settings, sessions, choices_history, projects_history, users_history, choices, users_with_deleted, projects_with_deleted CASCADE;`;
+  await sql.begin(async (tsql) => {
+    await tsql.file("src/server/setup.sql");
+  });
+}
+
 export async function project(
   tsql: TransactionSql<Record<string, unknown>>,
   min_participants = 5,
@@ -65,29 +72,9 @@ export async function vote(
   await tsql`INSERT INTO choices (user_id, project_id, rank) VALUES (${user_id}, ${project_id}, ${rank}) ON CONFLICT DO NOTHING;`;
 }
 
-export async function rollbackedTransaction(callback: (tsql: TransactionSql<{}>) => Promise<void>) {
-  try {
-    await sql.begin(async (tsql) => {
-      await tsql`SELECT set_config('projektwahl.id', 0::text, true);`;
-      await tsql`SELECT set_config('projektwahl.type', 'root', true);`;
-      try {
-        await callback(tsql);
-      } catch (error) {
-        console.error(error)
-        throw error
-      }
-      throw "CANARY_FAKE_ERROR"
-    });
-  } catch (error) {
-    if (error === "CANARY_FAKE_ERROR") {
-      return;
-    }
-    throw error
-  }
-}
-
 export async function test_only_one_user() {
-  await rollbackedTransaction(async (tsql) => {
+  await reset();
+  await sql.begin(async (tsql) => {
     const _u1 = await user(tsql, 5);
     deepEqual(await evaluate(tsql, false), {});
   });
@@ -97,7 +84,8 @@ export async function test_only_one_user() {
 // await test_only_one_user()
 
 export async function test_only_one_project() {
-  await rollbackedTransaction(async (tsql) => {
+  await reset();
+  await sql.begin(async (tsql) => {
     const _p1 = await project(tsql);
     deepEqual(await evaluate(tsql, false), {});
   });
@@ -107,7 +95,8 @@ export async function test_only_one_project() {
 // test_only_one_project()
 
 export async function test_one_project_one_user_correct_age() {
-  await rollbackedTransaction(async (tsql) => {
+  await reset();
+  await sql.begin(async (tsql) => {
     const _p1 = await project(tsql);
     const _u1 = await user(tsql, 5);
     deepEqual(await evaluate(tsql, false), {
@@ -122,8 +111,8 @@ export async function test_one_project_one_user_correct_age() {
 await test_one_project_one_user_correct_age();
 
 export async function test_one_project_one_user_wrong_age() {
-  
-  await rollbackedTransaction(async (tsql) => {
+  await reset();
+  await sql.begin(async (tsql) => {
     const _p1 = await project(tsql);
     const _u1 = await user(tsql, 4);
     // TODO FIXME HERE IS A BUG: IF NO PROJECTS ARE FOUND FOR A USER WITH THEIR AGE
@@ -135,7 +124,8 @@ export async function test_one_project_one_user_wrong_age() {
 await test_one_project_one_user_wrong_age();
 
 export async function test_five_projects_one_user() {
-  await rollbackedTransaction(async (tsql) => {
+  await reset();
+  await sql.begin(async (tsql) => {
     const _p1 = await project(tsql);
     const _p2 = await project(tsql);
     const _p3 = await project(tsql);
@@ -154,7 +144,8 @@ export async function test_five_projects_one_user() {
 await test_five_projects_one_user();
 
 export async function test_one_user_one_project_voted_incorrectly() {
-  await rollbackedTransaction(async (tsql) => {
+  await reset();
+  await sql.begin(async (tsql) => {
     const p1 = await project(tsql);
     const u1 = await user(tsql, 5);
     await vote(tsql, p1, u1, 1);
@@ -170,7 +161,8 @@ export async function test_one_user_one_project_voted_incorrectly() {
 await test_one_user_one_project_voted_incorrectly();
 
 export async function test_five_projects_one_user_voted_correctly() {
-  await rollbackedTransaction(async (tsql) => {
+  await reset();
+  await sql.begin(async (tsql) => {
     const p1 = await project(tsql);
     const p2 = await project(tsql);
     const p3 = await project(tsql);
@@ -194,7 +186,8 @@ export async function test_five_projects_one_user_voted_correctly() {
 await test_five_projects_one_user_voted_correctly();
 
 export async function test_five_projects_conflicting_equal_votes() {
-  await rollbackedTransaction(async (tsql) => {
+  await reset();
+  await sql.begin(async (tsql) => {
     const p1 = await project(tsql, 1, 1);
     const p2 = await project(tsql, 1, 1);
     const p3 = await project(tsql, 1, 1);
@@ -230,7 +223,8 @@ export async function test_five_projects_conflicting_equal_votes() {
 await test_five_projects_conflicting_equal_votes();
 
 export async function test_five_projects_different_conflicting_votes() {
-  await rollbackedTransaction(async (tsql) => {
+  await reset();
+  await sql.begin(async (tsql) => {
     const p1 = await project(tsql, 0, 0);
     const p2 = await project(tsql, 0, 0); // fake project
     const p3 = await project(tsql, 0, 0); // fake project
@@ -264,7 +258,8 @@ export async function test_five_projects_different_conflicting_votes() {
 await test_five_projects_different_conflicting_votes();
 
 export async function test_five_projects_different_votes() {
-  await rollbackedTransaction(async (tsql) => {
+  await reset();
+  await sql.begin(async (tsql) => {
     const p1 = await project(tsql, 1, 1);
     const p2 = await project(tsql, 1, 1);
     const p3 = await project(tsql, 1, 1);
@@ -298,7 +293,8 @@ export async function test_five_projects_different_votes() {
 await test_five_projects_different_votes();
 
 export async function test_project_leader() {
-  await rollbackedTransaction(async (tsql) => {
+  await reset();
+  await sql.begin(async (tsql) => {
     const p1 = await project(tsql, 0, 0);
     const _u1 = await user(tsql, 5, p1);
     deepEqual(await evaluate(tsql, false), {
@@ -313,7 +309,8 @@ export async function test_project_leader() {
 await test_project_leader();
 
 export async function test_not_project_leader() {
-  await rollbackedTransaction(async (tsql) => {
+  await reset();
+  await sql.begin(async (tsql) => {
     const p1 = await project(tsql, 1, 1);
     const _u1 = await user(tsql, 5, p1);
     deepEqual(await evaluate(tsql, false), {
@@ -328,7 +325,8 @@ export async function test_not_project_leader() {
 await test_not_project_leader();
 
 export async function test_not_project_leader_voted_correctly() {
-  await rollbackedTransaction(async (tsql) => {
+  await reset();
+  await sql.begin(async (tsql) => {
     const p1 = await project(tsql, 1, 1);
     const p2 = await project(tsql);
     const p3 = await project(tsql);
@@ -353,7 +351,8 @@ export async function test_not_project_leader_voted_correctly() {
 await test_not_project_leader_voted_correctly();
 
 export async function test_not_project_leader_voted_correctly2() {
-  await rollbackedTransaction(async (tsql) => {
+  await reset();
+  await sql.begin(async (tsql) => {
     const p1 = await project(tsql, 1, 1);
     const p2 = await project(tsql, 1, 1);
     const p3 = await project(tsql, 1, 1);
@@ -378,7 +377,7 @@ export async function test_not_project_leader_voted_correctly2() {
 await test_not_project_leader_voted_correctly2();
 
 export async function test_extreme() {
-  await rollbackedTransaction(async (tsql) => {
+  await sql.begin(async (tsql) => {
     const projects: number[] = [];
     for (let i = 0; i < 200; i++) {
       projects.push(await project(tsql));
