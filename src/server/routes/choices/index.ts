@@ -125,7 +125,7 @@ export const choicesHandler = requestHandler(
               : "DESC"
           )}`,
         title: (q, o) =>
-          sql`id ${sql.unsafe(
+          sql`title ${sql.unsafe(
             o === "backwards"
               ? q === "ASC"
                 ? "DESC"
