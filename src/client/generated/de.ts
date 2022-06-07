@@ -9,7 +9,19 @@
     /* eslint-disable @typescript-eslint/no-explicit-any */
 
     export const templates = {
-      'hc66aaa662761137a': html`Nicht gefunden`,
+      'h254dbd1c5813b447': html`Aktuell ${0},
+                  ${1}${2}${3}
+                  Tage,
+                  ${4}${5}
+                  Stunden,
+                  ${6}${7}
+                  Minuten,
+                  ${8}${9}
+                  Sekunden bis ${10}`,
+'hc66aaa662761137a': html`Nicht gefunden`,
+'head5dc831bccada8': html`Also lieber "Ich mag fliegende Autos." anstatt
+                  "Moritz1234!".<br>Du kannst auch einen Passwort-Manager
+                  verwenden, z.B.`,
 's01a8d45397ec133b': `Sicherheit`,
 's01dc5a60edf9e053': `Komponente nicht vollständig initialisiert`,
 's03f42eea72154959': `Accountname`,
@@ -95,17 +107,5 @@
 'sf9b8d419a00f04bc': `Jahrgang`,
 'sfb43be2359ccab14': `Projekt erstellen`,
 'sfebb69bee8b5102d': `Quellcode`,
-'h254dbd1c5813b447': html`currently ${0},
-                  ${1}${2}${3}
-                  days,
-                  ${4}${5}
-                  hours,
-                  ${6}${7}
-                  minutes,
-                  ${8}${9}
-                  seconds until ${10}`,
-'head5dc831bccada8': html`Also lieber "Ich mag fliegende Autos." anstatt
-                  "Moritz1234!".<br>Du kannst auch einen Passwort-Manager
-                  verwenden, z.B.`,
     };
   

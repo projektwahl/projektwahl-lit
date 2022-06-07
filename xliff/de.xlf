@@ -32,7 +32,7 @@
                   minutes,
                   <x id="4" equiv-text="${renderDigit(Math.floor(seconds / 10))}${renderDigit(seconds % 10)}"/>
                   seconds until <x id="5" equiv-text="${next_date_and_state[0]}"/></source>
-  <target state="translated">Aktuell <x id="0" equiv-text="${state}"/>,
+  <target>Aktuell <x id="0" equiv-text="${state}"/>,
                   <x id="1" equiv-text="${renderDigit(Math.floor(days / 100) % 10)}${renderDigit(Math.floor(days / 10) % 10)}${renderDigit(days % 10)}"/>
                   Tage,
                   <x id="2" equiv-text="${renderDigit(Math.floor(hours / 10))}${renderDigit(hours % 10)}"/>
@@ -70,7 +70,7 @@
   <source>Also lieber "Ich mag fliegende Autos." anstatt
                   "Moritz1234!".<x id="0" equiv-text="&lt;br>"/>Du kannst auch einen Passwort-Manager
                   verwenden, z.B.</source>
-  <target state="translated">Also lieber "Ich mag fliegende Autos." anstatt
+  <target>Also lieber "Ich mag fliegende Autos." anstatt
                   "Moritz1234!".<x id="0" equiv-text="&lt;br>"/>Du kannst auch einen Passwort-Manager
                   verwenden, z.B.</target>
 </trans-unit>
