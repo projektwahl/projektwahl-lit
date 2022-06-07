@@ -137,7 +137,8 @@ export function createOrUpdateChoiceHandler<P extends "/api/v1/choices/update">(
           ];
           return returnValue;
         }
-        await tsql`SELECT set_config('projektwahl.type', ${loggedInUser.type}, true);`;
+        await tsql`SELECT set_config('projektwahl.id', ${loggedInUser.id}::text, true);`;
+        await tsql`SELECT set_config('projektwahl.type', ${loggedInUser.type}::text, true);`;
         await dbquery(tsql, choice, loggedInUser);
         return [
           {

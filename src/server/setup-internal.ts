@@ -29,6 +29,7 @@ export async function setup() {
   const chance = new Chance(1234);
 
   await sql.begin("READ WRITE", async (tsql) => {
+    await tsql`SELECT set_config('projektwahl.id', 0::text, true);`;
     await tsql`SELECT set_config('projektwahl.type', 'root', true);`;
 
     const hash = await hashPassword("changeme");

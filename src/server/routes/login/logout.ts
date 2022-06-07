@@ -31,9 +31,12 @@ export const logoutHandler = requestHandler(
   async function (body, user, session_id) {
     if (session_id) {
       await sql.begin("READ WRITE", async (tsql) => {
+        await tsql`SELECT set_config('projektwahl.id', ${
+          user?.id ?? null
+        }::text, true);`;
         await tsql`SELECT set_config('projektwahl.type', ${
           user?.type ?? null
-        }, true);`;
+        }::text, true);`;
         return await typedSql(tsql, {
           columns: {},
         } as const)`DELETE FROM sessions WHERE session_id = ${session_id}`;
@@ -48,6 +51,7 @@ export const logoutHandler = requestHandler(
         `lax_id=; Expires=Thu, 01 Jan 1970 00:00:00 GMT; Path=/; Secure; HttpOnly; SameSite=Lax`,
         `username=; Expires=Thu, 01 Jan 1970 00:00:00 GMT; Path=/; Secure; SameSite=Lax`,
         `type=; Expires=Thu, 01 Jan 1970 00:00:00 GMT; Path=/; Secure; SameSite=Lax`,
+        `id=; Expires=Thu, 01 Jan 1970 00:00:00 GMT; Path=/; Secure; SameSite=Lax`,
       ],
     };
     return [

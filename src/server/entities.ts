@@ -147,7 +147,8 @@ export async function fetchData<R extends keyof typeof entityRoutes>(
   let sqlResult;
   if (!paginationCursor) {
     sqlResult = await sql.begin(async (tsql) => {
-      await tsql`SELECT set_config('projektwahl.type', ${loggedInUser.type}, true);`;
+      await tsql`SELECT set_config('projektwahl.id', ${loggedInUser.id}::text, true);`;
+      await tsql`SELECT set_config('projektwahl.type', ${loggedInUser.type}::text, true);`;
       return await tsql`${sql`(${sqlQuery(query)} ${orderByQuery} LIMIT ${
         query.paginationLimit + 1
       })`}`;
@@ -228,7 +229,8 @@ export async function fetchData<R extends keyof typeof entityRoutes>(
     });
 
     await sql.begin(async (tsql) => {
-      await tsql`SELECT set_config('projektwahl.type', ${loggedInUser.type}, true);`;
+      await tsql`SELECT set_config('projektwahl.id', ${loggedInUser.id}::text, true);`;
+      await tsql`SELECT set_config('projektwahl.type', ${loggedInUser.type}::text, true);`;
       if (queries.length == 1) {
         sqlResult = await tsql`${queries[0]}`;
       } else {

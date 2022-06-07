@@ -28,6 +28,7 @@ import { checkPassword } from "../../password.js";
 import type { OutgoingHttpHeaders } from "node:http";
 import nodeCrypto from "node:crypto";
 import { typedSql } from "../../describe.js";
+import { sensitiveHeaders } from "node:http2";
 // @ts-expect-error wrong typings
 const { webcrypto: crypto }: { webcrypto: Crypto } = nodeCrypto;
 
@@ -36,6 +37,7 @@ export const loginHandler = requestHandler(
   "/api/v1/login",
   async function (body) {
     const r = await sql.begin(async (tsql) => {
+      await tsql`SELECT set_config('projektwahl.id', 0::text, true);`;
       await tsql`SELECT set_config('projektwahl.type', 'root', true);`;
       return await typedSql(tsql, {
         columns: {
@@ -128,6 +130,7 @@ export const loginHandler = requestHandler(
 
     if (!valid) {
       await sql.begin("READ WRITE", async (tsql) => {
+        await tsql`SELECT set_config('projektwahl.id', 0::text, true);`;
         await tsql`SELECT set_config('projektwahl.type', 'root', true);`;
         await tsql`UPDATE users SET last_failed_login_attempt = CURRENT_TIMESTAMP WHERE id = ${dbUser.id}`;
       });
@@ -156,7 +159,8 @@ export const loginHandler = requestHandler(
 
     if (needsRehash) {
       await sql.begin("READ WRITE", async (tsql) => {
-        await tsql`SELECT set_config('projektwahl.type', ${dbUser.id}, true);`;
+        await tsql`SELECT set_config('projektwahl.id', ${dbUser.id}::text, true);`;
+        await tsql`SELECT set_config('projektwahl.type', ${dbUser.type}::text, true);`;
         return await typedSql(tsql, {
           columns: {},
         } as const)`UPDATE users SET password_hash = ${newHash} WHERE id = ${dbUser.id}`;
@@ -174,7 +178,8 @@ export const loginHandler = requestHandler(
     );
 
     await sql.begin("READ WRITE", async (tsql) => {
-      await tsql`SELECT set_config('projektwahl.type', ${dbUser.id}, true);`;
+      await tsql`SELECT set_config('projektwahl.id', ${dbUser.id}::text, true);`;
+      await tsql`SELECT set_config('projektwahl.type', ${dbUser.type}::text, true);`;
       return await typedSql(tsql, {
         columns: {},
       } as const)`INSERT INTO sessions (user_id, session_id) VALUES (${dbUser.id}, ${session_id})`;
@@ -196,7 +201,11 @@ export const loginHandler = requestHandler(
         `type=${dbUser.type}; Secure; Path=/; SameSite=Lax; Max-Age=${
           48 * 60 * 60
         };`,
+        `id=${encodeURIComponent(
+          dbUser.id
+        )}; Secure; Path=/; SameSite=Lax; Max-Age=${48 * 60 * 60};`,
       ],
+      [sensitiveHeaders]: ["set-cookie"],
     };
     return [
       headers,

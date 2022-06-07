@@ -211,9 +211,8 @@ export function createOrUpdateProjectsHandler<
     try {
       const row: { id: number } = (
         await sql.begin("READ WRITE", async (tsql) => {
-          await tsql`SELECT set_config('projektwahl.type', ${
-            loggedInUser?.type ?? null
-          }, true);`;
+          await tsql`SELECT set_config('projektwahl.id', ${loggedInUser.id}::text, true);`;
+          await tsql`SELECT set_config('projektwahl.type', ${loggedInUser.type}::text, true);`;
           const result: { id: number }[] = await dbquery(
             tsql,
             project,

@@ -254,6 +254,7 @@ export async function evaluate(
   const lp = new CPLEXLP();
   await lp.setup();
 
+  await tsql`SELECT set_config('projektwahl.id', 0::text, true);`;
   await tsql`SELECT set_config('projektwahl.type', 'root', true);`;
 
   const choices = z.array(rawChoice).parse(
@@ -472,10 +473,11 @@ export async function evaluate(
   console.log(finalOutput.choices);
   if (update) {
     await sql.begin(async (tsql) => {
-      await tsql`SELECT set_config('projektwahl.type', 'admin', true);`;
-      await tsql`UPDATE users SET computed_in_project_id = NULL, last_updated_by = (SELECT id FROM users_with_deleted WHERE type = 'admin') WHERE computed_in_project_id IS NOT NULL;`; // reset previous computed
+      await tsql`SELECT set_config('projektwahl.id', 0::text, true);`;
+      await tsql`SELECT set_config('projektwahl.type', 'root', true);`;
+      await tsql`UPDATE users SET computed_in_project_id = NULL, last_updated_by = (SELECT id FROM users_with_deleted WHERE type = 'admin' ORDER BY id LIMIT 1) WHERE computed_in_project_id IS NOT NULL;`; // reset previous computed
       for (const choice of finalOutput.choices) {
-        await tsql`UPDATE users SET computed_in_project_id = ${choice[1]}, last_updated_by = (SELECT id FROM users_with_deleted WHERE type = 'admin') WHERE id = ${choice[0]}`;
+        await tsql`UPDATE users SET computed_in_project_id = ${choice[1]}, last_updated_by = (SELECT id FROM users_with_deleted WHERE type = 'admin' ORDER BY id LIMIT 1) WHERE id = ${choice[0]}`;
       }
     });
   }

@@ -56,6 +56,7 @@ export const openidRedirectHandler = requestHandler(
       );
 
       const dbUser = await sql.begin(async (tsql) => {
+        await tsql`SELECT set_config('projektwahl.id', 0::text, true);`;
         await tsql`SELECT set_config('projektwahl.type', 'root', true);`;
         return (
           await typedSql(tsql, {
@@ -106,9 +107,12 @@ export const openidRedirectHandler = requestHandler(
       );
 
       await sql.begin("READ WRITE", async (tsql) => {
+        await tsql`SELECT set_config('projektwahl.id', ${
+          dbUser?.id ?? null
+        }::text, true);`;
         await tsql`SELECT set_config('projektwahl.type', ${
           dbUser?.type ?? null
-        }, true);`;
+        }::text, true);`;
         return await typedSql(tsql, {
           columns: {},
         } as const)`INSERT INTO sessions (user_id, session_id) VALUES (${dbUser.id}, ${session_id})`;
@@ -130,6 +134,9 @@ export const openidRedirectHandler = requestHandler(
           `type=${dbUser.type}; Secure; Path=/; SameSite=Lax; Max-Age=${
             48 * 60 * 60
           };`,
+          `id=${encodeURIComponent(
+            dbUser.id
+          )}; Secure; Path=/; SameSite=Lax; Max-Age=${48 * 60 * 60};`,
         ],
         [sensitiveHeaders]: ["set-cookie"],
       };

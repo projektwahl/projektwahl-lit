@@ -88,9 +88,8 @@ export const updateSettingsHandler = requestHandler(
 
     try {
       await sql.begin("READ WRITE", async (tsql) => {
-        await tsql`SELECT set_config('projektwahl.type', ${
-          loggedInUser?.type ?? null
-        }, true);`;
+        await tsql`SELECT set_config('projektwahl.id', ${loggedInUser.id}::text, true);`;
+        await tsql`SELECT set_config('projektwahl.type', ${loggedInUser.type}::text, true);`;
         const {
           open_date,
           voting_start_date,
