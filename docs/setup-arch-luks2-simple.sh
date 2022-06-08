@@ -576,6 +576,7 @@ modules:
     http:
       headers:
         x-csrf-protection: projektwahl
+      body: "{}"
 
 sudo systemctl enable --now prometheus-blackbox-exporter
 
