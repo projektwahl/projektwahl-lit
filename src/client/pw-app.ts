@@ -352,6 +352,32 @@ export class PwApp extends PwElement {
                         >
                       </li>`
                     : ``}
+                  <li>
+                    <a
+                      href="/imprint"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      class="nav-link ${this.history.url.pathname.startsWith(
+                        "/imprint"
+                      )
+                        ? "active"
+                        : ""}"
+                      >${msg("Imprint")}</a
+                    >
+                  </li>
+                  <li>
+                    <a
+                      href="/privacy"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      class="nav-link ${this.history.url.pathname.startsWith(
+                        "/privacy"
+                      )
+                        ? "active"
+                        : ""}"
+                      >${msg("Privacy Policy")}</a
+                    >
+                  </li>
                 </ul>
                 <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
                   ${this.userController.username

@@ -142,7 +142,8 @@ class PwChoices<X extends string> extends PwEntityList<"/api/v1/choices", X> {
             if (value.data.every((v) => v === 1)) {
               return html`
                 <div class="alert alert-success w-100" role="alert">
-                  Korrekt gewählt!
+                  Korrekt gewählt! Die Wahl wird automatisch gespeichert. Du
+                  kannst dich nun abmelden!
                 </div>
               `;
             } else {
