@@ -152,3 +152,9 @@ This application will probably never work without JavaScript as this would requi
 ```
 npx license-checker --production --summary
 ```
+
+SELECT id, a FROM users, LATERAL (SELECT COUNT(\*), bit_or(1 << rank) FROM choices WHERE users.id = choices.user_id) AS a;
+
+SELECT id, a FROM users, LATERAL (WITH c AS (SELECT COUNT(\*) AS count, bit_or(1 << rank) AS ranks FROM choices WHERE users.id = choices.user_id) SELECT ranks FROM c);
+
+SELECT id, t.valid FROM users, LATERAL (WITH c AS (SELECT COUNT(\*) AS count, bit_or(1 << rank) AS ranks FROM choices WHERE users.id = choices.user_id) SELECT (count = 5 AND ranks = 62) AS valid FROM c) AS t;

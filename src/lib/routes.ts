@@ -313,6 +313,9 @@ export const routes = {
         force_in_project_id: true,
         computed_in_project_id: true,
       })
+      .extend({
+        valid: z.boolean().optional(),
+      })
       .strict(),
     z
       .array(

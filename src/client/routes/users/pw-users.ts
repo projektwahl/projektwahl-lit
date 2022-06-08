@@ -309,7 +309,13 @@ export class PwUsers<X extends string> extends PwEntityList<
         complete: (result) => {
           return result.success
             ? result.data.entities.map(
-                (value) => html`<tr>
+                (value) => html`<tr
+                  class="${value.valid === undefined
+                    ? ""
+                    : value.valid
+                    ? "table-success"
+                    : "table-danger"}"
+                >
                   <th scope="row">
                     <p>
                       ${value.deleted

@@ -90,9 +90,15 @@ export const usersHandler = requestHandler(
                 : sql``
             }
             ${id === loggedInUser.id ? sql`computed_in_project_id,` : sql``}
-            "deleted" FROM users_with_deleted WHERE TRUE ${
-              id === undefined ? sql`` : sql`AND id = ${id ?? null}`
-            } ${
+            "deleted" ${
+              loggedInUser.type === "admin" ? sql`, t.valid` : sql``
+            } FROM users_with_deleted ${
+            loggedInUser.type === "admin"
+              ? sql`, LATERAL (WITH c AS (SELECT COUNT(*) AS count, bit_or(1 << rank) AS ranks FROM choices WHERE users_with_deleted.id = choices.user_id) SELECT (count = 5 AND ranks = 62) AS valid FROM c) AS t`
+              : sql``
+          } WHERE TRUE ${
+            id === undefined ? sql`` : sql`AND id = ${id ?? null}`
+          } ${
             username === undefined
               ? sql``
               : sql`AND username LIKE ${"%" + username + "%"}`
