@@ -350,6 +350,14 @@
   <source>Vote</source>
   <target>Wahl</target>
 </trans-unit>
+<trans-unit id="s1f7e12b71164c5da">
+  <source>Imprint</source>
+  <target>Impressum</target>
+</trans-unit>
+<trans-unit id="sab07cf2bfae8483f">
+  <source>Privacy Policy</source>
+  <target>Datenschutzerklärung</target>
+</trans-unit>
 <trans-unit id="s2667d13ee670a19d">
   <source>Logout <x id="0" equiv-text="${this.userController.username}"/></source>
   <target><x id="0" equiv-text="${this.userController.username}"/> abmelden</target>
@@ -365,14 +373,6 @@
 <trans-unit id="s01a8d45397ec133b">
   <source>Security</source>
   <target>Sicherheit</target>
-</trans-unit>
-<trans-unit id="s1f7e12b71164c5da">
-  <source>Imprint</source>
-  <target>Impressum</target>
-</trans-unit>
-<trans-unit id="sab07cf2bfae8483f">
-  <source>Privacy Policy</source>
-  <target>Datenschutzerklärung</target>
 </trans-unit>
 </body>
 </file>
