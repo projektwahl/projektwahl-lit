@@ -206,6 +206,9 @@
   <source>Type</source>
   <target>Typ</target>
 </trans-unit>
+<trans-unit id="s4220dda46d622211">
+  <source>Valid</source>
+</trans-unit>
 <trans-unit id="saae1c70e168b45b4">
   <source>Admin</source>
   <target>Admin</target>
