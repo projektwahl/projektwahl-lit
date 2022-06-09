@@ -72,6 +72,7 @@ export const usersHandler = requestHandler(
             force_in_project_id,
             deleted,
             group,
+            valid,
             ...rest
           } = query.filters;
           let _ = rest;
@@ -116,6 +117,7 @@ export const usersHandler = requestHandler(
               ? sql``
               : sql`AND deleted = ${deleted ?? null}`
           }
+          ${valid === undefined ? sql`` : sql`AND t.valid = ${valid ?? null}`}
           ${
             force_in_project_id === undefined ||
             !(loggedInUser.type === "admin" || loggedInUser.type === "helper")

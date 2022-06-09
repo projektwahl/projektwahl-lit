@@ -368,6 +368,9 @@ export const routes = {
         deleted: true,
         group: true,
       })
+      .extend({
+        valid: z.boolean(),
+      })
       .strict()
       .partial()
   ),
