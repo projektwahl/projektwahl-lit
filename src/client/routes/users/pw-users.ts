@@ -193,6 +193,21 @@ export class PwUsers<X extends string> extends PwEntityList<
             })}
           </th>
 
+          <th class="table-cell-hover p-0" scope="col">
+            ${pwOrder({
+              url: "/api/v1/users",
+              name: ["sorting", "valid"],
+              orderBy: "valid",
+              prefix: this.prefix,
+              title: msg("Valid"),
+              value: null,
+              get: (o) => o.sorting,
+              set: (o, v) => (o.sorting = v),
+              initial,
+              defaultValue: [],
+            })}
+          </th>
+
           <th class="table-cell-hover">${msg("Show deleted")}</th>
 
           <th class="table-cell-hover">${msg("Actions")}</th>
@@ -275,20 +290,39 @@ export class PwUsers<X extends string> extends PwEntityList<
             })}
           </th>
 
-          ${pwInputCheckbox<"/api/v1/users">({
-            url: this.url,
-            label: null,
-            name: ["filters", "deleted"],
-            get: (o) => o.filters.deleted,
-            set: (o, v) => (o.filters.deleted = v),
-            task: this._task,
-            type: "checkbox",
-            trueValue: undefined,
-            falseValue: false,
-            defaultValue: undefined,
-            initial: initial,
-            resettable: false,
-          })}
+          <th scope="col">
+            ${pwInputCheckbox<"/api/v1/users">({
+              url: this.url,
+              label: null,
+              name: ["filters", "valid"],
+              get: (o) => o.filters.valid,
+              set: (o, v) => (o.filters.valid = v),
+              task: this._task,
+              type: "checkbox",
+              trueValue: undefined,
+              falseValue: false,
+              defaultValue: undefined,
+              initial: initial,
+              resettable: false,
+            })}
+          </th>
+
+          <th scope="col">
+            ${pwInputCheckbox<"/api/v1/users">({
+              url: this.url,
+              label: null,
+              name: ["filters", "deleted"],
+              get: (o) => o.filters.deleted,
+              set: (o, v) => (o.filters.deleted = v),
+              task: this._task,
+              type: "checkbox",
+              trueValue: undefined,
+              falseValue: false,
+              defaultValue: undefined,
+              initial: initial,
+              resettable: false,
+            })}
+          </th>
 
           <th scope="col"></th>
         </tr>`;
@@ -370,6 +404,7 @@ export class PwUsers<X extends string> extends PwEntityList<
                         : html`${value.group} `}
                     </p>
                   </td>
+                  <td>${value.valid ? "Valid" : "Invalid"}</td>
                   <td>
                     <p>${value.deleted ? msg("deleted") : ""}</p>
                   </td>

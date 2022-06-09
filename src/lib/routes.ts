@@ -326,6 +326,11 @@ export const routes = {
             z.null(),
           ]),
           z.tuple([
+            z.literal("valid" as const),
+            z.enum(["ASC", "DESC"] as const),
+            z.null(),
+          ]),
+          z.tuple([
             z.literal("username" as const),
             z.enum(["ASC", "DESC"] as const),
             z.null(),

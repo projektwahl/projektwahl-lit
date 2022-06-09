@@ -163,6 +163,16 @@ export const usersHandler = requestHandler(
                 ? "ASC"
                 : "DESC"
             )}`,
+          valid: (q, o) =>
+            sql`t.valid ${sql.unsafe(
+              o === "backwards"
+                ? q === "ASC"
+                  ? "DESC"
+                  : "ASC"
+                : q === "ASC"
+                ? "ASC"
+                : "DESC"
+            )}`,
           group: (q, o) =>
             sql`"group" ${sql.unsafe(
               o === "backwards"
