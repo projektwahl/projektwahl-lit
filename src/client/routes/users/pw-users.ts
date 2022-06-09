@@ -307,8 +307,10 @@ export class PwUsers<X extends string> extends PwEntityList<
               set: (o, v) => (o.filters.valid = v),
               options: [
                 { value: undefined, text: "Alle" },
-                { value: true, text: "Gültig gewählt" },
-                { value: false, text: "Ungültig gewählt" },
+                { value: "valid", text: "Gültig gewählt" },
+                { value: "invalid", text: "Ungültig gewählt" },
+                { value: "neutral", text: "Lehrer und Admins" },
+                { value: "project_leader", text: "Projektleiter" },
               ],
               task: this._task,
               initial,
@@ -356,9 +358,13 @@ export class PwUsers<X extends string> extends PwEntityList<
                 (value) => html`<tr
                   class="${value.valid === undefined
                     ? ""
-                    : value.valid
+                    : value.valid === "valid"
                     ? "table-success"
-                    : "table-danger"}"
+                    : value.valid === "invalid"
+                    ? "table-danger"
+                    : value.valid === "project_leader"
+                    ? "table-info"
+                    : "table-secondary"}"
                 >
                   <th scope="row">
                     <p>
@@ -414,7 +420,7 @@ export class PwUsers<X extends string> extends PwEntityList<
                         : html`${value.group} `}
                     </p>
                   </td>
-                  <td>${value.valid ? "Valid" : "Invalid"}</td>
+                  <td>${value.valid}</td>
                   <td>
                     <p>${value.deleted ? msg("deleted") : ""}</p>
                   </td>

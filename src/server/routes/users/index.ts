@@ -95,7 +95,17 @@ export const usersHandler = requestHandler(
               loggedInUser.type === "admin" ? sql`, t.valid` : sql``
             } FROM users_with_deleted ${
             loggedInUser.type === "admin"
-              ? sql`, LATERAL (WITH c AS (SELECT COUNT(*) AS count, bit_or(1 << rank) AS ranks FROM choices WHERE users_with_deleted.id = choices.user_id) SELECT (count = 5 AND ranks = 62) AS valid FROM c) AS t`
+              ? sql`, LATERAL
+(WITH c AS (SELECT COUNT(*) AS count, bit_or(1 << rank) AS ranks FROM choices WHERE users_with_deleted.id = choices.user_id)
+
+    SELECT CASE
+        WHEN (users_with_deleted.type = 'voter' AND count = 5 AND ranks = 62) THEN 'valid'
+        WHEN (users_with_deleted.type = 'voter' AND users_with_deleted.project_leader_id IS NOT NULL) THEN 'project_leader'
+        WHEN (users_with_deleted.type = 'voter' AND users_with_deleted.force_in_project_id IS NOT NULL) THEN 'valid'
+        WHEN (users_with_deleted.type = 'voter') THEN 'invalid'
+        WHEN (users_with_deleted.type = 'helper' OR users_with_deleted.type = 'admin') THEN 'neutral'
+    END
+    AS valid FROM c) AS t`
               : sql``
           } WHERE TRUE ${
             id === undefined ? sql`` : sql`AND id = ${id ?? null}`

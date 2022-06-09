@@ -314,7 +314,9 @@ export const routes = {
         computed_in_project_id: true,
       })
       .extend({
-        valid: z.boolean().optional(),
+        valid: z
+          .enum(["valid", "invalid", "project_leader", "neutral"])
+          .optional(),
       })
       .strict(),
     z
@@ -369,7 +371,9 @@ export const routes = {
         group: true,
       })
       .extend({
-        valid: z.boolean(),
+        valid: z
+          .enum(["valid", "invalid", "project_leader", "neutral"])
+          .optional(),
       })
       .strict()
       .partial()
