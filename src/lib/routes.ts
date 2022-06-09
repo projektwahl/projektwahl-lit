@@ -313,12 +313,22 @@ export const routes = {
         force_in_project_id: true,
         computed_in_project_id: true,
       })
+      .extend({
+        valid: z
+          .enum(["valid", "invalid", "project_leader", "neutral"])
+          .optional(),
+      })
       .strict(),
     z
       .array(
         z.union([
           z.tuple([
             z.literal("id" as const),
+            z.enum(["ASC", "DESC"] as const),
+            z.null(),
+          ]),
+          z.tuple([
+            z.literal("valid" as const),
             z.enum(["ASC", "DESC"] as const),
             z.null(),
           ]),
@@ -359,6 +369,11 @@ export const routes = {
         force_in_project_id: true,
         deleted: true,
         group: true,
+      })
+      .extend({
+        valid: z
+          .enum(["valid", "invalid", "project_leader", "neutral"])
+          .optional(),
       })
       .strict()
       .partial()

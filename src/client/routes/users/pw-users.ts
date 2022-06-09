@@ -193,6 +193,21 @@ export class PwUsers<X extends string> extends PwEntityList<
             })}
           </th>
 
+          <th class="table-cell-hover p-0" scope="col">
+            ${pwOrder({
+              url: "/api/v1/users",
+              name: ["sorting", "valid"],
+              orderBy: "valid",
+              prefix: this.prefix,
+              title: msg("Valid"),
+              value: null,
+              get: (o) => o.sorting,
+              set: (o, v) => (o.sorting = v),
+              initial,
+              defaultValue: [],
+            })}
+          </th>
+
           <th class="table-cell-hover">${msg("Show deleted")}</th>
 
           <th class="table-cell-hover">${msg("Actions")}</th>
@@ -275,20 +290,51 @@ export class PwUsers<X extends string> extends PwEntityList<
             })}
           </th>
 
-          ${pwInputCheckbox<"/api/v1/users">({
-            url: this.url,
-            label: null,
-            name: ["filters", "deleted"],
-            get: (o) => o.filters.deleted,
-            set: (o, v) => (o.filters.deleted = v),
-            task: this._task,
-            type: "checkbox",
-            trueValue: undefined,
-            falseValue: false,
-            defaultValue: undefined,
-            initial: initial,
-            resettable: false,
-          })}
+          <th scope="col">
+            ${pwInputSelect<
+              "/api/v1/users",
+              z.infer<
+                typeof routes["/api/v1/users"]["request"]
+              >["filters"]["valid"]
+            >({
+              url: this.url,
+              type: "select",
+              disabled: this.disabled,
+              enabled: true,
+              label: null,
+              name: ["filters", "valid"],
+              get: (o) => o.filters.valid,
+              set: (o, v) => (o.filters.valid = v),
+              options: [
+                { value: undefined, text: "Alle" },
+                { value: "valid", text: "Gültig gewählt" },
+                { value: "invalid", text: "Ungültig gewählt" },
+                { value: "neutral", text: "Lehrer und Admins" },
+                { value: "project_leader", text: "Projektleiter" },
+              ],
+              task: this._task,
+              initial,
+              defaultValue: undefined,
+              resettable: false,
+            })}
+          </th>
+
+          <th scope="col">
+            ${pwInputCheckbox<"/api/v1/users">({
+              url: this.url,
+              label: null,
+              name: ["filters", "deleted"],
+              get: (o) => o.filters.deleted,
+              set: (o, v) => (o.filters.deleted = v),
+              task: this._task,
+              type: "checkbox",
+              trueValue: undefined,
+              falseValue: false,
+              defaultValue: undefined,
+              initial: initial,
+              resettable: false,
+            })}
+          </th>
 
           <th scope="col"></th>
         </tr>`;
@@ -309,7 +355,17 @@ export class PwUsers<X extends string> extends PwEntityList<
         complete: (result) => {
           return result.success
             ? result.data.entities.map(
-                (value) => html`<tr>
+                (value) => html`<tr
+                  class="${value.valid === undefined
+                    ? ""
+                    : value.valid === "valid"
+                    ? "table-success"
+                    : value.valid === "invalid"
+                    ? "table-danger"
+                    : value.valid === "project_leader"
+                    ? "table-info"
+                    : "table-secondary"}"
+                >
                   <th scope="row">
                     <p>
                       ${value.deleted
@@ -364,6 +420,7 @@ export class PwUsers<X extends string> extends PwEntityList<
                         : html`${value.group} `}
                     </p>
                   </td>
+                  <td>${value.valid}</td>
                   <td>
                     <p>${value.deleted ? msg("deleted") : ""}</p>
                   </td>

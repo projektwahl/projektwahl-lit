@@ -72,6 +72,7 @@ export const usersHandler = requestHandler(
             force_in_project_id,
             deleted,
             group,
+            valid,
             ...rest
           } = query.filters;
           let _ = rest;
@@ -90,9 +91,25 @@ export const usersHandler = requestHandler(
                 : sql``
             }
             ${id === loggedInUser.id ? sql`computed_in_project_id,` : sql``}
-            "deleted" FROM users_with_deleted WHERE TRUE ${
-              id === undefined ? sql`` : sql`AND id = ${id ?? null}`
-            } ${
+            "deleted" ${
+              loggedInUser.type === "admin" ? sql`, t.valid` : sql``
+            } FROM users_with_deleted ${
+            loggedInUser.type === "admin"
+              ? sql`, LATERAL
+(WITH c AS (SELECT COUNT(*) AS count, bit_or(1 << rank) AS ranks FROM choices WHERE users_with_deleted.id = choices.user_id)
+
+    SELECT CASE
+        WHEN (users_with_deleted.type = 'voter' AND count = 5 AND ranks = 62) THEN 'valid'
+        WHEN (users_with_deleted.type = 'voter' AND users_with_deleted.project_leader_id IS NOT NULL) THEN 'project_leader'
+        WHEN (users_with_deleted.type = 'voter' AND users_with_deleted.force_in_project_id IS NOT NULL) THEN 'valid'
+        WHEN (users_with_deleted.type = 'voter') THEN 'invalid'
+        WHEN (users_with_deleted.type = 'helper' OR users_with_deleted.type = 'admin') THEN 'neutral'
+    END
+    AS valid FROM c) AS t`
+              : sql``
+          } WHERE TRUE ${
+            id === undefined ? sql`` : sql`AND id = ${id ?? null}`
+          } ${
             username === undefined
               ? sql``
               : sql`AND username LIKE ${"%" + username + "%"}`
@@ -110,6 +127,7 @@ export const usersHandler = requestHandler(
               ? sql``
               : sql`AND deleted = ${deleted ?? null}`
           }
+          ${valid === undefined ? sql`` : sql`AND t.valid = ${valid ?? null}`}
           ${
             force_in_project_id === undefined ||
             !(loggedInUser.type === "admin" || loggedInUser.type === "helper")
@@ -149,6 +167,16 @@ export const usersHandler = requestHandler(
             )}`,
           username: (q, o) =>
             sql`username ${sql.unsafe(
+              o === "backwards"
+                ? q === "ASC"
+                  ? "DESC"
+                  : "ASC"
+                : q === "ASC"
+                ? "ASC"
+                : "DESC"
+            )}`,
+          valid: (q, o) =>
+            sql`t.valid ${sql.unsafe(
               o === "backwards"
                 ? q === "ASC"
                   ? "DESC"
