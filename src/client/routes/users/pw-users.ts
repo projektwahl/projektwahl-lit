@@ -291,18 +291,28 @@ export class PwUsers<X extends string> extends PwEntityList<
           </th>
 
           <th scope="col">
-            ${pwInputCheckbox<"/api/v1/users">({
+            ${pwInputSelect<
+              "/api/v1/users",
+              z.infer<
+                typeof routes["/api/v1/users"]["request"]
+              >["filters"]["valid"]
+            >({
               url: this.url,
+              type: "select",
+              disabled: this.disabled,
+              enabled: true,
               label: null,
               name: ["filters", "valid"],
               get: (o) => o.filters.valid,
               set: (o, v) => (o.filters.valid = v),
+              options: [
+                { value: undefined, text: "Alle" },
+                { value: true, text: "Gültig gewählt" },
+                { value: false, text: "Ungültig gewählt" },
+              ],
               task: this._task,
-              type: "checkbox",
-              trueValue: undefined,
-              falseValue: false,
+              initial,
               defaultValue: undefined,
-              initial: initial,
               resettable: false,
             })}
           </th>

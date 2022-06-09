@@ -29,7 +29,7 @@ import { Ref, ref } from "lit/directives/ref.js";
 // workaround see https://github.com/runem/lit-analyzer/issues/149#issuecomment-1006162839
 export function pwInputSelect<
   P extends keyof typeof routes,
-  T extends string | number | undefined
+  T extends string | boolean | number | undefined
 >(
   props: Pick<
     PwInputSelect<P, T>,
@@ -109,7 +109,7 @@ export function pwInputSelect<
 
 export class PwInputSelect<
   P extends keyof typeof routes,
-  T extends string | number | undefined
+  T extends string | boolean | number | undefined
 > extends PwInput<P, T, HTMLSelectElement> {
   mypwinputchangeDispatcher = () => {
     if (!this.input.value) {
@@ -120,8 +120,12 @@ export class PwInputSelect<
     this.inputValue =
       input.selectedIndex == -1
         ? this.defaultValue
-        : this.options?.find((v) => v.value == input.value)?.value ??
-          this.defaultValue;
+        : this.options?.find((v) => {
+            // don't ask please. HTML select inputs can only store strings and this is a nice and easy hack
+            if (v.value === true && input.value === "true") return true;
+            if (v.value === false && input.value === "false") return true;
+            return v.value === input.value;
+          })?.value ?? this.defaultValue;
 
     this.set(this.pwForm.formData, this.inputValue);
 

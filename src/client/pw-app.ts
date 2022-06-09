@@ -27,7 +27,7 @@ import { myFetch } from "./utils.js";
 import { Task } from "@lit-labs/task";
 import { msg, str } from "@lit/localize";
 
-window.addEventListener("error", function (event: ErrorEvent) {
+document.addEventListener("error", function (event: ErrorEvent) {
   console.error("window.error", event.error);
   alert(`unknown error: ${String(event)} ${String(event.error)}`);
 });
