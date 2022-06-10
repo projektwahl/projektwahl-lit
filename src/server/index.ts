@@ -23,11 +23,12 @@ SPDX-FileCopyrightText: 2021 Moritz Hedtke <Moritz.Hedtke@t-online.de>
 import { createSecureServer } from "node:http2";
 import { readFileSync } from "node:fs";
 import "./routes/login/openid-client.js";
-import { getDirs, serverHandler } from "./server-handler.js";
+import { defaultHeaders, getDirs, serverHandler } from "./server-handler.js";
 import net from "net";
 import cluster from "cluster";
 import { watch } from "node:fs/promises";
 import { setupClient } from "./routes/login/openid-client.js";
+import { ZodIssueCode } from "zod";
 
 if (!process.env["BASE_URL"]) {
   console.error("BASE_URL not set!");
@@ -101,6 +102,24 @@ if (
         serverHandler(request, response).catch((error) => {
           // TODO FIXME try sending a 500 in a try catch
           console.error(error);
+          response.writeHead(500, {
+            ...defaultHeaders,
+          });
+          response.end(
+            // TODO FIXME typings
+            JSON.stringify({
+              success: false,
+              error: {
+                issues: [
+                  {
+                    code: ZodIssueCode.custom,
+                    path: ["internal_error"],
+                    message: String(error),
+                  },
+                ],
+              },
+            })
+          );
         });
       }
     );
