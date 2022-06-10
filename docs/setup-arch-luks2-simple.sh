@@ -204,7 +204,7 @@ sudo ufw logging off
 sudo ufw enable
 
 sudo pacman -S postgresql
-sudo -iu postgres initdb -D /var/lib/postgres/data
+sudo -iu postgres initdb --data-checksums -D /var/lib/postgres/data
 sudo systemctl --now enable postgresql
 sudo pacman -S nodejs npm make gcc
 
@@ -801,4 +801,9 @@ sudo systemctl log-level debug
 # https://www.freedesktop.org/software/systemd/man/systemd.exec.html#SystemCallFilter=
 
 systemd-analyze syscall-filter
+
+
+
+# Data corruption checking
+sudo -u postgres pg_amcheck --verbose --install-missing --progress --all --heapallindexed --parent-check --rootdescend
 
