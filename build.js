@@ -127,7 +127,7 @@ await rename("dist/pw-app.js", `dist/pw-app_${pwAppHash}.js`);
 }
 
 const index = `<!DOCTYPE html>
-<html lang="en">
+<html lang="de">
   <head>
     <!-- Required meta tags -->
     <meta charset="utf-8" />
