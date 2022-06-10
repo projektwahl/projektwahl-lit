@@ -23,7 +23,7 @@ SPDX-FileCopyrightText: 2021 Moritz Hedtke <Moritz.Hedtke@t-online.de>
 
 import { json } from "node:stream/consumers";
 import { routes, ResponseType, userSchema } from "../lib/routes.js";
-import { z, ZodIssueCode } from "zod";
+import type { z } from "zod";
 import { retryableBegin } from "./database.js";
 import cookie from "cookie";
 import type { IncomingMessage, ServerResponse } from "node:http";
@@ -62,125 +62,101 @@ export function requestHandler<P extends keyof typeof routes>(
     request: MyRequest,
     response: ServerResponse | Http2ServerResponse
   ) => {
-    try {
-      if (request.method !== method) {
-        response.writeHead(400, {
-          ...defaultHeaders,
-        });
-        response.end();
-        return;
-      }
-
-      if (
-        request.method === "POST" &&
-        request.headers["x-csrf-protection"] !== "projektwahl"
-      ) {
-        response.writeHead(403, {
-          ...defaultHeaders,
-        });
-        response.end("No CSRF header!");
-        return;
-      }
-
-      let user: z.infer<typeof userSchema> | undefined = undefined;
-      const cookies = request.headers.cookie
-        ? cookie.parse(request.headers.cookie)
-        : {};
-      // implementing https://datatracker.ietf.org/doc/html/draft-ietf-httpbis-rfc6265bis-02#section-8.8.2
-      const session_id_unhashed: string | Uint8Array | undefined =
-        request.method === "GET" ? cookies.lax_id : cookies.strict_id;
-
-      let session_id: Uint8Array | undefined;
-
-      if (session_id_unhashed) {
-        // if the hashed session id gets leaked in the log files / database dump or so you still are not able to login with it.
-        session_id = new Uint8Array(
-          await crypto.subtle.digest(
-            "SHA-256",
-            new TextEncoder().encode(session_id_unhashed)
-          )
-        );
-        const session_id_ = session_id;
-        // @ts-expect-error todo fixme
-        user = (
-          await retryableBegin(
-            "ISOLATION LEVEL READ COMMITTED READ WRITE",
-            async (tsql) => {
-              await tsql`SELECT set_config('projektwahl.id', 0::text, true);`;
-              await tsql`SELECT set_config('projektwahl.type', 'root', true);`;
-              return await typedSql(tsql, {
-                columns: {
-                  id: 23,
-                  type: null, // custom enum
-                  username: 1043,
-                  group: 1043,
-                  age: 23,
-                },
-              } as const)`UPDATE sessions SET updated_at = CURRENT_TIMESTAMP FROM users WHERE users.id = sessions.user_id AND session_id = ${session_id_} AND CURRENT_TIMESTAMP < updated_at + interval '24 hours' RETURNING users.id, users.type, users.username, users.group, users.age`;
-              //await typedSql(sql, {})`DELETE FROM sessions WHERE CURRENT_TIMESTAMP >= updated_at + interval '24 hours'`
-            }
-          )
-        )[0];
-      }
-
-      let body: ResponseType<P>;
-
-      if (request.method === "POST") {
-        body = routes[path].request.safeParse(await json(request));
-      } else {
-        body = routes[path].request.safeParse(
-          JSON.parse(
-            decodeURIComponent(
-              url.search == "" ? "{}" : url.search.substring(1)
-            )
-          )
-        ); // TODO FIXME if this throws
-      }
-      const requestBody: ResponseType<P> = body;
-      if (requestBody.success) {
-        await suspend();
-        const [new_headers, responseBody] = await handler(
-          requestBody.data,
-          user,
-          session_id
-        );
-        const { ":status": _, ...finalHeaders } = new_headers;
-        // TODO FIXME it is nowhere ensured that :status is set.
-        response.writeHead(Number(new_headers[":status"]), {
-          ...defaultHeaders,
-          ...finalHeaders,
-        });
-        const stringified = JSON.stringify(responseBody);
-        setImmediate(() => {
-          response.end(stringified);
-        });
-      } else {
-        response.writeHead(200, {
-          ...defaultHeaders,
-          "content-type": "text/json; charset=utf-8",
-        });
-        response.end(JSON.stringify(requestBody));
-      }
-    } catch (error) {
-      console.error(error);
-      response.writeHead(200, {
+    if (request.method !== method) {
+      response.writeHead(400, {
         ...defaultHeaders,
       });
-      response.end(
-        // TODO FIXME typings
-        JSON.stringify({
-          success: false,
-          error: {
-            issues: [
-              {
-                code: ZodIssueCode.custom,
-                path: ["internal_error"],
-                message: String(error),
-              },
-            ],
-          },
-        })
+      response.end();
+      return;
+    }
+
+    if (
+      request.method === "POST" &&
+      request.headers["x-csrf-protection"] !== "projektwahl"
+    ) {
+      response.writeHead(403, {
+        ...defaultHeaders,
+      });
+      response.end("No CSRF header!");
+      return;
+    }
+
+    let user: z.infer<typeof userSchema> | undefined = undefined;
+    const cookies = request.headers.cookie
+      ? cookie.parse(request.headers.cookie)
+      : {};
+    // implementing https://datatracker.ietf.org/doc/html/draft-ietf-httpbis-rfc6265bis-02#section-8.8.2
+    const session_id_unhashed: string | Uint8Array | undefined =
+      request.method === "GET" ? cookies.lax_id : cookies.strict_id;
+
+    let session_id: Uint8Array | undefined;
+
+    if (session_id_unhashed) {
+      // if the hashed session id gets leaked in the log files / database dump or so you still are not able to login with it.
+      session_id = new Uint8Array(
+        await crypto.subtle.digest(
+          "SHA-256",
+          new TextEncoder().encode(session_id_unhashed)
+        )
       );
+      const session_id_ = session_id;
+      // @ts-expect-error todo fixme
+      user = (
+        await retryableBegin(
+          "ISOLATION LEVEL READ COMMITTED READ WRITE",
+          async (tsql) => {
+            await tsql`SELECT set_config('projektwahl.id', 0::text, true);`;
+            await tsql`SELECT set_config('projektwahl.type', 'root', true);`;
+            return await typedSql(tsql, {
+              columns: {
+                id: 23,
+                type: null, // custom enum
+                username: 1043,
+                group: 1043,
+                age: 23,
+              },
+            } as const)`UPDATE sessions SET updated_at = CURRENT_TIMESTAMP FROM users WHERE users.id = sessions.user_id AND session_id = ${session_id_} AND CURRENT_TIMESTAMP < updated_at + interval '24 hours' RETURNING users.id, users.type, users.username, users.group, users.age`;
+            //await typedSql(sql, {})`DELETE FROM sessions WHERE CURRENT_TIMESTAMP >= updated_at + interval '24 hours'`
+          }
+        )
+      )[0];
+    }
+
+    let body: ResponseType<P>;
+
+    if (request.method === "POST") {
+      body = routes[path].request.safeParse(await json(request));
+    } else {
+      body = routes[path].request.safeParse(
+        JSON.parse(
+          decodeURIComponent(url.search == "" ? "{}" : url.search.substring(1))
+        )
+      ); // TODO FIXME if this throws
+    }
+    const requestBody: ResponseType<P> = body;
+    if (requestBody.success) {
+      await suspend();
+      const [new_headers, responseBody] = await handler(
+        requestBody.data,
+        user,
+        session_id
+      );
+      const { ":status": _, ...finalHeaders } = new_headers;
+      // TODO FIXME it is nowhere ensured that :status is set.
+      response.writeHead(Number(new_headers[":status"]), {
+        ...defaultHeaders,
+        ...finalHeaders,
+      });
+      const stringified = JSON.stringify(responseBody);
+      setImmediate(() => {
+        response.end(stringified);
+      });
+    } else {
+      response.writeHead(200, {
+        ...defaultHeaders,
+        "content-type": "text/json; charset=utf-8",
+      });
+      response.end(JSON.stringify(requestBody));
     }
   };
   return fn;

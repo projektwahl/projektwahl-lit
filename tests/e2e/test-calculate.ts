@@ -378,6 +378,32 @@ export async function test_not_project_leader_voted_correctly2() {
 
 await test_not_project_leader_voted_correctly2();
 
+export async function test_regression_418_invalid_five_votes() {
+  await reset();
+  await sql.begin(async (tsql) => {
+    const p1 = await project(tsql, 1, 1, 0, 10, false);
+    const p2 = await project(tsql, 1, 1, 0, 10, false);
+    const p3 = await project(tsql, 1, 1, 0, 10, false);
+    const p4 = await project(tsql, 1, 1, 0, 10, false);
+    const p5 = await project(tsql, 1, 1, 0, 10, false);
+    const u1 = await user(tsql, 5);
+    await vote(tsql, p1, u1, 1);
+    await vote(tsql, p2, u1, 1);
+    await vote(tsql, p3, u1, 1);
+    await vote(tsql, p4, u1, 1);
+    await vote(tsql, p5, u1, 1);
+
+    deepEqual(await evaluate(tsql, false), {
+      overloaded: [],
+      underloaded: [],
+      notexists: [1, 2, 3, 4],
+      choices: [[1, 5, 0]],
+    });
+  });
+}
+
+await test_regression_418_invalid_five_votes();
+
 export async function test_extreme() {
   // TODO FIXME shouldn't this already overload?
   await sql.begin(async (tsql) => {
