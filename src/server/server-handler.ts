@@ -406,7 +406,7 @@ export async function serverHandler(
       }
     } else {
       const rawContents = `<!DOCTYPE html>
-  <html lang="en">
+  <html lang="de">
     <head>
       <!-- Required meta tags -->
       <meta charset="utf-8" />
@@ -453,7 +453,7 @@ export async function serverHandler(
     });
     response.end(`
     <!DOCTYPE html>
-  <html lang="en">
+  <html lang="de">
     <head>
       <!-- Required meta tags -->
       <meta charset="utf-8" />
