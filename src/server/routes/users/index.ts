@@ -92,9 +92,11 @@ export const usersHandler = requestHandler(
             }
             ${id === loggedInUser.id ? sql`computed_in_project_id,` : sql``}
             "deleted" ${
-              loggedInUser.type === "admin" ? sql`, t.valid` : sql``
+              loggedInUser.type === "admin" || loggedInUser.type === "helper"
+                ? sql`, t.valid`
+                : sql``
             } FROM users_with_deleted ${
-            loggedInUser.type === "admin"
+            loggedInUser.type === "admin" || loggedInUser.type === "helper"
               ? sql`, LATERAL
 (WITH c AS (SELECT COUNT(*) AS count, bit_or(1 << rank) AS ranks FROM choices WHERE users_with_deleted.id = choices.user_id)
 
