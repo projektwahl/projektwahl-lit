@@ -277,6 +277,9 @@
   <source>Guaranteed project members</source>
   <target>Garantierte Projektmitglieder</target>
 </trans-unit>
+<trans-unit id="s21299da63ef352b5">
+  <source>Actual project members</source>
+</trans-unit>
 <trans-unit id="s97dc2365368a965f">
   <source>Choices</source>
   <target>Wahl</target>
