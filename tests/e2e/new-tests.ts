@@ -1011,8 +1011,6 @@ async function checkUsersPaginationLimitWorks(helper: Helper) {
           thisRowsText.push(Number(await r.getAttribute("innerText")));
         }
 
-        assert.ok(thisRowsText.length <= 50);
-
         console.log(thisRowsText);
 
         rows.push(...thisRowsText);
@@ -1021,7 +1019,14 @@ async function checkUsersPaginationLimitWorks(helper: Helper) {
           By.css(`a[aria-label="${direction} page"]`)
         );
 
-        if (!((await nextPage.getAttribute("aria-disabled")) === "false")) {
+        const hasNextPage =
+          (await nextPage.getAttribute("aria-disabled")) === "false";
+
+        assert.ok(
+          thisRowsText.length == 50 || (thisRowsText.length <= 50 && !nextPage)
+        );
+
+        if (!hasNextPage) {
           break;
         }
 
