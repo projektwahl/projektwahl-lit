@@ -39,7 +39,7 @@ import {
   WebDriver,
   WebElement,
 } from "selenium-webdriver";
-import chrome from "selenium-webdriver/chrome.js";
+import chrome, { Driver } from "selenium-webdriver/chrome.js";
 import firefox from "selenium-webdriver/firefox.js";
 import { installConsoleHandler } from "selenium-webdriver/lib/logging.js";
 import { sql } from "../../src/server/database.js";
@@ -903,7 +903,7 @@ async function checkProjectSortingWorks(helper: Helper) {
         By.css('a[aria-label="next page"]')
       );
 
-      if (!((await nextPage.getAttribute("aria-disabled")) === "false")) {
+      if ((await nextPage.getAttribute("disabled") === "true")) {
         break;
       }
 
@@ -962,7 +962,7 @@ async function checkUsersSortingWorks(helper: Helper) {
       By.css('a[aria-label="next page"]')
     );
 
-    if (!((await nextPage.getAttribute("aria-disabled")) === "false")) {
+    if ((await nextPage.getAttribute("disabled") === "true")) {
       break;
     }
 
@@ -1019,19 +1019,22 @@ async function checkUsersPaginationLimitWorks(helper: Helper) {
           By.css(`a[aria-label="${direction} page"]`)
         );
 
-        const hasNextPage =
-          (await nextPage.getAttribute("aria-disabled")) === "false";
+        const hasNoNextPage = (await nextPage.getAttribute("disabled") === "true");
+
+        console.log(thisRowsText, hasNoNextPage);
 
         assert.ok(
-          thisRowsText.length == 50 || (thisRowsText.length <= 50 && !nextPage)
+          thisRowsText.length == 50 ||
+            (thisRowsText.length <= 50 && hasNoNextPage)
         );
 
-        if (!hasNextPage) {
+        if (hasNoNextPage) {
           break;
         }
 
         await helper.click(nextPage);
 
+        await helper.waitUntilLoaded();
         await helper.waitUntilLoaded();
       }
 

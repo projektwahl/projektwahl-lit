@@ -124,7 +124,7 @@ export class PwInputSelect<
             // don't ask please. HTML select inputs can only store strings and this is a nice and easy hack
             if (v.value === true && input.value === "true") return true;
             if (v.value === false && input.value === "false") return true;
-            return v.value === input.value;
+            return v.value == input.value;
           })?.value ?? this.defaultValue;
 
     this.set(this.pwForm.formData, this.inputValue);
