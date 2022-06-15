@@ -70,6 +70,7 @@ export const usersHandler = requestHandler(
             type,
             project_leader_id,
             force_in_project_id,
+            computed_in_project_id,
             deleted,
             group,
             valid,
@@ -139,6 +140,14 @@ export const usersHandler = requestHandler(
                 }`
           }
           ${
+            computed_in_project_id === undefined ||
+            !(loggedInUser.type === "admin" || loggedInUser.type === "helper")
+              ? sql``
+              : sql`AND computed_in_project_id IS NOT DISTINCT FROM ${
+                  computed_in_project_id ?? null
+                }`
+          }
+          ${
             group === undefined
               ? sql``
               : sql` AND "group" LIKE ${`${group ?? ""}%`}`
@@ -199,6 +208,18 @@ export const usersHandler = requestHandler(
             )}`,
           force_in_project_id: (q, o, v) =>
             sql`(users_with_deleted.force_in_project_id IS NOT DISTINCT FROM ${
+              v ?? null
+            }) ${sql.unsafe(
+              o === "backwards"
+                ? q === "ASC"
+                  ? "DESC"
+                  : "ASC"
+                : q === "ASC"
+                ? "ASC"
+                : "DESC"
+            )}`,
+          computed_in_project_id: (q, o, v) =>
+            sql`(users_with_deleted.computed_in_project_id IS NOT DISTINCT FROM ${
               v ?? null
             }) ${sql.unsafe(
               o === "backwards"
