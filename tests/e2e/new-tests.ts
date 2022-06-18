@@ -903,7 +903,12 @@ async function checkProjectSortingWorks(helper: Helper) {
         By.css('a[aria-label="next page"]')
       );
 
-      if ((await nextPage.getAttribute("disabled")) === "true") {
+      const hasNoNextPage =
+      await helper.driver.executeScript(`return arguments[0].getAttribute("disabled")`, nextPage);
+
+      console.log("a", thisRowsText, hasNoNextPage);
+
+      if (hasNoNextPage === "true") {
         break;
       }
 
@@ -962,7 +967,12 @@ async function checkUsersSortingWorks(helper: Helper) {
       By.css('a[aria-label="next page"]')
     );
 
-    if ((await nextPage.getAttribute("disabled")) === "true") {
+    const hasNoNextPage =
+    await helper.driver.executeScript(`return arguments[0].getAttribute("disabled")`, nextPage);
+
+    console.log("b", thisRowsText, hasNoNextPage);
+
+    if (hasNoNextPage === "true") {
       break;
     }
 
@@ -1020,16 +1030,16 @@ async function checkUsersPaginationLimitWorks(helper: Helper) {
         );
 
         const hasNoNextPage =
-          (await nextPage.getAttribute("disabled")) === "true";
+        await helper.driver.executeScript(`return arguments[0].getAttribute("disabled")`, nextPage);
 
-        console.log(thisRowsText, hasNoNextPage);
+        console.log("c", thisRowsText, hasNoNextPage);
 
         assert.ok(
           thisRowsText.length == 50 ||
             (thisRowsText.length <= 50 && hasNoNextPage)
         );
 
-        if (hasNoNextPage) {
+        if (hasNoNextPage === "true") {
           break;
         }
 
