@@ -903,7 +903,7 @@ async function checkProjectSortingWorks(helper: Helper) {
         By.css('a[aria-label="next page"]')
       );
 
-      if ((await nextPage.getAttribute("disabled") === "true")) {
+      if ((await nextPage.getAttribute("disabled")) === "true") {
         break;
       }
 
@@ -962,7 +962,7 @@ async function checkUsersSortingWorks(helper: Helper) {
       By.css('a[aria-label="next page"]')
     );
 
-    if ((await nextPage.getAttribute("disabled") === "true")) {
+    if ((await nextPage.getAttribute("disabled")) === "true") {
       break;
     }
 
@@ -1019,7 +1019,8 @@ async function checkUsersPaginationLimitWorks(helper: Helper) {
           By.css(`a[aria-label="${direction} page"]`)
         );
 
-        const hasNoNextPage = (await nextPage.getAttribute("disabled") === "true");
+        const hasNoNextPage =
+          (await nextPage.getAttribute("disabled")) === "true";
 
         console.log(thisRowsText, hasNoNextPage);
 
