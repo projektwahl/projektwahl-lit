@@ -39,7 +39,7 @@ import {
   WebDriver,
   WebElement,
 } from "selenium-webdriver";
-import chrome, { Driver } from "selenium-webdriver/chrome.js";
+import chrome from "selenium-webdriver/chrome.js";
 import firefox from "selenium-webdriver/firefox.js";
 import { installConsoleHandler } from "selenium-webdriver/lib/logging.js";
 import { sql } from "../../src/server/database.js";
