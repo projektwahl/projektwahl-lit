@@ -70,7 +70,7 @@ export class PwProjectUsers<X extends string> extends PwUsers<X> {
     super();
   }
 
-  name!: "project_leader_id" | "force_in_project_id";
+  name!: "project_leader_id" | "force_in_project_id" | "computed_in_project_id";
 
   projectId!: number;
 

@@ -465,6 +465,16 @@ export class PwProjectCreate extends PwForm<
                             prefix: "members",
                           })
                         : html``}
+                      ${value &&
+                      (this.userController.type === "admin" ||
+                        this.userController.type === "helper")
+                        ? pwProjectUsers({
+                            projectId: value.data.id,
+                            name: "computed_in_project_id",
+                            title: msg("Actual project members"),
+                            prefix: "actual_members",
+                          })
+                        : html``}
                     </form>
                   </div>
                 </div>

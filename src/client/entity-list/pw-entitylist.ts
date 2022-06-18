@@ -330,7 +330,7 @@ export class PwEntityList<
                               : -1,
                         })
                       )}
-                      aria-disabled=${this._task.render({
+                      disabled=${this._task.render({
                         pending: () => true,
                         complete: (result) =>
                           result.success &&
@@ -372,7 +372,7 @@ export class PwEntityList<
                               : -1,
                         })
                       )}
-                      aria-disabled=${this._task.render({
+                      disabled=${this._task.render({
                         pending: () => true,
                         complete: (result) =>
                           result.success && result.data?.nextCursor === null,

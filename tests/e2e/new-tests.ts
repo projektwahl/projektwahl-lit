@@ -288,7 +288,7 @@ async function runTest(
   capabilities: Record<string | symbol, unknown>,
   testFunction: (helper: Helper) => Promise<void>
 ) {
-  chance = new Chance(12345);
+  chance = new Chance(123456);
   /*
   console.log(
     (
@@ -903,7 +903,14 @@ async function checkProjectSortingWorks(helper: Helper) {
         By.css('a[aria-label="next page"]')
       );
 
-      if (!((await nextPage.getAttribute("aria-disabled")) === "false")) {
+      const hasNoNextPage = await helper.driver.executeScript(
+        `return arguments[0].getAttribute("disabled")`,
+        nextPage
+      );
+
+      console.log("a", thisRowsText, hasNoNextPage);
+
+      if (hasNoNextPage === "true") {
         break;
       }
 
@@ -962,7 +969,14 @@ async function checkUsersSortingWorks(helper: Helper) {
       By.css('a[aria-label="next page"]')
     );
 
-    if (!((await nextPage.getAttribute("aria-disabled")) === "false")) {
+    const hasNoNextPage = await helper.driver.executeScript(
+      `return arguments[0].getAttribute("disabled")`,
+      nextPage
+    );
+
+    console.log("b", thisRowsText, hasNoNextPage);
+
+    if (hasNoNextPage === "true") {
       break;
     }
 
@@ -1011,8 +1025,6 @@ async function checkUsersPaginationLimitWorks(helper: Helper) {
           thisRowsText.push(Number(await r.getAttribute("innerText")));
         }
 
-        assert.ok(thisRowsText.length <= 50);
-
         console.log(thisRowsText);
 
         rows.push(...thisRowsText);
@@ -1021,12 +1033,25 @@ async function checkUsersPaginationLimitWorks(helper: Helper) {
           By.css(`a[aria-label="${direction} page"]`)
         );
 
-        if (!((await nextPage.getAttribute("aria-disabled")) === "false")) {
+        const hasNoNextPage = await helper.driver.executeScript(
+          `return arguments[0].getAttribute("disabled")`,
+          nextPage
+        );
+
+        console.log("c", thisRowsText, hasNoNextPage);
+
+        assert.ok(
+          thisRowsText.length == 50 ||
+            (thisRowsText.length <= 50 && hasNoNextPage)
+        );
+
+        if (hasNoNextPage === "true") {
           break;
         }
 
         await helper.click(nextPage);
 
+        await helper.waitUntilLoaded();
         await helper.waitUntilLoaded();
       }
 
