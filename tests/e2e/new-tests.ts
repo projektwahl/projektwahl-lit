@@ -288,7 +288,7 @@ async function runTest(
   capabilities: Record<string | symbol, unknown>,
   testFunction: (helper: Helper) => Promise<void>
 ) {
-  chance = new Chance(12345);
+  chance = new Chance(123456);
   /*
   console.log(
     (
@@ -903,8 +903,10 @@ async function checkProjectSortingWorks(helper: Helper) {
         By.css('a[aria-label="next page"]')
       );
 
-      const hasNoNextPage =
-      await helper.driver.executeScript(`return arguments[0].getAttribute("disabled")`, nextPage);
+      const hasNoNextPage = await helper.driver.executeScript(
+        `return arguments[0].getAttribute("disabled")`,
+        nextPage
+      );
 
       console.log("a", thisRowsText, hasNoNextPage);
 
@@ -967,8 +969,10 @@ async function checkUsersSortingWorks(helper: Helper) {
       By.css('a[aria-label="next page"]')
     );
 
-    const hasNoNextPage =
-    await helper.driver.executeScript(`return arguments[0].getAttribute("disabled")`, nextPage);
+    const hasNoNextPage = await helper.driver.executeScript(
+      `return arguments[0].getAttribute("disabled")`,
+      nextPage
+    );
 
     console.log("b", thisRowsText, hasNoNextPage);
 
@@ -1029,8 +1033,10 @@ async function checkUsersPaginationLimitWorks(helper: Helper) {
           By.css(`a[aria-label="${direction} page"]`)
         );
 
-        const hasNoNextPage =
-        await helper.driver.executeScript(`return arguments[0].getAttribute("disabled")`, nextPage);
+        const hasNoNextPage = await helper.driver.executeScript(
+          `return arguments[0].getAttribute("disabled")`,
+          nextPage
+        );
 
         console.log("c", thisRowsText, hasNoNextPage);
 
