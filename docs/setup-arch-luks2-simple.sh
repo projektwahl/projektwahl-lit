@@ -316,7 +316,7 @@ sudo -u projektwahl_production_admin psql --single-transaction --db projektwahl_
 set -C
 sudo pg_dump --no-acl --no-owner --username projektwahl_production_admin projektwahl_production > "dump_$(date +"%F %T").sql"
 
-scp -P 2121 -r aes.selfmade4u.de:~/dumps/ /home/moritz/Documents/Projektwoche/
+rsync --verbose -r -e 'ssh -p 2121' moritz@aes.selfmade4u.de:~/dumps/ /home/moritz/Documents/Projektwoche/
 
 # Recover
 sudo psql --username projektwahl_staging_admin --set ON_ERROR_STOP=on projektwahl_staging < dump.sql
