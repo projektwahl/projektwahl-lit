@@ -42,3 +42,7 @@ pw-app {
   grid-column: 1;
   grid-row: 1;
 }
+
+.break-inside-avoid {
+  break-inside: avoid;
+}

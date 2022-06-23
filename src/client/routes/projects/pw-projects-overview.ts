@@ -30,12 +30,8 @@ import {
   PwEntityList,
   taskFunction,
 } from "../../entity-list/pw-entitylist.js";
-import { pwOrder } from "../../entity-list/pw-order.js";
-import { pwInputNumber } from "../../form/pw-input-number.js";
-import { pwInputText } from "../../form/pw-input-text.js";
 import type { entityRoutes } from "../../../lib/routes.js";
 import type { z } from "zod";
-import { pwInputCheckbox } from "../../form/pw-input-checkbox.js";
 import { ref } from "lit/directives/ref.js";
 
 // TODO FIXME this currently needs to be synced with the defaults in the pwInput stuff. Fix that.
@@ -108,7 +104,7 @@ export class PwProjectsOverview<X extends string> extends PwEntityList<
         complete: (result) => {
           return result.success
             ? result.data.entities.map(
-                (value) => html`<article>
+                (value) => html`<article class="break-inside-avoid">
                   <h2 class="text-center">
                     ${value.deleted
                       ? html`<del
@@ -122,28 +118,25 @@ export class PwProjectsOverview<X extends string> extends PwEntityList<
                           >${value.title}</a
                         >`}
                   </h2>
-                  <dl>
-                    <dt>Info</dt>
-                    <dd>
-                      ${value.deleted
-                        ? html`<del>${value.info}</del>`
-                        : html`${value.info}`}
-                      <p>${value.deleted ? msg("deleted") : ""}</p>
+                  <dl class="row">
+                    <dt class="col-1">Info</dt>
+                    <dd class="col-11">${value.info}</dd>
+                    <dt class="col-1">Ort</dt>
+                    <dd class="col-11">${value.place}</dd>
+                    <dt class="col-1">Kosten</dt>
+                    <dd class="col-11">${value.costs}</dd>
+                    <dt class="col-1">Jahrgang</dt>
+                    <dd class="col-11">${value.min_age} - ${value.max_age}</dd>
+                    <dt class="col-1">Teilnehmer</dt>
+                    <dd class="col-11">
+                      ${value.min_participants} - ${value.max_participants}
                     </dd>
-                    <dt>Ort</dt>
-                    <dd>${value.place}</dd>
-                    <dt>Kosten</dt>
-                    <dd>${value.costs}</dd>
-                    <dt>Jahrgang</dt>
-                    <dd>${value.min_age} - ${value.max_age}</dd>
-                    <dt>Teilnehmer</dt>
-                    <dd>${value.min_participants} - ${value.max_participants}</dd>
-                    <dt>Zufällige Zuweisungen erlaubt?</dt>
-                    <dd>${value.random_assignments ? "Ja" : "Nein"}</dd>
-                    <dt>Projektleiter</dt>
-                    <dd>TODO</dd>
-                    <dt>Teilnehmende</dt>
-                    <dd>TODO</dd>
+                    <dt class="col-1">Zufällige Zuweisungen erlaubt?</dt>
+                    <dd class="col-11">${value.random_assignments ? "Ja" : "Nein"}</dd>
+                    <dt class="col-1">Projektleiter</dt>
+                    <dd class="col-11">TODO</dd>
+                    <dt class="col-1">Teilnehmer</dt>
+                    <dd class="col-11">TODO</dd>
                   </dl>
                 </article>`
               )

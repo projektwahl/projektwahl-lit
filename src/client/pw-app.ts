@@ -276,7 +276,7 @@ export class PwApp extends PwElement {
       <div class="d-flex flex-column h-100">
         <header>
           <nav
-            class="navbar navbar-expand-lg navbar-light bg-light shadow p-3 mb-5"
+            class="navbar navbar-expand-lg navbar-light bg-light shadow p-3 mb-5 d-print-none"
           >
             <div class="container-fluid">
               <a @click=${aClick} class="navbar-brand" href="/"
