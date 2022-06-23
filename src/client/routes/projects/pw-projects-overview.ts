@@ -130,6 +130,20 @@ export class PwProjectsOverview<X extends string> extends PwEntityList<
                         : html`${value.info}`}
                       <p>${value.deleted ? msg("deleted") : ""}</p>
                     </dd>
+                    <dt>Ort</dt>
+                    <dd>${value.place}</dd>
+                    <dt>Kosten</dt>
+                    <dd>${value.costs}</dd>
+                    <dt>Jahrgang</dt>
+                    <dd>${value.min_age} - ${value.max_age}</dd>
+                    <dt>Teilnehmer</dt>
+                    <dd>${value.min_participants} - ${value.max_participants}</dd>
+                    <dt>Zufällige Zuweisungen erlaubt?</dt>
+                    <dd>${value.random_assignments ? "Ja" : "Nein"}</dd>
+                    <dt>Projektleiter</dt>
+                    <dd>TODO</dd>
+                    <dt>Teilnehmende</dt>
+                    <dd>TODO</dd>
                   </dl>
                 </article>`
               )
