@@ -385,19 +385,23 @@ export const routes = {
       .partial()
   ),
   "/api/v1/projects": baseQuery(
-    rawProjectSchema.pick({
-      id: true,
-      title: true,
-      info: true,
-      place: true,
-      costs: true,
-      min_age: true,
-      max_age: true,
-      min_participants: true,
-      max_participants: true,
-      random_assignments: true,
-      deleted: true,
-    }),
+    rawProjectSchema
+      .pick({
+        id: true,
+        title: true,
+        info: true,
+        place: true,
+        costs: true,
+        min_age: true,
+        max_age: true,
+        min_participants: true,
+        max_participants: true,
+        random_assignments: true,
+        deleted: true,
+      })
+      .extend({
+        project_leaders: z.array(z.string()),
+      }),
     z
       .array(
         z.union([
