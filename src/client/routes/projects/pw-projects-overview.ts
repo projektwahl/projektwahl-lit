@@ -119,24 +119,26 @@ export class PwProjectsOverview<X extends string> extends PwEntityList<
                         >`}
                   </h2>
                   <dl class="row">
-                    <dt class="col-1">Info</dt>
-                    <dd class="col-11">${value.info}</dd>
-                    <dt class="col-1">Ort</dt>
-                    <dd class="col-11">${value.place}</dd>
-                    <dt class="col-1">Kosten</dt>
-                    <dd class="col-11">${value.costs}</dd>
-                    <dt class="col-1">Jahrgang</dt>
-                    <dd class="col-11">${value.min_age} - ${value.max_age}</dd>
-                    <dt class="col-1">Teilnehmer</dt>
-                    <dd class="col-11">
-                      ${value.min_participants} - ${value.max_participants}
+                    <dt class="col-2">Info</dt>
+                    <dd class="col-10">${value.info}</dd>
+                    <dt class="col-2">Ort</dt>
+                    <dd class="col-10">${value.place}</dd>
+                    <dt class="col-2">Kosten</dt>
+                    <dd class="col-1">${value.costs}</dd>
+                    <dt class="col-2">Jahrgang</dt>
+                    <dd class="col-1">${value.min_age}-${value.max_age}</dd>
+                    <dt class="col-2">Teilnehmer</dt>
+                    <dd class="col-1">
+                      ${value.min_participants}-${value.max_participants}
                     </dd>
-                    <dt class="col-1">Zufällige Zuweisungen erlaubt?</dt>
-                    <dd class="col-11">${value.random_assignments ? "Ja" : "Nein"}</dd>
-                    <dt class="col-1">Projektleiter</dt>
-                    <dd class="col-11">TODO</dd>
-                    <dt class="col-1">Teilnehmer</dt>
-                    <dd class="col-11">TODO</dd>
+                    <dt class="col-2">Zufällige Zuweisungen?</dt>
+                    <dd class="col-1">
+                      ${value.random_assignments ? "Ja" : "Nein"}
+                    </dd>
+                    <dt class="col-2">Projektleiter</dt>
+                    <dd class="col-10">TODO</dd>
+                    <!--<dt class="col-2">Teilnehmer</dt>
+                    <dd class="col-10">TODO</dd>-->
                   </dl>
                 </article>`
               )
@@ -178,7 +180,7 @@ export class PwProjectsOverview<X extends string> extends PwEntityList<
     //console.log("taskk", this._task);
 
     return html`
-      <main class="container">
+      <main class="container-fluid">
         <h1 class="text-center">${this.title}</h1>
 
         <form
