@@ -109,5 +109,6 @@
 'sfebb69bee8b5102d': `Quellcode`,
 's4220dda46d622211': `Valid`,
 's21299da63ef352b5': `Actual project members`,
+'sb62e7e9db758a86a': `Projects overview`,
     };
   

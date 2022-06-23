@@ -73,6 +73,7 @@ import { pwChoicesPreloaded } from "./routes/choices/pw-choices.js";
 import { pwLogin } from "./routes/login/pw-login.js";
 import { pwSessionsPreloaded } from "./routes/sessions/pw-sessions.js";
 import { pwSettingsUpdate } from "./routes/settings/pw-settings-update.js";
+import { pwProjectsOverviewPreloaded } from "./routes/projects/pw-projects-overview.js";
 
 export const { getLocale, setLocale } = configureLocalization({
   sourceLocale,
@@ -129,6 +130,9 @@ const pages = {
   },
   "^/projects$": async (url: URL) => {
     return await pwProjectsPreloaded(url);
+  },
+  "^/projects-overview$": async (url: URL) => {
+    return await pwProjectsOverviewPreloaded(url);
   },
   "^/projects/create$": () => {
     return pwProjectCreate({
@@ -272,7 +276,7 @@ export class PwApp extends PwElement {
       <div class="d-flex flex-column h-100">
         <header>
           <nav
-            class="navbar navbar-expand-lg navbar-light bg-light shadow p-3 mb-5"
+            class="navbar navbar-expand-lg navbar-light bg-light shadow p-3 mb-5 d-print-none"
           >
             <div class="container-fluid">
               <a @click=${aClick} class="navbar-brand" href="/"

@@ -109,11 +109,17 @@ export const projectsHandler = requestHandler(
           "min_participants",
           "max_participants",
           "random_assignments",
-          "deleted" FROM projects_with_deleted WHERE (${
-            id === undefined
-          } OR id = ${id ?? null}) AND (${deleted === undefined} OR deleted = ${
-          deleted ?? null
-        }) AND title LIKE ${"%" + (title ?? "") + "%"}
+          "deleted", coalesce(t.project_leaders, array[]::varchar[]) AS project_leaders FROM projects_with_deleted LEFT JOIN  (
+            SELECT u.project_leader_id, array_agg(u.username) AS project_leaders
+            FROM   users u
+            GROUP  BY u.project_leader_id
+            ) t ON projects_with_deleted.id = t.project_leader_id WHERE (${
+              id === undefined
+            } OR id = ${id ?? null}) AND (${
+          deleted === undefined
+        } OR deleted = ${deleted ?? null}) AND title LIKE ${
+          "%" + (title ?? "") + "%"
+        }
              AND info  LIKE ${"%" + (info ?? "") + "%"}`;
       },
       {

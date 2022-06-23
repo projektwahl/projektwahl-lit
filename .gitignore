@@ -1,18 +1,5 @@
 # SPDX-License-Identifier: AGPL-3.0-or-later
 # SPDX-FileCopyrightText: 2021 Moritz Hedtke <Moritz.Hedtke@t-online.de>
-/node_modules
-/.tmp
-/dist
+/node_modules/
+/dist/
 /*.pem
-bootstrap.min.css
-/zap*
-/chromedriver*
-/lit
-/*.sql
-screenshot.png
-*.csv
-*.JPG
-*.rtf
-openid_client_secret
-postgres
-coverage/
