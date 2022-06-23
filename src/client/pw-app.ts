@@ -73,6 +73,7 @@ import { pwChoicesPreloaded } from "./routes/choices/pw-choices.js";
 import { pwLogin } from "./routes/login/pw-login.js";
 import { pwSessionsPreloaded } from "./routes/sessions/pw-sessions.js";
 import { pwSettingsUpdate } from "./routes/settings/pw-settings-update.js";
+import { pwProjectsOverviewPreloaded } from "./routes/projects/pw-projects-overview.js";
 
 export const { getLocale, setLocale } = configureLocalization({
   sourceLocale,
@@ -129,6 +130,9 @@ const pages = {
   },
   "^/projects$": async (url: URL) => {
     return await pwProjectsPreloaded(url);
+  },
+  "^/projects-overview$": async (url: URL) => {
+    return await pwProjectsOverviewPreloaded(url);
   },
   "^/projects/create$": () => {
     return pwProjectCreate({
