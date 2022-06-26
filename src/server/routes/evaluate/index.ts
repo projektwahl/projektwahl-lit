@@ -461,9 +461,9 @@ export async function evaluate(
     }
     if (result[2] != 0) {
       finalOutput.choices.push([result[0], result[1], choice.rank]);
-      /*console.log(
+      console.log(
         `user: ${choice.user_id}, project: ${choice.project_id}, rank: ${choice.rank}`
-      );*/
+      );
       rank_distribution[choice.rank]++;
     }
   }
