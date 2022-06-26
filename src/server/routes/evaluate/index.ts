@@ -289,8 +289,8 @@ export async function evaluate(
   }
 
   for (const project of projects) {
-    await lp.maximize(-9000, `project_overloaded_${project.id}`);
-    await lp.maximize(-9000, `project_underloaded_${project.id}`);
+    await lp.maximize(-1000000, `project_overloaded_${project.id}`);
+    await lp.maximize(-1000000, `project_underloaded_${project.id}`);
   }
 
   await lp.startConstraints();
@@ -345,7 +345,7 @@ export async function evaluate(
 
     await lp.constraint(
       `project_max_size_${project.id}`,
-      0,
+      null,
       [
         ...(choicesGroupedByProject[project.id] || []).map<[number, string]>(
           (choice) => [1, `choice_${choice.user_id}_${choice.project_id}`]
@@ -461,9 +461,9 @@ export async function evaluate(
     }
     if (result[2] != 0) {
       finalOutput.choices.push([result[0], result[1], choice.rank]);
-      console.log(
+      /*console.log(
         `user: ${choice.user_id}, project: ${choice.project_id}, rank: ${choice.rank}`
-      );
+      );*/
       rank_distribution[choice.rank]++;
     }
   }
