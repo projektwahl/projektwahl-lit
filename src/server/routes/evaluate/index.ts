@@ -32,6 +32,8 @@ import type { Abortable } from "node:events";
 import type { TransactionSql } from "postgres";
 import { sql } from "../../database.js";
 
+// TODO FIXME think about whether we can handle project leaders like normal members by making the project bigger?
+
 async function readFileWithBacktrace(
   path: PathLike | FileHandle,
   options:
@@ -289,8 +291,8 @@ export async function evaluate(
   }
 
   for (const project of projects) {
-    await lp.maximize(-1000000, `project_overloaded_${project.id}`);
-    await lp.maximize(-1000000, `project_underloaded_${project.id}`);
+    await lp.maximize(-10000, `project_overloaded_${project.id}`);
+    await lp.maximize(-10000, `project_underloaded_${project.id}`);
   }
 
   await lp.startConstraints();
@@ -483,6 +485,8 @@ export async function evaluate(
   }
 
   console.log(rank_distribution);
+
+  console.log("WARNING solutions don't need to be strictly equal, but the sum of overloaded places and the score must be equal.")
 
   return finalOutput;
 }
