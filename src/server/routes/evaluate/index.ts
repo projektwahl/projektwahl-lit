@@ -347,7 +347,7 @@ export async function evaluate(
 
     await lp.constraint(
       `project_max_size_${project.id}`,
-      null,
+      0,
       [
         ...(choicesGroupedByProject[project.id] || []).map<[number, string]>(
           (choice) => [1, `choice_${choice.user_id}_${choice.project_id}`]
