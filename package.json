@@ -54,7 +54,7 @@
     "csv-parse": "^5.2.0",
     "js-cookie": "^3.0.1",
     "lit": "^2.2.6",
-    "openid-client": "^5.1.6",
+    "openid-client": "^5.1.7",
     "postgres": "^3.2.4",
     "zod": "^3.17.3"
   },
