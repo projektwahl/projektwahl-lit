@@ -401,6 +401,7 @@ export const routes = {
       })
       .extend({
         project_leaders: z.array(z.string()),
+        computed_in_projects: z.array(z.string()),
       }),
     z
       .array(
