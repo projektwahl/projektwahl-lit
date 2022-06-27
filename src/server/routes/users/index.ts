@@ -91,7 +91,13 @@ export const usersHandler = requestHandler(
                 ? sql`"force_in_project_id",`
                 : sql``
             }
-            ${id === loggedInUser.id ? sql`computed_in_project_id,` : sql``}
+            ${
+              id === loggedInUser.id ||
+              loggedInUser.type === "admin" ||
+              loggedInUser.type === "helper"
+                ? sql`computed_in_project_id,`
+                : sql``
+            }
             "deleted" ${
               loggedInUser.type === "admin" || loggedInUser.type === "helper"
                 ? sql`, t.valid`
