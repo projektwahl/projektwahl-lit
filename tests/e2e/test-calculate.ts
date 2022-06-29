@@ -381,11 +381,11 @@ await test_not_project_leader_voted_correctly2();
 export async function test_regression_418_invalid_five_votes() {
   await reset();
   await sql.begin(async (tsql) => {
-    const p1 = await project(tsql, 1, 1, 0, 10, false);
-    const p2 = await project(tsql, 1, 1, 0, 10, false);
-    const p3 = await project(tsql, 1, 1, 0, 10, false);
-    const p4 = await project(tsql, 1, 1, 0, 10, false);
-    const p5 = await project(tsql, 1, 1, 0, 10, false);
+    const p1 = await project(tsql, 1, 1, 0, 10, true);
+    const p2 = await project(tsql, 1, 1, 0, 10, true);
+    const p3 = await project(tsql, 1, 1, 0, 10, true);
+    const p4 = await project(tsql, 1, 1, 0, 10, true);
+    const p5 = await project(tsql, 1, 1, 0, 10, true);
     const u1 = await user(tsql, 5);
     await vote(tsql, p1, u1, 1);
     await vote(tsql, p2, u1, 1);
