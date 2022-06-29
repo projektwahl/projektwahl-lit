@@ -32,6 +32,8 @@ import type { Abortable } from "node:events";
 import type { TransactionSql } from "postgres";
 import { sql } from "../../database.js";
 
+// TODO FIXME think about whether we can handle project leaders like normal members by making the project bigger?
+
 async function readFileWithBacktrace(
   path: PathLike | FileHandle,
   options:
@@ -228,6 +230,20 @@ export class CPLEXLP {
   };
 }
 
+/*
+
+
+WARNING: PROJECT OVERLOADED: project 18 with 2 people too much
+WARNING: PROJECT OVERLOADED: project 2 with 18 people too much
+WARNING: PROJECT OVERLOADED: project 24 with 10 people too much
+WARNING: PROJECT OVERLOADED: project 28 with 2 people too much
+WARNING: PROJECT OVERLOADED: project 33 with 7 people too much
+WARNING: PROJECT OVERLOADED: project 36 with 5 people too much
+WARNING: PROJECT UNDERLOADED: project 19 with 4 people too few
+WARNING: PROJECT UNDERLOADED: project 26 with 1 people too few
+
+49 overloaded
+  */
 export const rank2points = (rank: number) => {
   switch (rank) {
     case 0:
@@ -289,8 +305,8 @@ export async function evaluate(
   }
 
   for (const project of projects) {
-    await lp.maximize(-9000, `project_overloaded_${project.id}`);
-    await lp.maximize(-9000, `project_underloaded_${project.id}`);
+    await lp.maximize(-10000, `project_overloaded_${project.id}`);
+    await lp.maximize(-10000, `project_underloaded_${project.id}`);
   }
 
   await lp.startConstraints();
@@ -472,6 +488,7 @@ export async function evaluate(
 
   console.log(finalOutput.choices);
   if (update) {
+    console.log("UPDATING DATABASE DATA");
     await sql.begin(async (tsql) => {
       await tsql`SELECT set_config('projektwahl.id', 0::text, true);`;
       await tsql`SELECT set_config('projektwahl.type', 'root', true);`;
@@ -483,6 +500,10 @@ export async function evaluate(
   }
 
   console.log(rank_distribution);
+
+  console.log(
+    "WARNING solutions don't need to be strictly equal, but the sum of overloaded places and the score must be equal."
+  );
 
   return finalOutput;
 }

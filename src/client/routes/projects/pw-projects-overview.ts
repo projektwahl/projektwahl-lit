@@ -136,9 +136,11 @@ export class PwProjectsOverview<X extends string> extends PwEntityList<
                       ${value.random_assignments ? "Ja" : "Nein"}
                     </dd>
                     <dt class="col-2">Projektleiter</dt>
-                    <dd class="col-10">${value.project_leaders.join(",")}</dd>
-                    <!--<dt class="col-2">Teilnehmer</dt>
-                    <dd class="col-10">TODO</dd>-->
+                    <dd class="col-10">${value.project_leaders.join(", ")}</dd>
+                    <dt class="col-2">Teilnehmer</dt>
+                    <dd class="col-10">
+                      ${value.computed_in_projects.join(", ")}
+                    </dd>
                   </dl>
                 </article>`
               )

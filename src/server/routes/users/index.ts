@@ -91,24 +91,49 @@ export const usersHandler = requestHandler(
                 ? sql`"force_in_project_id",`
                 : sql``
             }
-            ${id === loggedInUser.id ? sql`computed_in_project_id,` : sql``}
-            "deleted" ${
+            ${
               loggedInUser.type === "admin" || loggedInUser.type === "helper"
-                ? sql`, t.valid`
+                ? sql`q.voted_choices,`
                 : sql``
-            } FROM users_with_deleted ${
+            }
+            ${
+              loggedInUser.type === "admin" || loggedInUser.type === "helper"
+                ? sql`t.valid,`
+                : sql``
+            }
+            ${
+              id === loggedInUser.id ||
+              loggedInUser.type === "admin" ||
+              loggedInUser.type === "helper"
+                ? sql`computed_in_project_id,`
+                : sql``
+            }
+            "deleted" FROM users_with_deleted ${
+              loggedInUser.type === "admin" || loggedInUser.type === "helper"
+                ? // https://dba.stackexchange.com/questions/225874/using-column-alias-in-a-where-clause-doesnt-work
+                  sql`, LATERAL
+                (WITH c AS (SELECT COUNT(*) AS count, bit_or(1 << rank) AS ranks FROM choices WHERE users_with_deleted.id = choices.user_id)
+                    SELECT users_with_deleted.id as user_id, CASE
+                        WHEN (users_with_deleted.type = 'voter' AND count = 5 AND ranks = 62) THEN 'valid'
+                        WHEN (users_with_deleted.type = 'voter' AND users_with_deleted.project_leader_id IS NOT NULL) THEN 'project_leader'
+                        WHEN (users_with_deleted.type = 'voter' AND users_with_deleted.force_in_project_id IS NOT NULL) THEN 'valid'
+                        WHEN (users_with_deleted.type = 'voter') THEN 'invalid'
+                        WHEN (users_with_deleted.type = 'helper' OR users_with_deleted.type = 'admin') THEN 'neutral'
+                    END
+                    AS valid FROM c) AS t`
+                : sql``
+            }  ${
             loggedInUser.type === "admin" || loggedInUser.type === "helper"
-              ? sql`, LATERAL
-(WITH c AS (SELECT COUNT(*) AS count, bit_or(1 << rank) AS ranks FROM choices WHERE users_with_deleted.id = choices.user_id)
-
-    SELECT CASE
-        WHEN (users_with_deleted.type = 'voter' AND count = 5 AND ranks = 62) THEN 'valid'
-        WHEN (users_with_deleted.type = 'voter' AND users_with_deleted.project_leader_id IS NOT NULL) THEN 'project_leader'
-        WHEN (users_with_deleted.type = 'voter' AND users_with_deleted.force_in_project_id IS NOT NULL) THEN 'valid'
-        WHEN (users_with_deleted.type = 'voter') THEN 'invalid'
-        WHEN (users_with_deleted.type = 'helper' OR users_with_deleted.type = 'admin') THEN 'neutral'
-    END
-    AS valid FROM c) AS t`
+              ? sql`
+              LEFT JOIN (SELECT user_id, COUNT(*) AS count, bit_or(1 << rank) AS ranks FROM choices GROUP BY user_id) c ON c.user_id = t.user_id `
+              : sql``
+          } ${
+            loggedInUser.type === "admin" || loggedInUser.type === "helper"
+              ? sql` LEFT JOIN  (
+            SELECT c.user_id, array_agg(CONCAT(c.rank, ' ', title)) AS voted_choices
+            FROM   choices c LEFT JOIN (SELECT id, title FROM projects) p ON c.project_id = p.id
+            GROUP  BY c.user_id
+            ) q ON t.user_id = q.user_id`
               : sql``
           } WHERE TRUE ${
             id === undefined ? sql`` : sql`AND id = ${id ?? null}`

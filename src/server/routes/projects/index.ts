@@ -99,6 +99,8 @@ export const projectsHandler = requestHandler(
         const { id, title, info, deleted, ...rest } = query.filters;
         let _ = rest;
         _ = 1; // ensure no property is missed - Don't use `{}` as a type. `{}` actually means "any non-nullish value".
+
+        // warning: this shows final members to everybody but I think this is ok for us.
         return sql`SELECT "id",
           "title",
           "info",
@@ -109,13 +111,18 @@ export const projectsHandler = requestHandler(
           "min_participants",
           "max_participants",
           "random_assignments",
-          "deleted", coalesce(t.project_leaders, array[]::varchar[]) AS project_leaders FROM projects_with_deleted LEFT JOIN  (
+          "deleted", coalesce(t.project_leaders, array[]::varchar[]) AS project_leaders, coalesce(q.computed_in_projects, array[]::varchar[]) as computed_in_projects FROM projects_with_deleted LEFT JOIN  (
             SELECT u.project_leader_id, array_agg(u.username) AS project_leaders
             FROM   users u
             GROUP  BY u.project_leader_id
-            ) t ON projects_with_deleted.id = t.project_leader_id WHERE (${
-              id === undefined
-            } OR id = ${id ?? null}) AND (${
+            ) t ON projects_with_deleted.id = t.project_leader_id
+            LEFT JOIN  (
+              SELECT u.computed_in_project_id, array_agg(u.username) AS computed_in_projects
+              FROM   users u
+              GROUP  BY u.computed_in_project_id
+              ) q ON projects_with_deleted.id = q.computed_in_project_id WHERE (${
+                id === undefined
+              } OR id = ${id ?? null}) AND (${
           deleted === undefined
         } OR deleted = ${deleted ?? null}) AND title LIKE ${
           "%" + (title ?? "") + "%"

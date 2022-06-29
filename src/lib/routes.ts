@@ -317,6 +317,7 @@ export const routes = {
         valid: z
           .enum(["valid", "invalid", "project_leader", "neutral"])
           .optional(),
+        voted_choices: z.array(z.string()).nullable().optional(),
       })
       .strict(),
     z
@@ -401,6 +402,7 @@ export const routes = {
       })
       .extend({
         project_leaders: z.array(z.string()),
+        computed_in_projects: z.array(z.string()),
       }),
     z
       .array(
