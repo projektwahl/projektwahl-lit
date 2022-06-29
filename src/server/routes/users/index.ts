@@ -125,7 +125,7 @@ export const usersHandler = requestHandler(
             }  ${
             loggedInUser.type === "admin" || loggedInUser.type === "helper"
               ? sql`
-            LEFT JOIN (SELECT user_id, COUNT(*) AS count, bit_or(1 << rank) AS ranks FROM choices GROUP BY user_id) c ON c.user_id = users_with_deleted.id `
+              LEFT JOIN (SELECT user_id, COUNT(*) AS count, bit_or(1 << rank) AS ranks FROM choices GROUP BY user_id) c ON c.user_id = jusers_with_deleted.id `
               : sql``
           } ${
             loggedInUser.type === "admin" || loggedInUser.type === "helper"
