@@ -317,6 +317,7 @@ export const routes = {
         valid: z
           .enum(["valid", "invalid", "project_leader", "neutral"])
           .optional(),
+        voted_choices: z.array(z.string()).nullable().optional(),
       })
       .strict(),
     z
