@@ -116,7 +116,12 @@ export const usersHandler = requestHandler(
     END
     AS valid FROM c) AS t`
               : sql``
-          } WHERE TRUE ${
+          } ${loggedInUser.type === "admin" || loggedInUser.type === "helper"
+          ? sql` LEFT JOIN  (
+            SELECT c.user_id, array_agg(c.project_id) AS voted_choices
+            FROM   choices c
+            GROUP  BY c.user_id
+            ) q ON users_with_deleted.id = q.user_id` : sql``} WHERE TRUE ${
             id === undefined ? sql`` : sql`AND id = ${id ?? null}`
           } ${
             username === undefined
