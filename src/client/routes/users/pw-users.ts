@@ -210,6 +210,8 @@ export class PwUsers<X extends string> extends PwEntityList<
 
           <th class="table-cell-hover">${msg("Show deleted")}</th>
 
+          <th class="table-cell-hover">Gewählt</th>
+
           <th class="table-cell-hover">${msg("Actions")}</th>
         </tr>
 
@@ -337,6 +339,8 @@ export class PwUsers<X extends string> extends PwEntityList<
           </th>
 
           <th scope="col"></th>
+
+          <th scope="col"></th>
         </tr>`;
     } catch (error) {
       console.error(error);
@@ -423,6 +427,9 @@ export class PwUsers<X extends string> extends PwEntityList<
                   <td>${value.valid}</td>
                   <td>
                     <p>${value.deleted ? msg("deleted") : ""}</p>
+                  </td>
+                  <td>
+                    <p>${value.voted_choices?.join("; ")}</p>
                   </td>
                   <td>
                     <a

@@ -121,7 +121,7 @@ export const usersHandler = requestHandler(
           } ${
             loggedInUser.type === "admin" || loggedInUser.type === "helper"
               ? sql` LEFT JOIN  (
-            SELECT c.user_id, array_agg(title) AS voted_choices
+            SELECT c.user_id, array_agg(CONCAT(c.rank, ' ', title)) AS voted_choices
             FROM   choices c LEFT JOIN (SELECT id, title FROM projects) p ON c.project_id = p.id
             GROUP  BY c.user_id
             ) q ON users_with_deleted.id = q.user_id`
