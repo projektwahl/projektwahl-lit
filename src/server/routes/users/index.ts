@@ -97,23 +97,29 @@ export const usersHandler = requestHandler(
                 : sql``
             }
             ${
+              loggedInUser.type === "admin" || loggedInUser.type === "helper"
+                ? sql`t.valid,`
+                : sql``
+            }
+            ${
               id === loggedInUser.id ||
               loggedInUser.type === "admin" ||
               loggedInUser.type === "helper"
                 ? sql`computed_in_project_id,`
                 : sql``
             }
-            "deleted" ${
+            "deleted" FROM users_with_deleted ${
               loggedInUser.type === "admin" || loggedInUser.type === "helper"
-                ? sql`, (CASE
-                  WHEN (users_with_deleted.type = 'voter' AND count = 5 AND ranks = 62) THEN 'valid'
+              // https://dba.stackexchange.com/questions/225874/using-column-alias-in-a-where-clause-doesnt-work
+                ? sql`, LATERAL (SELECT (CASE
+                  WHEN (users_with_deleted.type = 'voter' AND (SELECT COUNT(*) = 5 AND bit_or(1 << rank) = 62 FROM choices WHERE user_id = users_with_deleted.id)) THEN 'valid'
                   WHEN (users_with_deleted.type = 'voter' AND users_with_deleted.project_leader_id IS NOT NULL) THEN 'project_leader'
                   WHEN (users_with_deleted.type = 'voter' AND users_with_deleted.force_in_project_id IS NOT NULL) THEN 'valid'
                   WHEN (users_with_deleted.type = 'voter') THEN 'invalid'
                   WHEN (users_with_deleted.type = 'helper' OR users_with_deleted.type = 'admin') THEN 'neutral'
-              END) as valid`
+              END) as valid) t`
                 : sql``
-            } FROM users_with_deleted ${
+            }  ${
             loggedInUser.type === "admin" || loggedInUser.type === "helper"
               ? sql`
             LEFT JOIN (SELECT user_id, COUNT(*) AS count, bit_or(1 << rank) AS ranks FROM choices GROUP BY user_id) c ON c.user_id = users_with_deleted.id `
@@ -146,7 +152,7 @@ export const usersHandler = requestHandler(
               ? sql``
               : sql`AND deleted = ${deleted ?? null}`
           }
-          ${valid === undefined ? sql`` : sql`AND valid = ${valid ?? null}`}
+          ${valid === undefined ? sql`` : sql`AND t.valid = ${valid ?? null}`}
           ${
             force_in_project_id === undefined ||
             !(loggedInUser.type === "admin" || loggedInUser.type === "helper")
@@ -203,7 +209,7 @@ export const usersHandler = requestHandler(
                 : "DESC"
             )}`,
           valid: (q, o) =>
-            sql`valid ${sql.unsafe(
+            sql`t.valid ${sql.unsafe(
               o === "backwards"
                 ? q === "ASC"
                   ? "DESC"

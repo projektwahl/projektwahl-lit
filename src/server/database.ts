@@ -32,9 +32,9 @@ export const sql = postgres(process.env["DATABASE_URL"], {
   //onnotice: () => {
   // empty
   //}, // TODO FIXME
-  /*debug: (conn, query, params) => {
+  debug: (conn, query, params) => {
     console.log(conn, query, params);
-  }, */ // this seems to be a MAJOR performance issue
+  },  // this seems to be a MAJOR performance issue
 });
 
 export async function retryableBegin<T>(
