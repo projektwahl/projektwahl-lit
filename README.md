@@ -154,20 +154,20 @@ npx license-checker --production --summary
 ```
 
 SELECT "id",
-            "type",
-            "username",
-            "openid_id",
-            "group",
-            "age",
-            "away",
-            "project_leader_id",
-            "force_in_project_id",
-            computed_in_project_id,
-            "deleted",
-            (CASE
-        WHEN (users_with_deleted.type = 'voter' AND count = 5 AND ranks = 62) THEN 'valid'
-        WHEN (users_with_deleted.type = 'voter' AND users_with_deleted.project_leader_id IS NOT NULL) THEN 'project_leader'
-        WHEN (users_with_deleted.type = 'voter' AND users_with_deleted.force_in_project_id IS NOT NULL) THEN 'valid'
-        WHEN (users_with_deleted.type = 'voter') THEN 'invalid'
-        WHEN (users_with_deleted.type = 'helper' OR users_with_deleted.type = 'admin') THEN 'neutral'
-    END) FROM users_with_deleted LEFT JOIN (SELECT user_id, COUNT(*) AS count, bit_or(1 << rank) AS ranks FROM choices GROUP BY user_id) q ON q.user_id = users_with_deleted.id;
+"type",
+"username",
+"openid_id",
+"group",
+"age",
+"away",
+"project_leader_id",
+"force_in_project_id",
+computed_in_project_id,
+"deleted",
+(CASE
+WHEN (users_with_deleted.type = 'voter' AND count = 5 AND ranks = 62) THEN 'valid'
+WHEN (users_with_deleted.type = 'voter' AND users_with_deleted.project_leader_id IS NOT NULL) THEN 'project_leader'
+WHEN (users_with_deleted.type = 'voter' AND users_with_deleted.force_in_project_id IS NOT NULL) THEN 'valid'
+WHEN (users_with_deleted.type = 'voter') THEN 'invalid'
+WHEN (users_with_deleted.type = 'helper' OR users_with_deleted.type = 'admin') THEN 'neutral'
+END) FROM users_with_deleted LEFT JOIN (SELECT user_id, COUNT(\*) AS count, bit_or(1 << rank) AS ranks FROM choices GROUP BY user_id) q ON q.user_id = users_with_deleted.id;

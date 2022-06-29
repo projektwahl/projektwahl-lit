@@ -108,13 +108,20 @@ export const usersHandler = requestHandler(
                   WHEN (users_with_deleted.type = 'helper' OR users_with_deleted.type = 'admin') THEN 'neutral'
               END) as valid`
                 : sql``
-            } FROM users_with_deleted ${loggedInUser.type === "admin" || loggedInUser.type === "helper" ? sql`
-            LEFT JOIN (SELECT user_id, COUNT(*) AS count, bit_or(1 << rank) AS ranks FROM choices GROUP BY user_id) q ON q.user_id = users_with_deleted.id ` : sql``} ${loggedInUser.type === "admin" || loggedInUser.type === "helper"
-          ? sql` LEFT JOIN  (
+            } FROM users_with_deleted ${
+            loggedInUser.type === "admin" || loggedInUser.type === "helper"
+              ? sql`
+            LEFT JOIN (SELECT user_id, COUNT(*) AS count, bit_or(1 << rank) AS ranks FROM choices GROUP BY user_id) c ON c.user_id = users_with_deleted.id `
+              : sql``
+          } ${
+            loggedInUser.type === "admin" || loggedInUser.type === "helper"
+              ? sql` LEFT JOIN  (
             SELECT c.user_id, array_agg(c.project_id) AS voted_choices
             FROM   choices c
             GROUP  BY c.user_id
-            ) q ON users_with_deleted.id = q.user_id` : sql``} WHERE TRUE ${
+            ) q ON users_with_deleted.id = q.user_id`
+              : sql``
+          } WHERE TRUE ${
             id === undefined ? sql`` : sql`AND id = ${id ?? null}`
           } ${
             username === undefined
@@ -134,7 +141,7 @@ export const usersHandler = requestHandler(
               ? sql``
               : sql`AND deleted = ${deleted ?? null}`
           }
-          ${valid === undefined ? sql`` : sql`AND t.valid = ${valid ?? null}`}
+          ${valid === undefined ? sql`` : sql`AND valid = ${valid ?? null}`}
           ${
             force_in_project_id === undefined ||
             !(loggedInUser.type === "admin" || loggedInUser.type === "helper")
@@ -191,7 +198,7 @@ export const usersHandler = requestHandler(
                 : "DESC"
             )}`,
           valid: (q, o) =>
-            sql`t.valid ${sql.unsafe(
+            sql`valid ${sql.unsafe(
               o === "backwards"
                 ? q === "ASC"
                   ? "DESC"
