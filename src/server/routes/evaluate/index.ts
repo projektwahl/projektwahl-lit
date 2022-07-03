@@ -230,20 +230,6 @@ export class CPLEXLP {
   };
 }
 
-/*
-
-
-WARNING: PROJECT OVERLOADED: project 18 with 2 people too much
-WARNING: PROJECT OVERLOADED: project 2 with 18 people too much
-WARNING: PROJECT OVERLOADED: project 24 with 10 people too much
-WARNING: PROJECT OVERLOADED: project 28 with 2 people too much
-WARNING: PROJECT OVERLOADED: project 33 with 7 people too much
-WARNING: PROJECT OVERLOADED: project 36 with 5 people too much
-WARNING: PROJECT UNDERLOADED: project 19 with 4 people too few
-WARNING: PROJECT UNDERLOADED: project 26 with 1 people too few
-
-49 overloaded
-  */
 export const rank2points = (rank: number) => {
   switch (rank) {
     case 0:
