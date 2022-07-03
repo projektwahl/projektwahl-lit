@@ -184,6 +184,7 @@ export const updateUserAction = rawUserSchema
     project_leader_id: true,
     force_in_project_id: true,
     deleted: true,
+    computed_in_project_id: true,
   })
   .extend({
     password: z.optional(z.string().min(1)),

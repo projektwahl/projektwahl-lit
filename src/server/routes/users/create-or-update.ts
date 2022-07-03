@@ -103,6 +103,7 @@ export const createOrUpdateUsersHandler = requestHandler(
                 away,
                 deleted,
                 force_in_project_id,
+                computed_in_project_id,
                 group,
                 openid_id,
                 password,
@@ -129,6 +130,11 @@ export const createOrUpdateUsersHandler = requestHandler(
   ${
     force_in_project_id !== undefined
       ? sql`"force_in_project_id" = ${force_in_project_id},`
+      : sql``
+  }
+  ${
+    computed_in_project_id !== undefined
+      ? sql`"computed_in_project_id" = ${computed_in_project_id},`
       : sql``
   }
   ${deleted !== undefined ? sql`"deleted" = ${deleted},` : sql``}
