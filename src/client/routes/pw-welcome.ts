@@ -182,7 +182,7 @@ export class PwWelcome extends PwElement {
   userController: LoggedInUserController;
   clockController: ClockController;
   task: Task<[string | undefined], ResponseType<"/api/v1/settings">>;
-  userTask: Task<[string | undefined], ResponseType<"/api/v1/projects">>;
+  userTask: Task<[string | undefined], [number, string, boolean] | undefined>;
 
   constructor() {
     super();
@@ -223,17 +223,21 @@ export class PwWelcome extends PwElement {
             },
             {}
           );
+          // TODO FIXME this condition is wrong for project leaders. we need to wait until election end
           if (
             results.success &&
             results.data.entities.length > 0 &&
-            results.data.entities[0].computed_in_project_id
+            (results.data.entities[0].computed_in_project_id ||
+              results.data.entities[0].project_leader_id)
           ) {
             const project = await myFetch(
               "GET",
               "/api/v1/projects",
               {
                 filters: {
-                  id: results.data.entities[0].computed_in_project_id,
+                  id:
+                    results.data.entities[0].computed_in_project_id ||
+                    (results.data.entities[0].project_leader_id ?? undefined),
                 },
                 sorting: [],
                 paginationDirection: "forwards",
@@ -241,22 +245,16 @@ export class PwWelcome extends PwElement {
               },
               {}
             );
-            return project;
-          } else {
-            return {
-              success: false,
-              error: {
-                issues: [],
-              },
-            };
+            if (project.success) {
+              return [
+                project.data.entities[0].id,
+                project.data.entities[0].title,
+                results.data.entities[0].project_leader_id !== null,
+              ];
+            }
           }
         } else {
-          return {
-            success: false,
-            error: {
-              issues: [],
-            },
-          };
+          return undefined;
         }
       },
       () => [this.userController.username]
@@ -295,7 +293,7 @@ export class PwWelcome extends PwElement {
         ${this.userController.type === "voter"
           ? this.userTask.render({
               complete: (value) => {
-                if (value.success) {
+                if (value) {
                   return html`
                     <div
                       class="alert alert-success d-flex align-items-center"
@@ -311,11 +309,9 @@ export class PwWelcome extends PwElement {
                         <use xlink:href="#check-circle-fill" />
                       </svg>
                       <div>
-                        Du bist im Projekt
-                        <a
-                          href="/projects/view/${value.data.entities[0].id}"
-                          class="alert-link"
-                          >${value.data.entities[0].title}</a
+                        Du bist ${value[2] ? "Projektleiter" : ""} im Projekt
+                        <a href="/projects/view/${value[0]}" class="alert-link"
+                          >${value[1]}</a
                         >.
                       </div>
                     </div>
