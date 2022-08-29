@@ -75,7 +75,7 @@
     "@lit/localize-tools": "^0.6.3",
     "@typescript-eslint/eslint-plugin": "^5.30.0",
     "c8": "^7.11.3",
-    "eslint": "^8.18.0",
+    "eslint": "^8.23.0",
     "eslint-config-prettier": "^8.5.0",
     "prettier": "^2.7.1"
   }
