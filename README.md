@@ -34,7 +34,7 @@ This software is licensed under the GNU Affero General Public License v3.0 or an
 - **Remove/Adapt https://github.com/projektwahl/projektwahl-lit/blob/main/src/client/routes/pw-privacy.ts and https://github.com/projektwahl/projektwahl-lit/blob/main/src/client/routes/pw-imprint.ts**
 - Node 16+
 - npm
-- Postgresql database **14+**
+- Postgresql database **15+**
 - OpenID credentials (optional)
 
 ## Important notes
@@ -130,7 +130,7 @@ npx c8 report --exclude-after-remap --temp-directory=coverage --reporter=html &&
 ```
 psql postgres://projektwahl_staging_admin:projektwahl@localhost/projektwahl_staging
 
-# sudo tail -f /var/lib/postgresql/14/log/postgresql-2022-03-31_201007.log
+# sudo tail -f /var/lib/postgresql/15/log/postgresql-2022-03-31_201007.log
 ```
 
 ## Security

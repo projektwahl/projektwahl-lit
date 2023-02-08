@@ -31,7 +31,7 @@
 
     services.postgresql = {
       enable = true;
-      package = pkgs.postgresql_14;
+      package = pkgs.postgresql_15;
       enableTCPIP = true;
       authentication = "hostnossl all all 10.233.3.1 255.255.0.0 scram-sha-256";
     };

@@ -398,7 +398,7 @@ makechrootpkg -c -r $HOME/chroot -- --holdver
 sudo pacman -S devtools pacman-contrib
 updpkgsums
 
-# postgresql 13.6
+# postgresql 15
 sudo pacman -U *.tar.zst
 
 
