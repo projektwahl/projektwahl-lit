@@ -16,6 +16,10 @@
   },
   "description": "Software to manage choosing projects and automatically assigning people to projects.",
   "type": "module",
+  "engines" : {
+    "npm" : ">=9.4.0",
+    "node" : ">=19.6.0"
+  },
   "scripts": {
     "format": "docker build -t getting-started . && docker run --mount type=bind,source=\"$(pwd)\"/tests,target=/opt/projektwahl-lit/tests --mount type=bind,source=\"$(pwd)\"/.github,target=/opt/projektwahl-lit/.github --mount type=bind,source=\"$(pwd)\"/README.md,target=/opt/projektwahl-lit/README.md --mount type=bind,source=\"$(pwd)\"/package.json,target=/opt/projektwahl-lit/package.json --mount type=bind,source=\"$(pwd)\"/src,target=/opt/projektwahl-lit/src --mount type=bind,source=\"$(pwd)\"/.eslintrc.cjs,target=/opt/projektwahl-lit/.eslintrc.cjs --mount type=bind,source=\"$(pwd)\"/build.js,target=/opt/projektwahl-lit/build.js getting-started npm run format-internal",
     "format-internal": "prettier --ignore-path .prettierignore --write .",

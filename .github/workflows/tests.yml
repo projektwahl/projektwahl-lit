@@ -17,7 +17,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        node-version: [18.x]
+        node-version: [19.x]
         browser-engine: ["firefox", "chrome"]
 
     steps:
