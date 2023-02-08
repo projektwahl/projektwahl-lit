@@ -502,3 +502,9 @@ export class PwApp extends PwElement {
 }
 
 customElements.define("pw-app", PwApp);
+
+declare global {
+  interface HTMLElementTagNameMap {
+    'pw-app': PwApp
+  }
+}
