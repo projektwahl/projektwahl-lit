@@ -1,6 +1,6 @@
 {
   "name": "projektwahl-lit",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "license": "AGPL-3.0-or-later",
   "author": {
     "name": "Moritz Hedtke",
@@ -49,10 +49,10 @@
     "build": "node build.js"
   },
   "dependencies": {
-    "@dev.mohe/argon2": "^0.29.4",
     "@lit-labs/motion": "^1.0.3",
     "@lit-labs/task": "^2.0.0",
     "@lit/localize": "^0.11.4",
+    "argon2": "^0.30.3",
     "bootstrap": "^5.2.3",
     "cookie": "^0.5.0",
     "csv-parse": "^5.3.5",
@@ -64,27 +64,21 @@
   },
   "devDependencies": {
     "@swc/core": "^1.3.34",
-    "@swc/helpers": "^0.4.14",
     "@types/chance": "^1.1.3",
     "@types/cookie": "^0.5.1",
     "@types/js-cookie": "^3.0.2",
     "@types/node": "^18.13.0",
     "@types/selenium-webdriver": "^4.1.10",
     "chance": "^1.1.9",
-    "esbuild": "^0.17.6",
-    "esbuild-linux-64": "^0.15.18",
     "purgecss": "^5.0.0",
     "selenium-webdriver": "4.8.0",
     "ts-node": "^10.9.1",
-    "tslib": "^2.5.0",
     "typescript": "^4.9.5"
   },
   "optionalDependencies": {
     "@lit/localize-tools": "^0.6.7",
     "@typescript-eslint/eslint-plugin": "^5.51.0",
     "c8": "^7.12.0",
-    "eslint": "^8.33.0",
-    "eslint-config-prettier": "^8.6.0",
-    "prettier": "^2.8.4"
+    "eslint": "^8.33.0"
   }
 }
