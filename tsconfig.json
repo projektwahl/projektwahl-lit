@@ -19,6 +19,9 @@
     "outDir": "dist/",
     "disableSizeLimit": true
   },
+  "ts-node": {
+    "swc": true
+  },
   "include": [
     "src/**/*.ts",
     "tests/**/*.ts",

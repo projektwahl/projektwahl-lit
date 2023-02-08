@@ -32,7 +32,7 @@ This software is licensed under the GNU Affero General Public License v3.0 or an
 ## Requirements
 
 - **Remove/Adapt https://github.com/projektwahl/projektwahl-lit/blob/main/src/client/routes/pw-privacy.ts and https://github.com/projektwahl/projektwahl-lit/blob/main/src/client/routes/pw-imprint.ts**
-- Node 16+
+- Node 19+
 - npm
 - Postgresql database **15+**
 - OpenID credentials (optional)
@@ -51,11 +51,11 @@ git clone https://github.com/projektwahl/projektwahl-lit.git
 cd projektwahl-lit/
 
 # this is important as our optional dependencies are not audited in comparison to the other dependencies
-npm ci --ignore-scripts --omit=optional
+npm ci --omit=optional
 touch key.pem cert.pem
 chown projektwahl_staging key.pem cert.pem
 sudo -u projektwahl_staging openssl req -x509 -newkey rsa:2048 -nodes -sha256 -subj '/CN=localhost' -keyout key.pem -out cert.pem
-./node_modules/@dev.mohe/argon2/build.sh /usr/include/node/
+./node_modules/@dev.mohe/argon2/build.sh /home/moritz/.nvm/versions/node/v19.6.0/include/node/
 npm run localize-build
 LANGUAGE=de npm run build
 

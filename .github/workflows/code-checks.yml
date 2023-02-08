@@ -27,7 +27,7 @@ jobs:
           node-version: ${{ matrix.node-version }}
           cache: "npm"
       - run: ls -R /opt/hostedtoolcache/node/
-      - run: npm ci --ignore-scripts
+      - run: npm ci
       - run: npm run format:check-internal
       - run: ./node_modules/@dev.mohe/argon2/build.sh /opt/hostedtoolcache/node/$(node -v | cut -c2-)/x64/include/node
       - run: LANGUAGE=de npm run build
