@@ -23,8 +23,8 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",
-    "format": "rome format .",
-    "format:check": "rome format --write .",
+    "format": "rome format --write .",
+    "format:check": "rome format .",
     "test-internal:chrome": "node --loader ts-node/esm tests/e2e/new-tests.ts chrome",
     "test-internal:browserstack-ipad": "node --loader ts-node/esm tests/e2e/new-tests.ts browserstack-ipad",
     "test-api": "node --loader ts-node/esm tests/e2e/api-tests.ts chrome",
