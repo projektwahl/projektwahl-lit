@@ -19,6 +19,9 @@
     "noErrorTruncation": true,
     "skipLibCheck": true
   },
+  "ts-node": {
+    "swc": true
+  },
   "include": ["src/**/*.ts"],
   "references": [{ "path": "./tsconfig.node.json" }]
 }
