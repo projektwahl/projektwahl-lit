@@ -285,11 +285,11 @@ CREATE TABLE IF NOT EXISTS settings (
 INSERT INTO settings (open_date, voting_start_date, voting_end_date, results_date) SELECT TIMESTAMP WITH TIME ZONE '2222-01-01 00:00:00+00', TIMESTAMP WITH TIME ZONE '2222-01-01 00:00:01+00', TIMESTAMP WITH TIME ZONE '2222-01-01 00:00:02+00', TIMESTAMP WITH TIME ZONE '2222-01-01 00:00:03+00' WHERE NOT EXISTS (SELECT * FROM settings);
 
 -- warning: if we replace our row level security by users this will break. view are always executed as their owner. https://www.depesz.com/2022/03/22/waiting-for-postgresql-15-add-support-for-security-invoker-views/. Postgresql 15 will add the security_invoker option
-CREATE OR REPLACE VIEW users WITH (security_barrier) AS SELECT * FROM users_with_deleted WHERE NOT deleted;
+CREATE OR REPLACE VIEW users WITH (security_barrier, security_invoker) AS SELECT * FROM users_with_deleted WHERE NOT deleted;
 
-CREATE OR REPLACE VIEW projects WITH (security_barrier) AS SELECT * FROM projects_with_deleted WHERE NOT deleted;
+CREATE OR REPLACE VIEW projects WITH (security_barrier, security_invoker) AS SELECT * FROM projects_with_deleted WHERE NOT deleted;
 
-CREATE OR REPLACE VIEW present_voters WITH (security_barrier) AS SELECT * FROM users WHERE type = 'voter' AND NOT away;
+CREATE OR REPLACE VIEW present_voters WITH (security_barrier, security_invoker) AS SELECT * FROM users WHERE type = 'voter' AND NOT away;
 
 CREATE OR REPLACE FUNCTION check_choices_age() RETURNS TRIGGER AS $body$
 BEGIN
@@ -510,8 +510,5 @@ DO $_$
         EXECUTE FORMAT('GRANT SELECT,INSERT,UPDATE,DELETE ON choices TO %I;', the_database);
         EXECUTE FORMAT('GRANT SELECT,UPDATE ON settings TO %I;', the_database);
         EXECUTE FORMAT('GRANT SELECT,INSERT,UPDATE,DELETE ON sessions TO %I;', the_database);
-        EXECUTE FORMAT('ALTER VIEW users OWNER TO %I;', the_database);
-        EXECUTE FORMAT('ALTER VIEW present_voters OWNER TO %I;', the_database);
-        EXECUTE FORMAT('ALTER VIEW projects OWNER TO %I;', the_database);
     END
 $_$;

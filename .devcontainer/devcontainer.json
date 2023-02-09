@@ -4,13 +4,9 @@
 	"name": "Node.js & PostgreSQL",
 	"dockerComposeFile": "docker-compose.yml",
 	"service": "app",
-	"workspaceFolder": "/workspaces/${localWorkspaceFolderBasename}",
-	"features": {
-		"ghcr.io/devcontainers/features/node:1": {
-			"nodeGypDependencies": true,
-			"version": "latest"
-		}
-	}
+	"workspaceFolder": "/workspaces/${localWorkspaceFolderBasename}"
+
+	// NODE_ENV=development DATABASE_URL=postgres://postgres:postgres@db/postgres npm run setup
 
 	// Features to add to the dev container. More info: https://containers.dev/features.
 	// "features": {},
