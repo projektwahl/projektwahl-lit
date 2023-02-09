@@ -10,6 +10,6 @@ RUN tar xf geckodriver-v0.30.0-linux64.tar.gz
 #RUN apt-get update && apt-get full-upgrade && apt-get install -y nano
 COPY --chown=node:node package.json package-lock.json /opt/projektwahl-lit/
 RUN npm ci
-RUN ./node_modules/@dev.mohe/argon2/build.sh /usr/local/include/node/
+RUN npx @mapbox/node-pre-gyp rebuild -C ./node_modules/argon2
 CMD ["/bin/bash"]
 COPY . .

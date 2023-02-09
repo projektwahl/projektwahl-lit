@@ -13,7 +13,7 @@ USER node:node
 COPY package.json package-lock.json /opt/projektwahl-lit/
 RUN openssl req -x509 -newkey rsa:2048 -nodes -sha256 -subj '/CN=localhost' -keyout key.pem -out cert.pem
 RUN npm ci
-RUN ./node_modules/@dev.mohe/argon2/build.sh /usr/local/include/node/
+RUN npx @mapbox/node-pre-gyp rebuild -C ./node_modules/argon2
 COPY . .
 RUN LANGUAGE=en npm run build
 CMD ./start.sh
