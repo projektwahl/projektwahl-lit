@@ -31,7 +31,7 @@
   ],
   "scripts": {
     "dev": "vite",
-    "build2": "tsc && vite build",
+    "build": "tsc && vite build",
     "format": "docker build -t getting-started . && docker run --mount type=bind,source=\"$(pwd)\"/tests,target=/opt/projektwahl-lit/tests --mount type=bind,source=\"$(pwd)\"/.github,target=/opt/projektwahl-lit/.github --mount type=bind,source=\"$(pwd)\"/README.md,target=/opt/projektwahl-lit/README.md --mount type=bind,source=\"$(pwd)\"/package.json,target=/opt/projektwahl-lit/package.json --mount type=bind,source=\"$(pwd)\"/src,target=/opt/projektwahl-lit/src --mount type=bind,source=\"$(pwd)\"/.eslintrc.cjs,target=/opt/projektwahl-lit/.eslintrc.cjs --mount type=bind,source=\"$(pwd)\"/build.js,target=/opt/projektwahl-lit/build.js getting-started npm run format-internal",
     "format-internal": "prettier --ignore-path .prettierignore --write .",
     "format:check": "docker build -t getting-started . && docker run getting-started npm run format:check-internal",
@@ -56,8 +56,7 @@
     "localize-build-internal": "lit-localize build",
     "typecheck": "tsc",
     "lit-analyze": "docker build -t getting-started . && docker run getting-started npm run lit-analyze-internal",
-    "lit-analyze-internal": "lit-analyzer --strict --rules.no-unknown-attribute off src",
-    "build": "node build.js"
+    "lit-analyze-internal": "lit-analyzer --strict --rules.no-unknown-attribute off src"
   },
   "dependencies": {
     "@lit-labs/motion": "^1.0.3",
