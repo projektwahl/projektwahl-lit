@@ -107,7 +107,7 @@ psql postgres://projektwahl_staging_admin:projektwahl@localhost/projektwahl_stag
 psql postgres://projektwahl_staging_admin:projektwahl@localhost/projektwahl_staging --command="UPDATE settings SET open_date = CURRENT_TIMESTAMP + (- '1 minute'::interval), voting_start_date = CURRENT_TIMESTAMP, voting_end_date = CURRENT_TIMESTAMP + '1 hour', results_date = CURRENT_TIMESTAMP + '2 hours';"
 NODE_ENV=development DATABASE_HOST=localhost DATABASE_URL=postgres://projektwahl_staging:projektwahl@localhost/projektwahl_staging npm run setup
 
-NODE_ENV=testing PORT=8443 BASE_URL=https://localhost:8443 CREDENTIALS_DIRECTORY=$PWD DATABASE_HOST=localhost DATABASE_URL=postgres://projektwahl_staging_admin:projektwahl@localhost/projektwahl_staging npm run test-internal:firefox 1
+NODE_ENV=testing PORT=8443 BASE_URL=https://localhost:8443 CREDENTIALS_DIRECTORY=$PWD DATABASE_HOST=localhost DATABASE_URL=postgres://projektwahl_staging_admin:projektwahl@localhost/projektwahl_staging npm run test:firefox 1
 
 NODE_ENV=testing PORT=8443 BASE_URL=https://localhost:8443 CREDENTIALS_DIRECTORY=$PWD DATABASE_HOST=localhost DATABASE_URL=postgres://projektwahl_staging_admin:projektwahl@localhost/projektwahl_staging npm run test-api
 ```
@@ -118,7 +118,7 @@ NODE_ENV=testing PORT=8443 BASE_URL=https://localhost:8443 CREDENTIALS_DIRECTORY
 
 rm -Rf dist coverage && LANGUAGE=en npm run build && NODE_ENV=coverage PORT=8443 BASE_URL=https://localhost CREDENTIALS_DIRECTORY=$PWD DATABASE_HOST=localhost DATABASE_URL=postgres://projektwahl_staging:projektwahl@localhost/projektwahl_staging NODE_V8_COVERAGE=coverage node dist/server-testing.js
 
-NODE_ENV=testing BASE_URL=https://localhost:8443 CREDENTIALS_DIRECTORY=$PWD DATABASE_HOST=localhost DATABASE_URL=postgres://projektwahl_staging_admin:projektwahl@localhost/projektwahl_staging npm run test-internal:firefox 1
+NODE_ENV=testing BASE_URL=https://localhost:8443 CREDENTIALS_DIRECTORY=$PWD DATABASE_HOST=localhost DATABASE_URL=postgres://projektwahl_staging_admin:projektwahl@localhost/projektwahl_staging npm run test:firefox 1
 
 LANGUAGE=en npm run build && NODE_ENV=coverage PORT=8443 BASE_URL=https://localhost:8443 CREDENTIALS_DIRECTORY=$PWD DATABASE_HOST=localhost DATABASE_URL=postgres://projektwahl_staging_admin:projektwahl@localhost/projektwahl_staging NODE_V8_COVERAGE=coverage node dist/api-tests.js
 

@@ -28,11 +28,11 @@ jobs:
           cache: "npm"
       - run: ls -R /opt/hostedtoolcache/node/
       - run: npm ci
-      - run: npm run format:check-internal
+      - run: npm run format:check
       - run: npx @mapbox/node-pre-gyp rebuild -C ./node_modules/argon2
       - run: LANGUAGE=de npm run build
       - run: npm run typecheck
-      - run: npm run lint-internal
-      - run: npm run localize-extract-internal
+      - run: npm run lint
+      - run: npm run localize-extract
       - run: git update-index --refresh
       - run: git diff-index --quiet HEAD --
