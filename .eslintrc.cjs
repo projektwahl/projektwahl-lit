@@ -53,7 +53,6 @@ module.exports = {
   ],
   ignorePatterns: [
     "dist/",
-    "src/client/hmr.ts",
     "rollup.config.js",
     "lit/",
     "coverage/",
