@@ -37,7 +37,7 @@ jobs:
         with:
           node-version: ${{ matrix.node-version }}
           cache: "npm"
-      - run: npm ci --omit=optional
+      - run: npm ci
       - run: sudo docker build -f Dockerfile -t projektwahl .
       - run: sudo docker compose up --build --detach --wait
       - name: "Running test on BrowserStack" # Invokes the actual test script that would run on BrowserStack browsers

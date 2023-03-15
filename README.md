@@ -51,7 +51,7 @@ git clone https://github.com/projektwahl/projektwahl-lit.git
 cd projektwahl-lit/
 
 # this is important as our optional dependencies are not audited in comparison to the other dependencies
-npm ci --omit=optional
+npm ci
 touch key.pem cert.pem
 chown projektwahl_staging key.pem cert.pem
 sudo -u projektwahl_staging openssl req -x509 -newkey rsa:2048 -nodes -sha256 -subj '/CN=localhost' -keyout key.pem -out cert.pem

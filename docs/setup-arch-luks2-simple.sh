@@ -293,7 +293,7 @@ sudo chown moritz projektwahl-lit-staging
 git clone git@github.com:projektwahl/projektwahl-lit.git projektwahl-lit-staging
 cd projektwahl-lit-staging
 openssl req -x509 -newkey rsa:2048 -nodes -sha256 -subj '/CN=localhost' -keyout key.pem -out cert.pem
-npm ci --omit=optional
+npm ci
 npx @mapbox/node-pre-gyp rebuild -C ./node_modules/argon2
 LANGUAGE=de npm run build
 
@@ -302,7 +302,7 @@ sudo chown moritz projektwahl-lit-production
 git clone git@github.com:projektwahl/projektwahl-lit.git projektwahl-lit-production
 cd projektwahl-lit-production
 openssl req -x509 -newkey rsa:2048 -nodes -sha256 -subj '/CN=localhost' -keyout key.pem -out cert.pem
-npm ci --omit=optional
+npm ci
 npx @mapbox/node-pre-gyp rebuild -C ./node_modules/argon2
 LANGUAGE=de npm run build
 
