@@ -78,7 +78,7 @@ NODE_ENV=development DATABASE_HOST=/run/postgresql DATABASE_URL=postgres://proje
 
 
 
-PORT=8443 BASE_URL=https://localhost:8443 DATABASE_URL=postgres://projektwahl@projektwahl/projektwahl CREDENTIALS_DIRECTORY=$PWD node  --enable-source-maps dist/server.js
+PORT=8443 BASE_URL=https://localhost:8443 DATABASE_URL=postgres://projektwahl@projektwahl/projektwahl CREDENTIALS_DIRECTORY=$PWD npm run server
 
 ```
 
