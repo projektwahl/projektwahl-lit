@@ -6,11 +6,14 @@
 name: Test
 
 on:
+  merge_group:
+  push:
+    branches: [main]
   pull_request:
     branches: [main]
 
 jobs:
-  ubuntu-job:
+  test:
     runs-on: ubuntu-latest
     name: "Test on Ubuntu"
 

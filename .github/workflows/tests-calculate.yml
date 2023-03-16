@@ -6,12 +6,13 @@
 name: Tests Calculate
 
 on:
+  merge_group:
   push:
     branches: [main]
   pull_request:
     branches: [main]
 
-jobs:
+jobs-calculate:
   test:
     runs-on: ubuntu-latest
 

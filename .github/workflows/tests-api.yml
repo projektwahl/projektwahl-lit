@@ -6,13 +6,14 @@
 name: API Tests
 
 on:
+  merge_group:
   push:
     branches: [main]
   pull_request:
     branches: [main]
 
 jobs:
-  test:
+  test-api:
     runs-on: ubuntu-latest
 
     services:
