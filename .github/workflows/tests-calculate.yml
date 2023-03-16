@@ -12,8 +12,8 @@ on:
   pull_request:
     branches: [main]
 
-jobs-calculate:
-  test:
+jobs:
+  test-calculate:
     runs-on: ubuntu-latest
 
     services:
