@@ -11,7 +11,7 @@ services:
       - back-tier
     healthcheck:
       # TODO FIXME test an API endpoint so that this is tested fully
-      test: ["CMD", "curl", "-f", "--insecure", "https://localhost:8443/api"]
+      test: ["CMD", "curl", "--fail-with-body ", "--insecure", "-X", "POST", "-H", "x-csrf-protection: projektwahl", "-d", "{}", "https://localhost:8443/api/v1/login"]
       interval: 10s
       timeout: 10s
       retries: 12
@@ -36,7 +36,7 @@ services:
     #      - server-key
     healthcheck:
       # TODO FIXME test an API endpoint so that this is tested fully
-      test: ["CMD", "curl", "-f", "--insecure", "https://localhost:443"]
+      test: ["CMD", "curl", "--fail-with-body ", "--insecure", "https://localhost:443"]
       interval: 10s
       timeout: 10s
       retries: 3
