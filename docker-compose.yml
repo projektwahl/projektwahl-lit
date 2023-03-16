@@ -3,7 +3,6 @@ version: "3.8"
 # sudo docker compose up --build
 services:
   frontend:
-    image: projektwahl
     build:
       context: .
       dockerfile: Dockerfile
@@ -22,7 +21,6 @@ services:
   #      - httpd-config
 
   reverse-proxy:
-    image: projektwahl-reverse-proxy
     build:
       context: .
       dockerfile: Dockerfile-reverse-proxy
