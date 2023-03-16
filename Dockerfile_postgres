@@ -1,0 +1,4 @@
+FROM docker.io/library/postgres AS postgres
+COPY ./src/server/setup.sql /opt/projektwahl-lit/src/server/setup.sql
+COPY ./setup-postgresql.sh /docker-entrypoint-initdb.d/setup-postgresql.sh
+ENV POSTGRES_PASSWORD=projektwahl

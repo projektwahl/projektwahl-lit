@@ -7,6 +7,7 @@ services:
       context: .
       dockerfile: Dockerfile
       target: backend
+    restart: on-failure
     networks:
       - front-tier
       - back-tier
@@ -26,12 +27,11 @@ services:
       context: .
       dockerfile: Dockerfile
       target: frontend
+    restart: on-failure
     ports:
       - "8443:443"
     networks:
       - front-tier
-    volumes:
-      - ./docs/sites-enabled-projektwahl.conf:/etc/nginx/conf.d/default.conf
     #    secrets:
     #      - server-certificate
     #      - server-key
@@ -44,14 +44,10 @@ services:
       start_period: 0s
 
   postgres:
-    image: docker.io/library/postgres
-    restart: always
-    environment:
-      POSTGRES_PASSWORD: projektwahl
-    volumes:
-      #      - db-data:/var/lib/postgresql
-      - ./src/server/setup.sql:/opt/projektwahl-lit/src/server/setup.sql
-      - ./setup-postgresql.sh:/docker-entrypoint-initdb.d/setup-postgresql.sh
+    build:
+      context: .
+      dockerfile: Dockerfile_postgres
+    restart: on-failure
     networks:
       - back-tier
 
