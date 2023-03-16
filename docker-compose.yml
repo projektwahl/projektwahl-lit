@@ -14,7 +14,7 @@ services:
       test: ["CMD", "curl", "-f", "--insecure", "https://localhost:8443/api"]
       interval: 10s
       timeout: 10s
-      retries: 3
+      retries: 12
       start_period: 0s
     # https://docs.docker.com/compose/startup-order/
   #    configs:
