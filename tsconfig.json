@@ -22,6 +22,6 @@
   "ts-node": {
     "swc": true
   },
-  "include": ["src/**/*.ts"],
+  "include": ["**/*.ts", "*.ts", "**/*.js", "*.js"],
   "references": [{ "path": "./tsconfig.node.json" }]
 }

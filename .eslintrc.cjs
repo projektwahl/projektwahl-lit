@@ -53,11 +53,5 @@ module.exports = {
   ],
   ignorePatterns: [
     "dist/",
-    "rollup.config.js",
-    "lit/",
-    "coverage/",
-    "tests/e2e/fast-selenium.js",
-    "src/client/polyfill.js",
-    "jsonaddage.js",
   ],
 };
