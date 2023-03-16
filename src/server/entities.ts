@@ -247,9 +247,7 @@ export async function fetchData<R extends keyof typeof entityRoutes>(
 
   // would be great to stream the results but they are post processed below
 
-  let entities: z.infer<entitiesType[R]["response"]>["entities"] =
-    
-    sqlResult as unknown as z.infer<entitiesType[R]["response"]>["entities"];
+  let entities: z.infer<entitiesType[R]["response"]>["entities"] = sqlResult;
 
   let nextCursor: z.infer<entitiesType[R]["response"]>["nextCursor"] = null;
   let previousCursor: z.infer<entitiesType[R]["response"]>["previousCursor"] =

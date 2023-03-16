@@ -103,7 +103,7 @@ export const myFetch = async <P extends keyof typeof routes>(
       return c;
     } else {
       
-      return json as MinimalSafeParseError;
+      return json;
     }
   } catch (error) {
     console.error(error);

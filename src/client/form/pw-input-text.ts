@@ -97,7 +97,7 @@ export class PwInputText<
       throw new Error();
     }
     
-    const val = this.input.value.value as T;
+    const val = this.input.value.value;
 
     this.inputValue = val === "" ? this.defaultValue : val;
 

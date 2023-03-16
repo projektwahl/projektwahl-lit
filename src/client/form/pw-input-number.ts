@@ -98,7 +98,7 @@ export class PwInputNumber<
       this.input.value.value === ""
         ? this.defaultValue
         : 
-          (this.input.value.valueAsNumber as T);
+          (this.input.value.valueAsNumber);
     this.set(this.pwForm.formData, this.inputValue);
 
     this.input.value?.dispatchEvent(
