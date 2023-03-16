@@ -22,6 +22,7 @@ SPDX-FileCopyrightText: 2021 Moritz Hedtke <Moritz.Hedtke@t-online.de>
 */
 import { deepStrictEqual } from "assert";
 import type {
+  MaybeRow,
   PendingQuery,
   SerializableParameter,
   TransactionSql,
@@ -34,7 +35,7 @@ export function typedSql<R extends { [column: string]: number | null }>(
 ) {
   return async function test(
     template: TemplateStringsArray,
-    ...args: (SerializableParameter | PendingQuery<any>)[]
+    ...args: (SerializableParameter | PendingQuery<readonly MaybeRow[]>)[]
   ) {
     const err = new Error();
     try {

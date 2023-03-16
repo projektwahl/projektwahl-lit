@@ -28,13 +28,14 @@ if (process.argv.length !== 3) {
   exit(0);
 }
 
-const contents = JSON.parse(await readFile(process.argv[2]));
+// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+const contents: { group: string }[] = JSON.parse(await readFile(process.argv[2], "utf-8"));
 
 console.log(
   JSON.stringify(
     contents.map((e) => {
       let age;
-      let result = [...e.group.matchAll(/^\d+/g)];
+      const result = [...e.group.matchAll(/^\d+/g)];
       if (result.length == 1) {
         age = Number(result[0]);
       } else if (e.group.startsWith("E0")) {
