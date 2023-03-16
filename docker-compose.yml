@@ -9,6 +9,13 @@ services:
     networks:
       - front-tier
       - back-tier
+    healthcheck:
+      # TODO FIXME test an API endpoint so that this is tested fully
+      test: ["CMD", "curl", "-f", "--insecure", "https://localhost:8443/api"]
+      interval: 10s
+      timeout: 10s
+      retries: 3
+      start_period: 0s
     # https://docs.docker.com/compose/startup-order/
   #    configs:
   #      - httpd-config
