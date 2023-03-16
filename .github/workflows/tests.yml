@@ -29,6 +29,6 @@ jobs:
           cache: "npm"
       - run: npm ci
       - run: sudo docker build -f Dockerfile -t projektwahl .
-      - run: sudo docker compose up --build --detach --wait
+      - run: sudo docker compose up --build --wait
       - name: "Running test"
         run: NODE_ENV=testing DATABASE_URL=postgres://projektwahl_staging:projektwahl@localhost/projektwahl_staging BASE_URL=https://localhost:8443 npm run test:${{ matrix.browser-engine }} 1
