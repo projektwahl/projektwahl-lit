@@ -5,3 +5,6 @@ dist
 .git
 key.pem
 cert.pem
+docker-compose.yml
+Dockerfile
+Dockerfile_dev
