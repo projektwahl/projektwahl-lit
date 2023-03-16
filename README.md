@@ -32,9 +32,9 @@ This software is licensed under the GNU Affero General Public License v3.0 or an
 ## Requirements
 
 - **Remove/Adapt https://github.com/projektwahl/projektwahl-lit/blob/main/src/client/routes/pw-privacy.ts and https://github.com/projektwahl/projektwahl-lit/blob/main/src/client/routes/pw-imprint.ts**
-- Node 16+
+- Node 19+
 - npm
-- Postgresql database **14+**
+- Postgresql database **15+**
 - OpenID credentials (optional)
 
 ## Important notes
@@ -51,11 +51,11 @@ git clone https://github.com/projektwahl/projektwahl-lit.git
 cd projektwahl-lit/
 
 # this is important as our optional dependencies are not audited in comparison to the other dependencies
-npm ci --ignore-scripts --omit=optional
+npm ci
 touch key.pem cert.pem
 chown projektwahl_staging key.pem cert.pem
 sudo -u projektwahl_staging openssl req -x509 -newkey rsa:2048 -nodes -sha256 -subj '/CN=localhost' -keyout key.pem -out cert.pem
-./node_modules/@dev.mohe/argon2/build.sh /usr/include/node/
+npx @mapbox/node-pre-gyp rebuild -C ./node_modules/argon2
 npm run localize-build
 LANGUAGE=de npm run build
 
@@ -78,7 +78,7 @@ NODE_ENV=development DATABASE_HOST=/run/postgresql DATABASE_URL=postgres://proje
 
 
 
-PORT=8443 BASE_URL=https://localhost:8443 DATABASE_URL=postgres://projektwahl@projektwahl/projektwahl CREDENTIALS_DIRECTORY=$PWD node  --enable-source-maps dist/server.js
+PORT=8443 BASE_URL=https://localhost:8443 DATABASE_URL=postgres://projektwahl@projektwahl/projektwahl CREDENTIALS_DIRECTORY=$PWD npm run server
 
 ```
 
@@ -107,7 +107,7 @@ psql postgres://projektwahl_staging_admin:projektwahl@localhost/projektwahl_stag
 psql postgres://projektwahl_staging_admin:projektwahl@localhost/projektwahl_staging --command="UPDATE settings SET open_date = CURRENT_TIMESTAMP + (- '1 minute'::interval), voting_start_date = CURRENT_TIMESTAMP, voting_end_date = CURRENT_TIMESTAMP + '1 hour', results_date = CURRENT_TIMESTAMP + '2 hours';"
 NODE_ENV=development DATABASE_HOST=localhost DATABASE_URL=postgres://projektwahl_staging:projektwahl@localhost/projektwahl_staging npm run setup
 
-NODE_ENV=testing PORT=8443 BASE_URL=https://localhost:8443 CREDENTIALS_DIRECTORY=$PWD DATABASE_HOST=localhost DATABASE_URL=postgres://projektwahl_staging_admin:projektwahl@localhost/projektwahl_staging npm run test-internal:firefox 1
+NODE_ENV=testing PORT=8443 BASE_URL=https://localhost:8443 CREDENTIALS_DIRECTORY=$PWD DATABASE_HOST=localhost DATABASE_URL=postgres://projektwahl_staging_admin:projektwahl@localhost/projektwahl_staging npm run test:firefox 1
 
 NODE_ENV=testing PORT=8443 BASE_URL=https://localhost:8443 CREDENTIALS_DIRECTORY=$PWD DATABASE_HOST=localhost DATABASE_URL=postgres://projektwahl_staging_admin:projektwahl@localhost/projektwahl_staging npm run test-api
 ```
@@ -118,7 +118,7 @@ NODE_ENV=testing PORT=8443 BASE_URL=https://localhost:8443 CREDENTIALS_DIRECTORY
 
 rm -Rf dist coverage && LANGUAGE=en npm run build && NODE_ENV=coverage PORT=8443 BASE_URL=https://localhost CREDENTIALS_DIRECTORY=$PWD DATABASE_HOST=localhost DATABASE_URL=postgres://projektwahl_staging:projektwahl@localhost/projektwahl_staging NODE_V8_COVERAGE=coverage node dist/server-testing.js
 
-NODE_ENV=testing BASE_URL=https://localhost:8443 CREDENTIALS_DIRECTORY=$PWD DATABASE_HOST=localhost DATABASE_URL=postgres://projektwahl_staging_admin:projektwahl@localhost/projektwahl_staging npm run test-internal:firefox 1
+NODE_ENV=testing BASE_URL=https://localhost:8443 CREDENTIALS_DIRECTORY=$PWD DATABASE_HOST=localhost DATABASE_URL=postgres://projektwahl_staging_admin:projektwahl@localhost/projektwahl_staging npm run test:firefox 1
 
 LANGUAGE=en npm run build && NODE_ENV=coverage PORT=8443 BASE_URL=https://localhost:8443 CREDENTIALS_DIRECTORY=$PWD DATABASE_HOST=localhost DATABASE_URL=postgres://projektwahl_staging_admin:projektwahl@localhost/projektwahl_staging NODE_V8_COVERAGE=coverage node dist/api-tests.js
 
@@ -130,7 +130,7 @@ npx c8 report --exclude-after-remap --temp-directory=coverage --reporter=html &&
 ```
 psql postgres://projektwahl_staging_admin:projektwahl@localhost/projektwahl_staging
 
-# sudo tail -f /var/lib/postgresql/14/log/postgresql-2022-03-31_201007.log
+# sudo tail -f /var/lib/postgresql/15/log/postgresql-2022-03-31_201007.log
 ```
 
 ## Security

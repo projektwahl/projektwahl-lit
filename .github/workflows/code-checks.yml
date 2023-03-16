@@ -6,6 +6,7 @@
 name: Code checks
 
 on:
+  merge_group:
   push:
     branches: [main]
   pull_request:
@@ -17,7 +18,7 @@ jobs:
 
     strategy:
       matrix:
-        node-version: [18.x]
+        node-version: [19.x]
 
     steps:
       - uses: actions/checkout@v2
@@ -27,12 +28,12 @@ jobs:
           node-version: ${{ matrix.node-version }}
           cache: "npm"
       - run: ls -R /opt/hostedtoolcache/node/
-      - run: npm ci --ignore-scripts
-      - run: npm run format:check-internal
-      - run: ./node_modules/@dev.mohe/argon2/build.sh /opt/hostedtoolcache/node/$(node -v | cut -c2-)/x64/include/node
+      - run: npm ci
+      - run: npm run format:check
+      - run: npx @mapbox/node-pre-gyp rebuild -C ./node_modules/argon2
       - run: LANGUAGE=de npm run build
       - run: npm run typecheck
-      - run: npm run lint-internal
-      - run: npm run localize-extract-internal
+      - run: npm run lint
+      - run: npm run localize-extract
       - run: git update-index --refresh
       - run: git diff-index --quiet HEAD --

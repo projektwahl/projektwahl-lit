@@ -27,7 +27,6 @@ import nodeCrypto from "node:crypto";
 // import { promisify } from "node:util";
 // @ts-expect-error wrong typings
 const { webcrypto: crypto }: { webcrypto: Crypto } = nodeCrypto;
-import "./fast-selenium.js";
 
 import {
   Builder,

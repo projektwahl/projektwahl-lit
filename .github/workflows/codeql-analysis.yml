@@ -11,19 +11,19 @@
 # the `language` matrix defined below to confirm you have the correct set of
 # supported CodeQL languages.
 #
-name: "CodeQL"
+name: "CodeQL Analyze"
 
 on:
+  merge_group:
   push:
     branches: [main]
   pull_request:
-    # The branches below must be a subset of the branches above
     branches: [main]
   schedule:
     - cron: "27 11 * * 6"
 
 jobs:
-  analyze:
+  codeql-analyze:
     name: Analyze
     runs-on: ubuntu-latest
     permissions:

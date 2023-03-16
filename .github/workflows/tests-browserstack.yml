@@ -15,7 +15,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        node-version: [18.x]
+        node-version: [19.x]
         browser-engine: [2, 3]
 
     steps:
@@ -37,11 +37,11 @@ jobs:
         with:
           node-version: ${{ matrix.node-version }}
           cache: "npm"
-      - run: npm ci --ignore-scripts --omit=optional
+      - run: npm ci
       - run: sudo docker build -f Dockerfile -t projektwahl .
       - run: sudo docker compose up --build --detach --wait
       - name: "Running test on BrowserStack" # Invokes the actual test script that would run on BrowserStack browsers
-        run: SELENIUM_URL=http://${{ secrets.BROWSERSTACK_USERNAME }}:${{ secrets.BROWSERSTACK_ACCESS_KEY }}@hub-cloud.browserstack.com/wd/hub NODE_ENV=testing DATABASE_URL=postgres://projektwahl_staging:projektwahl@localhost/projektwahl_staging BASE_URL=https://localhost:8443 npm run test-internal:browserstack-ipad ${{ matrix.browser-engine }} # See sample test script above
+        run: SELENIUM_URL=http://${{ secrets.BROWSERSTACK_USERNAME }}:${{ secrets.BROWSERSTACK_ACCESS_KEY }}@hub-cloud.browserstack.com/wd/hub NODE_ENV=testing DATABASE_URL=postgres://projektwahl_staging:projektwahl@localhost/projektwahl_staging BASE_URL=https://localhost:8443 npm run test:browserstack-ipad ${{ matrix.browser-engine }} # See sample test script above
       - name: "BrowserStackLocal Stop" # Terminating the BrowserStackLocal tunnel connection
         uses: browserstack/github-actions/setup-local@master
         with:

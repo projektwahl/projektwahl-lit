@@ -156,7 +156,7 @@ async function testLogin() {
         {
           code: "custom",
           path: ["internal_error"],
-          message: "SyntaxError: Unexpected token u in JSON at position 0",
+          message: 'SyntaxError: "undefined" is not valid JSON',
         },
       ],
     },

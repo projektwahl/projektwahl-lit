@@ -64,11 +64,11 @@ export const parseRequestWithPrefix = <
   url: URL,
   defaultValue: z.infer<typeof entityRoutes[P]["request"]>
 ): parseRequestWithPrefixType<PREFIX>[P] => {
-  const schema: parseRequestWithPrefixSchemaType<PREFIX>[P] = z
+  const schema = z
     .object({})
     // @ts-expect-error wrong typings I assume
     .setKey(prefix, entityRoutes[apiUrl]["request"].default(defaultValue))
-    .passthrough();
+    .passthrough() as unknown as parseRequestWithPrefixSchemaType<PREFIX>[P]; // TODO FIXME
   const data: parseRequestWithPrefixType<PREFIX>[P] = mappedFunctionCall(
     schema,
     JSON.parse(

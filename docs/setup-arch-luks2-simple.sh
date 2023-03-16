@@ -293,8 +293,8 @@ sudo chown moritz projektwahl-lit-staging
 git clone git@github.com:projektwahl/projektwahl-lit.git projektwahl-lit-staging
 cd projektwahl-lit-staging
 openssl req -x509 -newkey rsa:2048 -nodes -sha256 -subj '/CN=localhost' -keyout key.pem -out cert.pem
-npm ci --ignore-scripts --omit=optional
-./node_modules/@dev.mohe/argon2/build.sh /usr/include/node/
+npm ci
+npx @mapbox/node-pre-gyp rebuild -C ./node_modules/argon2
 LANGUAGE=de npm run build
 
 sudo mkdir projektwahl-lit-production
@@ -302,8 +302,8 @@ sudo chown moritz projektwahl-lit-production
 git clone git@github.com:projektwahl/projektwahl-lit.git projektwahl-lit-production
 cd projektwahl-lit-production
 openssl req -x509 -newkey rsa:2048 -nodes -sha256 -subj '/CN=localhost' -keyout key.pem -out cert.pem
-npm ci --ignore-scripts --omit=optional
-./node_modules/@dev.mohe/argon2/build.sh /usr/include/node/
+npm ci
+npx @mapbox/node-pre-gyp rebuild -C ./node_modules/argon2
 LANGUAGE=de npm run build
 
 
@@ -398,7 +398,7 @@ makechrootpkg -c -r $HOME/chroot -- --holdver
 sudo pacman -S devtools pacman-contrib
 updpkgsums
 
-# postgresql 13.6
+# postgresql 15
 sudo pacman -U *.tar.zst
 
 

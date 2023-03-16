@@ -6,18 +6,21 @@
 name: Test
 
 on:
+  merge_group:
+  push:
+    branches: [main]
   pull_request:
     branches: [main]
 
 jobs:
-  ubuntu-job:
+  test:
     runs-on: ubuntu-latest
     name: "Test on Ubuntu"
 
     strategy:
       fail-fast: false
       matrix:
-        node-version: [18.x]
+        node-version: [19.x]
         browser-engine: ["firefox", "chrome"]
 
     steps:
@@ -27,8 +30,7 @@ jobs:
         with:
           node-version: ${{ matrix.node-version }}
           cache: "npm"
-      - run: npm ci --ignore-scripts --omit=optional
-      - run: sudo docker build -f Dockerfile -t projektwahl .
-      - run: sudo docker compose up --build --detach --wait
+      - run: npm ci
+      - run: sudo docker compose up --build --detach --wait --remove-orphans
       - name: "Running test"
-        run: NODE_ENV=testing DATABASE_URL=postgres://projektwahl_staging:projektwahl@localhost/projektwahl_staging BASE_URL=https://localhost:8443 npm run test-internal:${{ matrix.browser-engine }} 1
+        run: NODE_ENV=testing DATABASE_URL=postgres://projektwahl_staging:projektwahl@localhost/projektwahl_staging BASE_URL=https://localhost:8443 npm run test:${{ matrix.browser-engine }} 1

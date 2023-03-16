@@ -20,7 +20,7 @@ https://github.com/projektwahl/projektwahl-lit
 SPDX-License-Identifier: AGPL-3.0-or-later
 SPDX-FileCopyrightText: 2021 Moritz Hedtke <Moritz.Hedtke@t-online.de>
 */
-import argon2 from "@dev.mohe/argon2";
+import argon2 from "argon2";
 
 // we could also additionally do the PBKDF2 client side so no log leaks etc would be possible.
 
