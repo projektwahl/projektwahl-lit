@@ -36,7 +36,7 @@ import type {
 import { suspend } from "../client/utils.js";
 import { typedSql } from "./describe.js";
 import nodeCrypto from "node:crypto";
-// @ts-expect-error wrong typings
+
 const { webcrypto: crypto }: { webcrypto: Crypto } = nodeCrypto;
 
 export type MyRequest = (IncomingMessage | Http2ServerRequest) &
@@ -100,7 +100,7 @@ export function requestHandler<P extends keyof typeof routes>(
         )
       );
       const session_id_ = session_id;
-      // @ts-expect-error todo fixme
+      
       user = (
         await retryableBegin(
           "ISOLATION LEVEL READ COMMITTED READ WRITE",

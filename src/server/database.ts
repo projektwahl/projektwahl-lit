@@ -43,7 +43,7 @@ export async function retryableBegin<T>(
 ): Promise<T> {
   for (;;) {
     try {
-      // @ts-expect-error wrong typings in deps
+      
       return await sql.begin(options, cb);
     } catch (error) {
       if (error instanceof postgres.PostgresError && error.code === "40001") {

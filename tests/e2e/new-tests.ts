@@ -25,7 +25,7 @@ import assert from "assert/strict";
 import { writeFile } from "fs/promises";
 import nodeCrypto from "node:crypto";
 // import { promisify } from "node:util";
-// @ts-expect-error wrong typings
+
 const { webcrypto: crypto }: { webcrypto: Crypto } = nodeCrypto;
 
 import {

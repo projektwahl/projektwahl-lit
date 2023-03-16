@@ -111,7 +111,7 @@ export async function fetchData<R extends keyof typeof entityRoutes>(
   const sorting: entitiesType15[R] = mappedIndexing(query, "sorting");
 
   if (tiebreaker !== undefined && !sorting.find((e) => e[0] == tiebreaker)) {
-    // @ts-expect-error probably mappedfunctioncall needed. or maybe we can store that tuple separately and type it.
+    
     sorting.push([tiebreaker, "ASC", null]);
   }
 
@@ -122,12 +122,12 @@ export async function fetchData<R extends keyof typeof entityRoutes>(
     sorting,
     (v: entitiesType4[R]) => {
       const v0: entitiesType6[R] = mappedIndexing<entitiesType4, R, 0>(v, 0);
-      // @ts-expect-error bruh
+      
       const v1: entitiesType2[R][typeof v0] = mappedIndexing(v, 1);
       const v2: entitiesType10[R] = mappedIndexing(v, 2);
       return [
         sql`,`,
-        // @ts-expect-error bruh
+        
         sql`${orderByQueries[v0](v1, query.paginationDirection, v2)}`,
       ];
     }
@@ -167,7 +167,7 @@ export async function fetchData<R extends keyof typeof entityRoutes>(
         let order;
         
         const cursorValue = paginationCursor
-          ? // @ts-expect-error this seems impossible to type - we probably need to unify this to the indexed type before
+          ? 
             paginationCursor[value[0]]
           : null;
         const column = sql.unsafe(`"${value[0]}"`);
@@ -290,7 +290,7 @@ export async function fetchData<R extends keyof typeof entityRoutes>(
       "content-type": "text/json; charset=utf-8",
       ":status": 200,
     },
-    // @ts-expect-error TODO FIXME
+    
     a,
   ];
 }

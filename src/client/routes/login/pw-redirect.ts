@@ -97,7 +97,7 @@ class PwRedirect extends PwForm<"/api/v1/redirect"> {
 
   override render() {
     if (!this.hasUpdated) {
-      // @ts-expect-error impossible
+      
       this.formData = {};
     }
 

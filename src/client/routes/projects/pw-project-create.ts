@@ -121,7 +121,7 @@ export class PwProjectCreate extends PwForm<
           id: this.projectId,
         };
       } else {
-        // @ts-expect-error bruh
+        
         this.formData = {};
       }
     }

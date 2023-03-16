@@ -219,7 +219,7 @@ export abstract class PwInput<
       // in case this is an update set the value to undefined as it wasn't changed yet.
       this.set(
         this.pwForm.formData,
-        // @ts-expect-error tmp error
+        
         this.resettable
           ? this.initial !== undefined
             ? undefined
@@ -242,7 +242,7 @@ export abstract class PwInput<
       // in case this is an update set the value to undefined as it wasn't changed yet.
       this.set(
         this.pwForm.formData,
-        // @ts-expect-error tmp error
+        
         this.resettable
           ? this.initial !== undefined
             ? undefined
@@ -344,7 +344,7 @@ export abstract class PwInput<
                   : this.defaultValue;
               this.set(
                 this.pwForm.formData,
-                // @ts-expect-error tmp error
+                
                 this.initial !== undefined ? undefined : this.defaultValue
               );
               this.requestUpdate();

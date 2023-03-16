@@ -196,7 +196,7 @@ export const createOrUpdateUsersHandler = requestHandler(
         },
         {
           success: true as const,
-          // @ts-expect-error bruh
+          
           data: row,
         },
       ];

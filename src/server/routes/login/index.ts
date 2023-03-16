@@ -29,7 +29,7 @@ import type { OutgoingHttpHeaders } from "node:http";
 import nodeCrypto from "node:crypto";
 import { typedSql } from "../../describe.js";
 import { sensitiveHeaders } from "node:http2";
-// @ts-expect-error wrong typings
+
 const { webcrypto: crypto }: { webcrypto: Crypto } = nodeCrypto;
 
 export const loginHandler = requestHandler(

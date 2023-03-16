@@ -62,7 +62,7 @@ class PwUsersImport extends PwForm<"/api/v1/users/create-or-update"> {
     super();
 
     this._task = new Task(this, async () => {
-      // @ts-expect-error impossible
+      
       
       const fileContents = await this.formData.file;
 
@@ -88,7 +88,7 @@ class PwUsersImport extends PwForm<"/api/v1/users/create-or-update"> {
     }
 
     if (!this.hasUpdated) {
-      // @ts-expect-error impossible
+      
       this.formData = { file: Promise.resolve(undefined) };
     }
 
@@ -117,7 +117,7 @@ class PwUsersImport extends PwForm<"/api/v1/users/create-or-update"> {
                 name: [],
                 get: () => undefined,
                 set: (o, v) => {
-                  // @ts-expect-error hack
+                  
                   o.file = v;
                 },
                 task: this._task,

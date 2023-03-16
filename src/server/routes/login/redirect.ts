@@ -29,7 +29,7 @@ import { client } from "./openid-client.js";
 import type { OutgoingHttpHeaders } from "node:http";
 import nodeCrypto from "node:crypto";
 import { typedSql } from "../../describe.js";
-// @ts-expect-error wrong typings
+
 const { webcrypto: crypto }: { webcrypto: Crypto } = nodeCrypto;
 
 export const openidRedirectHandler = requestHandler(

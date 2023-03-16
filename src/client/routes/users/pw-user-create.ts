@@ -196,7 +196,7 @@ class PwUserCreate extends PwForm<"/api/v1/users/create-or-update"> {
           },
         ];
       } else {
-        // @ts-expect-error bruh
+        
         this.formData = [{ action: "create" }];
       }
     }

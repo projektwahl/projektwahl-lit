@@ -40,7 +40,7 @@ window.addEventListener(
       `unknown promise error: ${String(event.reason)} ${String(event.promise)}`
     );
     
-    event.promise.catch((reason) => alert(String(reason.stack)));
+    event.promise.catch((reason) => alert(String(reason)));
   }
 );
 
@@ -78,7 +78,7 @@ import { pwProjectsOverviewPreloaded } from "./routes/projects/pw-projects-overv
 export const { getLocale, setLocale } = configureLocalization({
   sourceLocale,
   targetLocales,
-  
+  // eslint-disable-next-line @typescript-eslint/require-await
   loadLocale: async () => templates_de,
 });
 void setLocale(window.LANGUAGE ?? "en");
