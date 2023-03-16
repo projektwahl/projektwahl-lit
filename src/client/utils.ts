@@ -68,7 +68,7 @@ export const myFetch = async <P extends keyof typeof routes>(
         );
       }
       try {
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-return
+        
         return await response.json();
       } catch (error) {
         const r: ResponseType<P> = {
@@ -87,22 +87,22 @@ export const myFetch = async <P extends keyof typeof routes>(
       }
     }
     // TODO FIXME maybe include the result shit in the typings directly
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+    
     const json = await response.json();
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+    
     if (json.success) {
       const a: typeof routes[P] = routes[url];
       const b: typeof routes[P]["response"] = a.response;
       const c:
         | z.SafeParseSuccess<z.infer<typeof routes[P]["response"]>>
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+        
         | MinimalSafeParseError = b.safeParse(json.data);
       if (!c.success) {
         console.error(c.error);
       }
       return c;
     } else {
-      // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
+      
       return json as MinimalSafeParseError;
     }
   } catch (error) {

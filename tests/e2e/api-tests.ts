@@ -454,7 +454,7 @@ async function testLogout() {
     },
     null
   );
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+  
   const parsed: { success: unknown } = JSON.parse(r);
   assert.equal(parsed.success, true);
 
@@ -613,11 +613,11 @@ async function testCreateOrUpdateUsers() {
       },
     ])
   );
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+  
   let value = JSON.parse(r);
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access,@typescript-eslint/no-unsafe-assignment
+  
   const id: number = value.data[0].id;
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+  
   value.data[0].id = 1337;
   assert.deepEqual(value, {
     success: true,
@@ -637,7 +637,7 @@ async function testCreateOrUpdateUsers() {
       },
     ])
   );
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+  
   value = JSON.parse(r);
   assert.deepEqual(value, {
     success: false,
@@ -669,7 +669,7 @@ async function testCreateOrUpdateUsers() {
       },
     ])
   );
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+  
   value = JSON.parse(r);
   assert.deepEqual(value, {
     success: true,
@@ -692,7 +692,7 @@ async function testCreateOrUpdateUsers() {
     },
     null
   );
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+  
   value = JSON.parse(r);
   assert.deepEqual(value, {
     success: true,
@@ -735,7 +735,7 @@ async function testCreateOrUpdateUsers() {
       },
     ])
   );
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+  
   value = JSON.parse(r);
   assert.deepEqual(value, {
     success: true,
@@ -758,7 +758,7 @@ async function testCreateOrUpdateUsers() {
     },
     null
   );
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+  
   value = JSON.parse(r);
   assert.deepEqual(value, {
     success: true,
@@ -899,11 +899,11 @@ async function testCreateOrUpdateProjects() {
       random_assignments: false,
     })
   );
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+  
   const data = JSON.parse(r);
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment,@typescript-eslint/no-unsafe-member-access
+  
   const id: number = data.data.id;
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+  
   data.data.id = 1337;
   assert.deepEqual(data, { success: true, data: { id: 1337 } });
 
@@ -923,7 +923,7 @@ async function testCreateOrUpdateProjects() {
     },
     null
   );
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+  
   const value = JSON.parse(r);
   assert.deepEqual(value, {
     success: true,

@@ -39,7 +39,7 @@ window.addEventListener(
     alert(
       `unknown promise error: ${String(event.reason)} ${String(event.promise)}`
     );
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+    
     event.promise.catch((reason) => alert(String(reason.stack)));
   }
 );
@@ -78,7 +78,7 @@ import { pwProjectsOverviewPreloaded } from "./routes/projects/pw-projects-overv
 export const { getLocale, setLocale } = configureLocalization({
   sourceLocale,
   targetLocales,
-  // eslint-disable-next-line @typescript-eslint/require-await
+  
   loadLocale: async () => templates_de,
 });
 void setLocale(window.LANGUAGE ?? "en");
@@ -243,9 +243,9 @@ export class PwApp extends PwElement {
 
     this.popstateListener = (event: PopStateEvent) => {
       const url = new URL(window.location.href);
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+      
       const state = event.state;
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+      
       HistoryController.goto(url, state, true); // TODO FIXME don't pushstate here at all
     };
 

@@ -97,7 +97,7 @@ export class PwInputNumber<
     this.inputValue =
       this.input.value.value === ""
         ? this.defaultValue
-        : // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
+        : 
           (this.input.value.valueAsNumber as T);
     this.set(this.pwForm.formData, this.inputValue);
 

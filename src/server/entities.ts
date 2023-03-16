@@ -165,7 +165,7 @@ export async function fetchData<R extends keyof typeof entityRoutes>(
 
       const partsTmp = part.flatMap((value, index) => {
         let order;
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+        
         const cursorValue = paginationCursor
           ? // @ts-expect-error this seems impossible to type - we probably need to unify this to the indexed type before
             paginationCursor[value[0]]
@@ -248,7 +248,7 @@ export async function fetchData<R extends keyof typeof entityRoutes>(
   // would be great to stream the results but they are post processed below
 
   let entities: z.infer<entitiesType[R]["response"]>["entities"] =
-    // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
+    
     sqlResult as unknown as z.infer<entitiesType[R]["response"]>["entities"];
 
   let nextCursor: z.infer<entitiesType[R]["response"]>["nextCursor"] = null;

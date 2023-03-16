@@ -63,13 +63,13 @@ class PwUsersImport extends PwForm<"/api/v1/users/create-or-update"> {
 
     this._task = new Task(this, async () => {
       // @ts-expect-error impossible
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+      
       const fileContents = await this.formData.file;
 
       const result = await myFetch<"/api/v1/users/create-or-update">(
         "POST",
         "/api/v1/users/create-or-update",
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+        
         fileContents ? JSON.parse(fileContents) : null,
         {}
       );

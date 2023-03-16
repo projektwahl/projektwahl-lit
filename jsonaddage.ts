@@ -28,7 +28,7 @@ if (process.argv.length !== 3) {
   exit(0);
 }
 
-// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+
 const contents: { group: string }[] = JSON.parse(await readFile(process.argv[2], "utf-8"));
 
 console.log(
