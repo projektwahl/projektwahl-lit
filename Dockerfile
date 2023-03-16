@@ -5,7 +5,7 @@
 
 # TODO https://github.com/moby/buildkit/blob/master/frontend/dockerfile/docs/syntax.md
 
-FROM node
+FROM node AS backend
 WORKDIR /opt/projektwahl-lit
 RUN chown node:node /opt/projektwahl-lit
 RUN apt update && apt install -y postgresql-client
@@ -17,3 +17,7 @@ RUN npx @mapbox/node-pre-gyp rebuild -C ./node_modules/argon2
 COPY . .
 RUN LANGUAGE=en npm run build
 CMD ./start.sh
+
+FROM nginx AS frontend
+COPY --from=backend /opt/projektwahl-lit /opt/projektwahl-lit
+RUN openssl req -x509 -newkey rsa:2048 -nodes -sha256 -subj '/CN=localhost' -keyout key.pem -out cert.pem

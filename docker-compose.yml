@@ -2,10 +2,11 @@ version: "3.8"
 # https://docs.docker.com/compose/compose-file/
 # sudo docker compose up --build
 services:
-  frontend:
+  backend:
     build:
       context: .
       dockerfile: Dockerfile
+      target: backend
     networks:
       - front-tier
       - back-tier
@@ -23,7 +24,8 @@ services:
   reverse-proxy:
     build:
       context: .
-      dockerfile: Dockerfile-reverse-proxy
+      dockerfile: Dockerfile
+      target: frontend
     ports:
       - "8443:443"
     networks:
