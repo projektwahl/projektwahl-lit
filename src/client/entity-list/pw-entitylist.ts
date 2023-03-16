@@ -66,9 +66,8 @@ export const parseRequestWithPrefix = <
 ): parseRequestWithPrefixType<PREFIX>[P] => {
   const schema = z
     .object({})
-    
     .setKey(prefix, entityRoutes[apiUrl]["request"].default(defaultValue))
-    .passthrough() as unknown as parseRequestWithPrefixSchemaType<PREFIX>[P]; // TODO FIXME
+    .passthrough()
   const data: parseRequestWithPrefixType<PREFIX>[P] = mappedFunctionCall(
     schema,
     JSON.parse(
