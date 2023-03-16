@@ -30,6 +30,8 @@ import {
   OutgoingHttpHeaders,
 } from "node:http2";
 import { sleep } from "../../src/client/utils.js";
+import { z } from "zod";
+import { routes } from "../../src/lib/routes.js";
 
 const chance: Chance.Chance = new Chance(/*1234*/);
 
@@ -39,10 +41,12 @@ if (!process.env["BASE_URL"]) {
 }
 const BASE_URL = process.env.BASE_URL;
 
-function request(
+function request<U extends keyof typeof routes>(
+  url: U,
+  params: string | null,
   requestHeaders: OutgoingHttpHeaders,
   requestBody: string | null
-): Promise<[string, IncomingHttpHeaders & IncomingHttpStatusHeader]> {
+): Promise<[z.infer<typeof routes[U]["response"]>, IncomingHttpHeaders & IncomingHttpStatusHeader]> {
   return new Promise((resolve, reject) => {
     const client = connect(BASE_URL, {
       rejectUnauthorized: false,
@@ -53,6 +57,7 @@ function request(
 
     const req = client.request({
       [constants.HTTP2_HEADER_SCHEME]: "https",
+      [constants.HTTP2_HEADER_PATH]: params ? `${url}?${params}` : url,
       ...requestHeaders,
       ...(buffer !== null
         ? {
@@ -74,8 +79,8 @@ function request(
     });
     req.on("end", () => {
       client.close();
-
-      resolve([data, responseHeaders]);
+      
+      resolve([routes[url].response.parse(JSON.parse(data)), responseHeaders]);
     });
 
     if (buffer) {
@@ -89,9 +94,10 @@ async function testLogin() {
   let r, headers;
 
   [r, headers] = await request(
+    `/api/v1/login`,
+    null,
     {
       [constants.HTTP2_HEADER_METHOD]: constants.HTTP2_METHOD_GET,
-      [constants.HTTP2_HEADER_PATH]: `/api/v1/login`,
     },
     null
   );
@@ -99,18 +105,20 @@ async function testLogin() {
   assert.deepEqual(r, "");
 
   [r, headers] = await request(
+    `/api/v1/login`,
+    null,
     {
       [constants.HTTP2_HEADER_METHOD]: constants.HTTP2_METHOD_POST,
-      [constants.HTTP2_HEADER_PATH]: `/api/v1/login`,
     },
     "null"
   );
   assert.deepEqual(r, "No CSRF header!");
 
   [r, headers] = await request(
+    `/api/v1/login`,
+    null,
     {
       [constants.HTTP2_HEADER_METHOD]: constants.HTTP2_METHOD_POST,
-      [constants.HTTP2_HEADER_PATH]: `/api/v1/login`,
       "x-csrf-protection": "wrong",
     },
     "null"
@@ -118,14 +126,15 @@ async function testLogin() {
   assert.deepEqual(r, "No CSRF header!");
 
   [r, headers] = await request(
+    `/api/v1/login`,
+    null,
     {
       [constants.HTTP2_HEADER_METHOD]: constants.HTTP2_METHOD_POST,
-      [constants.HTTP2_HEADER_PATH]: `/api/v1/login`,
       "x-csrf-protection": "projektwahl",
     },
     "null"
   );
-  assert.deepEqual(JSON.parse(r), {
+  assert.deepEqual(r, {
     success: false,
     error: {
       issues: [
@@ -142,14 +151,15 @@ async function testLogin() {
   });
 
   [r, headers] = await request(
+    `/api/v1/login`,
+    null,
     {
       [constants.HTTP2_HEADER_METHOD]: constants.HTTP2_METHOD_POST,
-      [constants.HTTP2_HEADER_PATH]: `/api/v1/login`,
       "x-csrf-protection": "projektwahl",
     },
     "undefined"
   );
-  assert.deepEqual(JSON.parse(r), {
+  assert.deepEqual(r, {
     success: false,
     error: {
       issues: [
@@ -163,14 +173,15 @@ async function testLogin() {
   });
 
   [r, headers] = await request(
+    `/api/v1/login`,
+    null,
     {
       [constants.HTTP2_HEADER_METHOD]: constants.HTTP2_METHOD_POST,
-      [constants.HTTP2_HEADER_PATH]: `/api/v1/login`,
       "x-csrf-protection": "projektwahl",
     },
     ""
   );
-  assert.deepEqual(JSON.parse(r), {
+  assert.deepEqual(r, {
     success: false,
     error: {
       issues: [
@@ -184,14 +195,15 @@ async function testLogin() {
   });
 
   [r, headers] = await request(
+    `/api/v1/login`,
+    null,
     {
       [constants.HTTP2_HEADER_METHOD]: constants.HTTP2_METHOD_POST,
-      [constants.HTTP2_HEADER_PATH]: `/api/v1/login`,
       "x-csrf-protection": "projektwahl",
     },
     "{}"
   );
-  assert.deepEqual(JSON.parse(r), {
+  assert.deepEqual(r, {
     success: false,
     error: {
       issues: [
@@ -215,9 +227,10 @@ async function testLogin() {
   });
 
   [r, headers] = await request(
+    `/api/v1/login`,
+    null,
     {
       [constants.HTTP2_HEADER_METHOD]: constants.HTTP2_METHOD_POST,
-      [constants.HTTP2_HEADER_PATH]: `/api/v1/login`,
       "x-csrf-protection": "projektwahl",
     },
     JSON.stringify({
@@ -225,7 +238,7 @@ async function testLogin() {
       password: "jo",
     })
   );
-  assert.deepEqual(JSON.parse(r), {
+  assert.deepEqual(r, {
     success: false,
     error: {
       issues: [
@@ -248,9 +261,10 @@ async function testLogin() {
   });
 
   [r, headers] = await request(
+    `/api/v1/login`,
+    null,
     {
       [constants.HTTP2_HEADER_METHOD]: constants.HTTP2_METHOD_POST,
-      [constants.HTTP2_HEADER_PATH]: `/api/v1/login`,
       "x-csrf-protection": "projektwahl",
     },
     JSON.stringify({
@@ -258,7 +272,7 @@ async function testLogin() {
       password: "jo",
     })
   );
-  assert.deepEqual(JSON.parse(r), {
+  assert.deepEqual(r, {
     success: false,
     error: {
       issues: [
@@ -272,9 +286,10 @@ async function testLogin() {
   });
 
   [r, headers] = await request(
+    `/api/v1/login`,
+    null,
     {
       [constants.HTTP2_HEADER_METHOD]: constants.HTTP2_METHOD_POST,
-      [constants.HTTP2_HEADER_PATH]: `/api/v1/login`,
       "x-csrf-protection": "projektwahl",
     },
     JSON.stringify({
@@ -282,7 +297,7 @@ async function testLogin() {
       password: "jo",
     })
   );
-  assert.deepEqual(JSON.parse(r), {
+  assert.deepEqual(r, {
     success: false,
     error: {
       issues: [
@@ -296,9 +311,10 @@ async function testLogin() {
   });
 
   [r, headers] = await request(
+    `/api/v1/login`,
+    null,
     {
       [constants.HTTP2_HEADER_METHOD]: constants.HTTP2_METHOD_POST,
-      [constants.HTTP2_HEADER_PATH]: `/api/v1/login`,
       "x-csrf-protection": "projektwahl",
     },
     JSON.stringify({
@@ -306,7 +322,7 @@ async function testLogin() {
       password: "jo",
     })
   );
-  assert.deepEqual(JSON.parse(r), {
+  assert.deepEqual(r, {
     success: false,
     error: {
       issues: [
@@ -323,9 +339,10 @@ async function testLogin() {
   await sleep(5000);
 
   [r, headers] = await request(
+    `/api/v1/login`,
+    null,
     {
       [constants.HTTP2_HEADER_METHOD]: constants.HTTP2_METHOD_POST,
-      [constants.HTTP2_HEADER_PATH]: `/api/v1/login`,
       "x-csrf-protection": "projektwahl",
     },
     JSON.stringify({
@@ -333,12 +350,13 @@ async function testLogin() {
       password: "changeme",
     })
   );
-  assert.deepEqual(JSON.parse(r), { success: true, data: {} });
+  assert.deepEqual(r, { success: true, data: {} });
 
   [r, headers] = await request(
+    `/api/v1/login`,
+    null,
     {
       [constants.HTTP2_HEADER_METHOD]: constants.HTTP2_METHOD_POST,
-      [constants.HTTP2_HEADER_PATH]: `/api/v1/login`,
       "x-csrf-protection": "projektwahl",
     },
     JSON.stringify({
@@ -346,7 +364,7 @@ async function testLogin() {
       password: "jo",
     })
   );
-  assert.deepEqual(JSON.parse(r), {
+  assert.deepEqual(r, {
     success: false,
     error: {
       issues: [
@@ -362,9 +380,10 @@ async function testLogin() {
 
 async function getAdminSessionId() {
   const [r, headers] = await request(
+    `/api/v1/login`,
+    null,
     {
       [constants.HTTP2_HEADER_METHOD]: constants.HTTP2_METHOD_POST,
-      [constants.HTTP2_HEADER_PATH]: `/api/v1/login`,
       "x-csrf-protection": "projektwahl",
     },
     JSON.stringify({
@@ -372,7 +391,7 @@ async function getAdminSessionId() {
       password: "changeme",
     })
   );
-  assert.deepEqual(JSON.parse(r), { success: true, data: {} });
+  assert.deepEqual(r, { success: true, data: {} });
   const session_id = (headers["set-cookie"] || "")[0]
     .split(";")[0]
     .split("=")[1];
@@ -381,9 +400,10 @@ async function getAdminSessionId() {
 
 async function getVoterSessionId() {
   const [r, headers] = await request(
+    `/api/v1/login`,
+    null,
     {
       [constants.HTTP2_HEADER_METHOD]: constants.HTTP2_METHOD_POST,
-      [constants.HTTP2_HEADER_PATH]: `/api/v1/login`,
       "x-csrf-protection": "projektwahl",
     },
     JSON.stringify({
@@ -391,7 +411,7 @@ async function getVoterSessionId() {
       password: "changeme",
     })
   );
-  assert.deepEqual(JSON.parse(r), { success: true, data: {} });
+  assert.deepEqual(r, { success: true, data: {} });
   const session_id = (headers["set-cookie"] || "")[0]
     .split(";")[0]
     .split("=")[1];
@@ -402,16 +422,17 @@ async function testLogout() {
   let r;
 
   [r] = await request(
+    `/api/v1/logout`,
+    null,
     {
       [constants.HTTP2_HEADER_METHOD]: constants.HTTP2_METHOD_POST,
-      [constants.HTTP2_HEADER_PATH]: `/api/v1/logout`,
       "x-csrf-protection": "projektwahl",
     },
     JSON.stringify({
       anything: 1,
     })
   );
-  assert.deepEqual(JSON.parse(r), {
+  assert.deepEqual(r, {
     success: false,
     error: {
       issues: [
@@ -427,65 +448,69 @@ async function testLogout() {
   });
 
   [r] = await request(
+    `/api/v1/logout`,
+    null,
     {
       [constants.HTTP2_HEADER_METHOD]: constants.HTTP2_METHOD_POST,
-      [constants.HTTP2_HEADER_PATH]: `/api/v1/logout`,
       "x-csrf-protection": "projektwahl",
     },
     JSON.stringify({})
   );
-  assert.deepEqual(JSON.parse(r), { success: true, data: {} });
+  assert.deepEqual(r, { success: true, data: {} });
 
   const session_id = await getAdminSessionId();
 
   [r] = await request(
+    `/api/v1/sessions`,
+    encodeURIComponent(
+      JSON.stringify({
+        filters: {
+          user_id: null,
+        },
+        sorting: [],
+      })
+    ),
     {
       [constants.HTTP2_HEADER_METHOD]: constants.HTTP2_METHOD_GET,
-      [constants.HTTP2_HEADER_PATH]: `/api/v1/sessions?${encodeURIComponent(
-        JSON.stringify({
-          filters: {
-            user_id: null,
-          },
-          sorting: [],
-        })
-      )}`,
       [constants.HTTP2_HEADER_COOKIE]: `lax_id=${session_id}`,
       "x-csrf-protection": "projektwahl",
     },
     null
   );
   
-  const parsed: { success: unknown } = JSON.parse(r);
+  const parsed = z.object({ success: z.boolean() }).parse(r);
   assert.equal(parsed.success, true);
 
   [r] = await request(
+    `/api/v1/logout`,
+    null,
     {
       [constants.HTTP2_HEADER_METHOD]: constants.HTTP2_METHOD_POST,
-      [constants.HTTP2_HEADER_PATH]: `/api/v1/logout`,
       [constants.HTTP2_HEADER_COOKIE]: `strict_id=${session_id}`,
       "x-csrf-protection": "projektwahl",
     },
     JSON.stringify({})
   );
-  assert.deepEqual(JSON.parse(r), { success: true, data: {} });
+  assert.deepEqual(r, { success: true, data: {} });
 
   [r] = await request(
+    `/api/v1/sessions`,
+    encodeURIComponent(
+      JSON.stringify({
+        filters: {
+          user_id: null,
+        },
+        sorting: [],
+      })
+    ),
     {
       [constants.HTTP2_HEADER_METHOD]: constants.HTTP2_METHOD_GET,
-      [constants.HTTP2_HEADER_PATH]: `/api/v1/sessions?${encodeURIComponent(
-        JSON.stringify({
-          filters: {
-            user_id: null,
-          },
-          sorting: [],
-        })
-      )}`,
       [constants.HTTP2_HEADER_COOKIE]: `lax_id=${session_id}`,
       "x-csrf-protection": "projektwahl",
     },
     null
   );
-  assert.deepEqual(JSON.parse(r), {
+  assert.deepEqual(r, {
     success: false,
     error: {
       issues: [
@@ -500,17 +525,17 @@ async function testLogout() {
 }
 
 async function testCreateOrUpdateUsers() {
-  let r;
 
-  [r] = await request(
+  let [r] = await request(
+    `/api/v1/users/create-or-update`,
+    null,
     {
       [constants.HTTP2_HEADER_METHOD]: constants.HTTP2_METHOD_POST,
-      [constants.HTTP2_HEADER_PATH]: `/api/v1/users/create-or-update`,
       "x-csrf-protection": "projektwahl",
     },
     JSON.stringify([])
   );
-  assert.deepEqual(JSON.parse(r), {
+  assert.deepEqual(r, {
     success: false,
     error: {
       issues: [
@@ -526,26 +551,28 @@ async function testCreateOrUpdateUsers() {
   const session_id = await getAdminSessionId();
 
   [r] = await request(
+    `/api/v1/users/create-or-update`,
+    null,
     {
       [constants.HTTP2_HEADER_METHOD]: constants.HTTP2_METHOD_POST,
-      [constants.HTTP2_HEADER_PATH]: `/api/v1/users/create-or-update`,
       [constants.HTTP2_HEADER_COOKIE]: `strict_id=${session_id}`,
       "x-csrf-protection": "projektwahl",
     },
     JSON.stringify([])
   );
-  assert.deepEqual(JSON.parse(r), { success: true });
+  assert.deepEqual(r, { success: true });
 
   [r] = await request(
+    `/api/v1/users/create-or-update`,
+    null,
     {
       [constants.HTTP2_HEADER_METHOD]: constants.HTTP2_METHOD_POST,
-      [constants.HTTP2_HEADER_PATH]: `/api/v1/users/create-or-update`,
       [constants.HTTP2_HEADER_COOKIE]: `strict_id=${session_id}`,
       "x-csrf-protection": "projektwahl",
     },
     JSON.stringify([{}])
   );
-  assert.deepEqual(JSON.parse(r), {
+  assert.deepEqual(r, {
     success: false,
     error: {
       issues: [
@@ -562,9 +589,10 @@ async function testCreateOrUpdateUsers() {
   });
 
   [r] = await request(
+    `/api/v1/users/create-or-update`,
+    null,
     {
       [constants.HTTP2_HEADER_METHOD]: constants.HTTP2_METHOD_POST,
-      [constants.HTTP2_HEADER_PATH]: `/api/v1/users/create-or-update`,
       [constants.HTTP2_HEADER_COOKIE]: `strict_id=${session_id}`,
       "x-csrf-protection": "projektwahl",
     },
@@ -574,7 +602,7 @@ async function testCreateOrUpdateUsers() {
       },
     ])
   );
-  assert.deepEqual(JSON.parse(r), {
+  assert.deepEqual(r, {
     success: false,
     error: {
       issues: [
@@ -599,9 +627,10 @@ async function testCreateOrUpdateUsers() {
 
   const old_username = chance.name();
   [r] = await request(
+    `/api/v1/users/create-or-update`,
+    null,
     {
       [constants.HTTP2_HEADER_METHOD]: constants.HTTP2_METHOD_POST,
-      [constants.HTTP2_HEADER_PATH]: `/api/v1/users/create-or-update`,
       [constants.HTTP2_HEADER_COOKIE]: `strict_id=${session_id}`,
       "x-csrf-protection": "projektwahl",
     },
@@ -614,20 +643,19 @@ async function testCreateOrUpdateUsers() {
     ])
   );
   
-  let value = JSON.parse(r);
+  const id: number = r[0].id;
   
-  const id: number = value.data[0].id;
-  
-  value.data[0].id = 1337;
-  assert.deepEqual(value, {
+  r[0].id = 1337;
+  assert.deepEqual(r, {
     success: true,
     data: [{ id: 1337, project_leader_id: null, force_in_project_id: null }],
   });
 
   [r] = await request(
+    `/api/v1/users/create-or-update`,
+    null,
     {
       [constants.HTTP2_HEADER_METHOD]: constants.HTTP2_METHOD_POST,
-      [constants.HTTP2_HEADER_PATH]: `/api/v1/users/create-or-update`,
       [constants.HTTP2_HEADER_COOKIE]: `strict_id=${session_id}`,
       "x-csrf-protection": "projektwahl",
     },
@@ -638,8 +666,7 @@ async function testCreateOrUpdateUsers() {
     ])
   );
   
-  value = JSON.parse(r);
-  assert.deepEqual(value, {
+  assert.deepEqual(r, {
     success: false,
     error: {
       issues: [
@@ -656,9 +683,10 @@ async function testCreateOrUpdateUsers() {
   });
 
   [r] = await request(
+    `/api/v1/users/create-or-update`,
+    null,
     {
       [constants.HTTP2_HEADER_METHOD]: constants.HTTP2_METHOD_POST,
-      [constants.HTTP2_HEADER_PATH]: `/api/v1/users/create-or-update`,
       [constants.HTTP2_HEADER_COOKIE]: `strict_id=${session_id}`,
       "x-csrf-protection": "projektwahl",
     },
@@ -670,60 +698,62 @@ async function testCreateOrUpdateUsers() {
     ])
   );
   
-  value = JSON.parse(r);
-  assert.deepEqual(value, {
+  assert.deepEqual(r, {
     success: true,
     data: [{ id, project_leader_id: null, force_in_project_id: null }],
   });
 
-  [r] = await request(
-    {
-      [constants.HTTP2_HEADER_METHOD]: constants.HTTP2_METHOD_GET,
-      [constants.HTTP2_HEADER_PATH]: `/api/v1/users?${encodeURIComponent(
+  {
+    const [r] = await request(
+      `/api/v1/users`,
+      encodeURIComponent(
         JSON.stringify({
           filters: {
             id,
           },
           sorting: [],
         })
-      )}`,
-      [constants.HTTP2_HEADER_COOKIE]: `lax_id=${session_id}`,
-      "x-csrf-protection": "projektwahl",
-    },
-    null
-  );
-  
-  value = JSON.parse(r);
-  assert.deepEqual(value, {
-    success: true,
-    data: {
-      entities: [
-        {
-          id,
-          type: "admin",
-          username: old_username,
-          openid_id: null,
-          group: null,
-          age: null,
-          away: false,
-          project_leader_id: null,
-          force_in_project_id: null,
-          computed_in_project_id: null,
-          deleted: false,
-          valid: "neutral",
-          voted_choices: null,
-        },
-      ],
-      nextCursor: null,
-      previousCursor: null,
-    },
-  });
+      ),
+      {
+        [constants.HTTP2_HEADER_METHOD]: constants.HTTP2_METHOD_GET,
+        [constants.HTTP2_HEADER_COOKIE]: `lax_id=${session_id}`,
+        "x-csrf-protection": "projektwahl",
+      },
+      null
+    );
+    
+    assert.deepEqual(r, {
+      success: true,
+      data: {
+        entities: [
+          {
+            id,
+            type: "admin",
+            username: old_username,
+            openid_id: null,
+            group: null,
+            age: null,
+            away: false,
+            project_leader_id: null,
+            force_in_project_id: null,
+            computed_in_project_id: null,
+            deleted: false,
+            valid: "neutral",
+            voted_choices: null,
+          },
+        ],
+        nextCursor: null,
+        previousCursor: null,
+      },
+    });
+  }
 
   const new_username = chance.name();
   [r] = await request(
+    `/api/v1/users/create-or-update`,
+    null,
     {
       [constants.HTTP2_HEADER_METHOD]: constants.HTTP2_METHOD_POST,
-      [constants.HTTP2_HEADER_PATH]: `/api/v1/users/create-or-update`,
       [constants.HTTP2_HEADER_COOKIE]: `strict_id=${session_id}`,
       "x-csrf-protection": "projektwahl",
     },
@@ -736,54 +766,55 @@ async function testCreateOrUpdateUsers() {
     ])
   );
   
-  value = JSON.parse(r);
-  assert.deepEqual(value, {
+  assert.deepEqual(r, {
     success: true,
     data: [{ id, project_leader_id: null, force_in_project_id: null }],
   });
 
-  [r] = await request(
-    {
-      [constants.HTTP2_HEADER_METHOD]: constants.HTTP2_METHOD_GET,
-      [constants.HTTP2_HEADER_PATH]: `/api/v1/users?${encodeURIComponent(
+  {
+    const [r] = await request(
+      `/api/v1/users`,
+      encodeURIComponent(
         JSON.stringify({
           filters: {
             id,
           },
           sorting: [],
         })
-      )}`,
-      [constants.HTTP2_HEADER_COOKIE]: `lax_id=${session_id}`,
-      "x-csrf-protection": "projektwahl",
-    },
-    null
-  );
-  
-  value = JSON.parse(r);
-  assert.deepEqual(value, {
-    success: true,
-    data: {
-      entities: [
-        {
-          id,
-          type: "admin",
-          username: new_username,
-          openid_id: null,
-          group: null,
-          age: null,
-          away: false,
-          project_leader_id: null,
-          force_in_project_id: null,
-          computed_in_project_id: null,
-          deleted: false,
-          valid: "neutral",
-          voted_choices: null,
-        },
-      ],
-      nextCursor: null,
-      previousCursor: null,
-    },
-  });
+      ),
+      {
+        [constants.HTTP2_HEADER_METHOD]: constants.HTTP2_METHOD_GET,
+        [constants.HTTP2_HEADER_COOKIE]: `lax_id=${session_id}`,
+        "x-csrf-protection": "projektwahl",
+      },
+      null
+    );
+    
+    assert.deepEqual(r, {
+      success: true,
+      data: {
+        entities: [
+          {
+            id,
+            type: "admin",
+            username: new_username,
+            openid_id: null,
+            group: null,
+            age: null,
+            away: false,
+            project_leader_id: null,
+            force_in_project_id: null,
+            computed_in_project_id: null,
+            deleted: false,
+            valid: "neutral",
+            voted_choices: null,
+          },
+        ],
+        nextCursor: null,
+        previousCursor: null,
+      },
+    });
+  }
 }
 
 async function testCreateOrUpdateProjects() {
@@ -792,15 +823,16 @@ async function testCreateOrUpdateProjects() {
   const session_id = await getAdminSessionId();
 
   [r] = await request(
+    `/api/v1/projects/create`,
+    null,
     {
       [constants.HTTP2_HEADER_METHOD]: constants.HTTP2_METHOD_POST,
-      [constants.HTTP2_HEADER_PATH]: `/api/v1/projects/create`,
       [constants.HTTP2_HEADER_COOKIE]: `strict_id=${session_id}`,
       "x-csrf-protection": "projektwahl",
     },
     JSON.stringify({})
   );
-  assert.deepEqual(JSON.parse(r), {
+  assert.deepEqual(r, {
     success: false,
     error: {
       issues: [
@@ -880,9 +912,10 @@ async function testCreateOrUpdateProjects() {
   });
 
   [r] = await request(
+    `/api/v1/projects/create`,
+    null,
     {
       [constants.HTTP2_HEADER_METHOD]: constants.HTTP2_METHOD_POST,
-      [constants.HTTP2_HEADER_PATH]: `/api/v1/projects/create`,
       [constants.HTTP2_HEADER_COOKIE]: `strict_id=${session_id}`,
       "x-csrf-protection": "projektwahl",
     },
@@ -899,32 +932,31 @@ async function testCreateOrUpdateProjects() {
       random_assignments: false,
     })
   );
+    
+  const id: number = r.id;
   
-  const data = JSON.parse(r);
-  
-  const id: number = data.data.id;
-  
-  data.data.id = 1337;
-  assert.deepEqual(data, { success: true, data: { id: 1337 } });
+  r.id = 1337;
+  assert.deepEqual(r, { success: true, data: { id: 1337 } });
 
   [r] = await request(
+    `/api/v1/projects`,
+    encodeURIComponent(
+      JSON.stringify({
+        filters: {
+          id,
+        },
+        sorting: [],
+      })
+    ),
     {
       [constants.HTTP2_HEADER_METHOD]: constants.HTTP2_METHOD_GET,
-      [constants.HTTP2_HEADER_PATH]: `/api/v1/projects?${encodeURIComponent(
-        JSON.stringify({
-          filters: {
-            id,
-          },
-          sorting: [],
-        })
-      )}`,
       [constants.HTTP2_HEADER_COOKIE]: `lax_id=${session_id}`,
       "x-csrf-protection": "projektwahl",
     },
     null
   );
   
-  const value = JSON.parse(r);
+  const value = r;
   assert.deepEqual(value, {
     success: true,
     data: {
@@ -951,9 +983,10 @@ async function testCreateOrUpdateProjects() {
   });
 
   [r] = await request(
+    `/api/v1/projects/update`,
+    null,
     {
       [constants.HTTP2_HEADER_METHOD]: constants.HTTP2_METHOD_POST,
-      [constants.HTTP2_HEADER_PATH]: `/api/v1/projects/update`,
       [constants.HTTP2_HEADER_COOKIE]: `strict_id=${session_id}`,
       "x-csrf-protection": "projektwahl",
     },
@@ -962,25 +995,26 @@ async function testCreateOrUpdateProjects() {
       title: "bruh",
     })
   );
-  assert.deepEqual(JSON.parse(r), { success: true, data: { id } });
+  assert.deepEqual(r, { success: true, data: { id } });
 
   [r] = await request(
+    `/api/v1/projects`,
+    encodeURIComponent(
+      JSON.stringify({
+        filters: {
+          id,
+        },
+        sorting: [],
+      })
+    ),
     {
       [constants.HTTP2_HEADER_METHOD]: constants.HTTP2_METHOD_GET,
-      [constants.HTTP2_HEADER_PATH]: `/api/v1/projects?${encodeURIComponent(
-        JSON.stringify({
-          filters: {
-            id,
-          },
-          sorting: [],
-        })
-      )}`,
       [constants.HTTP2_HEADER_COOKIE]: `lax_id=${session_id}`,
       "x-csrf-protection": "projektwahl",
     },
     null
   );
-  assert.deepEqual(JSON.parse(r), {
+  assert.deepEqual(r, {
     success: true,
     data: {
       entities: [
@@ -1012,15 +1046,16 @@ async function testChoices() {
   const session_id = await getVoterSessionId();
 
   [r] = await request(
+    `/api/v1/choices/update`,
+    null,
     {
       [constants.HTTP2_HEADER_METHOD]: constants.HTTP2_METHOD_POST,
-      [constants.HTTP2_HEADER_PATH]: `/api/v1/choices/update`,
       [constants.HTTP2_HEADER_COOKIE]: `strict_id=${session_id}`,
       "x-csrf-protection": "projektwahl",
     },
     JSON.stringify({})
   );
-  assert.deepEqual(JSON.parse(r), {
+  assert.deepEqual(r, {
     success: false,
     error: {
       issues: [
@@ -1044,9 +1079,10 @@ async function testChoices() {
   });
 
   [r] = await request(
+    `/api/v1/choices/update`,
+    null,
     {
       [constants.HTTP2_HEADER_METHOD]: constants.HTTP2_METHOD_POST,
-      [constants.HTTP2_HEADER_PATH]: `/api/v1/choices/update`,
       [constants.HTTP2_HEADER_COOKIE]: `strict_id=${session_id}`,
       "x-csrf-protection": "projektwahl",
     },
@@ -1055,7 +1091,7 @@ async function testChoices() {
       rank: 1,
     })
   );
-  assert.deepEqual(JSON.parse(r), {
+  assert.deepEqual(r, {
     success: false,
     error: {
       issues: [
@@ -1070,9 +1106,10 @@ async function testChoices() {
   });
 
   [r] = await request(
+    `/api/v1/choices/update`,
+    null,
     {
       [constants.HTTP2_HEADER_METHOD]: constants.HTTP2_METHOD_POST,
-      [constants.HTTP2_HEADER_PATH]: `/api/v1/choices/update`,
       [constants.HTTP2_HEADER_COOKIE]: `strict_id=${session_id}`,
       "x-csrf-protection": "projektwahl",
     },
@@ -1081,25 +1118,26 @@ async function testChoices() {
       rank: 1,
     })
   );
-  assert.deepEqual(JSON.parse(r), { success: true, data: {} });
+  assert.deepEqual(r, { success: true, data: {} });
 
   [r] = await request(
+    `/api/v1/choices`,
+    encodeURIComponent(
+      JSON.stringify({
+        filters: {
+          title: "Tu asojag aza",
+        },
+        sorting: [],
+      })
+    ),
     {
       [constants.HTTP2_HEADER_METHOD]: constants.HTTP2_METHOD_GET,
-      [constants.HTTP2_HEADER_PATH]: `/api/v1/choices?${encodeURIComponent(
-        JSON.stringify({
-          filters: {
-            title: "Tu asojag aza",
-          },
-          sorting: [],
-        })
-      )}`,
       [constants.HTTP2_HEADER_COOKIE]: `lax_id=${session_id}`,
       "x-csrf-protection": "projektwahl",
     },
     null
   );
-  assert.deepEqual(JSON.parse(r), {
+  assert.deepEqual(r, {
     success: true,
     data: {
       entities: [
@@ -1132,15 +1170,16 @@ async function testSudo() {
   let headers;
 
   let [r] = await request(
+    `/api/v1/sudo`,
+    null,
     {
       [constants.HTTP2_HEADER_METHOD]: constants.HTTP2_METHOD_POST,
-      [constants.HTTP2_HEADER_PATH]: `/api/v1/sudo`,
       [constants.HTTP2_HEADER_COOKIE]: `strict_id=${session_id}`,
       "x-csrf-protection": "projektwahl",
     },
     JSON.stringify({})
   );
-  assert.deepEqual(JSON.parse(r), {
+  assert.deepEqual(r, {
     success: false,
     error: {
       issues: [
@@ -1157,9 +1196,10 @@ async function testSudo() {
   });
 
   [r, headers] = await request(
+    `/api/v1/sudo`,
+    null,
     {
       [constants.HTTP2_HEADER_METHOD]: constants.HTTP2_METHOD_POST,
-      [constants.HTTP2_HEADER_PATH]: `/api/v1/sudo`,
       [constants.HTTP2_HEADER_COOKIE]: `strict_id=${session_id}`,
       "x-csrf-protection": "projektwahl",
     },
@@ -1170,12 +1210,13 @@ async function testSudo() {
   const sudo_session_id = (headers["set-cookie"] || "")[0]
     .split(";")[0]
     .split("=")[1];
-  assert.deepEqual(JSON.parse(r), { success: true, data: {} });
+  assert.deepEqual(r, { success: true, data: {} });
 
   [r, headers] = await request(
+    `/api/v1/sudo`,
+    null,
     {
       [constants.HTTP2_HEADER_METHOD]: constants.HTTP2_METHOD_POST,
-      [constants.HTTP2_HEADER_PATH]: `/api/v1/sudo`,
       [constants.HTTP2_HEADER_COOKIE]: `strict_id=${sudo_session_id}`,
       "x-csrf-protection": "projektwahl",
     },
@@ -1183,7 +1224,7 @@ async function testSudo() {
       id: 2,
     })
   );
-  assert.deepEqual(JSON.parse(r), {
+  assert.deepEqual(r, {
     success: false,
     error: {
       issues: [

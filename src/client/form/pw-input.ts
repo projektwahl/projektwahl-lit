@@ -189,7 +189,7 @@ export abstract class PwInput<
       this.mypwinputchangeDispatcher
     );
     let curr: HTMLElement | null = this.parentElement;
-    while (!(curr === null || curr instanceof PwForm)) {
+    while (!(curr === null || curr instanceof PwForm<P>)) {
       curr = curr.parentElement;
     }
     if (!curr) {

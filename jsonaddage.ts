@@ -22,14 +22,18 @@ SPDX-FileCopyrightText: 2021 Moritz Hedtke <Moritz.Hedtke@t-online.de>
 */
 import { readFile } from "node:fs/promises";
 import { exit } from "node:process";
+import { z } from "zod";
 
 if (process.argv.length !== 3) {
   console.log("usage: node jsonaddage.js <file>");
   exit(0);
 }
 
+const contentsParser = z.array(z.object({
+  group: z.string()
+}))
 
-const contents: { group: string }[] = JSON.parse(await readFile(process.argv[2], "utf-8"));
+const contents = contentsParser.parse(JSON.parse(await readFile(process.argv[2], "utf-8")));
 
 console.log(
   JSON.stringify(
