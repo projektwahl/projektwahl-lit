@@ -1,10 +1,16 @@
 # SPDX-License-Identifier: AGPL-3.0-or-later
 # SPDX-FileCopyrightText: 2021 Moritz Hedtke <Moritz.Hedtke@t-online.de>
-node_modules
-dist
-.git
-key.pem
-cert.pem
-docker-compose.yml
-Dockerfile
-Dockerfile_dev
+*
+!/package.json
+!/package-lock.json
+!/xliff
+!/lit-localize.json
+!/src
+!/assets
+!/vite.config.ts
+!/tsconfig.json
+!/tsconfig.node.json
+!/vite-env.d.ts
+!/index.html
+!/.npmrc
+!/docs/sites-enabled-projektwahl.conf
