@@ -1,49 +1,9 @@
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  namespace: projektwahl
-  name: frontend
-spec:
-  selector:
-    matchLabels:
-      run: frontend
-  replicas: 2
-  template:
-    metadata:
-      labels:
-        run: frontend
-    spec:
-      containers:
-      - name: frontend
-        image: harbor.selfmade4u.de/projektwahl/frontend:latest
-        ports:
-        - containerPort: 80
 ---
-apiVersion: v1
-kind: Service
-metadata:
-  namespace: projektwahl
-  name: frontend
-  labels:
-    run: frontend
-spec:
-  ports:
-  - port: 80
-    protocol: TCP
-  selector:
-    run: frontend
----
-apiVersion: gateway.networking.k8s.io/v1beta1
-kind: HTTPRoute
 metadata:
   namespace: projektwahl
   name: projektwahl-route
 spec:
-  parentRefs:
-  - name: eg
-    namespace: default
-  hostnames:
-  - "projektwahl.selfmade4u.de"
+ 
   rules:
   - backendRefs:
     - name: frontend

@@ -5,8 +5,8 @@
 replicaCount: 1
 
 image:
-  repository: nginx
-  pullPolicy: IfNotPresent
+  repository: harbor.selfmade4u.de/projektwahl/frontend
+  pullPolicy: Always
   # Overrides the image tag whose default is the chart appVersion.
   tag: ""
 
@@ -55,6 +55,19 @@ ingress:
   #  - secretName: chart-example-tls
   #    hosts:
   #      - chart-example.local
+
+gateway:
+  enabled: false
+  parentRefs:
+  - name: eg
+    namespace: default
+  annotations: {}
+    # kubernetes.io/ingress.class: nginx
+    # kubernetes.io/tls-acme: "true"
+  hostnames:
+    - "projektwahl.selfmade4u.de"
+  rules:
+    -
 
 resources: {}
   # We usually recommend not to specify default resources and to leave this as a conscious
