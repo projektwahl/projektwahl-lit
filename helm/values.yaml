@@ -57,7 +57,7 @@ ingress:
   #      - chart-example.local
 
 gateway:
-  enabled: false
+  enabled: true
   parentRefs:
   - name: eg
     namespace: default
@@ -65,9 +65,7 @@ gateway:
     # kubernetes.io/ingress.class: nginx
     # kubernetes.io/tls-acme: "true"
   hostnames:
-    - "projektwahl.selfmade4u.de"
-  rules:
-    -
+    - "projektwahl-test.selfmade4u.de"
 
 resources: {}
   # We usually recommend not to specify default resources and to leave this as a conscious

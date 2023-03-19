@@ -12,12 +12,12 @@ metadata:
     {{- toYaml . | nindent 4 }}
   {{- end }}
 spec:
-  parentRefs: {{ .Values.gateway.parentRefs }}
-  hostnames: {{ .Values.gateway.hostnames }}
+  parentRefs:
+    {{- toYaml .Values.gateway.parentRefs | nindent 4 }}
+  hostnames:
+    {{- toYaml .Values.gateway.hostnames | nindent 4 }}
   rules:
-    {{- range .Values.gateway.rules }}
-    - {{ . }}
-      backendRefs:
+    - backendRefs:
         - name: {{ $fullName }}
           port: {{ $svcPort }}   
-    {{- end }}
+{{- end }}
