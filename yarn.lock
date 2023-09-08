@@ -650,6 +650,23 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@types/eslint@npm:^8.44.2":
+  version: 8.44.2
+  resolution: "@types/eslint@npm:8.44.2"
+  dependencies:
+    "@types/estree": "npm:*"
+    "@types/json-schema": "npm:*"
+  checksum: 3c402215f7f495f9267a51fecd6a6d056eb8b3b031a1c472286b7d23a397257327eb03712befa7da60614dd63d31235d27dbc5c586b6a408798dafb8ee0c5eb2
+  languageName: node
+  linkType: hard
+
+"@types/estree@npm:*":
+  version: 1.0.1
+  resolution: "@types/estree@npm:1.0.1"
+  checksum: b4022067f834d86766f23074a1a7ac6c460e823b00cd8fe94c997bc491e7794615facd3e1520a934c42bd8c0689dbff81e5c643b01f1dee143fc758cac19669e
+  languageName: node
+  linkType: hard
+
 "@types/istanbul-lib-coverage@npm:^2.0.1":
   version: 2.0.4
   resolution: "@types/istanbul-lib-coverage@npm:2.0.4"
@@ -664,7 +681,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/json-schema@npm:^7.0.12":
+"@types/json-schema@npm:*, @types/json-schema@npm:^7.0.12":
   version: 7.0.12
   resolution: "@types/json-schema@npm:7.0.12"
   checksum: 2c39946ae321fe42d085c61a85872a81bbee70f9b2054ad344e8811dfc478fdbaf1ebf5f2989bb87c895ba2dfc3b1dcba85db11e467bbcdc023708814207791c
@@ -732,6 +749,24 @@ __metadata:
     typescript:
       optional: true
   checksum: be6d0b4e79cb5890c3786cd87870db394914cf980cb60b756b5a2395c62743cf4c19cf81c57548ff19d141f1c967b6ab1a2c73eb7ddee261154b81d9041da923
+  languageName: node
+  linkType: hard
+
+"@typescript-eslint/parser@npm:^6.6.0":
+  version: 6.6.0
+  resolution: "@typescript-eslint/parser@npm:6.6.0"
+  dependencies:
+    "@typescript-eslint/scope-manager": "npm:6.6.0"
+    "@typescript-eslint/types": "npm:6.6.0"
+    "@typescript-eslint/typescript-estree": "npm:6.6.0"
+    "@typescript-eslint/visitor-keys": "npm:6.6.0"
+    debug: "npm:^4.3.4"
+  peerDependencies:
+    eslint: ^7.0.0 || ^8.0.0
+  peerDependenciesMeta:
+    typescript:
+      optional: true
+  checksum: 869601abdd8a70d4cb823bda7ba838fe6ce28f908e25b8028c07cf2cc56bfe5b79f5a4b2421d5f7027bcdb2ad56df6d4eddf7903182caa384ea8b0353ca3a64e
   languageName: node
   linkType: hard
 
@@ -2769,6 +2804,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "projektwahl-lit@workspace:."
   dependencies:
+    "@eslint/eslintrc": "npm:^2.1.2"
     "@lit-labs/motion": "npm:^1.0.4"
     "@lit-labs/task": "npm:^3.0.2"
     "@lit/localize": "npm:^0.11.4"
@@ -2777,10 +2813,12 @@ __metadata:
     "@swc/core": "npm:^1.3.83"
     "@types/chance": "npm:^1.1.4"
     "@types/cookie": "npm:^0.5.2"
+    "@types/eslint": "npm:^8.44.2"
     "@types/js-cookie": "npm:^3.0.3"
     "@types/node": "npm:^20.5.9"
     "@types/selenium-webdriver": "npm:^4.1.16"
     "@typescript-eslint/eslint-plugin": "npm:^6.6.0"
+    "@typescript-eslint/parser": "npm:^6.6.0"
     "@vitejs/plugin-basic-ssl": "npm:^1.0.1"
     argon2: "npm:^0.31.1"
     bootstrap: "npm:^5.3.1"
@@ -2803,11 +2841,7 @@ __metadata:
   dependenciesMeta:
     "@lit/localize-tools":
       optional: true
-    "@typescript-eslint/eslint-plugin":
-      optional: true
     c8:
-      optional: true
-    eslint:
       optional: true
   languageName: unknown
   linkType: soft

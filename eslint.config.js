@@ -20,38 +20,36 @@ https://github.com/projektwahl/projektwahl-lit
 SPDX-License-Identifier: AGPL-3.0-or-later
 SPDX-FileCopyrightText: 2021 Moritz Hedtke <Moritz.Hedtke@t-online.de>
 */
-module.exports = {
-  root: true,
-  parser: "@typescript-eslint/parser",
-  parserOptions: {
-    ecmaVersion: 13,
-    sourceType: "module",
-    project: ["./tsconfig.json"],
-  },
-  plugins: ["@typescript-eslint"],
-  env: {
-    browser: true,
-    es2021: true,
-    node: true,
-  },
-  rules: {
-    "@typescript-eslint/no-unused-vars": [
-      "error",
-      { varsIgnorePattern: "^_", argsIgnorePattern: "^_" },
-    ],
-    "@typescript-eslint/consistent-type-assertions": [
-      "error",
-      { assertionStyle: "never" },
-    ],
-    "@typescript-eslint/no-non-null-assertion": "error",
-  },
-  extends: [
-    "eslint:recommended",
-    "plugin:@typescript-eslint/eslint-recommended",
-    "plugin:@typescript-eslint/recommended",
-    "plugin:@typescript-eslint/recommended-requiring-type-checking",
-  ],
-  ignorePatterns: [
-    "dist/",
-  ],
-};
+import typescriptParser from '@typescript-eslint/parser';
+import { FlatCompat } from "@eslint/eslintrc";
+import path from "path";
+import { fileURLToPath } from "url";
+
+// mimic CommonJS variables -- not needed if using CommonJS
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+const compat = new FlatCompat({
+    baseDirectory: __dirname
+});
+
+/** @type { import("eslint").Linter.FlatConfig[] } */
+export default [
+  ...compat.extends("plugin:@typescript-eslint/recommended"),
+  {
+    languageOptions: {
+      parser: typescriptParser,
+    },
+    rules: {
+      "@typescript-eslint/no-unused-vars": [
+        "error",
+        { varsIgnorePattern: "^_", argsIgnorePattern: "^_" },
+      ],
+      "@typescript-eslint/consistent-type-assertions": [
+        "error",
+        { assertionStyle: "never" },
+      ],
+      "@typescript-eslint/no-non-null-assertion": "error",
+    }
+  }
+];
