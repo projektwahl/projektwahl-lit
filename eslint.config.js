@@ -20,6 +20,8 @@ https://github.com/projektwahl/projektwahl-lit
 SPDX-License-Identifier: AGPL-3.0-or-later
 SPDX-FileCopyrightText: 2021 Moritz Hedtke <Moritz.Hedtke@t-online.de>
 */
+
+// https://github.com/microsoft/vscode-eslint/issues/1518
 import typescriptParser from '@typescript-eslint/parser';
 import { FlatCompat } from "@eslint/eslintrc";
 import path from "path";
@@ -31,7 +33,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const compat = new FlatCompat({
-    baseDirectory: __dirname
+    baseDirectory: __dirname,
 });
 
 /** @type { import("eslint").Linter.FlatConfig[] } */
@@ -60,13 +62,15 @@ export default [
     linterOptions: {
       noInlineConfig: false,
       reportUnusedDisableDirectives: true,
-    }
+    },
   },
   {
+    files: [ "tests" ],
     ignores: [
       ".yarn/**",
       ".pnp.loader.mjs",
       ".pnp.cjs",
+      "eslint.config.js",
       "csv2json.js" // TODO FIXME remove
     ],
   }

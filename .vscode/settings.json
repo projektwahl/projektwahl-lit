@@ -7,5 +7,9 @@
   },
   "eslint.nodePath": ".yarn/sdks",
   "typescript.tsdk": ".yarn/sdks/typescript/lib",
-  "typescript.enablePromptUseWorkspaceTsdk": true
+  "typescript.enablePromptUseWorkspaceTsdk": true,
+  "eslint.experimental.useFlatConfig": true,
+  "eslint.trace.server": "verbose",
+	"eslint.debug": true,
+  "eslint.packageManager": "yarn",
 }

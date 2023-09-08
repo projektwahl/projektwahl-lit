@@ -16,10 +16,6 @@
   },
   "description": "Software to manage choosing projects and automatically assigning people to projects.",
   "type": "module",
-  "engines": {
-    "npm": ">=9.4.0",
-    "node": ">=19.6.0"
-  },
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",

@@ -23,10 +23,7 @@ SPDX-FileCopyrightText: 2021 Moritz Hedtke <Moritz.Hedtke@t-online.de>
 import assert from "assert/strict";
 // import { exec as unpromisifiedExec } from "child_process";
 import { writeFile } from "fs/promises";
-import nodeCrypto from "node:crypto";
-// import { promisify } from "node:util";
-
-const { webcrypto: crypto }: { webcrypto: Crypto } = nodeCrypto;
+import { webcrypto as crypto } from "node:crypto";
 
 import {
   Builder,
