@@ -24,6 +24,7 @@ import typescriptParser from '@typescript-eslint/parser';
 import { FlatCompat } from "@eslint/eslintrc";
 import path from "path";
 import { fileURLToPath } from "url";
+import js from "@eslint/js";
 
 // mimic CommonJS variables -- not needed if using CommonJS
 const __filename = fileURLToPath(import.meta.url);
@@ -35,10 +36,14 @@ const compat = new FlatCompat({
 
 /** @type { import("eslint").Linter.FlatConfig[] } */
 export default [
-  ...compat.extends("plugin:@typescript-eslint/recommended"),
+  js.configs.recommended,
+  ...compat.extends("plugin:@typescript-eslint/recommended-type-checked"),
   {
     languageOptions: {
       parser: typescriptParser,
+      parserOptions: {
+        project: true,
+      }
     },
     rules: {
       "@typescript-eslint/no-unused-vars": [

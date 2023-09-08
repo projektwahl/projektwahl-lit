@@ -217,7 +217,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@eslint/js@npm:8.48.0":
+"@eslint/js@npm:8.48.0, @eslint/js@npm:^8.48.0":
   version: 8.48.0
   resolution: "@eslint/js@npm:8.48.0"
   checksum: c8ac8952f37cccd41b4adc4399a7a3a6a0b4c52d67bc55b412be5b3ffb476343b3463a4df2c1d7b633dbb6e0d5fb277eeaf3ba0de0dcdf6d0ed97fcdd416ba94
@@ -2805,6 +2805,7 @@ __metadata:
   resolution: "projektwahl-lit@workspace:."
   dependencies:
     "@eslint/eslintrc": "npm:^2.1.2"
+    "@eslint/js": "npm:^8.48.0"
     "@lit-labs/motion": "npm:^1.0.4"
     "@lit-labs/task": "npm:^3.0.2"
     "@lit/localize": "npm:^0.11.4"
