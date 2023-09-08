@@ -220,7 +220,7 @@ class PwUserCreate extends PwForm<"/api/v1/users/create-or-update"> {
 
       ${this.initialTask.render({
         complete: (value) => {
-          if (value === undefined || value?.success) {
+          if (value === undefined || value.success) {
             if (this.actionText === undefined) {
               throw new Error(msg("component not fully initialized"));
             }
@@ -429,7 +429,7 @@ class PwUserCreate extends PwForm<"/api/v1/users/create-or-update"> {
                       <button
                         type="button"
                         class="btn btn-secondary"
-                        @click=${() => window.history.back()}
+                        @click=${() => { window.history.back(); }}
                       >
                         ${msg(`Back`)}
                       </button>
@@ -441,7 +441,7 @@ class PwUserCreate extends PwForm<"/api/v1/users/create-or-update"> {
                               // I think it doesnt but not sure
                               void this.initialTask.run();
                             },
-                            user: value?.data[0],
+                            user: value.data[0],
                             name: "project_leader_id",
                             title: msg("Project leader in"),
                             prefix: "leaders",
@@ -452,7 +452,7 @@ class PwUserCreate extends PwForm<"/api/v1/users/create-or-update"> {
                               // I think it doesnt but not sure
                               void this.initialTask.run();
                             },
-                            user: value?.data[0],
+                            user: value.data[0],
                             name: "force_in_project_id",
                             title: msg("Guaranteed project member in"),
                             prefix: "members",
@@ -470,7 +470,7 @@ class PwUserCreate extends PwForm<"/api/v1/users/create-or-update"> {
                 
                 <div class="alert alert-danger" role="alert">
                 ${msg("Some errors occurred!")}<br />
-                ${value?.error.issues.map(
+                ${value.error.issues.map(
                   (issue) => html` ${issue.path}: ${issue.message}<br /> `
                 )}
               </div>

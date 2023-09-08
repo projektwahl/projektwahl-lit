@@ -204,7 +204,7 @@ export class PwProjectCreate extends PwForm<
           console.log("FORMDATA", this.formData);
           console.log("INITIAL", value);
 
-          if (value === undefined || value?.success) {
+          if (value === undefined || value.success) {
             if (this.actionText === undefined) {
               throw new Error(msg("component not fully initialized"));
             }
@@ -440,7 +440,7 @@ export class PwProjectCreate extends PwForm<
                       <button
                         type="button"
                         class="btn btn-secondary"
-                        @click=${() => window.history.back()}
+                        @click=${() => { window.history.back(); }}
                       >
                         ${msg(`Back`)}
                       </button>
@@ -487,7 +487,7 @@ export class PwProjectCreate extends PwForm<
                 
                 <div class="alert alert-danger" role="alert">
                 ${msg("Some errors occurred!")}<br />
-                ${value?.error.issues.map(
+                ${value.error.issues.map(
                   (issue) => html` ${issue.path}: ${issue.message}<br /> `
                 )}
               </div>

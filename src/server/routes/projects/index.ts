@@ -62,9 +62,9 @@ export const projectsHandler = requestHandler(
 
     if (
       !(
-        loggedInUser?.type === "admin" ||
-        loggedInUser?.type === "helper" ||
-        loggedInUser?.type === "voter"
+        loggedInUser.type === "admin" ||
+        loggedInUser.type === "helper" ||
+        loggedInUser.type === "voter"
       )
     ) {
       const returnValue: [

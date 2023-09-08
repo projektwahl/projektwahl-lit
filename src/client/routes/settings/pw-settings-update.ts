@@ -178,7 +178,7 @@ class PwSettingsUpdate extends PwForm<"/api/v1/settings/update"> {
 
       ${this.initialTask.render({
         complete: (value) => {
-          if (value === undefined || value?.success) {
+          if (value === undefined || value.success) {
             if (this.actionText === undefined) {
               throw new Error(msg("component not fully initialized"));
             }
@@ -288,7 +288,7 @@ class PwSettingsUpdate extends PwForm<"/api/v1/settings/update"> {
                       <button
                         type="button"
                         class="btn btn-secondary"
-                        @click=${() => window.history.back()}
+                        @click=${() => { window.history.back(); }}
                       >
                         ${msg(`Back`)}
                       </button>
@@ -304,7 +304,7 @@ class PwSettingsUpdate extends PwForm<"/api/v1/settings/update"> {
                 
                 <div class="alert alert-danger" role="alert">
                 ${msg("Some errors occurred!")}<br />
-                ${value?.error.issues.map(
+                ${value.error.issues.map(
                   (issue) => html` ${issue.path}: ${issue.message}<br /> `
                 )}
               </div>

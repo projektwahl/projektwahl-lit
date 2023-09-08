@@ -102,7 +102,7 @@ export const userSchema = rawUserSchema
 export type UnknownKeysParam = "passthrough" | "strict" | "strip";
 
 export const entities = <
-  T extends { [k: string]: ZodTypeAny },
+  T extends Record<string, ZodTypeAny>,
   UnknownKeys extends UnknownKeysParam = "strip",
   Catchall extends ZodTypeAny = ZodTypeAny
 >(
@@ -119,7 +119,7 @@ export const entities = <
   );
 
 const baseQuery = <
-  T1 extends { [k: string]: ZodTypeAny },
+  T1 extends Record<string, ZodTypeAny>,
   T2 extends ZodTypeAny,
   T3 extends ZodTypeAny,
   UnknownKeys extends UnknownKeysParam = "strip",
@@ -561,10 +561,10 @@ export declare class MinimalZodError {
   issues: ZodIssue[];
 }
 
-export declare type MinimalSafeParseError = {
+export declare interface MinimalSafeParseError {
   success: false;
   error: MinimalZodError;
-};
+}
 
 export type ResponseType<P extends keyof typeof routes> =
   | z.SafeParseSuccess<z.infer<typeof routes[P]["response"]>>

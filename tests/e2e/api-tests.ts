@@ -35,7 +35,7 @@ import { routes } from "../../src/lib/routes.js";
 
 const chance: Chance.Chance = new Chance(/*1234*/);
 
-if (!process.env["BASE_URL"]) {
+if (!process.env.BASE_URL) {
   console.error("BASE_URL not set!");
   process.exit(1);
 }
@@ -51,7 +51,7 @@ function request<U extends keyof typeof routes>(
     const client = connect(BASE_URL, {
       rejectUnauthorized: false,
     });
-    client.on("error", (err) => reject(err));
+    client.on("error", (err) => { reject(err); });
 
     const buffer = requestBody !== null ? Buffer.from(requestBody) : null;
 

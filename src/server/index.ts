@@ -30,12 +30,12 @@ import { watch } from "node:fs/promises";
 import { setupClient } from "./routes/login/openid-client.js";
 import { ZodIssueCode } from "zod";
 
-if (!process.env["BASE_URL"]) {
+if (!process.env.BASE_URL) {
   console.error("BASE_URL not set!");
   process.exit(1);
 }
 
-if (!process.env["CREDENTIALS_DIRECTORY"]) {
+if (!process.env.CREDENTIALS_DIRECTORY) {
   console.error("CREDENTIALS_DIRECTORY not set!");
   process.exit(1);
 }

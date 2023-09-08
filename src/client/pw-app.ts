@@ -40,7 +40,7 @@ window.addEventListener(
       `unknown promise error: ${String(event.reason)} ${String(event.promise)}`
     );
     
-    event.promise.catch((reason) => alert(String(reason)));
+    event.promise.catch((reason) => { alert(String(reason)); });
   }
 );
 

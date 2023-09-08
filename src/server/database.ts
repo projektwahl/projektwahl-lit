@@ -22,13 +22,13 @@ SPDX-FileCopyrightText: 2021 Moritz Hedtke <Moritz.Hedtke@t-online.de>
 */
 import postgres, { TransactionSql } from "postgres";
 
-if (!process.env["DATABASE_URL"]) {
+if (!process.env.DATABASE_URL) {
   console.error("DATABASE_URL not set!");
   process.exit(1);
 }
 
-export const sql = postgres(process.env["DATABASE_URL"], {
-  host: process.env["DATABASE_HOST"],
+export const sql = postgres(process.env.DATABASE_URL, {
+  host: process.env.DATABASE_HOST,
   //onnotice: () => {
   // empty
   //}, // TODO FIXME

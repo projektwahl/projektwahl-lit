@@ -61,7 +61,7 @@ export const updateSettingsHandler = requestHandler(
       return returnValue;
     }
 
-    if (!(loggedInUser?.type === "admin")) {
+    if (!(loggedInUser.type === "admin")) {
       const returnValue: [
         OutgoingHttpHeaders,
         ResponseType<"/api/v1/settings/update">

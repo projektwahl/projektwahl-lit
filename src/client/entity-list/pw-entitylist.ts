@@ -66,7 +66,7 @@ export const parseRequestWithPrefix = <
 ): parseRequestWithPrefixType<PREFIX>[P] => {
   const schema = z
     .object({})
-    .setKey(prefix, entityRoutes[apiUrl]["request"].default(defaultValue))
+    .setKey(prefix, entityRoutes[apiUrl].request.default(defaultValue))
     .passthrough()
   const data: parseRequestWithPrefixType<PREFIX>[P] = mappedFunctionCall(
     schema,
@@ -239,7 +239,7 @@ export class PwEntityList<
           @refreshentitylist=${async () => {
             await this._task.run();
           }}
-          @submit=${(e: Event) => e.preventDefault()}
+          @submit=${(e: Event) => { e.preventDefault(); }}
         >
           ${this.buttons}
 
@@ -311,7 +311,7 @@ export class PwEntityList<
 
                         if (this._task.value?.success) {
                           this.formData.paginationCursor =
-                            this._task.value?.data.previousCursor;
+                            this._task.value.data.previousCursor;
                           this.formData.paginationDirection = "backwards";
                         }
                         await this._task.run();
@@ -324,7 +324,7 @@ export class PwEntityList<
                           pending: () => undefined,
                           complete: (result) =>
                             result.success &&
-                            result.data?.previousCursor === null
+                            result.data.previousCursor === null
                               ? undefined
                               : -1,
                         })
@@ -333,7 +333,7 @@ export class PwEntityList<
                         pending: () => true,
                         complete: (result) =>
                           result.success &&
-                          result.data?.previousCursor === null,
+                          result.data.previousCursor === null,
                       })}
                     >
                       <span aria-hidden="true">&laquo;</span>
@@ -343,7 +343,7 @@ export class PwEntityList<
                     class="page-item ${this._task.render({
                       pending: () => "disabled",
                       complete: (result) =>
-                        result.success && result.data?.nextCursor === null
+                        result.success && result.data.nextCursor === null
                           ? "disabled"
                           : "",
                     })}"
@@ -354,7 +354,7 @@ export class PwEntityList<
 
                         if (this._task.value?.success) {
                           this.formData.paginationCursor =
-                            this._task.value?.data.nextCursor;
+                            this._task.value.data.nextCursor;
                           this.formData.paginationDirection = "forwards";
                         }
                         await this._task.run();
@@ -366,7 +366,7 @@ export class PwEntityList<
                         this._task.render({
                           pending: () => undefined,
                           complete: (result) =>
-                            result.success && result.data?.nextCursor === null
+                            result.success && result.data.nextCursor === null
                               ? undefined
                               : -1,
                         })
@@ -374,7 +374,7 @@ export class PwEntityList<
                       disabled=${this._task.render({
                         pending: () => true,
                         complete: (result) =>
-                          result.success && result.data?.nextCursor === null,
+                          result.success && result.data.nextCursor === null,
                       })}
                     >
                       <span aria-hidden="true">&raquo;</span>

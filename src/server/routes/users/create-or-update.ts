@@ -62,7 +62,7 @@ export const createOrUpdateUsersHandler = requestHandler(
       return returnValue;
     }
 
-    if (!(loggedInUser?.type === "admin" || loggedInUser?.type === "helper")) {
+    if (!(loggedInUser.type === "admin" || loggedInUser.type === "helper")) {
       const returnValue: [
         OutgoingHttpHeaders,
         ResponseType<"/api/v1/users/create-or-update">

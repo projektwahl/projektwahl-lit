@@ -44,9 +44,9 @@ import { settingsHandler } from "./routes/settings/index.js";
 import { updateSettingsHandler } from "./routes/settings/create-or-update.js";
 
 // https://github.com/colinhacks/zod/blob/master/src/ZodError.ts
-type ErrorMapCtx = {
+interface ErrorMapCtx {
   defaultError: string;
-};
+}
 
 const myErrorMap: z.ZodErrorMap = (
   issue: ZodIssueOptionalMessage,

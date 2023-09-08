@@ -5,8 +5,8 @@
     import {html} from 'lit';
     import {str} from '@lit/localize';
 
-    /* eslint-disable no-irregular-whitespace */
-    /* eslint-disable @typescript-eslint/no-explicit-any */
+     
+     
 
     export const templates = {
       'h254dbd1c5813b447': html`Aktuell ${0},

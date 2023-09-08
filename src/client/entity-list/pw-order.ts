@@ -47,9 +47,7 @@ type entitiesType2 = {
 };
 
 type entitiesType3 = {
-  [P in keyof typeof entityRoutes]: Array<
-    z.infer<typeof entityRoutes[P]["request"]>["sorting"][number]
-  >;
+  [P in keyof typeof entityRoutes]: z.infer<typeof entityRoutes[P]["request"]>["sorting"][number][];
 };
 
 type entitiesType4 = {
@@ -108,7 +106,7 @@ export class PwOrder<
   X extends string
 > extends PwInput<
   P,
-  Array<z.infer<typeof entityRoutes[P]["request"]>["sorting"][number]>,
+  z.infer<typeof entityRoutes[P]["request"]>["sorting"][number][],
   HTMLButtonElement
 > {
   static override get properties() {
@@ -159,7 +157,7 @@ export class PwOrder<
       const theName: entitiesType1[P] = this.orderBy;
       const theValue: entitiesType2[P] = this.value;
 
-      switch (oldElement?.[1]) {
+      switch (oldElement[1]) {
         case "DESC":
           break;
         case "ASC": {

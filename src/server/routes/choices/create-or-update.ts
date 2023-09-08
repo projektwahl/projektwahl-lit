@@ -86,7 +86,7 @@ export function createOrUpdateChoiceHandler<P extends "/api/v1/choices/update">(
       return returnValue;
     }
 
-    if (!(loggedInUser?.type === "voter")) {
+    if (!(loggedInUser.type === "voter")) {
       const returnValue: [OutgoingHttpHeaders, ResponseType<P>] = [
         {
           "content-type": "text/json; charset=utf-8",

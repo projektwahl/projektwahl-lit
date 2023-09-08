@@ -115,7 +115,7 @@ export async function setup() {
                 columns: {},
               } as const)`INSERT INTO choices (user_id, project_id, rank) VALUES (${
                 user.id
-              }, ${projects[j]["id"]}, ${(j % 5) + 1});`;
+              }, ${projects[j].id}, ${(j % 5) + 1});`;
             });
           } catch (error) {
             // ignore

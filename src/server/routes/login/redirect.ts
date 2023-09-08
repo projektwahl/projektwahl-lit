@@ -108,10 +108,10 @@ export const openidRedirectHandler = requestHandler(
 
       await sql.begin("READ WRITE", async (tsql) => {
         await tsql`SELECT set_config('projektwahl.id', ${
-          dbUser?.id ?? null
+          dbUser.id ?? null
         }::text, true);`;
         await tsql`SELECT set_config('projektwahl.type', ${
-          dbUser?.type ?? null
+          dbUser.type ?? null
         }::text, true);`;
         return await typedSql(tsql, {
           columns: {},

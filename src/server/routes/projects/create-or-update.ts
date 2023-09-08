@@ -186,7 +186,7 @@ export function createOrUpdateProjectsHandler<
       return returnValue;
     }
 
-    if (!(loggedInUser?.type === "admin" || loggedInUser?.type === "helper")) {
+    if (!(loggedInUser.type === "admin" || loggedInUser.type === "helper")) {
       const returnValue: [OutgoingHttpHeaders, ResponseType<P>] = [
         {
           "content-type": "text/json; charset=utf-8",

@@ -57,7 +57,7 @@ export const sudoHandler = requestHandler(
       return returnValue;
     }
 
-    if (!(loggedInUser?.type === "admin")) {
+    if (!(loggedInUser.type === "admin")) {
       const returnValue: [OutgoingHttpHeaders, ResponseType<"/api/v1/sudo">] = [
         {
           "content-type": "text/json; charset=utf-8",

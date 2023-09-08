@@ -71,9 +71,7 @@ type entitiesType4 = {
 };
 
 type entitiesType15 = {
-  [K in keyof typeof entityRoutes]: Array<
-    z.infer<typeof entityRoutes[K]["request"]>["sorting"][number]
-  >;
+  [K in keyof typeof entityRoutes]: z.infer<typeof entityRoutes[K]["request"]>["sorting"][number][];
 };
 
 type entitiesType18 = {

@@ -190,7 +190,7 @@ export class PwProjectsOverview<X extends string> extends PwEntityList<
           @refreshentitylist=${async () => {
             await this._task.run();
           }}
-          @submit=${(e: Event) => e.preventDefault()}
+          @submit=${(e: Event) => { e.preventDefault(); }}
         >
           ${this.getErrors()} ${this.body}
         </form>

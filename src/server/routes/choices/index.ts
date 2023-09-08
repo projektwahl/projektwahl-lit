@@ -58,7 +58,7 @@ export const choicesHandler = requestHandler(
       return returnValue;
     }
 
-    if (!(loggedInUser?.type === "voter")) {
+    if (!(loggedInUser.type === "voter")) {
       const returnValue: [
         OutgoingHttpHeaders,
         ResponseType<"/api/v1/choices">

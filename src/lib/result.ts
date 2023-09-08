@@ -25,7 +25,7 @@ import { z, ZodObject, ZodType, ZodTypeAny, ZodTypeDef } from "zod";
 import type { entityRoutes, UnknownKeysParam } from "./routes.js";
 
 export const successResult = <
-  T extends { [k: string]: ZodTypeAny },
+  T extends Record<string, ZodTypeAny>,
   UnknownKeys extends UnknownKeysParam = "strip",
   Catchall extends ZodTypeAny = ZodTypeAny
 >(
@@ -54,7 +54,7 @@ export const failureResult = <
     .strict();
 
 export const result = <
-  T extends { [k: string]: ZodTypeAny },
+  T extends Record<string, ZodTypeAny>,
   UnknownKeys extends UnknownKeysParam = "strip",
   Catchall extends ZodTypeAny = ZodTypeAny
 >(
@@ -62,14 +62,14 @@ export const result = <
 ) => z.union([successResult(s), failureResult(z.record(z.string()))]);
 
 export type ToIndexed<
-  T extends { [K: string]: { [inner in I]: unknown } },
+  T extends Record<string, { [inner in I]: unknown }>,
   I extends string | number | symbol
 > = {
   [K in keyof T]: T[K][I];
 };
 
 export function mappedIndexing<
-  T extends { [K: string]: { [inner in I]: unknown } },
+  T extends Record<string, { [inner in I]: unknown }>,
   K extends string,
   I extends string | number | symbol
 >(value: T[K], index: I): ToIndexed<T, I>[K] {
@@ -77,7 +77,7 @@ export function mappedIndexing<
 }
 
 export function mappedIndexingSet<
-  T extends { [K: string]: { [inner in I]: unknown } },
+  T extends Record<string, { [inner in I]: unknown }>,
   K extends string,
   I extends string | number | symbol
 >(value: T[K], index: I, newValue: ToIndexed<T, I>[K]): void {
@@ -107,20 +107,20 @@ export function testa<Output>(zodtype: ZodType<Output>, data: unknown): Output {
 }
 
 export type MappedFunctionCallType<
-  T extends { [K: string]: ZodType<unknown> }
+  T extends Record<string, ZodType<unknown>>
 > = {
   [K in keyof T]: T[K]["_output"];
 };
 
 export function mappedFunctionCall<
-  T extends { [K: string]: ZodType<unknown> },
+  T extends Record<string, ZodType<unknown>>,
   K extends string
 >(schema: T[K], value: unknown): MappedFunctionCallType<T>[K] {
   return testa(schema, value);
 }
 
 type entitiesType15 = {
-  [K in keyof typeof entityRoutes]: Array<entitiesType4[K]>;
+  [K in keyof typeof entityRoutes]: entitiesType4[K][];
 };
 
 type entitiesType4 = {
@@ -131,7 +131,7 @@ type entitiesType4 = {
 
 export function mappedFunctionCall2<R extends keyof typeof entityRoutes, U>(
   array: entitiesType15[R],
-  functio: (v: entitiesType4[R]) => ReadonlyArray<U>
-): Array<U> {
+  functio: (v: entitiesType4[R]) => readonly U[]
+): U[] {
   return array.flatMap(functio);
 }

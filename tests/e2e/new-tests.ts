@@ -49,7 +49,7 @@ let chance: Chance.Chance;
 
 // const exec = promisify(unpromisifiedExec);
 
-if (!process.env["BASE_URL"]) {
+if (!process.env.BASE_URL) {
   console.error("BASE_URL not set!");
   process.exit(1);
 }

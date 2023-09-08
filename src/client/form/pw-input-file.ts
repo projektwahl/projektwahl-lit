@@ -94,7 +94,7 @@ export class PwInputFile<P extends keyof typeof routes> extends PwInput<
     if (this.input.value.files?.length === 1) {
       this.set(this.pwForm.formData, this.input.value.files.item(0)?.text());
 
-      this.input.value?.dispatchEvent(
+      this.input.value.dispatchEvent(
         new CustomEvent("refreshentitylist", {
           bubbles: true,
           composed: true,
