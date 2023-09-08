@@ -13,6 +13,9 @@
               pkgs.nodejs_latest
               (pkgs.yarn.override { nodejs = pkgs.nodejs_latest; })
             ];
+            shellHook = ''
+              export ROME_BINARY="${pkgs.biome}/bin/rome"
+            '';
           };
         }
       );
