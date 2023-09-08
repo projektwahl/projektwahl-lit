@@ -50,6 +50,13 @@ export default [
         { assertionStyle: "never" },
       ],
       "@typescript-eslint/no-non-null-assertion": "error",
+    },
+    linterOptions: {
+      noInlineConfig: false,
+      reportUnusedDisableDirectives: true,
     }
+  },
+  {
+    ignores: [".yarn/**"],
   }
 ];
