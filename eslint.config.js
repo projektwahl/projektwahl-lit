@@ -37,12 +37,13 @@ const compat = new FlatCompat({
 /** @type { import("eslint").Linter.FlatConfig[] } */
 export default [
   js.configs.recommended,
-  ...compat.extends("plugin:@typescript-eslint/recommended-type-checked"),
+  ...compat.extends('plugin:@typescript-eslint/strict-type-checked', "plugin:@typescript-eslint/stylistic-type-checked"),
   {
     languageOptions: {
       parser: typescriptParser,
       parserOptions: {
         project: true,
+        tsconfigRootDir: __dirname,
       }
     },
     rules: {
@@ -62,6 +63,11 @@ export default [
     }
   },
   {
-    ignores: [".yarn/**"],
+    ignores: [
+      ".yarn/**",
+      ".pnp.loader.mjs",
+      ".pnp.cjs",
+      "csv2json.js" // TODO FIXME remove
+    ],
   }
 ];
