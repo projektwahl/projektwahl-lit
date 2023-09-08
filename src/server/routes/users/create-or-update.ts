@@ -115,7 +115,13 @@ export const createOrUpdateUsersHandler = requestHandler(
               let _ = rest;
               _ = 1; // ensure no property is missed - Don't use `{}` as a type. `{}` actually means "any non-nullish value".
 
-              const finalQuery = tsql`UPDATE users_with_deleted SET
+              const finalQuery = typedSql(tsql, {
+                columns: {
+                  id: 23,
+                  project_leader_id: 23,
+                  force_in_project_id: 23,
+                },
+              } as const)`UPDATE users_with_deleted SET
   ${username !== undefined ? sql`"username" = ${username},` : sql``}
   ${openid_id !== undefined ? sql`"openid_id" = ${openid_id},` : sql``}
   ${type !== undefined ? sql`"type" = ${type},` : sql``}

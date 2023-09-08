@@ -29,7 +29,7 @@ import type {
 } from "postgres";
 
 // stack traces are garbage
-export function typedSql<R extends Record<string, number | null>>(
+export function typedSql<R extends Record<string, unknown>>(
   sql: TransactionSql<Record<string, unknown>>,
   description: { columns: R }
 ) {
@@ -62,6 +62,7 @@ export function typedSql<R extends Record<string, number | null>>(
 
       deepStrictEqual(computed_description.columns, description.columns);
 
+      // TODO FIXME check types again
       return await sql<DescriptionTypes<R>[]>(template, ...args).execute();
     } catch (error) {
       console.error(err);
@@ -70,7 +71,10 @@ export function typedSql<R extends Record<string, number | null>>(
   };
 }
 
-// https://github.com/porsager/postgres/blob/rewrite/src/types.js
+export declare const voterHelperAdminType: unique symbol;
+
+// https://github.com/porsager/postgres/blob/master/src/types.js
+// TODO FIXME
 export type DescriptionTypes<T> = {
   -readonly [K in keyof T]: T[K] extends 23 | 701
     ? number
@@ -80,6 +84,8 @@ export type DescriptionTypes<T> = {
     ? boolean
     : T[K] extends 17
     ? Uint8Array
+    : T[K] extends typeof voterHelperAdminType
+    ? "voter" | "helper" | "admin"
     : T[K] extends null
     ? string
     : unknown;

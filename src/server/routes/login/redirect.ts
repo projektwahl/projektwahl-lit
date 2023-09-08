@@ -27,10 +27,7 @@ import { sql } from "../../database.js";
 import { requestHandler } from "../../express.js";
 import { client } from "./openid-client.js";
 import type { OutgoingHttpHeaders } from "node:http";
-import nodeCrypto from "node:crypto";
 import { typedSql } from "../../describe.js";
-
-const { webcrypto: crypto }: { webcrypto: Crypto } = nodeCrypto;
 
 export const openidRedirectHandler = requestHandler(
   "GET",

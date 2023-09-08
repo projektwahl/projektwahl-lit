@@ -34,10 +34,8 @@ import type {
   OutgoingHttpHeaders,
 } from "http2";
 import { suspend } from "../client/utils.js";
-import { typedSql } from "./describe.js";
+import { typedSql, voterHelperAdminType } from "./describe.js";
 import nodeCrypto from "node:crypto";
-
-const { webcrypto: crypto }: { webcrypto: Crypto } = nodeCrypto;
 
 export type MyRequest = (IncomingMessage | Http2ServerRequest) &
   Required<Pick<IncomingMessage | Http2ServerRequest, "url" | "method">>;
@@ -110,7 +108,7 @@ export function requestHandler<P extends keyof typeof routes>(
             return await typedSql(tsql, {
               columns: {
                 id: 23,
-                type: null, // custom enum
+                type: voterHelperAdminType, // custom enum
                 username: 1043,
                 group: 1043,
                 age: 23,

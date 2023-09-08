@@ -29,8 +29,6 @@ import nodeCrypto from "node:crypto";
 import { typedSql } from "../../describe.js";
 import { sensitiveHeaders } from "node:http2";
 
-const { webcrypto: crypto }: { webcrypto: Crypto } = nodeCrypto;
-
 export const sudoHandler = requestHandler(
   "POST",
   "/api/v1/sudo",

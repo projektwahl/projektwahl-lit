@@ -26,11 +26,8 @@ import { sql } from "../../database.js";
 import { requestHandler } from "../../express.js";
 import { checkPassword } from "../../password.js";
 import type { OutgoingHttpHeaders } from "node:http";
-import nodeCrypto from "node:crypto";
 import { typedSql } from "../../describe.js";
 import { sensitiveHeaders } from "node:http2";
-
-const { webcrypto: crypto }: { webcrypto: Crypto } = nodeCrypto;
 
 export const loginHandler = requestHandler(
   "POST",
