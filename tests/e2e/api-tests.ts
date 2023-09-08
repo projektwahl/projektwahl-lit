@@ -392,7 +392,7 @@ async function getAdminSessionId() {
     })
   );
   assert.deepEqual(r, { success: true, data: {} });
-  const session_id = (headers["set-cookie"] || "")[0]
+  const session_id = (headers["set-cookie"] ?? "")[0]
     .split(";")[0]
     .split("=")[1];
   return session_id;
@@ -412,7 +412,7 @@ async function getVoterSessionId() {
     })
   );
   assert.deepEqual(r, { success: true, data: {} });
-  const session_id = (headers["set-cookie"] || "")[0]
+  const session_id = (headers["set-cookie"] ?? "")[0]
     .split(";")[0]
     .split("=")[1];
   return session_id;
@@ -1207,7 +1207,7 @@ async function testSudo() {
       id: 2,
     })
   );
-  const sudo_session_id = (headers["set-cookie"] || "")[0]
+  const sudo_session_id = (headers["set-cookie"] ?? "")[0]
     .split(";")[0]
     .split("=")[1];
   assert.deepEqual(r, { success: true, data: {} });

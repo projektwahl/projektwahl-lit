@@ -90,7 +90,7 @@ const myErrorMap: z.ZodErrorMap = (
       break;
     case ZodIssueCode.invalid_string:
       if (issue.validation !== "regex")
-        message = `Ungültig ${issue.validation.toString()}`;
+        message = `Ungültig ${String(issue.validation)}`;
       else message = "Ungültig";
       break;
     case ZodIssueCode.too_small:

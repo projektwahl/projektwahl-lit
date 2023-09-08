@@ -136,7 +136,7 @@ export const usersHandler = requestHandler(
             ) q ON t.user_id = q.user_id`
               : sql``
           } WHERE TRUE ${
-            id === undefined ? sql`` : sql`AND id = ${id ?? null}`
+            id === undefined ? sql`` : sql`AND id = ${id}`
           } ${
             username === undefined
               ? sql``
@@ -153,9 +153,9 @@ export const usersHandler = requestHandler(
           ${
             deleted === undefined
               ? sql``
-              : sql`AND deleted = ${deleted ?? null}`
+              : sql`AND deleted = ${deleted}`
           }
-          ${valid === undefined ? sql`` : sql`AND t.valid = ${valid ?? null}`}
+          ${valid === undefined ? sql`` : sql`AND t.valid = ${valid}`}
           ${
             force_in_project_id === undefined ||
             !(loggedInUser.type === "admin" || loggedInUser.type === "helper")
@@ -177,7 +177,7 @@ export const usersHandler = requestHandler(
               ? sql``
               : sql` AND "group" LIKE ${`${group ?? ""}%`}`
           }
-          ${type === undefined ? sql`` : sql`AND type = ${type ?? null}`}`;
+          ${type === undefined ? sql`` : sql`AND type = ${type}`}`;
         },
         {
           id: (q, o) => {

@@ -59,37 +59,7 @@ export const projectsHandler = requestHandler(
       ];
       return returnValue;
     }
-
-    if (
-      !(
-        loggedInUser.type === "admin" ||
-        loggedInUser.type === "helper" ||
-        loggedInUser.type === "voter"
-      )
-    ) {
-      const returnValue: [
-        OutgoingHttpHeaders,
-        ResponseType<"/api/v1/projects">
-      ] = [
-        {
-          "content-type": "text/json; charset=utf-8",
-          ":status": 403,
-        },
-        {
-          success: false as const,
-          error: {
-            issues: [
-              {
-                code: ZodIssueCode.custom,
-                path: ["forbidden"],
-                message: "Unzureichende Berechtigung!",
-              },
-            ],
-          },
-        },
-      ];
-      return returnValue;
-    }
+    const _enforce_type: "voter" | "helper" | "admin" = loggedInUser.type;
 
     return await fetchData<"/api/v1/projects">(
       loggedInUser,
