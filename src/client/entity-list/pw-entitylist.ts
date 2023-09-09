@@ -62,10 +62,10 @@ export const parseRequestWithPrefix = <
   apiUrl: P,
   prefix: PREFIX,
   url: URL,
-  defaultValue: z.infer<typeof entityRoutes[P]["request"]>,
+  defaultValue: z.infer<typeof entityRoutes[typeof apiUrl]["request"]>,
 ): parseRequestWithPrefixType<PREFIX>[P] => {
   const schema = z
-    .object({})
+    .object({}) // we need kind of a mapped type here
     .setKey(prefix, entityRoutes[apiUrl].request.default(defaultValue))
     .passthrough();
   const data: parseRequestWithPrefixType<PREFIX>[P] = mappedFunctionCall(

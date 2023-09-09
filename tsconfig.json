@@ -17,7 +17,7 @@
     "forceConsistentCasingInFileNames": true,
     "useDefineForClassFields": false,
     "noErrorTruncation": true,
-    "skipLibCheck": true
+    "skipLibCheck": true,
   },
   "ts-node": {
     "swc": true
