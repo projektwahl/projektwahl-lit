@@ -1,25 +1,14 @@
 
+
+function canIGetAGenericFunctionAndMapIt<MappedType extends {
+    [key: string]: readonly unknown[]
+}, Key extends keyof MappedType, GenericFunction extends <T>(input: readonly T[]) => T>(mappedType: MappedType, func: GenericFunction, key: Key): MappedType[Key][0] {
+    return func(mappedType[key])
+}
+
 const map = {
-    "a": [1, 2, 3],
-    "b": ["hello", "jofe"],
-}
+    hi: [1, 2, 3],
+    jo: ["hi", "jo"]
+} as const
 
-function singleOperate<V extends unknown>(arr: V[], value: V): V {
-    arr.push(value)
-    return arr[0]
-}
-
-function canIGetAGenericFunction<genericFunction extends <T>(value: T) => T>(func: genericFunction) {
-
-}
-
-function testMap<MAPPED_TYPE, K extends keyof MAPPED_TYPE, FUNCTION extends {
-    [Property in keyof MAPPED_TYPE]: (arg: MAPPED_TYPE[Property]) => unknown[Property];
-}>(map: MAPPED_TYPE, key: K, func: FUNCTION) {
-    return func[key](map[key])
-}
-
-const func1 = <T>(value: T[]): T => value[0];
-const result = testMap<typeof map, "a", {
-    [Property in keyof typeof map]: (arg: typeof map[Property]) => typeof map[Property][0];
-}>(map, "a", func1);
+const result = canIGetAGenericFunctionAndMapIt(map, (key) => key[0], "hi")
