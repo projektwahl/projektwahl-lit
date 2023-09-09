@@ -24,6 +24,7 @@ import {
   AnyZodObject,
   SomeZodObject,
   z,
+  ZodAny,
   ZodIssue,
   ZodObject,
   ZodOptional,
@@ -321,48 +322,43 @@ const settingsUpdateRequest = z
 
 const settingsUpdateResponse = z.object({}).strict();
 
+const makeReqSeq = <REQ extends AnyZodObject, RES>(
+  request: REQ,
+  response: RES,
+) => {
+  return {
+    request: request,
+    partialRequest: request.partial(),
+    response: response,
+  };
+};
+
 const routes = {
-  "/api/v1/logout": {
-    request: logoutRequest,
-    partialRequest: logoutRequest.partial(),
-    response: logoutResponse,
-  },
-  "/api/v1/login": {
-    request: loginRequest,
-    response: loginResponse,
-  },
-  "/api/v1/sudo": {
-    request: sudoRequest,
-    response: sudoResponse,
-  },
-  "/api/v1/openid-login": {
-    request: openIdLoginRequest,
-    response: openIdLoginResponse,
-  },
-  "/api/v1/redirect": {
-    request: redirectRequest,
-    response: redirectResponse,
-  },
-  "/api/v1/sleep": {
-    request: sleepRequest,
-    response: sleepResponse,
-  },
-  "/api/v1/update": {
-    request: updateRequest,
-    response: updateResponse,
-  },
+  "/api/v1/logout": makeReqSeq(logoutRequest, logoutResponse),
+  "/api/v1/login": makeReqSeq(loginRequest, loginResponse),
+  "/api/v1/sudo": makeReqSeq(sudoRequest, sudoResponse),
+  "/api/v1/openid-login": makeReqSeq(openIdLoginRequest, openIdLoginResponse),
+  "/api/v1/redirect": makeReqSeq(redirectRequest, redirectResponse),
+  "/api/v1/sleep": makeReqSeq(sleepRequest, sleepResponse),
+  "/api/v1/update": makeReqSeq(updateRequest, updateResponse),
   "/api/v1/users/create-or-update": {
     request: usersCreateOrUpdateRequest,
+    partialRequest: z.array(
+      z.discriminatedUnion("action", [
+        createUserAction.strict().partial(),
+        updateUserAction.strict().partial(),
+      ]),
+    ),
     response: usersCreateOrUpdateResponse,
   },
-  "/api/v1/projects/create": {
-    request: projectsCreateRequest,
-    response: projectsCreateResponse,
-  },
-  "/api/v1/projects/update": {
-    request: projectsUpdateRequest,
-    response: projectsUpdateResponse,
-  },
+  "/api/v1/projects/create": makeReqSeq(
+    projectsCreateRequest,
+    projectsCreateResponse,
+  ),
+  "/api/v1/projects/update": makeReqSeq(
+    projectsUpdateRequest,
+    projectsUpdateResponse,
+  ),
   "/api/v1/users": baseQuery(
     rawUserSchema
       .pick({
@@ -563,14 +559,14 @@ const routes = {
       .strict()
       .partial(),
   ),
-  "/api/v1/choices/update": {
-    request: choicesUpdateRequest,
-    response: choicesUpdateResponse,
-  },
-  "/api/v1/settings/update": {
-    request: settingsUpdateRequest,
-    response: settingsUpdateResponse,
-  },
+  "/api/v1/choices/update": makeReqSeq(
+    choicesUpdateRequest,
+    choicesUpdateResponse,
+  ),
+  "/api/v1/settings/update": makeReqSeq(
+    settingsUpdateRequest,
+    settingsUpdateResponse,
+  ),
   "/api/v1/sessions": baseQuery(
     rawSessionType,
     z.array(
