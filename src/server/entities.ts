@@ -102,6 +102,10 @@ type entitiesType8 = {
   };
 };
 
+export function tupleStupid<R extends keyof typeof entityRoutes>(tiebreaker: entitiesType18[R]): [entitiesType18[R], "ASC", null] {
+  return [tiebreaker, "ASC", null]
+}
+
 export async function fetchData<R extends keyof typeof entityRoutes>(
   loggedInUser: Exclude<z.infer<typeof userSchema>, undefined>,
   path: R,
@@ -113,7 +117,7 @@ export async function fetchData<R extends keyof typeof entityRoutes>(
   const sorting: entitiesType15[R] = mappedIndexing(query, "sorting");
 
   if (tiebreaker !== undefined && !sorting.find((e) => e[0] == tiebreaker)) {
-    sorting.push([tiebreaker, "ASC", null]);
+    sorting.push(tupleStupid(tiebreaker));
   }
 
   // TODO FIXME id tiebreaker lost
