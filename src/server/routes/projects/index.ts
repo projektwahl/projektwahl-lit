@@ -38,7 +38,7 @@ export const projectsHandler = requestHandler(
     if (!loggedInUser) {
       const returnValue: [
         OutgoingHttpHeaders,
-        ResponseType<"/api/v1/projects">
+        ResponseType<"/api/v1/projects">,
       ] = [
         {
           "content-type": "text/json; charset=utf-8",
@@ -108,7 +108,7 @@ export const projectsHandler = requestHandler(
                 : "ASC"
               : q === "ASC"
               ? "ASC"
-              : "DESC"
+              : "DESC",
           )}`,
         title: (q, o) =>
           sql`title ${sql.unsafe(
@@ -118,7 +118,7 @@ export const projectsHandler = requestHandler(
                 : "ASC"
               : q === "ASC"
               ? "ASC"
-              : "DESC"
+              : "DESC",
           )}`,
         info: (q, o) =>
           sql`info ${sql.unsafe(
@@ -128,7 +128,7 @@ export const projectsHandler = requestHandler(
                 : "ASC"
               : q === "ASC"
               ? "ASC"
-              : "DESC"
+              : "DESC",
           )}`,
         force_in_project_id: (q, o, v) =>
           sql`(id IS NOT DISTINCT FROM ${v ?? null}) ${sql.unsafe(
@@ -138,7 +138,7 @@ export const projectsHandler = requestHandler(
                 : "ASC"
               : q === "ASC"
               ? "ASC"
-              : "DESC"
+              : "DESC",
           )}`,
         project_leader_id: (q, o, v) =>
           sql`(id IS NOT DISTINCT FROM ${v ?? null}) ${sql.unsafe(
@@ -148,10 +148,10 @@ export const projectsHandler = requestHandler(
                 : "ASC"
               : q === "ASC"
               ? "ASC"
-              : "DESC"
+              : "DESC",
           )}`,
       },
-      "id"
+      "id",
     );
-  }
+  },
 );

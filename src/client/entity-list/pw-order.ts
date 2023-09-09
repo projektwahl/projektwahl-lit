@@ -47,7 +47,9 @@ type entitiesType2 = {
 };
 
 type entitiesType3 = {
-  [P in keyof typeof entityRoutes]: z.infer<typeof entityRoutes[P]["request"]>["sorting"][number][];
+  [P in keyof typeof entityRoutes]: z.infer<
+    typeof entityRoutes[P]["request"]
+  >["sorting"][number][];
 };
 
 type entitiesType4 = {
@@ -70,7 +72,7 @@ export function pwOrder<P extends keyof typeof entityRoutes, X extends string>(
     | "set"
     | "initial"
     | "defaultValue"
-  >
+  >,
 ) {
   const {
     url,
@@ -103,7 +105,7 @@ export function pwOrder<P extends keyof typeof entityRoutes, X extends string>(
 
 export class PwOrder<
   P extends keyof typeof entityRoutes,
-  X extends string
+  X extends string,
 > extends PwInput<
   P,
   z.infer<typeof entityRoutes[P]["request"]>["sorting"][number][],
@@ -143,7 +145,6 @@ export class PwOrder<
   }
 
   mypwinputchangeDispatcher = () => {
-    
     const sorting: entitiesType3[P] = this.get(this.pwForm.formData);
 
     const oldElementIndex = sorting.findIndex(([e]) => e === this.orderBy);
@@ -169,7 +170,6 @@ export class PwOrder<
             entitiesType2
           >(this.url, theName, "DESC", theValue);
 
-          
           const adding2: entitiesType4[P] = adding;
 
           sorting.push(adding2);
@@ -185,7 +185,6 @@ export class PwOrder<
         entitiesType2
       >(this.url, this.orderBy, "ASC", this.value);
 
-      
       const adding2: entitiesType4[P] = adding;
 
       sorting.push(adding2);
@@ -198,7 +197,7 @@ export class PwOrder<
       new CustomEvent("refreshentitylist", {
         bubbles: true,
         composed: true,
-      })
+      }),
     );
   };
 
@@ -232,7 +231,6 @@ export class PwOrder<
         id=${this.randomId}
       >
         ${(() => {
-          
           const sorting: entitiesType3[P] = this.inputValue;
 
           const value = sorting.find(([e]) => e === `${this.orderBy}`)?.[1];

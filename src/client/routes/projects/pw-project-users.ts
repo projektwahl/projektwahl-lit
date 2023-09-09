@@ -43,7 +43,7 @@ export function pwProjectUsers<X extends string>(
   props: Pick<
     PwProjectUsers<X>,
     "initial" | "prefix" | "projectId" | "name" | "title"
-  >
+  >,
 ) {
   const { initial, prefix, projectId, name, title, ...rest } = props;
   let _ = rest;
@@ -97,7 +97,7 @@ export class PwProjectUsers<X extends string> extends PwUsers<X> {
         this.url,
         this.prefix,
         this.history.url,
-        this.defaultValue
+        this.defaultValue,
       );
 
       const initial = data[this.prefix];
@@ -273,42 +273,48 @@ export class PwProjectUsers<X extends string> extends PwUsers<X> {
                   </td>
                   <th scope="row">
                     <p>
-                      ${value.deleted
-                        ? html`<del
+                      ${
+                        value.deleted
+                          ? html`<del
                             ><a @click=${aClick} href="/users/view/${value.id}"
                               >${value.id}</a
                             ></del
                           >`
-                        : html`<a
+                          : html`<a
                             @click=${aClick}
                             href="/users/view/${value.id}"
                             >${value.id}</a
-                          >`}
+                          >`
+                      }
                     </p>
                   </th>
                   <td>
                     <p>
-                      ${value.deleted
-                        ? html`<del
+                      ${
+                        value.deleted
+                          ? html`<del
                             ><a @click=${aClick} href="/users/view/${value.id}"
                               >${value.username}</a
                             ></del
                           >`
-                        : html`<a
+                          : html`<a
                             @click=${aClick}
                             href="/users/view/${value.id}"
                             >${value.username}</a
-                          >`}
+                          >`
+                      }
                     </p>
                   </td>
                   <td>
                     <p>
-                      ${value.deleted
-                        ? html`<del>${value.type}</del>`
-                        : html`${value.type}`}
+                      ${
+                        value.deleted
+                          ? html`<del>${value.type}</del>`
+                          : html`${value.type}`
+                      }
                     </p>
                   </td>
-                </tr>`
+                </tr>`,
               )
             : result.error;
         },

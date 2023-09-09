@@ -45,7 +45,7 @@ export function pwInputCheckbox<P extends keyof typeof routes>(
     | "trueValue"
     | "falseValue"
     | "resettable"
-  >
+  >,
 ) {
   const {
     disabled,
@@ -112,14 +112,14 @@ export class PwInputCheckbox<P extends keyof typeof routes> extends PwInput<
     this.inputValue = this.input.value.checked;
     this.set(
       this.pwForm.formData,
-      this.inputValue ? this.trueValue : this.falseValue
+      this.inputValue ? this.trueValue : this.falseValue,
     );
 
     this.input.value.dispatchEvent(
       new CustomEvent("refreshentitylist", {
         bubbles: true,
         composed: true,
-      })
+      }),
     );
   };
 }

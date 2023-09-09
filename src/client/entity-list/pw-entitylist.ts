@@ -57,47 +57,47 @@ export type parseRequestWithPrefixSchemaType<PREFIX extends string> = {
 
 export const parseRequestWithPrefix = <
   P extends keyof typeof entityRoutes,
-  PREFIX extends string
+  PREFIX extends string,
 >(
   apiUrl: P,
   prefix: PREFIX,
   url: URL,
-  defaultValue: z.infer<typeof entityRoutes[P]["request"]>
+  defaultValue: z.infer<typeof entityRoutes[P]["request"]>,
 ): parseRequestWithPrefixType<PREFIX>[P] => {
   const schema = z
     .object({})
     .setKey(prefix, entityRoutes[apiUrl].request.default(defaultValue))
-    .passthrough()
+    .passthrough();
   const data: parseRequestWithPrefixType<PREFIX>[P] = mappedFunctionCall(
     schema,
     JSON.parse(
-      decodeURIComponent(url.search == "" ? "{}" : url.search.substring(1))
-    )
+      decodeURIComponent(url.search == "" ? "{}" : url.search.substring(1)),
+    ),
   );
   return data;
 };
 
 export const taskFunction = async <
   P extends keyof typeof entityRoutes,
-  PREFIX extends string
+  PREFIX extends string,
 >(
   apiUrl: P,
   url: URL,
   prefix: PREFIX,
-  defaultValue: z.infer<typeof entityRoutes[P]["request"]>
+  defaultValue: z.infer<typeof entityRoutes[P]["request"]>,
 ) => {
   const result = await myFetch<P>(
     "GET",
     apiUrl,
     parseRequestWithPrefix(apiUrl, prefix, url, defaultValue)[prefix],
-    {}
+    {},
   );
   return result;
 };
 
 export class PwEntityList<
   P extends keyof typeof entityRoutes,
-  X extends string
+  X extends string,
 > extends PwForm<P> {
   static override get properties() {
     return {
@@ -175,7 +175,7 @@ export class PwEntityList<
           this.url,
           this.prefix,
           this.history.url,
-          this.defaultValue
+          this.defaultValue,
         );
 
         HistoryController.goto(
@@ -184,12 +184,12 @@ export class PwEntityList<
               JSON.stringify({
                 ...data,
                 [this.prefix]: this.formData,
-              })
+              }),
             )}`,
-            window.location.href
+            window.location.href,
           ),
           this.history.state,
-          true
+          true,
         );
 
         const result = await myFetch<P>("GET", this.url, this.formData, {});
@@ -218,7 +218,7 @@ export class PwEntityList<
           this.url,
           this.prefix,
           this.history.url,
-          this.defaultValue
+          this.defaultValue,
         )[this.prefix] ?? {};
 
       void this._task.run();
@@ -239,7 +239,9 @@ export class PwEntityList<
           @refreshentitylist=${async () => {
             await this._task.run();
           }}
-          @submit=${(e: Event) => { e.preventDefault(); }}
+          @submit=${(e: Event) => {
+            e.preventDefault();
+          }}
         >
           ${this.buttons}
 
@@ -292,8 +294,9 @@ export class PwEntityList<
           </div>
         </form>
 
-        ${this._task.status !== TaskStatus.COMPLETE || this._task.value?.success
-          ? html`
+        ${
+          this._task.status !== TaskStatus.COMPLETE || this._task.value?.success
+            ? html`
               <nav aria-label="${msg("navigation of user list")}">
                 <ul class="pagination justify-content-center">
                   <li
@@ -327,13 +330,12 @@ export class PwEntityList<
                             result.data.previousCursor === null
                               ? undefined
                               : -1,
-                        })
+                        }),
                       )}
                       disabled=${this._task.render({
                         pending: () => true,
                         complete: (result) =>
-                          result.success &&
-                          result.data.previousCursor === null,
+                          result.success && result.data.previousCursor === null,
                       })}
                     >
                       <span aria-hidden="true">&laquo;</span>
@@ -369,7 +371,7 @@ export class PwEntityList<
                             result.success && result.data.nextCursor === null
                               ? undefined
                               : -1,
-                        })
+                        }),
                       )}
                       disabled=${this._task.render({
                         pending: () => true,
@@ -383,7 +385,8 @@ export class PwEntityList<
                 </ul>
               </nav>
             `
-          : undefined}
+            : undefined
+        }
       </main>
     `;
   }

@@ -46,7 +46,7 @@ async function setupClient() {
     const client_secret = (
       await readFile(
         process.env.CREDENTIALS_DIRECTORY + "/openid_client_secret",
-        "utf8"
+        "utf8",
       )
     ).trim();
 

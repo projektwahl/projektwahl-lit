@@ -38,7 +38,7 @@ export const settingsHandler = requestHandler(
     if (!loggedInUser) {
       const returnValue: [
         OutgoingHttpHeaders,
-        ResponseType<"/api/v1/settings">
+        ResponseType<"/api/v1/settings">,
       ] = [
         {
           "content-type": "text/json; charset=utf-8",
@@ -74,8 +74,8 @@ export const settingsHandler = requestHandler(
         {
           fake_sort: () => sql``,
         },
-        undefined
+        undefined,
       );
     return ret;
-  }
+  },
 );

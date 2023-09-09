@@ -38,7 +38,7 @@ export const sessionsHandler = requestHandler(
     if (!loggedInUser) {
       const returnValue: [
         OutgoingHttpHeaders,
-        ResponseType<"/api/v1/sessions">
+        ResponseType<"/api/v1/sessions">,
       ] = [
         {
           "content-type": "text/json; charset=utf-8",
@@ -88,11 +88,11 @@ export const sessionsHandler = requestHandler(
                   : "ASC"
                 : q === "ASC"
                 ? "ASC"
-                : "DESC"
+                : "DESC",
             )}`,
         },
-        "session_id"
+        "session_id",
       );
     return ret;
-  }
+  },
 );

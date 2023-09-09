@@ -68,7 +68,7 @@ class FormTester {
   async resetField(name: string, value: string) {
     await this.helper.ensureNothingLoading();
     const element = await this.form.findElement(
-      By.css(`input[name="${name}"]`)
+      By.css(`input[name="${name}"]`),
     );
     // really? https://github.com/w3c/webdriver/issues/1630
     // https://github.com/w3c/webdriver/issues/445
@@ -77,14 +77,14 @@ class FormTester {
       "a",
       Key.BACK_SPACE,
       ...[...(await element.getAttribute("value"))].map(() => Key.BACK_SPACE),
-      value
+      value,
     );
   }
 
   async setField(name: string, value: string) {
     await this.helper.ensureNothingLoading();
     const element = await this.form.findElement(
-      By.css(`input[name="${name}"]`)
+      By.css(`input[name="${name}"]`),
     );
     await element.sendKeys(value);
   }
@@ -92,7 +92,7 @@ class FormTester {
   async resetTextareaField(name: string, value: string) {
     await this.helper.ensureNothingLoading();
     const element = await this.form.findElement(
-      By.css(`textarea[name="${name}"]`)
+      By.css(`textarea[name="${name}"]`),
     );
     await element.click();
     // copy pasta from above
@@ -100,14 +100,14 @@ class FormTester {
       "a",
       Key.BACK_SPACE,
       ...[...(await element.getAttribute("value"))].map(() => Key.BACK_SPACE),
-      value
+      value,
     );
   }
 
   async setTextareaField(name: string, value: string) {
     await this.helper.ensureNothingLoading();
     const element = await this.form.findElement(
-      By.css(`textarea[name="${name}"]`)
+      By.css(`textarea[name="${name}"]`),
     );
     await element.click();
     await element.sendKeys(value);
@@ -116,7 +116,7 @@ class FormTester {
   async checkField(name: string, value: boolean) {
     await this.helper.ensureNothingLoading();
     const element = await this.form.findElement(
-      By.css(`input[name="${name}"]`)
+      By.css(`input[name="${name}"]`),
     );
     if ((await element.isSelected()) != value) {
       await this.helper.click(element);
@@ -132,7 +132,7 @@ class FormTester {
   async getCheckboxField(name: string) {
     await this.helper.ensureNothingLoading();
     const element = await this.form.findElement(
-      By.css(`input[name="${name}"]`)
+      By.css(`input[name="${name}"]`),
     );
     return await element.isSelected();
   }
@@ -140,7 +140,7 @@ class FormTester {
   private async submit() {
     await this.helper.ensureNothingLoading();
     const submitButton = await this.form.findElement(
-      By.css('button[type="submit"]')
+      By.css('button[type="submit"]'),
     );
 
     await this.helper.click(submitButton);
@@ -153,7 +153,7 @@ class FormTester {
     await this.submit();
 
     const alerts = await this.helper.driver.findElements(
-      By.css('div[class="alert alert-danger"]')
+      By.css('div[class="alert alert-danger"]'),
     );
 
     assert.deepEqual(alerts, []);
@@ -166,12 +166,12 @@ class FormTester {
     await this.submit();
 
     const alert = await this.helper.driver.findElement(
-      By.css('div[class="alert alert-danger"]')
+      By.css('div[class="alert alert-danger"]'),
     );
 
     assert.match(
       await alert.getAttribute("innerText"),
-      /Some errors occurred./
+      /Some errors occurred./,
     );
     await this.helper.waitUntilLoaded();
     return this.getErrors();
@@ -233,14 +233,14 @@ class Helper {
     for (;;) {
       try {
         const loadingIndicators = await this.driver.findElements(
-          By.css(".spinner-grow")
+          By.css(".spinner-grow"),
         );
 
         for (const e of loadingIndicators) {
           await this.driver.wait(
             until.stalenessOf(e),
             20000,
-            "waitUntilLoaded spinners didn't go stale"
+            "waitUntilLoaded spinners didn't go stale",
           );
         }
         break;
@@ -259,7 +259,7 @@ class Helper {
     return await this.driver.wait(
       until.elementLocated(By.css(name)),
       20000,
-      `Element ${name} not found`
+      `Element ${name} not found`,
     );
   }
 
@@ -272,7 +272,7 @@ class Helper {
   async openNavbar() {
     await this.ensureNothingLoading();
     const navbarButton = this.driver.findElement(
-      By.css("button.navbar-toggler")
+      By.css("button.navbar-toggler"),
     );
 
     await this.click(navbarButton);
@@ -282,7 +282,7 @@ class Helper {
 async function runTest(
   browser: "firefox" | "chrome" | "browserstack-ipad",
   capabilities: Record<string | symbol, unknown>,
-  testFunction: (helper: Helper) => Promise<void>
+  testFunction: (helper: Helper) => Promise<void>,
 ) {
   chance = new Chance(123456);
   /*
@@ -338,7 +338,7 @@ async function runTest(
       Capabilities.firefox()
         .setAcceptInsecureCerts(true)
         .setBrowserName("firefox")
-        .setLoggingPrefs(prefs)
+        .setLoggingPrefs(prefs),
     );
   }
 
@@ -347,7 +347,7 @@ async function runTest(
       new Capabilities()
         .setAcceptInsecureCerts(true)
         .setBrowserName("chrome")
-        .setLoggingPrefs(prefs)
+        .setLoggingPrefs(prefs),
     );
     //.usingServer("http://localhost:9515");
   }
@@ -373,8 +373,8 @@ async function runTest(
       new chrome.Options().addArguments(
         "--headless",
         "--no-sandbox",
-        "--disable-dev-shm-usage"
-      )
+        "--disable-dev-shm-usage",
+      ),
     );
     builder.setFirefoxOptions(new firefox.Options().headless());
   }
@@ -417,7 +417,7 @@ async function runTest(
             status: "passed",
             reason: `Successfully ran all tests`,
           },
-        })}`
+        })}`,
       );
     }
 
@@ -448,7 +448,7 @@ async function runTest(
               status: "failed",
               reason: String(error),
             },
-          })}`
+          })}`,
         );
         await driver.quit();
       } catch (error) {
@@ -465,7 +465,7 @@ async function loginEmptyUsernameAndPassword(helper: Helper) {
   const formTester = await helper.form("pw-login");
   assert.deepStrictEqual(
     [["username", "Text muss mindestens 1 Zeichen haben"]],
-    await formTester.submitFailure()
+    await formTester.submitFailure(),
   );
 }
 
@@ -475,7 +475,7 @@ async function loginWrongUsername(helper: Helper) {
   await formTester.setField("username", "nonexistent");
   assert.deepStrictEqual(
     [["username", "Nutzer existiert nicht!"]],
-    await formTester.submitFailure()
+    await formTester.submitFailure(),
   );
 }
 
@@ -485,7 +485,7 @@ async function loginEmptyPassword(helper: Helper) {
   await formTester.setField("username", "admin");
   assert.deepStrictEqual(
     [["password", "Falsches Passwort!"]],
-    await formTester.submitFailure()
+    await formTester.submitFailure(),
   );
 }
 
@@ -495,7 +495,7 @@ async function loginEmptyUsername(helper: Helper) {
   await formTester.setField("password", "password");
   assert.deepStrictEqual(
     [["username", "Text muss mindestens 1 Zeichen haben"]],
-    await formTester.submitFailure()
+    await formTester.submitFailure(),
   );
 }
 
@@ -507,7 +507,7 @@ async function loginWrongPassword(helper: Helper) {
   await formTester.setField("password", "wrongpassword");
   assert.deepStrictEqual(
     [["password", "Falsches Passwort!"]],
-    await formTester.submitFailure()
+    await formTester.submitFailure(),
   );
 }
 
@@ -523,18 +523,18 @@ async function welcomeWorks(helper: Helper) {
   await helper.driver.get(`${BASE_URL}/`);
   assert.match(
     await (await helper.waitElem("pw-welcome")).getAttribute("innerText"),
-    /Projektwoche/
+    /Projektwoche/,
   );
 }
 
 async function imprintWorks(helper: Helper) {
   await helper.driver.get(`${BASE_URL}/`);
   await helper.click(
-    await helper.driver.findElement(By.css(`a[href="/imprint"]`))
+    await helper.driver.findElement(By.css(`a[href="/imprint"]`)),
   );
   await helper.driver.wait(
     async () => (await helper.driver.getAllWindowHandles()).length === 2,
-    10000
+    10000,
   );
   const windowHandle = await helper.driver.getWindowHandle();
   await helper.driver
@@ -542,11 +542,11 @@ async function imprintWorks(helper: Helper) {
     .window(
       (
         await helper.driver.getAllWindowHandles()
-      ).find((h) => h !== windowHandle) ?? ""
+      ).find((h) => h !== windowHandle) ?? "",
     );
   assert.match(
     await (await helper.waitElem("pw-imprint")).getAttribute("innerText"),
-    /Angaben gemäß § 5 TMG/
+    /Angaben gemäß § 5 TMG/,
   );
   await helper.driver.close();
   await helper.driver
@@ -558,11 +558,11 @@ async function imprintWorks(helper: Helper) {
 async function privacyWorks(helper: Helper) {
   await helper.driver.get(`${BASE_URL}/`);
   await helper.click(
-    await helper.driver.findElement(By.css(`a[href="/privacy"]`))
+    await helper.driver.findElement(By.css(`a[href="/privacy"]`)),
   );
   await helper.driver.wait(
     async () => (await helper.driver.getAllWindowHandles()).length === 2,
-    10000
+    10000,
   );
   const windowHandle = await helper.driver.getWindowHandle();
   await helper.driver
@@ -570,11 +570,11 @@ async function privacyWorks(helper: Helper) {
     .window(
       (
         await helper.driver.getAllWindowHandles()
-      ).find((h) => h !== windowHandle) ?? ""
+      ).find((h) => h !== windowHandle) ?? "",
     );
   assert.match(
     await (await helper.waitElem("pw-privacy")).getAttribute("innerText"),
-    /Verantwortlicher/
+    /Verantwortlicher/,
   );
   await helper.driver.close();
   await helper.driver
@@ -589,7 +589,7 @@ async function logoutWorks(helper: Helper) {
   await helper.driver.get(`${BASE_URL}/imprint`);
   await helper.waitElem("pw-imprint");
   await helper.click(
-    await helper.driver.findElement(By.css(`a[href="/logout"]`))
+    await helper.driver.findElement(By.css(`a[href="/logout"]`)),
   );
   await helper.form("pw-login");
 }
@@ -599,11 +599,11 @@ async function createUserAllFields(helper: Helper) {
 
   await helper.openNavbar();
   await helper.click(
-    await helper.driver.findElement(By.css(`a[href="/users"]`))
+    await helper.driver.findElement(By.css(`a[href="/users"]`)),
   );
   await helper.form("pw-users");
   await helper.click(
-    await helper.driver.findElement(By.css(`a[href="/users/create"]`))
+    await helper.driver.findElement(By.css(`a[href="/users/create"]`)),
   );
   let form = await helper.form("pw-user-create");
   const username = `username${crypto.getRandomValues(new Uint32Array(1))[0]}`;
@@ -621,7 +621,7 @@ async function createUserAllFields(helper: Helper) {
   await form.submitSuccess();
   await helper.driver.wait(until.urlContains("/users/edit/"), 2000);
   const id = (await helper.driver.getCurrentUrl()).match(
-    /\/users\/edit\/(\d+)/
+    /\/users\/edit\/(\d+)/,
   )?.[1];
   if (!id) {
     assert.fail("id not found in url");
@@ -642,7 +642,9 @@ async function createUserAllFields(helper: Helper) {
 
   // back
   await helper.click(
-    await helper.driver.findElement(By.css(`button[class="btn btn-secondary"]`))
+    await helper.driver.findElement(
+      By.css(`button[class="btn btn-secondary"]`),
+    ),
   );
 
   form = await helper.form("pw-users");
@@ -670,7 +672,7 @@ async function createUserAllFields(helper: Helper) {
 
   // click edit button
   await helper.click(
-    await helper.driver.findElement(By.css(`a[href="/users/edit/${id}"]`))
+    await helper.driver.findElement(By.css(`a[href="/users/edit/${id}"]`)),
   );
   await helper.waitUntilLoaded();
 
@@ -684,7 +686,7 @@ async function createUserAllFields(helper: Helper) {
   await form.checkField("0,deleted", false);
   assert.deepStrictEqual(
     [["0,username", "Text muss mindestens 1 Zeichen haben"]],
-    await form.submitFailure()
+    await form.submitFailure(),
   );
 
   await form.setField("0,username", username);
@@ -707,11 +709,11 @@ async function createProjectAllFields(helper: Helper) {
   await helper.openNavbar();
 
   await helper.click(
-    await helper.driver.findElement(By.css(`a[href="/projects"]`))
+    await helper.driver.findElement(By.css(`a[href="/projects"]`)),
   );
   await helper.form("pw-projects");
   await helper.click(
-    await helper.driver.findElement(By.css(`a[href="/projects/create"]`))
+    await helper.driver.findElement(By.css(`a[href="/projects/create"]`)),
   );
   let form = await helper.form("pw-project-create");
   const title = `title${chance.integer()}`;
@@ -737,7 +739,7 @@ async function createProjectAllFields(helper: Helper) {
   await form.submitSuccess();
   await helper.driver.wait(until.urlContains("/projects/edit/"), 2000);
   const id = (await helper.driver.getCurrentUrl()).match(
-    /\/projects\/edit\/(\d+)/
+    /\/projects\/edit\/(\d+)/,
   )?.[1];
   if (!id) {
     assert.fail("id not found in url");
@@ -754,7 +756,7 @@ async function createProjectAllFields(helper: Helper) {
   assert.equal(await form.getField("max_participants"), `${max_participants}`);
   assert.equal(
     await form.getCheckboxField("random_assignments"),
-    random_assignments
+    random_assignments,
   );
   assert.equal(await form.getCheckboxField("deleted"), deleted);
 
@@ -764,7 +766,9 @@ async function createProjectAllFields(helper: Helper) {
   await form.submitSuccess();
 
   await helper.click(
-    await helper.driver.findElement(By.css(`button[class="btn btn-secondary"]`))
+    await helper.driver.findElement(
+      By.css(`button[class="btn btn-secondary"]`),
+    ),
   );
 
   form = await helper.form("pw-projects");
@@ -795,13 +799,13 @@ async function createProjectAllFields(helper: Helper) {
   assert.equal(await form.getField("max_participants"), `${max_participants}`);
   assert.equal(
     await form.getCheckboxField("random_assignments"),
-    random_assignments
+    random_assignments,
   );
   assert.equal(await form.getCheckboxField("deleted"), deleted);
 
   // click edit button
   await helper.click(
-    await helper.driver.findElement(By.css(`a[href="/projects/edit/${id}"]`))
+    await helper.driver.findElement(By.css(`a[href="/projects/edit/${id}"]`)),
   );
   await helper.waitUntilLoaded();
 
@@ -839,7 +843,7 @@ async function checkNotLoggedInUsers(helper: Helper) {
   const alert = await helper.driver.wait(
     until.elementLocated(By.css('div[class="alert alert-danger"]')),
     5000,
-    "Expected submit failure 2"
+    "Expected submit failure 2",
   );
 
   assert.match(await alert.getAttribute("innerText"), /Nicht angemeldet!/);
@@ -851,7 +855,7 @@ async function checkNotLoggedInProjects(helper: Helper) {
   const alert = await helper.driver.wait(
     until.elementLocated(By.css('div[class="alert alert-danger"]')),
     5000,
-    "Expected submit failure 3"
+    "Expected submit failure 3",
   );
 
   assert.match(await alert.getAttribute("innerText"), /Nicht angemeldet!/);
@@ -867,13 +871,13 @@ async function checkProjectSortingWorks(helper: Helper) {
     await helper.openNavbar();
 
     await helper.click(
-      await helper.driver.findElement(By.css(`a[href="/projects"]`))
+      await helper.driver.findElement(By.css(`a[href="/projects"]`)),
     );
     await helper.form("pw-projects");
 
     for (let i = 0; i < chance.integer({ min: 1, max: 10 }); i++) {
       const randomOrderButton = randomFromArray(
-        await helper.driver.findElements(By.css("pw-order button"))
+        await helper.driver.findElements(By.css("pw-order button")),
       );
       await randomOrderButton.click();
     }
@@ -884,7 +888,7 @@ async function checkProjectSortingWorks(helper: Helper) {
       await helper.waitUntilLoaded();
 
       const thisRows = await helper.driver.findElements(
-        By.css('tbody tr th[scope="row"]')
+        By.css('tbody tr th[scope="row"]'),
       );
       const thisRowsText = [];
       for (const r of thisRows) {
@@ -896,12 +900,12 @@ async function checkProjectSortingWorks(helper: Helper) {
       rows.push(...thisRowsText);
 
       const nextPage = await helper.driver.findElement(
-        By.css('a[aria-label="next page"]')
+        By.css('a[aria-label="next page"]'),
       );
 
       const hasNoNextPage = await helper.driver.executeScript(
         `return arguments[0].getAttribute("disabled")`,
-        nextPage
+        nextPage,
       );
 
       console.log("a", thisRowsText, hasNoNextPage);
@@ -922,7 +926,7 @@ async function checkProjectSortingWorks(helper: Helper) {
 
     assert.deepEqual(
       Array.from({ length: rows.length }, (_, i) => i + 1),
-      rows
+      rows,
     );
   }
 }
@@ -932,13 +936,13 @@ async function checkUsersSortingWorks(helper: Helper) {
   await helper.openNavbar();
 
   await helper.click(
-    await helper.driver.findElement(By.css(`a[href="/users"]`))
+    await helper.driver.findElement(By.css(`a[href="/users"]`)),
   );
   await helper.form("pw-users");
 
   for (let i = 0; i < chance.integer({ min: 1, max: 10 }); i++) {
     const randomOrderButton = randomFromArray(
-      await helper.driver.findElements(By.css("pw-order button"))
+      await helper.driver.findElements(By.css("pw-order button")),
     );
     await randomOrderButton.click();
   }
@@ -949,7 +953,7 @@ async function checkUsersSortingWorks(helper: Helper) {
     await helper.waitUntilLoaded();
 
     const thisRows = await helper.driver.findElements(
-      By.css('tbody tr th[scope="row"]')
+      By.css('tbody tr th[scope="row"]'),
     );
 
     const thisRowsText = [];
@@ -962,12 +966,12 @@ async function checkUsersSortingWorks(helper: Helper) {
     rows.push(...thisRowsText);
 
     const nextPage = await helper.driver.findElement(
-      By.css('a[aria-label="next page"]')
+      By.css('a[aria-label="next page"]'),
     );
 
     const hasNoNextPage = await helper.driver.executeScript(
       `return arguments[0].getAttribute("disabled")`,
-      nextPage
+      nextPage,
     );
 
     console.log("b", thisRowsText, hasNoNextPage);
@@ -985,7 +989,7 @@ async function checkUsersSortingWorks(helper: Helper) {
 
   assert.deepEqual(
     Array.from({ length: rows.length }, (_, i) => i + 1),
-    rows
+    rows,
   );
 
   assert.equal(501, rows.length);
@@ -997,13 +1001,13 @@ async function checkUsersPaginationLimitWorks(helper: Helper) {
     await helper.openNavbar();
 
     await helper.click(
-      await helper.driver.findElement(By.css(`a[href="/${entityType}"]`))
+      await helper.driver.findElement(By.css(`a[href="/${entityType}"]`)),
     );
     await helper.form(`pw-${entityType}`);
 
     await (
       await helper.driver.findElement(
-        By.css('select[name="paginationLimit"] option[value="50"]')
+        By.css('select[name="paginationLimit"] option[value="50"]'),
       )
     ).click();
 
@@ -1014,7 +1018,7 @@ async function checkUsersPaginationLimitWorks(helper: Helper) {
 
       for (;;) {
         const thisRows = await helper.driver.findElements(
-          By.css('tbody tr th[scope="row"]')
+          By.css('tbody tr th[scope="row"]'),
         );
         const thisRowsText = [];
         for (const r of thisRows) {
@@ -1026,19 +1030,19 @@ async function checkUsersPaginationLimitWorks(helper: Helper) {
         rows.push(...thisRowsText);
 
         const nextPage = await helper.driver.findElement(
-          By.css(`a[aria-label="${direction} page"]`)
+          By.css(`a[aria-label="${direction} page"]`),
         );
 
         const hasNoNextPage = await helper.driver.executeScript(
           `return arguments[0].getAttribute("disabled")`,
-          nextPage
+          nextPage,
         );
 
         console.log("c", thisRowsText, hasNoNextPage);
 
         assert.ok(
           thisRowsText.length == 50 ||
-            (thisRowsText.length <= 50 && hasNoNextPage)
+            (thisRowsText.length <= 50 && hasNoNextPage),
         );
 
         if (hasNoNextPage === "true") {
@@ -1057,7 +1061,7 @@ async function checkUsersPaginationLimitWorks(helper: Helper) {
 
       assert.deepEqual(
         Array.from({ length: rows.length }, (_, i) => i + 1),
-        rows
+        rows,
       );
 
       assert.equal(entityType === "users" ? 501 : 100, rows.length);
@@ -1070,13 +1074,13 @@ async function checkUsersFilteringWorks(helper: Helper) {
   await helper.openNavbar();
 
   await helper.click(
-    await helper.driver.findElement(By.css(`a[href="/users"]`))
+    await helper.driver.findElement(By.css(`a[href="/users"]`)),
   );
   await helper.form("pw-users");
 
   await (
     await helper.driver.findElement(
-      By.css('select[name="filters,type"] option[value="admin"]')
+      By.css('select[name="filters,type"] option[value="admin"]'),
     )
   ).click();
 
@@ -1085,7 +1089,7 @@ async function checkUsersFilteringWorks(helper: Helper) {
   await helper.waitUntilLoaded();
 
   const thisRows = await helper.driver.findElements(
-    By.css('tbody tr th[scope="row"]')
+    By.css('tbody tr th[scope="row"]'),
   );
   const thisRowsText = [];
   for (const r of thisRows) {
@@ -1104,7 +1108,7 @@ async function checkUsersFilteringWorks(helper: Helper) {
 
   assert.deepEqual(
     Array.from({ length: rows.length }, (_, i) => i + 1),
-    rows
+    rows,
   );
 }
 
@@ -1113,12 +1117,12 @@ async function resettingUserWorks(helper: Helper) {
 
   await helper.openNavbar();
   await helper.click(
-    await helper.driver.findElement(By.css(`a[href="/users"]`))
+    await helper.driver.findElement(By.css(`a[href="/users"]`)),
   );
 
   await helper.form("pw-users");
   await helper.click(
-    await helper.driver.findElement(By.css(`a[href="/users/create"]`))
+    await helper.driver.findElement(By.css(`a[href="/users/create"]`)),
   );
   let form = await helper.form("pw-user-create");
   const username = `username${chance.integer()}`;
@@ -1130,7 +1134,7 @@ async function resettingUserWorks(helper: Helper) {
 
   await (
     await helper.driver.findElement(
-      By.css('select[name="0,type"] option[value="admin"]')
+      By.css('select[name="0,type"] option[value="admin"]'),
     )
   ).click();
 
@@ -1139,7 +1143,7 @@ async function resettingUserWorks(helper: Helper) {
   await form.submitSuccess();
   await helper.driver.wait(until.urlContains("/users/edit/"), 2000);
   (await helper.driver.getCurrentUrl()).substring(
-    "https://localhost:8443/users/edit/".length
+    "https://localhost:8443/users/edit/".length,
   );
   await helper.waitUntilLoaded();
   form = await helper.form("pw-user-create");
@@ -1149,7 +1153,7 @@ async function resettingUserWorks(helper: Helper) {
   await form.resetField("0,openid_id", "");
   await (
     await helper.driver.findElement(
-      By.css('select[name="0,type"] option[value="helper"]')
+      By.css('select[name="0,type"] option[value="helper"]'),
     )
   ).click();
   await form.checkField("0,away", false);
@@ -1157,7 +1161,7 @@ async function resettingUserWorks(helper: Helper) {
 
   // TODO click all reset buttons
   for (const elem of await helper.driver.findElements(
-    By.css('div button[class="btn btn-outline-secondary"]')
+    By.css('div button[class="btn btn-outline-secondary"]'),
   )) {
     await helper.click(elem);
   }
@@ -1177,12 +1181,12 @@ async function resettingProjectWorks(helper: Helper) {
 
   await helper.openNavbar();
   await helper.click(
-    await helper.driver.findElement(By.css(`a[href="/projects"]`))
+    await helper.driver.findElement(By.css(`a[href="/projects"]`)),
   );
 
   await helper.form("pw-projects");
   await helper.click(
-    await helper.driver.findElement(By.css(`a[href="/projects/create"]`))
+    await helper.driver.findElement(By.css(`a[href="/projects/create"]`)),
   );
   let form = await helper.form("pw-project-create");
   const title = `title${chance.integer()}`;
@@ -1208,7 +1212,7 @@ async function resettingProjectWorks(helper: Helper) {
   await form.submitSuccess();
   await helper.driver.wait(until.urlContains("/projects/edit/"), 2000);
   (await helper.driver.getCurrentUrl()).substring(
-    "https://localhost:8443/projects/edit/".length
+    "https://localhost:8443/projects/edit/".length,
   );
   await helper.waitUntilLoaded();
   form = await helper.form("pw-project-create");
@@ -1227,7 +1231,7 @@ async function resettingProjectWorks(helper: Helper) {
 
   // TODO click all reset buttons
   for (const elem of await helper.driver.findElements(
-    By.css('div button[class="btn btn-outline-secondary"]')
+    By.css('div button[class="btn btn-outline-secondary"]'),
   )) {
     await helper.click(elem);
   }
@@ -1244,7 +1248,7 @@ async function resettingProjectWorks(helper: Helper) {
   assert.equal(await form.getField("max_participants"), `${max_participants}`);
   assert.equal(
     await form.getCheckboxField("random_assignments"),
-    random_assignments
+    random_assignments,
   );
   assert.equal(await form.getCheckboxField("deleted"), deleted);
 }
@@ -1255,12 +1259,12 @@ async function resettingUserWorks2(helper: Helper) {
 
     await helper.openNavbar();
     await helper.click(
-      await helper.driver.findElement(By.css(`a[href="/users"]`))
+      await helper.driver.findElement(By.css(`a[href="/users"]`)),
     );
 
     await helper.form("pw-users");
     await helper.click(
-      await helper.driver.findElement(By.css(`a[href="/users/create"]`))
+      await helper.driver.findElement(By.css(`a[href="/users/create"]`)),
     );
     let form = await helper.form("pw-user-create");
     const username = `username${crypto.getRandomValues(new Uint32Array(1))[0]}`;
@@ -1278,7 +1282,7 @@ async function resettingUserWorks2(helper: Helper) {
     await form.submitSuccess();
     await helper.driver.wait(until.urlContains("/users/edit/"), 2000);
     (await helper.driver.getCurrentUrl()).substring(
-      "https://localhost:8443/users/edit/".length
+      "https://localhost:8443/users/edit/".length,
     );
     await helper.waitUntilLoaded();
     form = await helper.form("pw-user-create");
@@ -1306,7 +1310,7 @@ async function resettingUserWorks2(helper: Helper) {
 
     // TODO click all reset buttons
     for (const elem of await helper.driver.findElements(
-      By.css('div button[class="btn btn-outline-secondary"]')
+      By.css('div button[class="btn btn-outline-secondary"]'),
     )) {
       await helper.click(elem);
     }
@@ -1330,12 +1334,12 @@ async function resettingProjectWorks2(helper: Helper) {
 
     await helper.openNavbar();
     await helper.click(
-      await helper.driver.findElement(By.css(`a[href="/projects"]`))
+      await helper.driver.findElement(By.css(`a[href="/projects"]`)),
     );
 
     await helper.form("pw-projects");
     await helper.click(
-      await helper.driver.findElement(By.css(`a[href="/projects/create"]`))
+      await helper.driver.findElement(By.css(`a[href="/projects/create"]`)),
     );
     let form = await helper.form("pw-project-create");
     const title = `title${chance.integer()}`;
@@ -1361,7 +1365,7 @@ async function resettingProjectWorks2(helper: Helper) {
     await form.submitSuccess();
     await helper.driver.wait(until.urlContains("/projects/edit/"), 2000);
     (await helper.driver.getCurrentUrl()).substring(
-      "https://localhost:8443/projects/edit/".length
+      "https://localhost:8443/projects/edit/".length,
     );
     await helper.waitUntilLoaded();
     form = await helper.form("pw-project-create");
@@ -1390,7 +1394,7 @@ async function resettingProjectWorks2(helper: Helper) {
 
     // TODO click all reset buttons
     for (const elem of await helper.driver.findElements(
-      By.css('div button[class="btn btn-outline-secondary"]')
+      By.css('div button[class="btn btn-outline-secondary"]'),
     )) {
       await helper.click(elem);
     }
@@ -1423,12 +1427,12 @@ async function checkUserOrProjectNotFound(helper: Helper) {
   await helper.waitUntilLoaded();
 
   const alert1 = await helper.driver.findElement(
-    By.css('div[class="alert alert-danger"]')
+    By.css('div[class="alert alert-danger"]'),
   );
 
   assert.match(
     await alert1.getAttribute("innerText"),
-    /Projekt nicht gefunden!/
+    /Projekt nicht gefunden!/,
   );
 
   await helper.driver.get(`${BASE_URL}/users/edit/34234`);
@@ -1436,12 +1440,12 @@ async function checkUserOrProjectNotFound(helper: Helper) {
   await helper.waitUntilLoaded();
 
   const alert2 = await helper.driver.findElement(
-    By.css('div[class="alert alert-danger"]')
+    By.css('div[class="alert alert-danger"]'),
   );
 
   assert.match(
     await alert2.getAttribute("innerText"),
-    /Account nicht gefunden!/
+    /Account nicht gefunden!/,
   );
 }
 
@@ -1454,7 +1458,7 @@ async function testVotingWorks(helper: Helper) {
 
   await helper.openNavbar();
   await helper.click(
-    await helper.driver.findElement(By.css(`a[href="/vote"]`))
+    await helper.driver.findElement(By.css(`a[href="/vote"]`)),
   );
 
   await helper.waitUntilLoaded();
@@ -1463,9 +1467,9 @@ async function testVotingWorks(helper: Helper) {
   await helper.click(
     helper.driver.findElement(
       By.xpath(
-        `//th/p/a[@href="/projects/view/${4}"]/../../../td/pw-rank-select/form/div/button[1]`
-      )
-    )
+        `//th/p/a[@href="/projects/view/${4}"]/../../../td/pw-rank-select/form/div/button[1]`,
+      ),
+    ),
   );
 
   await helper.driver.sleep(1000);
@@ -1475,7 +1479,7 @@ async function testVotingWorks(helper: Helper) {
   await helper.waitUntilLoaded();
 
   const alerts1 = await helper.driver.findElements(
-    By.css('div[class="alert alert-danger"]')
+    By.css('div[class="alert alert-danger"]'),
   );
 
   assert.equal(alerts1.length, 0);
@@ -1483,9 +1487,9 @@ async function testVotingWorks(helper: Helper) {
   await helper.click(
     helper.driver.findElement(
       By.xpath(
-        `//th/p/a[@href="/projects/view/${2}"]/../../../td/pw-rank-select/form/div/button[1]`
-      )
-    )
+        `//th/p/a[@href="/projects/view/${2}"]/../../../td/pw-rank-select/form/div/button[1]`,
+      ),
+    ),
   );
 
   await helper.driver.sleep(1000);
@@ -1494,7 +1498,7 @@ async function testVotingWorks(helper: Helper) {
   await helper.waitUntilLoaded();
 
   const alerts2 = await helper.driver.findElements(
-    By.css('div[class="alert alert-danger"]')
+    By.css('div[class="alert alert-danger"]'),
   );
 
   assert.equal(alerts2.length, 1);
@@ -1503,12 +1507,12 @@ async function testVotingWorks(helper: Helper) {
   assert.equal(
     (await alerts2[0].getAttribute("innerText")).trim(),
     "Some errors occurred!\n" +
-      "database: Der Nutzer passt nicht in die Altersbegrenzung des Projekts!"
+      "database: Der Nutzer passt nicht in die Altersbegrenzung des Projekts!",
   );
 }
 
 async function testHelperCreatesProjectWithProjectLeadersAndMembers(
-  helper: Helper
+  helper: Helper,
 ) {
   await helper.driver.get(`${BASE_URL}/login`);
   const formTester = await helper.form("pw-login");
@@ -1518,12 +1522,12 @@ async function testHelperCreatesProjectWithProjectLeadersAndMembers(
 
   await helper.openNavbar();
   await helper.click(
-    await helper.driver.findElement(By.css(`a[href="/projects"]`))
+    await helper.driver.findElement(By.css(`a[href="/projects"]`)),
   );
 
   await helper.form("pw-projects");
   await helper.click(
-    await helper.driver.findElement(By.css(`a[href="/projects/create"]`))
+    await helper.driver.findElement(By.css(`a[href="/projects/create"]`)),
   );
   let form = await helper.form("pw-project-create");
   await helper.waitUntilLoaded();
@@ -1550,7 +1554,7 @@ async function testHelperCreatesProjectWithProjectLeadersAndMembers(
   await form.submitSuccess();
   await helper.driver.wait(until.urlContains("/projects/edit/"), 2000);
   (await helper.driver.getCurrentUrl()).substring(
-    "https://localhost:8443/projects/edit/".length
+    "https://localhost:8443/projects/edit/".length,
   );
   await helper.waitUntilLoaded();
   form = await helper.form("pw-project-create");
@@ -1563,11 +1567,11 @@ async function testHelperCreatesProjectWithProjectLeadersAndMembers(
     await helper.driver.wait(
       until.elementLocated(
         By.xpath(
-          `//th/p/a[@href="/users/view/${2}"]/../../../td/pw-project-user-checkbox/form/input`
-        )
+          `//th/p/a[@href="/users/view/${2}"]/../../../td/pw-project-user-checkbox/form/input`,
+        ),
       ),
-      10000
-    )
+      10000,
+    ),
   );
 
   await helper.waitUntilLoaded();
@@ -1575,7 +1579,7 @@ async function testHelperCreatesProjectWithProjectLeadersAndMembers(
   await helper.waitUntilLoaded();
 
   const alerts1 = await helper.driver.findElements(
-    By.css('div[class="alert alert-danger"]')
+    By.css('div[class="alert alert-danger"]'),
   );
 
   assert.equal(alerts1.length, 0);
@@ -1585,10 +1589,10 @@ async function testHelperCreatesProjectWithProjectLeadersAndMembers(
   const checkbox = await helper.driver.wait(
     until.elementLocated(
       By.xpath(
-        `//th/p/a[@href="/users/view/${4}"]/../../../td/pw-project-user-checkbox/form/input`
-      )
+        `//th/p/a[@href="/users/view/${4}"]/../../../td/pw-project-user-checkbox/form/input`,
+      ),
     ),
-    10000
+    10000,
   );
   await helper.waitUntilLoaded();
   await helper.waitUntilLoaded();
@@ -1601,7 +1605,7 @@ async function testHelperCreatesProjectWithProjectLeadersAndMembers(
   await helper.waitUntilLoaded();
 
   const alerts2 = await helper.driver.findElements(
-    By.css('div[class="alert alert-danger"]')
+    By.css('div[class="alert alert-danger"]'),
   );
 
   assert.equal(alerts2.length, 1);
@@ -1612,19 +1616,19 @@ async function checkSettingEmptyPasswordFails(helper: Helper) {
 
   await helper.openNavbar();
   await helper.click(
-    await helper.driver.findElement(By.css(`a[href="/users"]`))
+    await helper.driver.findElement(By.css(`a[href="/users"]`)),
   );
 
   await helper.form("pw-users");
   await helper.click(
-    await helper.driver.findElement(By.css(`a[href="/users/create"]`))
+    await helper.driver.findElement(By.css(`a[href="/users/create"]`)),
   );
   let form = await helper.form("pw-user-create");
   const username = `username${crypto.getRandomValues(new Uint32Array(1))[0]}`;
 
   await (
     await helper.driver.findElement(
-      By.css('select[name="0,type"] option[value="helper"]')
+      By.css('select[name="0,type"] option[value="helper"]'),
     )
   ).click();
 
@@ -1632,7 +1636,7 @@ async function checkSettingEmptyPasswordFails(helper: Helper) {
   await form.submitSuccess();
   await helper.driver.wait(until.urlContains("/users/edit/"), 2000);
   const id = (await helper.driver.getCurrentUrl()).match(
-    /\/users\/edit\/(\d+)/
+    /\/users\/edit\/(\d+)/,
   )?.[1];
   if (!id) {
     assert.fail("id not found in url");
@@ -1640,7 +1644,7 @@ async function checkSettingEmptyPasswordFails(helper: Helper) {
   await helper.waitUntilLoaded();
 
   await helper.click(
-    await helper.driver.findElement(By.css(`a[href="/logout"]`))
+    await helper.driver.findElement(By.css(`a[href="/logout"]`)),
   );
   await helper.form("pw-login");
   form = await helper.form("pw-login");
@@ -1649,20 +1653,20 @@ async function checkSettingEmptyPasswordFails(helper: Helper) {
 
   assert.deepStrictEqual(
     [["password", "Kein Password für Account gesetzt!"]],
-    await form.submitFailure()
+    await form.submitFailure(),
   );
 
   await loginCorrect(helper);
 
   await helper.click(
-    await helper.driver.findElement(By.css(`a[href="/users"]`))
+    await helper.driver.findElement(By.css(`a[href="/users"]`)),
   );
   form = await helper.form("pw-users");
   await form.setField("filters,id", id);
   await helper.waitUntilLoaded();
 
   await helper.click(
-    await helper.driver.findElement(By.css(`a[href="/users/edit/${id}"]`))
+    await helper.driver.findElement(By.css(`a[href="/users/edit/${id}"]`)),
   );
   await helper.waitUntilLoaded();
 
@@ -1673,7 +1677,7 @@ async function checkSettingEmptyPasswordFails(helper: Helper) {
   await form.submitSuccess();
 
   await helper.click(
-    await helper.driver.findElement(By.css(`a[href="/logout"]`))
+    await helper.driver.findElement(By.css(`a[href="/logout"]`)),
   );
   await helper.form("pw-login");
   form = await helper.form("pw-login");
@@ -1682,7 +1686,7 @@ async function checkSettingEmptyPasswordFails(helper: Helper) {
 
   assert.deepStrictEqual(
     [["password", "Kein Password für Account gesetzt!"]],
-    await form.submitFailure()
+    await form.submitFailure(),
   );
 
   await loginCorrect(helper);

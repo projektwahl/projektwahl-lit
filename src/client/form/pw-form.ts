@@ -64,10 +64,10 @@ class PwForm<P extends keyof typeof routes> extends PwElement {
 
   getErrors() {
     return html`${this._task.render({
-        complete: (data) => {
-          if (!data.success) {
-            if (data.error.issues.length > 0) {
-              return html`<div
+      complete: (data) => {
+        if (!data.success) {
+          if (data.error.issues.length > 0) {
+            return html`<div
                 ${ref(this.errors)}
                 class="alert alert-danger"
                 role="alert"
@@ -78,19 +78,19 @@ class PwForm<P extends keyof typeof routes> extends PwElement {
                     (i) =>
                       // TODO FIXME nested keys don't work
                       !Object.keys(this.formData).find(
-                        (v) => JSON.stringify([v]) === JSON.stringify(i.path)
-                      )
+                        (v) => JSON.stringify([v]) === JSON.stringify(i.path),
+                      ),
                   )
                   .map(
-                    (issue) => html` ${issue.path}: ${issue.message}<br /> `
+                    (issue) => html` ${issue.path}: ${issue.message}<br /> `,
                   )}
               </div>`;
-            }
           }
-          return html``;
-        },
-        pending: () => noChange,
-      })}
+        }
+        return html``;
+      },
+      pending: () => noChange,
+    })}
       <div class="fully-centered">
         ${this._task.render({
           pending: () => html`<div

@@ -32,7 +32,7 @@ import { z } from "zod";
 
 // workaround see https://github.com/runem/lit-analyzer/issues/149#issuecomment-1006162839
 export function pwRedirect(
-  props: Record<string, never> // Pick<PwRedirect, never>
+  props: Record<string, never>, // Pick<PwRedirect, never>
 ) {
   const { ...rest } = props;
   const _: Record<string, never> = rest;
@@ -72,7 +72,7 @@ class PwRedirect extends PwForm<"/api/v1/redirect"> {
         "GET",
         `/api/v1/redirect`,
         searchParams,
-        {}
+        {},
       );
 
       if (result.success) {
@@ -80,7 +80,7 @@ class PwRedirect extends PwForm<"/api/v1/redirect"> {
         window.dispatchEvent(
           new StorageEvent("storage", {
             newValue: "login",
-          })
+          }),
         );
 
         if (window.opener) {
@@ -97,7 +97,6 @@ class PwRedirect extends PwForm<"/api/v1/redirect"> {
 
   override render() {
     if (!this.hasUpdated) {
-      
       this.formData = {};
     }
 

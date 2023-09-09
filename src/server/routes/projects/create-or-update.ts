@@ -33,7 +33,7 @@ export const createProjectsHandler = createOrUpdateProjectsHandler(
   async (
     tsql,
     project,
-    loggedInUser: Exclude<z.infer<typeof userSchema>, undefined>
+    loggedInUser: Exclude<z.infer<typeof userSchema>, undefined>,
   ) => {
     const {
       title,
@@ -64,9 +64,7 @@ export const createProjectsHandler = createOrUpdateProjectsHandler(
     ${max_participants ?? null},
     ${random_assignments ?? false}, ${deleted ?? false}, ${
       loggedInUser.id
-    } FROM users_with_deleted WHERE users_with_deleted.id = ${
-      loggedInUser.id
-    } AND (users_with_deleted.type = 'helper' OR users_with_deleted.type = 'admin'))
+    } FROM users_with_deleted WHERE users_with_deleted.id = ${loggedInUser.id} AND (users_with_deleted.type = 'helper' OR users_with_deleted.type = 'admin'))
     RETURNING id;`;
 
     // TODO FIXME make this in sql directly
@@ -77,7 +75,7 @@ export const createProjectsHandler = createOrUpdateProjectsHandler(
     }
 
     return res;
-  }
+  },
 );
 
 export const updateProjectsHandler = createOrUpdateProjectsHandler(
@@ -85,7 +83,7 @@ export const updateProjectsHandler = createOrUpdateProjectsHandler(
   async (
     tsql,
     project,
-    loggedInUser: Exclude<z.infer<typeof userSchema>, undefined>
+    loggedInUser: Exclude<z.infer<typeof userSchema>, undefined>,
   ) => {
     const {
       id,
@@ -106,24 +104,12 @@ export const updateProjectsHandler = createOrUpdateProjectsHandler(
     const finalQuery = typedSql(tsql, {
       columns: { id: 23 },
     } as const)`UPDATE projects_with_deleted SET
-    "title" = CASE WHEN ${title !== undefined} THEN ${
-      title ?? null
-    } ELSE "projects_with_deleted"."title" END,
-    "info" = CASE WHEN ${info !== undefined} THEN ${
-      info ?? null
-    } ELSE "projects_with_deleted"."info" END,
-    "place" = CASE WHEN ${place !== undefined} THEN ${
-      place ?? null
-    } ELSE "projects_with_deleted"."place" END,
-    "costs" = CASE WHEN ${costs !== undefined} THEN ${
-      costs ?? null
-    } ELSE "projects_with_deleted"."costs" END,
-    "min_age" = CASE WHEN ${min_age !== undefined} THEN ${
-      min_age ?? null
-    } ELSE "projects_with_deleted"."min_age" END,
-    "max_age" = CASE WHEN ${max_age !== undefined} THEN ${
-      max_age ?? null
-    } ELSE "projects_with_deleted"."max_age" END,
+    "title" = CASE WHEN ${title !== undefined} THEN ${title ?? null} ELSE "projects_with_deleted"."title" END,
+    "info" = CASE WHEN ${info !== undefined} THEN ${info ?? null} ELSE "projects_with_deleted"."info" END,
+    "place" = CASE WHEN ${place !== undefined} THEN ${place ?? null} ELSE "projects_with_deleted"."place" END,
+    "costs" = CASE WHEN ${costs !== undefined} THEN ${costs ?? null} ELSE "projects_with_deleted"."costs" END,
+    "min_age" = CASE WHEN ${min_age !== undefined} THEN ${min_age ?? null} ELSE "projects_with_deleted"."min_age" END,
+    "max_age" = CASE WHEN ${max_age !== undefined} THEN ${max_age ?? null} ELSE "projects_with_deleted"."max_age" END,
     "min_participants" = CASE WHEN ${min_participants !== undefined} THEN ${
       min_participants ?? null
     } ELSE "projects_with_deleted"."min_participants" END,
@@ -133,27 +119,25 @@ export const updateProjectsHandler = createOrUpdateProjectsHandler(
     "random_assignments" = CASE WHEN ${random_assignments !== undefined} THEN ${
       random_assignments ?? null
     } ELSE "projects_with_deleted"."random_assignments" END,
-    "deleted" = CASE WHEN ${deleted !== undefined} THEN ${
-      deleted ?? null
-    } ELSE "projects_with_deleted"."deleted" END,
+    "deleted" = CASE WHEN ${deleted !== undefined} THEN ${deleted ?? null} ELSE "projects_with_deleted"."deleted" END,
 last_updated_by = ${loggedInUser.id}
 FROM users_with_deleted WHERE projects_with_deleted.id = ${id} AND users_with_deleted.id = ${
       loggedInUser.id
     } AND (users_with_deleted.project_leader_id = ${id} AND users_with_deleted.type = 'helper' OR users_with_deleted.type = 'admin') RETURNING projects_with_deleted.id;`;
 
     return await finalQuery;
-  }
+  },
 );
 
 export function createOrUpdateProjectsHandler<
-  P extends "/api/v1/projects/create" | "/api/v1/projects/update"
+  P extends "/api/v1/projects/create" | "/api/v1/projects/update",
 >(
   path: P,
   dbquery: (
     sql: postgres.TransactionSql<Record<string, unknown>>,
     project: z.infer<typeof routes[P]["request"]>,
-    loggedInUser: Exclude<z.infer<typeof userSchema>, undefined>
-  ) => Promise<z.infer<typeof routes[P]["response"]>[]>
+    loggedInUser: Exclude<z.infer<typeof userSchema>, undefined>,
+  ) => Promise<z.infer<typeof routes[P]["response"]>[]>,
 ) {
   // TODO FIXME create or update multiple
   return requestHandler("POST", path, async function (project, loggedInUser) {
@@ -164,7 +148,7 @@ export function createOrUpdateProjectsHandler<
     if (!loggedInUser) {
       const returnValue: [
         OutgoingHttpHeaders,
-        ResponseType<"/api/v1/projects/create" | "/api/v1/projects/update">
+        ResponseType<"/api/v1/projects/create" | "/api/v1/projects/update">,
       ] = [
         {
           "content-type": "text/json; charset=utf-8",
@@ -216,7 +200,7 @@ export function createOrUpdateProjectsHandler<
           const result: { id: number }[] = await dbquery(
             tsql,
             project,
-            loggedInUser
+            loggedInUser,
           );
           return result;
         })

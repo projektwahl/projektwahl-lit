@@ -20,7 +20,16 @@ https://github.com/projektwahl/projektwahl-lit
 SPDX-License-Identifier: AGPL-3.0-or-later
 SPDX-FileCopyrightText: 2021 Moritz Hedtke <Moritz.Hedtke@t-online.de>
 */
-import { AnyZodObject, SomeZodObject, z, ZodIssue, ZodObject, ZodOptional, ZodRawShape, ZodTypeAny } from "zod";
+import {
+  AnyZodObject,
+  SomeZodObject,
+  z,
+  ZodIssue,
+  ZodObject,
+  ZodOptional,
+  ZodRawShape,
+  ZodTypeAny,
+} from "zod";
 import { result } from "./result.js";
 
 export const rawChoice = z
@@ -104,9 +113,9 @@ export type UnknownKeysParam = "passthrough" | "strict" | "strip";
 export const entities = <
   T extends Record<string, ZodTypeAny>,
   UnknownKeys extends UnknownKeysParam = "strip",
-  Catchall extends ZodTypeAny = ZodTypeAny
+  Catchall extends ZodTypeAny = ZodTypeAny,
 >(
-  entity: ZodObject<T, UnknownKeys, Catchall>
+  entity: ZodObject<T, UnknownKeys, Catchall>,
 ) =>
   result(
     z
@@ -115,7 +124,7 @@ export const entities = <
         previousCursor: entity.nullable(),
         nextCursor: entity.nullable(),
       })
-      .strict()
+      .strict(),
   );
 
 const baseQuery = <
@@ -123,11 +132,11 @@ const baseQuery = <
   T2 extends ZodTypeAny,
   T3 extends ZodTypeAny,
   UnknownKeys extends UnknownKeysParam = "strip",
-  Catchall extends ZodTypeAny = ZodTypeAny
+  Catchall extends ZodTypeAny = ZodTypeAny,
 >(
   s: ZodObject<T1, UnknownKeys, Catchall>,
   sorting: T2,
-  filters: T3
+  filters: T3,
 ) => {
   return {
     request: z
@@ -200,19 +209,19 @@ const logoutRequest = z.object({}).strict();
 const logoutResponse = z.object({}).strict();
 
 const loginRequest = z
-.object({
-  username: z.string().min(1).max(100),
-  password: z.string(),
-})
-.strict();
+  .object({
+    username: z.string().min(1).max(100),
+    password: z.string(),
+  })
+  .strict();
 
 const loginResponse = z.object({}).strict();
 
-const sudoRequest =  z
-.object({
-  id: z.number(),
-})
-.strict();
+const sudoRequest = z
+  .object({
+    id: z.number(),
+  })
+  .strict();
 
 const sudoResponse = z.object({}).strict();
 
@@ -221,11 +230,11 @@ const openIdLoginRequest = z.object({}).strict();
 const openIdLoginResponse = z.object({}).strict();
 
 const redirectRequest = z
-.object({
-  session_state: z.string(),
-  code: z.string(),
-})
-.strict();
+  .object({
+    session_state: z.string(),
+    code: z.string(),
+  })
+  .strict();
 
 const redirectResponse = z.object({}).strict();
 
@@ -241,7 +250,7 @@ const usersCreateOrUpdateRequest = z.array(
   z.discriminatedUnion("action", [
     createUserAction.strict(),
     updateUserAction.strict(),
-  ])
+  ]),
 );
 
 const usersCreateOrUpdateResponse = z.array(
@@ -251,64 +260,64 @@ const usersCreateOrUpdateResponse = z.array(
       project_leader_id: true,
       force_in_project_id: true,
     })
-    .strict()
+    .strict(),
 );
 
 const projectsCreateRequest = rawProjectSchema
-.pick({
-  costs: true,
-  deleted: true,
-  info: true,
-  max_age: true,
-  max_participants: true,
-  min_age: true,
-  min_participants: true,
-  place: true,
-  random_assignments: true,
-  title: true,
-})
-.strict();
+  .pick({
+    costs: true,
+    deleted: true,
+    info: true,
+    max_age: true,
+    max_participants: true,
+    min_age: true,
+    min_participants: true,
+    place: true,
+    random_assignments: true,
+    title: true,
+  })
+  .strict();
 
 const projectsCreateResponse = z.object({}).extend({ id: z.number() }).strict();
 
 const projectsUpdateRequest = rawProjectSchema
-.pick({
-  costs: true,
-  deleted: true,
-  info: true,
-  max_age: true,
-  max_participants: true,
-  min_age: true,
-  min_participants: true,
-  place: true,
-  random_assignments: true,
-  title: true,
-})
-.partial()
-.extend({
-  id: z.number(),
-})
-.strict();
+  .pick({
+    costs: true,
+    deleted: true,
+    info: true,
+    max_age: true,
+    max_participants: true,
+    min_age: true,
+    min_participants: true,
+    place: true,
+    random_assignments: true,
+    title: true,
+  })
+  .partial()
+  .extend({
+    id: z.number(),
+  })
+  .strict();
 
 const projectsUpdateResponse = z.object({}).extend({ id: z.number() }).strict();
 
 const choicesUpdateRequest = rawChoiceNullable
-.pick({
-  project_id: true,
-  rank: true,
-})
-.strict();
+  .pick({
+    project_id: true,
+    rank: true,
+  })
+  .strict();
 
 const choicesUpdateResponse = z.object({}).strict();
 
 const settingsUpdateRequest = z
-.object({
-  open_date: z.string(),
-  voting_start_date: z.string(),
-  voting_end_date: z.string(),
-  results_date: z.string(),
-})
-.strict();
+  .object({
+    open_date: z.string(),
+    voting_start_date: z.string(),
+    voting_end_date: z.string(),
+    results_date: z.string(),
+  })
+  .strict();
 
 const settingsUpdateResponse = z.object({}).strict();
 
@@ -424,7 +433,7 @@ const routes = {
             z.enum(["ASC", "DESC"] as const),
             z.number(),
           ]),
-        ])
+        ]),
       )
       .default([]),
     rawUserSchema
@@ -444,7 +453,7 @@ const routes = {
           .optional(),
       })
       .strict()
-      .partial()
+      .partial(),
   ),
   "/api/v1/projects": baseQuery(
     rawProjectSchema
@@ -493,7 +502,7 @@ const routes = {
             z.enum(["ASC", "DESC"] as const),
             z.number(),
           ]),
-        ])
+        ]),
       )
       .default([]),
     rawProjectSchema
@@ -504,7 +513,7 @@ const routes = {
         deleted: true,
       })
       .strict()
-      .partial()
+      .partial(),
   ),
   "/api/v1/choices": baseQuery(
     rawChoiceNullable.merge(
@@ -520,7 +529,7 @@ const routes = {
         max_participants: true,
         random_assignments: true,
         deleted: true,
-      })
+      }),
     ),
     z
       .array(
@@ -540,7 +549,7 @@ const routes = {
             z.enum(["ASC", "DESC"] as const),
             z.null(),
           ]),
-        ])
+        ]),
       )
       .default([]),
     rawChoiceNullable
@@ -552,7 +561,7 @@ const routes = {
         rank: true,
       })
       .strict()
-      .partial()
+      .partial(),
   ),
   "/api/v1/choices/update": {
     request: choicesUpdateRequest,
@@ -569,13 +578,13 @@ const routes = {
         z.literal("session_id" as const),
         z.enum(["ASC", "DESC"] as const),
         z.null(),
-      ])
+      ]),
     ),
     z
       .object({
         user_id: z.number().nullable(),
       })
-      .strict()
+      .strict(),
   ),
   "/api/v1/settings": baseQuery(
     z
@@ -591,9 +600,9 @@ const routes = {
         z.literal("fake_sort" as const),
         z.enum(["ASC", "DESC"] as const),
         z.null(),
-      ])
+      ]),
     ),
-    z.object({}).strict()
+    z.object({}).strict(),
   ),
 } as const;
 

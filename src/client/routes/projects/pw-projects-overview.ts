@@ -51,7 +51,7 @@ export const pwProjectsOverviewPreloaded = async (url: URL) => {
     "/api/v1/projects",
     url,
     "projects",
-    defaultValue
+    defaultValue,
   );
   return pwProjectsOverview({
     initial: result,
@@ -61,7 +61,7 @@ export const pwProjectsOverviewPreloaded = async (url: URL) => {
 
 // workaround see https://github.com/runem/lit-analyzer/issues/149#issuecomment-1006162839
 export function pwProjectsOverview<X extends string>(
-  props: Pick<PwProjectsOverview<X>, "initial" | "prefix">
+  props: Pick<PwProjectsOverview<X>, "initial" | "prefix">,
 ) {
   const { initial, prefix, ...rest } = props;
   let _ = rest;
@@ -106,17 +106,19 @@ export class PwProjectsOverview<X extends string> extends PwEntityList<
             ? result.data.entities.map(
                 (value) => html`<article class="break-inside-avoid">
                   <h2 class="text-center">
-                    ${value.deleted
-                      ? html`<del
+                    ${
+                      value.deleted
+                        ? html`<del
                           ><a @click=${aClick} href="/projects/view/${value.id}"
                             >${value.title}</a
                           ></del
                         >`
-                      : html`<a
+                        : html`<a
                           @click=${aClick}
                           href="/projects/view/${value.id}"
                           >${value.title}</a
-                        >`}
+                        >`
+                    }
                   </h2>
                   <dl class="row">
                     <dt class="col-2">Info</dt>
@@ -142,7 +144,7 @@ export class PwProjectsOverview<X extends string> extends PwEntityList<
                       ${value.computed_in_projects.join(", ")}
                     </dd>
                   </dl>
-                </article>`
+                </article>`,
               )
             : undefined;
         },
@@ -169,7 +171,7 @@ export class PwProjectsOverview<X extends string> extends PwEntityList<
           this.url,
           this.prefix,
           this.history.url,
-          this.defaultValue
+          this.defaultValue,
         )[this.prefix] ?? {};
 
       void this._task.run();
@@ -190,7 +192,9 @@ export class PwProjectsOverview<X extends string> extends PwEntityList<
           @refreshentitylist=${async () => {
             await this._task.run();
           }}
-          @submit=${(e: Event) => { e.preventDefault(); }}
+          @submit=${(e: Event) => {
+            e.preventDefault();
+          }}
         >
           ${this.getErrors()} ${this.body}
         </form>

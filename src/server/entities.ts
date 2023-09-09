@@ -46,9 +46,10 @@ type entitiesType1 = {
 
 type entitiesType2 = {
   [K in keyof typeof entityRoutes]: {
-    [R in z.infer<
-      typeof entityRoutes[K]["request"]
-    >["sorting"][number][0]]: z.infer<
+    [R in
+      z.infer<
+        typeof entityRoutes[K]["request"]
+      >["sorting"][number][0]]: z.infer<
       typeof entityRoutes[K]["request"]
     >["sorting"][number][1];
   };
@@ -56,9 +57,10 @@ type entitiesType2 = {
 
 type entitiesType9 = {
   [K in keyof typeof entityRoutes]: {
-    [R in z.infer<
-      typeof entityRoutes[K]["request"]
-    >["sorting"][number][0]]: z.infer<
+    [R in
+      z.infer<
+        typeof entityRoutes[K]["request"]
+      >["sorting"][number][0]]: z.infer<
       typeof entityRoutes[K]["request"]
     >["sorting"][number][2];
   };
@@ -71,7 +73,9 @@ type entitiesType4 = {
 };
 
 type entitiesType15 = {
-  [K in keyof typeof entityRoutes]: z.infer<typeof entityRoutes[K]["request"]>["sorting"][number][];
+  [K in keyof typeof entityRoutes]: z.infer<
+    typeof entityRoutes[K]["request"]
+  >["sorting"][number][];
 };
 
 type entitiesType18 = {
@@ -93,7 +97,7 @@ type entitiesType8 = {
     [key in entitiesType1[K]]: (
       order: entitiesType2[K][key],
       paginationDirection: "forwards" | "backwards",
-      v: entitiesType9[K][key]
+      v: entitiesType9[K][key],
     ) => PendingQuery<Row[]>;
   };
 };
@@ -104,12 +108,11 @@ export async function fetchData<R extends keyof typeof entityRoutes>(
   query: entitiesType0[R],
   sqlQuery: (query: entitiesType0[R]) => PendingQuery<Row[]>,
   orderByQueries: entitiesType8[R],
-  tiebreaker: entitiesType18[R] | undefined
+  tiebreaker: entitiesType18[R] | undefined,
 ): Promise<[OutgoingHttpHeaders, ResponseType<R>]> {
   const sorting: entitiesType15[R] = mappedIndexing(query, "sorting");
 
   if (tiebreaker !== undefined && !sorting.find((e) => e[0] == tiebreaker)) {
-    
     sorting.push([tiebreaker, "ASC", null]);
   }
 
@@ -120,15 +123,15 @@ export async function fetchData<R extends keyof typeof entityRoutes>(
     sorting,
     (v: entitiesType4[R]) => {
       const v0: entitiesType6[R] = mappedIndexing<entitiesType4, R, 0>(v, 0);
-      
+
       const v1: entitiesType2[R][typeof v0] = mappedIndexing(v, 1);
       const v2: entitiesType10[R] = mappedIndexing(v, 2);
       return [
         sql`,`,
-        
+
         sql`${orderByQueries[v0](v1, query.paginationDirection, v2)}`,
       ];
-    }
+    },
   ).slice(1);
 
   const orderByQuery =
@@ -136,7 +139,7 @@ export async function fetchData<R extends keyof typeof entityRoutes>(
       ? sql``
       : orderByQueryParts.reduce<PendingQuery<Row[]>>(
           (prev, curr) => sql`${prev}${curr}`,
-          sql` ORDER BY `
+          sql` ORDER BY `,
         );
 
   const paginationCursor: entitiesType0[R]["paginationCursor"] =
@@ -163,10 +166,9 @@ export async function fetchData<R extends keyof typeof entityRoutes>(
 
       const partsTmp = part.flatMap((value, index) => {
         let order;
-        
+
         const cursorValue = paginationCursor
-          ? 
-            paginationCursor[value[0]]
+          ? paginationCursor[value[0]]
           : null;
         const column = sql.unsafe(`"${value[0]}"`);
         if (index === part.length - 1) {
@@ -221,9 +223,9 @@ export async function fetchData<R extends keyof typeof entityRoutes>(
         .slice(1)
         .reduce((prev, curr) => sql`${prev}${curr}`);
 
-      return sql`(${sqlQuery(query)} AND (${parts}) ${orderByQuery} LIMIT ${
-        query.paginationLimit + 1
-      })`;
+      return sql`(${sqlQuery(
+        query,
+      )} AND (${parts}) ${orderByQuery} LIMIT ${query.paginationLimit + 1})`;
     });
 
     await sql.begin(async (tsql) => {
@@ -286,7 +288,7 @@ export async function fetchData<R extends keyof typeof entityRoutes>(
       "content-type": "text/json; charset=utf-8",
       ":status": 200,
     },
-    
+
     a,
   ];
 }

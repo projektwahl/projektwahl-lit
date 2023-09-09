@@ -35,7 +35,7 @@ const parser = createReadStream(process.argv[2]).pipe(
     columns: true,
     delimiter: ",",
     cast: true,
-  })
+  }),
 );
 
 const result = [];

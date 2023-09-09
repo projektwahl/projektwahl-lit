@@ -29,11 +29,15 @@ if (process.argv.length !== 3) {
   exit(0);
 }
 
-const contentsParser = z.array(z.object({
-  group: z.string()
-}))
+const contentsParser = z.array(
+  z.object({
+    group: z.string(),
+  }),
+);
 
-const contents = contentsParser.parse(JSON.parse(await readFile(process.argv[2], "utf-8")));
+const contents = contentsParser.parse(
+  JSON.parse(await readFile(process.argv[2], "utf-8")),
+);
 
 console.log(
   JSON.stringify(
@@ -55,6 +59,6 @@ console.log(
       };
     }),
     null,
-    2
-  )
+    2,
+  ),
 );

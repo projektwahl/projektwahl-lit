@@ -33,7 +33,7 @@ import { choose } from "lit/directives/choose.js";
 
 // workaround see https://github.com/runem/lit-analyzer/issues/149#issuecomment-1006162839
 export function pwWelcome(
-  props: Record<string, never> // Pick<PwWelcome, never>
+  props: Record<string, never>, // Pick<PwWelcome, never>
 ) {
   const { ...rest } = props;
   const _: Record<string, never> = rest;
@@ -201,9 +201,9 @@ export class PwWelcome extends PwElement {
             paginationDirection: "forwards",
             paginationLimit: 100,
           },
-          {}
+          {},
         ),
-      () => [this.userController.username]
+      () => [this.userController.username],
     );
 
     this.userTask = new Task(
@@ -221,7 +221,7 @@ export class PwWelcome extends PwElement {
               paginationDirection: "forwards",
               paginationLimit: 100,
             },
-            {}
+            {},
           );
           // TODO FIXME this condition is wrong for project leaders. we need to wait until election end
           if (
@@ -243,7 +243,7 @@ export class PwWelcome extends PwElement {
                 paginationDirection: "forwards",
                 paginationLimit: 100,
               },
-              {}
+              {},
             );
             if (project.success) {
               return [
@@ -257,7 +257,7 @@ export class PwWelcome extends PwElement {
           return undefined;
         }
       },
-      () => [this.userController.username]
+      () => [this.userController.username],
     );
   }
 
@@ -290,11 +290,12 @@ export class PwWelcome extends PwElement {
           </symbol>
         </svg>
 
-        ${this.userController.type === "voter"
-          ? this.userTask.render({
-              complete: (value) => {
-                if (value) {
-                  return html`
+        ${
+          this.userController.type === "voter"
+            ? this.userTask.render({
+                complete: (value) => {
+                  if (value) {
+                    return html`
                     <div
                       class="alert alert-success d-flex align-items-center"
                       role="alert"
@@ -316,8 +317,8 @@ export class PwWelcome extends PwElement {
                       </div>
                     </div>
                   `;
-                } else {
-                  return html`<div
+                  } else {
+                    return html`<div
                     class="alert alert-danger d-flex align-items-center"
                     role="alert"
                   >
@@ -334,10 +335,11 @@ export class PwWelcome extends PwElement {
                       Fehler beim Laden des Wahlergebnisses. Lade die Seite neu!
                     </div>
                   </div>`;
-                }
-              },
-            })
-          : ``}
+                  }
+                },
+              })
+            : ``
+        }
 
         <h1 class="text-center">Projektwoche AES 3.0 18.-21. Juli 2022</h1>
 
@@ -349,19 +351,21 @@ export class PwWelcome extends PwElement {
           Ausstellung der Ergebnisse der Projekttage
         </p>
 
-        ${this.userController.type === "helper"
-          ? html`<p>
+        ${
+          this.userController.type === "helper"
+            ? html`<p>
               Oben im Menü unter "Projekte" kannst du Projekte erstellen und
               bearbeiten.
             </p>`
-          : this.userController.type === "voter"
-          ? html`<p>
+            : this.userController.type === "voter"
+            ? html`<p>
               Oben im Menü unter "Wahl" kannst du deine Projektwünsche
               auswählen.
             </p>`
-          : this.userController.type === undefined
-          ? html`<p>Oben rechts im Menü kann man sich anmelden.</p>`
-          : ``}
+            : this.userController.type === undefined
+            ? html`<p>Oben rechts im Menü kann man sich anmelden.</p>`
+            : ``
+        }
         ${this.task.render({
           complete: (value) => {
             if (value.success) {
@@ -408,19 +412,19 @@ export class PwWelcome extends PwElement {
                 return html`<span class="font-monospace"
                   >${msg(html`currently ${state},
                   ${renderDigit(Math.floor(days / 100) % 10)}${renderDigit(
-                    Math.floor(days / 10) % 10
+                    Math.floor(days / 10) % 10,
                   )}${renderDigit(days % 10)}
                   days,
                   ${renderDigit(Math.floor(hours / 10))}${renderDigit(
-                    hours % 10
+                    hours % 10,
                   )}
                   hours,
                   ${renderDigit(Math.floor(minutes / 10))}${renderDigit(
-                    minutes % 10
+                    minutes % 10,
                   )}
                   minutes,
                   ${renderDigit(Math.floor(seconds / 10))}${renderDigit(
-                    seconds % 10
+                    seconds % 10,
                   )}
                   seconds until ${next_date_and_state[0]}`)}</span
                 >`;

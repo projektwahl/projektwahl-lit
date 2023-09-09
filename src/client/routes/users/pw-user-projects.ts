@@ -54,7 +54,7 @@ export function pwUserProjects<X extends string>(
     "initial" | "prefix" | "user" | "name" | "title"
   > & {
     refreshentitylist?: () => void;
-  }
+  },
 ) {
   const { initial, prefix, refreshentitylist, user, name, title, ...rest } =
     props;
@@ -105,7 +105,7 @@ export class PwUserProjects<X extends string> extends PwProjects<X> {
         this.url,
         this.prefix,
         this.history.url,
-        defaultValue
+        defaultValue,
       );
 
       const initial = data[this.prefix];
@@ -281,46 +281,52 @@ export class PwUserProjects<X extends string> extends PwProjects<X> {
                   </td>
                   <th scope="row">
                     <p>
-                      ${value.deleted
-                        ? html`<del
+                      ${
+                        value.deleted
+                          ? html`<del
                             ><a
                               @click=${aClick}
                               href="/projects/view/${value.id}"
                               >${value.id}</a
                             ></del
                           >`
-                        : html`<a
+                          : html`<a
                             @click=${aClick}
                             href="/projects/view/${value.id}"
                             >${value.id}</a
-                          >`}
+                          >`
+                      }
                     </p>
                   </th>
                   <td>
                     <p>
-                      ${value.deleted
-                        ? html`<del
+                      ${
+                        value.deleted
+                          ? html`<del
                             ><a
                               @click=${aClick}
                               href="/projects/view/${value.id}"
                               >${value.title}</a
                             ></del
                           >`
-                        : html`<a
+                          : html`<a
                             @click=${aClick}
                             href="/projects/view/${value.id}"
                             >${value.title}</a
-                          >`}
+                          >`
+                      }
                     </p>
                   </td>
                   <td>
                     <p>
-                      ${value.deleted
-                        ? html`<del>${value.info}</del>`
-                        : html`${value.info}`}
+                      ${
+                        value.deleted
+                          ? html`<del>${value.info}</del>`
+                          : html`${value.info}`
+                      }
                     </p>
                   </td>
-                </tr>`
+                </tr>`,
               )
             : result.error;
         },

@@ -49,7 +49,7 @@ export const openidRedirectHandler = requestHandler(
     try {
       const result = await client.callback(
         `${process.env.BASE_URL}/redirect`,
-        data
+        data,
       );
 
       const dbUser = await sql.begin(async (tsql) => {
@@ -71,7 +71,7 @@ export const openidRedirectHandler = requestHandler(
       if (dbUser === undefined) {
         const returnValue: [
           OutgoingHttpHeaders,
-          ResponseType<"/api/v1/redirect">
+          ResponseType<"/api/v1/redirect">,
         ] = [
           {
             "content-type": "text/json; charset=utf-8",
@@ -94,13 +94,13 @@ export const openidRedirectHandler = requestHandler(
       }
 
       const session_id_unhashed = Buffer.from(
-        crypto.getRandomValues(new Uint8Array(32))
+        crypto.getRandomValues(new Uint8Array(32)),
       ).toString("hex");
       const session_id = new Uint8Array(
         await crypto.subtle.digest(
           "SHA-256",
-          new TextEncoder().encode(session_id_unhashed)
-        )
+          new TextEncoder().encode(session_id_unhashed),
+        ),
       );
 
       await sql.begin("READ WRITE", async (tsql) => {
@@ -126,13 +126,13 @@ export const openidRedirectHandler = requestHandler(
             48 * 60 * 60
           };`,
           `username=${encodeURIComponent(
-            dbUser.username
+            dbUser.username,
           )}; Secure; SameSite=Strict; Path=/; Max-Age=${48 * 60 * 60};`,
           `type=${dbUser.type}; Secure; Path=/; SameSite=Lax; Max-Age=${
             48 * 60 * 60
           };`,
           `id=${encodeURIComponent(
-            dbUser.id
+            dbUser.id,
           )}; Secure; Path=/; SameSite=Lax; Max-Age=${48 * 60 * 60};`,
         ],
         [sensitiveHeaders]: ["set-cookie"],
@@ -148,7 +148,7 @@ export const openidRedirectHandler = requestHandler(
       console.error(error);
       const returnValue: [
         OutgoingHttpHeaders,
-        ResponseType<"/api/v1/redirect">
+        ResponseType<"/api/v1/redirect">,
       ] = [
         {
           "content-type": "text/json; charset=utf-8",
@@ -169,5 +169,5 @@ export const openidRedirectHandler = requestHandler(
       ];
       return returnValue;
     }
-  }
+  },
 );

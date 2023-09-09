@@ -45,13 +45,20 @@ function request<U extends keyof typeof routes>(
   url: U,
   params: string | null,
   requestHeaders: OutgoingHttpHeaders,
-  requestBody: string | null
-): Promise<[z.infer<typeof routes[U]["response"]>, IncomingHttpHeaders & IncomingHttpStatusHeader]> {
+  requestBody: string | null,
+): Promise<
+  [
+    z.infer<typeof routes[U]["response"]>,
+    IncomingHttpHeaders & IncomingHttpStatusHeader,
+  ]
+> {
   return new Promise((resolve, reject) => {
     const client = connect(BASE_URL, {
       rejectUnauthorized: false,
     });
-    client.on("error", (err) => { reject(err); });
+    client.on("error", (err) => {
+      reject(err);
+    });
 
     const buffer = requestBody !== null ? Buffer.from(requestBody) : null;
 
@@ -79,7 +86,7 @@ function request<U extends keyof typeof routes>(
     });
     req.on("end", () => {
       client.close();
-      
+
       resolve([routes[url].response.parse(JSON.parse(data)), responseHeaders]);
     });
 
@@ -99,7 +106,7 @@ async function testLogin() {
     {
       [constants.HTTP2_HEADER_METHOD]: constants.HTTP2_METHOD_GET,
     },
-    null
+    null,
   );
   assert.deepEqual(headers[constants.HTTP2_HEADER_STATUS], 400);
   assert.deepEqual(r, "");
@@ -110,7 +117,7 @@ async function testLogin() {
     {
       [constants.HTTP2_HEADER_METHOD]: constants.HTTP2_METHOD_POST,
     },
-    "null"
+    "null",
   );
   assert.deepEqual(r, "No CSRF header!");
 
@@ -121,7 +128,7 @@ async function testLogin() {
       [constants.HTTP2_HEADER_METHOD]: constants.HTTP2_METHOD_POST,
       "x-csrf-protection": "wrong",
     },
-    "null"
+    "null",
   );
   assert.deepEqual(r, "No CSRF header!");
 
@@ -132,7 +139,7 @@ async function testLogin() {
       [constants.HTTP2_HEADER_METHOD]: constants.HTTP2_METHOD_POST,
       "x-csrf-protection": "projektwahl",
     },
-    "null"
+    "null",
   );
   assert.deepEqual(r, {
     success: false,
@@ -157,7 +164,7 @@ async function testLogin() {
       [constants.HTTP2_HEADER_METHOD]: constants.HTTP2_METHOD_POST,
       "x-csrf-protection": "projektwahl",
     },
-    "undefined"
+    "undefined",
   );
   assert.deepEqual(r, {
     success: false,
@@ -179,7 +186,7 @@ async function testLogin() {
       [constants.HTTP2_HEADER_METHOD]: constants.HTTP2_METHOD_POST,
       "x-csrf-protection": "projektwahl",
     },
-    ""
+    "",
   );
   assert.deepEqual(r, {
     success: false,
@@ -201,7 +208,7 @@ async function testLogin() {
       [constants.HTTP2_HEADER_METHOD]: constants.HTTP2_METHOD_POST,
       "x-csrf-protection": "projektwahl",
     },
-    "{}"
+    "{}",
   );
   assert.deepEqual(r, {
     success: false,
@@ -236,7 +243,7 @@ async function testLogin() {
     JSON.stringify({
       usernamee: "hi",
       password: "jo",
-    })
+    }),
   );
   assert.deepEqual(r, {
     success: false,
@@ -270,7 +277,7 @@ async function testLogin() {
     JSON.stringify({
       username: "hi",
       password: "jo",
-    })
+    }),
   );
   assert.deepEqual(r, {
     success: false,
@@ -295,7 +302,7 @@ async function testLogin() {
     JSON.stringify({
       username: "admin",
       password: "jo",
-    })
+    }),
   );
   assert.deepEqual(r, {
     success: false,
@@ -320,7 +327,7 @@ async function testLogin() {
     JSON.stringify({
       username: "admin",
       password: "jo",
-    })
+    }),
   );
   assert.deepEqual(r, {
     success: false,
@@ -348,7 +355,7 @@ async function testLogin() {
     JSON.stringify({
       username: "admin",
       password: "changeme",
-    })
+    }),
   );
   assert.deepEqual(r, { success: true, data: {} });
 
@@ -362,7 +369,7 @@ async function testLogin() {
     JSON.stringify({
       username: "admin",
       password: "jo",
-    })
+    }),
   );
   assert.deepEqual(r, {
     success: false,
@@ -389,7 +396,7 @@ async function getAdminSessionId() {
     JSON.stringify({
       username: "admin",
       password: "changeme",
-    })
+    }),
   );
   assert.deepEqual(r, { success: true, data: {} });
   const session_id = (headers["set-cookie"] ?? "")[0]
@@ -409,7 +416,7 @@ async function getVoterSessionId() {
     JSON.stringify({
       username: "Dr. Dustin Allison M.D.",
       password: "changeme",
-    })
+    }),
   );
   assert.deepEqual(r, { success: true, data: {} });
   const session_id = (headers["set-cookie"] ?? "")[0]
@@ -430,7 +437,7 @@ async function testLogout() {
     },
     JSON.stringify({
       anything: 1,
-    })
+    }),
   );
   assert.deepEqual(r, {
     success: false,
@@ -454,7 +461,7 @@ async function testLogout() {
       [constants.HTTP2_HEADER_METHOD]: constants.HTTP2_METHOD_POST,
       "x-csrf-protection": "projektwahl",
     },
-    JSON.stringify({})
+    JSON.stringify({}),
   );
   assert.deepEqual(r, { success: true, data: {} });
 
@@ -468,16 +475,16 @@ async function testLogout() {
           user_id: null,
         },
         sorting: [],
-      })
+      }),
     ),
     {
       [constants.HTTP2_HEADER_METHOD]: constants.HTTP2_METHOD_GET,
       [constants.HTTP2_HEADER_COOKIE]: `lax_id=${session_id}`,
       "x-csrf-protection": "projektwahl",
     },
-    null
+    null,
   );
-  
+
   const parsed = z.object({ success: z.boolean() }).parse(r);
   assert.equal(parsed.success, true);
 
@@ -489,7 +496,7 @@ async function testLogout() {
       [constants.HTTP2_HEADER_COOKIE]: `strict_id=${session_id}`,
       "x-csrf-protection": "projektwahl",
     },
-    JSON.stringify({})
+    JSON.stringify({}),
   );
   assert.deepEqual(r, { success: true, data: {} });
 
@@ -501,14 +508,14 @@ async function testLogout() {
           user_id: null,
         },
         sorting: [],
-      })
+      }),
     ),
     {
       [constants.HTTP2_HEADER_METHOD]: constants.HTTP2_METHOD_GET,
       [constants.HTTP2_HEADER_COOKIE]: `lax_id=${session_id}`,
       "x-csrf-protection": "projektwahl",
     },
-    null
+    null,
   );
   assert.deepEqual(r, {
     success: false,
@@ -525,7 +532,6 @@ async function testLogout() {
 }
 
 async function testCreateOrUpdateUsers() {
-
   let [r] = await request(
     `/api/v1/users/create-or-update`,
     null,
@@ -533,7 +539,7 @@ async function testCreateOrUpdateUsers() {
       [constants.HTTP2_HEADER_METHOD]: constants.HTTP2_METHOD_POST,
       "x-csrf-protection": "projektwahl",
     },
-    JSON.stringify([])
+    JSON.stringify([]),
   );
   assert.deepEqual(r, {
     success: false,
@@ -558,7 +564,7 @@ async function testCreateOrUpdateUsers() {
       [constants.HTTP2_HEADER_COOKIE]: `strict_id=${session_id}`,
       "x-csrf-protection": "projektwahl",
     },
-    JSON.stringify([])
+    JSON.stringify([]),
   );
   assert.deepEqual(r, { success: true });
 
@@ -570,7 +576,7 @@ async function testCreateOrUpdateUsers() {
       [constants.HTTP2_HEADER_COOKIE]: `strict_id=${session_id}`,
       "x-csrf-protection": "projektwahl",
     },
-    JSON.stringify([{}])
+    JSON.stringify([{}]),
   );
   assert.deepEqual(r, {
     success: false,
@@ -600,7 +606,7 @@ async function testCreateOrUpdateUsers() {
       {
         action: "create",
       },
-    ])
+    ]),
   );
   assert.deepEqual(r, {
     success: false,
@@ -640,11 +646,11 @@ async function testCreateOrUpdateUsers() {
         type: "admin",
         username: old_username,
       },
-    ])
+    ]),
   );
-  
+
   const id: number = r[0].id;
-  
+
   r[0].id = 1337;
   assert.deepEqual(r, {
     success: true,
@@ -663,9 +669,9 @@ async function testCreateOrUpdateUsers() {
       {
         action: "update",
       },
-    ])
+    ]),
   );
-  
+
   assert.deepEqual(r, {
     success: false,
     error: {
@@ -695,9 +701,9 @@ async function testCreateOrUpdateUsers() {
         action: "update",
         id,
       },
-    ])
+    ]),
   );
-  
+
   assert.deepEqual(r, {
     success: true,
     data: [{ id, project_leader_id: null, force_in_project_id: null }],
@@ -712,16 +718,16 @@ async function testCreateOrUpdateUsers() {
             id,
           },
           sorting: [],
-        })
+        }),
       ),
       {
         [constants.HTTP2_HEADER_METHOD]: constants.HTTP2_METHOD_GET,
         [constants.HTTP2_HEADER_COOKIE]: `lax_id=${session_id}`,
         "x-csrf-protection": "projektwahl",
       },
-      null
+      null,
     );
-    
+
     assert.deepEqual(r, {
       success: true,
       data: {
@@ -763,9 +769,9 @@ async function testCreateOrUpdateUsers() {
         id,
         username: new_username,
       },
-    ])
+    ]),
   );
-  
+
   assert.deepEqual(r, {
     success: true,
     data: [{ id, project_leader_id: null, force_in_project_id: null }],
@@ -780,16 +786,16 @@ async function testCreateOrUpdateUsers() {
             id,
           },
           sorting: [],
-        })
+        }),
       ),
       {
         [constants.HTTP2_HEADER_METHOD]: constants.HTTP2_METHOD_GET,
         [constants.HTTP2_HEADER_COOKIE]: `lax_id=${session_id}`,
         "x-csrf-protection": "projektwahl",
       },
-      null
+      null,
     );
-    
+
     assert.deepEqual(r, {
       success: true,
       data: {
@@ -830,7 +836,7 @@ async function testCreateOrUpdateProjects() {
       [constants.HTTP2_HEADER_COOKIE]: `strict_id=${session_id}`,
       "x-csrf-protection": "projektwahl",
     },
-    JSON.stringify({})
+    JSON.stringify({}),
   );
   assert.deepEqual(r, {
     success: false,
@@ -930,11 +936,11 @@ async function testCreateOrUpdateProjects() {
       max_participants: 15,
       place: "jo",
       random_assignments: false,
-    })
+    }),
   );
-    
+
   const id: number = r.id;
-  
+
   r.id = 1337;
   assert.deepEqual(r, { success: true, data: { id: 1337 } });
 
@@ -946,16 +952,16 @@ async function testCreateOrUpdateProjects() {
           id,
         },
         sorting: [],
-      })
+      }),
     ),
     {
       [constants.HTTP2_HEADER_METHOD]: constants.HTTP2_METHOD_GET,
       [constants.HTTP2_HEADER_COOKIE]: `lax_id=${session_id}`,
       "x-csrf-protection": "projektwahl",
     },
-    null
+    null,
   );
-  
+
   const value = r;
   assert.deepEqual(value, {
     success: true,
@@ -993,7 +999,7 @@ async function testCreateOrUpdateProjects() {
     JSON.stringify({
       id,
       title: "bruh",
-    })
+    }),
   );
   assert.deepEqual(r, { success: true, data: { id } });
 
@@ -1005,14 +1011,14 @@ async function testCreateOrUpdateProjects() {
           id,
         },
         sorting: [],
-      })
+      }),
     ),
     {
       [constants.HTTP2_HEADER_METHOD]: constants.HTTP2_METHOD_GET,
       [constants.HTTP2_HEADER_COOKIE]: `lax_id=${session_id}`,
       "x-csrf-protection": "projektwahl",
     },
-    null
+    null,
   );
   assert.deepEqual(r, {
     success: true,
@@ -1053,7 +1059,7 @@ async function testChoices() {
       [constants.HTTP2_HEADER_COOKIE]: `strict_id=${session_id}`,
       "x-csrf-protection": "projektwahl",
     },
-    JSON.stringify({})
+    JSON.stringify({}),
   );
   assert.deepEqual(r, {
     success: false,
@@ -1089,7 +1095,7 @@ async function testChoices() {
     JSON.stringify({
       project_id: 42,
       rank: 1,
-    })
+    }),
   );
   assert.deepEqual(r, {
     success: false,
@@ -1116,7 +1122,7 @@ async function testChoices() {
     JSON.stringify({
       project_id: 1,
       rank: 1,
-    })
+    }),
   );
   assert.deepEqual(r, { success: true, data: {} });
 
@@ -1128,14 +1134,14 @@ async function testChoices() {
           title: "Tu asojag aza",
         },
         sorting: [],
-      })
+      }),
     ),
     {
       [constants.HTTP2_HEADER_METHOD]: constants.HTTP2_METHOD_GET,
       [constants.HTTP2_HEADER_COOKIE]: `lax_id=${session_id}`,
       "x-csrf-protection": "projektwahl",
     },
-    null
+    null,
   );
   assert.deepEqual(r, {
     success: true,
@@ -1177,7 +1183,7 @@ async function testSudo() {
       [constants.HTTP2_HEADER_COOKIE]: `strict_id=${session_id}`,
       "x-csrf-protection": "projektwahl",
     },
-    JSON.stringify({})
+    JSON.stringify({}),
   );
   assert.deepEqual(r, {
     success: false,
@@ -1205,7 +1211,7 @@ async function testSudo() {
     },
     JSON.stringify({
       id: 2,
-    })
+    }),
   );
   const sudo_session_id = (headers["set-cookie"] ?? "")[0]
     .split(";")[0]
@@ -1222,7 +1228,7 @@ async function testSudo() {
     },
     JSON.stringify({
       id: 2,
-    })
+    }),
   );
   assert.deepEqual(r, {
     success: false,

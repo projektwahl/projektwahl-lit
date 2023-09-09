@@ -50,7 +50,7 @@ export const pwSessionsPreloaded = async (url: URL) => {
     "/api/v1/sessions",
     url,
     "sessions",
-    defaultValue
+    defaultValue,
   );
   return pwSessions({
     initial: result,
@@ -60,7 +60,7 @@ export const pwSessionsPreloaded = async (url: URL) => {
 
 // workaround see https://github.com/runem/lit-analyzer/issues/149#issuecomment-1006162839
 export function pwSessions<X extends string>(
-  props: Pick<PwSessions<X>, "initial" | "prefix">
+  props: Pick<PwSessions<X>, "initial" | "prefix">,
 ) {
   const { initial, prefix, ...rest } = props;
   let _ = rest;
@@ -104,7 +104,7 @@ export class PwSessions<X extends string> extends PwEntityList<
         this.url,
         this.prefix,
         this.history.url,
-        defaultValue
+        defaultValue,
       );
 
       const initial = data[this.prefix];
@@ -190,7 +190,7 @@ export class PwSessions<X extends string> extends PwEntityList<
                       </svg>
                     </a>
                   </td>
-                </tr>`
+                </tr>`,
               )
             : undefined;
         },

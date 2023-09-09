@@ -135,9 +135,7 @@ export const usersHandler = requestHandler(
             GROUP  BY c.user_id
             ) q ON t.user_id = q.user_id`
               : sql``
-          } WHERE TRUE ${
-            id === undefined ? sql`` : sql`AND id = ${id}`
-          } ${
+          } WHERE TRUE ${id === undefined ? sql`` : sql`AND id = ${id}`} ${
             username === undefined
               ? sql``
               : sql`AND username LIKE ${"%" + username + "%"}`
@@ -150,11 +148,7 @@ export const usersHandler = requestHandler(
             project_leader_id ?? null
           }`
           }
-          ${
-            deleted === undefined
-              ? sql``
-              : sql`AND deleted = ${deleted}`
-          }
+          ${deleted === undefined ? sql`` : sql`AND deleted = ${deleted}`}
           ${valid === undefined ? sql`` : sql`AND t.valid = ${valid}`}
           ${
             force_in_project_id === undefined ||
@@ -188,7 +182,7 @@ export const usersHandler = requestHandler(
                   : "ASC"
                 : q === "ASC"
                 ? "ASC"
-                : "DESC"
+                : "DESC",
             )}`;
           },
           type: (q, o) =>
@@ -199,7 +193,7 @@ export const usersHandler = requestHandler(
                   : "ASC"
                 : q === "ASC"
                 ? "ASC"
-                : "DESC"
+                : "DESC",
             )}`,
           username: (q, o) =>
             sql`username ${sql.unsafe(
@@ -209,7 +203,7 @@ export const usersHandler = requestHandler(
                   : "ASC"
                 : q === "ASC"
                 ? "ASC"
-                : "DESC"
+                : "DESC",
             )}`,
           valid: (q, o) =>
             sql`t.valid ${sql.unsafe(
@@ -219,7 +213,7 @@ export const usersHandler = requestHandler(
                   : "ASC"
                 : q === "ASC"
                 ? "ASC"
-                : "DESC"
+                : "DESC",
             )}`,
           group: (q, o) =>
             sql`"group" ${sql.unsafe(
@@ -229,7 +223,7 @@ export const usersHandler = requestHandler(
                   : "ASC"
                 : q === "ASC"
                 ? "ASC"
-                : "DESC"
+                : "DESC",
             )}`,
           force_in_project_id: (q, o, v) =>
             sql`(users_with_deleted.force_in_project_id IS NOT DISTINCT FROM ${
@@ -241,7 +235,7 @@ export const usersHandler = requestHandler(
                   : "ASC"
                 : q === "ASC"
                 ? "ASC"
-                : "DESC"
+                : "DESC",
             )}`,
           computed_in_project_id: (q, o, v) =>
             sql`(users_with_deleted.computed_in_project_id IS NOT DISTINCT FROM ${
@@ -253,7 +247,7 @@ export const usersHandler = requestHandler(
                   : "ASC"
                 : q === "ASC"
                 ? "ASC"
-                : "DESC"
+                : "DESC",
             )}`,
           project_leader_id: (q, o, v) =>
             sql`(users_with_deleted.project_leader_id IS NOT DISTINCT FROM ${
@@ -265,11 +259,11 @@ export const usersHandler = requestHandler(
                   : "ASC"
                 : q === "ASC"
                 ? "ASC"
-                : "DESC"
+                : "DESC",
             )}`,
         },
-        "id"
+        "id",
       );
     return ret;
-  }
+  },
 );

@@ -55,7 +55,7 @@ export const pwUsersPreloaded = async (url: URL) => {
     "/api/v1/users",
     url,
     "users",
-    defaultValue
+    defaultValue,
   );
   return pwUsers({
     initial: result,
@@ -65,7 +65,7 @@ export const pwUsersPreloaded = async (url: URL) => {
 
 // workaround see https://github.com/runem/lit-analyzer/issues/149#issuecomment-1006162839
 export function pwUsers<X extends string>(
-  props: Pick<PwUsers<X>, "initial" | "prefix">
+  props: Pick<PwUsers<X>, "initial" | "prefix">,
 ) {
   const { initial, prefix, ...rest } = props;
   let _ = rest;
@@ -127,7 +127,7 @@ export class PwUsers<X extends string> extends PwEntityList<
         this.url,
         this.prefix,
         this.history.url,
-        defaultValue
+        defaultValue,
       );
 
       const initial = data[this.prefix];
@@ -360,68 +360,82 @@ export class PwUsers<X extends string> extends PwEntityList<
           return result.success
             ? result.data.entities.map(
                 (value) => html`<tr
-                  class="${value.valid === undefined
-                    ? ""
-                    : value.valid === "valid"
-                    ? "table-success"
-                    : value.valid === "invalid"
-                    ? "table-danger"
-                    : value.valid === "project_leader"
-                    ? "table-info"
-                    : "table-secondary"}"
+                  class="${
+                    value.valid === undefined
+                      ? ""
+                      : value.valid === "valid"
+                      ? "table-success"
+                      : value.valid === "invalid"
+                      ? "table-danger"
+                      : value.valid === "project_leader"
+                      ? "table-info"
+                      : "table-secondary"
+                  }"
                 >
                   <th scope="row">
                     <p>
-                      ${value.deleted
-                        ? html`<del
+                      ${
+                        value.deleted
+                          ? html`<del
                             ><a @click=${aClick} href="/users/view/${value.id}"
                               >${value.id}</a
                             ></del
                           >`
-                        : html`<a
+                          : html`<a
                             @click=${aClick}
                             href="/users/view/${value.id}"
                             >${value.id}</a
-                          >`}
+                          >`
+                      }
                     </p>
                   </th>
                   <td>
                     <p>
-                      ${value.deleted
-                        ? html`<del
+                      ${
+                        value.deleted
+                          ? html`<del
                             ><a @click=${aClick} href="/users/view/${value.id}"
                               >${value.username}</a
                             ></del
                           >`
-                        : html`<a
+                          : html`<a
                             @click=${aClick}
                             href="/users/view/${value.id}"
                             >${value.username}</a
-                          >`}
-                    </p>
-                  </td>
-                  <td>
-                    <p>
-                      ${value.deleted
-                        ? html`<del
-                            >${value.type === "admin"
-                              ? msg("Admin")
-                              : value.type === "helper"
-                              ? msg("Lehrer")
-                              : msg("Schüler")}</del
                           >`
-                        : html`${value.type === "admin"
-                            ? msg("Admin")
-                            : value.type === "helper"
-                            ? msg("Lehrer")
-                            : msg("Schüler")}`}
+                      }
                     </p>
                   </td>
                   <td>
                     <p>
-                      ${value.deleted
-                        ? html`<del>${value.group} </del>`
-                        : html`${value.group} `}
+                      ${
+                        value.deleted
+                          ? html`<del
+                            >${
+                              value.type === "admin"
+                                ? msg("Admin")
+                                : value.type === "helper"
+                                ? msg("Lehrer")
+                                : msg("Schüler")
+                            }</del
+                          >`
+                          : html`${
+                              value.type === "admin"
+                                ? msg("Admin")
+                                : value.type === "helper"
+                                ? msg("Lehrer")
+                                : msg("Schüler")
+                            }`
+                      }
+                    </p>
+                  </td>
+                  <td>
+                    <p>
+                      ${
+                        value.deleted
+                          ? html`<del>${value.group} </del>`
+                          : html`${value.group} `
+                      }
                     </p>
                   </td>
                   <td>${value.valid}</td>
@@ -451,8 +465,9 @@ export class PwUsers<X extends string> extends PwEntityList<
                         />
                       </svg>
                     </a>
-                    ${this.userController.type === "admin"
-                      ? html` <a
+                    ${
+                      this.userController.type === "admin"
+                        ? html` <a
                           class="btn btn-secondary"
                           role="button"
                           @click=${async () => {
@@ -462,7 +477,7 @@ export class PwUsers<X extends string> extends PwEntityList<
                               {
                                 id: value.id,
                               },
-                              {}
+                              {},
                             );
 
                             if (result.success) {
@@ -470,13 +485,13 @@ export class PwUsers<X extends string> extends PwEntityList<
                               window.dispatchEvent(
                                 new StorageEvent("storage", {
                                   newValue: "login",
-                                })
+                                }),
                               );
 
                               HistoryController.goto(
                                 new URL("/", window.location.href),
                                 {},
-                                true
+                                true,
                               );
                             } else {
                               // TODO FIXME do this cleaner
@@ -503,9 +518,10 @@ export class PwUsers<X extends string> extends PwEntityList<
                             />
                           </svg>
                         </a>`
-                      : undefined}
+                        : undefined
+                    }
                   </td>
-                </tr>`
+                </tr>`,
               )
             : undefined;
         },

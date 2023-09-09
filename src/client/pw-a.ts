@@ -37,7 +37,7 @@ export const aClick = (event: MouseEvent) => {
     HistoryController.goto(
       new URL(target.href, window.location.href),
       {},
-      false
+      false,
     );
   }
 };

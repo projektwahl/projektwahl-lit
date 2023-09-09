@@ -39,7 +39,7 @@ export const updateSettingsHandler = requestHandler(
     if (!loggedInUser) {
       const returnValue: [
         OutgoingHttpHeaders,
-        ResponseType<"/api/v1/settings/update">
+        ResponseType<"/api/v1/settings/update">,
       ] = [
         {
           "content-type": "text/json; charset=utf-8",
@@ -64,7 +64,7 @@ export const updateSettingsHandler = requestHandler(
     if (!(loggedInUser.type === "admin")) {
       const returnValue: [
         OutgoingHttpHeaders,
-        ResponseType<"/api/v1/settings/update">
+        ResponseType<"/api/v1/settings/update">,
       ] = [
         {
           "content-type": "text/json; charset=utf-8",
@@ -121,7 +121,7 @@ export const updateSettingsHandler = requestHandler(
       if (error instanceof postgres.PostgresError) {
         const returnValue: [
           OutgoingHttpHeaders,
-          ResponseType<"/api/v1/settings/update">
+          ResponseType<"/api/v1/settings/update">,
         ] = [
           {
             "content-type": "text/json; charset=utf-8",
@@ -145,7 +145,7 @@ export const updateSettingsHandler = requestHandler(
       console.error(error);
       const returnValue: [
         OutgoingHttpHeaders,
-        ResponseType<"/api/v1/settings/update">
+        ResponseType<"/api/v1/settings/update">,
       ] = [
         {
           "content-type": "text/json; charset=utf-8",
@@ -166,5 +166,5 @@ export const updateSettingsHandler = requestHandler(
       ];
       return returnValue;
     }
-  }
+  },
 );

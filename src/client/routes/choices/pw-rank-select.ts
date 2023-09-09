@@ -77,18 +77,18 @@ class PwRankSelect extends PwElement {
             project_id: this.choice.id, // project id
             rank: args[0] === 0 ? null : args[0],
           },
-          {}
+          {},
         );
 
         this.dispatchEvent(
           new CustomEvent("refreshentitylist", {
             bubbles: true,
             composed: true,
-          })
+          }),
         );
 
         return result;
-      }
+      },
     );
   }
 
@@ -104,7 +104,7 @@ class PwRankSelect extends PwElement {
         complete: (data) => {
           if (!data.success) {
             const errors = data.error.issues.map(
-              (i) => html`${i.path}: ${i.message}<br />`
+              (i) => html`${i.path}: ${i.message}<br />`,
             );
             if (errors.length > 0) {
               return html`<div class="alert alert-danger" role="alert">
@@ -125,14 +125,16 @@ class PwRankSelect extends PwElement {
             }}
             ?disabled=${this.disabled}
             type="button"
-            class="btn ${this.disabled
-              ? "btn-secondary"
-              : this.choice.rank === (v === 0 ? null : v)
-              ? "btn-primary"
-              : "btn-outline-primary"}"
+            class="btn ${
+              this.disabled
+                ? "btn-secondary"
+                : this.choice.rank === (v === 0 ? null : v)
+                ? "btn-primary"
+                : "btn-outline-primary"
+            }"
           >
             ${v === 0 ? "X" : `${v}.`}
-          </button>`
+          </button>`,
         )}
       </div>
     </form>`;

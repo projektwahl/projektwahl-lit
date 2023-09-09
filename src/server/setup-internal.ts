@@ -76,7 +76,7 @@ export async function setup() {
               last_updated_by: 23,
             },
           } as const)`INSERT INTO projects (title, info, place, costs, min_age, max_age, min_participants, max_participants, random_assignments, last_updated_by) (SELECT ${chance.sentence(
-            { punctuation: false, words: 3 }
+            { punctuation: false, words: 3 },
           )}, ${chance.paragraph()}, ${chance.address()}, ${chance.integer({
             min: 0,
             max: 10,
@@ -98,7 +98,7 @@ export async function setup() {
           await typedSql(tsql, {
             columns: { id: 23 },
           } as const)`INSERT INTO users (username, type, "group", age, password_hash, last_updated_by) VALUES (${chance.name(
-            { prefix: true, suffix: true }
+            { prefix: true, suffix: true },
           )}, ${
             chance.bool() ? "voter" : "helper"
           }, ${chance.profession()}, ${chance.integer({

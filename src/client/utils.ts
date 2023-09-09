@@ -29,7 +29,7 @@ export const myFetch = async <P extends keyof typeof routes>(
   method: "GET" | "POST",
   url: P,
   body: z.infer<typeof routes[P]["request"]>,
-  options: RequestInit
+  options: RequestInit,
 ): Promise<ResponseType<P>> => {
   try {
     const response =
@@ -64,11 +64,10 @@ export const myFetch = async <P extends keyof typeof routes>(
         window.dispatchEvent(
           new StorageEvent("storage", {
             newValue: "logout",
-          })
+          }),
         );
       }
       try {
-        
         return await response.json();
       } catch (error) {
         const r: ResponseType<P> = {
@@ -87,22 +86,20 @@ export const myFetch = async <P extends keyof typeof routes>(
       }
     }
     // TODO FIXME maybe include the result shit in the typings directly
-    
+
     const json = await response.json();
-    
+
     if (json.success) {
       const a: typeof routes[P] = routes[url];
       const b: typeof routes[P]["response"] = a.response;
       const c:
         | z.SafeParseSuccess<z.infer<typeof routes[P]["response"]>>
-        
         | MinimalSafeParseError = b.safeParse(json.data);
       if (!c.success) {
         console.error(c.error);
       }
       return c;
     } else {
-      
       return json;
     }
   } catch (error) {

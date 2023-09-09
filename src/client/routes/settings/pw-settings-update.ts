@@ -34,7 +34,7 @@ import { pwInputText } from "../../form/pw-input-text.js";
 
 // workaround see https://github.com/runem/lit-analyzer/issues/149#issuecomment-1006162839
 export function pwSettingsUpdate(
-  props: Pick<PwSettingsUpdate, "disabled" | "url">
+  props: Pick<PwSettingsUpdate, "disabled" | "url">,
 ) {
   const { disabled, url, ...rest } = props;
   let _ = rest;
@@ -61,7 +61,7 @@ const taskFunction = async (): Promise<
       paginationLimit: 100,
       sorting: [],
     },
-    {}
+    {},
   );
   if (response.success) {
     return {
@@ -79,9 +79,9 @@ function database2datetimelocal(unix_time: number) {
   // 2022-05-04T20:58
   const d = new Date(unix_time);
   return `${String(d.getFullYear()).padStart(4, "0")}-${String(
-    d.getMonth() + 1
+    d.getMonth() + 1,
   ).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}T${String(
-    d.getHours()
+    d.getHours(),
   ).padStart(2, "0")}:${String(d.getMinutes()).padStart(2, "0")}`;
 }
 
@@ -94,7 +94,7 @@ function datetimelocal2database(input: string) {
     Number(input.slice(5, 7)) - 1,
     Number(input.slice(8, 10)),
     Number(input.slice(11, 13)),
-    Number(input.slice(14, 16))
+    Number(input.slice(14, 16)),
   ).getTime();
 }
 
@@ -142,7 +142,7 @@ class PwSettingsUpdate extends PwForm<"/api/v1/settings/update"> {
         "POST",
         this.url,
         this.formData,
-        {}
+        {},
       );
 
       return result;
@@ -153,9 +153,9 @@ class PwSettingsUpdate extends PwForm<"/api/v1/settings/update"> {
       async () => {
         return await taskFunction();
       },
-      () => []
+      () => [],
     );
-    
+
     this.formData = {};
   }
 
@@ -233,7 +233,7 @@ class PwSettingsUpdate extends PwForm<"/api/v1/settings/update"> {
                           database2datetimelocal(Number(o.voting_start_date)), // gets initial data
                         set: (o, v) =>
                           (o.voting_start_date = String(
-                            datetimelocal2database(v)
+                            datetimelocal2database(v),
                           )),
                         task: this._task,
                         defaultValue: "",
@@ -250,7 +250,7 @@ class PwSettingsUpdate extends PwForm<"/api/v1/settings/update"> {
                           database2datetimelocal(Number(o.voting_end_date)), // gets initial data
                         set: (o, v) =>
                           (o.voting_end_date = String(
-                            datetimelocal2database(v)
+                            datetimelocal2database(v),
                           )),
                         task: this._task,
                         defaultValue: "",
@@ -287,7 +287,9 @@ class PwSettingsUpdate extends PwForm<"/api/v1/settings/update"> {
                       <button
                         type="button"
                         class="btn btn-secondary"
-                        @click=${() => { window.history.back(); }}
+                        @click=${() => {
+                          window.history.back();
+                        }}
                       >
                         ${msg(`Back`)}
                       </button>
@@ -304,7 +306,7 @@ class PwSettingsUpdate extends PwForm<"/api/v1/settings/update"> {
                 <div class="alert alert-danger" role="alert">
                 ${msg("Some errors occurred!")}<br />
                 ${value.error.issues.map(
-                  (issue) => html` ${issue.path}: ${issue.message}<br /> `
+                  (issue) => html` ${issue.path}: ${issue.message}<br /> `,
                 )}
               </div>
               

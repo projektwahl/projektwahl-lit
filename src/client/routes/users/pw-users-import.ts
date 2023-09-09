@@ -62,15 +62,14 @@ class PwUsersImport extends PwForm<"/api/v1/users/create-or-update"> {
     super();
 
     this._task = new Task(this, async () => {
-      
       const fileContents = await this.formData.file;
 
       const result = await myFetch<"/api/v1/users/create-or-update">(
         "POST",
         "/api/v1/users/create-or-update",
-        
+
         fileContents ? JSON.parse(fileContents) : null,
-        {}
+        {},
       );
 
       if (result.success) {
@@ -87,7 +86,6 @@ class PwUsersImport extends PwForm<"/api/v1/users/create-or-update"> {
     }
 
     if (!this.hasUpdated) {
-      
       this.formData = { file: Promise.resolve(undefined) };
     }
 
@@ -116,7 +114,6 @@ class PwUsersImport extends PwForm<"/api/v1/users/create-or-update"> {
                 name: [],
                 get: () => undefined,
                 set: (o, v) => {
-                  
                   o.file = v;
                 },
                 task: this._task,

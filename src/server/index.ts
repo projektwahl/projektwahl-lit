@@ -118,10 +118,10 @@ if (
                   },
                 ],
               },
-            })
+            }),
           );
         });
-      }
+      },
     );
 
     server.listen(
@@ -138,9 +138,9 @@ if (
         console.log(
           `[${cluster.worker?.id ?? "unknown"}] Server started at ${
             process.env.BASE_URL
-          }`
+          }`,
         );
-      }
+      },
     );
 
     if (

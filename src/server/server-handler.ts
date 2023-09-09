@@ -50,7 +50,7 @@ interface ErrorMapCtx {
 
 const myErrorMap: z.ZodErrorMap = (
   issue: ZodIssueOptionalMessage,
-  _ctx: ErrorMapCtx
+  _ctx: ErrorMapCtx,
 ): { message: string } => {
   let message: string;
   switch (issue.code) {
@@ -166,7 +166,7 @@ const BASE_URL = new URL(process.env.BASE_URL);
 
 export async function serverHandler(
   request: MyRequest,
-  response: Http2ServerResponse
+  response: Http2ServerResponse,
 ) {
   const url = new URL(request.url, BASE_URL);
 

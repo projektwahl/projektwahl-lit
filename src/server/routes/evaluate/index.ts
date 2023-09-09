@@ -41,7 +41,7 @@ async function readFileWithBacktrace(
         encoding: BufferEncoding;
         flag?: OpenMode | undefined;
       } & Abortable)
-    | BufferEncoding
+    | BufferEncoding,
 ): Promise<string> {
   try {
     // nodejs is too stupid to create a backtrace here (there is an open issue about that)
@@ -53,7 +53,7 @@ async function readFileWithBacktrace(
 
 const groupByNumber = <T>(
   data: T[],
-  keySelector: (k: T) => number
+  keySelector: (k: T) => number,
 ): Record<number, T[]> => {
   const result: Record<number, T[]> = {};
 
@@ -83,7 +83,7 @@ export class CPLEXLP {
     this.fileHandle = await open(
       this.filePath,
       constants.O_WRONLY | constants.O_CREAT | constants.O_EXCL,
-      0o600
+      0o600,
     );
   };
 
@@ -94,7 +94,7 @@ export class CPLEXLP {
   maximize = async (factor: number, variable: string) => {
     if (factor !== 0) {
       await this.fileHandle.write(
-        `\n ${factor < 0 ? "" : "+"}${factor} ${variable}`
+        `\n ${factor < 0 ? "" : "+"}${factor} ${variable}`,
       );
     }
   };
@@ -107,13 +107,13 @@ export class CPLEXLP {
     name: string,
     min: number | null,
     constraints: [number, string][],
-    max: number | null
+    max: number | null,
   ) => {
     if (min !== null && min === max) {
       await this.fileHandle.write(`\neq_${name}: `);
       for (const constraint of constraints) {
         await this.fileHandle.write(
-          ` ${constraint[0] < 0 ? "" : "+"}${constraint[0]} ${constraint[1]}`
+          ` ${constraint[0] < 0 ? "" : "+"}${constraint[0]} ${constraint[1]}`,
         );
       }
       await this.fileHandle.write(` = ${min}`);
@@ -122,7 +122,7 @@ export class CPLEXLP {
         await this.fileHandle.write(`\nmin_${name}: `);
         for (const constraint of constraints) {
           await this.fileHandle.write(
-            ` ${constraint[0] < 0 ? "" : "+"}${constraint[0]} ${constraint[1]}`
+            ` ${constraint[0] < 0 ? "" : "+"}${constraint[0]} ${constraint[1]}`,
           );
         }
         await this.fileHandle.write(` >= ${min}`);
@@ -131,7 +131,7 @@ export class CPLEXLP {
         await this.fileHandle.write(`\nmax_${name}: `);
         for (const constraint of constraints) {
           await this.fileHandle.write(
-            ` ${constraint[0] < 0 ? "" : "+"}${constraint[0]} ${constraint[1]}`
+            ` ${constraint[0] < 0 ? "" : "+"}${constraint[0]} ${constraint[1]}`,
           );
         }
         await this.fileHandle.write(` <= ${max}`);
@@ -190,7 +190,7 @@ export class CPLEXLP {
         "--wfreemps",
         this.problemFreeMpsPath,
       ],
-      {}
+      {},
     );
 
     if (childProcess.stdout) {
@@ -213,7 +213,7 @@ export class CPLEXLP {
       solution
         .filter((l) => l.startsWith("j "))
         .map((l) => l.split(" "))
-        .map(([_j, index, value]) => [parseInt(index), parseInt(value)])
+        .map(([_j, index, value]) => [parseInt(index), parseInt(value)]),
     );
 
     const problem = (
@@ -251,7 +251,7 @@ export const rank2points = (rank: number) => {
 
 export async function evaluate(
   tsql: TransactionSql<Record<string, unknown>>,
-  update: boolean
+  update: boolean,
 ) {
   const lp = new CPLEXLP();
   await lp.setup();
@@ -262,7 +262,7 @@ export async function evaluate(
   const choices = z.array(rawChoice).parse(
     await tsql.file("src/server/routes/evaluate/calculate.sql", [], {
       cache: false,
-    })
+    }),
   );
 
   const projects = await typedSql(tsql, {
@@ -286,7 +286,7 @@ export async function evaluate(
   for (const choice of choices) {
     await lp.maximize(
       rank2points(choice.rank),
-      `choice_${choice.user_id}_${choice.project_id}`
+      `choice_${choice.user_id}_${choice.project_id}`,
     );
   }
 
@@ -310,7 +310,7 @@ export async function evaluate(
         `only_in_one_project_${groupedChoice[0]}`,
         0,
         [...a, [-1, `project_not_exists_${user.project_leader_id}`]],
-        0
+        0,
       );
     } else {
       await lp.constraint(`only_in_one_project_${groupedChoice[0]}`, 1, a, 1);
@@ -326,7 +326,7 @@ export async function evaluate(
         [1, `choice_${choice.user_id}_${choice.project_id}`],
         [1, `project_not_exists_${choice.project_id}`],
       ],
-      1
+      1,
     );
   }
 
@@ -337,12 +337,12 @@ export async function evaluate(
       project.min_participants,
       [
         ...(choicesGroupedByProject[project.id] || []).map<[number, string]>(
-          (choice) => [1, `choice_${choice.user_id}_${choice.project_id}`]
+          (choice) => [1, `choice_${choice.user_id}_${choice.project_id}`],
         ),
         [1, `project_underloaded_${project.id}`],
         [project.min_participants, `project_not_exists_${project.id}`],
       ],
-      null
+      null,
     );
 
     await lp.constraint(
@@ -350,12 +350,12 @@ export async function evaluate(
       0,
       [
         ...(choicesGroupedByProject[project.id] || []).map<[number, string]>(
-          (choice) => [1, `choice_${choice.user_id}_${choice.project_id}`]
+          (choice) => [1, `choice_${choice.user_id}_${choice.project_id}`],
         ),
         [-1, `project_overloaded_${project.id}`],
         [project.max_participants, `project_not_exists_${project.id}`],
       ],
-      project.max_participants
+      project.max_participants,
     );
   }
 
@@ -366,7 +366,7 @@ export async function evaluate(
     await lp.bound(
       0,
       `project_underloaded_${project.id}`,
-      Math.max(project.min_participants - 1, 0)
+      Math.max(project.min_participants - 1, 0),
     ); // don't allow an empty project
   }
 
@@ -413,7 +413,7 @@ export async function evaluate(
     if (result[1] > 0) {
       finalOutput.overloaded.push(result);
       console.log(
-        `WARNING: PROJECT OVERLOADED: project ${result[0]} with ${result[1]} people too much`
+        `WARNING: PROJECT OVERLOADED: project ${result[0]} with ${result[1]} people too much`,
       );
     }
   }
@@ -426,7 +426,7 @@ export async function evaluate(
     if (result[1] > 0) {
       finalOutput.underloaded.push(result);
       console.log(
-        `WARNING: PROJECT UNDERLOADED: project ${result[0]} with ${result[1]} people too few`
+        `WARNING: PROJECT UNDERLOADED: project ${result[0]} with ${result[1]} people too few`,
       );
     }
   }
@@ -445,7 +445,7 @@ export async function evaluate(
   const rank_distribution = [0, 0, 0, 0, 0, 0];
 
   const keyed_choices = Object.fromEntries(
-    choices.map((c) => [`${c.user_id}_${c.project_id}`, c])
+    choices.map((c) => [`${c.user_id}_${c.project_id}`, c]),
   );
 
   for (const result of results
@@ -488,7 +488,7 @@ export async function evaluate(
   console.log(rank_distribution);
 
   console.log(
-    "WARNING solutions don't need to be strictly equal, but the sum of overloaded places and the score must be equal."
+    "WARNING solutions don't need to be strictly equal, but the sum of overloaded places and the score must be equal.",
   );
 
   return finalOutput;

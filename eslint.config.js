@@ -22,7 +22,7 @@ SPDX-FileCopyrightText: 2021 Moritz Hedtke <Moritz.Hedtke@t-online.de>
 */
 
 // https://github.com/microsoft/vscode-eslint/issues/1518
-import typescriptParser from '@typescript-eslint/parser';
+import typescriptParser from "@typescript-eslint/parser";
 import { FlatCompat } from "@eslint/eslintrc";
 import path from "path";
 import { fileURLToPath } from "url";
@@ -33,20 +33,23 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const compat = new FlatCompat({
-    baseDirectory: __dirname,
+  baseDirectory: __dirname,
 });
 
 /** @type { import("eslint").Linter.FlatConfig[] } */
 export default [
   js.configs.recommended,
-  ...compat.extends('plugin:@typescript-eslint/strict-type-checked', "plugin:@typescript-eslint/stylistic-type-checked"),
+  ...compat.extends(
+    "plugin:@typescript-eslint/strict-type-checked",
+    "plugin:@typescript-eslint/stylistic-type-checked",
+  ),
   {
     languageOptions: {
       parser: typescriptParser,
       parserOptions: {
         project: true,
         tsconfigRootDir: __dirname,
-      }
+      },
     },
     rules: {
       "@typescript-eslint/no-unused-vars": [
@@ -65,13 +68,13 @@ export default [
     },
   },
   {
-    files: [ "tests" ],
+    files: ["tests"],
     ignores: [
       ".yarn/**",
       ".pnp.loader.mjs",
       ".pnp.cjs",
       "eslint.config.js",
-      "csv2json.js" // TODO FIXME remove
+      "csv2json.js", // TODO FIXME remove
     ],
-  }
+  },
 ];

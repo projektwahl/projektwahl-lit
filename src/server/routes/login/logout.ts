@@ -61,5 +61,5 @@ export const logoutHandler = requestHandler(
         data: {},
       },
     ];
-  }
+  },
 );

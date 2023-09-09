@@ -50,7 +50,7 @@ export function pwUserCreatePreloaded(id: number, viewOnly = false) {
 
 // workaround see https://github.com/runem/lit-analyzer/issues/149#issuecomment-1006162839
 export function pwUserCreate(
-  props: Pick<PwUserCreate, "disabled" | "userId" | "url">
+  props: Pick<PwUserCreate, "disabled" | "userId" | "url">,
 ) {
   const { disabled, userId, url, ...rest } = props;
   let _ = rest;
@@ -82,7 +82,7 @@ const taskFunction = async ([id]: [number]): Promise<
       paginationLimit: 100,
       sorting: [],
     },
-    {}
+    {},
   );
   if (response.success) {
     return {
@@ -154,15 +154,17 @@ class PwUserCreate extends PwForm<"/api/v1/users/create-or-update"> {
       const result = await myFetch<"/api/v1/users/create-or-update">(
         "POST",
         this.url,
-        routes["/api/v1/users/create-or-update"]["request"].parse(this.formData), // TODO FIXME error handling
-        {}
+        routes["/api/v1/users/create-or-update"]["request"].parse(
+          this.formData,
+        ), // TODO FIXME error handling
+        {},
       );
 
       if (result.success) {
         HistoryController.goto(
           new URL(`/users/edit/${result.data[0].id}`, window.location.href),
           { random: Math.random() },
-          true
+          true,
         );
       }
       return result;
@@ -177,7 +179,7 @@ class PwUserCreate extends PwForm<"/api/v1/users/create-or-update"> {
           return undefined;
         }
       },
-      () => [this.userId]
+      () => [this.userId],
     );
 
     this.typeRef = createRef();
@@ -319,23 +321,24 @@ class PwUserCreate extends PwForm<"/api/v1/users/create-or-update"> {
                         initial: value?.data,
                         resettable: value !== undefined,
                       })}
-                      ${this.typeRef.value?.inputValue === "voter"
-                        ? html`${pwInputText<
-                            "/api/v1/users/create-or-update",
-                            string | null | undefined
-                          >({
-                            url: this.url,
-                            type: "text",
-                            disabled: this.disabled,
-                            label: msg("Group"),
-                            name: [0, "group"],
-                            get: (o) => o[0].group,
-                            set: (o, v) => (o[0].group = v),
-                            task: this._task,
-                            defaultValue: "",
-                            initial: value?.data,
-                            resettable: value !== undefined,
-                          })}
+                      ${
+                        this.typeRef.value?.inputValue === "voter"
+                          ? html`${pwInputText<
+                              "/api/v1/users/create-or-update",
+                              string | null | undefined
+                            >({
+                              url: this.url,
+                              type: "text",
+                              disabled: this.disabled,
+                              label: msg("Group"),
+                              name: [0, "group"],
+                              get: (o) => o[0].group,
+                              set: (o, v) => (o[0].group = v),
+                              task: this._task,
+                              defaultValue: "",
+                              initial: value?.data,
+                              resettable: value !== undefined,
+                            })}
                           ${pwInputNumber<
                             "/api/v1/users/create-or-update",
                             number | undefined | null
@@ -352,9 +355,11 @@ class PwUserCreate extends PwForm<"/api/v1/users/create-or-update"> {
                             initial: value?.data,
                             resettable: value !== undefined,
                           })}`
-                        : undefined}
-                      ${!this.disabled
-                        ? html`
+                          : undefined
+                      }
+                      ${
+                        !this.disabled
+                          ? html`
                             ${pwInputText<
                               "/api/v1/users/create-or-update",
                               string | undefined
@@ -373,7 +378,8 @@ class PwUserCreate extends PwForm<"/api/v1/users/create-or-update"> {
                               resettable: value !== undefined,
                             })}
                           `
-                        : undefined}
+                          : undefined
+                      }
                       ${pwInputCheckbox<"/api/v1/users/create-or-update">({
                         url: this.url,
                         type: "checkbox",
@@ -404,8 +410,9 @@ class PwUserCreate extends PwForm<"/api/v1/users/create-or-update"> {
                         initial: value?.data,
                         resettable: value !== undefined,
                       })}
-                      ${!this.disabled
-                        ? html`
+                      ${
+                        !this.disabled
+                          ? html`
                             <button
                               type="submit"
                               ?disabled=${this._task.render({
@@ -418,33 +425,37 @@ class PwUserCreate extends PwForm<"/api/v1/users/create-or-update"> {
                               ${this.actionText}
                             </button>
                           `
-                        : html`<a
+                          : html`<a
                             class="btn btn-secondary"
                             href="/users/edit/${value?.data[0].id}"
                             @click=${aClick}
                             role="button"
                             >Edit user</a
-                          >`}
+                          >`
+                      }
                       <button
                         type="button"
                         class="btn btn-secondary"
-                        @click=${() => { window.history.back(); }}
+                        @click=${() => {
+                          window.history.back();
+                        }}
                       >
                         ${msg(`Back`)}
                       </button>
 
-                      ${value?.data[0].action == "update"
-                        ? html`${pwUserProjects({
-                            refreshentitylist: () => {
-                              // TODO FIXME this may let you loose data?
-                              // I think it doesnt but not sure
-                              void this.initialTask.run();
-                            },
-                            user: value.data[0],
-                            name: "project_leader_id",
-                            title: msg("Project leader in"),
-                            prefix: "leaders",
-                          })}
+                      ${
+                        value?.data[0].action == "update"
+                          ? html`${pwUserProjects({
+                              refreshentitylist: () => {
+                                // TODO FIXME this may let you loose data?
+                                // I think it doesnt but not sure
+                                void this.initialTask.run();
+                              },
+                              user: value.data[0],
+                              name: "project_leader_id",
+                              title: msg("Project leader in"),
+                              prefix: "leaders",
+                            })}
                           ${pwUserProjects({
                             refreshentitylist: () => {
                               // TODO FIXME this may let you loose data?
@@ -456,7 +467,8 @@ class PwUserCreate extends PwForm<"/api/v1/users/create-or-update"> {
                             title: msg("Guaranteed project member in"),
                             prefix: "members",
                           })}`
-                        : undefined}
+                          : undefined
+                      }
                     </form>
                   </div>
                 </div>
@@ -470,7 +482,7 @@ class PwUserCreate extends PwForm<"/api/v1/users/create-or-update"> {
                 <div class="alert alert-danger" role="alert">
                 ${msg("Some errors occurred!")}<br />
                 ${value.error.issues.map(
-                  (issue) => html` ${issue.path}: ${issue.message}<br /> `
+                  (issue) => html` ${issue.path}: ${issue.message}<br /> `,
                 )}
               </div>
               

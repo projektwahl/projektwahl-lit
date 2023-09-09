@@ -28,7 +28,7 @@ import { PwInput } from "./pw-input.js";
 // workaround see https://github.com/runem/lit-analyzer/issues/149#issuecomment-1006162839
 export function pwInputText<
   P extends keyof typeof routes,
-  T extends string | undefined | null
+  T extends string | undefined | null,
 >(
   props: Pick<
     PwInputText<P, T>,
@@ -46,7 +46,7 @@ export function pwInputText<
     | "task"
     | "defaultValue"
     | "resettable"
-  >
+  >,
 ) {
   const {
     disabled,
@@ -87,7 +87,7 @@ export function pwInputText<
 
 export class PwInputText<
   P extends keyof typeof routes,
-  T extends string | undefined | null
+  T extends string | undefined | null,
 > extends PwInput<P, T, HTMLInputElement> {
   mypwinputchangeDispatcher = () => {
     if (!this.input.value) {
@@ -96,7 +96,7 @@ export class PwInputText<
     if (!this.input.value) {
       throw new Error();
     }
-    
+
     const val = this.input.value.value;
 
     this.inputValue = val === "" ? this.defaultValue : val;
@@ -107,7 +107,7 @@ export class PwInputText<
       new CustomEvent("refreshentitylist", {
         bubbles: true,
         composed: true,
-      })
+      }),
     );
   };
 }

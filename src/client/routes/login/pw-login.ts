@@ -33,7 +33,7 @@ import { pwInputText } from "../../form/pw-input-text.js";
 
 // workaround see https://github.com/runem/lit-analyzer/issues/149#issuecomment-1006162839
 export function pwLogin(
-  props: Record<string, never> // Pick<PwLogin, never>
+  props: Record<string, never>, // Pick<PwLogin, never>
 ) {
   const { ...rest } = props;
   const _: Record<string, never> = rest;
@@ -68,7 +68,7 @@ class PwLogin extends PwForm<"/api/v1/login"> {
         "POST",
         "/api/v1/login",
         this.formData,
-        {}
+        {},
       );
 
       if (result.success) {
@@ -76,7 +76,7 @@ class PwLogin extends PwForm<"/api/v1/login"> {
         window.dispatchEvent(
           new StorageEvent("storage", {
             newValue: "login",
-          })
+          }),
         );
 
         if (window.opener) {
@@ -96,7 +96,6 @@ class PwLogin extends PwForm<"/api/v1/login"> {
     }
 
     if (!this.hasUpdated) {
-      
       this.formData = {};
     }
 
@@ -150,8 +149,9 @@ class PwLogin extends PwForm<"/api/v1/login"> {
                 defaultValue: "",
                 resettable: false,
               })}
-              ${!this.disabled
-                ? html`
+              ${
+                !this.disabled
+                  ? html`
                     <button
                       type="submit"
                       ?disabled=${this._task.render({
@@ -164,7 +164,8 @@ class PwLogin extends PwForm<"/api/v1/login"> {
                       ${this.actionText}
                     </button>
                   `
-                : undefined}
+                  : undefined
+              }
             </form>
           </div>
         </div>

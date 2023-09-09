@@ -25,7 +25,7 @@ import { PwElement } from "../pw-element.js";
 
 // workaround see https://github.com/runem/lit-analyzer/issues/149#issuecomment-1006162839
 export function pwEvaluation(
-  props: Record<string, never> // Pick<PwEvaluation, never>
+  props: Record<string, never>, // Pick<PwEvaluation, never>
 ) {
   const { ...rest } = props;
   const _: Record<string, never> = rest;

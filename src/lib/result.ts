@@ -27,9 +27,9 @@ import type { entityRoutes, UnknownKeysParam } from "./routes.js";
 export const successResult = <
   T extends Record<string, ZodTypeAny>,
   UnknownKeys extends UnknownKeysParam = "strip",
-  Catchall extends ZodTypeAny = ZodTypeAny
+  Catchall extends ZodTypeAny = ZodTypeAny,
 >(
-  s: ZodObject<T, UnknownKeys, Catchall>
+  s: ZodObject<T, UnknownKeys, Catchall>,
 ) =>
   z
     .object({
@@ -42,9 +42,9 @@ export const successResult = <
 export const failureResult = <
   Output,
   Def extends ZodTypeDef = ZodTypeDef,
-  Input = Output
+  Input = Output,
 >(
-  s: ZodType<Output, Def, Input>
+  s: ZodType<Output, Def, Input>,
 ) =>
   z
     .object({
@@ -56,14 +56,14 @@ export const failureResult = <
 export const result = <
   T extends Record<string, ZodTypeAny>,
   UnknownKeys extends UnknownKeysParam = "strip",
-  Catchall extends ZodTypeAny = ZodTypeAny
+  Catchall extends ZodTypeAny = ZodTypeAny,
 >(
-  s: ZodObject<T, UnknownKeys, Catchall>
+  s: ZodObject<T, UnknownKeys, Catchall>,
 ) => z.union([successResult(s), failureResult(z.record(z.string()))]);
 
 export type ToIndexed<
   T extends Record<string, { [inner in I]: unknown }>,
-  I extends string | number | symbol
+  I extends string | number | symbol,
 > = {
   [K in keyof T]: T[K][I];
 };
@@ -71,7 +71,7 @@ export type ToIndexed<
 export function mappedIndexing<
   T extends Record<string, { [inner in I]: unknown }>,
   K extends string,
-  I extends string | number | symbol
+  I extends string | number | symbol,
 >(value: T[K], index: I): ToIndexed<T, I>[K] {
   return value[index];
 }
@@ -79,7 +79,7 @@ export function mappedIndexing<
 export function mappedIndexingSet<
   T extends Record<string, { [inner in I]: unknown }>,
   K extends string,
-  I extends string | number | symbol
+  I extends string | number | symbol,
 >(value: T[K], index: I, newValue: ToIndexed<T, I>[K]): void {
   value[index] = newValue;
 }
@@ -88,7 +88,7 @@ export type ToTuple<
   K extends string | symbol | number,
   T extends { [key in K]: unknown },
   Q extends { [key in K]: unknown },
-  R extends { [key in K]: unknown }
+  R extends { [key in K]: unknown },
 > = {
   [key in K]: [T[key], Q[key], R[key]];
 };
@@ -97,7 +97,7 @@ export function mappedTuple<
   K extends string | number | symbol,
   T extends { [key in K]: unknown },
   Q extends { [key in K]: unknown },
-  R extends { [key in K]: unknown }
+  R extends { [key in K]: unknown },
 >(path: K, value1: T[K], value2: Q[K], value3: R[K]): ToTuple<K, T, Q, R>[K] {
   return [value1, value2, value3];
 }
@@ -106,15 +106,14 @@ export function testa<Output>(zodtype: ZodType<Output>, data: unknown): Output {
   return zodtype.parse(data);
 }
 
-export type MappedFunctionCallType<
-  T extends Record<string, ZodType<unknown>>
-> = {
-  [K in keyof T]: T[K]["_output"];
-};
+export type MappedFunctionCallType<T extends Record<string, ZodType<unknown>>> =
+  {
+    [K in keyof T]: T[K]["_output"];
+  };
 
 export function mappedFunctionCall<
   T extends Record<string, ZodType<unknown>>,
-  K extends string
+  K extends string,
 >(schema: T[K], value: unknown): MappedFunctionCallType<T>[K] {
   return testa(schema, value);
 }
@@ -131,7 +130,7 @@ type entitiesType4 = {
 
 export function mappedFunctionCall2<R extends keyof typeof entityRoutes, U>(
   array: entitiesType15[R],
-  functio: (v: entitiesType4[R]) => readonly U[]
+  functio: (v: entitiesType4[R]) => readonly U[],
 ): U[] {
   return array.flatMap(functio);
 }

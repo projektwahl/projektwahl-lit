@@ -42,7 +42,7 @@ export async function project(
   max_participants = 15,
   min_age = 5,
   max_age = 13,
-  random_assignments = true
+  random_assignments = true,
 ): Promise<number> {
   return (
     await typedSql(tsql, {
@@ -54,7 +54,7 @@ export async function project(
 export async function user(
   tsql: TransactionSql<Record<string, unknown>>,
   age: number,
-  project_leader_id: number | null = null
+  project_leader_id: number | null = null,
 ): Promise<number> {
   await tsql`SELECT set_config('projektwahl.id', 0::text, true);`;
   await tsql`SELECT set_config('projektwahl.type', 'root', true);`;
@@ -69,7 +69,7 @@ export async function vote(
   tsql: TransactionSql<Record<string, unknown>>,
   project_id: number,
   user_id: number,
-  rank: number
+  rank: number,
 ) {
   await tsql`INSERT INTO choices (user_id, project_id, rank) VALUES (${user_id}, ${project_id}, ${rank}) ON CONFLICT DO NOTHING;`;
 }
@@ -421,7 +421,7 @@ export async function test_extreme() {
           tsql,
           projects[chance.integer({ min: 0, max: projects.length - 1 })],
           currentUser,
-          j
+          j,
         );
       }
     }

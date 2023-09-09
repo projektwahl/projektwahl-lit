@@ -46,7 +46,7 @@ export const updateChoiceHandler = createOrUpdateChoiceHandler(
         columns: {},
       } as const)`INSERT INTO choices (user_id, project_id, rank) VALUES (${loggedInUser.id}, ${project_id}, ${rank}) ON CONFLICT (user_id, project_id) DO UPDATE SET rank = ${rank};`;
     }
-  }
+  },
 );
 
 export function createOrUpdateChoiceHandler<P extends "/api/v1/choices/update">(
@@ -54,8 +54,8 @@ export function createOrUpdateChoiceHandler<P extends "/api/v1/choices/update">(
   dbquery: (
     sql: postgres.TransactionSql<Record<string, unknown>>,
     choice: z.infer<typeof routes[P]["request"]>,
-    loggedInUser: Exclude<z.infer<typeof userSchema>, undefined>
-  ) => Promise<z.infer<typeof routes[P]["response"]>[]>
+    loggedInUser: Exclude<z.infer<typeof userSchema>, undefined>,
+  ) => Promise<z.infer<typeof routes[P]["response"]>[]>,
 ) {
   return requestHandler("POST", path, async function (choice, loggedInUser) {
     // helper is allowed to create projects and change their own projects
@@ -64,7 +64,7 @@ export function createOrUpdateChoiceHandler<P extends "/api/v1/choices/update">(
     if (!loggedInUser) {
       const returnValue: [
         OutgoingHttpHeaders,
-        ResponseType<"/api/v1/choices/update">
+        ResponseType<"/api/v1/choices/update">,
       ] = [
         {
           "content-type": "text/json; charset=utf-8",
@@ -156,7 +156,7 @@ export function createOrUpdateChoiceHandler<P extends "/api/v1/choices/update">(
       if (error instanceof postgres.PostgresError) {
         const returnValue: [
           OutgoingHttpHeaders,
-          ResponseType<"/api/v1/users/create-or-update">
+          ResponseType<"/api/v1/users/create-or-update">,
         ] = [
           {
             "content-type": "text/json; charset=utf-8",

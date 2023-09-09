@@ -29,7 +29,7 @@ import { Ref, ref } from "lit/directives/ref.js";
 // workaround see https://github.com/runem/lit-analyzer/issues/149#issuecomment-1006162839
 export function pwInputSelect<
   P extends keyof typeof routes,
-  T extends string | boolean | number | undefined
+  T extends string | boolean | number | undefined,
 >(
   props: Pick<
     PwInputSelect<P, T>,
@@ -47,7 +47,7 @@ export function pwInputSelect<
     | "task"
     | "defaultValue"
     | "resettable"
-  > & { pwRef?: Ref<PwInputSelect<P, T>> }
+  > & { pwRef?: Ref<PwInputSelect<P, T>> },
 ) {
   const {
     disabled,
@@ -109,7 +109,7 @@ export function pwInputSelect<
 
 export class PwInputSelect<
   P extends keyof typeof routes,
-  T extends string | boolean | number | undefined
+  T extends string | boolean | number | undefined,
 > extends PwInput<P, T, HTMLSelectElement> {
   mypwinputchangeDispatcher = () => {
     if (!this.input.value) {
@@ -133,7 +133,7 @@ export class PwInputSelect<
       new CustomEvent("refreshentitylist", {
         bubbles: true,
         composed: true,
-      })
+      }),
     );
   };
 }

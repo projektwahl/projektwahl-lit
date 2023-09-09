@@ -54,7 +54,7 @@ export const pwProjectsPreloaded = async (url: URL) => {
     "/api/v1/projects",
     url,
     "projects",
-    defaultValue
+    defaultValue,
   );
   return pwProjects({
     initial: result,
@@ -64,7 +64,7 @@ export const pwProjectsPreloaded = async (url: URL) => {
 
 // workaround see https://github.com/runem/lit-analyzer/issues/149#issuecomment-1006162839
 export function pwProjects<X extends string>(
-  props: Pick<PwProjects<X>, "initial" | "prefix">
+  props: Pick<PwProjects<X>, "initial" | "prefix">,
 ) {
   const { initial, prefix, ...rest } = props;
   let _ = rest;
@@ -118,7 +118,7 @@ export class PwProjects<X extends string> extends PwEntityList<
         this.url,
         this.prefix,
         this.history.url,
-        defaultValue
+        defaultValue,
       );
 
       const initial = data[this.prefix];
@@ -261,42 +261,48 @@ export class PwProjects<X extends string> extends PwEntityList<
                 (value) => html`<tr>
                   <th scope="row">
                     <p>
-                      ${value.deleted
-                        ? html`<del
+                      ${
+                        value.deleted
+                          ? html`<del
                             ><a
                               @click=${aClick}
                               href="/projects/view/${value.id}"
                               >${value.id}</a
                             ></del
                           >`
-                        : html`<a
+                          : html`<a
                             @click=${aClick}
                             href="/projects/view/${value.id}"
                             >${value.id}</a
-                          >`}
+                          >`
+                      }
                     </p>
                   </th>
                   <td>
                     <p>
-                      ${value.deleted
-                        ? html`<del
+                      ${
+                        value.deleted
+                          ? html`<del
                             ><a
                               @click=${aClick}
                               href="/projects/view/${value.id}"
                               >${value.title}</a
                             ></del
                           >`
-                        : html`<a
+                          : html`<a
                             @click=${aClick}
                             href="/projects/view/${value.id}"
                             >${value.title}</a
-                          >`}
+                          >`
+                      }
                     </p>
                   </td>
                   <td class="td-truncate w-50">
-                    ${value.deleted
-                      ? html`<del>${value.info}</del>`
-                      : html`${value.info}`}
+                    ${
+                      value.deleted
+                        ? html`<del>${value.info}</del>`
+                        : html`${value.info}`
+                    }
                   </td>
                   <td>
                     <p>${value.deleted ? msg("deleted") : ""}</p>
@@ -322,7 +328,7 @@ export class PwProjects<X extends string> extends PwEntityList<
                       </svg>
                     </a>
                   </td>
-                </tr>`
+                </tr>`,
               )
             : undefined;
         },

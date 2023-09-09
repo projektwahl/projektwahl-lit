@@ -36,7 +36,7 @@ import { live } from "lit/directives/live.js";
 export abstract class PwInput<
   P extends keyof typeof routes,
   T,
-  I extends Element
+  I extends Element,
 > extends PwElement {
   static override get properties() {
     return {
@@ -46,7 +46,7 @@ export abstract class PwInput<
         attribute: false,
         hasChanged: (
           newVal: (string | number)[],
-          oldVal: (string | number)[]
+          oldVal: (string | number)[],
         ) => {
           return JSON.stringify(newVal) !== JSON.stringify(oldVal);
         },
@@ -56,7 +56,7 @@ export abstract class PwInput<
         attribute: false,
         hasChanged: (
           newVal: (string | number)[],
-          oldVal: (string | number)[]
+          oldVal: (string | number)[],
         ) => {
           return JSON.stringify(newVal) !== JSON.stringify(oldVal);
         },
@@ -186,7 +186,7 @@ export abstract class PwInput<
     super.connectedCallback();
     this.addEventListener(
       this.type === "select" || this.type === "checkbox" ? "change" : "input",
-      this.mypwinputchangeDispatcher
+      this.mypwinputchangeDispatcher,
     );
     let curr: HTMLElement | null = this.parentElement;
     while (!(curr === null || curr instanceof PwForm<P>)) {
@@ -195,7 +195,7 @@ export abstract class PwInput<
     if (!curr) {
       throw new Error("PwForm not found");
     }
-    
+
     this.pwForm = curr;
   }
 
@@ -203,7 +203,7 @@ export abstract class PwInput<
     super.disconnectedCallback();
     this.removeEventListener(
       this.type === "select" || this.type === "checkbox" ? "change" : "input",
-      this.mypwinputchangeDispatcher
+      this.mypwinputchangeDispatcher,
     );
   }
 
@@ -219,12 +219,12 @@ export abstract class PwInput<
       // in case this is an update set the value to undefined as it wasn't changed yet.
       this.set(
         this.pwForm.formData,
-        
+
         this.resettable
           ? this.initial !== undefined
             ? undefined
             : this.defaultValue
-          : this.inputValue
+          : this.inputValue,
       );
     }
   }
@@ -242,12 +242,12 @@ export abstract class PwInput<
       // in case this is an update set the value to undefined as it wasn't changed yet.
       this.set(
         this.pwForm.formData,
-        
+
         this.resettable
           ? this.initial !== undefined
             ? undefined
             : this.defaultValue
-          : this.inputValue
+          : this.inputValue,
       );
     }
 
@@ -276,10 +276,10 @@ export abstract class PwInput<
           .value=${ifDefined(
             this.type !== "checkbox" && this.type !== "select"
               ? live(this.inputValue ?? "")
-              : undefined
+              : undefined,
           )}
           .checked=${ifDefined(
-            this.type === "checkbox" ? live(this.inputValue) : undefined
+            this.type === "checkbox" ? live(this.inputValue) : undefined,
           )}
           class="${
             this.type === "checkbox" ? "form-check-input" : "form-control"
@@ -288,7 +288,7 @@ export abstract class PwInput<
       complete: (v) =>
         !v.success &&
         v.error.issues.find(
-          (i) => JSON.stringify(i.path) == JSON.stringify(this.name)
+          (i) => JSON.stringify(i.path) == JSON.stringify(this.name),
         ) !== undefined
           ? "is-invalid"
           : "is-valid",
@@ -317,7 +317,7 @@ export abstract class PwInput<
                     .value=${o.value}
                   >
                     ${o.text}
-                  </option>`
+                  </option>`,
               )
             : undefined
         }</${
@@ -344,8 +344,8 @@ export abstract class PwInput<
                   : this.defaultValue;
               this.set(
                 this.pwForm.formData,
-                
-                this.initial !== undefined ? undefined : this.defaultValue
+
+                this.initial !== undefined ? undefined : this.defaultValue,
               );
               this.requestUpdate();
             }}
@@ -376,16 +376,19 @@ export abstract class PwInput<
             if (!v.success) {
               if (
                 v.error.issues.find(
-                  (i) => JSON.stringify(i.path) == JSON.stringify(this.name)
+                  (i) => JSON.stringify(i.path) == JSON.stringify(this.name),
                 ) !== undefined
               ) {
                 return html` <div
                   id="${this.randomId}-feedback"
                   class="invalid-feedback"
                 >
-                  ${v.error.issues.find(
-                    (i) => JSON.stringify(i.path) == JSON.stringify(this.name)
-                  )?.message}
+                  ${
+                    v.error.issues.find(
+                      (i) =>
+                        JSON.stringify(i.path) == JSON.stringify(this.name),
+                    )?.message
+                  }
                 </div>`;
               }
               return undefined;
@@ -403,13 +406,13 @@ export abstract class PwInput<
                 rel="noopener noreferrer"
                 href="https://imgs.xkcd.com/comics/password_strength.png"
                 >${msg(
-                  "Denk dran: Lange Passwörter sind viel sicherer als welche mit vielen Sonderzeichen."
+                  "Denk dran: Lange Passwörter sind viel sicherer als welche mit vielen Sonderzeichen.",
                 )}</a
               ><br />
               ${msg(
                 html`Also lieber "Ich mag fliegende Autos." anstatt
                   "Moritz1234!".<br />Du kannst auch einen Passwort-Manager
-                  verwenden, z.B.`
+                  verwenden, z.B.`,
               )}
               <a
                 target="_blank"

@@ -33,7 +33,7 @@ import { PwElement } from "../../pw-element.js";
 
 // workaround see https://github.com/runem/lit-analyzer/issues/149#issuecomment-1006162839
 export function pwProjectUserCheckbox(
-  props: Pick<PwProjectUserCheckbox, "type" | "projectId" | "user" | "name">
+  props: Pick<PwProjectUserCheckbox, "type" | "projectId" | "user" | "name">,
 ) {
   const { type, projectId, user, name, ...rest } = props;
   let _ = rest;
@@ -103,14 +103,14 @@ class PwProjectUserCheckbox extends PwElement {
               this.user[this.name] === this.projectId ? null : this.projectId,
           },
         ],
-        {}
+        {},
       );
 
       this.input.value?.dispatchEvent(
         new CustomEvent("refreshentitylist", {
           bubbles: true,
           composed: true,
-        })
+        }),
       );
 
       return result;
@@ -123,7 +123,7 @@ class PwProjectUserCheckbox extends PwElement {
         complete: (data) => {
           if (!data.success) {
             const errors = data.error.issues.map(
-              (i) => html`${i.path}: ${i.message}<br />`
+              (i) => html`${i.path}: ${i.message}<br />`,
             );
             if (errors.length > 0) {
               return html`<div class="alert alert-danger" role="alert">

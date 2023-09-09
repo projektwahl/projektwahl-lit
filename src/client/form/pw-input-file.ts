@@ -43,7 +43,7 @@ export function pwInputFile<P extends keyof typeof routes>(
     | "task"
     | "defaultValue"
     | "resettable"
-  >
+  >,
 ) {
   const {
     disabled,
@@ -98,7 +98,7 @@ export class PwInputFile<P extends keyof typeof routes> extends PwInput<
         new CustomEvent("refreshentitylist", {
           bubbles: true,
           composed: true,
-        })
+        }),
       );
     } else {
       throw new Error("invalid amount of files selected");

@@ -46,19 +46,19 @@ export function requestHandler<P extends keyof typeof routes>(
   handler: (
     r: z.infer<typeof routes[P]["request"]>,
     user: z.infer<typeof userSchema>,
-    session_id: Uint8Array | undefined
+    session_id: Uint8Array | undefined,
   ) =>
     | PromiseLike<[OutgoingHttpHeaders, ResponseType<P>]>
-    | [OutgoingHttpHeaders, ResponseType<P>]
+    | [OutgoingHttpHeaders, ResponseType<P>],
 ): (
   url: URL,
   request: MyRequest,
-  response: ServerResponse | Http2ServerResponse
+  response: ServerResponse | Http2ServerResponse,
 ) => Promise<void> {
   const fn = async (
     url: URL,
     request: MyRequest,
-    response: ServerResponse | Http2ServerResponse
+    response: ServerResponse | Http2ServerResponse,
   ) => {
     if (request.method !== method) {
       response.writeHead(400, {
@@ -94,11 +94,11 @@ export function requestHandler<P extends keyof typeof routes>(
       session_id = new Uint8Array(
         await crypto.subtle.digest(
           "SHA-256",
-          new TextEncoder().encode(session_id_unhashed)
-        )
+          new TextEncoder().encode(session_id_unhashed),
+        ),
       );
       const session_id_ = session_id;
-      
+
       user = (
         await retryableBegin(
           "ISOLATION LEVEL READ COMMITTED READ WRITE",
@@ -115,7 +115,7 @@ export function requestHandler<P extends keyof typeof routes>(
               },
             } as const)`UPDATE sessions SET updated_at = CURRENT_TIMESTAMP FROM users WHERE users.id = sessions.user_id AND session_id = ${session_id_} AND CURRENT_TIMESTAMP < updated_at + interval '24 hours' RETURNING users.id, users.type, users.username, users.group, users.age`;
             //await typedSql(sql, {})`DELETE FROM sessions WHERE CURRENT_TIMESTAMP >= updated_at + interval '24 hours'`
-          }
+          },
         )
       )[0];
     }
@@ -127,8 +127,8 @@ export function requestHandler<P extends keyof typeof routes>(
     } else {
       body = routes[path].request.safeParse(
         JSON.parse(
-          decodeURIComponent(url.search == "" ? "{}" : url.search.substring(1))
-        )
+          decodeURIComponent(url.search == "" ? "{}" : url.search.substring(1)),
+        ),
       ); // TODO FIXME if this throws
     }
     const requestBody: ResponseType<P> = body;
@@ -137,7 +137,7 @@ export function requestHandler<P extends keyof typeof routes>(
       const [new_headers, responseBody] = await handler(
         requestBody.data,
         user,
-        session_id
+        session_id,
       );
       const { ":status": _, ...finalHeaders } = new_headers;
       // TODO FIXME it is nowhere ensured that :status is set.

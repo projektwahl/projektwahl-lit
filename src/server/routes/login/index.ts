@@ -122,7 +122,7 @@ export const loginHandler = requestHandler(
 
     const [valid, needsRehash, newHash] = await checkPassword(
       dbUser.password_hash,
-      body.password
+      body.password,
     );
 
     if (!valid) {
@@ -165,13 +165,13 @@ export const loginHandler = requestHandler(
     }
 
     const session_id_unhashed = Buffer.from(
-      crypto.getRandomValues(new Uint8Array(32))
+      crypto.getRandomValues(new Uint8Array(32)),
     ).toString("hex");
     const session_id = new Uint8Array(
       await crypto.subtle.digest(
         "SHA-256",
-        new TextEncoder().encode(session_id_unhashed)
-      )
+        new TextEncoder().encode(session_id_unhashed),
+      ),
     );
 
     await sql.begin("READ WRITE", async (tsql) => {
@@ -193,13 +193,13 @@ export const loginHandler = requestHandler(
           48 * 60 * 60
         };`,
         `username=${encodeURIComponent(
-          dbUser.username
+          dbUser.username,
         )}; Secure; Path=/; SameSite=Lax; Max-Age=${48 * 60 * 60};`,
         `type=${dbUser.type}; Secure; Path=/; SameSite=Lax; Max-Age=${
           48 * 60 * 60
         };`,
         `id=${encodeURIComponent(
-          dbUser.id
+          dbUser.id,
         )}; Secure; Path=/; SameSite=Lax; Max-Age=${48 * 60 * 60};`,
       ],
       [sensitiveHeaders]: ["set-cookie"],
@@ -211,5 +211,5 @@ export const loginHandler = requestHandler(
         data: {},
       },
     ];
-  }
+  },
 );

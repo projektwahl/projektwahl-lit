@@ -99,7 +99,7 @@ export async function hashPassword(password: string): Promise<string> {
 
 export async function checkPassword(
   hash: string,
-  password: string
+  password: string,
 ): Promise<[boolean, boolean, string]> {
   const needsRehash = argon2.needsRehash(hash, argon2Options);
   return [

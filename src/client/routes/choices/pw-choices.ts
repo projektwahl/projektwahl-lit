@@ -58,7 +58,7 @@ export const pwChoicesPreloaded = async (url: URL) => {
     "/api/v1/choices",
     url,
     "choices",
-    defaultValue
+    defaultValue,
   );
   return pwChoices({
     initial: result,
@@ -68,7 +68,7 @@ export const pwChoicesPreloaded = async (url: URL) => {
 
 // workaround see https://github.com/runem/lit-analyzer/issues/149#issuecomment-1006162839
 export function pwChoices<X extends string>(
-  props: Pick<PwChoices<X>, "initial" | "prefix">
+  props: Pick<PwChoices<X>, "initial" | "prefix">,
 ) {
   const { initial, prefix, ...rest } = props;
   let _ = rest;
@@ -102,7 +102,7 @@ class PwChoices<X extends string> extends PwEntityList<"/api/v1/choices", X> {
             paginationCursor: null,
             sorting: [["rank", "ASC", null]],
           },
-          {}
+          {},
         );
 
         if (result.success) {
@@ -150,21 +150,31 @@ class PwChoices<X extends string> extends PwEntityList<"/api/v1/choices", X> {
               return html`
                 <div class="alert alert-danger w-100" role="alert">
                   Falsch gewählt!
-                  ${value.data[0] !== 1
-                    ? `${value.data[0]} anstatt einer Erstwahl!`
-                    : undefined}
-                  ${value.data[1] !== 1
-                    ? `${value.data[1]} anstatt einer Zweitwahl!`
-                    : undefined}
-                  ${value.data[2] !== 1
-                    ? `${value.data[2]} anstatt einer Drittwahl!`
-                    : undefined}
-                  ${value.data[3] !== 1
-                    ? `${value.data[3]} anstatt einer Viertwahl!`
-                    : undefined}
-                  ${value.data[4] !== 1
-                    ? `${value.data[4]} anstatt einer Fünftwahl!`
-                    : undefined}
+                  ${
+                    value.data[0] !== 1
+                      ? `${value.data[0]} anstatt einer Erstwahl!`
+                      : undefined
+                  }
+                  ${
+                    value.data[1] !== 1
+                      ? `${value.data[1]} anstatt einer Zweitwahl!`
+                      : undefined
+                  }
+                  ${
+                    value.data[2] !== 1
+                      ? `${value.data[2]} anstatt einer Drittwahl!`
+                      : undefined
+                  }
+                  ${
+                    value.data[3] !== 1
+                      ? `${value.data[3]} anstatt einer Viertwahl!`
+                      : undefined
+                  }
+                  ${
+                    value.data[4] !== 1
+                      ? `${value.data[4]} anstatt einer Fünftwahl!`
+                      : undefined
+                  }
                 </div>
               `;
             }
@@ -201,7 +211,7 @@ class PwChoices<X extends string> extends PwEntityList<"/api/v1/choices", X> {
         this.url,
         this.prefix,
         this.history.url,
-        defaultValue
+        defaultValue,
       );
 
       const initial = data[this.prefix];
@@ -333,36 +343,40 @@ class PwChoices<X extends string> extends PwEntityList<"/api/v1/choices", X> {
                 (value) => html`<tr ${animate()}>
                   <th scope="row">
                     <p>
-                      ${value.deleted
-                        ? html`<del
+                      ${
+                        value.deleted
+                          ? html`<del
                             ><a
                               @click=${aClick}
                               href="/projects/view/${value.id}"
                               >${value.id}</a
                             ></del
                           >`
-                        : html`<a
+                          : html`<a
                             @click=${aClick}
                             href="/projects/view/${value.id}"
                             >${value.id}</a
-                          >`}
+                          >`
+                      }
                     </p>
                   </th>
                   <td>
                     <p>
-                      ${value.deleted
-                        ? html`<del
+                      ${
+                        value.deleted
+                          ? html`<del
                             ><a
                               @click=${aClick}
                               href="/projects/view/${value.id}"
                               >${value.title}</a
                             ></del
                           >`
-                        : html`<a
+                          : html`<a
                             @click=${aClick}
                             href="/projects/view/${value.id}"
                             >${value.title}</a
-                          >`}
+                          >`
+                      }
                     </p>
                   </td>
                   <td>${value.min_age} - ${value.max_age}</td>
@@ -371,7 +385,7 @@ class PwChoices<X extends string> extends PwEntityList<"/api/v1/choices", X> {
                       choice: value,
                     })}
                   </td>
-                </tr>`
+                </tr>`,
               )
             : undefined;
         },

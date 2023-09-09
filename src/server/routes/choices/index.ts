@@ -36,7 +36,7 @@ export const choicesHandler = requestHandler(
     if (!loggedInUser) {
       const returnValue: [
         OutgoingHttpHeaders,
-        ResponseType<"/api/v1/choices">
+        ResponseType<"/api/v1/choices">,
       ] = [
         {
           "content-type": "text/json; charset=utf-8",
@@ -61,7 +61,7 @@ export const choicesHandler = requestHandler(
     if (!(loggedInUser.type === "voter")) {
       const returnValue: [
         OutgoingHttpHeaders,
-        ResponseType<"/api/v1/choices">
+        ResponseType<"/api/v1/choices">,
       ] = [
         {
           "content-type": "text/json; charset=utf-8",
@@ -122,7 +122,7 @@ export const choicesHandler = requestHandler(
                 : "ASC"
               : q === "ASC"
               ? "ASC"
-              : "DESC"
+              : "DESC",
           )}`,
         title: (q, o) =>
           sql`title ${sql.unsafe(
@@ -132,7 +132,7 @@ export const choicesHandler = requestHandler(
                 : "ASC"
               : q === "ASC"
               ? "ASC"
-              : "DESC"
+              : "DESC",
           )}`,
         id: (q, o) =>
           sql`id ${sql.unsafe(
@@ -142,10 +142,10 @@ export const choicesHandler = requestHandler(
                 : "ASC"
               : q === "ASC"
               ? "ASC"
-              : "DESC"
+              : "DESC",
           )}`,
       },
-      "id"
+      "id",
     );
-  }
+  },
 );

@@ -40,7 +40,7 @@ export const createOrUpdateUsersHandler = requestHandler(
     if (!loggedInUser) {
       const returnValue: [
         OutgoingHttpHeaders,
-        ResponseType<"/api/v1/users/create-or-update">
+        ResponseType<"/api/v1/users/create-or-update">,
       ] = [
         {
           "content-type": "text/json; charset=utf-8",
@@ -65,7 +65,7 @@ export const createOrUpdateUsersHandler = requestHandler(
     if (!(loggedInUser.type === "admin" || loggedInUser.type === "helper")) {
       const returnValue: [
         OutgoingHttpHeaders,
-        ResponseType<"/api/v1/users/create-or-update">
+        ResponseType<"/api/v1/users/create-or-update">,
       ] = [
         {
           "content-type": "text/json; charset=utf-8",
@@ -175,9 +175,9 @@ export const createOrUpdateUsersHandler = requestHandler(
                   project_leader_id: 23,
                   force_in_project_id: 23,
                 },
-              } as const)`INSERT INTO users_with_deleted (username, openid_id, password_hash, type, "group", age, away, deleted, last_updated_by) VALUES (${
-                username
-              }, ${openid_id ?? null}, ${
+              } as const)`INSERT INTO users_with_deleted (username, openid_id, password_hash, type, "group", age, away, deleted, last_updated_by) VALUES (${username}, ${
+                openid_id ?? null
+              }, ${
                 password !== undefined ? await hashPassword(password) : null
               }, ${type}, ${type === "voter" ? group ?? null : null}, ${
                 type === "voter" ? age ?? null : null
@@ -194,7 +194,7 @@ export const createOrUpdateUsersHandler = requestHandler(
 
       const returnValue: [
         OutgoingHttpHeaders,
-        ResponseType<"/api/v1/users/create-or-update">
+        ResponseType<"/api/v1/users/create-or-update">,
       ] = [
         {
           "content-type": "text/json; charset=utf-8",
@@ -202,7 +202,7 @@ export const createOrUpdateUsersHandler = requestHandler(
         },
         {
           success: true as const,
-          
+
           data: row,
         },
       ];
@@ -216,7 +216,7 @@ export const createOrUpdateUsersHandler = requestHandler(
           // unique violation
           const returnValue: [
             OutgoingHttpHeaders,
-            ResponseType<"/api/v1/users/create-or-update">
+            ResponseType<"/api/v1/users/create-or-update">,
           ] = [
             {
               "content-type": "text/json; charset=utf-8",
@@ -240,7 +240,7 @@ export const createOrUpdateUsersHandler = requestHandler(
           // TODO FIXME do this everywhere else / unify
           const returnValue: [
             OutgoingHttpHeaders,
-            ResponseType<"/api/v1/users/create-or-update">
+            ResponseType<"/api/v1/users/create-or-update">,
           ] = [
             {
               "content-type": "text/json; charset=utf-8",
@@ -265,7 +265,7 @@ export const createOrUpdateUsersHandler = requestHandler(
       console.error(error);
       const returnValue: [
         OutgoingHttpHeaders,
-        ResponseType<"/api/v1/users/create-or-update">
+        ResponseType<"/api/v1/users/create-or-update">,
       ] = [
         {
           "content-type": "text/json; charset=utf-8",
@@ -286,5 +286,5 @@ export const createOrUpdateUsersHandler = requestHandler(
       ];
       return returnValue;
     }
-  }
+  },
 );

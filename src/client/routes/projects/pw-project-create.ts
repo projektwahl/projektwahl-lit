@@ -49,7 +49,7 @@ export function pwProjectCreatePreloaded(id: number, viewOnly = false) {
 
 // workaround see https://github.com/runem/lit-analyzer/issues/149#issuecomment-1006162839
 export function pwProjectCreate(
-  props: Pick<PwProjectCreate, "disabled" | "url" | "projectId">
+  props: Pick<PwProjectCreate, "disabled" | "url" | "projectId">,
 ) {
   const { disabled, url, projectId, ...rest } = props;
   let _ = rest;
@@ -74,7 +74,7 @@ const taskFunction = async ([id]: [number]) => {
       paginationLimit: 100,
       sorting: [],
     },
-    {}
+    {},
   );
   if (response.success) {
     return {
@@ -121,7 +121,6 @@ export class PwProjectCreate extends PwForm<
           id: this.projectId,
         };
       } else {
-        
         this.formData = {};
       }
     }
@@ -167,7 +166,7 @@ export class PwProjectCreate extends PwForm<
         HistoryController.goto(
           new URL(`/projects/edit/${result.data.id}`, window.location.href),
           { random: Math.random() },
-          true
+          true,
         );
       }
 
@@ -183,7 +182,7 @@ export class PwProjectCreate extends PwForm<
           return undefined;
         }
       },
-      () => [this.projectId]
+      () => [this.projectId],
     );
   }
 
@@ -414,8 +413,9 @@ export class PwProjectCreate extends PwForm<
                         initial: value?.data,
                         resettable: value !== undefined,
                       })}
-                      ${!this.disabled
-                        ? html`
+                      ${
+                        !this.disabled
+                          ? html`
                             <button
                               type="submit"
                               ?disabled=${this._task.render({
@@ -428,53 +428,62 @@ export class PwProjectCreate extends PwForm<
                               ${this.actionText}
                             </button>
                           `
-                        : this.userController.type !== "voter"
-                        ? html`<a
+                          : this.userController.type !== "voter"
+                          ? html`<a
                             class="btn btn-secondary"
                             @click=${aClick}
                             href="/projects/edit/${value?.data.id}"
                             role="button"
                             >Edit project</a
                           >`
-                        : ``}
+                          : ``
+                      }
                       <button
                         type="button"
                         class="btn btn-secondary"
-                        @click=${() => { window.history.back(); }}
+                        @click=${() => {
+                          window.history.back();
+                        }}
                       >
                         ${msg(`Back`)}
                       </button>
 
                       <!-- Projektleitende -->
                       <!-- TODO FIXME view only -->
-                      ${value
-                        ? pwProjectUsers({
-                            projectId: value.data.id,
-                            name: "project_leader_id",
-                            title: msg("Project leaders"),
-                            prefix: "leaders",
-                          })
-                        : html``}
-                      ${value &&
-                      (this.userController.type === "admin" ||
-                        this.userController.type === "helper")
-                        ? pwProjectUsers({
-                            projectId: value.data.id,
-                            name: "force_in_project_id",
-                            title: msg("Guaranteed project members"),
-                            prefix: "members",
-                          })
-                        : html``}
-                      ${value &&
-                      (this.userController.type === "admin" ||
-                        this.userController.type === "helper")
-                        ? pwProjectUsers({
-                            projectId: value.data.id,
-                            name: "computed_in_project_id",
-                            title: msg("Actual project members"),
-                            prefix: "actual_members",
-                          })
-                        : html``}
+                      ${
+                        value
+                          ? pwProjectUsers({
+                              projectId: value.data.id,
+                              name: "project_leader_id",
+                              title: msg("Project leaders"),
+                              prefix: "leaders",
+                            })
+                          : html``
+                      }
+                      ${
+                        value &&
+                        (this.userController.type === "admin" ||
+                          this.userController.type === "helper")
+                          ? pwProjectUsers({
+                              projectId: value.data.id,
+                              name: "force_in_project_id",
+                              title: msg("Guaranteed project members"),
+                              prefix: "members",
+                            })
+                          : html``
+                      }
+                      ${
+                        value &&
+                        (this.userController.type === "admin" ||
+                          this.userController.type === "helper")
+                          ? pwProjectUsers({
+                              projectId: value.data.id,
+                              name: "computed_in_project_id",
+                              title: msg("Actual project members"),
+                              prefix: "actual_members",
+                            })
+                          : html``
+                      }
                     </form>
                   </div>
                 </div>
@@ -488,7 +497,7 @@ export class PwProjectCreate extends PwForm<
                 <div class="alert alert-danger" role="alert">
                 ${msg("Some errors occurred!")}<br />
                 ${value.error.issues.map(
-                  (issue) => html` ${issue.path}: ${issue.message}<br /> `
+                  (issue) => html` ${issue.path}: ${issue.message}<br /> `,
                 )}
               </div>
               

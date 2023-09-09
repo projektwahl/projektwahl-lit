@@ -37,11 +37,13 @@ window.addEventListener(
   function (event: PromiseRejectionEvent) {
     console.error("window.unhandledrejection", event.promise);
     alert(
-      `unknown promise error: ${String(event.reason)} ${String(event.promise)}`
+      `unknown promise error: ${String(event.reason)} ${String(event.promise)}`,
     );
-    
-    event.promise.catch((reason) => { alert(String(reason)); });
-  }
+
+    event.promise.catch((reason) => {
+      alert(String(reason));
+    });
+  },
 );
 
 ReactiveElement.enableWarning?.("migration");
@@ -119,13 +121,13 @@ const pages = {
   },
   "^/users/edit/\\d+$": (url: URL) => {
     return pwUserCreatePreloaded(
-      Number(url.pathname.match(/^\/users\/edit\/(\d+)$/)?.[1])
+      Number(url.pathname.match(/^\/users\/edit\/(\d+)$/)?.[1]),
     );
   },
   "^/users/view/\\d+$": (url: URL) => {
     return pwUserCreatePreloaded(
       Number(url.pathname.match(/^\/users\/view\/(\d+)$/)?.[1]),
-      true
+      true,
     );
   },
   "^/projects$": async (url: URL) => {
@@ -143,13 +145,13 @@ const pages = {
   },
   "^/projects/edit/\\d+$": (url: URL) => {
     return pwProjectCreatePreloaded(
-      Number(url.pathname.match(/^\/projects\/edit\/(\d+)$/)?.[1])
+      Number(url.pathname.match(/^\/projects\/edit\/(\d+)$/)?.[1]),
     );
   },
   "^/projects/view/\\d+$": (url: URL) => {
     return pwProjectCreatePreloaded(
       Number(url.pathname.match(/^\/projects\/view\/(\d+)$/)?.[1]),
-      true
+      true,
     );
   },
   "^/vote$": async (url: URL) => {
@@ -168,7 +170,7 @@ const pages = {
 
 // workaround see https://github.com/runem/lit-analyzer/issues/149#issuecomment-1006162839
 export function pwApp(
-  props: Record<string, never> // Pick<PwApp, never>
+  props: Record<string, never>, // Pick<PwApp, never>
 ) {
   const { ...rest } = props;
   const _: Record<string, never> = rest;
@@ -196,14 +198,14 @@ export class PwApp extends PwElement {
   protected _apiTask!: Task<[keyof typeof pages | undefined], TemplateResult>;
 
   nextPage: ([key]: [
-    keyof typeof pages | undefined
+    keyof typeof pages | undefined,
   ]) => Promise<TemplateResult>;
 
   userController: LoggedInUserController;
 
   private navigateListener: (
     this: Window,
-    event: CustomEvent<{ url: URL; state: HistoryState }>
+    event: CustomEvent<{ url: URL; state: HistoryState }>,
   ) => void;
 
   override connectedCallback(): void {
@@ -243,9 +245,9 @@ export class PwApp extends PwElement {
 
     this.popstateListener = (event: PopStateEvent) => {
       const url = new URL(window.location.href);
-      
+
       const state = event.state;
-      
+
       HistoryController.goto(url, state, true); // TODO FIXME don't pushstate here at all
     };
 
@@ -263,7 +265,7 @@ export class PwApp extends PwElement {
       task: this.nextPage,
       args: () => {
         const _a: keyof typeof pages | undefined = Object.keys(pages).find(
-          (k) => new RegExp(k).test(this.history.url.pathname)
+          (k) => new RegExp(k).test(this.history.url.pathname),
         );
         const _b: [keyof typeof pages | undefined] = [_a];
         return _b;
@@ -295,77 +297,81 @@ export class PwApp extends PwElement {
                 <span class="navbar-toggler-icon"></span>
               </button>
               <div
-                class="collapse navbar-collapse ${this.navbarOpen
-                  ? "show"
-                  : ""}"
+                class="collapse navbar-collapse ${this.navbarOpen ? "show" : ""}"
                 id="navbarSupportedContent"
               >
                 <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                   <li class="nav-item">
                     <a
                       @click=${aClick}
-                      class="nav-link ${this.history.url.pathname === "/"
-                        ? "active"
-                        : ""}"
+                      class="nav-link ${
+                        this.history.url.pathname === "/" ? "active" : ""
+                      }"
                       aria-current="page"
                       href="/"
                       >${msg("Home")}</a
                     >
                   </li>
-                  ${this.userController.type === "admin" ||
-                  this.userController.type === "helper"
-                    ? html`<li class="nav-item">
+                  ${
+                    this.userController.type === "admin" ||
+                    this.userController.type === "helper"
+                      ? html`<li class="nav-item">
                         <a
                           @click=${aClick}
-                          class="nav-link ${this.history.url.pathname.startsWith(
-                            "/users"
-                          )
-                            ? "active"
-                            : ""}"
+                          class="nav-link ${
+                            this.history.url.pathname.startsWith("/users")
+                              ? "active"
+                              : ""
+                          }"
                           href="/users"
                           >${msg("Accounts")}</a
                         >
                       </li>`
-                    : ``}
-                  ${this.userController.type === "admin" ||
-                  this.userController.type === "helper"
-                    ? html`<li>
+                      : ``
+                  }
+                  ${
+                    this.userController.type === "admin" ||
+                    this.userController.type === "helper"
+                      ? html`<li>
                         <a
                           @click=${aClick}
-                          class="nav-link ${this.history.url.pathname.startsWith(
-                            "/projects"
-                          )
-                            ? "active"
-                            : ""}"
+                          class="nav-link ${
+                            this.history.url.pathname.startsWith("/projects")
+                              ? "active"
+                              : ""
+                          }"
                           href="/projects"
                           >${msg("Projects")}</a
                         >
                       </li>`
-                    : ``}
-                  ${this.userController.type === "voter"
-                    ? html`<li>
+                      : ``
+                  }
+                  ${
+                    this.userController.type === "voter"
+                      ? html`<li>
                         <a
                           @click=${aClick}
-                          class="nav-link ${this.history.url.pathname.startsWith(
-                            "/vote"
-                          )
-                            ? "active"
-                            : ""}"
+                          class="nav-link ${
+                            this.history.url.pathname.startsWith("/vote")
+                              ? "active"
+                              : ""
+                          }"
                           href="/vote"
                           >${msg("Vote")}</a
                         >
                       </li>`
-                    : ``}
+                      : ``
+                  }
                   <li>
                     <a
                       href="/imprint"
                       target="_blank"
                       rel="noopener noreferrer"
-                      class="nav-link ${this.history.url.pathname.startsWith(
-                        "/imprint"
-                      )
-                        ? "active"
-                        : ""}"
+                      class="nav-link ${
+                        this.history.url.pathname.startsWith("/imprint")
+                          ? "active"
+                          : ""
+                      }"
                       >${msg("Imprint")}</a
                     >
                   </li>
@@ -374,18 +380,19 @@ export class PwApp extends PwElement {
                       href="/privacy"
                       target="_blank"
                       rel="noopener noreferrer"
-                      class="nav-link ${this.history.url.pathname.startsWith(
-                        "/privacy"
-                      )
-                        ? "active"
-                        : ""}"
+                      class="nav-link ${
+                        this.history.url.pathname.startsWith("/privacy")
+                          ? "active"
+                          : ""
+                      }"
                       >${msg("Privacy Policy")}</a
                     >
                   </li>
                 </ul>
                 <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
-                  ${this.userController.username
-                    ? html`<li class="nav-item">
+                  ${
+                    this.userController.username
+                      ? html`<li class="nav-item">
                         <a
                           @click=${async (e: Event) => {
                             e.preventDefault();
@@ -393,41 +400,41 @@ export class PwApp extends PwElement {
                               "POST",
                               "/api/v1/logout",
                               {},
-                              {}
+                              {},
                             );
 
                             localStorage.setItem("stateupdate", "logout");
                             window.dispatchEvent(
                               new StorageEvent("storage", {
                                 newValue: "logout",
-                              })
+                              }),
                             );
 
                             HistoryController.goto(
                               new URL("/login", window.location.href),
                               {},
-                              false
+                              false,
                             );
                           }}
                           class="nav-link"
                           href="/logout"
-                          >${msg(
-                            str`Logout ${this.userController.username}`
-                          )}</a
+                          >${msg(str`Logout ${this.userController.username}`)}</a
                         >
                       </li>`
-                    : html` <li class="nav-item">
+                      : html` <li class="nav-item">
                         <a
-                          class="nav-link ${this.history.url.pathname ===
-                          "/login"
-                            ? "active"
-                            : ""}"
+                          class="nav-link ${
+                            this.history.url.pathname === "/login"
+                              ? "active"
+                              : ""
+                          }"
                           href="/login"
                           target="_blank"
                           rel="opener"
                           >${msg("Login")}</a
                         >
-                      </li>`}
+                      </li>`
+                  }
                 </ul>
               </div>
             </div>
@@ -489,8 +496,9 @@ export class PwApp extends PwElement {
               >
               | Version
               <a
-                href="https://github.com/projektwahl/projektwahl-lit/tree/${window.VERSION_FULL ??
-                "main"}"
+                href="https://github.com/projektwahl/projektwahl-lit/tree/${
+                  window.VERSION_FULL ?? "main"
+                }"
                 >${window.VERSION_SHORT ?? "main"}</a
               >
             </span>
@@ -505,6 +513,6 @@ customElements.define("pw-app", PwApp);
 
 declare global {
   interface HTMLElementTagNameMap {
-    'pw-app': PwApp
+    "pw-app": PwApp;
   }
 }
