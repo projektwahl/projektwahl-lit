@@ -196,6 +196,9 @@ export const updateUserAction = rawUserSchema
   })
   .strict();
 
+const logoutRequest = z.object({}).strict();
+const logoutResponse = z.object({}).strict();
+
 const loginRequest = z
 .object({
   username: z.string().min(1).max(100),
@@ -203,112 +206,153 @@ const loginRequest = z
 })
 .strict();
 
-function compileTimeIf<B extends boolean, I, O1, O2>(partial: B, input: I, funTrue: (i: I) => O1, funFalse: (i: I) => O2): B extends true ? O1 : (B extends false ? O2 : O1 | O2) {
-  if (partial) {
-    return funTrue(input) as B extends true ? O1 : (B extends false ? O2 : O1 | O2)
-  } else {
-    return funFalse(input) as B extends true ? O1 : (B extends false ? O2 : O1 | O2
-  }
-}
+const loginResponse = z.object({}).strict();
 
-function partialIf<B extends true|false, T extends ZodRawShape>(partial: B, v: ZodObject<T>): B extends true ? ZodObject<{
-  [k in keyof T]: ZodOptional<T[k]>;
-}> : ZodObject<T> {
-  return compileTimeIf(partial, v, v => v.partial(), v => v) // partial ? v.partial() : v as (B extends false ? ZodObject<T> : never)
-}
+const sudoRequest =  z
+.object({
+  id: z.number(),
+})
+.strict();
 
-function routesFun<T extends boolean>(partial: T) { return {
+const sudoResponse = z.object({}).strict();
+
+const openIdLoginRequest = z.object({}).strict();
+
+const openIdLoginResponse = z.object({}).strict();
+
+const redirectRequest = z
+.object({
+  session_state: z.string(),
+  code: z.string(),
+})
+.strict();
+
+const redirectResponse = z.object({}).strict();
+
+const sleepRequest = z.object({}).strict();
+
+const sleepResponse = z.object({}).strict();
+
+const updateRequest = z.object({}).strict();
+
+const updateResponse = z.object({}).strict();
+
+const usersCreateOrUpdateRequest = z.array(
+  z.discriminatedUnion("action", [
+    createUserAction.strict(),
+    updateUserAction.strict(),
+  ])
+);
+
+const usersCreateOrUpdateResponse = z.array(
+  rawUserSchema
+    .pick({
+      id: true,
+      project_leader_id: true,
+      force_in_project_id: true,
+    })
+    .strict()
+);
+
+const projectsCreateRequest = rawProjectSchema
+.pick({
+  costs: true,
+  deleted: true,
+  info: true,
+  max_age: true,
+  max_participants: true,
+  min_age: true,
+  min_participants: true,
+  place: true,
+  random_assignments: true,
+  title: true,
+})
+.strict();
+
+const projectsCreateResponse = z.object({}).extend({ id: z.number() }).strict();
+
+const projectsUpdateRequest = rawProjectSchema
+.pick({
+  costs: true,
+  deleted: true,
+  info: true,
+  max_age: true,
+  max_participants: true,
+  min_age: true,
+  min_participants: true,
+  place: true,
+  random_assignments: true,
+  title: true,
+})
+.partial()
+.extend({
+  id: z.number(),
+})
+.strict();
+
+const projectsUpdateResponse = z.object({}).extend({ id: z.number() }).strict();
+
+const choicesUpdateRequest = rawChoiceNullable
+.pick({
+  project_id: true,
+  rank: true,
+})
+.strict();
+
+const choicesUpdateResponse = z.object({}).strict();
+
+const settingsUpdateRequest = z
+.object({
+  open_date: z.string(),
+  voting_start_date: z.string(),
+  voting_end_date: z.string(),
+  results_date: z.string(),
+})
+.strict();
+
+const settingsUpdateResponse = z.object({}).strict();
+
+const routes = {
   "/api/v1/logout": {
-    request: z.object({}).strict(),
-    response: z.object({}).strict(),
+    request: logoutRequest,
+    partialRequest: logoutRequest.partial(),
+    response: logoutResponse,
   },
   "/api/v1/login": {
-    request: partialIf(partial, loginRequest),
-    response: z.object({}).strict(),
+    request: loginRequest,
+    response: loginResponse,
   },
   "/api/v1/sudo": {
-    request: z
-      .object({
-        id: z.number(),
-      })
-      .strict(),
-    response: z.object({}).strict(),
+    request: sudoRequest,
+    response: sudoResponse,
   },
   "/api/v1/openid-login": {
-    request: z.object({}).strict(),
-    response: z.object({}).strict(),
+    request: openIdLoginRequest,
+    response: openIdLoginResponse,
   },
   "/api/v1/redirect": {
-    request: z
-      .object({
-        session_state: z.string(),
-        code: z.string(),
-      })
-      .strict(),
-    response: z.object({}).strict(),
+    request: redirectRequest,
+    response: redirectResponse,
   },
   "/api/v1/sleep": {
-    request: z.object({}).strict(),
-    response: z.object({}).strict(),
+    request: sleepRequest,
+    response: sleepResponse,
   },
   "/api/v1/update": {
-    request: z.object({}).strict(),
-    response: z.object({}).strict(),
+    request: updateRequest,
+    response: updateResponse,
   },
   "/api/v1/users/create-or-update": {
-    request: z.array(
-      z.discriminatedUnion("action", [
-        createUserAction.strict(),
-        updateUserAction.strict(),
-      ])
-    ),
-    response: z.array(
-      rawUserSchema
-        .pick({
-          id: true,
-          project_leader_id: true,
-          force_in_project_id: true,
-        })
-        .strict()
-    ),
+    request: usersCreateOrUpdateRequest,
+    response: usersCreateOrUpdateResponse,
   },
   "/api/v1/projects/create": {
-    request: rawProjectSchema
-      .pick({
-        costs: true,
-        deleted: true,
-        info: true,
-        max_age: true,
-        max_participants: true,
-        min_age: true,
-        min_participants: true,
-        place: true,
-        random_assignments: true,
-        title: true,
-      })
-      .strict(),
-    response: z.object({}).extend({ id: z.number() }).strict(),
+    request: projectsCreateRequest,
+    response: projectsCreateResponse,
   },
   "/api/v1/projects/update": {
-    request: rawProjectSchema
-      .pick({
-        costs: true,
-        deleted: true,
-        info: true,
-        max_age: true,
-        max_participants: true,
-        min_age: true,
-        min_participants: true,
-        place: true,
-        random_assignments: true,
-        title: true,
-      })
-      .partial()
-      .extend({
-        id: z.number(),
-      })
-      .strict(),
-    response: z.object({}).extend({ id: z.number() }).strict(),
+    request: projectsUpdateRequest,
+    response: projectsUpdateResponse,
   },
   "/api/v1/users": baseQuery(
     rawUserSchema
@@ -511,24 +555,12 @@ function routesFun<T extends boolean>(partial: T) { return {
       .partial()
   ),
   "/api/v1/choices/update": {
-    request: rawChoiceNullable
-      .pick({
-        project_id: true,
-        rank: true,
-      })
-      .strict(),
-    response: z.object({}).strict(),
+    request: choicesUpdateRequest,
+    response: choicesUpdateResponse,
   },
   "/api/v1/settings/update": {
-    request: z
-      .object({
-        open_date: z.string(),
-        voting_start_date: z.string(),
-        voting_end_date: z.string(),
-        results_date: z.string(),
-      })
-      .strict(),
-    response: z.object({}).strict(),
+    request: settingsUpdateRequest,
+    response: settingsUpdateResponse,
   },
   "/api/v1/sessions": baseQuery(
     rawSessionType,
@@ -563,16 +595,7 @@ function routesFun<T extends boolean>(partial: T) { return {
     ),
     z.object({}).strict()
   ),
-} as const
-};
-
-export const routes = routesFun(false);
-
-export const partialRoutes = routesFun(true);
-
-const login = routes["/api/v1/login"].request._type;
-
-const loginPartial = partialRoutes["/api/v1/login"].request._type;
+} as const;
 
 export const entityRoutes = {
   "/api/v1/users": routes["/api/v1/users"],
