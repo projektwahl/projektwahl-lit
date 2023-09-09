@@ -7,5 +7,7 @@
   },
   "typescript.tsdk": ".yarn/sdks/typescript/lib",
   "typescript.enablePromptUseWorkspaceTsdk": true,
-  "biome.lspBin": "/nix/store/sbgnp77jsf6lddisw22cmkfpxr5hpsrv-biome-1.1.0/bin/biome"
+  "typescript.tsserver.log": "verbose",
+  "biome.lspBin": "/nix/store/sbgnp77jsf6lddisw22cmkfpxr5hpsrv-biome-1.1.0/bin/biome",
+  "eslint.nodePath": ".yarn/sdks"
 }

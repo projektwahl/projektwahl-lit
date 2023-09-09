@@ -27,6 +27,7 @@ function pushSorting<
   V extends (typeof map)[Key][number]
 >(sorting: Array<V>, key: Key, sortToAdd: V): void {
   sorting.push(sortToAdd);
+  return sorting[0]
 }
 
 pushSorting(map["a"], "a", 5)
