@@ -106,6 +106,14 @@ export function tupleStupid<R extends keyof typeof entityRoutes>(tiebreaker: ent
   return [tiebreaker, "ASC", null]
 }
 
+function sortingPush<V extends unknown>(sorting: V[], value: V) {
+  sorting.push(value)
+}
+
+function testPushMap<K extends keyof typeof map>(key: K, sorting: (typeof map)[K], newValue: (typeof map)[K][number]) {
+  sortingPush(map[key], newValue)
+}
+
 export async function fetchData<R extends keyof typeof entityRoutes>(
   loggedInUser: Exclude<z.infer<typeof userSchema>, undefined>,
   path: R,
@@ -117,7 +125,7 @@ export async function fetchData<R extends keyof typeof entityRoutes>(
   const sorting: entitiesType15[R] = mappedIndexing(query, "sorting");
 
   if (tiebreaker !== undefined && !sorting.find((e) => e[0] == tiebreaker)) {
-    sorting.push(tupleStupid(tiebreaker));
+    testPushMap(path, value, tupleStupid(tiebreaker));
   }
 
   // TODO FIXME id tiebreaker lost
