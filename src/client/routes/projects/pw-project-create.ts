@@ -28,7 +28,7 @@ import { PwForm } from "../../form/pw-form.js";
 import { HistoryController } from "../../history-controller.js";
 import { msg } from "@lit/localize";
 import type { z } from "zod";
-import type { routes, MinimalSafeParseError } from "../../../lib/routes.js";
+import { routes, MinimalSafeParseError } from "../../../lib/routes.js";
 import { ref } from "lit/directives/ref.js";
 import { pwInputText } from "../../form/pw-input-text.js";
 import { pwInputNumber } from "../../form/pw-input-number.js";
@@ -160,7 +160,12 @@ export class PwProjectCreate extends PwForm<
     this._task = new Task(this, async () => {
       const result = await myFetch<
         "/api/v1/projects/create" | "/api/v1/projects/update"
-      >("POST", this.url, this.formData, {});
+      >(
+        "POST",
+        this.url,
+        routes[this.url].request.parse(this.formData), // TODO FIXME error handling
+        {},
+      );
 
       if (result.success) {
         HistoryController.goto(

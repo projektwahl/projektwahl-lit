@@ -154,9 +154,7 @@ class PwUserCreate extends PwForm<"/api/v1/users/create-or-update"> {
       const result = await myFetch<"/api/v1/users/create-or-update">(
         "POST",
         this.url,
-        routes["/api/v1/users/create-or-update"]["request"].parse(
-          this.formData,
-        ), // TODO FIXME error handling
+        routes[this.url].request.parse(this.formData), // TODO FIXME error handling
         {},
       );
 

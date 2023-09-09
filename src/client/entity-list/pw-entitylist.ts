@@ -24,7 +24,7 @@ import { css, html, TemplateResult } from "lit";
 import { HistoryController } from "../history-controller.js";
 import { ref } from "lit/directives/ref.js";
 import { Task, TaskStatus } from "@lit-labs/task";
-import { entityRoutes, ResponseType } from "../../lib/routes.js";
+import { entityRoutes, ResponseType, routes } from "../../lib/routes.js";
 import { z } from "zod";
 import { PwForm } from "../form/pw-form.js";
 import { msg } from "@lit/localize";
@@ -71,7 +71,7 @@ export const parseRequestWithPrefix = <
   const data: parseRequestWithPrefixType<PREFIX>[P] = mappedFunctionCall(
     schema,
     JSON.parse(
-      decodeURIComponent(url.search == "" ? "{}" : url.search.substring(1)),
+      decodeURIComponent(url.search === "" ? "{}" : url.search.substring(1)),
     ),
   );
   return data;
@@ -257,7 +257,7 @@ export class PwEntityList<
                 },
                 task: this._task,
                 type: "select",
-                initial: this.formData,
+                initial: routes[this.url].request.parse(this.formData), // TODO FIXME error handling
                 options: [
                   {
                     text: "10",

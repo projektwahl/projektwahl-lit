@@ -27,7 +27,7 @@ import { myFetch } from "../../utils.js";
 import { PwForm } from "../../form/pw-form.js";
 import { msg } from "@lit/localize";
 import "../../form/pw-input.js";
-import type { MinimalSafeParseError, routes } from "../../../lib/routes.js";
+import { MinimalSafeParseError, routes } from "../../../lib/routes.js";
 import type { z } from "zod";
 import { ref } from "lit/directives/ref.js";
 import { pwInputText } from "../../form/pw-input-text.js";
@@ -141,7 +141,7 @@ class PwSettingsUpdate extends PwForm<"/api/v1/settings/update"> {
       const result = await myFetch<"/api/v1/settings/update">(
         "POST",
         this.url,
-        this.formData,
+        routes[this.url].request.parse(this.formData), // TODO FIXME error handling
         {},
       );
 

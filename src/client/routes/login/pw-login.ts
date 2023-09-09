@@ -30,6 +30,7 @@ import { msg } from "@lit/localize";
 import "../../form/pw-input.js";
 import { ref } from "lit/directives/ref.js";
 import { pwInputText } from "../../form/pw-input-text.js";
+import { routes } from "../../../lib/routes.js";
 
 // workaround see https://github.com/runem/lit-analyzer/issues/149#issuecomment-1006162839
 export function pwLogin(
@@ -67,7 +68,7 @@ class PwLogin extends PwForm<"/api/v1/login"> {
       const result = await myFetch<"/api/v1/login">(
         "POST",
         "/api/v1/login",
-        this.formData,
+        routes[this.url].request.parse(this.formData), // TODO FIXME error handling
         {},
       );
 
