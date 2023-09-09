@@ -155,7 +155,6 @@ class PwSettingsUpdate extends PwForm<"/api/v1/settings/update"> {
       },
       () => []
     );
-
     
     this.formData = {};
   }

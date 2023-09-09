@@ -37,13 +37,16 @@ export const sql = postgres(process.env.DATABASE_URL, {
   }, */ // this seems to be a MAJOR performance issue
 });
 
+type UnwrapPromiseArray<T> = T extends any[] ? {
+  [k in keyof T]: T[k] extends Promise<infer R> ? R : T[k]
+} : T;
+
 export async function retryableBegin<T>(
   options: string,
   cb: (tsql: TransactionSql<Record<string, unknown>>) => Promise<T>
-): Promise<T> {
+): Promise<UnwrapPromiseArray<T>> {
   for (;;) {
     try {
-      
       return await sql.begin(options, cb);
     } catch (error) {
       if (error instanceof postgres.PostgresError && error.code === "40001") {

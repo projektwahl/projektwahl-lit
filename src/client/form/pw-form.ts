@@ -27,6 +27,7 @@ import type { routes, ResponseType } from "../../lib/routes.js";
 import type { Task } from "@lit-labs/task";
 import { PwElement } from "../pw-element.js";
 import type { z } from "zod";
+import { partialUtil } from "zod/lib/helpers/partialUtil.js";
 
 class PwForm<P extends keyof typeof routes> extends PwElement {
   static get properties() {
@@ -51,7 +52,7 @@ class PwForm<P extends keyof typeof routes> extends PwElement {
   errors: Ref<HTMLDivElement>;
 
   // this is intentionally not { state: true } as then updating the children is just super slow
-  formData!: z.infer<typeof routes[P]["request"]>;
+  formData!: z.infer<typeof routes[P]["partial-request"]>;
 
   constructor() {
     super();

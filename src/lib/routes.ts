@@ -20,7 +20,7 @@ https://github.com/projektwahl/projektwahl-lit
 SPDX-License-Identifier: AGPL-3.0-or-later
 SPDX-FileCopyrightText: 2021 Moritz Hedtke <Moritz.Hedtke@t-online.de>
 */
-import { z, ZodIssue, ZodObject, ZodTypeAny } from "zod";
+import { AnyZodObject, SomeZodObject, z, ZodIssue, ZodObject, ZodOptional, ZodRawShape, ZodTypeAny } from "zod";
 import { result } from "./result.js";
 
 export const rawChoice = z
@@ -196,18 +196,34 @@ export const updateUserAction = rawUserSchema
   })
   .strict();
 
-export const routes = {
+const loginRequest = z
+.object({
+  username: z.string().min(1).max(100),
+  password: z.string(),
+})
+.strict();
+
+function compileTimeIf<B extends boolean, I, O1, O2>(partial: B, input: I, funTrue: (i: I) => O1, funFalse: (i: I) => O2): B extends true ? O1 : O2 {
+  if (partial) {
+    return funTrue(input) as B extends true ? O1 : O2
+  } else {
+    return funFalse(input) as B extends true ? O1 : O2
+  }
+}
+
+function partialIf<B extends true|false, T extends ZodRawShape>(partial: B, v: ZodObject<T>): B extends true ? ZodObject<{
+  [k in keyof T]: ZodOptional<T[k]>;
+}> : ZodObject<T> {
+  return compileTimeIf(partial, v, v => v.partial(), v => v) // partial ? v.partial() : v as (B extends false ? ZodObject<T> : never)
+}
+
+function routesFun<T extends boolean>(partial: T) { return {
   "/api/v1/logout": {
     request: z.object({}).strict(),
     response: z.object({}).strict(),
   },
   "/api/v1/login": {
-    request: z
-      .object({
-        username: z.string().min(1).max(100),
-        password: z.string(),
-      })
-      .strict(),
+    request: partialIf(partial, loginRequest),
     response: z.object({}).strict(),
   },
   "/api/v1/sudo": {
@@ -547,7 +563,16 @@ export const routes = {
     ),
     z.object({}).strict()
   ),
-} as const;
+} as const
+};
+
+export const routes = routesFun(false);
+
+export const partialRoutes = routesFun(true);
+
+const login = routes["/api/v1/login"].request._type;
+
+const loginPartial = partialRoutes["/api/v1/login"].request._type;
 
 export const entityRoutes = {
   "/api/v1/users": routes["/api/v1/users"],

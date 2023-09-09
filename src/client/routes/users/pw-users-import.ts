@@ -63,7 +63,6 @@ class PwUsersImport extends PwForm<"/api/v1/users/create-or-update"> {
 
     this._task = new Task(this, async () => {
       
-      
       const fileContents = await this.formData.file;
 
       const result = await myFetch<"/api/v1/users/create-or-update">(
