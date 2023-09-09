@@ -1,14 +1,32 @@
+export type Writable<T> = { -readonly [P in keyof T]: T[P] };
 
+export type DeepWritable<T> = { -readonly [P in keyof T]: DeepWritable<T[P]> };
 
-function canIGetAGenericFunctionAndMapIt<MappedType extends {
-    [key: string]: readonly unknown[]
-}, Key extends keyof MappedType, GenericFunction extends <T>(input: readonly T[]) => T>(mappedType: MappedType, func: GenericFunction, key: Key): MappedType[Key][0] {
-    return func(mappedType[key])
+function jo2<
+  MappedType extends {
+    [key: string]: readonly unknown[];
+  },
+  Key extends keyof MappedType,
+>(mappedType: MappedType, key: Key): MappedType[Key][0] {
+  return mappedType[key][0];
 }
 
-const map = {
-    hi: [1, 2, 3],
-    jo: ["hi", "jo"]
-} as const
 
-const result = canIGetAGenericFunctionAndMapIt(map, (key) => key[0], "hi")
+const result = jo2(map, "hi");
+
+//const thePush = <T>()#
+
+
+const map = {
+    a: [1, 2, 3],
+    b: ["hi", "jo"],
+};
+
+function pushSorting<
+  Key extends keyof typeof map,
+  V extends (typeof map)[Key][number]
+>(sorting: Array<V>, key: Key, sortToAdd: V): void {
+  sorting.push(sortToAdd);
+}
+
+pushSorting(map["a"], "a", 5)

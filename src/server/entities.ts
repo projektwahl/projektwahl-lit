@@ -23,7 +23,8 @@ SPDX-FileCopyrightText: 2021 Moritz Hedtke <Moritz.Hedtke@t-online.de>
 import type { OutgoingHttpHeaders } from "node:http2";
 import type { PendingQuery, Row } from "postgres";
 import type { z } from "zod";
-import type { entityRoutes, ResponseType, userSchema } from "../lib/routes.js";
+import type { ResponseType, userSchema } from "../lib/routes.js";
+import { entityRoutes } from "../lib/routes.js";
 import { sql } from "./database.js";
 import { mappedFunctionCall2, mappedIndexing } from "../lib/result.js";
 
@@ -102,17 +103,13 @@ type entitiesType8 = {
   };
 };
 
-export function tupleStupid<R extends keyof typeof entityRoutes>(tiebreaker: entitiesType18[R]): [entitiesType18[R], "ASC", null] {
-  return [tiebreaker, "ASC", null]
-}
 
-function sortingPush<V extends unknown>(sorting: V[], value: V) {
-  sorting.push(value)
-}
+type entitiesType19 = {
+  [K in keyof typeof entityRoutes]: [z.infer<
+    typeof entityRoutes[K]["request"]
+  >["sorting"][number][0], "ASC", null];
+};
 
-function testPushMap<K extends keyof typeof map>(key: K, sorting: (typeof map)[K], newValue: (typeof map)[K][number]) {
-  sortingPush(map[key], newValue)
-}
 
 export async function fetchData<R extends keyof typeof entityRoutes>(
   loggedInUser: Exclude<z.infer<typeof userSchema>, undefined>,
@@ -122,10 +119,10 @@ export async function fetchData<R extends keyof typeof entityRoutes>(
   orderByQueries: entitiesType8[R],
   tiebreaker: entitiesType18[R] | undefined,
 ): Promise<[OutgoingHttpHeaders, ResponseType<R>]> {
-  const sorting: entitiesType15[R] = mappedIndexing(query, "sorting");
+  let sorting: entitiesType15[R] = mappedIndexing(query, "sorting");
 
   if (tiebreaker !== undefined && !sorting.find((e) => e[0] == tiebreaker)) {
-    testPushMap(path, value, tupleStupid(tiebreaker));
+    y(entityRoutes, path, [tiebreaker, "ASC", null]);
   }
 
   // TODO FIXME id tiebreaker lost
