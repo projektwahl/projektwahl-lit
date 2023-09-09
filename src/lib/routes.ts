@@ -139,8 +139,8 @@ const baseQuery = <
   sorting: T2,
   filters: T3,
 ) => {
-  return {
-    request: z
+  return makeReqSeq(
+    z
       .object({
         paginationDirection: z
           .enum(["forwards", "backwards"])
@@ -151,14 +151,14 @@ const baseQuery = <
         paginationLimit: z.number().default(10),
       })
       .strict(),
-    response: z
+    z
       .object({
         entities: z.array(s),
         previousCursor: s.nullable(),
         nextCursor: s.nullable(),
       })
       .strict(),
-  };
+  );
 };
 
 export const createUserAction = rawUserSchema
@@ -322,8 +322,8 @@ const settingsUpdateRequest = z
 
 const settingsUpdateResponse = z.object({}).strict();
 
-const makeReqSeq = <REQ extends AnyZodObject, RES>(
-  request: REQ,
+const makeReqSeq = <REQ extends ZodRawShape, RES>(
+  request: ZodObject<REQ>,
   response: RES,
 ) => {
   return {
@@ -333,7 +333,7 @@ const makeReqSeq = <REQ extends AnyZodObject, RES>(
   };
 };
 
-const routes = {
+export const routes = {
   "/api/v1/logout": makeReqSeq(logoutRequest, logoutResponse),
   "/api/v1/login": makeReqSeq(loginRequest, loginResponse),
   "/api/v1/sudo": makeReqSeq(sudoRequest, sudoResponse),

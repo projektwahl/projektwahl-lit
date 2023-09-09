@@ -52,7 +52,7 @@ class PwForm<P extends keyof typeof routes> extends PwElement {
   errors: Ref<HTMLDivElement>;
 
   // this is intentionally not { state: true } as then updating the children is just super slow
-  formData!: z.infer<typeof routes[P]["partial-request"]>;
+  formData!: z.infer<typeof routes[P]["partialRequest"]>;
 
   constructor() {
     super();
