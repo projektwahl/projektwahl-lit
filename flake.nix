@@ -12,6 +12,8 @@
             packages = [
               pkgs.nodejs_latest
               (pkgs.yarn.override { nodejs = pkgs.nodejs_latest; })
+              pkgs.bashInteractive
+              pkgs.biome
             ];
             shellHook = ''
               export ROME_BINARY="${pkgs.biome}/bin/biome"

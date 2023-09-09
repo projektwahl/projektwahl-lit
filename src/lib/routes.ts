@@ -203,11 +203,11 @@ const loginRequest = z
 })
 .strict();
 
-function compileTimeIf<B extends boolean, I, O1, O2>(partial: B, input: I, funTrue: (i: I) => O1, funFalse: (i: I) => O2): B extends true ? O1 : O2 {
+function compileTimeIf<B extends boolean, I, O1, O2>(partial: B, input: I, funTrue: (i: I) => O1, funFalse: (i: I) => O2): B extends true ? O1 : (B extends false ? O2 : O1 | O2) {
   if (partial) {
-    return funTrue(input) as B extends true ? O1 : O2
+    return funTrue(input) as B extends true ? O1 : (B extends false ? O2 : O1 | O2)
   } else {
-    return funFalse(input) as B extends true ? O1 : O2
+    return funFalse(input) as B extends true ? O1 : (B extends false ? O2 : O1 | O2
   }
 }
 
