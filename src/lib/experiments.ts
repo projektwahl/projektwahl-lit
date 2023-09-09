@@ -9,6 +9,10 @@ function singleOperate<V extends unknown>(arr: V[], value: V): V {
     return arr[0]
 }
 
+function canIGetAGenericFunction<genericFunction extends <T>(value: T) => T>(func: genericFunction) {
+
+}
+
 function testMap<MAPPED_TYPE, K extends keyof MAPPED_TYPE, FUNCTION extends {
     [Property in keyof MAPPED_TYPE]: (arg: MAPPED_TYPE[Property]) => unknown[Property];
 }>(map: MAPPED_TYPE, key: K, func: FUNCTION) {
