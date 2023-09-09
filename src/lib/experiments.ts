@@ -24,7 +24,7 @@ function pushSorting<
 
 pushSorting(map["a"], "a", 5)
 
-function mappedTypeMap<MappedType, Key extends (keyof MappedType & keyof Q), Q = Record<string|number|symbol, unknown>>(mappedType: MappedType, key: Key, func: (input: MappedType[Key]) => Q[Key]): Q[Key] {
+function mappedTypeMap<MappedType, Key extends (keyof MappedType & keyof Q), Q>(mappedType: MappedType, key: Key, func: (input: MappedType[Key]) => Q[Key]): Q[Key] {
   return func(mappedType[key])
 }
 
