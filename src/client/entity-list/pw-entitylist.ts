@@ -31,29 +31,6 @@ import { msg } from "@lit/localize";
 import { ifDefined } from "lit/directives/if-defined.js";
 import { myFetch } from "../utils.js";
 import { pwInputSelect } from "../form/pw-input-select.js";
-import { mappedFunctionCall } from "../../lib/result.js";
-
-export type parseRequestWithPrefixType<PREFIX extends string> = {
-  [P in keyof typeof entityRoutes]: z.infer<
-    z.ZodObject<
-      { [k in PREFIX]: typeof entityRoutes[P]["request"] },
-      "passthrough",
-      z.ZodTypeAny,
-      { [k in PREFIX]: z.infer<typeof entityRoutes[P]["request"]> },
-      Record<string, unknown>
-    >
-  >;
-};
-
-export type parseRequestWithPrefixSchemaType<PREFIX extends string> = {
-  [P in keyof typeof entityRoutes]: z.ZodObject<
-    { [k in PREFIX]: typeof entityRoutes[P]["request"] },
-    "passthrough",
-    z.ZodTypeAny,
-    { [k in PREFIX]: z.infer<typeof entityRoutes[P]["request"]> },
-    Record<string, unknown>
-  >;
-};
 
 // https://github.com/microsoft/TypeScript/pull/47109#issuecomment-991693300
 type EntityRoutesParam<K extends keyof (typeof entityRoutes)> = { [P in K]: z.infer<(typeof entityRoutes)[P]["request"]> }[K];
@@ -73,18 +50,15 @@ export const parseRequestWithPrefix = <
   prefix: PREFIX,
   url: URL,
   defaultValue: z.infer<typeof entityRoutes[P]["request"]>,
-): parseRequestWithPrefixType<PREFIX>[P] => {
+): z.ZodObject<{ [k in PREFIX]: EntityRoutesReturn<P>; }, "passthrough">["_output"] => {
   const entityRoutesDefault: EntityRoutesDefault = entityRoutes;
-  const schema = z
+  const schema: z.ZodObject<{ [k in PREFIX]: EntityRoutesReturn<P>; }, "passthrough"> = z
     .object({}) // we need kind of a mapped type here
     .setKey(prefix, entityRoutesDefault[apiUrl].request.default(defaultValue))
     .passthrough();
-  const data: parseRequestWithPrefixType<PREFIX>[P] = mappedFunctionCall(
-    schema,
-    JSON.parse(
-      decodeURIComponent(url.search === "" ? "{}" : url.search.substring(1)),
-    ),
-  );
+  const data = schema.parse(JSON.parse(
+    decodeURIComponent(url.search === "" ? "{}" : url.search.substring(1)),
+  ))
   return data;
 };
 
