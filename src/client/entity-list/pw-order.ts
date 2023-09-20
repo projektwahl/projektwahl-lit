@@ -139,7 +139,7 @@ export class PwOrder<
   constructor() {
     super();
 
-    this.randomId = "id" + Math.random().toString().replace(".", "");
+    this.randomId = `id${Math.random().toString().replace(".", "")}`;
 
     this.history = new HistoryController(this, /.*/);
   }

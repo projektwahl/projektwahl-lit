@@ -173,7 +173,7 @@ export abstract class PwInput<
 
   constructor() {
     super();
-    this.randomId = "id" + Math.random().toString().replace(".", "");
+    this.randomId = `id${Math.random().toString().replace(".", "")}`;
 
     this.type = "text";
 
@@ -189,7 +189,7 @@ export abstract class PwInput<
       this.mypwinputchangeDispatcher,
     );
     let curr: HTMLElement | null = this.parentElement;
-    while (!(curr === null || curr instanceof PwForm<P>)) {
+    while (!(curr === null || curr instanceof PwForm)) {
       curr = curr.parentElement;
     }
     if (!curr) {
@@ -288,7 +288,7 @@ export abstract class PwInput<
       complete: (v) =>
         !v.success &&
         v.error.issues.find(
-          (i) => JSON.stringify(i.path) == JSON.stringify(this.name),
+          (i) => JSON.stringify(i.path) === JSON.stringify(this.name),
         ) !== undefined
           ? "is-invalid"
           : "is-valid",
@@ -376,7 +376,7 @@ export abstract class PwInput<
             if (!v.success) {
               if (
                 v.error.issues.find(
-                  (i) => JSON.stringify(i.path) == JSON.stringify(this.name),
+                  (i) => JSON.stringify(i.path) === JSON.stringify(this.name),
                 ) !== undefined
               ) {
                 return html` <div
@@ -386,7 +386,7 @@ export abstract class PwInput<
                   ${
                     v.error.issues.find(
                       (i) =>
-                        JSON.stringify(i.path) == JSON.stringify(this.name),
+                        JSON.stringify(i.path) === JSON.stringify(this.name),
                     )?.message
                   }
                 </div>`;
