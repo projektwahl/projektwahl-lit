@@ -177,7 +177,7 @@ export class PwEntityList<
           true,
         );
 
-        const result = await myFetch<P>("GET", this.url, this.formData, {});
+        const result = await myFetch<P>("GET", this.url, routes[this.url].request.parse(this.formData), {});
 
         //console.log("result", result);
 

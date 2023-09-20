@@ -53,7 +53,7 @@ export const myFetch = async <P extends keyof typeof routes>(
             body: JSON.stringify(body),
           });
     if (!response.ok) {
-      if (response.status == 401) {
+      if (response.status === 401) {
         // unauthorized
         jscookie.remove("lax_id");
         jscookie.remove("strict_id");
