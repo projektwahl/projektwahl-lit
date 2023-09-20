@@ -23,7 +23,7 @@ SPDX-FileCopyrightText: 2021 Moritz Hedtke <Moritz.Hedtke@t-online.de>
 import { html } from "lit";
 import { HistoryController } from "../history-controller.js";
 import { msg, str } from "@lit/localize";
-import type { entityRoutes } from "../../lib/routes.js";
+import { entityRoutes, routes } from "../../lib/routes.js";
 import type { z } from "zod";
 import { mappedTuple } from "../../lib/result.js";
 import { PwInput } from "../form/pw-input.js";
@@ -145,7 +145,9 @@ export class PwOrder<
   }
 
   mypwinputchangeDispatcher = () => {
-    const sorting: entitiesType3[P] = this.get(this.pwForm.formData);
+    const partialFormData: z.infer<typeof routes[P]["partialRequest"]> = this.pwForm.formData;
+    const formData: z.infer<typeof routes[P]["request"]> = routes[this.url].request.parse(partialFormData);
+    const sorting: entitiesType3[P] = this.get(formData);
 
     const oldElementIndex = sorting.findIndex(([e]) => e === this.orderBy);
 
