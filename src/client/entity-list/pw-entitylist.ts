@@ -55,9 +55,11 @@ export type parseRequestWithPrefixSchemaType<PREFIX extends string> = {
   >;
 };
 
+type EntityRoutesParam<K extends keyof (typeof entityRoutes) = keyof (typeof entityRoutes)> = { [P in K]: z.infer<(typeof entityRoutes)[P]["request"]> };
+type EntityRoutesReturn<K extends keyof (typeof entityRoutes) = keyof (typeof entityRoutes)> = { [P in K]: z.ZodDefault<(typeof entityRoutes)[P]["request"]> };
 type EntityRoutesDefault<K extends keyof (typeof entityRoutes) = keyof (typeof entityRoutes)> = { [P in K]: {
   request: {
-    default: (v: z.infer<(typeof entityRoutes)[P]["request"]>) => z.ZodDefault<(typeof entityRoutes)[P]["request"]>
+    default: (v: EntityRoutesParam[P]) => EntityRoutesReturn[P]
   }
 }}[K];
 
