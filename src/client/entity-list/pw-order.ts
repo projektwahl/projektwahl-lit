@@ -28,34 +28,34 @@ import type { z } from "zod";
 import { mappedTuple } from "../../lib/result.js";
 import { PwInput } from "../form/pw-input.js";
 
-type entitiesType1<K extends keyof (typeof entityRoutes)> = {
+type EntitySorting0<K extends keyof (typeof entityRoutes)> = {
   [P in K]: z.infer<
     typeof entityRoutes[P]["request"]
   >["sorting"][number][0];
 }[K];
 
-type entitiesType2<K extends keyof (typeof entityRoutes)> = {
+type EntitySorting1<K extends keyof (typeof entityRoutes)> = {
+  [P in K]: z.infer<
+    typeof entityRoutes[P]["request"]
+  >["sorting"][number][1];
+}[K];
+
+type EntitySorting2<K extends keyof (typeof entityRoutes)> = {
   [P in K]: z.infer<
     typeof entityRoutes[P]["request"]
   >["sorting"][number][2];
 }[K];
 
-type entitiesType3<K extends keyof (typeof entityRoutes)> = {
+type EntitySortingAll<K extends keyof (typeof entityRoutes)> = {
   [P in K]: z.infer<
     typeof entityRoutes[P]["request"]
   >["sorting"][number][];
 }[K];
 
-type EntityOrder1<K extends keyof (typeof entityRoutes)> = { [P in K]: z.infer<typeof entityRoutes[P]["request"]>["sorting"][number][] }[K];
-
-type EntityOrder2<K extends keyof (typeof entityRoutes)> = { [P in K]: readonly [
-  z.infer<
-    typeof entityRoutes[P]["request"]
-  >["sorting"][number][0],
-  "DESC",
-  z.infer<
-    typeof entityRoutes[P]["request"]
-  >["sorting"][number][2]
+type EntitySorting<K extends keyof (typeof entityRoutes)> = { [P in K]: [
+  EntitySorting0<P>,
+  EntitySorting1<P>,
+  EntitySorting2<P>,
 ] }[K];
 
 // workaround see https://github.com/runem/lit-analyzer/issues/149#issuecomment-1006162839
@@ -124,9 +124,9 @@ export class PwOrder<
 
   prefix!: X;
 
-  orderBy!: entitiesType1<P>;
+  orderBy!: EntitySorting0<P>;
 
-  value!: entitiesType2<P>;
+  value!: EntitySorting2<P>;
 
   title!: string;
 
@@ -147,7 +147,8 @@ export class PwOrder<
   mypwinputchangeDispatcher = () => {
     const partialFormData: z.infer<typeof routes[P]["partialRequest"]> = this.pwForm.formData;
     const formData: z.infer<typeof routes[P]["request"]> = routes[this.url].request.parse(partialFormData);
-    const sorting: EntityOrder1<P> = this.get(formData);
+    const sortingAll: EntitySortingAll<P> = this.get(formData);
+    const sorting: EntitySorting<P> = sortingAll;
 
     const oldElementIndex = sorting.findIndex(([e]) => e === this.orderBy);
 
@@ -164,7 +165,7 @@ export class PwOrder<
         case "DESC":
           break;
         case "ASC": {
-          const sortingPush: EntityOrder2<P> = [theName, "DESC", theValue] as const;
+          const sortingPush: Readonly<EntitySorting<P>> = [theName, "DESC", theValue] as const;
           sorting.push(sortingPush)
          
           break;
