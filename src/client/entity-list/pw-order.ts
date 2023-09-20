@@ -147,7 +147,7 @@ export class PwOrder<
   mypwinputchangeDispatcher = () => {
     const partialFormData: z.infer<typeof routes[P]["partialRequest"]> = this.pwForm.formData;
     const formData: z.infer<typeof routes[P]["request"]> = routes[this.url].request.parse(partialFormData);
-    const sorting: entitiesType3[P] = this.get(formData);
+    const sorting: z.infer<typeof entityRoutes[P]["request"]>["sorting"][number][] = this.get(formData);
 
     const oldElementIndex = sorting.findIndex(([e]) => e === this.orderBy);
 
@@ -164,32 +164,15 @@ export class PwOrder<
         case "DESC":
           break;
         case "ASC": {
-          //sorting.push([theName, "DESC", theValue])
-          const adding = mappedTuple<
-            P,
-            entitiesType1,
-            entitiesType15,
-            entitiesType2
-          >(this.url, theName, "DESC", theValue);
-
-          const adding2: entitiesType4[P] = adding;
-
-          sorting.push(adding2);
-
+          const sortingPush = [theName, "DESC", theValue] as const;
+          sorting.push(sortingPush)
+         
           break;
         }
       }
     } else {
-      const adding = mappedTuple<
-        P,
-        entitiesType1,
-        entitiesType15,
-        entitiesType2
-      >(this.url, this.orderBy, "ASC", this.value);
-
-      const adding2: entitiesType4[P] = adding;
-
-      sorting.push(adding2);
+      const adding = [this.orderBy, "ASC", this.value] as const;
+      sorting.push(adding);
     }
 
     this.inputValue = sorting;
