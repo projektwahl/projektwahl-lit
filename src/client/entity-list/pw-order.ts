@@ -108,7 +108,7 @@ export class PwOrder<
   X extends string,
 > extends PwInput<
   P,
-  z.infer<typeof entityRoutes[P]["request"]>["sorting"],
+  EntitySorting<P>[],
   HTMLButtonElement
 > {
   static override get properties() {
@@ -147,8 +147,7 @@ export class PwOrder<
   mypwinputchangeDispatcher = () => {
     const partialFormData: z.infer<typeof routes[P]["partialRequest"]> = this.pwForm.formData;
     const formData: z.infer<typeof routes[P]["request"]> = routes[this.url].request.parse(partialFormData);
-    const sortingAll: EntitySortingAll<P> = this.get(formData);
-    const sorting: EntitySorting<P> = sortingAll;
+    const sorting: EntitySorting<P>[] = this.get(formData);
 
     const oldElementIndex = sorting.findIndex(([e]) => e === this.orderBy);
 
