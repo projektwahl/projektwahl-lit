@@ -7,11 +7,15 @@ const map = {
     },
     b: {
       input: "i",
-      fun: (input: number) => ["hi", "jo"]
+      fun: (input: string) => ["hi", "jo"]
     },
 } as const;
 
-const magic = <K extends keyof typeof map>(key: K) => {
-  const ji: { [K in keyof typeof map]: typeof map[K] }[K] = map[key]
-  ji.fun(ji.input)
+// the issue is that K could contain multiple keys and then this is broken
+function magic<K extends keyof (typeof map)>(key: K) {
+  if (key === "a") {
+    map["a"].fun(map["a"].input)
+  } else if (key === "b") {
+    map["b"].fun(map["b"].input)
+  }
 }
