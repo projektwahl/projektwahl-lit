@@ -103,9 +103,9 @@ export async function fetchData<R extends keyof typeof entityRoutes>(
   orderByQueries: entitiesType8[R],
   tiebreaker: entitiesType18[R] | undefined,
 ): Promise<[OutgoingHttpHeaders, ResponseType<R>]> {
-  let sorting: entitiesType15[R] = mappedIndexing(query, "sorting");
+  const sorting: entitiesType15[R] = mappedIndexing(query, "sorting");
 
-  if (tiebreaker !== undefined && !sorting.find((e) => e[0] == tiebreaker)) {
+  if (tiebreaker !== undefined && !sorting.find((e) => e[0] === tiebreaker)) {
     y(entityRoutes, path, [tiebreaker, "ASC", null]);
   }
 

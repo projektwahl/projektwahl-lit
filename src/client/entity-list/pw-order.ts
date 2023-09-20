@@ -49,7 +49,7 @@ type EntitySorting2<K extends keyof (typeof entityRoutes)> = {
 type EntitySortingAll<K extends keyof (typeof entityRoutes)> = {
   [P in K]: z.infer<
     typeof entityRoutes[P]["request"]
-  >["sorting"][number][];
+  >["sorting"];
 }[K];
 
 type EntitySorting<K extends keyof (typeof entityRoutes)> = { [P in K]: [
@@ -108,7 +108,7 @@ export class PwOrder<
   X extends string,
 > extends PwInput<
   P,
-  z.infer<typeof entityRoutes[P]["request"]>["sorting"][number][],
+  z.infer<typeof entityRoutes[P]["request"]>["sorting"],
   HTMLButtonElement
 > {
   static override get properties() {
