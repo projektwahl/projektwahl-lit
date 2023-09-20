@@ -55,16 +55,17 @@ export type parseRequestWithPrefixSchemaType<PREFIX extends string> = {
   >;
 };
 
-type EntityRoutesParam<K extends keyof (typeof entityRoutes) = keyof (typeof entityRoutes)> = { [P in K]: z.infer<(typeof entityRoutes)[P]["request"]> };
-type EntityRoutesReturn<K extends keyof (typeof entityRoutes) = keyof (typeof entityRoutes)> = { [P in K]: z.ZodDefault<(typeof entityRoutes)[P]["request"]> };
+// https://github.com/microsoft/TypeScript/pull/47109#issuecomment-991693300
+type EntityRoutesParam<K extends keyof (typeof entityRoutes) = keyof (typeof entityRoutes)> = { [P in K]: z.infer<(typeof entityRoutes)[P]["request"]> }[K];
+type EntityRoutesReturn<K extends keyof (typeof entityRoutes) = keyof (typeof entityRoutes)> = { [P in K]: z.ZodDefault<(typeof entityRoutes)[P]["request"]> }[K];
 type EntityRoutesDefault<K extends keyof (typeof entityRoutes) = keyof (typeof entityRoutes)> = { [P in K]: {
   request: {
-    default: (v: EntityRoutesParam[P]) => EntityRoutesReturn[P]
+    default: (v: EntityRoutesParam<P>) => EntityRoutesReturn<P>
   }
-}}[K];
+}};
 
 export const parseRequestWithPrefix = <
-  P extends keyof typeof entityRoutes,
+  P extends keyof (typeof entityRoutes),
   PREFIX extends string,
 >(
   apiUrl: P,
@@ -73,10 +74,11 @@ export const parseRequestWithPrefix = <
   defaultValue: z.infer<typeof entityRoutes[typeof apiUrl]["request"]>,
 ): parseRequestWithPrefixType<PREFIX>[P] => {
   const jo: z.ZodDefault<(typeof entityRoutes)["/api/v1/choices"]["request"]> = entityRoutes["/api/v1/choices"].request.default({filters: {}});
-  const entityRoutesDefault: EntityRoutesDefault = entityRoutes[apiUrl];
+  const entityRoutesDefault: EntityRoutesDefault = entityRoutes;
+  const ji: EntityRoutesDefault<P>[P] = entityRoutesDefault[apiUrl];
   const schema = z
     .object({}) // we need kind of a mapped type here
-    .setKey(prefix, entityRoutesDefault.request.default(defaultValue))
+    .setKey(prefix, ji.request.default(defaultValue))
     .passthrough();
   const data: parseRequestWithPrefixType<PREFIX>[P] = mappedFunctionCall(
     schema,
