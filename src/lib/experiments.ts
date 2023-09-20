@@ -1,12 +1,3 @@
-function jo2<
-  MappedType extends {
-    [key: string]: readonly unknown[];
-  },
-  Key extends keyof MappedType,
->(mappedType: MappedType, key: Key): MappedType[Key][0] {
-  return mappedType[key][0];
-}
-
 // https://stackoverflow.com/questions/54366720/mapped-types-in-typescript-with-functions
 
 const map = {
@@ -14,21 +5,16 @@ const map = {
     b: ["hi", "jo"],
 };
 
-function pushSorting<
-  Key extends keyof typeof map,
-  V extends (typeof map)[Key][number]
->(sorting: Array<V>, key: Key, sortToAdd: V): (typeof map)[Key][number] {
-  sorting.push(sortToAdd);
-  return sorting[0]
-}
-
-pushSorting(map["a"], "a", 5)
-
 function mappedTypeMap<MappedType, Key extends (keyof MappedType & keyof Q), Q>(mappedType: MappedType, key: Key, func: (input: MappedType[Key]) => Q[Key]): Q[Key] {
   return func(mappedType[key])
 }
 
-const result = mappedTypeMap<typeof map, "a", { [Key in keyof typeof map]: (typeof map)[Key][number] }>(map, "a", (input) => {
-  input.push(5)
+const result = mappedTypeMap<typeof map, "a" | "b", { [Key in keyof typeof map]: (typeof map)[Key][number] }>(map, "a", (input) => {
+  input.push()
+  return input[0]
+})
+
+const result2 = mappedTypeMap<typeof map, "a" | "b", { [Key in keyof typeof map]: (typeof map)[Key][number] }>(map, "a", (input) => {
+  input.push()
   return input[0]
 })

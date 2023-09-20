@@ -31,18 +31,8 @@ import { mappedFunctionCall2, mappedIndexing } from "../lib/result.js";
 // Mapped Types
 // https://www.typescriptlang.org/docs/handbook/2/mapped-types.html
 
-type entitiesType = {
-  [K in keyof typeof entityRoutes]: typeof entityRoutes[K];
-};
-
-type entitiesType0 = {
+type entityRoutesRequest = {
   [K in keyof typeof entityRoutes]: z.infer<typeof entityRoutes[K]["request"]>;
-};
-
-type entitiesType1 = {
-  [K in keyof typeof entityRoutes]: z.infer<
-    typeof entityRoutes[K]["request"]
-  >["sorting"][number][0];
 };
 
 type entitiesType2 = {
@@ -95,7 +85,9 @@ type entitiesType10 = {
 
 type entitiesType8 = {
   [K in keyof typeof entityRoutes]: {
-    [key in entitiesType1[K]]: (
+    [key in z.infer<
+      typeof entityRoutes[K]["request"]
+    >["sorting"][number][0]]: (
       order: entitiesType2[K][key],
       paginationDirection: "forwards" | "backwards",
       v: entitiesType9[K][key],
@@ -103,19 +95,11 @@ type entitiesType8 = {
   };
 };
 
-
-type entitiesType19 = {
-  [K in keyof typeof entityRoutes]: [z.infer<
-    typeof entityRoutes[K]["request"]
-  >["sorting"][number][0], "ASC", null];
-};
-
-
 export async function fetchData<R extends keyof typeof entityRoutes>(
   loggedInUser: Exclude<z.infer<typeof userSchema>, undefined>,
   path: R,
-  query: entitiesType0[R],
-  sqlQuery: (query: entitiesType0[R]) => PendingQuery<Row[]>,
+  query: entityRoutesRequest[R],
+  sqlQuery: (query: entityRoutesRequest[R]) => PendingQuery<Row[]>,
   orderByQueries: entitiesType8[R],
   tiebreaker: entitiesType18[R] | undefined,
 ): Promise<[OutgoingHttpHeaders, ResponseType<R>]> {
@@ -151,7 +135,7 @@ export async function fetchData<R extends keyof typeof entityRoutes>(
           sql` ORDER BY `,
         );
 
-  const paginationCursor: entitiesType0[R]["paginationCursor"] =
+  const paginationCursor: entityRoutesRequest[R]["paginationCursor"] =
     query.paginationCursor;
 
   let sqlResult;
@@ -256,10 +240,10 @@ export async function fetchData<R extends keyof typeof entityRoutes>(
 
   // would be great to stream the results but they are post processed below
 
-  let entities: z.infer<entitiesType[R]["response"]>["entities"] = sqlResult;
+  let entities: z.infer<(typeof entityRoutes)[R]["response"]>["entities"] = sqlResult;
 
-  let nextCursor: z.infer<entitiesType[R]["response"]>["nextCursor"] = null;
-  let previousCursor: z.infer<entitiesType[R]["response"]>["previousCursor"] =
+  let nextCursor: z.infer<(typeof entityRoutes)[R]["response"]>["nextCursor"] = null;
+  let previousCursor: z.infer<(typeof entityRoutes)[R]["response"]>["previousCursor"] =
     null;
   // TODO FIXME also recalculate the other cursor because data could've been deleted in between / the filters have changed
   if (query.paginationDirection === "forwards") {
