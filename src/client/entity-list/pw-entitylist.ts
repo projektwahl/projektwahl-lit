@@ -55,6 +55,12 @@ export type parseRequestWithPrefixSchemaType<PREFIX extends string> = {
   >;
 };
 
+type EntityRoutesDefault<K extends keyof (typeof entityRoutes) = keyof (typeof entityRoutes)> = { [P in K]: {
+  request: {
+    default: (v: z.infer<(typeof entityRoutes)[P]["request"]>) => z.ZodDefault<(typeof entityRoutes)[P]["request"]>
+  }
+}}[K];
+
 export const parseRequestWithPrefix = <
   P extends keyof typeof entityRoutes,
   PREFIX extends string,
@@ -64,9 +70,11 @@ export const parseRequestWithPrefix = <
   url: URL,
   defaultValue: z.infer<typeof entityRoutes[typeof apiUrl]["request"]>,
 ): parseRequestWithPrefixType<PREFIX>[P] => {
+  const jo: z.ZodDefault<(typeof entityRoutes)["/api/v1/choices"]["request"]> = entityRoutes["/api/v1/choices"].request.default({filters: {}});
+  const entityRoutesDefault: EntityRoutesDefault = entityRoutes[apiUrl];
   const schema = z
     .object({}) // we need kind of a mapped type here
-    .setKey(prefix, entityRoutes[apiUrl].request.default(defaultValue))
+    .setKey(prefix, entityRoutesDefault.request.default(defaultValue))
     .passthrough();
   const data: parseRequestWithPrefixType<PREFIX>[P] = mappedFunctionCall(
     schema,
