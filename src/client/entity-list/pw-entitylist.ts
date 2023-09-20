@@ -56,8 +56,9 @@ export type parseRequestWithPrefixSchemaType<PREFIX extends string> = {
 };
 
 // https://github.com/microsoft/TypeScript/pull/47109#issuecomment-991693300
-type EntityRoutesParam<K extends keyof (typeof entityRoutes) = keyof (typeof entityRoutes)> = { [P in K]: z.infer<(typeof entityRoutes)[P]["request"]> }[K];
-type EntityRoutesReturn<K extends keyof (typeof entityRoutes) = keyof (typeof entityRoutes)> = { [P in K]: z.ZodDefault<(typeof entityRoutes)[P]["request"]> }[K];
+type EntityRoutesParam<K extends keyof (typeof entityRoutes)> = { [P in K]: z.infer<(typeof entityRoutes)[P]["request"]> }[K];
+type EntityRoutesReturn<K extends keyof (typeof entityRoutes)> = { [P in K]: z.ZodDefault<(typeof entityRoutes)[P]["request"]> }[K];
+// seems like this is enough to globally fix the types
 type EntityRoutesDefault<K extends keyof (typeof entityRoutes) = keyof (typeof entityRoutes)> = { [P in K]: {
   request: {
     default: (v: EntityRoutesParam<P>) => EntityRoutesReturn<P>
@@ -71,14 +72,12 @@ export const parseRequestWithPrefix = <
   apiUrl: P,
   prefix: PREFIX,
   url: URL,
-  defaultValue: z.infer<typeof entityRoutes[typeof apiUrl]["request"]>,
+  defaultValue: z.infer<typeof entityRoutes[P]["request"]>,
 ): parseRequestWithPrefixType<PREFIX>[P] => {
-  const jo: z.ZodDefault<(typeof entityRoutes)["/api/v1/choices"]["request"]> = entityRoutes["/api/v1/choices"].request.default({filters: {}});
   const entityRoutesDefault: EntityRoutesDefault = entityRoutes;
-  const ji: EntityRoutesDefault<P>[P] = entityRoutesDefault[apiUrl];
   const schema = z
     .object({}) // we need kind of a mapped type here
-    .setKey(prefix, ji.request.default(defaultValue))
+    .setKey(prefix, entityRoutesDefault[apiUrl].request.default(defaultValue))
     .passthrough();
   const data: parseRequestWithPrefixType<PREFIX>[P] = mappedFunctionCall(
     schema,
