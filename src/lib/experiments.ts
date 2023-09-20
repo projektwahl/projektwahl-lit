@@ -1,20 +1,22 @@
 // https://stackoverflow.com/questions/54366720/mapped-types-in-typescript-with-functions
 
 const map = {
-    a: [1, 2, 3],
-    b: ["hi", "jo"],
+    a: {
+      input: 4,
+      fun: (input: number) => [1, 2, 3]
+    },
+    b: {
+      input: "i",
+      fun: (input: number) => ["hi", "jo"]
+    },
 };
 
-function mappedTypeMap<MappedType, Key extends (keyof MappedType & keyof Q), Q>(mappedType: MappedType, key: Key, func: (input: MappedType[Key]) => Q[Key]): Q[Key] {
+export function mappedTypeMap<MappedType, Key extends (keyof MappedType & keyof Q), Q>(mappedType: MappedType, key: Key, func: (input: MappedType[Key]) => Q[Key]): Q[Key] {
   return func(mappedType[key])
 }
 
-const result = mappedTypeMap<typeof map, "a" | "b", { [Key in keyof typeof map]: (typeof map)[Key][number] }>(map, "a", (input) => {
-  input.push()
-  return input[0]
-})
+const someKey: "a" | "b" = "a";
 
-const result2 = mappedTypeMap<typeof map, "a" | "b", { [Key in keyof typeof map]: (typeof map)[Key][number] }>(map, "a", (input) => {
-  input.push()
-  return input[0]
+const result = mappedTypeMap<typeof map, keyof typeof map, { [Key in keyof typeof map]: (typeof map)[Key]["input"][] }>(map, someKey, (input) => {
+  return input.fun(input.input)
 })

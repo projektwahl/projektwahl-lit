@@ -32,6 +32,7 @@ import { ifDefined } from "lit/directives/if-defined.js";
 import { myFetch } from "../utils.js";
 import { pwInputSelect } from "../form/pw-input-select.js";
 import { mappedFunctionCall } from "../../lib/result.js";
+import { mappedTypeMap } from "../../lib/experiments.js";
 
 export type parseRequestWithPrefixType<PREFIX extends string> = {
   [P in keyof typeof entityRoutes]: z.infer<
@@ -54,6 +55,12 @@ export type parseRequestWithPrefixSchemaType<PREFIX extends string> = {
     Record<string, unknown>
   >;
 };
+
+
+
+const defaultFunction = <P extends keyof typeof entityRoutes>(apiUrl: P, defaultValue: z.infer<typeof entityRoutes[P]["request"]>,) => mappedTypeMap<typeof entityRoutes, keyof typeof entityRoutes, { [key in keyof typeof entityRoutes]: void }>(entityRoutes, apiUrl, (input) => {
+  input.request.default(defaultValue)
+})
 
 export const parseRequestWithPrefix = <
   P extends keyof typeof entityRoutes,
