@@ -27,9 +27,14 @@ import type { ResponseType, userSchema } from "../lib/routes.js";
 import { entityRoutes } from "../lib/routes.js";
 import { sql } from "./database.js";
 import { EntitySorting } from "../client/entity-list/pw-order.js";
+import { typedSql } from "./describe.js";
 
 // Mapped Types
 // https://www.typescriptlang.org/docs/handbook/2/mapped-types.html
+
+type magic<K extends keyof (typeof entityRoutes)> = {
+  [P in K]: typeof entityRoutes[P];
+}[K];
 
 type entityRoutesRequest<K extends keyof (typeof entityRoutes)> = {
   [P in K]: z.infer<typeof entityRoutes[P]["request"]>;
@@ -67,25 +72,11 @@ type entitiesType4<K extends keyof (typeof entityRoutes)> = {
   >["sorting"][number];
 }[K];
 
-type entitiesType15 = {
-  [K in keyof typeof entityRoutes]: z.infer<
-    typeof entityRoutes[K]["request"]
-  >["sorting"][number][];
-};
-
 type entitiesType18<K extends keyof (typeof entityRoutes)> = {
   [P in K]: z.infer<
     typeof entityRoutes[P]["request"]
   >["sorting"][number][0];
 }[K];
-
-type entitiesType6 = {
-  [K in keyof typeof entityRoutes]: entitiesType4<K>[0];
-};
-
-type entitiesType10 = {
-  [K in keyof typeof entityRoutes]: entitiesType4<K>[2];
-};
 
 type entitiesType8<K extends keyof (typeof entityRoutes)> = {
   [P in K]: {
@@ -104,6 +95,7 @@ export async function fetchData<R extends keyof typeof entityRoutes>(
   path: R,
   query: entityRoutesRequest<R>,
   sqlQuery: (query: entityRoutesRequest<R>) => PendingQuery<Row[]>,
+  description: { columns: z.infer<magic<R>["response"]>["entities"][number] },
   orderByQueries: entitiesType8<R>,
   tiebreaker: entitiesType18<R> | undefined,
 ): Promise<[OutgoingHttpHeaders, ResponseType<R>]> {
@@ -140,7 +132,7 @@ export async function fetchData<R extends keyof typeof entityRoutes>(
     sqlResult = await sql.begin(async (tsql) => {
       await tsql`SELECT set_config('projektwahl.id', ${loggedInUser.id}::text, true);`;
       await tsql`SELECT set_config('projektwahl.type', ${loggedInUser.type}::text, true);`;
-      return await tsql`${sql`(${sqlQuery(query)} ${orderByQuery} LIMIT ${
+      return await typedSql(tsql, description)`${sql`(${sqlQuery(query)} ${orderByQuery} LIMIT ${
         query.paginationLimit + 1
       })`}`;
     });
@@ -230,9 +222,9 @@ export async function fetchData<R extends keyof typeof entityRoutes>(
       await tsql`SELECT set_config('projektwahl.id', ${loggedInUser.id}::text, true);`;
       await tsql`SELECT set_config('projektwahl.type', ${loggedInUser.type}::text, true);`;
       if (queries.length == 1) {
-        sqlResult = await tsql`${queries[0]}`;
+        sqlResult = await typedSql(tsql, description)`${queries[0]}`;
       } else {
-        sqlResult = await tsql`${queries
+        sqlResult = await typedSql(tsql, description)`${queries
           .reverse()
           .flatMap((v) => [sql`\nUNION ALL\n`, v])
           .slice(1)
@@ -245,7 +237,7 @@ export async function fetchData<R extends keyof typeof entityRoutes>(
 
   // would be great to stream the results but they are post processed below
 
-  let entities: z.infer<(typeof entityRoutes)[R]["response"]>["entities"] = sqlResult;
+  let entities: z.infer<magic<R>["response"]>["entities"] = sqlResult;
 
   let nextCursor: z.infer<(typeof entityRoutes)[R]["response"]>["nextCursor"] = null;
   let previousCursor: z.infer<(typeof entityRoutes)[R]["response"]>["previousCursor"] =
