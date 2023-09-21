@@ -1,9 +1,10 @@
-import { defineConfig } from "vite";
+import { PluginOption, defineConfig } from "vite";
 import basicSsl from "@vitejs/plugin-basic-ssl";
+import { visualizer } from "rollup-plugin-visualizer";
 
 // https://vitejs.dev/config/
 export default defineConfig({
-  plugins: [basicSsl()],
+  plugins: [basicSsl(), visualizer() as PluginOption],
   server: {
     https: true,
     proxy: {

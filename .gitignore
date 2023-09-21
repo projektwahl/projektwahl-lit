@@ -13,3 +13,7 @@
 
 #!.yarn/cache
 .pnp.*
+
+stats.html
+node_modules
+dist
