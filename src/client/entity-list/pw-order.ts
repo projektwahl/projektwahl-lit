@@ -216,7 +216,7 @@ export class PwOrder<
         id=${this.randomId}
       >
         ${(() => {
-          const sorting: entitiesType3[P] = this.inputValue;
+          const sorting = this.inputValue;
 
           const value = sorting.find(([e]) => e === `${this.orderBy}`)?.[1];
           return value === "ASC"
