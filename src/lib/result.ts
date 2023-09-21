@@ -61,6 +61,9 @@ export const result = <
   s: ZodObject<T, UnknownKeys, Catchall>,
 ) => z.union([successResult(s), failureResult(z.record(z.string()))]);
 
+/**
+ * @deprecated The method should not be used
+ */
 export type ToIndexed<
   T extends Record<string, { [inner in I]: unknown }>,
   I extends string | number | symbol,
@@ -68,6 +71,9 @@ export type ToIndexed<
   [K in keyof T]: T[K][I];
 };
 
+/**
+ * @deprecated The method should not be used
+ */
 export function mappedIndexing<
   T extends Record<string, { [inner in I]: unknown }>,
   K extends string,
@@ -76,6 +82,9 @@ export function mappedIndexing<
   return value[index];
 }
 
+/**
+ * @deprecated The method should not be used
+ */
 export function mappedIndexingSet<
   T extends Record<string, { [inner in I]: unknown }>,
   K extends string,
@@ -84,6 +93,9 @@ export function mappedIndexingSet<
   value[index] = newValue;
 }
 
+/**
+ * @deprecated The method should not be used
+ */
 export type ToTuple<
   K extends string | symbol | number,
   T extends { [key in K]: unknown },
@@ -93,6 +105,9 @@ export type ToTuple<
   [key in K]: [T[key], Q[key], R[key]];
 };
 
+/**
+ * @deprecated The method should not be used
+ */
 export function mappedTuple<
   K extends string | number | symbol,
   T extends { [key in K]: unknown },
@@ -102,15 +117,24 @@ export function mappedTuple<
   return [value1, value2, value3];
 }
 
+/**
+ * @deprecated The method should not be used
+ */
 export function testa<Output>(zodtype: ZodType<Output>, data: unknown): Output {
   return zodtype.parse(data);
 }
 
+/**
+ * @deprecated The method should not be used
+ */
 export type MappedFunctionCallType<T extends Record<string, ZodType<unknown>>> =
   {
     [K in keyof T]: T[K]["_output"];
   };
 
+/**
+ * @deprecated The method should not be used
+ */
 export function mappedFunctionCall<
   T extends Record<string, ZodType<unknown>>,
   K extends string,
@@ -118,16 +142,25 @@ export function mappedFunctionCall<
   return testa(schema, value);
 }
 
+/**
+ * @deprecated The method should not be used
+ */
 type entitiesType15 = {
   [K in keyof typeof entityRoutes]: entitiesType4[K][];
 };
 
+/**
+ * @deprecated The method should not be used
+ */
 type entitiesType4 = {
   [K in keyof typeof entityRoutes]: z.infer<
     typeof entityRoutes[K]["request"]
   >["sorting"][number];
 };
 
+/**
+ * @deprecated The method should not be used
+ */
 export function mappedFunctionCall2<R extends keyof typeof entityRoutes, U>(
   array: entitiesType15[R],
   functio: (v: entitiesType4[R]) => readonly U[],

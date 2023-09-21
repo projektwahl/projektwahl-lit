@@ -25,34 +25,33 @@ import { HistoryController } from "../history-controller.js";
 import { msg, str } from "@lit/localize";
 import { entityRoutes, routes } from "../../lib/routes.js";
 import type { z } from "zod";
-import { mappedTuple } from "../../lib/result.js";
 import { PwInput } from "../form/pw-input.js";
 
-type EntitySorting0<K extends keyof (typeof entityRoutes)> = {
+export type EntitySorting0<K extends keyof (typeof entityRoutes)> = {
   [P in K]: z.infer<
     typeof entityRoutes[P]["request"]
   >["sorting"][number][0];
 }[K];
 
-type EntitySorting1<K extends keyof (typeof entityRoutes)> = {
+export type EntitySorting1<K extends keyof (typeof entityRoutes)> = {
   [P in K]: z.infer<
     typeof entityRoutes[P]["request"]
   >["sorting"][number][1];
 }[K];
 
-type EntitySorting2<K extends keyof (typeof entityRoutes)> = {
+export type EntitySorting2<K extends keyof (typeof entityRoutes)> = {
   [P in K]: z.infer<
     typeof entityRoutes[P]["request"]
   >["sorting"][number][2];
 }[K];
 
-type EntitySortingAll<K extends keyof (typeof entityRoutes)> = {
+export type EntitySortingAll<K extends keyof (typeof entityRoutes)> = {
   [P in K]: z.infer<
     typeof entityRoutes[P]["request"]
   >["sorting"];
 }[K];
 
-type EntitySorting<K extends keyof (typeof entityRoutes)> = { [P in K]: [
+export type EntitySorting<K extends keyof (typeof entityRoutes)> = { [P in K]: [
   EntitySorting0<P>,
   EntitySorting1<P>,
   EntitySorting2<P>,

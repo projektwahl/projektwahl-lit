@@ -26,42 +26,42 @@ import type { z } from "zod";
 import type { ResponseType, userSchema } from "../lib/routes.js";
 import { entityRoutes } from "../lib/routes.js";
 import { sql } from "./database.js";
-import { mappedFunctionCall2, mappedIndexing } from "../lib/result.js";
+import { EntitySorting } from "../client/entity-list/pw-order.js";
 
 // Mapped Types
 // https://www.typescriptlang.org/docs/handbook/2/mapped-types.html
 
-type entityRoutesRequest = {
-  [K in keyof typeof entityRoutes]: z.infer<typeof entityRoutes[K]["request"]>;
-};
+type entityRoutesRequest<K extends keyof (typeof entityRoutes)> = {
+  [P in K]: z.infer<typeof entityRoutes[P]["request"]>;
+}[K];
 
-type entitiesType2 = {
-  [K in keyof typeof entityRoutes]: {
+type entitiesType2<K extends keyof (typeof entityRoutes)> = {
+  [P in K]: {
     [R in
       z.infer<
-        typeof entityRoutes[K]["request"]
+        typeof entityRoutes[P]["request"]
       >["sorting"][number][0]]: z.infer<
-      typeof entityRoutes[K]["request"]
+      typeof entityRoutes[P]["request"]
     >["sorting"][number][1];
   };
-};
+}[K];
 
-type entitiesType9 = {
-  [K in keyof typeof entityRoutes]: {
+type entitiesType9<K extends keyof (typeof entityRoutes)> = {
+  [P in K]: {
     [R in
       z.infer<
-        typeof entityRoutes[K]["request"]
+        typeof entityRoutes[P]["request"]
       >["sorting"][number][0]]: z.infer<
-      typeof entityRoutes[K]["request"]
+      typeof entityRoutes[P]["request"]
     >["sorting"][number][2];
   };
-};
+}[K];
 
-type entitiesType4 = {
-  [K in keyof typeof entityRoutes]: z.infer<
-    typeof entityRoutes[K]["request"]
+type entitiesType4<K extends keyof (typeof entityRoutes)> = {
+  [P in K]: z.infer<
+    typeof entityRoutes[P]["request"]
   >["sorting"][number];
-};
+}[K];
 
 type entitiesType15 = {
   [K in keyof typeof entityRoutes]: z.infer<
@@ -69,63 +69,56 @@ type entitiesType15 = {
   >["sorting"][number][];
 };
 
-type entitiesType18 = {
-  [K in keyof typeof entityRoutes]: z.infer<
-    typeof entityRoutes[K]["request"]
+type entitiesType18<K extends keyof (typeof entityRoutes)> = {
+  [P in K]: z.infer<
+    typeof entityRoutes[P]["request"]
   >["sorting"][number][0];
-};
+}[K];
 
 type entitiesType6 = {
-  [K in keyof typeof entityRoutes]: entitiesType4[K][0];
+  [K in keyof typeof entityRoutes]: entitiesType4<K>[0];
 };
 
 type entitiesType10 = {
-  [K in keyof typeof entityRoutes]: entitiesType4[K][2];
+  [K in keyof typeof entityRoutes]: entitiesType4<K>[2];
 };
 
-type entitiesType8 = {
-  [K in keyof typeof entityRoutes]: {
+type entitiesType8<K extends keyof (typeof entityRoutes)> = {
+  [P in K]: {
     [key in z.infer<
-      typeof entityRoutes[K]["request"]
+      typeof entityRoutes[P]["request"]
     >["sorting"][number][0]]: (
-      order: entitiesType2[K][key],
+      order: entitiesType2<P>[key],
       paginationDirection: "forwards" | "backwards",
-      v: entitiesType9[K][key],
+      v: entitiesType9<P>[key],
     ) => PendingQuery<Row[]>;
   };
-};
+}[K];
 
 export async function fetchData<R extends keyof typeof entityRoutes>(
   loggedInUser: Exclude<z.infer<typeof userSchema>, undefined>,
   path: R,
-  query: entityRoutesRequest[R],
-  sqlQuery: (query: entityRoutesRequest[R]) => PendingQuery<Row[]>,
-  orderByQueries: entitiesType8[R],
-  tiebreaker: entitiesType18[R] | undefined,
+  query: entityRoutesRequest<R>,
+  sqlQuery: (query: entityRoutesRequest<R>) => PendingQuery<Row[]>,
+  orderByQueries: entitiesType8<R>,
+  tiebreaker: entitiesType18<R> | undefined,
 ): Promise<[OutgoingHttpHeaders, ResponseType<R>]> {
-  const sorting: entitiesType15[R] = mappedIndexing(query, "sorting");
+  const sorting: EntitySorting<R>[] = query.sorting;
 
   if (tiebreaker !== undefined && !sorting.find((e) => e[0] === tiebreaker)) {
-    y(entityRoutes, path, [tiebreaker, "ASC", null]);
+    sorting.push([tiebreaker, "ASC", null]);
   }
 
   // TODO FIXME id tiebreaker lost
   console.log(sorting);
 
-  const orderByQueryParts = mappedFunctionCall2(
-    sorting,
-    (v: entitiesType4[R]) => {
-      const v0: entitiesType6[R] = mappedIndexing<entitiesType4, R, 0>(v, 0);
+  const orderByQueryParts = sorting.flatMap(v => {
+    return [
+      sql`,`,
 
-      const v1: entitiesType2[R][typeof v0] = mappedIndexing(v, 1);
-      const v2: entitiesType10[R] = mappedIndexing(v, 2);
-      return [
-        sql`,`,
-
-        sql`${orderByQueries[v0](v1, query.paginationDirection, v2)}`,
-      ];
-    },
-  ).slice(1);
+      sql`${orderByQueries[v[0]](v[1], query.paginationDirection, v[2])}`,
+    ];
+  }).slice(1);
 
   const orderByQuery =
     orderByQueryParts.length == 0
@@ -135,7 +128,7 @@ export async function fetchData<R extends keyof typeof entityRoutes>(
           sql` ORDER BY `,
         );
 
-  const paginationCursor: entityRoutesRequest[R]["paginationCursor"] =
+  const paginationCursor: entityRoutesRequest<R>["paginationCursor"] =
     query.paginationCursor;
 
   let sqlResult;
