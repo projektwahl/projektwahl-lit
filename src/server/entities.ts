@@ -154,8 +154,8 @@ export async function fetchData<R extends keyof typeof entityRoutes>(
     const queries = sorting.map((value, index) => {
       const part = sorting.slice(0, index + 1);
 
-      const partsTmp = part.flatMap((value, index) => {
-        let order;
+      const partsTmp = part.flatMap<PendingQuery<Row[]>>((value, index) => {
+        let order: PendingQuery<Row[]>;
 
         const value0 = value[0];
         const cursorValue = paginationCursor
@@ -181,6 +181,8 @@ export async function fetchData<R extends keyof typeof entityRoutes>(
                       : sql``
                   })`;
                   break;
+                default:
+                  throw new Error("unreachable")
               }
               break;
             case "DESC":
@@ -200,14 +202,19 @@ export async function fetchData<R extends keyof typeof entityRoutes>(
                       : sql``
                   })`;
                   break;
+                default:
+                  throw new Error("unreachable")
               }
               break;
+            default:
+              throw new Error("unreachable")
           }
         } else {
           // this is probably not compatible with the checks above
           order = sql`${cursorValue} IS NOT DISTINCT FROM ${column}`;
         }
-        return [sql` AND `, order];
+        const result = [sql` AND `, order];
+        return result
       });
 
       const parts = partsTmp
