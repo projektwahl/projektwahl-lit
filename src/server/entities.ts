@@ -35,6 +35,10 @@ type entityRoutesRequest<K extends keyof (typeof entityRoutes)> = {
   [P in K]: z.infer<typeof entityRoutes[P]["request"]>;
 }[K];
 
+type entityRoutesRequestPaginationCursor<K extends keyof (typeof entityRoutes)> = {
+  [P in K]: z.infer<typeof entityRoutes[P]["request"]>["paginationCursor"];
+}[K];
+
 type entitiesType2<K extends keyof (typeof entityRoutes)> = {
   [P in K]: {
     [R in
@@ -128,7 +132,7 @@ export async function fetchData<R extends keyof typeof entityRoutes>(
           sql` ORDER BY `,
         );
 
-  const paginationCursor: entityRoutesRequest<R>["paginationCursor"] =
+  const paginationCursor: entityRoutesRequestPaginationCursor<R> =
     query.paginationCursor;
 
   let sqlResult;
@@ -153,8 +157,9 @@ export async function fetchData<R extends keyof typeof entityRoutes>(
       const partsTmp = part.flatMap((value, index) => {
         let order;
 
+        const value0 = value[0];
         const cursorValue = paginationCursor
-          ? paginationCursor[value[0]]
+          ? paginationCursor[value0]
           : null;
         const column = sql.unsafe(`"${value[0]}"`);
         if (index === part.length - 1) {
