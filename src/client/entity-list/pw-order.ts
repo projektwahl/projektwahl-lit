@@ -153,25 +153,25 @@ export class PwOrder<
 
     if (oldElementIndex !== -1) {
       // splice REMOVES the elements from the original array
-      const oldElement: z.infer<
-        typeof entityRoutes[P]["request"]
-      >["sorting"][number] = sorting.splice(oldElementIndex, 1)[0];
+      const oldElement: EntitySorting<P> = sorting.splice(oldElementIndex, 1)[0];
 
       const theName = this.orderBy;
       const theValue = this.value;
+      const desc: EntitySorting1<P> = "DESC";
 
       switch (oldElement[1]) {
         case "DESC":
           break;
         case "ASC": {
-          const sortingPush: Readonly<EntitySorting<P>> = [theName, "DESC", theValue] as const;
+          const sortingPush: EntitySorting<P> = [theName, desc, theValue];
           sorting.push(sortingPush)
          
           break;
         }
       }
     } else {
-      const adding = [this.orderBy, "ASC", this.value] as const;
+      const asc: EntitySorting1<P> = "ASC";
+      const adding: EntitySorting<P> = [this.orderBy, asc, this.value];
       sorting.push(adding);
     }
 
