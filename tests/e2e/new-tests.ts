@@ -46,13 +46,13 @@ let chance: Chance.Chance;
 
 // const exec = promisify(unpromisifiedExec);
 
-if (!process.env.BASE_URL) {
+if (!process.env["BASE_URL"]) {
   console.error("BASE_URL not set!");
   process.exit(1);
 }
-const BASE_URL = process.env.BASE_URL;
+const BASE_URL = process.env["BASE_URL"];
 
-if (!process.env.BASE_URL) {
+if (!process.env["BASE_URL"]) {
   throw new Error("BASE_URL not set!");
 }
 
@@ -356,7 +356,7 @@ async function runTest(
     const combinedCapabilities = {
       ...capabilities,
       "browserstack.local": "true",
-      "browserstack.localIdentifier": process.env.BROWSERSTACK_LOCAL_IDENTIFIER,
+      "browserstack.localIdentifier": process.env["BROWSERSTACK_LOCAL_IDENTIFIER"],
       acceptSslCerts: "true",
       "browserstack.networkLogs": "true",
       "browserstack.console": "verbose",
@@ -364,11 +364,11 @@ async function runTest(
       name: "Projektwahl",
     } as const;
     builder
-      .usingServer(process.env.SELENIUM_URL ?? "")
+      .usingServer(process.env["SELENIUM_URL"] ?? "")
       .withCapabilities(combinedCapabilities);
   }
 
-  if (process.env.CI) {
+  if (process.env["CI"]) {
     builder.setChromeOptions(
       new chrome.Options().addArguments(
         "--headless",
