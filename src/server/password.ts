@@ -38,61 +38,6 @@ const argon2Options = {
   parallelism: 4,
 };
 
-/*
-import nodeCrypto from "node:crypto";
-
-async function getKeyMaterial(password: string): Promise<CryptoKey> {
-  let enc = new TextEncoder();
-  return webcrypto.subtle.importKey(
-    "raw",
-    enc.encode(password),
-    "PBKDF2",
-    false,
-    ["deriveBits"]
-  );
-}
-
-async function hashPasswordWithSalt(
-  password: string,
-  salt: Buffer
-): Promise<Buffer> {
-  let keyMaterial = await getKeyMaterial(password);
-  return Buffer.from(
-    await webcrypto.subtle.deriveBits(
-      {
-        name: "PBKDF2",
-        salt: salt,
-        iterations: 1200000,
-        hash: "SHA-256",
-      },
-      keyMaterial,
-      256
-    )
-  );
-}
-
-export async function hashPassword(
-  password: string
-): Promise<[Buffer, Buffer]> {
-  const salt = webcrypto.getRandomValues(new Uint8Array(64));
-  return [
-    await hashPasswordWithSalt(password, Buffer.from(salt)),
-    Buffer.from(salt),
-  ];
-}
-
-export async function checkPassword(
-  hash: Buffer,
-  salt: Buffer,
-  password: string
-): Promise<boolean> {
-  return crypto.timingSafeEqual(
-    await hashPasswordWithSalt(password, salt),
-    hash
-  );
-}
-*/
-
 export async function hashPassword(password: string): Promise<string> {
   return await argon2.hash(password, argon2Options);
 }

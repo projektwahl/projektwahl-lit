@@ -108,19 +108,19 @@ export class PwOrder<
     };
   }
 
-  prefix!: X;
+  override prefix!: X;
 
   orderBy!: EntitySorting0<P>;
 
   value!: EntitySorting2<P>;
 
-  title!: string;
+  override title!: string;
 
-  randomId;
+  override randomId;
 
   history;
 
-  url!: P;
+  override url!: P;
 
   constructor() {
     super();
@@ -179,7 +179,7 @@ export class PwOrder<
   };
 
   // TODO FIXME we're not able to reset this so move this somewhere else
-  protected willUpdate(changedProperties: Map<PropertyKey, unknown>): void {
+  protected override willUpdate(changedProperties: Map<PropertyKey, unknown>): void {
     if (changedProperties.has("initial")) {
       // the input value contains the value that is shown to the user
       this.inputValue =

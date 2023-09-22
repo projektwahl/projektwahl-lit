@@ -109,7 +109,7 @@ export class PwProjectCreate extends PwForm<
     };
   }
 
-  protected willUpdate(changedProperties: Map<PropertyKey, unknown>): void {
+  protected override willUpdate(changedProperties: Map<PropertyKey, unknown>): void {
     super.willUpdate(changedProperties);
     if (changedProperties.has("projectId")) {
       // because fields are resettable we need to set this to undefined

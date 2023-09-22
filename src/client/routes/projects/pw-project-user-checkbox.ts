@@ -24,7 +24,7 @@ import "../../form/pw-input.js";
 import { Task, TaskStatus } from "@lit-labs/task";
 import { html } from "lit";
 import { myFetch } from "../../utils.js";
-import { createRef, ref } from "lit/directives/ref.js";
+import { Ref, createRef, ref } from "lit/directives/ref.js";
 import { msg } from "@lit/localize";
 import type { routes } from "../../../lib/routes.js";
 import type { z } from "zod";
@@ -76,9 +76,9 @@ class PwProjectUserCheckbox extends PwElement {
 
   disabled: boolean;
 
-  form: import("lit/directives/ref").Ref<HTMLFormElement>;
+  form: Ref<HTMLFormElement>;
 
-  input: import("lit/directives/ref").Ref<HTMLElement>;
+  input: Ref<HTMLElement>;
 
   type!: "radio" | "checkbox";
 
@@ -117,7 +117,7 @@ class PwProjectUserCheckbox extends PwElement {
     });
   }
 
-  render() {
+  override render() {
     return html` <form ${ref(this.form)}>
       ${this._task.render({
         complete: (data) => {

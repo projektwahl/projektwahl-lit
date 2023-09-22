@@ -24,7 +24,7 @@ import { createSecureServer } from "node:http2";
 import { readFileSync } from "node:fs";
 import "./routes/login/openid-client.js";
 import { defaultHeaders, getDirs, serverHandler } from "./server-handler.js";
-import net from "net";
+import { Socket } from "net";
 import cluster from "cluster";
 import { watch } from "node:fs/promises";
 import { setupClient } from "./routes/login/openid-client.js";
@@ -129,7 +129,7 @@ if (
         ? Number(process.env.PORT)
         : process.env.SOCKET
         ? { path: process.env.SOCKET }
-        : new net.Socket({ fd: 3 }), // this doesn't work with cluster
+        : new Socket({ fd: 3 }), // this doesn't work with cluster
       511,
       () => {
         if (!process.env.BASE_URL) {

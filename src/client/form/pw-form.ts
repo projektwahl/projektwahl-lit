@@ -27,10 +27,9 @@ import type { routes, MyResponseType } from "../../lib/routes.js";
 import type { Task } from "@lit-labs/task";
 import { PwElement } from "../pw-element.js";
 import type { z } from "zod";
-import { partialUtil } from "zod/lib/helpers/partialUtil.js";
 
 class PwForm<P extends keyof typeof routes> extends PwElement {
-  static get properties() {
+  static override get properties() {
     return {
       disabled: { type: Boolean },
       url: { attribute: false },
@@ -45,7 +44,7 @@ class PwForm<P extends keyof typeof routes> extends PwElement {
 
   _task!: Task<[URLSearchParams], MyResponseType<P>>;
 
-  form: import("lit/directives/ref").Ref<HTMLFormElement>;
+  form: Ref<HTMLFormElement>;
 
   url!: P;
 
@@ -103,7 +102,7 @@ class PwForm<P extends keyof typeof routes> extends PwElement {
       </div>`;
   }
 
-  protected updated(): void {
+  protected override updated(): void {
     this.errors.value?.scrollIntoView();
   }
 }

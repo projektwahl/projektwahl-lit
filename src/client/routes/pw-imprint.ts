@@ -34,7 +34,7 @@ export function pwImprint(
 }
 
 export class PwImprint extends PwElement {
-  protected render() {
+  protected override render() {
     return html`
       <div class="container">
         <h1 class="text-center">Impressum</h1>

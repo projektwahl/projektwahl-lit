@@ -97,7 +97,7 @@ const taskFunction = async ([id]: [number]): Promise<
 };
 
 class PwUserCreate extends PwForm<"/api/v1/users/create-or-update"> {
-  static get properties() {
+  static override get properties() {
     return {
       ...super.properties,
       _task: {
@@ -183,7 +183,7 @@ class PwUserCreate extends PwForm<"/api/v1/users/create-or-update"> {
     this.typeRef = createRef();
   }
 
-  protected willUpdate(changedProperties: Map<PropertyKey, unknown>): void {
+  protected override willUpdate(changedProperties: Map<PropertyKey, unknown>): void {
     super.willUpdate(changedProperties);
     if (changedProperties.has("userId")) {
       // because fields are resettable we need to set this to undefined

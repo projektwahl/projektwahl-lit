@@ -115,7 +115,7 @@ export class PwEntityList<
     };
   }
 
-  connectedCallback(): void {
+  override connectedCallback(): void {
     super.connectedCallback();
     window.addEventListener("storage", (event) => {
       if (event.newValue === "login") {
@@ -133,7 +133,7 @@ export class PwEntityList<
 
   defaultValue!: z.infer<typeof entityRoutes[P]["request"]>;
 
-  get title(): string {
+  override get title(): string {
     throw new Error("not implemented");
   }
 
@@ -149,7 +149,7 @@ export class PwEntityList<
     throw new Error("not implemented");
   }
 
-  get actionText(): string {
+  override get actionText(): string {
     return "blub";
   }
 
@@ -157,7 +157,7 @@ export class PwEntityList<
 
   protected history;
 
-  prefix!: X;
+  override prefix!: X;
 
   constructor() {
     super();

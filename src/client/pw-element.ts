@@ -24,11 +24,11 @@ import { LitElement } from "lit";
 
 export class PwElement extends LitElement {
   // you didn't see this or I will switch to React. Reasoning: Tests, Bootstrap isn't shadow dom ready
-  protected createRenderRoot() {
+  protected override createRenderRoot() {
     return this;
   }
 
-  protected willUpdate(_changedProperties: Map<PropertyKey, unknown>): void {
+  protected override willUpdate(_changedProperties: Map<PropertyKey, unknown>): void {
     console.debug(this.tagName, _changedProperties);
   }
 }

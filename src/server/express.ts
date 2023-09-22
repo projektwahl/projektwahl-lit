@@ -39,7 +39,6 @@ import type {
   OutgoingHttpHeaders,
 } from "http2";
 import { suspend } from "../client/utils.js";
-import nodeCrypto from "node:crypto";
 
 export type MyRequest = (IncomingMessage | Http2ServerRequest) &
   Required<Pick<IncomingMessage | Http2ServerRequest, "url" | "method">>;

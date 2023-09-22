@@ -5,7 +5,7 @@ export class ClockController implements ReactiveController {
 
   value = new Date();
   timeout: number;
-  private _timerID?: number;
+  private _timerID: number | undefined;
 
   constructor(host: ReactiveControllerHost, timeout = 1000) {
     (this.host = host).addController(this);

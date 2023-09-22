@@ -40,7 +40,7 @@ export function pwUsersImport(props: Pick<PwUsersImport, "url">) {
 }
 
 class PwUsersImport extends PwForm<"/api/v1/users/create-or-update"> {
-  static get properties() {
+  static override get properties() {
     return {
       ...super.properties,
       _task: {

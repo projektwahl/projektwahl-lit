@@ -34,7 +34,7 @@ export function pwEvaluation(
 }
 
 export class PwEvaluation extends PwElement {
-  protected render() {
+  protected override render() {
     return html`
       <div class="container">
         <h1 class="text-center">Wie funktioniert die Auswertung?</h1>

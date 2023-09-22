@@ -99,7 +99,7 @@ function datetimelocal2database(input: string) {
 }
 
 class PwSettingsUpdate extends PwForm<"/api/v1/settings/update"> {
-  static get properties() {
+  static override get properties() {
     return {
       ...super.properties,
       _task: {

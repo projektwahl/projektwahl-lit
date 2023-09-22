@@ -92,13 +92,13 @@ class PwRankSelect extends PwElement {
     );
   }
 
-  protected willUpdate(changedProperties: Map<PropertyKey, unknown>): void {
+  protected override willUpdate(changedProperties: Map<PropertyKey, unknown>): void {
     if (changedProperties.has("choice")) {
       this.disabled = false;
     }
   }
 
-  render() {
+  override render() {
     return html` <form>
       ${this._task.render({
         complete: (data) => {
