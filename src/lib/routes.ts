@@ -20,7 +20,7 @@ https://github.com/projektwahl/projektwahl-lit
 SPDX-License-Identifier: AGPL-3.0-or-later
 SPDX-FileCopyrightText: 2021 Moritz Hedtke <Moritz.Hedtke@t-online.de>
 */
-import { z, ZodIssue, ZodObject, ZodRawShape, ZodTypeAny } from "zod";
+import { z, ZodArray, ZodIssue, ZodObject, ZodRawShape, ZodTypeAny } from "zod";
 import { result } from "./result.js";
 
 export const rawChoice = z
@@ -127,8 +127,8 @@ const baseQuery = <
   Catchall extends ZodTypeAny = ZodTypeAny,
 >(
   s: ZodObject<T1, UnknownKeys, Catchall>,
-  sorting: T2,
-  filters: T3,
+  sorting: ZodArray<T2>, // ZodArray
+  filters: T3, // ZodObject
 ) => {
   return {
     request: z
@@ -148,9 +148,9 @@ const baseQuery = <
           .enum(["forwards", "backwards"])
           .default("forwards"),
         paginationCursor: s.nullish(),
-        filters,
-        sorting,
-        paginationLimit: z.number().default(10),
+        filters: filters.default({}).optional(),
+        sorting: sorting.default([]),
+        paginationLimit: z.number().default(10).optional(),
       })
       .strict(),
     response: z
@@ -432,8 +432,7 @@ export const routes = {
             z.number(),
           ]),
         ]),
-      )
-      .default([]),
+      ),
     rawUserSchema
       .pick({
         id: true,
@@ -501,8 +500,7 @@ export const routes = {
             z.number(),
           ]),
         ]),
-      )
-      .default([]),
+      ),
     rawProjectSchema
       .pick({
         id: true,
@@ -548,8 +546,7 @@ export const routes = {
             z.null(),
           ]),
         ]),
-      )
-      .default([]),
+      ),
     rawChoiceNullable
       .merge(rawProjectSchema)
       .pick({

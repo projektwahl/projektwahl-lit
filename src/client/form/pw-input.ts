@@ -33,6 +33,9 @@ import { PwElement } from "../pw-element.js";
 import { PwForm } from "./pw-form.js";
 import { live } from "lit/directives/live.js";
 
+/// TODO FIXME instead of T we also need to take a zod schema for example for the enum (or if everything is from routes we could use that)
+// maybe also use the default from zod
+// think about login as thats an easy example
 export abstract class PwInput<
   P extends keyof typeof routes,
   T,
@@ -94,12 +97,12 @@ export abstract class PwInput<
   /**
    * Extracts the value from the routes request data.
    */
-  get!: (o: z.infer<typeof routes[P]["partialRequest"]>) => T;
+  get!: (o: z.infer<typeof routes[P]["partialRequest"]>) => T | undefined;
 
   /**
    * Sets the value in the routes request data.
    */
-  set!: (o: z.infer<typeof routes[P]["partialRequest"]>, v: T) => void;
+  set!: (o: z.infer<typeof routes[P]["partialRequest"]>, v: T | undefined) => void;
 
   // TODO FIXME maybe merge these two?
   disabled?: boolean = false;
@@ -252,7 +255,6 @@ export abstract class PwInput<
     }
 
     return html`
-      
       <div class="col mb-3">
       ${
         this.type !== "checkbox" && this.label !== null
@@ -410,7 +412,7 @@ export abstract class PwInput<
                 )}</a
               ><br />
               ${msg(
-                html`Also lieber "Ich mag fliegende Autos." anstatt
+                html`Also lieber "gasthaus lokales horizont monopol dosen klausel" anstatt
                   "Moritz1234!".<br />Du kannst auch einen Passwort-Manager
                   verwenden, z.B.`,
               )}
