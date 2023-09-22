@@ -21,7 +21,7 @@ SPDX-License-Identifier: AGPL-3.0-or-later
 SPDX-FileCopyrightText: 2021 Moritz Hedtke <Moritz.Hedtke@t-online.de>
 */
 import { sql } from "./database.js";
-import { DescriptionTypes, typedSql } from "./describe.js";
+import { FromDescriptionTypes, typedSql } from "./describe.js";
 import { hashPassword } from "./password.js";
 import { Chance } from "chance";
 
@@ -44,7 +44,7 @@ export async function setup() {
       process.env.NODE_ENV === "development" ||
       process.env.NODE_ENV === "testing"
     ) {
-      let projects: DescriptionTypes<{
+      let projects: FromDescriptionTypes<{
         readonly id: 23;
         readonly title: 1043;
         readonly info: 1043;
