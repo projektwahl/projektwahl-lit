@@ -28,24 +28,24 @@ import type { z } from "zod";
 import { PwInput } from "../form/pw-input.js";
 
 export type EntitySorting0<K extends keyof typeof entityRoutes> = {
-  [P in K]: z.infer<typeof entityRoutes[P]["request"]>["sorting"][number][0];
+  [P in keyof typeof entityRoutes]: z.infer<typeof entityRoutes[P]["request"]>["sorting"][number][0];
 }[K];
 
 export type EntitySorting1<K extends keyof typeof entityRoutes> = {
-  [P in K]: z.infer<typeof entityRoutes[P]["request"]>["sorting"][number][1];
+  [P in keyof typeof entityRoutes]: z.infer<typeof entityRoutes[P]["request"]>["sorting"][number][1];
 }[K];
 
 export type EntitySorting2<K extends keyof typeof entityRoutes> = {
-  [P in K]: z.infer<typeof entityRoutes[P]["request"]>["sorting"][number][2];
+  [P in keyof typeof entityRoutes]: z.infer<typeof entityRoutes[P]["request"]>["sorting"][number][2];
 }[K];
 
 export type EntitySortingAll<K extends keyof typeof entityRoutes> = {
-  [P in K]: z.infer<typeof entityRoutes[P]["request"]>["sorting"][number];
+  [P in keyof typeof entityRoutes]: z.infer<typeof entityRoutes[P]["request"]>["sorting"][number];
 }[K];
 
 export type EntitySortingDontUse<K extends keyof typeof entityRoutes> = {
   /// TODO FIXME This seems to be wrong as it removes the correlation (e.g. some things where the last value is not null are now nullable)
-  [P in K]: [EntitySorting0<P>, EntitySorting1<P>, EntitySorting2<P>];
+  [P in keyof typeof entityRoutes]: [EntitySorting0<P>, EntitySorting1<P>, EntitySorting2<P>];
 }[K];
 
 // workaround see https://github.com/runem/lit-analyzer/issues/149#issuecomment-1006162839
@@ -56,8 +56,7 @@ export function pwOrder<P extends keyof typeof entityRoutes, X extends string>(
     | "name"
     | "prefix"
     | "title"
-    | "value"
-    | "orderBy"
+    | "sorting"
     | "get"
     | "set"
     | "initial"
@@ -69,8 +68,7 @@ export function pwOrder<P extends keyof typeof entityRoutes, X extends string>(
     name,
     title,
     prefix,
-    value,
-    orderBy,
+    sorting,
     get,
     set,
     initial,
@@ -84,8 +82,7 @@ export function pwOrder<P extends keyof typeof entityRoutes, X extends string>(
     .set=${set}
     .prefix=${prefix}
     .title=${title}
-    .value=${value}
-    .orderBy=${orderBy}
+    .sorting=${sorting}
     .initial=${initial}
     .defaultValue=${defaultValue}
   ></pw-order>`;
@@ -102,15 +99,13 @@ export class PwOrder<
       path: { attribute: false },
       url: { attribute: false },
       prefix: { attribute: false },
-      orderBy: { attribute: false },
+      sorting: { attribute: false },
     };
   }
 
   override prefix!: X;
 
-  orderBy!: EntitySorting0<P>;
-
-  value!: EntitySorting2<P>;
+  sorting!: EntitySortingAll<P>;
 
   override title!: string;
 
@@ -135,7 +130,7 @@ export class PwOrder<
       routes[this.url].request.parse(partialFormData);
     const sorting: EntitySortingAll<P>[] = this.get(formData);
 
-    const oldElementIndex = sorting.findIndex(([e]) => e === this.orderBy);
+    const oldElementIndex = sorting.findIndex(([e]) => e === this.sorting[0]);
 
     if (oldElementIndex !== -1) {
       // splice REMOVES the elements from the original array
@@ -144,29 +139,19 @@ export class PwOrder<
         1,
       )[0];
 
-      const theName: EntitySortingAll<P>["0"] = this.orderBy;
-      const desc: EntitySortingAll<P>["1"] = "DESC";
-      const theValue: EntitySortingAll<P>["2"] = this.value;
-
       switch (oldElement[1]) {
         case "DESC":
           break;
         case "ASC": {
-          const sortingPush: EntitySortingDontUse<P> = [
-            theName,
-            desc,
-            theValue,
-          ];
-          const two: EntitySortingAll<P> = sortingPush;
-          sorting.push(two);
-
+          this.sorting[1] = "DESC";
+          sorting.push(this.sorting);
           break;
         }
       }
     } else {
-      const asc: EntitySorting1<P> = "ASC";
-      const adding: EntitySortingAll<P> = [this.orderBy, asc, this.value];
-      sorting.push(adding);
+      // TODO FIXME maybe copy and don't mutate
+      this.sorting[1] = "ASC";
+      sorting.push(this.sorting);
     }
 
     this.inputValue = sorting;
