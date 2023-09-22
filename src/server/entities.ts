@@ -36,6 +36,10 @@ type magic<K extends keyof (typeof entityRoutes)> = {
 }[K];
 
 type EntityRoutesResponse<K extends keyof (typeof entityRoutes)> = {
+  [P in K]: EntityRoutesResponseInternal<P>;
+}[K];
+
+type EntityRoutesResponseInternal<K extends keyof (typeof entityRoutes)> = {
   [P in K]: z.infer<typeof entityRoutes[P]["response"]>;
 }[K];
 
