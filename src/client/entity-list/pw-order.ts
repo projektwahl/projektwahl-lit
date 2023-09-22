@@ -28,24 +28,36 @@ import type { z } from "zod";
 import { PwInput } from "../form/pw-input.js";
 
 export type EntitySorting0<K extends keyof typeof entityRoutes> = {
-  [P in keyof typeof entityRoutes]: z.infer<typeof entityRoutes[P]["request"]>["sorting"][number][0];
+  [P in keyof typeof entityRoutes]: z.infer<
+    typeof entityRoutes[P]["request"]
+  >["sorting"][number][0];
 }[K];
 
 export type EntitySorting1<K extends keyof typeof entityRoutes> = {
-  [P in keyof typeof entityRoutes]: z.infer<typeof entityRoutes[P]["request"]>["sorting"][number][1];
+  [P in keyof typeof entityRoutes]: z.infer<
+    typeof entityRoutes[P]["request"]
+  >["sorting"][number][1];
 }[K];
 
 export type EntitySorting2<K extends keyof typeof entityRoutes> = {
-  [P in keyof typeof entityRoutes]: z.infer<typeof entityRoutes[P]["request"]>["sorting"][number][2];
+  [P in keyof typeof entityRoutes]: z.infer<
+    typeof entityRoutes[P]["request"]
+  >["sorting"][number][2];
 }[K];
 
 export type EntitySortingAll<K extends keyof typeof entityRoutes> = {
-  [P in keyof typeof entityRoutes]: z.infer<typeof entityRoutes[P]["request"]>["sorting"][number];
+  [P in keyof typeof entityRoutes]: z.infer<
+    typeof entityRoutes[P]["request"]
+  >["sorting"][number];
 }[K];
 
 export type EntitySortingDontUse<K extends keyof typeof entityRoutes> = {
   /// TODO FIXME This seems to be wrong as it removes the correlation (e.g. some things where the last value is not null are now nullable)
-  [P in keyof typeof entityRoutes]: [EntitySorting0<P>, EntitySorting1<P>, EntitySorting2<P>];
+  [P in keyof typeof entityRoutes]: [
+    EntitySorting0<P>,
+    EntitySorting1<P>,
+    EntitySorting2<P>,
+  ];
 }[K];
 
 // workaround see https://github.com/runem/lit-analyzer/issues/149#issuecomment-1006162839
@@ -63,17 +75,8 @@ export function pwOrder<P extends keyof typeof entityRoutes, X extends string>(
     | "defaultValue"
   >,
 ) {
-  const {
-    url,
-    name,
-    title,
-    prefix,
-    sorting,
-    get,
-    set,
-    initial,
-    defaultValue,
-  } = props;
+  const { url, name, title, prefix, sorting, get, set, initial, defaultValue } =
+    props;
 
   return html`<pw-order
     .name=${name}
@@ -182,7 +185,7 @@ export class PwOrder<
   override render() {
     if (
       this.title === undefined ||
-      this.orderBy === undefined ||
+      this.sorting[0] === undefined ||
       this.prefix === undefined
     ) {
       throw new Error(msg("component not fully initialized"));
@@ -191,7 +194,7 @@ export class PwOrder<
     return html`
       <button
         @click=${this.mypwinputchangeDispatcher}
-        name="${this.orderBy.toString()}"
+        name="${this.sorting[0].toString()}"
         type="button"
         class="btn w-100 text-start"
         id=${this.randomId}
@@ -199,7 +202,7 @@ export class PwOrder<
         ${(() => {
           const sorting = this.inputValue;
 
-          const value = sorting.find(([e]) => e === `${this.orderBy}`)?.[1];
+          const value = sorting.find(([e]) => e === `${this.sorting[0]}`)?.[1];
           return value === "ASC"
             ? html`<svg
                 xmlns="http://www.w3.org/2000/svg"
