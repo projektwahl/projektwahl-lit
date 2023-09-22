@@ -46,8 +46,8 @@ export async function setup() {
       )[0];
 
     if (
-      process.env.NODE_ENV === "development" ||
-      process.env.NODE_ENV === "testing"
+      process.env["NODE_ENV"] === "development" ||
+      process.env["NODE_ENV"] === "testing"
     ) {
       let projects: z.infer<typeof rawProjectSchema>[] = [];
       for (let i = 0; i < 100; i++) {

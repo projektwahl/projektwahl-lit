@@ -26,7 +26,6 @@ import type { z } from "zod";
 import type { MyResponseType, userSchema } from "../lib/routes.js";
 import { entityRoutes } from "../lib/routes.js";
 import { sql } from "./database.js";
-import { EntitySorting } from "../client/entity-list/pw-order.js";
 
 // Mapped Types
 // https://www.typescriptlang.org/docs/handbook/2/mapped-types.html

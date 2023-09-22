@@ -30,19 +30,19 @@ import { watch } from "node:fs/promises";
 import { setupClient } from "./routes/login/openid-client.js";
 import { ZodIssueCode } from "zod";
 
-if (!process.env.BASE_URL) {
+if (!process.env["BASE_URL"]) {
   console.error("BASE_URL not set!");
   process.exit(1);
 }
 
-if (!process.env.CREDENTIALS_DIRECTORY) {
+if (!process.env["CREDENTIALS_DIRECTORY"]) {
   console.error("CREDENTIALS_DIRECTORY not set!");
   process.exit(1);
 }
 
 if (
-  (process.env.NODE_ENV === "development" ||
-    process.env.NODE_ENV === "testing") &&
+  (process.env["NODE_ENV"] === "development" ||
+    process.env["NODE_ENV"] === "testing") &&
   cluster.isPrimary
 ) {
   console.log(`Primary is running`);
@@ -88,14 +88,14 @@ if (
   void (async () => {
     await setupClient();
 
-    if (!process.env.CREDENTIALS_DIRECTORY) {
+    if (!process.env["CREDENTIALS_DIRECTORY"]) {
       throw new Error("CREDENTIALS_DIRECTORY not set!");
     }
 
     const server = createSecureServer(
       {
-        key: readFileSync(process.env.CREDENTIALS_DIRECTORY + "/key.pem"),
-        cert: readFileSync(process.env.CREDENTIALS_DIRECTORY + "/cert.pem"),
+        key: readFileSync(process.env["CREDENTIALS_DIRECTORY"] + "/key.pem"),
+        cert: readFileSync(process.env["CREDENTIALS_DIRECTORY"] + "/cert.pem"),
         allowHTTP1: true,
       },
       (request, response) => {
@@ -125,27 +125,27 @@ if (
     );
 
     server.listen(
-      process.env.PORT
-        ? Number(process.env.PORT)
-        : process.env.SOCKET
-        ? { path: process.env.SOCKET }
+      process.env["PORT"]
+        ? Number(process.env["PORT"])
+        : process.env["SOCKET"]
+        ? { path: process.env["SOCKET"] }
         : new Socket({ fd: 3 }), // this doesn't work with cluster
       511,
       () => {
-        if (!process.env.BASE_URL) {
+        if (!process.env["BASE_URL"]) {
           throw new Error("BASE_URL not set!");
         }
         console.log(
           `[${cluster.worker?.id ?? "unknown"}] Server started at ${
-            process.env.BASE_URL
+            process.env["BASE_URL"]
           }`,
         );
       },
     );
 
     if (
-      process.env.NODE_ENV === "development" ||
-      process.env.NODE_ENV === "testing"
+      process.env["NODE_ENV"] === "development" ||
+      process.env["NODE_ENV"] === "testing"
     ) {
       cluster.worker?.on("message", (message) => {
         if (message === "shutdown") {

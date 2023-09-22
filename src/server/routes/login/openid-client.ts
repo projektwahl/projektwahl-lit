@@ -28,35 +28,35 @@ import { Client, Issuer } from "openid-client";
 let client: Client | null = null;
 
 async function setupClient() {
-  if (process.env.OPENID_URL) {
-    if (!process.env.BASE_URL) {
+  if (process.env["OPENID_URL"]) {
+    if (!process.env["BASE_URL"]) {
       throw new Error("BASE_URL not set!");
     }
 
-    if (!process.env.CLIENT_ID) {
+    if (!process.env["CLIENT_ID"]) {
       console.error("CLIENT_ID not set!");
       process.exit(1);
     }
 
-    if (!process.env.CREDENTIALS_DIRECTORY) {
+    if (!process.env["CREDENTIALS_DIRECTORY"]) {
       console.error("CREDENTIALS_DIRECTORY not set!");
       process.exit(1);
     }
 
     const client_secret = (
       await readFile(
-        process.env.CREDENTIALS_DIRECTORY + "/openid_client_secret",
+        process.env["CREDENTIALS_DIRECTORY"] + "/openid_client_secret",
         "utf8",
       )
     ).trim();
 
     try {
-      const issuer = await Issuer.discover(process.env.OPENID_URL);
+      const issuer = await Issuer.discover(process.env["OPENID_URL"]);
       const Client = issuer.Client;
       client = new Client({
-        client_id: process.env.CLIENT_ID,
+        client_id: process.env["CLIENT_ID"],
         client_secret,
-        redirect_uris: [`${process.env.BASE_URL}/redirect`],
+        redirect_uris: [`${process.env["BASE_URL"]}/redirect`],
         response_types: ["code"],
       });
     } catch (error) {

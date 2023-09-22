@@ -158,11 +158,11 @@ export const defaultHeaders = {
     "default-src 'none'; connect-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; frame-ancestors 'none'; form-action 'none'",
 };
 
-if (!process.env.BASE_URL) {
+if (!process.env["BASE_URL"]) {
   throw new Error("BASE_URL not set.");
 }
 
-const BASE_URL = new URL(process.env.BASE_URL);
+const BASE_URL = new URL(process.env["BASE_URL"]);
 
 export async function serverHandler(
   request: MyRequest,

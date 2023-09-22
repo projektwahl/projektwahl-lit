@@ -32,7 +32,7 @@ export const openidLoginHandler = requestHandler(
     // https://docs.microsoft.com/en-us/azure/active-directory/develop/scenario-spa-app-registration
     // USE single tenant as for all others we need permissions
 
-    if (!process.env.BASE_URL) {
+    if (!process.env["BASE_URL"]) {
       throw new Error("BASE_URL not set!");
     }
 
@@ -41,7 +41,7 @@ export const openidLoginHandler = requestHandler(
     }
 
     const url = client.authorizationUrl({
-      redirect_uri: `${process.env.BASE_URL}/redirect`,
+      redirect_uri: `${process.env["BASE_URL"]}/redirect`,
       scope: "openid email",
     });
 

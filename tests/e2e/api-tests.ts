@@ -35,11 +35,11 @@ import { routes } from "../../src/lib/routes.js";
 
 const chance: Chance.Chance = new Chance(/*1234*/);
 
-if (!process.env.BASE_URL) {
+if (!process.env["BASE_URL"]) {
   console.error("BASE_URL not set!");
   process.exit(1);
 }
-const BASE_URL = process.env.BASE_URL;
+const BASE_URL = process.env["BASE_URL"];
 
 function request<U extends keyof typeof routes>(
   url: U,

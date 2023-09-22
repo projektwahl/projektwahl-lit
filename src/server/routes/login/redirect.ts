@@ -37,7 +37,7 @@ export const openidRedirectHandler = requestHandler(
     // USE single tenant as for all others we need permissions
     // https://portal.azure.com/
 
-    if (!process.env.BASE_URL) {
+    if (!process.env["BASE_URL"]) {
       throw new Error("BASE_URL not set");
     }
 
@@ -47,7 +47,7 @@ export const openidRedirectHandler = requestHandler(
 
     try {
       const result = await client.callback(
-        `${process.env.BASE_URL}/redirect`,
+        `${process.env["BASE_URL"]}/redirect`,
         data,
       );
 
