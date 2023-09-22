@@ -36,31 +36,27 @@ type magic<K extends keyof (typeof entityRoutes)> = {
 }[K];
 
 type EntityRoutesResponse<K extends keyof (typeof entityRoutes)> = {
-  [P in K]: EntityRoutesResponseInternal<P>;
-}[K];
-
-type EntityRoutesResponseInternal<K extends keyof (typeof entityRoutes)> = {
-  [P in K]: z.infer<typeof entityRoutes[P]["response"]>;
-}[K];
-
-type EntityRoutesResponseIntermediate<K extends keyof (typeof entityRoutes)> = {
   [P in K]: {
-    entities: EntityRoutesResponseEntities<P>,
-    previousCursor: EntityRoutesResponsePreviousCursor<P>,
-    nextCursor: EntityRoutesResponseNextCursor<P>,
+    entities: EntityRoutesResponseAll<P>["entities"],
+    previousCursor: EntityRoutesResponseAll<P>["previousCursor"],
+    nextCursor: EntityRoutesResponseAll<P>["nextCursor"],
   };
 }[K];
 
+type EntityRoutesResponseAll<K extends keyof (typeof entityRoutes)> = {
+  [P in K]: z.infer<typeof entityRoutes[P]["response"]>;
+}[K];
+
 type EntityRoutesResponseEntities<K extends keyof (typeof entityRoutes)> = {
-  [P in K]: z.infer<typeof entityRoutes[P]["response"]["shape"]["entities"]>;
+  [P in K]: EntityRoutesResponseAll<P>["entities"];
 }[K];
 
 type EntityRoutesResponsePreviousCursor<K extends keyof (typeof entityRoutes)> = {
-  [P in K]: z.infer<typeof entityRoutes[P]["response"]["shape"]["previousCursor"]>;
+  [P in K]: z.infer<typeof entityRoutes[P]["response"]>["previousCursor"];
 }[K];
 
 type EntityRoutesResponseNextCursor<K extends keyof (typeof entityRoutes)> = {
-  [P in K]: z.infer<typeof entityRoutes[P]["response"]["shape"]["previousCursor"]>;
+  [P in K]: z.infer<typeof entityRoutes[P]["response"]>["nextCursor"];
 }[K];
 
 type entityRoutesRequest<K extends keyof (typeof entityRoutes)> = {
@@ -262,10 +258,10 @@ export async function fetchData<R extends keyof typeof entityRoutes>(
   }
 
   // would be great to stream the results but they are post processed below
-  let entities: EntityRoutesResponseEntities<R> = sqlResult;
+  let entities: EntityRoutesResponseAll<R>["entities"] = sqlResult;
 
-  let nextCursor: EntityRoutesResponseNextCursor<R> = null;
-  let previousCursor: EntityRoutesResponsePreviousCursor<R> =
+  let nextCursor: EntityRoutesResponseAll<R>["nextCursor"] = null;
+  let previousCursor: EntityRoutesResponseAll<R>["previousCursor"] =
     null;
   // TODO FIXME also recalculate the other cursor because data could've been deleted in between / the filters have changed
   if (query.paginationDirection === "forwards") {
@@ -287,17 +283,18 @@ export async function fetchData<R extends keyof typeof entityRoutes>(
     }
   }
 
-  const y: EntityRoutesResponseIntermediate<R> = {
-    entities: entities,
-    nextCursor: nextCursor,
-    previousCursor: previousCursor,
+  const test: EntityRoutesResponseAll<R> = {
+    entities: [],
+    previousCursor: null,
+    nextCursor: null
   };
-
-  const zefw: EntityRoutesResponse<R> = y;
-
-  const a = {
+  test.entities = entities;
+  test.nextCursor = nextCursor;
+  test.previousCursor = previousCursor;
+  
+  const a: MyResponseType<R> = {
     success: true as const,
-    data: zefw,
+    data: test,
   };
 
   return [
