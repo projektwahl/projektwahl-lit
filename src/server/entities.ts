@@ -27,7 +27,6 @@ import type { ResponseType, userSchema } from "../lib/routes.js";
 import { entityRoutes } from "../lib/routes.js";
 import { sql } from "./database.js";
 import { EntitySorting } from "../client/entity-list/pw-order.js";
-import { typedSql } from "./describe.js";
 
 // Mapped Types
 // https://www.typescriptlang.org/docs/handbook/2/mapped-types.html
@@ -95,7 +94,6 @@ export async function fetchData<R extends keyof typeof entityRoutes>(
   path: R,
   query: entityRoutesRequest<R>,
   sqlQuery: (query: entityRoutesRequest<R>) => PendingQuery<Row[]>,
-  description: { columns: z.infer<magic<R>["response"]>["entities"][number] },
   orderByQueries: entitiesType8<R>,
   tiebreaker: entitiesType18<R> | undefined,
 ): Promise<[OutgoingHttpHeaders, ResponseType<R>]> {
@@ -132,9 +130,9 @@ export async function fetchData<R extends keyof typeof entityRoutes>(
     sqlResult = await sql.begin(async (tsql) => {
       await tsql`SELECT set_config('projektwahl.id', ${loggedInUser.id}::text, true);`;
       await tsql`SELECT set_config('projektwahl.type', ${loggedInUser.type}::text, true);`;
-      return await typedSql(tsql, description)`${sql`(${sqlQuery(query)} ${orderByQuery} LIMIT ${
+      return entityRoutes[path].response.shape.entities.parse(await tsql`${sql`(${sqlQuery(query)} ${orderByQuery} LIMIT ${
         query.paginationLimit + 1
-      })`}`;
+      })`}`);
     });
   } else {
     // TODO test with pagination step 10 and 11 null values
@@ -218,25 +216,24 @@ export async function fetchData<R extends keyof typeof entityRoutes>(
       )} AND (${parts}) ${orderByQuery} LIMIT ${query.paginationLimit + 1})`;
     });
 
-    await sql.begin(async (tsql) => {
+    sqlResult = await sql.begin(async (tsql) => {
       await tsql`SELECT set_config('projektwahl.id', ${loggedInUser.id}::text, true);`;
       await tsql`SELECT set_config('projektwahl.type', ${loggedInUser.type}::text, true);`;
       if (queries.length == 1) {
-        sqlResult = await typedSql(tsql, description)`${queries[0]}`;
+        return entityRoutes[path].response.shape.entities.parse(await tsql`${queries[0]}`);
       } else {
-        sqlResult = await typedSql(tsql, description)`${queries
+        return entityRoutes[path].response.shape.entities.parse(await tsql`${queries
           .reverse()
           .flatMap((v) => [sql`\nUNION ALL\n`, v])
           .slice(1)
           .reduce((prev, curr) => sql`${prev}${curr}`)} LIMIT ${
           query.paginationLimit + 1
-        }`;
+        }`);
       }
     });
   }
 
   // would be great to stream the results but they are post processed below
-
   let entities: z.infer<magic<R>["response"]>["entities"] = sqlResult;
 
   let nextCursor: z.infer<(typeof entityRoutes)[R]["response"]>["nextCursor"] = null;
