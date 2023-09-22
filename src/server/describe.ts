@@ -24,6 +24,7 @@ import { deepStrictEqual } from "assert";
 import type {
   MaybeRow,
   PendingQuery,
+  Row,
   SerializableParameter,
   TransactionSql,
 } from "postgres";
@@ -35,7 +36,7 @@ export function typedSql<R extends Record<string, unknown>>(
 ) {
   return async function test(
     template: TemplateStringsArray,
-    ...args: (SerializableParameter | PendingQuery<readonly MaybeRow[]>)[]
+    ...args: (SerializableParameter | PendingQuery<Row[]>)[]
   ) {
     const err = new Error();
     try {
@@ -72,7 +73,7 @@ export function typedSql<R extends Record<string, unknown>>(
   };
 }
 
-export declare const voterHelperAdminType: unique symbol;
+export const voterHelperAdminType: unique symbol = Symbol();
 
 // https://github.com/porsager/postgres/blob/master/src/types.js
 // TODO FIXME
