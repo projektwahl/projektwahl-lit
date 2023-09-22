@@ -146,16 +146,17 @@ export class PwOrder<
         1,
       )[0];
 
-      const theName = this.orderBy;
-      const theValue = this.value;
-      const desc: EntitySorting1<P> = "DESC";
+      const theName: EntitySortingAll<P>["0"] = this.orderBy;
+      const desc: EntitySortingAll<P>["1"] = "DESC";
+      const theValue: EntitySortingAll<P>["2"] = this.value;
 
       switch (oldElement[1]) {
         case "DESC":
           break;
         case "ASC": {
-          const sortingPush: EntitySortingAll<P> = [theName, desc, theValue];
-          sorting.push(sortingPush);
+          const sortingPush: EntitySortingDontUse<P> = [theName, desc, theValue];
+          const two: EntitySortingAll<P> = sortingPush;
+          sorting.push(two);
 
           break;
         }

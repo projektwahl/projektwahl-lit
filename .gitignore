@@ -17,3 +17,4 @@
 stats.html
 node_modules
 dist
+tsconfig.tsbuildinfo
