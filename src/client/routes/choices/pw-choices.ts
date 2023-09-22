@@ -70,9 +70,8 @@ export const pwChoicesPreloaded = async (url: URL) => {
 export function pwChoices<X extends string>(
   props: Pick<PwChoices<X>, "initial" | "prefix">,
 ) {
-  const { initial, prefix, ...rest } = props;
-  let _ = rest;
-  _ = 1; // ensure no property is missed - Don't use `{}` as a type. `{}` actually means "any non-nullish value".
+  const { initial, prefix } = props;
+
   return html`<pw-choices .initial=${initial} .prefix=${prefix}></pw-choices>`;
 }
 

@@ -109,10 +109,7 @@ export const createOrUpdateUsersHandler = requestHandler(
                 project_leader_id,
                 type,
                 username,
-                ...rest
               } = user;
-              let _ = rest;
-              _ = 1; // ensure no property is missed - Don't use `{}` as a type. `{}` actually means "any non-nullish value".
 
               const finalQuery = z
                 .array(
@@ -166,10 +163,8 @@ export const createOrUpdateUsersHandler = requestHandler(
                 password,
                 type,
                 username,
-                ...rest
               } = user;
-              let _ = rest;
-              _ = 1; // ensure no property is missed - Don't use `{}` as a type. `{}` actually means "any non-nullish value".
+
               const query = z
                 .array(
                   rawUserSchema.pick({

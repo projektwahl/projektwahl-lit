@@ -36,7 +36,7 @@ declare global {
     VERSION_FULL: string | undefined;
     VERSION_SHORT: string | undefined;
   }
-/*
+  /*
   interface ObjectConstructor {
     keys<T>(o: T): (keyof T)[];
   }

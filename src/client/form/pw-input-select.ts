@@ -65,10 +65,8 @@ export function pwInputSelect<
     defaultValue,
     resettable,
     pwRef,
-    ...rest
   } = props;
-  let _ = rest;
-  _ = 1; // ensure no property is missed - Don't use `{}` as a type. `{}` actually means "any non-nullish value".
+
   if (pwRef) {
     return html`<pw-input-select
       ${ref(pwRef)}

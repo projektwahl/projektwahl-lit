@@ -356,7 +356,8 @@ async function runTest(
     const combinedCapabilities = {
       ...capabilities,
       "browserstack.local": "true",
-      "browserstack.localIdentifier": process.env["BROWSERSTACK_LOCAL_IDENTIFIER"],
+      "browserstack.localIdentifier":
+        process.env["BROWSERSTACK_LOCAL_IDENTIFIER"],
       acceptSslCerts: "true",
       "browserstack.networkLogs": "true",
       "browserstack.console": "verbose",

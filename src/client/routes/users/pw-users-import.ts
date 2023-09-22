@@ -33,9 +33,8 @@ import { pwInputFile } from "../../form/pw-input-file.js";
 
 // workaround see https://github.com/runem/lit-analyzer/issues/149#issuecomment-1006162839
 export function pwUsersImport(props: Pick<PwUsersImport, "url">) {
-  const { url, ...rest } = props;
-  let _ = rest;
-  _ = 1; // ensure no property is missed - Don't use `{}` as a type. `{}` actually means "any non-nullish value".
+  const { url } = props;
+
   return html`<pw-users-import .url=${url}></pw-users-import>`;
 }
 

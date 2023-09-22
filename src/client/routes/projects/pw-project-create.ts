@@ -51,9 +51,8 @@ export function pwProjectCreatePreloaded(id: number, viewOnly = false) {
 export function pwProjectCreate(
   props: Pick<PwProjectCreate, "disabled" | "url" | "projectId">,
 ) {
-  const { disabled, url, projectId, ...rest } = props;
-  let _ = rest;
-  _ = 1; // ensure no property is missed - Don't use `{}` as a type. `{}` actually means "any non-nullish value".
+  const { disabled, url, projectId } = props;
+
   return html`<pw-project-create
     .projectId=${projectId}
     ?disabled=${disabled}
@@ -109,7 +108,9 @@ export class PwProjectCreate extends PwForm<
     };
   }
 
-  protected override willUpdate(changedProperties: Map<PropertyKey, unknown>): void {
+  protected override willUpdate(
+    changedProperties: Map<PropertyKey, unknown>,
+  ): void {
     super.willUpdate(changedProperties);
     if (changedProperties.has("projectId")) {
       // because fields are resettable we need to set this to undefined

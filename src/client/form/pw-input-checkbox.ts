@@ -64,10 +64,8 @@ export function pwInputCheckbox<P extends keyof typeof routes>(
     defaultValue,
     falseValue,
     resettable,
-    ...rest
   } = props;
-  let _ = rest;
-  _ = 1; // ensure no property is missed - Don't use `{}` as a type. `{}` actually means "any non-nullish value".
+
   return html`<pw-input-checkbox
     type=${type}
     ?disabled=${disabled}

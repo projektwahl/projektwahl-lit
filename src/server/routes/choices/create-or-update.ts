@@ -37,9 +37,7 @@ export const updateChoiceHandler = createOrUpdateChoiceHandler(
     // this only allows updating your own choice as we use the logged in user id.
     // Also in createOrUpdateChoiceHandler we check that you're a voter.
 
-    const { project_id, rank, ...rest } = choice;
-    let _ = rest;
-    _ = 1; // ensure no property is missed - Don't use `{}` as a type. `{}` actually means "any non-nullish value".
+    const { project_id, rank } = choice;
     if (choice.rank === null) {
       return await sql`DELETE FROM choices WHERE user_id = ${loggedInUser.id} AND project_id = ${project_id}`;
     } else {

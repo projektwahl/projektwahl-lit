@@ -27,9 +27,6 @@ import { PwElement } from "../pw-element.js";
 export function pwImprint(
   props: Record<string, never>, // Pick<PwImprint, never>
 ) {
-  const { ...rest } = props;
-  const _: Record<string, never> = rest;
-  //_ = 1; // ensure no property is missed - Don't use `{}` as a type. `{}` actually means "any non-nullish value".
   return html`<pw-imprint></pw-imprint>`;
 }
 

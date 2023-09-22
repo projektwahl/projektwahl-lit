@@ -88,9 +88,7 @@ export const choicesHandler = requestHandler(
       "/api/v1/choices" as const,
       query,
       (query) => {
-        const { id, title, info, rank, ...rest } = query.filters;
-        let _ = rest;
-        _ = 1; // ensure no property is missed - Don't use `{}` as a type. `{}` actually means "any non-nullish value".
+        const { id, title, info, rank } = query.filters;
         return sql`SELECT "id",
           "title",
           "info",

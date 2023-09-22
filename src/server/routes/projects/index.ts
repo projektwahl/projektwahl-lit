@@ -59,16 +59,13 @@ export const projectsHandler = requestHandler(
       ];
       return returnValue;
     }
-    const _enforce_type: "voter" | "helper" | "admin" = loggedInUser.type;
 
     return await fetchData<"/api/v1/projects">(
       loggedInUser,
       "/api/v1/projects" as const,
       query,
       (query) => {
-        const { id, title, info, deleted, ...rest } = query.filters;
-        let _ = rest;
-        _ = 1; // ensure no property is missed - Don't use `{}` as a type. `{}` actually means "any non-nullish value".
+        const { id, title, info, deleted } = query.filters;
 
         // warning: this shows final members to everybody but I think this is ok for us.
         return sql`SELECT "id",

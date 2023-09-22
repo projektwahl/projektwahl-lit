@@ -34,9 +34,6 @@ import { z } from "zod";
 export function pwRedirect(
   props: Record<string, never>, // Pick<PwRedirect, never>
 ) {
-  const { ...rest } = props;
-  const _: Record<string, never> = rest;
-  //_ = 1; // ensure no property is missed - Don't use `{}` as a type. `{}` actually means "any non-nullish value".
   return html`<pw-redirect></pw-redirect>`;
 }
 

@@ -35,9 +35,8 @@ import { PwElement } from "../../pw-element.js";
 export function pwProjectUserCheckbox(
   props: Pick<PwProjectUserCheckbox, "type" | "projectId" | "user" | "name">,
 ) {
-  const { type, projectId, user, name, ...rest } = props;
-  let _ = rest;
-  _ = 1; // ensure no property is missed - Don't use `{}` as a type. `{}` actually means "any non-nullish value".
+  const { type, projectId, user, name } = props;
+
   return html`<pw-project-user-checkbox
     type=${type}
     projectId=${projectId}

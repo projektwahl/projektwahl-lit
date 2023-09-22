@@ -66,9 +66,7 @@ export const sessionsHandler = requestHandler(
         "/api/v1/sessions" as const,
         query,
         (query) => {
-          const { user_id, ...rest } = query.filters;
-          let _ = rest;
-          _ = 1; // ensure no property is missed - Don't use `{}` as a type. `{}` actually means "any non-nullish value".
+          const { user_id } = query.filters;
           return sql`SELECT encode("session_id", 'base64') AS session_id,
             "created_at",
             "updated_at",

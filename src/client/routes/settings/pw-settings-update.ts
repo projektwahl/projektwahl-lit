@@ -36,9 +36,8 @@ import { pwInputText } from "../../form/pw-input-text.js";
 export function pwSettingsUpdate(
   props: Pick<PwSettingsUpdate, "disabled" | "url">,
 ) {
-  const { disabled, url, ...rest } = props;
-  let _ = rest;
-  _ = 1; // ensure no property is missed - Don't use `{}` as a type. `{}` actually means "any non-nullish value".
+  const { disabled, url } = props;
+
   return html`<pw-settings-update
     ?disabled=${disabled}
     .url=${url}

@@ -28,7 +28,9 @@ export class PwElement extends LitElement {
     return this;
   }
 
-  protected override willUpdate(_changedProperties: Map<PropertyKey, unknown>): void {
+  protected override willUpdate(
+    _changedProperties: Map<PropertyKey, unknown>,
+  ): void {
     console.debug(this.tagName, _changedProperties);
   }
 }

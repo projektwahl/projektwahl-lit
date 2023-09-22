@@ -52,9 +52,8 @@ export function pwUserCreatePreloaded(id: number, viewOnly = false) {
 export function pwUserCreate(
   props: Pick<PwUserCreate, "disabled" | "userId" | "url">,
 ) {
-  const { disabled, userId, url, ...rest } = props;
-  let _ = rest;
-  _ = 1; // ensure no property is missed - Don't use `{}` as a type. `{}` actually means "any non-nullish value".
+  const { disabled, userId, url } = props;
+
   return html`<pw-user-create
     ?disabled=${disabled}
     .userId=${userId}
@@ -183,7 +182,9 @@ class PwUserCreate extends PwForm<"/api/v1/users/create-or-update"> {
     this.typeRef = createRef();
   }
 
-  protected override willUpdate(changedProperties: Map<PropertyKey, unknown>): void {
+  protected override willUpdate(
+    changedProperties: Map<PropertyKey, unknown>,
+  ): void {
     super.willUpdate(changedProperties);
     if (changedProperties.has("userId")) {
       // because fields are resettable we need to set this to undefined

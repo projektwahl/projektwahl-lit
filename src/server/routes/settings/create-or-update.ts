@@ -89,15 +89,8 @@ export const updateSettingsHandler = requestHandler(
       await sql.begin("READ WRITE", async (tsql) => {
         await tsql`SELECT set_config('projektwahl.id', ${loggedInUser.id}::text, true);`;
         await tsql`SELECT set_config('projektwahl.type', ${loggedInUser.type}::text, true);`;
-        const {
-          open_date,
-          voting_start_date,
-          voting_end_date,
-          results_date,
-          ...rest
-        } = new_settings;
-        let _ = rest;
-        _ = 1; // ensure no property is missed - Don't use `{}` as a type. `{}` actually means "any non-nullish value".
+        const { open_date, voting_start_date, voting_end_date, results_date } =
+          new_settings;
         const finalQuery = tsql`UPDATE settings SET open_date = to_timestamp(${open_date}::BIGINT/1000)::TIMESTAMP WITH TIME ZONE, voting_start_date = to_timestamp(${voting_start_date}::BIGINT/1000)::TIMESTAMP WITH TIME ZONE, voting_end_date = to_timestamp(${voting_end_date}::BIGINT/1000)::TIMESTAMP WITH TIME ZONE, results_date = to_timestamp(${results_date}::BIGINT/1000)::TIMESTAMP WITH TIME ZONE;`;
         // warning: this will not work if we will ever use multiple workers in production
         // TODO FIXME we could use the postgresql notify feature?

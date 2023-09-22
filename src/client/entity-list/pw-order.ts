@@ -75,10 +75,8 @@ export function pwOrder<P extends keyof typeof entityRoutes, X extends string>(
     set,
     initial,
     defaultValue,
-    ...rest
   } = props;
-  let _ = rest;
-  _ = 1; // ensure no property is missed - Don't use `{}` as a type. `{}` actually means "any non-nullish value".
+
   return html`<pw-order
     .name=${name}
     .url=${url}
@@ -154,7 +152,11 @@ export class PwOrder<
         case "DESC":
           break;
         case "ASC": {
-          const sortingPush: EntitySortingDontUse<P> = [theName, desc, theValue];
+          const sortingPush: EntitySortingDontUse<P> = [
+            theName,
+            desc,
+            theValue,
+          ];
           const two: EntitySortingAll<P> = sortingPush;
           sorting.push(two);
 
@@ -179,7 +181,9 @@ export class PwOrder<
   };
 
   // TODO FIXME we're not able to reset this so move this somewhere else
-  protected override willUpdate(changedProperties: Map<PropertyKey, unknown>): void {
+  protected override willUpdate(
+    changedProperties: Map<PropertyKey, unknown>,
+  ): void {
     if (changedProperties.has("initial")) {
       // the input value contains the value that is shown to the user
       this.inputValue =

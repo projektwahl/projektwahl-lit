@@ -50,10 +50,7 @@ export const createProjectsHandler = createOrUpdateProjectsHandler(
       max_participants,
       random_assignments,
       deleted,
-      ...rest
     } = project;
-    let _ = rest;
-    _ = 1; // ensure no property is missed - Don't use `{}` as a type. `{}` actually means "any non-nullish value".
     const res = z
       .array(
         rawProjectSchema.pick({
@@ -103,10 +100,7 @@ export const updateProjectsHandler = createOrUpdateProjectsHandler(
       max_participants,
       random_assignments,
       deleted,
-      ...rest
     } = project;
-    let _ = rest;
-    _ = 1; // ensure no property is missed - Don't use `{}` as a type. `{}` actually means "any non-nullish value".
     const finalQuery = z
       .array(
         rawProjectSchema.pick({

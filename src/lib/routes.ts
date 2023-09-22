@@ -20,7 +20,15 @@ https://github.com/projektwahl/projektwahl-lit
 SPDX-License-Identifier: AGPL-3.0-or-later
 SPDX-FileCopyrightText: 2021 Moritz Hedtke <Moritz.Hedtke@t-online.de>
 */
-import { z, ZodArray, ZodIssue, ZodObject, ZodRawShape, ZodType, ZodTypeAny } from "zod";
+import {
+  z,
+  ZodArray,
+  ZodIssue,
+  ZodObject,
+  ZodRawShape,
+  ZodType,
+  ZodTypeAny,
+} from "zod";
 import { result } from "./result.js";
 
 export const rawChoice = z
@@ -121,7 +129,7 @@ export const entities = <
 
 const baseQuery = <
   T1 extends Record<string, ZodTypeAny>,
-  T2 extends ZodType<[string, "ASC"|"DESC", number|null]>,
+  T2 extends ZodType<[string, "ASC" | "DESC", number | null]>,
   T3 extends ZodTypeAny,
   UnknownKeys extends UnknownKeysParam = "strip",
   Catchall extends ZodTypeAny = ZodTypeAny,
@@ -388,51 +396,50 @@ export const routes = {
         voted_choices: z.array(z.string()).nullable().optional(),
       })
       .strict(),
-    z
-      .array(
-        z.union([
-          z.tuple([
-            z.literal("id" as const),
-            z.enum(["ASC", "DESC"] as const),
-            z.null(),
-          ]),
-          z.tuple([
-            z.literal("valid" as const),
-            z.enum(["ASC", "DESC"] as const),
-            z.null(),
-          ]),
-          z.tuple([
-            z.literal("username" as const),
-            z.enum(["ASC", "DESC"] as const),
-            z.null(),
-          ]),
-          z.tuple([
-            z.literal("type" as const),
-            z.enum(["ASC", "DESC"] as const),
-            z.null(),
-          ]),
-          z.tuple([
-            z.literal("group" as const),
-            z.enum(["ASC", "DESC"] as const),
-            z.null(),
-          ]),
-          z.tuple([
-            z.literal("project_leader_id" as const),
-            z.enum(["ASC", "DESC"] as const),
-            z.number(),
-          ]),
-          z.tuple([
-            z.literal("force_in_project_id" as const),
-            z.enum(["ASC", "DESC"] as const),
-            z.number(),
-          ]),
-          z.tuple([
-            z.literal("computed_in_project_id" as const),
-            z.enum(["ASC", "DESC"] as const),
-            z.number(),
-          ]),
+    z.array(
+      z.union([
+        z.tuple([
+          z.literal("id" as const),
+          z.enum(["ASC", "DESC"] as const),
+          z.null(),
         ]),
-      ),
+        z.tuple([
+          z.literal("valid" as const),
+          z.enum(["ASC", "DESC"] as const),
+          z.null(),
+        ]),
+        z.tuple([
+          z.literal("username" as const),
+          z.enum(["ASC", "DESC"] as const),
+          z.null(),
+        ]),
+        z.tuple([
+          z.literal("type" as const),
+          z.enum(["ASC", "DESC"] as const),
+          z.null(),
+        ]),
+        z.tuple([
+          z.literal("group" as const),
+          z.enum(["ASC", "DESC"] as const),
+          z.null(),
+        ]),
+        z.tuple([
+          z.literal("project_leader_id" as const),
+          z.enum(["ASC", "DESC"] as const),
+          z.number(),
+        ]),
+        z.tuple([
+          z.literal("force_in_project_id" as const),
+          z.enum(["ASC", "DESC"] as const),
+          z.number(),
+        ]),
+        z.tuple([
+          z.literal("computed_in_project_id" as const),
+          z.enum(["ASC", "DESC"] as const),
+          z.number(),
+        ]),
+      ]),
+    ),
     rawUserSchema
       .pick({
         id: true,
@@ -471,36 +478,35 @@ export const routes = {
         project_leaders: z.array(z.string()),
         computed_in_projects: z.array(z.string()),
       }),
-    z
-      .array(
-        z.union([
-          z.tuple([
-            z.literal("id" as const),
-            z.enum(["ASC", "DESC"] as const),
-            z.null(),
-          ]),
-          z.tuple([
-            z.literal("title" as const),
-            z.enum(["ASC", "DESC"] as const),
-            z.null(),
-          ]),
-          z.tuple([
-            z.literal("info" as const),
-            z.enum(["ASC", "DESC"] as const),
-            z.null(),
-          ]),
-          z.tuple([
-            z.literal("project_leader_id" as const),
-            z.enum(["ASC", "DESC"] as const),
-            z.number(),
-          ]),
-          z.tuple([
-            z.literal("force_in_project_id" as const),
-            z.enum(["ASC", "DESC"] as const),
-            z.number(),
-          ]),
+    z.array(
+      z.union([
+        z.tuple([
+          z.literal("id" as const),
+          z.enum(["ASC", "DESC"] as const),
+          z.null(),
         ]),
-      ),
+        z.tuple([
+          z.literal("title" as const),
+          z.enum(["ASC", "DESC"] as const),
+          z.null(),
+        ]),
+        z.tuple([
+          z.literal("info" as const),
+          z.enum(["ASC", "DESC"] as const),
+          z.null(),
+        ]),
+        z.tuple([
+          z.literal("project_leader_id" as const),
+          z.enum(["ASC", "DESC"] as const),
+          z.number(),
+        ]),
+        z.tuple([
+          z.literal("force_in_project_id" as const),
+          z.enum(["ASC", "DESC"] as const),
+          z.number(),
+        ]),
+      ]),
+    ),
     rawProjectSchema
       .pick({
         id: true,
@@ -527,26 +533,25 @@ export const routes = {
         deleted: true,
       }),
     ),
-    z
-      .array(
-        z.union([
-          z.tuple([
-            z.literal("id" as const),
-            z.enum(["ASC", "DESC"] as const),
-            z.null(),
-          ]),
-          z.tuple([
-            z.literal("title" as const),
-            z.enum(["ASC", "DESC"] as const),
-            z.null(),
-          ]),
-          z.tuple([
-            z.literal("rank" as const),
-            z.enum(["ASC", "DESC"] as const),
-            z.null(),
-          ]),
+    z.array(
+      z.union([
+        z.tuple([
+          z.literal("id" as const),
+          z.enum(["ASC", "DESC"] as const),
+          z.null(),
         ]),
-      ),
+        z.tuple([
+          z.literal("title" as const),
+          z.enum(["ASC", "DESC"] as const),
+          z.null(),
+        ]),
+        z.tuple([
+          z.literal("rank" as const),
+          z.enum(["ASC", "DESC"] as const),
+          z.null(),
+        ]),
+      ]),
+    ),
     rawChoiceNullable
       .merge(rawProjectSchema)
       .pick({
