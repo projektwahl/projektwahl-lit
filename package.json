@@ -69,11 +69,10 @@
     "@vitejs/plugin-basic-ssl": "^1.0.1",
     "chance": "^1.1.11",
     "eslint": "^8.49.0",
-    "lightningcss": "^1.22.0",
+    "postcss": "^8.4.30",
     "purgecss": "^5.0.0",
     "rollup-plugin-visualizer": "^5.9.2",
     "selenium-webdriver": "4.12.0",
-    "terser": "^5.20.0",
     "ts-node": "^10.9.1",
     "typescript": "^5.2.2",
     "vite": "^4.4.9"
@@ -82,5 +81,5 @@
     "@lit/localize-tools": "^0.6.10",
     "c8": "^8.0.1"
   },
-  "packageManager": "yarn@3.6.3"
+  "packageManager": "yarn@4.0.0-rc.51"
 }
