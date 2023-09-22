@@ -25,6 +25,8 @@ import { Chance } from "chance";
 import { evaluate } from "../../src/server/routes/evaluate/index.js";
 import { deepEqual } from "assert/strict";
 import type { TransactionSql } from "postgres";
+import { rawProjectSchema, rawUserSchema } from "../../src/lib/routes.js";
+import { z } from "zod";
 
 const chance = new Chance();
 
@@ -44,9 +46,9 @@ export async function project(
   random_assignments = true,
 ): Promise<number> {
   return (
-    await typedSql(tsql, {
-      columns: { id: 23 },
-    } as const)`INSERT INTO projects (title, info, place, costs, min_age, max_age, min_participants, max_participants, random_assignments, last_updated_by) VALUES (${chance.sentence()}, '', '', 0, ${min_age}, ${max_age}, ${min_participants}, ${max_participants}, ${random_assignments}, NULL) RETURNING projects.id;`
+    z.array(rawProjectSchema.pick({
+      id: true,
+    })).parse(await tsql`INSERT INTO projects (title, info, place, costs, min_age, max_age, min_participants, max_participants, random_assignments, last_updated_by) VALUES (${chance.sentence()}, '', '', 0, ${min_age}, ${max_age}, ${min_participants}, ${max_participants}, ${random_assignments}, NULL) RETURNING projects.id;`)
   )[0].id;
 }
 
@@ -58,9 +60,9 @@ export async function user(
   await tsql`SELECT set_config('projektwahl.id', 0::text, true);`;
   await tsql`SELECT set_config('projektwahl.type', 'root', true);`;
   return (
-    await typedSql(tsql, {
-      columns: { id: 23 },
-    } as const)`INSERT INTO users (username, type, "group", age, project_leader_id, last_updated_by) VALUES (${`user${chance.integer()}`}, 'voter', '', ${age}, ${project_leader_id}, NULL) RETURNING users.id;`
+    z.array(rawUserSchema.pick({
+      id: true,
+    })).parse(await tsql`INSERT INTO users (username, type, "group", age, project_leader_id, last_updated_by) VALUES (${`user${chance.integer()}`}, 'voter', '', ${age}, ${project_leader_id}, NULL) RETURNING users.id;`)
   )[0].id;
 }
 

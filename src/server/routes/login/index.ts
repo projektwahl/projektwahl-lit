@@ -20,8 +20,8 @@ https://github.com/projektwahl/projektwahl-lit
 SPDX-License-Identifier: AGPL-3.0-or-later
 SPDX-FileCopyrightText: 2021 Moritz Hedtke <Moritz.Hedtke@t-online.de>
 */
-import { ZodIssueCode } from "zod";
-import type { ResponseType } from "../../../lib/routes.js";
+import { ZodIssueCode, z } from "zod";
+import { rawUserSchema, type ResponseType } from "../../../lib/routes.js";
 import { sql } from "../../database.js";
 import { requestHandler } from "../../express.js";
 import { checkPassword } from "../../password.js";
@@ -35,15 +35,7 @@ export const loginHandler = requestHandler(
     const r = await sql.begin(async (tsql) => {
       await tsql`SELECT set_config('projektwahl.id', 0::text, true);`;
       await tsql`SELECT set_config('projektwahl.type', 'root', true);`;
-      return await typedSql(tsql, {
-        columns: {
-          id: 23,
-          username: 1043,
-          password_hash: 1043,
-          type: null, // custom enum
-          last_failed_login_attempt: 16,
-        },
-      } as const)`SELECT id, username, password_hash, type, CURRENT_TIMESTAMP > last_failed_login_attempt + interval '5 seconds' as last_failed_login_attempt FROM users WHERE username = ${body.username} LIMIT 1`;
+      return z.array(rawUserSchema.pick({ id: true, username: true, password_hash: true, type: true, last_failed_login_attempt: true })).parse(`SELECT id, username, password_hash, type, CURRENT_TIMESTAMP > last_failed_login_attempt + interval '5 seconds' as last_failed_login_attempt FROM users WHERE username = ${body.username} LIMIT 1`);
     });
 
     const dbUser = r[0];
@@ -157,9 +149,7 @@ export const loginHandler = requestHandler(
       await sql.begin("READ WRITE", async (tsql) => {
         await tsql`SELECT set_config('projektwahl.id', ${dbUser.id}::text, true);`;
         await tsql`SELECT set_config('projektwahl.type', ${dbUser.type}::text, true);`;
-        return await typedSql(tsql, {
-          columns: {},
-        } as const)`UPDATE users SET password_hash = ${newHash} WHERE id = ${dbUser.id}`;
+        return await tsql`UPDATE users SET password_hash = ${newHash} WHERE id = ${dbUser.id}`;
       });
     }
 
@@ -176,9 +166,7 @@ export const loginHandler = requestHandler(
     await sql.begin("READ WRITE", async (tsql) => {
       await tsql`SELECT set_config('projektwahl.id', ${dbUser.id}::text, true);`;
       await tsql`SELECT set_config('projektwahl.type', ${dbUser.type}::text, true);`;
-      return await typedSql(tsql, {
-        columns: {},
-      } as const)`INSERT INTO sessions (user_id, session_id) VALUES (${dbUser.id}, ${session_id})`;
+      return await tsql`INSERT INTO sessions (user_id, session_id) VALUES (${dbUser.id}, ${session_id})`;
     });
 
     const headers: OutgoingHttpHeaders = {

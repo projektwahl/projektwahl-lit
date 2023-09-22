@@ -24,7 +24,7 @@ import postgres from "postgres";
 import { sql } from "../../database.js";
 import { requestHandler } from "../../express.js";
 import type { OutgoingHttpHeaders } from "node:http";
-import type { ResponseType, routes, userSchema } from "../../../lib/routes.js";
+import { rawProjectSchema, type ResponseType, type routes, type userSchema } from "../../../lib/routes.js";
 import { z, ZodIssueCode } from "zod";
 
 export const createProjectsHandler = createOrUpdateProjectsHandler(
@@ -49,9 +49,9 @@ export const createProjectsHandler = createOrUpdateProjectsHandler(
     } = project;
     let _ = rest;
     _ = 1; // ensure no property is missed - Don't use `{}` as a type. `{}` actually means "any non-nullish value".
-    const res = await typedSql(tsql, {
-      columns: { id: 23 },
-    } as const)`INSERT INTO projects_with_deleted (title, info, place, costs, min_age, max_age, min_participants, max_participants, random_assignments, deleted, last_updated_by)
+    const res = z.array(rawProjectSchema.pick({
+      id: true,
+    })).parse(tsql`INSERT INTO projects_with_deleted (title, info, place, costs, min_age, max_age, min_participants, max_participants, random_assignments, deleted, last_updated_by)
             (SELECT 
     ${title ?? null},
     ${info ?? null},
@@ -64,13 +64,11 @@ export const createProjectsHandler = createOrUpdateProjectsHandler(
     ${random_assignments ?? false}, ${deleted ?? false}, ${
       loggedInUser.id
     } FROM users_with_deleted WHERE users_with_deleted.id = ${loggedInUser.id} AND (users_with_deleted.type = 'helper' OR users_with_deleted.type = 'admin'))
-    RETURNING id;`;
+    RETURNING id;`);
 
     // TODO FIXME make this in sql directly
     if (loggedInUser.type === "helper") {
-      await typedSql(tsql, {
-        columns: {},
-      } as const)`UPDATE users_with_deleted SET project_leader_id = ${res[0].id} WHERE project_leader_id IS NULL AND id = ${loggedInUser.id}`;
+      await tsql`UPDATE users_with_deleted SET project_leader_id = ${res[0].id} WHERE project_leader_id IS NULL AND id = ${loggedInUser.id}`;
     }
 
     return res;
@@ -100,9 +98,9 @@ export const updateProjectsHandler = createOrUpdateProjectsHandler(
     } = project;
     let _ = rest;
     _ = 1; // ensure no property is missed - Don't use `{}` as a type. `{}` actually means "any non-nullish value".
-    const finalQuery = typedSql(tsql, {
-      columns: { id: 23 },
-    } as const)`UPDATE projects_with_deleted SET
+    const finalQuery = z.array(rawProjectSchema.pick({
+      id: true,
+    })).parse(tsql`UPDATE projects_with_deleted SET
     "title" = CASE WHEN ${title !== undefined} THEN ${title ?? null} ELSE "projects_with_deleted"."title" END,
     "info" = CASE WHEN ${info !== undefined} THEN ${info ?? null} ELSE "projects_with_deleted"."info" END,
     "place" = CASE WHEN ${place !== undefined} THEN ${place ?? null} ELSE "projects_with_deleted"."place" END,
@@ -122,7 +120,7 @@ export const updateProjectsHandler = createOrUpdateProjectsHandler(
 last_updated_by = ${loggedInUser.id}
 FROM users_with_deleted WHERE projects_with_deleted.id = ${id} AND users_with_deleted.id = ${
       loggedInUser.id
-    } AND (users_with_deleted.project_leader_id = ${id} AND users_with_deleted.type = 'helper' OR users_with_deleted.type = 'admin') RETURNING projects_with_deleted.id;`;
+    } AND (users_with_deleted.project_leader_id = ${id} AND users_with_deleted.type = 'helper' OR users_with_deleted.type = 'admin') RETURNING projects_with_deleted.id;`);
 
     return await finalQuery;
   },

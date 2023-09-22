@@ -20,8 +20,8 @@ https://github.com/projektwahl/projektwahl-lit
 SPDX-License-Identifier: AGPL-3.0-or-later
 SPDX-FileCopyrightText: 2021 Moritz Hedtke <Moritz.Hedtke@t-online.de>
 */
-import { ZodIssueCode } from "zod";
-import type { ResponseType } from "../../../lib/routes.js";
+import { z, ZodIssueCode } from "zod";
+import { rawUserSchema, type ResponseType } from "../../../lib/routes.js";
 import { sql } from "../../database.js";
 import { requestHandler } from "../../express.js";
 import type { OutgoingHttpHeaders } from "node:http";
@@ -78,14 +78,12 @@ export const sudoHandler = requestHandler(
     const r = await sql.begin(async (tsql) => {
       await tsql`SELECT set_config('projektwahl.id', 0::text, true);`;
       await tsql`SELECT set_config('projektwahl.type', 'root', true);`;
-      return await typedSql(tsql, {
-        columns: {
-          id: 23,
-          username: 1043,
-          password_hash: 1043,
-          type: null, // custom enum
-        },
-      } as const)`SELECT id, username, password_hash, type FROM users WHERE id = ${body.id} LIMIT 1`;
+      return z.array(rawUserSchema.pick({
+        id: true,
+        username: true,
+        password_hash: true,
+        type: true
+      })).parse(tsql`SELECT id, username, password_hash, type FROM users WHERE id = ${body.id} LIMIT 1`);
     });
 
     const dbUser = r[0];
@@ -127,9 +125,7 @@ export const sudoHandler = requestHandler(
     await sql.begin("READ WRITE", async (tsql) => {
       await tsql`SELECT set_config('projektwahl.id', ${dbUser.id}::text, true);`;
       await tsql`SELECT set_config('projektwahl.type', ${dbUser.type}::text, true);`;
-      return await typedSql(tsql, {
-        columns: {},
-      } as const)`INSERT INTO sessions (user_id, session_id) VALUES (${dbUser.id}, ${session_id})`;
+      return await tsql`INSERT INTO sessions (user_id, session_id) VALUES (${dbUser.id}, ${session_id})`;
     });
 
     const headers: OutgoingHttpHeaders = {

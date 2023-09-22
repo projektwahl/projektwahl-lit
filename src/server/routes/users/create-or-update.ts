@@ -21,12 +21,12 @@ SPDX-License-Identifier: AGPL-3.0-or-later
 SPDX-FileCopyrightText: 2021 Moritz Hedtke <Moritz.Hedtke@t-online.de>
 */
 import postgres from "postgres";
-import type { ResponseType } from "../../../lib/routes.js";
+import { rawUserSchema, type ResponseType } from "../../../lib/routes.js";
 import { sql } from "../../database.js";
 import { requestHandler } from "../../express.js";
 import { hashPassword } from "../../password.js";
 import type { OutgoingHttpHeaders } from "node:http";
-import { ZodIssueCode } from "zod";
+import { z, ZodIssueCode } from "zod";
 
 export const createOrUpdateUsersHandler = requestHandler(
   "POST",
@@ -114,13 +114,11 @@ export const createOrUpdateUsersHandler = requestHandler(
               let _ = rest;
               _ = 1; // ensure no property is missed - Don't use `{}` as a type. `{}` actually means "any non-nullish value".
 
-              const finalQuery = typedSql(tsql, {
-                columns: {
-                  id: 23,
-                  project_leader_id: 23,
-                  force_in_project_id: 23,
-                },
-              } as const)`UPDATE users_with_deleted SET
+              const finalQuery = z.array(rawUserSchema.pick({
+                id: true,
+                project_leader_id: true,
+                force_in_project_id: true,
+              })).parse(tsql`UPDATE users_with_deleted SET
   ${username !== undefined ? sql`"username" = ${username},` : sql``}
   ${openid_id !== undefined ? sql`"openid_id" = ${openid_id},` : sql``}
   ${type !== undefined ? sql`"type" = ${type},` : sql``}
@@ -150,7 +148,7 @@ export const createOrUpdateUsersHandler = requestHandler(
   }
   "last_updated_by" = ${loggedInUser.id}
 
-  WHERE id = ${id} RETURNING id, project_leader_id, force_in_project_id;`;
+  WHERE id = ${id} RETURNING id, project_leader_id, force_in_project_id;`);
               // TODO FIXME (found using fuzzer) if this tries to update a nonexisting user we should return an error
               results.push(await finalQuery);
             } else {
@@ -168,13 +166,11 @@ export const createOrUpdateUsersHandler = requestHandler(
               } = user;
               let _ = rest;
               _ = 1; // ensure no property is missed - Don't use `{}` as a type. `{}` actually means "any non-nullish value".
-              const query = typedSql(tsql, {
-                columns: {
-                  id: 23,
-                  project_leader_id: 23,
-                  force_in_project_id: 23,
-                },
-              } as const)`INSERT INTO users_with_deleted (username, openid_id, password_hash, type, "group", age, away, deleted, last_updated_by) VALUES (${username}, ${
+              const query = z.array(rawUserSchema.pick({
+                id: true,
+                project_leader_id: true,
+                force_in_project_id: true,
+              })).parse(tsql`INSERT INTO users_with_deleted (username, openid_id, password_hash, type, "group", age, away, deleted, last_updated_by) VALUES (${username}, ${
                 openid_id ?? null
               }, ${
                 password !== undefined ? await hashPassword(password) : null
@@ -182,7 +178,7 @@ export const createOrUpdateUsersHandler = requestHandler(
                 type === "voter" ? age ?? null : null
               }, ${away ?? false}, ${deleted ?? false}, ${
                 loggedInUser.id
-              }) RETURNING id, project_leader_id, force_in_project_id;`;
+              }) RETURNING id, project_leader_id, force_in_project_id;`);
 
               results.push(await query);
             }

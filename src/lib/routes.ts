@@ -65,6 +65,7 @@ export const rawUserSchema = z
     // we can't use a discriminated union because it doesn't work with .pick()
     group: z.string().min(0).max(100).nullable(),
     age: z.number().min(0).max(200).nullable(),
+    last_failed_login_attempt: z.date().nullable(),
     ...rawUserCommon,
   })
   .strict();

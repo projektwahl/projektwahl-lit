@@ -98,10 +98,10 @@ export const updateSettingsHandler = requestHandler(
         } = new_settings;
         let _ = rest;
         _ = 1; // ensure no property is missed - Don't use `{}` as a type. `{}` actually means "any non-nullish value".
-        const finalQuery = typedSql(tsql, {
-          columns: {},
-        } as const)`UPDATE settings SET open_date = to_timestamp(${open_date}::BIGINT/1000)::TIMESTAMP WITH TIME ZONE, voting_start_date = to_timestamp(${voting_start_date}::BIGINT/1000)::TIMESTAMP WITH TIME ZONE, voting_end_date = to_timestamp(${voting_end_date}::BIGINT/1000)::TIMESTAMP WITH TIME ZONE, results_date = to_timestamp(${results_date}::BIGINT/1000)::TIMESTAMP WITH TIME ZONE;`;
+        const finalQuery = tsql`UPDATE settings SET open_date = to_timestamp(${open_date}::BIGINT/1000)::TIMESTAMP WITH TIME ZONE, voting_start_date = to_timestamp(${voting_start_date}::BIGINT/1000)::TIMESTAMP WITH TIME ZONE, voting_end_date = to_timestamp(${voting_end_date}::BIGINT/1000)::TIMESTAMP WITH TIME ZONE, results_date = to_timestamp(${results_date}::BIGINT/1000)::TIMESTAMP WITH TIME ZONE;`;
         // warning: this will not work if we will ever use multiple workers in production
+        // TODO FIXME we could use the postgresql notify feature?
+
         //await updateCachedSettings(tsql);
         return await finalQuery;
       });

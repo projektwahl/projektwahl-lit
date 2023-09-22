@@ -111,7 +111,7 @@ export function requestHandler<P extends keyof typeof routes>(
               group: true,
               age: true
             })).parse(await tsql`UPDATE sessions SET updated_at = CURRENT_TIMESTAMP FROM users WHERE users.id = sessions.user_id AND session_id = ${session_id_} AND CURRENT_TIMESTAMP < updated_at + interval '24 hours' RETURNING users.id, users.type, users.username, users.group, users.age`);
-            //await typedSql(sql, {})`DELETE FROM sessions WHERE CURRENT_TIMESTAMP >= updated_at + interval '24 hours'`
+            //await tsql`DELETE FROM sessions WHERE CURRENT_TIMESTAMP >= updated_at + interval '24 hours'`
           },
         )
       )[0];
