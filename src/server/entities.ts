@@ -23,7 +23,7 @@ SPDX-FileCopyrightText: 2021 Moritz Hedtke <Moritz.Hedtke@t-online.de>
 import type { OutgoingHttpHeaders } from "node:http2";
 import type { PendingQuery, Row } from "postgres";
 import type { z } from "zod";
-import type { ResponseType, userSchema } from "../lib/routes.js";
+import type { MyResponseType, userSchema } from "../lib/routes.js";
 import { entityRoutes } from "../lib/routes.js";
 import { sql } from "./database.js";
 import { EntitySorting } from "../client/entity-list/pw-order.js";
@@ -124,7 +124,7 @@ export async function fetchData<R extends keyof typeof entityRoutes>(
   sqlQuery: (query: entityRoutesRequest<R>) => PendingQuery<Row[]>,
   orderByQueries: entitiesType8<R>,
   tiebreaker: entitiesType18<R> | undefined,
-): Promise<[OutgoingHttpHeaders, ResponseType<R>]> {
+): Promise<[OutgoingHttpHeaders, MyResponseType<R>]> {
   const sorting: EntitySorting<R>[] = query.sorting;
 
   if (tiebreaker !== undefined && !sorting.find((e) => e[0] === tiebreaker)) {

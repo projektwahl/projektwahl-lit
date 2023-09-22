@@ -22,7 +22,7 @@ SPDX-FileCopyrightText: 2021 Moritz Hedtke <Moritz.Hedtke@t-online.de>
 */
 
 import { json } from "node:stream/consumers";
-import { routes, ResponseType, userSchema, rawUserSchema } from "../lib/routes.js";
+import { routes, MyResponseType, userSchema, rawUserSchema } from "../lib/routes.js";
 import { z } from "zod";
 import { retryableBegin } from "./database.js";
 import cookie from "cookie";
@@ -47,8 +47,8 @@ export function requestHandler<P extends keyof typeof routes>(
     user: z.infer<typeof userSchema>,
     session_id: Uint8Array | undefined,
   ) =>
-    | PromiseLike<[OutgoingHttpHeaders, ResponseType<P>]>
-    | [OutgoingHttpHeaders, ResponseType<P>],
+    | PromiseLike<[OutgoingHttpHeaders, MyResponseType<P>]>
+    | [OutgoingHttpHeaders, MyResponseType<P>],
 ): (
   url: URL,
   request: MyRequest,
@@ -117,7 +117,7 @@ export function requestHandler<P extends keyof typeof routes>(
       )[0];
     }
 
-    let body: ResponseType<P>;
+    let body: MyResponseType<P>;
 
     if (request.method === "POST") {
       body = routes[path].request.safeParse(await json(request));
@@ -128,7 +128,7 @@ export function requestHandler<P extends keyof typeof routes>(
         ),
       ); // TODO FIXME if this throws
     }
-    const requestBody: ResponseType<P> = body;
+    const requestBody: MyResponseType<P> = body;
     if (requestBody.success) {
       await suspend();
       const [new_headers, responseBody] = await handler(

@@ -24,7 +24,7 @@ import { css, html, TemplateResult } from "lit";
 import { HistoryController } from "../history-controller.js";
 import { ref } from "lit/directives/ref.js";
 import { Task, TaskStatus } from "@lit-labs/task";
-import { entityRoutes, ResponseType, routes } from "../../lib/routes.js";
+import { entityRoutes, MyResponseType, routes } from "../../lib/routes.js";
 import { z } from "zod";
 import { PwForm } from "../form/pw-form.js";
 import { msg } from "@lit/localize";
@@ -137,7 +137,7 @@ export class PwEntityList<
     return "blub";
   }
 
-  initial?: ResponseType<P>;
+  initial?: MyResponseType<P>;
 
   protected history;
 

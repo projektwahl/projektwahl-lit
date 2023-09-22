@@ -21,7 +21,7 @@ SPDX-License-Identifier: AGPL-3.0-or-later
 SPDX-FileCopyrightText: 2021 Moritz Hedtke <Moritz.Hedtke@t-online.de>
 */
 import { z, ZodIssueCode } from "zod";
-import { rawUserSchema, type ResponseType } from "../../../lib/routes.js";
+import { rawUserSchema, type MyResponseType } from "../../../lib/routes.js";
 import { sql } from "../../database.js";
 import { requestHandler } from "../../express.js";
 import type { OutgoingHttpHeaders } from "node:http";
@@ -32,7 +32,7 @@ export const sudoHandler = requestHandler(
   "/api/v1/sudo",
   async function (body, loggedInUser) {
     if (!loggedInUser) {
-      const returnValue: [OutgoingHttpHeaders, ResponseType<"/api/v1/sudo">] = [
+      const returnValue: [OutgoingHttpHeaders, MyResponseType<"/api/v1/sudo">] = [
         {
           "content-type": "text/json; charset=utf-8",
           ":status": 401,
@@ -54,7 +54,7 @@ export const sudoHandler = requestHandler(
     }
 
     if (!(loggedInUser.type === "admin")) {
-      const returnValue: [OutgoingHttpHeaders, ResponseType<"/api/v1/sudo">] = [
+      const returnValue: [OutgoingHttpHeaders, MyResponseType<"/api/v1/sudo">] = [
         {
           "content-type": "text/json; charset=utf-8",
           ":status": 403,
@@ -90,7 +90,7 @@ export const sudoHandler = requestHandler(
 
     // this intentionally tells the user whether the account exists
     if (dbUser === undefined) {
-      const returnValue: [OutgoingHttpHeaders, ResponseType<"/api/v1/login">] =
+      const returnValue: [OutgoingHttpHeaders, MyResponseType<"/api/v1/login">] =
         [
           {
             "content-type": "text/json; charset=utf-8",

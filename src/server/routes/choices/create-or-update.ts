@@ -24,7 +24,7 @@ import postgres from "postgres";
 import { sql } from "../../database.js";
 import { requestHandler } from "../../express.js";
 import type { OutgoingHttpHeaders } from "node:http";
-import type { ResponseType, routes, userSchema } from "../../../lib/routes.js";
+import type { MyResponseType, routes, userSchema } from "../../../lib/routes.js";
 import { z, ZodIssueCode } from "zod";
 
 export const updateChoiceHandler = createOrUpdateChoiceHandler(
@@ -59,7 +59,7 @@ export function createOrUpdateChoiceHandler<P extends "/api/v1/choices/update">(
     if (!loggedInUser) {
       const returnValue: [
         OutgoingHttpHeaders,
-        ResponseType<"/api/v1/choices/update">,
+        MyResponseType<"/api/v1/choices/update">,
       ] = [
         {
           "content-type": "text/json; charset=utf-8",
@@ -82,7 +82,7 @@ export function createOrUpdateChoiceHandler<P extends "/api/v1/choices/update">(
     }
 
     if (!(loggedInUser.type === "voter")) {
-      const returnValue: [OutgoingHttpHeaders, ResponseType<P>] = [
+      const returnValue: [OutgoingHttpHeaders, MyResponseType<P>] = [
         {
           "content-type": "text/json; charset=utf-8",
           ":status": 403,
@@ -112,7 +112,7 @@ export function createOrUpdateChoiceHandler<P extends "/api/v1/choices/update">(
             await tsql`SELECT COUNT(*) AS count FROM settings WHERE voting_start_date < CURRENT_TIMESTAMP AND CURRENT_TIMESTAMP < voting_end_date;`
           )[0].count;
         if (!voting_allowed) {
-          const returnValue: [OutgoingHttpHeaders, ResponseType<P>] = [
+          const returnValue: [OutgoingHttpHeaders, MyResponseType<P>] = [
             {
               "content-type": "text/json; charset=utf-8",
               ":status": 200,
@@ -151,7 +151,7 @@ export function createOrUpdateChoiceHandler<P extends "/api/v1/choices/update">(
       if (error instanceof postgres.PostgresError) {
         const returnValue: [
           OutgoingHttpHeaders,
-          ResponseType<"/api/v1/users/create-or-update">,
+          MyResponseType<"/api/v1/users/create-or-update">,
         ] = [
           {
             "content-type": "text/json; charset=utf-8",
@@ -172,7 +172,7 @@ export function createOrUpdateChoiceHandler<P extends "/api/v1/choices/update">(
         ];
         return returnValue;
       }
-      const returnValue: [OutgoingHttpHeaders, ResponseType<P>] = [
+      const returnValue: [OutgoingHttpHeaders, MyResponseType<P>] = [
         {
           "content-type": "text/json; charset=utf-8",
           ":status": 500,

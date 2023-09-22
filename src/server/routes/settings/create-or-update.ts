@@ -24,7 +24,7 @@ import postgres from "postgres";
 import { sql } from "../../database.js";
 import { requestHandler } from "../../express.js";
 import type { OutgoingHttpHeaders } from "node:http";
-import type { ResponseType } from "../../../lib/routes.js";
+import type { MyResponseType } from "../../../lib/routes.js";
 import { ZodIssueCode } from "zod";
 
 export const updateSettingsHandler = requestHandler(
@@ -38,7 +38,7 @@ export const updateSettingsHandler = requestHandler(
     if (!loggedInUser) {
       const returnValue: [
         OutgoingHttpHeaders,
-        ResponseType<"/api/v1/settings/update">,
+        MyResponseType<"/api/v1/settings/update">,
       ] = [
         {
           "content-type": "text/json; charset=utf-8",
@@ -63,7 +63,7 @@ export const updateSettingsHandler = requestHandler(
     if (!(loggedInUser.type === "admin")) {
       const returnValue: [
         OutgoingHttpHeaders,
-        ResponseType<"/api/v1/settings/update">,
+        MyResponseType<"/api/v1/settings/update">,
       ] = [
         {
           "content-type": "text/json; charset=utf-8",
@@ -120,7 +120,7 @@ export const updateSettingsHandler = requestHandler(
       if (error instanceof postgres.PostgresError) {
         const returnValue: [
           OutgoingHttpHeaders,
-          ResponseType<"/api/v1/settings/update">,
+          MyResponseType<"/api/v1/settings/update">,
         ] = [
           {
             "content-type": "text/json; charset=utf-8",
@@ -144,7 +144,7 @@ export const updateSettingsHandler = requestHandler(
       console.error(error);
       const returnValue: [
         OutgoingHttpHeaders,
-        ResponseType<"/api/v1/settings/update">,
+        MyResponseType<"/api/v1/settings/update">,
       ] = [
         {
           "content-type": "text/json; charset=utf-8",

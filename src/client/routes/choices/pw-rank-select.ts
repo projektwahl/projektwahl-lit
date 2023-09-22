@@ -25,7 +25,7 @@ import { Task } from "@lit-labs/task";
 import { html } from "lit";
 import { myFetch } from "../../utils.js";
 import { msg } from "@lit/localize";
-import type { routes, ResponseType } from "../../../lib/routes.js";
+import type { routes, MyResponseType } from "../../../lib/routes.js";
 import type { z } from "zod";
 import { PwElement } from "../../pw-element.js";
 
@@ -65,7 +65,7 @@ class PwRankSelect extends PwElement {
 
     this.disabled = false;
 
-    this._task = new Task<[number], ResponseType<"/api/v1/choices/update">>(
+    this._task = new Task<[number], MyResponseType<"/api/v1/choices/update">>(
       this,
       async (args: [number]) => {
         this.disabled = true;

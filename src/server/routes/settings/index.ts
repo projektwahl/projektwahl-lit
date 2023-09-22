@@ -22,7 +22,7 @@ SPDX-FileCopyrightText: 2021 Moritz Hedtke <Moritz.Hedtke@t-online.de>
 */
 import type { OutgoingHttpHeaders } from "node:http";
 import { ZodIssueCode } from "zod";
-import type { ResponseType } from "../../../lib/routes.js";
+import type { MyResponseType } from "../../../lib/routes.js";
 import { fetchData } from "../../entities.js";
 import { requestHandler } from "../../express.js";
 import { sql } from "../../database.js";
@@ -38,7 +38,7 @@ export const settingsHandler = requestHandler(
     if (!loggedInUser) {
       const returnValue: [
         OutgoingHttpHeaders,
-        ResponseType<"/api/v1/settings">,
+        MyResponseType<"/api/v1/settings">,
       ] = [
         {
           "content-type": "text/json; charset=utf-8",
@@ -60,7 +60,7 @@ export const settingsHandler = requestHandler(
       return returnValue;
     }
 
-    const ret: [OutgoingHttpHeaders, ResponseType<"/api/v1/settings">] =
+    const ret: [OutgoingHttpHeaders, MyResponseType<"/api/v1/settings">] =
       await fetchData<"/api/v1/settings">(
         loggedInUser,
         "/api/v1/settings" as const,

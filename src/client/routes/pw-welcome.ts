@@ -27,7 +27,7 @@ import { LoggedInUserController } from "../user-controller.js";
 import { myFetch } from "../utils.js";
 import { ClockController } from "../clock-controller.js";
 import { Task } from "@lit-labs/task";
-import type { ResponseType } from "../../lib/routes.js";
+import type { MyResponseType } from "../../lib/routes.js";
 import { animate, flyBelow, flyAbove } from "@lit-labs/motion";
 import { choose } from "lit/directives/choose.js";
 
@@ -181,7 +181,7 @@ function renderDigit(digit: number) {
 export class PwWelcome extends PwElement {
   userController: LoggedInUserController;
   clockController: ClockController;
-  task: Task<[string | undefined], ResponseType<"/api/v1/settings">>;
+  task: Task<[string | undefined], MyResponseType<"/api/v1/settings">>;
   userTask: Task<[string | undefined], [number, string, boolean] | undefined>;
 
   constructor() {

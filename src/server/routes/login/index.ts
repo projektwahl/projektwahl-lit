@@ -21,7 +21,7 @@ SPDX-License-Identifier: AGPL-3.0-or-later
 SPDX-FileCopyrightText: 2021 Moritz Hedtke <Moritz.Hedtke@t-online.de>
 */
 import { ZodIssueCode, z } from "zod";
-import { rawUserSchema, type ResponseType } from "../../../lib/routes.js";
+import { rawUserSchema, type MyResponseType } from "../../../lib/routes.js";
 import { sql } from "../../database.js";
 import { requestHandler } from "../../express.js";
 import { checkPassword } from "../../password.js";
@@ -42,7 +42,7 @@ export const loginHandler = requestHandler(
 
     // this intentionally tells the user whether the account exists
     if (dbUser === undefined) {
-      const returnValue: [OutgoingHttpHeaders, ResponseType<"/api/v1/login">] =
+      const returnValue: [OutgoingHttpHeaders, MyResponseType<"/api/v1/login">] =
         [
           {
             "content-type": "text/json; charset=utf-8",
@@ -65,7 +65,7 @@ export const loginHandler = requestHandler(
     }
 
     if (dbUser.password_hash == null) {
-      const returnValue: [OutgoingHttpHeaders, ResponseType<"/api/v1/login">] =
+      const returnValue: [OutgoingHttpHeaders, MyResponseType<"/api/v1/login">] =
         [
           {
             "content-type": "text/json; charset=utf-8",
@@ -88,7 +88,7 @@ export const loginHandler = requestHandler(
     }
 
     if (!dbUser.last_failed_login_attempt) {
-      const returnValue: [OutgoingHttpHeaders, ResponseType<"/api/v1/login">] =
+      const returnValue: [OutgoingHttpHeaders, MyResponseType<"/api/v1/login">] =
         [
           {
             "content-type": "text/json; charset=utf-8",
@@ -123,7 +123,7 @@ export const loginHandler = requestHandler(
         await tsql`UPDATE users SET last_failed_login_attempt = CURRENT_TIMESTAMP WHERE id = ${dbUser.id}`;
       });
 
-      const returnValue: [OutgoingHttpHeaders, ResponseType<"/api/v1/login">] =
+      const returnValue: [OutgoingHttpHeaders, MyResponseType<"/api/v1/login">] =
         [
           {
             "content-type": "text/json; charset=utf-8",

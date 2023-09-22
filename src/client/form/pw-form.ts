@@ -23,7 +23,7 @@ SPDX-FileCopyrightText: 2021 Moritz Hedtke <Moritz.Hedtke@t-online.de>
 import { html, noChange } from "lit";
 import { createRef, ref, Ref } from "lit/directives/ref.js";
 import { msg } from "@lit/localize";
-import type { routes, ResponseType } from "../../lib/routes.js";
+import type { routes, MyResponseType } from "../../lib/routes.js";
 import type { Task } from "@lit-labs/task";
 import { PwElement } from "../pw-element.js";
 import type { z } from "zod";
@@ -43,7 +43,7 @@ class PwForm<P extends keyof typeof routes> extends PwElement {
     throw new Error("not implemented");
   }
 
-  _task!: Task<[URLSearchParams], ResponseType<P>>;
+  _task!: Task<[URLSearchParams], MyResponseType<P>>;
 
   form: import("lit/directives/ref").Ref<HTMLFormElement>;
 

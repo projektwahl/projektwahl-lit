@@ -21,7 +21,7 @@ SPDX-License-Identifier: AGPL-3.0-or-later
 SPDX-FileCopyrightText: 2021 Moritz Hedtke <Moritz.Hedtke@t-online.de>
 */
 import { ZodIssueCode } from "zod";
-import type { ResponseType } from "../../../lib/routes.js";
+import type { MyResponseType } from "../../../lib/routes.js";
 import { fetchData } from "../../entities.js";
 import { requestHandler } from "../../express.js";
 import type { OutgoingHttpHeaders } from "node:http";
@@ -38,7 +38,7 @@ export const projectsHandler = requestHandler(
     if (!loggedInUser) {
       const returnValue: [
         OutgoingHttpHeaders,
-        ResponseType<"/api/v1/projects">,
+        MyResponseType<"/api/v1/projects">,
       ] = [
         {
           "content-type": "text/json; charset=utf-8",

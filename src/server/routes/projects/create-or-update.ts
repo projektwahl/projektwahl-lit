@@ -24,7 +24,7 @@ import postgres from "postgres";
 import { sql } from "../../database.js";
 import { requestHandler } from "../../express.js";
 import type { OutgoingHttpHeaders } from "node:http";
-import { rawProjectSchema, type ResponseType, type routes, type userSchema } from "../../../lib/routes.js";
+import { rawProjectSchema, type MyResponseType, type routes, type userSchema } from "../../../lib/routes.js";
 import { z, ZodIssueCode } from "zod";
 
 export const createProjectsHandler = createOrUpdateProjectsHandler(
@@ -145,7 +145,7 @@ export function createOrUpdateProjectsHandler<
     if (!loggedInUser) {
       const returnValue: [
         OutgoingHttpHeaders,
-        ResponseType<"/api/v1/projects/create" | "/api/v1/projects/update">,
+        MyResponseType<"/api/v1/projects/create" | "/api/v1/projects/update">,
       ] = [
         {
           "content-type": "text/json; charset=utf-8",
@@ -168,7 +168,7 @@ export function createOrUpdateProjectsHandler<
     }
 
     if (!(loggedInUser.type === "admin" || loggedInUser.type === "helper")) {
-      const returnValue: [OutgoingHttpHeaders, ResponseType<P>] = [
+      const returnValue: [OutgoingHttpHeaders, MyResponseType<P>] = [
         {
           "content-type": "text/json; charset=utf-8",
           ":status": 403,
@@ -205,7 +205,7 @@ export function createOrUpdateProjectsHandler<
 
       if (!row) {
         // insufficient permissions
-        const returnValue: [OutgoingHttpHeaders, ResponseType<P>] = [
+        const returnValue: [OutgoingHttpHeaders, MyResponseType<P>] = [
           {
             "content-type": "text/json; charset=utf-8",
             ":status": 403,
@@ -242,7 +242,7 @@ export function createOrUpdateProjectsHandler<
           error.constraint_name === "users_with_deleted_username_key"
         ) {
           // unique violation
-          const returnValue: [OutgoingHttpHeaders, ResponseType<P>] = [
+          const returnValue: [OutgoingHttpHeaders, MyResponseType<P>] = [
             {
               "content-type": "text/json; charset=utf-8",
               ":status": 200,
@@ -262,7 +262,7 @@ export function createOrUpdateProjectsHandler<
           ];
           return returnValue;
         } else {
-          const returnValue: [OutgoingHttpHeaders, ResponseType<P>] = [
+          const returnValue: [OutgoingHttpHeaders, MyResponseType<P>] = [
             {
               "content-type": "text/json; charset=utf-8",
               ":status": 200,
@@ -284,7 +284,7 @@ export function createOrUpdateProjectsHandler<
         }
       }
       console.error(error);
-      const returnValue: [OutgoingHttpHeaders, ResponseType<P>] = [
+      const returnValue: [OutgoingHttpHeaders, MyResponseType<P>] = [
         {
           "content-type": "text/json; charset=utf-8",
           ":status": 500,

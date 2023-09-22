@@ -22,7 +22,7 @@ SPDX-FileCopyrightText: 2021 Moritz Hedtke <Moritz.Hedtke@t-online.de>
 */
 import { sensitiveHeaders } from "node:http2";
 import { z, ZodIssueCode } from "zod";
-import { rawUserSchema, type ResponseType } from "../../../lib/routes.js";
+import { rawUserSchema, type MyResponseType } from "../../../lib/routes.js";
 import { sql } from "../../database.js";
 import { requestHandler } from "../../express.js";
 import { client } from "./openid-client.js";
@@ -68,7 +68,7 @@ export const openidRedirectHandler = requestHandler(
       if (dbUser === undefined) {
         const returnValue: [
           OutgoingHttpHeaders,
-          ResponseType<"/api/v1/redirect">,
+          MyResponseType<"/api/v1/redirect">,
         ] = [
           {
             "content-type": "text/json; charset=utf-8",
@@ -143,7 +143,7 @@ export const openidRedirectHandler = requestHandler(
       console.error(error);
       const returnValue: [
         OutgoingHttpHeaders,
-        ResponseType<"/api/v1/redirect">,
+        MyResponseType<"/api/v1/redirect">,
       ] = [
         {
           "content-type": "text/json; charset=utf-8",

@@ -616,6 +616,6 @@ export declare interface MinimalSafeParseError {
   error: MinimalZodError;
 }
 
-export type ResponseType<P extends keyof typeof routes> =
+export type MyResponseType<P extends keyof typeof routes> =
   | z.SafeParseSuccess<z.infer<typeof routes[P]["response"]>>
   | MinimalSafeParseError;

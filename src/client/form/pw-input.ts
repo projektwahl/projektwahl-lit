@@ -26,7 +26,7 @@ import { ifDefined } from "lit/directives/if-defined.js";
 import { msg } from "@lit/localize";
 import { createRef, Ref, ref } from "lit/directives/ref.js";
 import { repeat } from "lit/directives/repeat.js";
-import type { routes, ResponseType } from "../../lib/routes.js";
+import type { routes, MyResponseType } from "../../lib/routes.js";
 import type { z } from "zod";
 import type { Task } from "@lit-labs/task";
 import { PwElement } from "../pw-element.js";
@@ -141,7 +141,7 @@ export abstract class PwInput<
   /**
    * The task that is executed in the parent form.
    */
-  task!: Task<[URLSearchParams], ResponseType<P>>;
+  task!: Task<[URLSearchParams], MyResponseType<P>>;
 
   /**
    * The initial data to show and reset to.

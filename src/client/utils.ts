@@ -21,7 +21,7 @@ SPDX-License-Identifier: AGPL-3.0-or-later
 SPDX-FileCopyrightText: 2021 Moritz Hedtke <Moritz.Hedtke@t-online.de>
 */
 
-import { MinimalSafeParseError, ResponseType, routes } from "../lib/routes.js";
+import { MinimalSafeParseError, MyResponseType, routes } from "../lib/routes.js";
 import jscookie from "js-cookie";
 import type { z } from "zod";
 
@@ -30,7 +30,7 @@ export const myFetch = async <P extends keyof typeof routes>(
   url: P,
   body: z.infer<typeof routes[P]["request"]>,
   options: RequestInit,
-): Promise<ResponseType<P>> => {
+): Promise<MyResponseType<P>> => {
   try {
     const response =
       method === "GET"
@@ -70,7 +70,7 @@ export const myFetch = async <P extends keyof typeof routes>(
       try {
         return await response.json();
       } catch (error) {
-        const r: ResponseType<P> = {
+        const r: MyResponseType<P> = {
           success: false,
           error: {
             issues: [

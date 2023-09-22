@@ -21,7 +21,7 @@ SPDX-License-Identifier: AGPL-3.0-or-later
 SPDX-FileCopyrightText: 2021 Moritz Hedtke <Moritz.Hedtke@t-online.de>
 */
 import postgres from "postgres";
-import { rawUserSchema, type ResponseType } from "../../../lib/routes.js";
+import { rawUserSchema, type MyResponseType } from "../../../lib/routes.js";
 import { sql } from "../../database.js";
 import { requestHandler } from "../../express.js";
 import { hashPassword } from "../../password.js";
@@ -39,7 +39,7 @@ export const createOrUpdateUsersHandler = requestHandler(
     if (!loggedInUser) {
       const returnValue: [
         OutgoingHttpHeaders,
-        ResponseType<"/api/v1/users/create-or-update">,
+        MyResponseType<"/api/v1/users/create-or-update">,
       ] = [
         {
           "content-type": "text/json; charset=utf-8",
@@ -64,7 +64,7 @@ export const createOrUpdateUsersHandler = requestHandler(
     if (!(loggedInUser.type === "admin" || loggedInUser.type === "helper")) {
       const returnValue: [
         OutgoingHttpHeaders,
-        ResponseType<"/api/v1/users/create-or-update">,
+        MyResponseType<"/api/v1/users/create-or-update">,
       ] = [
         {
           "content-type": "text/json; charset=utf-8",
@@ -189,7 +189,7 @@ export const createOrUpdateUsersHandler = requestHandler(
 
       const returnValue: [
         OutgoingHttpHeaders,
-        ResponseType<"/api/v1/users/create-or-update">,
+        MyResponseType<"/api/v1/users/create-or-update">,
       ] = [
         {
           "content-type": "text/json; charset=utf-8",
@@ -211,7 +211,7 @@ export const createOrUpdateUsersHandler = requestHandler(
           // unique violation
           const returnValue: [
             OutgoingHttpHeaders,
-            ResponseType<"/api/v1/users/create-or-update">,
+            MyResponseType<"/api/v1/users/create-or-update">,
           ] = [
             {
               "content-type": "text/json; charset=utf-8",
@@ -235,7 +235,7 @@ export const createOrUpdateUsersHandler = requestHandler(
           // TODO FIXME do this everywhere else / unify
           const returnValue: [
             OutgoingHttpHeaders,
-            ResponseType<"/api/v1/users/create-or-update">,
+            MyResponseType<"/api/v1/users/create-or-update">,
           ] = [
             {
               "content-type": "text/json; charset=utf-8",
@@ -260,7 +260,7 @@ export const createOrUpdateUsersHandler = requestHandler(
       console.error(error);
       const returnValue: [
         OutgoingHttpHeaders,
-        ResponseType<"/api/v1/users/create-or-update">,
+        MyResponseType<"/api/v1/users/create-or-update">,
       ] = [
         {
           "content-type": "text/json; charset=utf-8",
