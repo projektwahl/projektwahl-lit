@@ -35,6 +35,30 @@ type magic<K extends keyof (typeof entityRoutes)> = {
   [P in K]: typeof entityRoutes[P];
 }[K];
 
+type EntityRoutesResponse<K extends keyof (typeof entityRoutes)> = {
+  [P in K]: z.infer<typeof entityRoutes[P]["response"]>;
+}[K];
+
+type EntityRoutesResponseIntermediate<K extends keyof (typeof entityRoutes)> = {
+  [P in K]: {
+    entities: EntityRoutesResponseEntities<P>,
+    previousCursor: EntityRoutesResponsePreviousCursor<P>,
+    nextCursor: EntityRoutesResponseNextCursor<P>,
+  };
+}[K];
+
+type EntityRoutesResponseEntities<K extends keyof (typeof entityRoutes)> = {
+  [P in K]: z.infer<typeof entityRoutes[P]["response"]["shape"]["entities"]>;
+}[K];
+
+type EntityRoutesResponsePreviousCursor<K extends keyof (typeof entityRoutes)> = {
+  [P in K]: z.infer<typeof entityRoutes[P]["response"]["shape"]["previousCursor"]>;
+}[K];
+
+type EntityRoutesResponseNextCursor<K extends keyof (typeof entityRoutes)> = {
+  [P in K]: z.infer<typeof entityRoutes[P]["response"]["shape"]["previousCursor"]>;
+}[K];
+
 type entityRoutesRequest<K extends keyof (typeof entityRoutes)> = {
   [P in K]: z.infer<typeof entityRoutes[P]["request"]>;
 }[K];
@@ -234,10 +258,10 @@ export async function fetchData<R extends keyof typeof entityRoutes>(
   }
 
   // would be great to stream the results but they are post processed below
-  let entities: z.infer<magic<R>["response"]>["entities"] = sqlResult;
+  let entities: EntityRoutesResponseEntities<R> = sqlResult;
 
-  let nextCursor: z.infer<(typeof entityRoutes)[R]["response"]>["nextCursor"] = null;
-  let previousCursor: z.infer<(typeof entityRoutes)[R]["response"]>["previousCursor"] =
+  let nextCursor: EntityRoutesResponseNextCursor<R> = null;
+  let previousCursor: EntityRoutesResponsePreviousCursor<R> =
     null;
   // TODO FIXME also recalculate the other cursor because data could've been deleted in between / the filters have changed
   if (query.paginationDirection === "forwards") {
@@ -259,15 +283,17 @@ export async function fetchData<R extends keyof typeof entityRoutes>(
     }
   }
 
-  const y = {
+  const y: EntityRoutesResponseIntermediate<R> = {
     entities: entities,
     nextCursor: nextCursor,
     previousCursor: previousCursor,
   };
 
+  const zefw: EntityRoutesResponse<R> = y;
+
   const a = {
     success: true as const,
-    data: y,
+    data: zefw,
   };
 
   return [
@@ -275,7 +301,6 @@ export async function fetchData<R extends keyof typeof entityRoutes>(
       "content-type": "text/json; charset=utf-8",
       ":status": 200,
     },
-
     a,
   ];
 }
