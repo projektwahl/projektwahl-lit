@@ -27,7 +27,6 @@ import { requestHandler } from "../../express.js";
 import { hashPassword } from "../../password.js";
 import type { OutgoingHttpHeaders } from "node:http";
 import { ZodIssueCode } from "zod";
-import { typedSql } from "../../describe.js";
 
 export const createOrUpdateUsersHandler = requestHandler(
   "POST",

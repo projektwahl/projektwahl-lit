@@ -22,8 +22,8 @@ SPDX-FileCopyrightText: 2021 Moritz Hedtke <Moritz.Hedtke@t-online.de>
 */
 
 import { json } from "node:stream/consumers";
-import { routes, ResponseType, userSchema } from "../lib/routes.js";
-import type { z } from "zod";
+import { routes, ResponseType, userSchema, rawUserSchema } from "../lib/routes.js";
+import { z } from "zod";
 import { retryableBegin } from "./database.js";
 import cookie from "cookie";
 import type { IncomingMessage, ServerResponse } from "node:http";
@@ -34,7 +34,6 @@ import type {
   OutgoingHttpHeaders,
 } from "http2";
 import { suspend } from "../client/utils.js";
-import { typedSql, voterHelperAdminType } from "./describe.js";
 import nodeCrypto from "node:crypto";
 
 export type MyRequest = (IncomingMessage | Http2ServerRequest) &
@@ -105,15 +104,13 @@ export function requestHandler<P extends keyof typeof routes>(
           async (tsql) => {
             await tsql`SELECT set_config('projektwahl.id', 0::text, true);`;
             await tsql`SELECT set_config('projektwahl.type', 'root', true);`;
-            return await typedSql(tsql, {
-              columns: {
-                id: 23,
-                type: voterHelperAdminType, // custom enum
-                username: 1043,
-                group: 1043,
-                age: 23,
-              },
-            } as const)`UPDATE sessions SET updated_at = CURRENT_TIMESTAMP FROM users WHERE users.id = sessions.user_id AND session_id = ${session_id_} AND CURRENT_TIMESTAMP < updated_at + interval '24 hours' RETURNING users.id, users.type, users.username, users.group, users.age`;
+            return z.array(rawUserSchema.pick({
+              id: true,
+              type: true,
+              username: true,
+              group: true,
+              age: true
+            })).parse(await tsql`UPDATE sessions SET updated_at = CURRENT_TIMESTAMP FROM users WHERE users.id = sessions.user_id AND session_id = ${session_id_} AND CURRENT_TIMESTAMP < updated_at + interval '24 hours' RETURNING users.id, users.type, users.username, users.group, users.age`);
             //await typedSql(sql, {})`DELETE FROM sessions WHERE CURRENT_TIMESTAMP >= updated_at + interval '24 hours'`
           },
         )

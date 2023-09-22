@@ -24,7 +24,6 @@ import { sql } from "../../src/server/database.js";
 import { Chance } from "chance";
 import { evaluate } from "../../src/server/routes/evaluate/index.js";
 import { deepEqual } from "assert/strict";
-import { typedSql } from "../../src/server/describe.js";
 import type { TransactionSql } from "postgres";
 
 const chance = new Chance();

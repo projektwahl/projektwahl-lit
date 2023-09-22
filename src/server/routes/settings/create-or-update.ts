@@ -26,7 +26,6 @@ import { requestHandler } from "../../express.js";
 import type { OutgoingHttpHeaders } from "node:http";
 import type { ResponseType } from "../../../lib/routes.js";
 import { ZodIssueCode } from "zod";
-import { typedSql } from "../../describe.js";
 
 export const updateSettingsHandler = requestHandler(
   "POST",

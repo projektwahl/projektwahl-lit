@@ -25,8 +25,6 @@ import type { ResponseType } from "../../../lib/routes.js";
 import { sql } from "../../database.js";
 import { requestHandler } from "../../express.js";
 import type { OutgoingHttpHeaders } from "node:http";
-import nodeCrypto from "node:crypto";
-import { typedSql } from "../../describe.js";
 import { sensitiveHeaders } from "node:http2";
 
 export const sudoHandler = requestHandler(

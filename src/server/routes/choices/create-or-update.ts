@@ -26,7 +26,6 @@ import { requestHandler } from "../../express.js";
 import type { OutgoingHttpHeaders } from "node:http";
 import type { ResponseType, routes, userSchema } from "../../../lib/routes.js";
 import { z, ZodIssueCode } from "zod";
-import { typedSql } from "../../describe.js";
 
 export const updateChoiceHandler = createOrUpdateChoiceHandler(
   "/api/v1/choices/update",

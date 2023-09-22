@@ -27,7 +27,6 @@ import { constants, OpenMode, PathLike } from "node:fs";
 import { execFile } from "node:child_process";
 import { rawChoice } from "../../../lib/routes.js";
 import { z } from "zod";
-import { typedSql } from "../../describe.js";
 import type { Abortable } from "node:events";
 import type { TransactionSql } from "postgres";
 import { sql } from "../../database.js";

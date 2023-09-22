@@ -26,7 +26,6 @@ import { sql } from "../../database.js";
 import { requestHandler } from "../../express.js";
 import { checkPassword } from "../../password.js";
 import type { OutgoingHttpHeaders } from "node:http";
-import { typedSql } from "../../describe.js";
 import { sensitiveHeaders } from "node:http2";
 
 export const loginHandler = requestHandler(

@@ -27,7 +27,6 @@ import { sql } from "../../database.js";
 import { requestHandler } from "../../express.js";
 import { client } from "./openid-client.js";
 import type { OutgoingHttpHeaders } from "node:http";
-import { typedSql } from "../../describe.js";
 
 export const openidRedirectHandler = requestHandler(
   "GET",

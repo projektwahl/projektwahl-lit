@@ -22,7 +22,6 @@ SPDX-FileCopyrightText: 2021 Moritz Hedtke <Moritz.Hedtke@t-online.de>
 */
 import type { OutgoingHttpHeaders } from "node:http2";
 import { sql } from "../../database.js";
-import { typedSql } from "../../describe.js";
 import { requestHandler } from "../../express.js";
 
 export const logoutHandler = requestHandler(
