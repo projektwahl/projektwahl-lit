@@ -40,10 +40,11 @@ export type EntitySorting2<K extends keyof typeof entityRoutes> = {
 }[K];
 
 export type EntitySortingAll<K extends keyof typeof entityRoutes> = {
-  [P in K]: z.infer<typeof entityRoutes[P]["request"]>["sorting"];
+  [P in K]: z.infer<typeof entityRoutes[P]["request"]>["sorting"][number];
 }[K];
 
-export type EntitySorting<K extends keyof typeof entityRoutes> = {
+export type EntitySortingDontUse<K extends keyof typeof entityRoutes> = {
+  /// TODO FIXME This seems to be wrong as it removes the correlation (e.g. some things where the last value is not null are now nullable)
   [P in K]: [EntitySorting0<P>, EntitySorting1<P>, EntitySorting2<P>];
 }[K];
 
@@ -95,7 +96,7 @@ export function pwOrder<P extends keyof typeof entityRoutes, X extends string>(
 export class PwOrder<
   P extends keyof typeof entityRoutes,
   X extends string,
-> extends PwInput<P, EntitySorting<P>[], HTMLButtonElement> {
+> extends PwInput<P, EntitySortingAll<P>[], HTMLButtonElement> {
   static override get properties() {
     return {
       ...super.properties,
@@ -134,13 +135,13 @@ export class PwOrder<
       this.pwForm.formData;
     const formData: z.infer<typeof routes[P]["request"]> =
       routes[this.url].request.parse(partialFormData);
-    const sorting: EntitySorting<P>[] = this.get(formData);
+    const sorting: EntitySortingAll<P>[] = this.get(formData);
 
     const oldElementIndex = sorting.findIndex(([e]) => e === this.orderBy);
 
     if (oldElementIndex !== -1) {
       // splice REMOVES the elements from the original array
-      const oldElement: EntitySorting<P> = sorting.splice(
+      const oldElement: EntitySortingAll<P> = sorting.splice(
         oldElementIndex,
         1,
       )[0];
@@ -153,7 +154,7 @@ export class PwOrder<
         case "DESC":
           break;
         case "ASC": {
-          const sortingPush: EntitySorting<P> = [theName, desc, theValue];
+          const sortingPush: EntitySortingAll<P> = [theName, desc, theValue];
           sorting.push(sortingPush);
 
           break;
@@ -161,7 +162,7 @@ export class PwOrder<
       }
     } else {
       const asc: EntitySorting1<P> = "ASC";
-      const adding: EntitySorting<P> = [this.orderBy, asc, this.value];
+      const adding: EntitySortingAll<P> = [this.orderBy, asc, this.value];
       sorting.push(adding);
     }
 

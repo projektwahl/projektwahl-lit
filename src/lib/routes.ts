@@ -20,7 +20,7 @@ https://github.com/projektwahl/projektwahl-lit
 SPDX-License-Identifier: AGPL-3.0-or-later
 SPDX-FileCopyrightText: 2021 Moritz Hedtke <Moritz.Hedtke@t-online.de>
 */
-import { z, ZodArray, ZodIssue, ZodObject, ZodRawShape, ZodTypeAny } from "zod";
+import { z, ZodArray, ZodIssue, ZodObject, ZodRawShape, ZodType, ZodTypeAny } from "zod";
 import { result } from "./result.js";
 
 export const rawChoice = z
@@ -121,7 +121,7 @@ export const entities = <
 
 const baseQuery = <
   T1 extends Record<string, ZodTypeAny>,
-  T2 extends ZodTypeAny,
+  T2 extends ZodType<[string, "ASC"|"DESC", number|null]>,
   T3 extends ZodTypeAny,
   UnknownKeys extends UnknownKeysParam = "strip",
   Catchall extends ZodTypeAny = ZodTypeAny,
