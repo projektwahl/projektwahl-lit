@@ -24,7 +24,11 @@ import postgres from "postgres";
 import { sql } from "../../database.js";
 import { requestHandler } from "../../express.js";
 import type { OutgoingHttpHeaders } from "node:http";
-import type { MyResponseType, routes, userSchema } from "../../../lib/routes.js";
+import type {
+  MyResponseType,
+  routes,
+  userSchema,
+} from "../../../lib/routes.js";
 import { z, ZodIssueCode } from "zod";
 
 export const updateChoiceHandler = createOrUpdateChoiceHandler(
@@ -104,20 +108,17 @@ export function createOrUpdateChoiceHandler<P extends "/api/v1/choices/update">(
     }
 
     try {
-      return await sql.begin("READ WRITE", async (tsql) => {
-        // only allowed if the state is voting+
-        const voting_allowed =
-          "1" ===
-          (
-            await tsql`SELECT COUNT(*) AS count FROM settings WHERE voting_start_date < CURRENT_TIMESTAMP AND CURRENT_TIMESTAMP < voting_end_date;`
-          )[0].count;
-        if (!voting_allowed) {
-          const returnValue: [OutgoingHttpHeaders, MyResponseType<P>] = [
-            {
-              "content-type": "text/json; charset=utf-8",
-              ":status": 200,
-            },
-            {
+      const returnValue: MyResponseType<P> = await sql.begin(
+        "READ WRITE",
+        async (tsql) => {
+          // only allowed if the state is voting+
+          const voting_allowed =
+            "1" ===
+            (
+              await tsql`SELECT COUNT(*) AS count FROM settings WHERE voting_start_date < CURRENT_TIMESTAMP AND CURRENT_TIMESTAMP < voting_end_date;`
+            )[0].count;
+          if (!voting_allowed) {
+            const returnValue: MyResponseType<P> = {
               success: false as const,
               error: {
                 issues: [
@@ -128,24 +129,26 @@ export function createOrUpdateChoiceHandler<P extends "/api/v1/choices/update">(
                   },
                 ],
               },
-            },
-          ];
-          return returnValue;
-        }
-        await tsql`SELECT set_config('projektwahl.id', ${loggedInUser.id}::text, true);`;
-        await tsql`SELECT set_config('projektwahl.type', ${loggedInUser.type}::text, true);`;
-        await dbquery(tsql, choice, loggedInUser);
-        return [
-          {
-            "content-type": "text/json; charset=utf-8",
-            ":status": 200,
-          },
-          {
+            };
+            return returnValue;
+          }
+          await tsql`SELECT set_config('projektwahl.id', ${loggedInUser.id}::text, true);`;
+          await tsql`SELECT set_config('projektwahl.type', ${loggedInUser.type}::text, true);`;
+          await dbquery(tsql, choice, loggedInUser);
+          const returnValue: MyResponseType<P> = {
             success: true as const,
             data: {},
-          },
-        ];
-      });
+          };
+          return returnValue;
+        },
+      );
+      return [
+        {
+          "content-type": "text/json; charset=utf-8",
+          ":status": 200,
+        },
+        returnValue,
+      ];
     } catch (error: unknown) {
       console.error(error);
       if (error instanceof postgres.PostgresError) {

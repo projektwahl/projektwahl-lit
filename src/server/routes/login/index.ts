@@ -35,79 +35,97 @@ export const loginHandler = requestHandler(
     const r = await sql.begin(async (tsql) => {
       await tsql`SELECT set_config('projektwahl.id', 0::text, true);`;
       await tsql`SELECT set_config('projektwahl.type', 'root', true);`;
-      return z.array(rawUserSchema.pick({ id: true, username: true, password_hash: true, type: true, last_failed_login_attempt: true })).parse(`SELECT id, username, password_hash, type, CURRENT_TIMESTAMP > last_failed_login_attempt + interval '5 seconds' as last_failed_login_attempt FROM users WHERE username = ${body.username} LIMIT 1`);
+      return z
+        .array(
+          rawUserSchema.pick({
+            id: true,
+            username: true,
+            password_hash: true,
+            type: true,
+            last_failed_login_attempt: true,
+          }),
+        )
+        .parse(
+          `SELECT id, username, password_hash, type, CURRENT_TIMESTAMP > last_failed_login_attempt + interval '5 seconds' as last_failed_login_attempt FROM users WHERE username = ${body.username} LIMIT 1`,
+        );
     });
 
     const dbUser = r[0];
 
     // this intentionally tells the user whether the account exists
     if (dbUser === undefined) {
-      const returnValue: [OutgoingHttpHeaders, MyResponseType<"/api/v1/login">] =
-        [
-          {
-            "content-type": "text/json; charset=utf-8",
-            ":status": "200",
+      const returnValue: [
+        OutgoingHttpHeaders,
+        MyResponseType<"/api/v1/login">,
+      ] = [
+        {
+          "content-type": "text/json; charset=utf-8",
+          ":status": "200",
+        },
+        {
+          success: false as const,
+          error: {
+            issues: [
+              {
+                code: ZodIssueCode.custom,
+                path: ["username"],
+                message: "Nutzer existiert nicht!",
+              },
+            ],
           },
-          {
-            success: false as const,
-            error: {
-              issues: [
-                {
-                  code: ZodIssueCode.custom,
-                  path: ["username"],
-                  message: "Nutzer existiert nicht!",
-                },
-              ],
-            },
-          },
-        ];
+        },
+      ];
       return returnValue;
     }
 
     if (dbUser.password_hash == null) {
-      const returnValue: [OutgoingHttpHeaders, MyResponseType<"/api/v1/login">] =
-        [
-          {
-            "content-type": "text/json; charset=utf-8",
-            ":status": "200",
+      const returnValue: [
+        OutgoingHttpHeaders,
+        MyResponseType<"/api/v1/login">,
+      ] = [
+        {
+          "content-type": "text/json; charset=utf-8",
+          ":status": "200",
+        },
+        {
+          success: false as const,
+          error: {
+            issues: [
+              {
+                code: ZodIssueCode.custom,
+                path: ["password"],
+                message: "Kein Password für Account gesetzt!",
+              },
+            ],
           },
-          {
-            success: false as const,
-            error: {
-              issues: [
-                {
-                  code: ZodIssueCode.custom,
-                  path: ["password"],
-                  message: "Kein Password für Account gesetzt!",
-                },
-              ],
-            },
-          },
-        ];
+        },
+      ];
       return returnValue;
     }
 
     if (!dbUser.last_failed_login_attempt) {
-      const returnValue: [OutgoingHttpHeaders, MyResponseType<"/api/v1/login">] =
-        [
-          {
-            "content-type": "text/json; charset=utf-8",
-            ":status": "200",
+      const returnValue: [
+        OutgoingHttpHeaders,
+        MyResponseType<"/api/v1/login">,
+      ] = [
+        {
+          "content-type": "text/json; charset=utf-8",
+          ":status": "200",
+        },
+        {
+          success: false as const,
+          error: {
+            issues: [
+              {
+                code: ZodIssueCode.custom,
+                path: ["login"],
+                message:
+                  "Zu viele Anmeldeversuche in zu kurzer Zeit. Warte einen Moment.",
+              },
+            ],
           },
-          {
-            success: false as const,
-            error: {
-              issues: [
-                {
-                  code: ZodIssueCode.custom,
-                  path: ["login"],
-                  message:
-                    "Zu viele Anmeldeversuche in zu kurzer Zeit. Warte einen Moment.",
-                },
-              ],
-            },
-          },
-        ];
+        },
+      ];
       return returnValue;
     }
 
@@ -123,25 +141,27 @@ export const loginHandler = requestHandler(
         await tsql`UPDATE users SET last_failed_login_attempt = CURRENT_TIMESTAMP WHERE id = ${dbUser.id}`;
       });
 
-      const returnValue: [OutgoingHttpHeaders, MyResponseType<"/api/v1/login">] =
-        [
-          {
-            "content-type": "text/json; charset=utf-8",
-            ":status": "200",
+      const returnValue: [
+        OutgoingHttpHeaders,
+        MyResponseType<"/api/v1/login">,
+      ] = [
+        {
+          "content-type": "text/json; charset=utf-8",
+          ":status": "200",
+        },
+        {
+          success: false as const,
+          error: {
+            issues: [
+              {
+                code: ZodIssueCode.custom,
+                path: ["password"],
+                message: "Falsches Passwort!",
+              },
+            ],
           },
-          {
-            success: false as const,
-            error: {
-              issues: [
-                {
-                  code: ZodIssueCode.custom,
-                  path: ["password"],
-                  message: "Falsches Passwort!",
-                },
-              ],
-            },
-          },
-        ];
+        },
+      ];
       return returnValue;
     }
 

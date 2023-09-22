@@ -114,11 +114,15 @@ export const createOrUpdateUsersHandler = requestHandler(
               let _ = rest;
               _ = 1; // ensure no property is missed - Don't use `{}` as a type. `{}` actually means "any non-nullish value".
 
-              const finalQuery = z.array(rawUserSchema.pick({
-                id: true,
-                project_leader_id: true,
-                force_in_project_id: true,
-              })).parse(tsql`UPDATE users_with_deleted SET
+              const finalQuery = z
+                .array(
+                  rawUserSchema.pick({
+                    id: true,
+                    project_leader_id: true,
+                    force_in_project_id: true,
+                  }),
+                )
+                .parse(tsql`UPDATE users_with_deleted SET
   ${username !== undefined ? sql`"username" = ${username},` : sql``}
   ${openid_id !== undefined ? sql`"openid_id" = ${openid_id},` : sql``}
   ${type !== undefined ? sql`"type" = ${type},` : sql``}
@@ -166,19 +170,25 @@ export const createOrUpdateUsersHandler = requestHandler(
               } = user;
               let _ = rest;
               _ = 1; // ensure no property is missed - Don't use `{}` as a type. `{}` actually means "any non-nullish value".
-              const query = z.array(rawUserSchema.pick({
-                id: true,
-                project_leader_id: true,
-                force_in_project_id: true,
-              })).parse(tsql`INSERT INTO users_with_deleted (username, openid_id, password_hash, type, "group", age, away, deleted, last_updated_by) VALUES (${username}, ${
-                openid_id ?? null
-              }, ${
-                password !== undefined ? await hashPassword(password) : null
-              }, ${type}, ${type === "voter" ? group ?? null : null}, ${
-                type === "voter" ? age ?? null : null
-              }, ${away ?? false}, ${deleted ?? false}, ${
-                loggedInUser.id
-              }) RETURNING id, project_leader_id, force_in_project_id;`);
+              const query = z
+                .array(
+                  rawUserSchema.pick({
+                    id: true,
+                    project_leader_id: true,
+                    force_in_project_id: true,
+                  }),
+                )
+                .parse(
+                  tsql`INSERT INTO users_with_deleted (username, openid_id, password_hash, type, "group", age, away, deleted, last_updated_by) VALUES (${username}, ${
+                    openid_id ?? null
+                  }, ${
+                    password !== undefined ? await hashPassword(password) : null
+                  }, ${type}, ${type === "voter" ? group ?? null : null}, ${
+                    type === "voter" ? age ?? null : null
+                  }, ${away ?? false}, ${deleted ?? false}, ${
+                    loggedInUser.id
+                  }) RETURNING id, project_leader_id, force_in_project_id;`,
+                );
 
               results.push(await query);
             }

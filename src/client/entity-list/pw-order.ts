@@ -27,35 +27,25 @@ import { entityRoutes, routes } from "../../lib/routes.js";
 import type { z } from "zod";
 import { PwInput } from "../form/pw-input.js";
 
-export type EntitySorting0<K extends keyof (typeof entityRoutes)> = {
-  [P in K]: z.infer<
-    typeof entityRoutes[P]["request"]
-  >["sorting"][number][0];
+export type EntitySorting0<K extends keyof typeof entityRoutes> = {
+  [P in K]: z.infer<typeof entityRoutes[P]["request"]>["sorting"][number][0];
 }[K];
 
-export type EntitySorting1<K extends keyof (typeof entityRoutes)> = {
-  [P in K]: z.infer<
-    typeof entityRoutes[P]["request"]
-  >["sorting"][number][1];
+export type EntitySorting1<K extends keyof typeof entityRoutes> = {
+  [P in K]: z.infer<typeof entityRoutes[P]["request"]>["sorting"][number][1];
 }[K];
 
-export type EntitySorting2<K extends keyof (typeof entityRoutes)> = {
-  [P in K]: z.infer<
-    typeof entityRoutes[P]["request"]
-  >["sorting"][number][2];
+export type EntitySorting2<K extends keyof typeof entityRoutes> = {
+  [P in K]: z.infer<typeof entityRoutes[P]["request"]>["sorting"][number][2];
 }[K];
 
-export type EntitySortingAll<K extends keyof (typeof entityRoutes)> = {
-  [P in K]: z.infer<
-    typeof entityRoutes[P]["request"]
-  >["sorting"];
+export type EntitySortingAll<K extends keyof typeof entityRoutes> = {
+  [P in K]: z.infer<typeof entityRoutes[P]["request"]>["sorting"];
 }[K];
 
-export type EntitySorting<K extends keyof (typeof entityRoutes)> = { [P in K]: [
-  EntitySorting0<P>,
-  EntitySorting1<P>,
-  EntitySorting2<P>,
-] }[K];
+export type EntitySorting<K extends keyof typeof entityRoutes> = {
+  [P in K]: [EntitySorting0<P>, EntitySorting1<P>, EntitySorting2<P>];
+}[K];
 
 // workaround see https://github.com/runem/lit-analyzer/issues/149#issuecomment-1006162839
 export function pwOrder<P extends keyof typeof entityRoutes, X extends string>(
@@ -105,11 +95,7 @@ export function pwOrder<P extends keyof typeof entityRoutes, X extends string>(
 export class PwOrder<
   P extends keyof typeof entityRoutes,
   X extends string,
-> extends PwInput<
-  P,
-  EntitySorting<P>[],
-  HTMLButtonElement
-> {
+> extends PwInput<P, EntitySorting<P>[], HTMLButtonElement> {
   static override get properties() {
     return {
       ...super.properties,
@@ -144,15 +130,20 @@ export class PwOrder<
   }
 
   mypwinputchangeDispatcher = () => {
-    const partialFormData: z.infer<typeof routes[P]["partialRequest"]> = this.pwForm.formData;
-    const formData: z.infer<typeof routes[P]["request"]> = routes[this.url].request.parse(partialFormData);
+    const partialFormData: z.infer<typeof routes[P]["partialRequest"]> =
+      this.pwForm.formData;
+    const formData: z.infer<typeof routes[P]["request"]> =
+      routes[this.url].request.parse(partialFormData);
     const sorting: EntitySorting<P>[] = this.get(formData);
 
     const oldElementIndex = sorting.findIndex(([e]) => e === this.orderBy);
 
     if (oldElementIndex !== -1) {
       // splice REMOVES the elements from the original array
-      const oldElement: EntitySorting<P> = sorting.splice(oldElementIndex, 1)[0];
+      const oldElement: EntitySorting<P> = sorting.splice(
+        oldElementIndex,
+        1,
+      )[0];
 
       const theName = this.orderBy;
       const theValue = this.value;
@@ -163,8 +154,8 @@ export class PwOrder<
           break;
         case "ASC": {
           const sortingPush: EntitySorting<P> = [theName, desc, theValue];
-          sorting.push(sortingPush)
-         
+          sorting.push(sortingPush);
+
           break;
         }
       }

@@ -25,7 +25,11 @@ import path from "node:path";
 import os from "node:os";
 import { constants, OpenMode, PathLike } from "node:fs";
 import { execFile } from "node:child_process";
-import { rawChoice, rawProjectSchema, rawUserSchema } from "../../../lib/routes.js";
+import {
+  rawChoice,
+  rawProjectSchema,
+  rawUserSchema,
+} from "../../../lib/routes.js";
 import { z } from "zod";
 import type { Abortable } from "node:events";
 import type { TransactionSql } from "postgres";
@@ -264,9 +268,23 @@ export async function evaluate(
     }),
   );
 
-  const projects = z.array(rawProjectSchema.pick({ id: true, min_participants: true, max_participants: true })).parse(await tsql`SELECT id, min_participants, max_participants FROM projects;`);
+  const projects = z
+    .array(
+      rawProjectSchema.pick({
+        id: true,
+        min_participants: true,
+        max_participants: true,
+      }),
+    )
+    .parse(
+      await tsql`SELECT id, min_participants, max_participants FROM projects;`,
+    );
 
-  const users = z.array(rawUserSchema.pick({ id: true, project_leader_id: true })).parse(await tsql`SELECT id, project_leader_id FROM present_voters WHERE force_in_project_id IS NULL ORDER BY id;`);
+  const users = z
+    .array(rawUserSchema.pick({ id: true, project_leader_id: true }))
+    .parse(
+      await tsql`SELECT id, project_leader_id FROM present_voters WHERE force_in_project_id IS NULL ORDER BY id;`,
+    );
 
   console.log("choices: ", choices);
   console.log("projects: ", projects);

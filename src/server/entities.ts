@@ -31,43 +31,44 @@ import { EntitySorting } from "../client/entity-list/pw-order.js";
 // Mapped Types
 // https://www.typescriptlang.org/docs/handbook/2/mapped-types.html
 
-type magic<K extends keyof (typeof entityRoutes)> = {
+type magic<K extends keyof typeof entityRoutes> = {
   [P in K]: typeof entityRoutes[P];
 }[K];
 
-type EntityRoutesResponse<K extends keyof (typeof entityRoutes)> = {
+type EntityRoutesResponse<K extends keyof typeof entityRoutes> = {
   [P in K]: {
-    entities: EntityRoutesResponseAll<P>["entities"],
-    previousCursor: EntityRoutesResponseAll<P>["previousCursor"],
-    nextCursor: EntityRoutesResponseAll<P>["nextCursor"],
+    entities: EntityRoutesResponseAll<P>["entities"];
+    previousCursor: EntityRoutesResponseAll<P>["previousCursor"];
+    nextCursor: EntityRoutesResponseAll<P>["nextCursor"];
   };
 }[K];
 
-type EntityRoutesResponseAll<K extends keyof (typeof entityRoutes)> = {
+type EntityRoutesResponseAll<K extends keyof typeof entityRoutes> = {
   [P in K]: z.infer<typeof entityRoutes[P]["response"]>;
 }[K];
 
-type EntityRoutesResponseEntities<K extends keyof (typeof entityRoutes)> = {
+type EntityRoutesResponseEntities<K extends keyof typeof entityRoutes> = {
   [P in K]: EntityRoutesResponseAll<P>["entities"];
 }[K];
 
-type EntityRoutesResponsePreviousCursor<K extends keyof (typeof entityRoutes)> = {
+type EntityRoutesResponsePreviousCursor<K extends keyof typeof entityRoutes> = {
   [P in K]: z.infer<typeof entityRoutes[P]["response"]>["previousCursor"];
 }[K];
 
-type EntityRoutesResponseNextCursor<K extends keyof (typeof entityRoutes)> = {
+type EntityRoutesResponseNextCursor<K extends keyof typeof entityRoutes> = {
   [P in K]: z.infer<typeof entityRoutes[P]["response"]>["nextCursor"];
 }[K];
 
-type entityRoutesRequest<K extends keyof (typeof entityRoutes)> = {
+type entityRoutesRequest<K extends keyof typeof entityRoutes> = {
   [P in K]: z.infer<typeof entityRoutes[P]["request"]>;
 }[K];
 
-type entityRoutesRequestPaginationCursor<K extends keyof (typeof entityRoutes)> = {
-  [P in K]: z.infer<typeof entityRoutes[P]["request"]>["paginationCursor"];
-}[K];
+type entityRoutesRequestPaginationCursor<K extends keyof typeof entityRoutes> =
+  {
+    [P in K]: z.infer<typeof entityRoutes[P]["request"]>["paginationCursor"];
+  }[K];
 
-type entitiesType2<K extends keyof (typeof entityRoutes)> = {
+type entitiesType2<K extends keyof typeof entityRoutes> = {
   [P in K]: {
     [R in
       z.infer<
@@ -78,7 +79,7 @@ type entitiesType2<K extends keyof (typeof entityRoutes)> = {
   };
 }[K];
 
-type entitiesType9<K extends keyof (typeof entityRoutes)> = {
+type entitiesType9<K extends keyof typeof entityRoutes> = {
   [P in K]: {
     [R in
       z.infer<
@@ -89,23 +90,17 @@ type entitiesType9<K extends keyof (typeof entityRoutes)> = {
   };
 }[K];
 
-type entitiesType4<K extends keyof (typeof entityRoutes)> = {
-  [P in K]: z.infer<
-    typeof entityRoutes[P]["request"]
-  >["sorting"][number];
+type entitiesType4<K extends keyof typeof entityRoutes> = {
+  [P in K]: z.infer<typeof entityRoutes[P]["request"]>["sorting"][number];
 }[K];
 
-type entitiesType18<K extends keyof (typeof entityRoutes)> = {
-  [P in K]: z.infer<
-    typeof entityRoutes[P]["request"]
-  >["sorting"][number][0];
+type entitiesType18<K extends keyof typeof entityRoutes> = {
+  [P in K]: z.infer<typeof entityRoutes[P]["request"]>["sorting"][number][0];
 }[K];
 
-type entitiesType8<K extends keyof (typeof entityRoutes)> = {
+type entitiesType8<K extends keyof typeof entityRoutes> = {
   [P in K]: {
-    [key in z.infer<
-      typeof entityRoutes[P]["request"]
-    >["sorting"][number][0]]: (
+    [key in z.infer<typeof entityRoutes[P]["request"]>["sorting"][number][0]]: (
       order: entitiesType2<P>[key],
       paginationDirection: "forwards" | "backwards",
       v: entitiesType9<P>[key],
@@ -130,13 +125,15 @@ export async function fetchData<R extends keyof typeof entityRoutes>(
   // TODO FIXME id tiebreaker lost
   console.log(sorting);
 
-  const orderByQueryParts = sorting.flatMap(v => {
-    return [
-      sql`,`,
+  const orderByQueryParts = sorting
+    .flatMap((v) => {
+      return [
+        sql`,`,
 
-      sql`${orderByQueries[v[0]](v[1], query.paginationDirection, v[2])}`,
-    ];
-  }).slice(1);
+        sql`${orderByQueries[v[0]](v[1], query.paginationDirection, v[2])}`,
+      ];
+    })
+    .slice(1);
 
   const orderByQuery =
     orderByQueryParts.length == 0
@@ -154,9 +151,11 @@ export async function fetchData<R extends keyof typeof entityRoutes>(
     sqlResult = await sql.begin(async (tsql) => {
       await tsql`SELECT set_config('projektwahl.id', ${loggedInUser.id}::text, true);`;
       await tsql`SELECT set_config('projektwahl.type', ${loggedInUser.type}::text, true);`;
-      return entityRoutes[path].response.shape.entities.parse(await tsql`${sql`(${sqlQuery(query)} ${orderByQuery} LIMIT ${
-        query.paginationLimit + 1
-      })`}`);
+      return entityRoutes[path].response.shape.entities.parse(
+        await tsql`${sql`(${sqlQuery(query)} ${orderByQuery} LIMIT ${
+          query.paginationLimit + 1
+        })`}`,
+      );
     });
   } else {
     // TODO test with pagination step 10 and 11 null values
@@ -172,9 +171,7 @@ export async function fetchData<R extends keyof typeof entityRoutes>(
         let order: PendingQuery<Row[]>;
 
         const value0 = value[0];
-        const cursorValue = paginationCursor
-          ? paginationCursor[value0]
-          : null;
+        const cursorValue = paginationCursor ? paginationCursor[value0] : null;
         const column = sql.unsafe(`"${value[0]}"`);
         if (index === part.length - 1) {
           switch (value[1]) {
@@ -196,7 +193,7 @@ export async function fetchData<R extends keyof typeof entityRoutes>(
                   })`;
                   break;
                 default:
-                  throw new Error("unreachable")
+                  throw new Error("unreachable");
               }
               break;
             case "DESC":
@@ -217,18 +214,18 @@ export async function fetchData<R extends keyof typeof entityRoutes>(
                   })`;
                   break;
                 default:
-                  throw new Error("unreachable")
+                  throw new Error("unreachable");
               }
               break;
             default:
-              throw new Error("unreachable")
+              throw new Error("unreachable");
           }
         } else {
           // this is probably not compatible with the checks above
           order = sql`${cursorValue} IS NOT DISTINCT FROM ${column}`;
         }
         const result = [sql` AND `, order];
-        return result
+        return result;
       });
 
       const parts = partsTmp
@@ -244,15 +241,19 @@ export async function fetchData<R extends keyof typeof entityRoutes>(
       await tsql`SELECT set_config('projektwahl.id', ${loggedInUser.id}::text, true);`;
       await tsql`SELECT set_config('projektwahl.type', ${loggedInUser.type}::text, true);`;
       if (queries.length == 1) {
-        return entityRoutes[path].response.shape.entities.parse(await tsql`${queries[0]}`);
+        return entityRoutes[path].response.shape.entities.parse(
+          await tsql`${queries[0]}`,
+        );
       } else {
-        return entityRoutes[path].response.shape.entities.parse(await tsql`${queries
-          .reverse()
-          .flatMap((v) => [sql`\nUNION ALL\n`, v])
-          .slice(1)
-          .reduce((prev, curr) => sql`${prev}${curr}`)} LIMIT ${
-          query.paginationLimit + 1
-        }`);
+        return entityRoutes[path].response.shape.entities.parse(
+          await tsql`${queries
+            .reverse()
+            .flatMap((v) => [sql`\nUNION ALL\n`, v])
+            .slice(1)
+            .reduce((prev, curr) => sql`${prev}${curr}`)} LIMIT ${
+            query.paginationLimit + 1
+          }`,
+        );
       }
     });
   }
@@ -261,8 +262,7 @@ export async function fetchData<R extends keyof typeof entityRoutes>(
   let entities: EntityRoutesResponseAll<R>["entities"] = sqlResult;
 
   let nextCursor: EntityRoutesResponseAll<R>["nextCursor"] = null;
-  let previousCursor: EntityRoutesResponseAll<R>["previousCursor"] =
-    null;
+  let previousCursor: EntityRoutesResponseAll<R>["previousCursor"] = null;
   // TODO FIXME also recalculate the other cursor because data could've been deleted in between / the filters have changed
   if (query.paginationDirection === "forwards") {
     if (query.paginationCursor) {
@@ -286,12 +286,12 @@ export async function fetchData<R extends keyof typeof entityRoutes>(
   const test: EntityRoutesResponseAll<R> = {
     entities: [],
     previousCursor: null,
-    nextCursor: null
+    nextCursor: null,
   };
   test.entities = entities;
   test.nextCursor = nextCursor;
   test.previousCursor = previousCursor;
-  
+
   const a: MyResponseType<R> = {
     success: true as const,
     data: test,

@@ -33,32 +33,48 @@ import { myFetch } from "../utils.js";
 import { pwInputSelect } from "../form/pw-input-select.js";
 
 // https://github.com/microsoft/TypeScript/pull/47109#issuecomment-991693300
-type EntityRoutesParam<K extends keyof (typeof entityRoutes)> = { [P in K]: z.infer<(typeof entityRoutes)[P]["request"]> }[K];
-type EntityRoutesReturn<K extends keyof (typeof entityRoutes)> = { [P in K]: z.ZodDefault<(typeof entityRoutes)[P]["request"]> }[K];
+type EntityRoutesParam<K extends keyof typeof entityRoutes> = {
+  [P in K]: z.infer<typeof entityRoutes[P]["request"]>;
+}[K];
+type EntityRoutesReturn<K extends keyof typeof entityRoutes> = {
+  [P in K]: z.ZodDefault<typeof entityRoutes[P]["request"]>;
+}[K];
 // seems like this is enough to globally fix the types
-type EntityRoutesDefault<K extends keyof (typeof entityRoutes) = keyof (typeof entityRoutes)> = { [P in K]: {
-  request: {
-    default: (v: EntityRoutesParam<P>) => EntityRoutesReturn<P>
-  }
-}};
+type EntityRoutesDefault<
+  K extends keyof typeof entityRoutes = keyof typeof entityRoutes,
+> = {
+  [P in K]: {
+    request: {
+      default: (v: EntityRoutesParam<P>) => EntityRoutesReturn<P>;
+    };
+  };
+};
 
 export const parseRequestWithPrefix = <
-  P extends keyof (typeof entityRoutes),
+  P extends keyof typeof entityRoutes,
   PREFIX extends string,
 >(
   apiUrl: P,
   prefix: PREFIX,
   url: URL,
   defaultValue: z.infer<typeof entityRoutes[P]["request"]>,
-): z.ZodObject<{ [k in PREFIX]: EntityRoutesReturn<P>; }, "passthrough">["_output"] => {
+): z.ZodObject<
+  { [k in PREFIX]: EntityRoutesReturn<P> },
+  "passthrough"
+>["_output"] => {
   const entityRoutesDefault: EntityRoutesDefault = entityRoutes;
-  const schema: z.ZodObject<{ [k in PREFIX]: EntityRoutesReturn<P>; }, "passthrough"> = z
+  const schema: z.ZodObject<
+    { [k in PREFIX]: EntityRoutesReturn<P> },
+    "passthrough"
+  > = z
     .object({}) // we need kind of a mapped type here
     .setKey(prefix, entityRoutesDefault[apiUrl].request.default(defaultValue))
     .passthrough();
-  const data = schema.parse(JSON.parse(
-    decodeURIComponent(url.search === "" ? "{}" : url.search.substring(1)),
-  ))
+  const data = schema.parse(
+    JSON.parse(
+      decodeURIComponent(url.search === "" ? "{}" : url.search.substring(1)),
+    ),
+  );
   return data;
 };
 
@@ -177,7 +193,12 @@ export class PwEntityList<
           true,
         );
 
-        const result = await myFetch<P>("GET", this.url, routes[this.url].request.parse(this.formData), {});
+        const result = await myFetch<P>(
+          "GET",
+          this.url,
+          routes[this.url].request.parse(this.formData),
+          {},
+        );
 
         //console.log("result", result);
 

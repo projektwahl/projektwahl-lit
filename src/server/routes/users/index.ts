@@ -36,25 +36,27 @@ export const usersHandler = requestHandler(
     // voter is allowed to read users who are project leaders (see row level security)
 
     if (!loggedInUser) {
-      const returnValue: [OutgoingHttpHeaders, MyResponseType<"/api/v1/users">] =
-        [
-          {
-            "content-type": "text/json; charset=utf-8",
-            ":status": 401,
+      const returnValue: [
+        OutgoingHttpHeaders,
+        MyResponseType<"/api/v1/users">,
+      ] = [
+        {
+          "content-type": "text/json; charset=utf-8",
+          ":status": 401,
+        },
+        {
+          success: false as const,
+          error: {
+            issues: [
+              {
+                code: ZodIssueCode.custom,
+                path: ["unauthorized"],
+                message: "Nicht angemeldet! Klicke rechts oben auf Anmelden.",
+              },
+            ],
           },
-          {
-            success: false as const,
-            error: {
-              issues: [
-                {
-                  code: ZodIssueCode.custom,
-                  path: ["unauthorized"],
-                  message: "Nicht angemeldet! Klicke rechts oben auf Anmelden.",
-                },
-              ],
-            },
-          },
-        ];
+        },
+      ];
       return returnValue;
     }
 

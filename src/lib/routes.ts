@@ -20,13 +20,7 @@ https://github.com/projektwahl/projektwahl-lit
 SPDX-License-Identifier: AGPL-3.0-or-later
 SPDX-FileCopyrightText: 2021 Moritz Hedtke <Moritz.Hedtke@t-online.de>
 */
-import {
-  z,
-  ZodIssue,
-  ZodObject,
-  ZodRawShape,
-  ZodTypeAny,
-} from "zod";
+import { z, ZodIssue, ZodObject, ZodRawShape, ZodTypeAny } from "zod";
 import { result } from "./result.js";
 
 export const rawChoice = z
@@ -166,7 +160,7 @@ const baseQuery = <
         nextCursor: s.nullable(),
       })
       .strict(),
-    };
+  };
 };
 
 export const createUserAction = rawUserSchema
@@ -627,4 +621,8 @@ export declare interface MinimalSafeParseError {
   error: MinimalZodError;
 }
 
-export type MyResponseType<K extends keyof typeof routes> = { [P in K]: z.SafeParseSuccess<z.infer<typeof routes[P]["response"]>> | MinimalSafeParseError }[K];
+export type MyResponseType<K extends keyof typeof routes> = {
+  [P in K]:
+    | z.SafeParseSuccess<z.infer<typeof routes[P]["response"]>>
+    | MinimalSafeParseError;
+}[K];

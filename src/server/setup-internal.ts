@@ -35,11 +35,15 @@ export async function setup() {
 
     const hash = await hashPassword("changeme");
 
-    const admin = (
-      z.array(rawUserSchema.pick({
-        id: true,
-      })).parse(`INSERT INTO users_with_deleted (username, password_hash, type) VALUES ('admin', ${hash}, 'admin') ON CONFLICT (username) DO UPDATE SET "group" = "users_with_deleted"."group" RETURNING id;`)
-    )[0];
+    const admin = z
+      .array(
+        rawUserSchema.pick({
+          id: true,
+        }),
+      )
+      .parse(
+        `INSERT INTO users_with_deleted (username, password_hash, type) VALUES ('admin', ${hash}, 'admin') ON CONFLICT (username) DO UPDATE SET "group" = "users_with_deleted"."group" RETURNING id;`,
+      )[0];
 
     if (
       process.env.NODE_ENV === "development" ||
@@ -47,8 +51,8 @@ export async function setup() {
     ) {
       let projects: z.infer<typeof rawProjectSchema>[] = [];
       for (let i = 0; i < 100; i++) {
-        const project = (
-          z.array(rawProjectSchema).parse(await tsql`INSERT INTO projects (title, info, place, costs, min_age, max_age, min_participants, max_participants, random_assignments, last_updated_by) (SELECT ${chance.sentence(
+        const project = z.array(rawProjectSchema).parse(
+          await tsql`INSERT INTO projects (title, info, place, costs, min_age, max_age, min_participants, max_participants, random_assignments, last_updated_by) (SELECT ${chance.sentence(
             { punctuation: false, words: 3 },
           )}, ${chance.paragraph()}, ${chance.address()}, ${chance.integer({
             min: 0,
@@ -59,7 +63,7 @@ export async function setup() {
           })}, ${chance.integer({ min: 5, max: 10 })}, ${chance.integer({
             min: 10,
             max: 15,
-          })}, ${chance.bool({ likelihood: 90 })}, ${admin.id}) RETURNING *;`)
+          })}, ${chance.bool({ likelihood: 90 })}, ${admin.id}) RETURNING *;`,
         )[0];
 
         projects.push(project);
@@ -67,18 +71,22 @@ export async function setup() {
 
       // take care to set this value to project_count * min_participants <= user_count <= project_count * max_participants
       for (let i = 0; i < 500; i++) {
-        const user = (
-          z.array(rawUserSchema.pick({
-            id: true,
-          })).parse(`INSERT INTO users (username, type, "group", age, password_hash, last_updated_by) VALUES (${chance.name(
-            { prefix: true, suffix: true },
-          )}, ${
-            chance.bool() ? "voter" : "helper"
-          }, ${chance.profession()}, ${chance.integer({
-            min: 5,
-            max: 13,
-          })}, ${hash}, ${admin.id}) RETURNING users.id;`)
-        )[0];
+        const user = z
+          .array(
+            rawUserSchema.pick({
+              id: true,
+            }),
+          )
+          .parse(
+            `INSERT INTO users (username, type, "group", age, password_hash, last_updated_by) VALUES (${chance.name(
+              { prefix: true, suffix: true },
+            )}, ${
+              chance.bool() ? "voter" : "helper"
+            }, ${chance.profession()}, ${chance.integer({
+              min: 5,
+              max: 13,
+            })}, ${hash}, ${admin.id}) RETURNING users.id;`,
+          )[0];
 
         projects = chance.shuffle(projects);
         for (let j = 0; j < chance.integer({ min: 0, max: 25 }); j++) {

@@ -45,11 +45,15 @@ export async function project(
   max_age = 13,
   random_assignments = true,
 ): Promise<number> {
-  return (
-    z.array(rawProjectSchema.pick({
-      id: true,
-    })).parse(await tsql`INSERT INTO projects (title, info, place, costs, min_age, max_age, min_participants, max_participants, random_assignments, last_updated_by) VALUES (${chance.sentence()}, '', '', 0, ${min_age}, ${max_age}, ${min_participants}, ${max_participants}, ${random_assignments}, NULL) RETURNING projects.id;`)
-  )[0].id;
+  return z
+    .array(
+      rawProjectSchema.pick({
+        id: true,
+      }),
+    )
+    .parse(
+      await tsql`INSERT INTO projects (title, info, place, costs, min_age, max_age, min_participants, max_participants, random_assignments, last_updated_by) VALUES (${chance.sentence()}, '', '', 0, ${min_age}, ${max_age}, ${min_participants}, ${max_participants}, ${random_assignments}, NULL) RETURNING projects.id;`,
+    )[0].id;
 }
 
 export async function user(
@@ -59,11 +63,15 @@ export async function user(
 ): Promise<number> {
   await tsql`SELECT set_config('projektwahl.id', 0::text, true);`;
   await tsql`SELECT set_config('projektwahl.type', 'root', true);`;
-  return (
-    z.array(rawUserSchema.pick({
-      id: true,
-    })).parse(await tsql`INSERT INTO users (username, type, "group", age, project_leader_id, last_updated_by) VALUES (${`user${chance.integer()}`}, 'voter', '', ${age}, ${project_leader_id}, NULL) RETURNING users.id;`)
-  )[0].id;
+  return z
+    .array(
+      rawUserSchema.pick({
+        id: true,
+      }),
+    )
+    .parse(
+      await tsql`INSERT INTO users (username, type, "group", age, project_leader_id, last_updated_by) VALUES (${`user${chance.integer()}`}, 'voter', '', ${age}, ${project_leader_id}, NULL) RETURNING users.id;`,
+    )[0].id;
 }
 
 export async function vote(

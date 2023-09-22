@@ -32,69 +32,11 @@ export const sudoHandler = requestHandler(
   "/api/v1/sudo",
   async function (body, loggedInUser) {
     if (!loggedInUser) {
-      const returnValue: [OutgoingHttpHeaders, MyResponseType<"/api/v1/sudo">] = [
-        {
-          "content-type": "text/json; charset=utf-8",
-          ":status": 401,
-        },
-        {
-          success: false as const,
-          error: {
-            issues: [
-              {
-                code: ZodIssueCode.custom,
-                path: ["unauthorized"],
-                message: "Nicht angemeldet! Klicke rechts oben auf Anmelden.",
-              },
-            ],
-          },
-        },
-      ];
-      return returnValue;
-    }
-
-    if (!(loggedInUser.type === "admin")) {
-      const returnValue: [OutgoingHttpHeaders, MyResponseType<"/api/v1/sudo">] = [
-        {
-          "content-type": "text/json; charset=utf-8",
-          ":status": 403,
-        },
-        {
-          success: false as const,
-          error: {
-            issues: [
-              {
-                code: ZodIssueCode.custom,
-                path: ["forbidden"],
-                message: "Unzureichende Berechtigung!",
-              },
-            ],
-          },
-        },
-      ];
-      return returnValue;
-    }
-
-    const r = await sql.begin(async (tsql) => {
-      await tsql`SELECT set_config('projektwahl.id', 0::text, true);`;
-      await tsql`SELECT set_config('projektwahl.type', 'root', true);`;
-      return z.array(rawUserSchema.pick({
-        id: true,
-        username: true,
-        password_hash: true,
-        type: true
-      })).parse(tsql`SELECT id, username, password_hash, type FROM users WHERE id = ${body.id} LIMIT 1`);
-    });
-
-    const dbUser = r[0];
-
-    // this intentionally tells the user whether the account exists
-    if (dbUser === undefined) {
-      const returnValue: [OutgoingHttpHeaders, MyResponseType<"/api/v1/login">] =
+      const returnValue: [OutgoingHttpHeaders, MyResponseType<"/api/v1/sudo">] =
         [
           {
             "content-type": "text/json; charset=utf-8",
-            ":status": "200",
+            ":status": 401,
           },
           {
             success: false as const,
@@ -102,13 +44,81 @@ export const sudoHandler = requestHandler(
               issues: [
                 {
                   code: ZodIssueCode.custom,
-                  path: ["username"],
-                  message: "Nutzer existiert nicht!",
+                  path: ["unauthorized"],
+                  message: "Nicht angemeldet! Klicke rechts oben auf Anmelden.",
                 },
               ],
             },
           },
         ];
+      return returnValue;
+    }
+
+    if (!(loggedInUser.type === "admin")) {
+      const returnValue: [OutgoingHttpHeaders, MyResponseType<"/api/v1/sudo">] =
+        [
+          {
+            "content-type": "text/json; charset=utf-8",
+            ":status": 403,
+          },
+          {
+            success: false as const,
+            error: {
+              issues: [
+                {
+                  code: ZodIssueCode.custom,
+                  path: ["forbidden"],
+                  message: "Unzureichende Berechtigung!",
+                },
+              ],
+            },
+          },
+        ];
+      return returnValue;
+    }
+
+    const r = await sql.begin(async (tsql) => {
+      await tsql`SELECT set_config('projektwahl.id', 0::text, true);`;
+      await tsql`SELECT set_config('projektwahl.type', 'root', true);`;
+      return z
+        .array(
+          rawUserSchema.pick({
+            id: true,
+            username: true,
+            password_hash: true,
+            type: true,
+          }),
+        )
+        .parse(
+          tsql`SELECT id, username, password_hash, type FROM users WHERE id = ${body.id} LIMIT 1`,
+        );
+    });
+
+    const dbUser = r[0];
+
+    // this intentionally tells the user whether the account exists
+    if (dbUser === undefined) {
+      const returnValue: [
+        OutgoingHttpHeaders,
+        MyResponseType<"/api/v1/login">,
+      ] = [
+        {
+          "content-type": "text/json; charset=utf-8",
+          ":status": "200",
+        },
+        {
+          success: false as const,
+          error: {
+            issues: [
+              {
+                code: ZodIssueCode.custom,
+                path: ["username"],
+                message: "Nutzer existiert nicht!",
+              },
+            ],
+          },
+        },
+      ];
       return returnValue;
     }
 

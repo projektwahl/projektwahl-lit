@@ -54,15 +54,19 @@ export const openidRedirectHandler = requestHandler(
       const dbUser = await sql.begin(async (tsql) => {
         await tsql`SELECT set_config('projektwahl.id', 0::text, true);`;
         await tsql`SELECT set_config('projektwahl.type', 'root', true);`;
-        return (
-          z.array(rawUserSchema.pick({
-            id: true,
-            username: true,
-            type: true,
-          })).parse(tsql`SELECT id, username, type FROM users WHERE openid_id = ${
-            result.claims().email ?? null
-          } LIMIT 1`)
-        )[0];
+        return z
+          .array(
+            rawUserSchema.pick({
+              id: true,
+              username: true,
+              type: true,
+            }),
+          )
+          .parse(
+            tsql`SELECT id, username, type FROM users WHERE openid_id = ${
+              result.claims().email ?? null
+            } LIMIT 1`,
+          )[0];
       });
 
       if (dbUser === undefined) {
