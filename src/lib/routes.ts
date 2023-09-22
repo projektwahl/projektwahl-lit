@@ -136,8 +136,8 @@ const baseQuery = <
   sorting: T2,
   filters: T3,
 ) => {
-  return makeReqSeq(
-    z
+  return {
+    request: z
       .object({
         paginationDirection: z
           .enum(["forwards", "backwards"])
@@ -148,14 +148,25 @@ const baseQuery = <
         paginationLimit: z.number().default(10),
       })
       .strict(),
-    z
+    partialRequest: z
+      .object({
+        paginationDirection: z
+          .enum(["forwards", "backwards"])
+          .default("forwards"),
+        paginationCursor: s.nullish(),
+        filters,
+        sorting,
+        paginationLimit: z.number().default(10),
+      })
+      .strict(),
+    response: z
       .object({
         entities: z.array(s),
         previousCursor: s.nullable(),
         nextCursor: s.nullable(),
       })
       .strict(),
-  );
+    };
 };
 
 export const createUserAction = rawUserSchema
