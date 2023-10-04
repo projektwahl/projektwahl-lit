@@ -26,7 +26,9 @@ import { msg } from "@lit/localize";
 import type { routes, MyResponseType } from "../../lib/routes.js";
 import type { Task } from "@lit-labs/task";
 import { PwElement } from "../pw-element.js";
-import type { z } from "zod";
+
+// https://www.filamentgroup.com/lab/forms-with-custom-elements/
+// https://developer.mozilla.org/en-US/docs/Web/API/HTMLFormElement/reset
 
 class PwForm<P extends keyof typeof routes> extends PwElement {
   static override get properties() {
@@ -49,9 +51,6 @@ class PwForm<P extends keyof typeof routes> extends PwElement {
   url!: P;
 
   errors: Ref<HTMLDivElement>;
-
-  // this is intentionally not { state: true } as then updating the children is just super slow
-  formData!: z.infer<typeof routes[P]["partialRequest"]>;
 
   constructor() {
     super();
@@ -76,7 +75,8 @@ class PwForm<P extends keyof typeof routes> extends PwElement {
                   .filter(
                     (i) =>
                       // TODO FIXME nested keys don't work
-                      !Object.keys(this.formData).find(
+                      // TODO FIXME this code is probably bullshit now
+                      !Object.keys(new FormData(this.form.value)).find(
                         (v) => JSON.stringify([v]) === JSON.stringify(i.path),
                       ),
                   )

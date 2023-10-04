@@ -30,8 +30,6 @@ import type { routes, MyResponseType } from "../../lib/routes.js";
 import type { z } from "zod";
 import type { Task } from "@lit-labs/task";
 import { PwElement } from "../pw-element.js";
-import { PwForm } from "./pw-form.js";
-import { live } from "lit/directives/live.js";
 
 /// TODO FIXME instead of T we also need to take a zod schema for example for the enum (or if everything is from routes we could use that)
 // maybe also use the default from zod
@@ -66,7 +64,6 @@ export abstract class PwInput<
       },
       autocomplete: { type: String },
       disabled: { type: Boolean },
-      enabled: { type: Boolean },
       randomId: { state: true },
       defaultValue: { attribute: false },
       url: { attribute: false },
@@ -80,7 +77,6 @@ export abstract class PwInput<
         // TODO FIXME pass the inner element instead (and don't use the get method below)
         attribute: false,
       },
-      resettable: { attribute: false },
     };
   }
 
@@ -94,24 +90,7 @@ export abstract class PwInput<
    */
   name!: (string | number)[];
 
-  /**
-   * Extracts the value from the routes request data.
-   */
-  get!: (o: z.infer<typeof routes[P]["partialRequest"]>) => T;
-
-  /**
-   * Sets the value in the routes request data.
-   */
-  set!: (o: z.infer<typeof routes[P]["partialRequest"]>, v: T) => void;
-
-  // TODO FIXME maybe merge these two?
   disabled?: boolean = false;
-  enabled?: boolean = false;
-
-  /**
-   * Whether the input is resettable. Adds a reset button that resets the value to the initial value.
-   */
-  resettable = false;
 
   /**
    * A random id to associate the label and input errors to the input.
@@ -164,16 +143,6 @@ export abstract class PwInput<
    */
   defaultValue!: T;
 
-  /**
-   * The parent form.
-   */
-  pwForm!: PwForm<P>;
-
-  /**
-   * The value that is currently shown to the user. This value may differ from the value in pwForm.formData e.g. in case you are updating values and have either not changed a field yet or reset the field. This is so the update on the server only updates the fields that you actually changed.
-   */
-  inputValue!: T;
-
   constructor() {
     super();
     this.randomId = `id${Math.random().toString().replace(".", "")}`;
@@ -191,15 +160,6 @@ export abstract class PwInput<
       this.type === "select" || this.type === "checkbox" ? "change" : "input",
       this.mypwinputchangeDispatcher,
     );
-    let curr: HTMLElement | null = this.parentElement;
-    while (!(curr === null || curr instanceof PwForm)) {
-      curr = curr.parentElement;
-    }
-    if (!curr) {
-      throw new Error("PwForm not found");
-    }
-
-    this.pwForm = curr;
   }
 
   override disconnectedCallback() {
@@ -210,48 +170,9 @@ export abstract class PwInput<
     );
   }
 
-  protected override willUpdate(changedProperties: Map<PropertyKey, unknown>): void {
-    super.willUpdate(changedProperties);
-    if (this.resettable && changedProperties.has("initial")) {
-      // this is a "hack" so that rerendering with new initial data resets the resettable fields.
-
-      // the input value contains the value that is shown to the user
-      this.inputValue =
-        this.initial !== undefined ? this.get(this.initial) : this.defaultValue;
-
-      // in case this is an update set the value to undefined as it wasn't changed yet.
-      this.set(
-        this.pwForm.formData,
-
-        this.resettable
-          ? this.initial !== undefined
-            ? undefined
-            : this.defaultValue
-          : this.inputValue,
-      );
-    }
-  }
-
   override render() {
     if (this.label === undefined || this.task === undefined) {
       throw new Error(msg("component not fully initialized"));
-    }
-
-    if (!this.hasUpdated) {
-      // TODO FIXME updated from above
-      this.inputValue =
-        this.initial !== undefined ? this.get(this.initial) : this.defaultValue;
-
-      // in case this is an update set the value to undefined as it wasn't changed yet.
-      this.set(
-        this.pwForm.formData,
-
-        this.resettable
-          ? this.initial !== undefined
-            ? undefined
-            : this.defaultValue
-          : this.inputValue,
-      );
     }
 
     return html`
@@ -275,14 +196,6 @@ export abstract class PwInput<
           rows="6"
           type=${ifDefined(this.type !== "textarea" ? this.type : undefined)}
           name=${this.name}
-          .value=${ifDefined(
-            this.type !== "checkbox" && this.type !== "select"
-              ? live(this.inputValue ?? "")
-              : undefined,
-          )}
-          .checked=${ifDefined(
-            this.type === "checkbox" ? live(this.inputValue) : undefined,
-          )}
           class="${
             this.type === "checkbox" ? "form-check-input" : "form-control"
           } ${this.task.render({
@@ -300,13 +213,12 @@ export abstract class PwInput<
           aria-describedby="${this.randomId}-feedback"
           autocomplete=${ifDefined(this.autocomplete)}
           ?disabled=${
-            !this.enabled &&
-            (this.disabled ||
+            this.disabled ||
               this.task.render({
                 complete: () => false,
                 pending: () => true,
                 initial: () => false,
-              }))
+              })
           }
         >${
           this.type === "select" && this.options
@@ -315,7 +227,6 @@ export abstract class PwInput<
                 (o) => o.value,
                 (o) =>
                   html`<option
-                    .selected=${live(this.inputValue === o.value)}
                     .value=${o.value}
                   >
                     ${o.text}
@@ -334,43 +245,6 @@ export abstract class PwInput<
         ? html`<label for=${this.randomId} class="form-check-label"
             >${this.label}</label
           >`
-        : undefined
-    }
-    ${
-      this.resettable && !this.disabled
-        ? html`<button
-            @click=${() => {
-              this.inputValue =
-                this.initial !== undefined
-                  ? this.get(this.initial)
-                  : this.defaultValue;
-              this.set(
-                this.pwForm.formData,
-
-                this.initial !== undefined ? undefined : this.defaultValue,
-              );
-              this.requestUpdate();
-            }}
-            class="btn btn-outline-secondary"
-            type="button"
-          >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              width="16"
-              height="16"
-              fill="currentColor"
-              class="bi bi-arrow-counterclockwise"
-              viewBox="0 0 16 16"
-            >
-              <path
-                fill-rule="evenodd"
-                d="M8 3a5 5 0 1 1-4.546 2.914.5.5 0 0 0-.908-.417A6 6 0 1 0 8 2v1z"
-              />
-              <path
-                d="M8 4.466V.534a.25.25 0 0 0-.41-.192L5.23 2.308a.25.25 0 0 0 0 .384l2.36 1.966A.25.25 0 0 0 8 4.466z"
-              />
-            </svg>
-          </button>`
         : undefined
     }
         ${this.task.render({

@@ -25,7 +25,7 @@ import { PwElement } from "../pw-element.js";
 
 // workaround see https://github.com/runem/lit-analyzer/issues/149#issuecomment-1006162839
 export function pwImprint(
-  props: Record<string, never>, // Pick<PwImprint, never>
+  _props: Record<string, never>, // Pick<PwImprint, never>
 ) {
   return html`<pw-imprint></pw-imprint>`;
 }

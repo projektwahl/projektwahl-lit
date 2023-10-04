@@ -34,7 +34,7 @@ import { routes } from "../../../lib/routes.js";
 
 // workaround see https://github.com/runem/lit-analyzer/issues/149#issuecomment-1006162839
 export function pwLogin(
-  props: Record<string, never>, // Pick<PwLogin, never>
+  _props: Record<string, never>, // Pick<PwLogin, never>
 ) {
   return html`<pw-login></pw-login>`;
 }
