@@ -50,7 +50,7 @@ cd projektwahl-lit/
 npm i
 # generate tls certificate
 openssl req -x509 -newkey rsa:2048 -nodes -sha256 -subj '/CN=localhost' -keyout key.pem -out cert.pem
-#npm run localize-build
+npm run localize-build
 LANGUAGE=de npm run build
 
 sudo docker-compose up -d
