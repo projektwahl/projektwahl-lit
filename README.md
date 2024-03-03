@@ -44,11 +44,10 @@ To ensure data security you need two users to access the database. One privilege
 ## Setup
 
 ```bash
-sudo docker stop projektwahl-postgres
-sudo docker run --rm --name projektwahl-postgres -p 5432:5432 -v projektwahl-postgres:/var/lib/postgresql/data -e POSTGRES_PASSWORD=mysecretpassword -d docker.io/library/postgres:16.2
-
 git clone https://github.com/projektwahl/projektwahl-lit.git
 cd projektwahl-lit/
+
+sudo docker-compose up -d
 
 npm i
 # generate tls certificate

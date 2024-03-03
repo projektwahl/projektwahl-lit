@@ -7,7 +7,7 @@ services:
       target: backend
   # https://caddyserver.com/docs/running#docker-compose
   caddy:
-    image: caddy:<version>
+    image: caddy:2
     restart: unless-stopped
     ports:
       - "80:80"
@@ -19,15 +19,14 @@ services:
       - caddy_data:/data
       - caddy_config:/config
   postgres:
-    image: docker.io/library/postgres
-    restart: always
+    image: docker.io/library/postgres:16.2
+    ports:
+      - "5432:5432"
     environment:
       POSTGRES_PASSWORD: projektwahl
     volumes:
-      #      - db-data:/var/lib/postgresql
-      - ./src/server/setup.sql:/opt/projektwahl-lit/src/server/setup.sql
-      - ./setup-postgresql.sh:/docker-entrypoint-initdb.d/setup-postgresql.sh
+      - projektwahl-postgres:/var/lib/postgresql/data
 volumes:
-  db-data:
+  projektwahl-postgres:
   caddy_data:
   caddy_config:
