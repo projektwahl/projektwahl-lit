@@ -1,8 +1,22 @@
 version: "3.8"
 services:
+  backend:
+    image: docker.io/library/node:21
+    stop_grace_period: 1s
+    command: npm run server
+    working_dir: /app
+    ports:
+      - "8443:8443"
+    volumes:
+      - .:/app
+    environment:
+      PORT: "8443"
+      DATABASE_URL: postgres://projektwahl@postgres/projektwahl
+      BASE_URL: https://localhost
+      CREDENTIALS_DIRECTORY: /app
   # https://caddyserver.com/docs/running#docker-compose
   caddy:
-    image: caddy:2
+    image: docker.io/library/caddy:2
     restart: unless-stopped
     ports:
       - "80:80"

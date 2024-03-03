@@ -2,7 +2,12 @@ localhost {
     encode gzip
 
 	handle /api/* {
-		reverse_proxy localhost:8443
+        reverse_proxy backend:8443 {
+            transport http {
+                tls
+                tls_insecure_skip_verify
+            }
+        }
 	}
 
 	handle {
