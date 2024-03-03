@@ -66,7 +66,7 @@ exit
 
 psql postgres://projektwahl_production_admin:projektwahl@localhost/projektwahl_production --single-transaction < src/server/setup.sql
 
-NODE_ENV=production DATABASE_URL=postgres://projektwahl_staging:projektwahl@localhost/projektwahl_staging npm run setup
+NODE_ENV=production DATABASE_URL=postgres://projektwahl_production:projektwahl@localhost/projektwahl_production npm run setup
 
 
 
