@@ -22,6 +22,7 @@ SPDX-FileCopyrightText: 2021 Moritz Hedtke <Moritz.Hedtke@t-online.de>
 */
 import argon2 from "argon2";
 
+
 // we could also additionally do the PBKDF2 client side so no log leaks etc would be possible.
 
 // https://datatracker.ietf.org/doc/html/rfc9106#section-4
@@ -105,7 +106,7 @@ export async function checkPassword(
 ): Promise<[boolean, boolean, string]> {
   const needsRehash = argon2.needsRehash(hash, argon2Options);
   return [
-    await argon2.verify(hash, password, argon2Options),
+    await argon2.verify(hash, password),
     needsRehash,
     needsRehash ? await argon2.hash(password, argon2Options) : hash,
   ];
