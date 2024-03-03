@@ -41,11 +41,13 @@ export class PwImprint extends PwElement {
 
         <h2>Angaben gemäß § 5 TMG</h2>
         <address>
-          Moritz Hedtke<br />
-          Anne-Frank-Straße 10<br />
-          64354 Reinheim<br />
-          Telefon: +49 (0) 6162 2918<br />
-          E-Mail: Moritz.Hedtke@t-online.de
+          Vorname Nachname<br />
+          Straße Hausnummer<br />
+          Postleitzahl Stadt<br />
+          Telefon: <a href="tel:+499123456789">09123 456789</a><br />
+          E-Mail: <a href="mailto:E-Mail"
+            >E-Mail</a
+          >
         </address>
       </div>
     `;

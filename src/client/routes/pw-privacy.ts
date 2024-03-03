@@ -49,12 +49,12 @@ export class PwPrivacy extends PwElement {
         lauten:
 
         <address>
-          Moritz Hedtke<br />
-          Anne-Frank-Straße 10<br />
-          64354 Reinheim<br />
-          06162 2918<br />
-          <a href="mailto:Moritz.Hedtke@t-online.de"
-            >Moritz.Hedtke@t-online.de</a
+          Vorname Nachname<br />
+          Straße Hausnummer<br />
+          Postleitzahl Stadt<br />
+          Telefon: <a href="tel:+499123456789">09123 456789</a><br />
+          E-Mail: <a href="mailto:E-Mail"
+            >E-Mail</a
           >
         </address>
 
@@ -108,16 +108,12 @@ export class PwPrivacy extends PwElement {
         nicht bei Ihnen erhoben, sondern bei:
 
         <address>
-          <br />Albert-Einstein-Schule, vertreten durch<br />
-
-          Viktor Neufeld, StD<br />
-          Komm. Leitung (i.V.) der Albert-Einstein-Schule<br />
-          Albert-Einstein-Schule<br />
-          Hügelstraße 20<br />
-          64401 Groß-Bieberau<br />
-          Tel. 06162/9313-0<br />
-          <a href="mailto:aes_gross-bieberau@schulen.ladadi.de"
-            >aes_gross-bieberau@schulen.ladadi.de</a
+          Vorname Nachname<br />
+          Straße Hausnummer<br />
+          Postleitzahl Stadt<br />
+          Telefon: <a href="tel:+499123456789">09123 456789</a><br />
+          E-Mail: <a href="mailto:E-Mail"
+            >E-Mail</a
           >
         </address>
 
@@ -251,7 +247,7 @@ export class PwPrivacy extends PwElement {
           personenbezogener Daten zu widersprechen.</strong
         ><br />
         Mit dem Serverhoster
-        <a href="https://www.hetzner.com/de/">Hetzner</a> wurde ein
+        XYZ wurde ein
         Auftragsverarbeitungsvertrag nach
         <a
           href="https://eur-lex.europa.eu/legal-content/DE/TXT/HTML/?uri=CELEX:32016R0679&from=DE#d1e3162-1-1"
@@ -283,8 +279,7 @@ export class PwPrivacy extends PwElement {
 
             <ul>
               <li>
-                Sie werden auf einem Server in der
-                <a href="https://www.hetzner.com/de/">Hetzner</a> Cloud in
+                Sie werden auf einem Server bei XYZ in
                 Deutschland gespeichert und ein Auftragsverarbeitungsvertrag
                 wurde abgeschlossen.
               </li>
@@ -329,8 +324,7 @@ export class PwPrivacy extends PwElement {
               </li>
 
               <li>
-                Nur Moritz Hedtke (und der Serverhoster
-                <a href="https://www.hetzner.com/de/">Hetzner</a>) haben
+                Nur XYZ (und der Serverhoster) haben
                 direkten Zugriff auf den Server.
               </li>
             </ul>

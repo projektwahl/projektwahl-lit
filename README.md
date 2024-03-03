@@ -69,7 +69,12 @@ OPENID_URL=https://login.microsoftonline.com/tenant-id/v2.0
 CLIENT_ID=client-id
 openid_client_secret
 
-PORT=8443 BASE_URL=https://localhost:8443 DATABASE_URL=postgres://projektwahl@projektwahl/projektwahl CREDENTIALS_DIRECTORY=$PWD npm run server
+
+login as
+admin
+changeme
+
+change the password
 
 ```
 
