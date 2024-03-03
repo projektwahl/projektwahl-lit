@@ -51,10 +51,8 @@ git clone https://github.com/projektwahl/projektwahl-lit.git
 cd projektwahl-lit/
 
 npm i
-#touch key.pem cert.pem
-#chown projektwahl_staging key.pem cert.pem
-#sudo -u projektwahl_staging openssl req -x509 -newkey rsa:2048 -nodes -sha256 -subj '/CN=localhost' -keyout key.pem -out cert.pem
-#npx @mapbox/node-pre-gyp rebuild -C ./node_modules/argon2
+# generate tls certificate
+openssl req -x509 -newkey rsa:2048 -nodes -sha256 -subj '/CN=localhost' -keyout key.pem -out cert.pem
 #npm run localize-build
 LANGUAGE=de npm run build
 

@@ -245,5 +245,10 @@ export async function serverHandler(
         });
         response.end();
     }
+  } else {
+    response.writeHead(404, {
+      ...defaultHeaders,
+    });
+    response.end();
   }
 }
