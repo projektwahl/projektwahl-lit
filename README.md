@@ -47,15 +47,15 @@ To ensure data security you need two users to access the database. One privilege
 git clone https://github.com/projektwahl/projektwahl-lit.git
 cd projektwahl-lit/
 
-sudo docker-compose up -d
-
 npm i
 # generate tls certificate
 openssl req -x509 -newkey rsa:2048 -nodes -sha256 -subj '/CN=localhost' -keyout key.pem -out cert.pem
 #npm run localize-build
 LANGUAGE=de npm run build
 
-psql postgres://postgres:mysecretpassword@localhost
+sudo docker-compose up -d
+
+psql postgres://postgres:projektwahl@localhost
 CREATE ROLE projektwahl_production LOGIN PASSWORD 'projektwahl'; -- CHANGE/REMOVE THIS PASSWORD
 CREATE ROLE projektwahl_production_admin IN ROLE projektwahl_production LOGIN PASSWORD 'projektwahl'; -- CHANGE/REMOVE THIS PASSWORD
 CREATE DATABASE projektwahl_production OWNER projektwahl_production_admin;
