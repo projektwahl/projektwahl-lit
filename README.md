@@ -66,7 +66,9 @@ psql postgres://projektwahl_production_admin:projektwahl@localhost/projektwahl_p
 
 NODE_ENV=production DATABASE_URL=postgres://projektwahl_production:projektwahl@localhost/projektwahl_production npm run setup
 
-
+OPENID_URL=https://login.microsoftonline.com/tenant-id/v2.0
+CLIENT_ID=client-id
+openid_client_secret
 
 PORT=8443 BASE_URL=https://localhost:8443 DATABASE_URL=postgres://projektwahl@projektwahl/projektwahl CREDENTIALS_DIRECTORY=$PWD npm run server
 
