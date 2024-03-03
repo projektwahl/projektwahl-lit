@@ -7,7 +7,9 @@ export default defineConfig({
     basicSsl()
   ],
   server: {
-    https: true,
+    https: {
+      
+    },
     proxy: {
       '/api': {
         target: 'https://localhost:8443',
