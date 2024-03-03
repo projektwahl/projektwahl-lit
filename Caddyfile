@@ -1,6 +1,13 @@
 localhost {
-    # https://caddyserver.com/docs/caddyfile/patterns#single-page-apps-spas
-    try_files {path} /index.html
-    file_server
-    reverse_proxy /api/* localhost:8443
+    encode gzip
+
+	handle /api/* {
+		reverse_proxy localhost:8443
+	}
+
+	handle {
+		root * /srv
+		try_files {path} /index.html
+		file_server
+	}
 }
