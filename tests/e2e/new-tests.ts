@@ -379,7 +379,7 @@ async function runTest(
         "--disable-dev-shm-usage"
       )
     );
-    builder.setFirefoxOptions(new firefox.Options().headless());
+    builder.setFirefoxOptions(new firefox.Options().addArguments("--headless"));
   }
 
   const driver = builder.build();

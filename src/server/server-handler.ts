@@ -20,23 +20,19 @@ https://github.com/projektwahl/projektwahl-lit
 SPDX-License-Identifier: AGPL-3.0-or-later
 SPDX-FileCopyrightText: 2021 Moritz Hedtke <Moritz.Hedtke@t-online.de>
 */
-import { readdir, readFile, watch } from "node:fs/promises";
-import { join, resolve } from "node:path";
-import { fileURLToPath, pathToFileURL } from "node:url";
+import { readdir } from "node:fs/promises";
+import {  resolve } from "node:path";
 import { loginHandler } from "./routes/login/index.js";
 import { createOrUpdateUsersHandler } from "./routes/users/create-or-update.js";
 import { usersHandler } from "./routes/users/index.js";
 import { openidLoginHandler } from "./routes/login/openid-login.js";
 import { openidRedirectHandler } from "./routes/login/redirect.js";
-import { extname, relative } from "path/posix";
 import {
   createProjectsHandler,
   updateProjectsHandler,
 } from "./routes/projects/create-or-update.js";
-import { cwd } from "node:process";
 import { projectsHandler } from "./routes/projects/index.js";
 import { logoutHandler } from "./routes/login/logout.js";
-import { pipeline, Readable } from "node:stream";
 import type { Http2ServerResponse } from "node:http2";
 import type { MyRequest } from "./express.js";
 import { choicesHandler } from "./routes/choices/index.js";
@@ -245,5 +241,10 @@ export async function serverHandler(
         });
         response.end();
     }
+  } else {
+    response.writeHead(404, {
+      ...defaultHeaders,
+    });
+    response.end();
   }
 }

@@ -30,7 +30,6 @@ jobs:
       - run: ls -R /opt/hostedtoolcache/node/
       - run: npm ci
       - run: npm run format:check
-      - run: npx @mapbox/node-pre-gyp rebuild -C ./node_modules/argon2
       - run: LANGUAGE=de npm run build
       - run: npm run typecheck
       - run: npm run lint

@@ -64,6 +64,7 @@ export const parseRequestWithPrefix = <
   url: URL,
   defaultValue: z.infer<typeof entityRoutes[P]["request"]>
 ): parseRequestWithPrefixType<PREFIX>[P] => {
+  // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
   const schema = z
     .object({})
     // @ts-expect-error wrong typings I assume

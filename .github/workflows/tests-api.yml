@@ -42,7 +42,6 @@ jobs:
           node-version: ${{ matrix.node-version }}
           cache: "npm"
       - run: npm ci
-      - run: npx @mapbox/node-pre-gyp rebuild -C ./node_modules/argon2
       - run: LANGUAGE=de npm run build
       - run: openssl req -x509 -newkey rsa:2048 -nodes -sha256 -subj '/CN=localhost' -keyout key.pem -out cert.pem
       - run: |

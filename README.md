@@ -32,9 +32,9 @@ This software is licensed under the GNU Affero General Public License v3.0 or an
 ## Requirements
 
 - **Remove/Adapt https://github.com/projektwahl/projektwahl-lit/blob/main/src/client/routes/pw-privacy.ts and https://github.com/projektwahl/projektwahl-lit/blob/main/src/client/routes/pw-imprint.ts**
-- Node 19+
+- Node 21 (tested version)
 - npm
-- Postgresql database **15+**
+- Postgresql database 16.2 (tested version)
 - OpenID credentials (optional)
 
 ## Important notes
@@ -44,41 +44,37 @@ To ensure data security you need two users to access the database. One privilege
 ## Setup
 
 ```bash
-sudo useradd -m projektwahl_staging
-sudo useradd -m projektwahl_staging_admin
-
 git clone https://github.com/projektwahl/projektwahl-lit.git
 cd projektwahl-lit/
 
-# this is important as our optional dependencies are not audited in comparison to the other dependencies
-npm ci
-touch key.pem cert.pem
-chown projektwahl_staging key.pem cert.pem
-sudo -u projektwahl_staging openssl req -x509 -newkey rsa:2048 -nodes -sha256 -subj '/CN=localhost' -keyout key.pem -out cert.pem
-npx @mapbox/node-pre-gyp rebuild -C ./node_modules/argon2
+npm i
+# generate tls certificate
+openssl req -x509 -newkey rsa:2048 -nodes -sha256 -subj '/CN=localhost' -keyout key.pem -out cert.pem
 npm run localize-build
 LANGUAGE=de npm run build
 
+sudo docker-compose up -d
 
-sudo -u postgres psql
-CREATE ROLE projektwahl SUPERUSER LOGIN PASSWORD 'projektwahl'; -- CHANGE/REMOVE THIS PASSWORD
+psql postgres://postgres:projektwahl@localhost
+CREATE ROLE projektwahl_production LOGIN PASSWORD 'projektwahl'; -- CHANGE/REMOVE THIS PASSWORD
+CREATE ROLE projektwahl_production_admin IN ROLE projektwahl_production LOGIN PASSWORD 'projektwahl'; -- CHANGE/REMOVE THIS PASSWORD
+CREATE DATABASE projektwahl_production OWNER projektwahl_production_admin;
+exit
 
-CREATE ROLE projektwahl_staging LOGIN PASSWORD 'projektwahl'; -- CHANGE/REMOVE THIS PASSWORD
-CREATE ROLE projektwahl_staging_admin IN ROLE projektwahl_staging LOGIN PASSWORD 'projektwahl'; -- CHANGE/REMOVE THIS PASSWORD
-CREATE DATABASE projektwahl_staging OWNER projektwahl_staging_admin;
+psql postgres://projektwahl_production_admin:projektwahl@localhost/projektwahl_production --single-transaction < src/server/setup.sql
 
-psql postgres://projektwahl_staging_admin:projektwahl@localhost/projektwahl_staging --single-transaction < src/server/setup.sql
+NODE_ENV=production DATABASE_URL=postgres://projektwahl_production:projektwahl@localhost/projektwahl_production npm run setup
 
-sudo -u postgres psql --db projektwahl_staging
-REVOKE CREATE ON SCHEMA public FROM PUBLIC;
-GRANT CREATE ON SCHEMA public To projektwahl_staging_admin;
-
-
-NODE_ENV=development DATABASE_HOST=/run/postgresql DATABASE_URL=postgres://projektwahl_staging:projektwahl@localhost/projektwahl_staging npm run setup
-
+OPENID_URL=https://login.microsoftonline.com/tenant-id/v2.0
+CLIENT_ID=client-id
+openid_client_secret
 
 
-PORT=8443 BASE_URL=https://localhost:8443 DATABASE_URL=postgres://projektwahl@projektwahl/projektwahl CREDENTIALS_DIRECTORY=$PWD npm run server
+login as
+admin
+changeme
+
+change the password
 
 ```
 
@@ -90,49 +86,6 @@ ln -s $PWD/pre-commit .git/hooks/pre-commit
 NODE_ENV=development PORT=8443 BASE_URL=https://localhost:8443 CREDENTIALS_DIRECTORY=$PWD DATABASE_HOST=localhost DATABASE_URL=postgres://projektwahl_staging:projektwahl@localhost/projektwahl_staging npm run server
 ```
 
-## Debugging
-
-```bash
-NODE_ENV=debugging PORT=8443 BASE_URL=https://localhost:8443 CREDENTIALS_DIRECTORY=$PWD DATABASE_HOST=localhost DATABASE_URL=postgres://projektwahl_staging:projektwahl@localhost/projektwahl_staging node --inspect --conditions=development --experimental-loader ./src/loader.js --enable-source-maps --experimental-import-meta-resolve ./src/server/index.ts
-```
-
-## Testing
-
-```
-NODE_ENV=testing PORT=8443 BASE_URL=https://localhost:8443 CREDENTIALS_DIRECTORY=$PWD DATABASE_HOST=localhost DATABASE_URL=postgres://projektwahl_staging:projektwahl@localhost/projektwahl_staging npm run server
-
-psql --u postgres --command="DROP DATABASE projektwahl_staging;"
-psql --u postgres --command="CREATE DATABASE projektwahl_staging OWNER projektwahl_staging_admin;"
-psql postgres://projektwahl_staging_admin:projektwahl@localhost/projektwahl_staging --single-transaction < src/server/setup.sql
-psql postgres://projektwahl_staging_admin:projektwahl@localhost/projektwahl_staging --command="UPDATE settings SET open_date = CURRENT_TIMESTAMP + (- '1 minute'::interval), voting_start_date = CURRENT_TIMESTAMP, voting_end_date = CURRENT_TIMESTAMP + '1 hour', results_date = CURRENT_TIMESTAMP + '2 hours';"
-NODE_ENV=development DATABASE_HOST=localhost DATABASE_URL=postgres://projektwahl_staging:projektwahl@localhost/projektwahl_staging npm run setup
-
-NODE_ENV=testing PORT=8443 BASE_URL=https://localhost:8443 CREDENTIALS_DIRECTORY=$PWD DATABASE_HOST=localhost DATABASE_URL=postgres://projektwahl_staging_admin:projektwahl@localhost/projektwahl_staging npm run test:firefox 1
-
-NODE_ENV=testing PORT=8443 BASE_URL=https://localhost:8443 CREDENTIALS_DIRECTORY=$PWD DATABASE_HOST=localhost DATABASE_URL=postgres://projektwahl_staging_admin:projektwahl@localhost/projektwahl_staging npm run test-api
-```
-
-## Coverage
-
-```
-
-rm -Rf dist coverage && LANGUAGE=en npm run build && NODE_ENV=coverage PORT=8443 BASE_URL=https://localhost CREDENTIALS_DIRECTORY=$PWD DATABASE_HOST=localhost DATABASE_URL=postgres://projektwahl_staging:projektwahl@localhost/projektwahl_staging NODE_V8_COVERAGE=coverage node dist/server-testing.js
-
-NODE_ENV=testing BASE_URL=https://localhost:8443 CREDENTIALS_DIRECTORY=$PWD DATABASE_HOST=localhost DATABASE_URL=postgres://projektwahl_staging_admin:projektwahl@localhost/projektwahl_staging npm run test:firefox 1
-
-LANGUAGE=en npm run build && NODE_ENV=coverage PORT=8443 BASE_URL=https://localhost:8443 CREDENTIALS_DIRECTORY=$PWD DATABASE_HOST=localhost DATABASE_URL=postgres://projektwahl_staging_admin:projektwahl@localhost/projektwahl_staging NODE_V8_COVERAGE=coverage node dist/api-tests.js
-
-npx c8 report --exclude-after-remap --temp-directory=coverage --reporter=html && firefox coverage/index.html
-```
-
-## Database access
-
-```
-psql postgres://projektwahl_staging_admin:projektwahl@localhost/projektwahl_staging
-
-# sudo tail -f /var/lib/postgresql/15/log/postgresql-2022-03-31_201007.log
-```
-
 ## Security
 
 See [SECURITY.md](SECURITY.md)
@@ -140,8 +93,6 @@ See [SECURITY.md](SECURITY.md)
 ## Translation
 
 Currently https://github.com/vslavik/poedit.
-
-Maybe https://github.com/mozilla/pontoon/ at some point.
 
 ## Browser support
 

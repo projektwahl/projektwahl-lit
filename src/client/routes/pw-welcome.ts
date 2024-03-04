@@ -339,15 +339,7 @@ export class PwWelcome extends PwElement {
             })
           : ``}
 
-        <h1 class="text-center">Projektwoche AES 3.0 18.-21. Juli 2022</h1>
-
-        <h2 class="text-center">Montag bis Mittwoch: Projekttage</h2>
-        <h2 class="text-center">Donnerstag: großes AES - Festival</h2>
-        <p>
-          Voice-Aid Schulkonzert, Flashmop (Musik, Tanz, Kreativität,
-          Kleiderbasar, Vorbereitung Präsentationen), Sommerfest mit Eltern und
-          Ausstellung der Ergebnisse der Projekttage
-        </p>
+        <h1 class="text-center">Projektwoche</h1>
 
         ${this.userController.type === "helper"
           ? html`<p>
